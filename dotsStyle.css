@@ -1,0 +1,65 @@
+/*css stylesheet file for buttons
+  and button groups in dotsQt.py*/
+
+QPushButton { 
+  background: white;
+  color: black;
+  font-size: 13px;
+  border: 1px solid rgb(180, 174, 238);
+  border-radius: 3px;
+  padding: 2px 2px 2px 2px;
+} 
+ 
+QPushButton:Pressed {
+  background: rgb(47,123,222);
+  color:white;
+  border: 1px solid white;
+}
+
+QPushButton:Disabled {
+  background: rgb(220,220,220);
+  color:dimgrey;
+  border: 1px solid rgb(120,120,120);
+} 
+
+QMessageBox QPushButton {
+  background: rgb(38, 168, 228);
+  color: white;
+  border: 1px solid rgb(200,200,200);
+  font-size: 13px;
+  border-radius: 3px;
+  padding: 3px 12px 3px 12px;
+}
+
+QGroupBox {
+  background: rgb(195, 195, 195);
+  border: 1px solid rgb(100,100,100);
+  border-radius: 3px;
+  font-size: 14px;
+  margin-top: 5px;
+} 
+   
+QGroupBox:title {
+  subcontrol-origin: margin;
+  subcontrol-position: top center;
+  padding: -5px 3px 2px 3px;  
+} 
+
+QScrollArea:vertical {
+  background-color:light grey;
+  border: .5px solid rgb(120,120,120);
+}
+
+QScrollBar:add-line:vertical {
+  border: 1px solid  rgb(240, 240, 240);
+}
+
+QScrollBar:handle:vertical {
+  background-color: rgb(210, 210, 210);
+  min-height: 100px;
+} 
+
+QHeaderView:section {
+  background-color: lightgray;
+  border: .5px solid rgb(190,190,190);
+}
