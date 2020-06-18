@@ -28,15 +28,10 @@ class Shared():
         # self.viewW = 960  ## canvas width
         # self.viewH = 640   ## canvas height
 
-        # self.snapShot = "./" 
-        # self.bkgPath = "./backgrounds/" 
-        # self.imagePath = "./images/"
-        # self.spritePath = "./sprites/"
-
-        self.snapShot = "/users/melt/Desktop/"    
-        self.bkgPath = "/users/melt/python/qt5/wrks/backgrounds/"
-        self.imagePath = "/users/melt/python/qt5/wrks/images/"
-        self.spritePath = "/users/melt/python/qt5/wrks/sprites/"
+        self.snapShot = "./" 
+        self.bkgPath = "./backgrounds/" 
+        self.imagePath = "./images/"
+        self.spritePath = "./sprites/"
             
 ### --------------------------------------------------------
 class DotsQt(QWidget):
