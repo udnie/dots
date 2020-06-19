@@ -160,10 +160,10 @@ class InitBkg(QWidget):
         if self.parent.hasBackGround() > 0 or len(self.parent.scene.items()) > 0:    
             self.parent.unSelect()
             pix = self.parent.view.grab(QRect(QPoint(0,0), QSize(-1,-1)))
-            snap = "dots_" + snapTag() + ".png"
+            snap = "dots_" + snapTag() + ".jpg"
             pix.save(self.shared.snapShot + snap, 
-                format='png', 
-                quality=100)
+                format='jpg', 
+                quality=90)
             MsgBox("Saved as " + snap)
    
     def lockBkg(self):
