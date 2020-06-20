@@ -2,6 +2,9 @@ import os
 import sys
 import random
 
+import os.path
+from os import path
+
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -20,6 +23,7 @@ class BkgItem(QGraphicsPixmapItem):
         
         self.parent = parent
         self.filename = imgFile
+
         img = QImage(imgFile)
 
         self.imgFile = img.scaled(viewW, viewH, 
@@ -97,6 +101,7 @@ class InitBkg(QWidget):
          
         self.parent = parent
         self.shared = dotsQt.Shared() 
+
         self.sliders = self.parent.sliders
         self.buttons = self.parent.buttons
         
@@ -128,44 +133,19 @@ class InitBkg(QWidget):
                 self.shared.viewH,
                 self.parent)
             self.parent.scene.addItem(self.bkg)
-            if '-bkg.png' in file:
+            if '-bkg.jpg' in file:
                 self.lockBkg()
             else:
-                self.sliders.enableSliders(True)
-                self.buttons.btnSetBkg.setEnabled(True)
-                self.buttons.btnSave.setEnabled(True)
+                self.enableSave(True)
                 dotsQt.setCursor
                 
     def setBackground(self):
         if self.bkg.isBackgroundSet == False and self.bkg.key != 'lock':
             self.lockBkg()
         else:
+            self.enableSave(False)
             MsgBox("Already set to background") 
 
-    def saveBkg(self):
-        if self.buttons.btnSave.isEnabled() and self.bkg.isBackgroundSet:
-            if  '-bkg.png' not in self.bkg.filename:
-                file = os.path.basename(self.bkg.filename)
-                file = file[0: file.index('.')]
-                file = file[-15:] + "-bkg.png"
-                pix = self.parent.view.grab(QRect(QPoint(-1,-1), QSize()))
-                pix.save(self.shared.imagePath + file, 
-                    format='png', 
-                    quality=100)
-                MsgBox("Saved as " + file)
-            else:
-                MsgBox("Already saved as background png")
-
-    def snapShot(self):        
-        if self.parent.hasBackGround() > 0 or len(self.parent.scene.items()) > 0:    
-            self.parent.unSelect()
-            pix = self.parent.view.grab(QRect(QPoint(0,0), QSize(-1,-1)))
-            snap = "dots_" + snapTag() + ".jpg"
-            pix.save(self.shared.snapShot + snap, 
-                format='jpg', 
-                quality=90)
-            MsgBox("Saved as " + snap)
-   
     def lockBkg(self):
         self.sliders.enableSliders(False)
         self.mapKeys("lock", 0)  ## 0 is a place holder
@@ -176,6 +156,38 @@ class InitBkg(QWidget):
         self.bkg.setZValue(bkgZ)
         self.bkg.isBackgroundSet = True
         MsgBox("Set to background")
+        
+    def saveBkg(self):
+        if self.buttons.btnSave.isEnabled() and self.bkg.isBackgroundSet:
+            file = os.path.basename(self.bkg.filename)
+            file = file[0: file.index('.')]
+            file = file[-15:] + "-bkg.jpg"
+            ## if it's not already a bkg file and the new file doesn't exist
+            if self.bkg.filename.count("-bkg.jpg") == 0 and not \
+                path.exists(self.shared.bkgPath + file):
+                pix = self.parent.view.grab(QRect(QPoint(-1,-1), QSize()))
+                pix.save(self.shared.bkgPath + file, 
+                    format='jpg', 
+                    quality=100)
+                MsgBox("Saved as " + file)
+            else:
+                MsgBox("Already saved as background jpg")
+            self.enableSave(False)
+         
+    def snapShot(self):        
+        if self.parent.hasBackGround() > 0 or len(self.parent.scene.items()) > 0:    
+            self.parent.unSelect()  ## turn off any select borders
+            pix = self.parent.view.grab(QRect(QPoint(0,0), QSize(-1,-1)))
+            snap = "dots_" + snapTag() + ".jpg"
+            pix.save(self.shared.snapShot + snap, 
+                format='jpg', 
+                quality=90)
+            MsgBox("Saved as " + snap)
+   
+    def enableSave(self, bool):
+        self.sliders.enableSliders(bool)
+        self.buttons.btnSetBkg.setEnabled(bool)
+        self.buttons.btnSave.setEnabled(bool)
 
 ### --------------------------------------------------------
 class MsgBox(QMessageBox):  ## another stackoverflow solution
