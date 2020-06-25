@@ -47,7 +47,6 @@ class DropCanvas(QMainWindow):
 
         self.key = ''
         self.pixCount = 0
-        self.selections = []
       
         self.origin = QPoint(0,0)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
@@ -66,7 +65,7 @@ class DropCanvas(QMainWindow):
             self.sendPixKeys()
             # pub.sendMessage('setKeys', key=key)  ## pypubsub solution
             # if self.mapSet: ## already in sendPixKeys
-            #     self.initMap.updateMap()
+            #     self.initMap.updateMap()  ## redraw mapper
   
     def eventFilter(self, source, e): ## mostly handles mapping selections
         if source is self.view.viewport():
@@ -77,7 +76,7 @@ class DropCanvas(QMainWindow):
                     self.unSelect()
                     self.origin = QPoint(e.pos())
                     self.rubberBand.show()
-                elif self.isHidden() and len(self.selections) > 0:
+                elif self.hasHiddenPix() and len(self.initMap.selections) > 0:
                     self.initMap.updatePixItemPos()
             elif e.type() == QEvent.MouseMove:
                 if self.key == 'draw' and self.origin != QPoint(0,0):
@@ -93,13 +92,15 @@ class DropCanvas(QMainWindow):
                     self.initMap.addMapSelections()
                 elif self.mapSet and self.key == 'draw':
                     self.setKeys('')
-                elif self.isHidden() and self.key != 'draw':
+                elif self.hasHiddenPix() and self.key != 'draw':
+                    self.initMap.removeMap()
+                elif self.mapSet and len(self.scene.selectedItems()) == 0:
                     self.initMap.removeMap()
             elif e.type() == QEvent.MouseButtonDblClick and self.key != 'draw':
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
-                if len(self.selections) > 0 or self.isHidden():
+                if len(self.initMap.selections) > 0 or self.hasHiddenPix():
                     if self.mapSet:
                         self.initMap.removeMap()
                         self.setKeys('noMap')
@@ -137,12 +138,6 @@ class DropCanvas(QMainWindow):
         self.sliders.enableSliders(False)
         self.buttons.btnSetBkg.setEnabled(False)
         self.buttons.btnSave.setEnabled(False)
-
-    def isHidden(self):
-        for pix in self.scene.items():
-            if pix.zValue() > pixZ and pix.type == 'pix':
-                if pix.isHidden: return True
-        return False
  
     def selectAll(self):
         for pix in self.scene.items():
@@ -207,6 +202,12 @@ class DropCanvas(QMainWindow):
                 break
         return k
 
+    def hasHiddenPix(self):
+        for pix in self.scene.items():
+            if pix.zValue() > pixZ and pix.type == 'pix':
+                if pix.isHidden: return True  ## found one
+        return False
+
     ## added dlbclk if hidden to re-select ##
     def hideSelected(self): 
         for pix in self.scene.items():
@@ -217,7 +218,7 @@ class DropCanvas(QMainWindow):
                 elif pix.isHidden:
                     pix.setSelected(True)
                     pix.isHidden = False
-        if self.mapSet and self.isHidden():        
+        if self.mapSet and self.hasHiddenPix():        
             self.initMap.removeMap()
         
 ### --------------------------------------------------------

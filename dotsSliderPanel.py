@@ -19,10 +19,10 @@ class SliderPanel(QWidget):
         self.isEnabled = False
 
         layout = QVBoxLayout(self)
-        layout.addWidget(self.addTableGroup())       
+        
+        layout.addWidget(self.addTableGroup())     
         layout.addWidget(self.addSliderGroup())
 
-        layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
 
 ### -----------------------------------------------------
@@ -32,7 +32,7 @@ class SliderPanel(QWidget):
         self.scaleSldr.setValue(100)
         self.opacitySldr.setValue(100)
         self.sliderGroup.setEnabled(key)
-     
+
 ### -----------------------------------------------------
     def addTableGroup(self):
         self.tableGroup = QGroupBox("")

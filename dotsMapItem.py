@@ -47,27 +47,29 @@ class InitMap(QWidget):
          
         self.parent = parent
         self.mapRect = None
-        self.shared = dotsQt.Shared()      
+        self.shared = dotsQt.Shared()  
+
+        self.selections = []  
 
 ### --------------------------------------------------------      
     def mapSelectedItems(self):      ## toggles map on/off
         if self.parent.mapSet == False:
-            self.parent.selections = []
+            self.selections = []
             for pix in self.parent.scene.selectedItems():
-                self.parent.selections.append(pix.id)
-            if len(self.parent.selections) > 0:
+                self.selections.append(pix.id)
+            if len(self.selections) > 0:
                 self.addMapItem()
         else:
             self.removeMap()
-   
+     
     def addMapSelections(self):
-        if len(self.parent.selections) == 0:
+        if len(self.selections) == 0:
             self.mapSelections()
-        if len(self.parent.selections) > 0: 
+        if len(self.selections) > 0: 
             self.addMapItem()
     
     def mapSelections(self):
-        self.parent.selections = []
+        self.selections = []
         rect = QRect(self.parent.rubberBand.geometry())
         for pix in self.parent.scene.items():
             if pix.zValue() > -5.0 and pix.type == 'pix':
@@ -76,8 +78,8 @@ class InitMap(QWidget):
                 y = int(p.y() + p.height()/2)
                 if rect.contains(x, y):
                     pix.setSelected(True)
-                    self.parent.selections.append(pix.id)
-        return len(self.parent.selections)
+                    self.selections.append(pix.id)
+        return len(self.selections)
 
     def addMapItem(self):
         self.removeMapItem()
@@ -95,7 +97,7 @@ class InitMap(QWidget):
         self.removeMapItem()  
         self.origin = QPoint(0,0) 
         self.mapRect = None
-        self.parent.selections = []
+        self.selections = []
         self.parent.mapSet = False               
         self.parent.rubberBand.setGeometry(QRect(self.origin, QSize()))
 
@@ -113,7 +115,7 @@ class InitMap(QWidget):
         bx, by = 0, 0
         for pix in self.parent.scene.items():
             if pix.zValue() > -5.0 and pix.type == 'pix':
-                if pix.id in self.parent.selections:
+                if pix.id in self.selections:
                     p = pix.sceneBoundingRect()
                     x, y, w, h = p.x(), p.y(), p.width(), p.height()
                     if x < tx:
@@ -129,7 +131,7 @@ class InitMap(QWidget):
     def updatePixItemPos(self):   
         for pix in self.parent.scene.items():
             if pix.zValue() > -5.0 and pix.type == 'pix':
-                if pix.id in self.parent.selections:
+                if pix.id in self.selections:
                     p = pix.pos()
                     pix.x = int(p.x())
                     pix.y = int(p.y())

@@ -38,7 +38,7 @@ QGroupBox {
   font-size: 14px;
   margin-top: 5px;
 } 
-   
+
 QGroupBox:title {
   subcontrol-origin: margin;
   subcontrol-position: top center;

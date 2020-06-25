@@ -155,6 +155,7 @@ class InitBkg(QWidget):
                     itm.setZValue(self.parent.lastZval('bkg')-1)
         self.bkg.setZValue(bkgZ)
         self.bkg.isBackgroundSet = True
+        self.enableSave(False)
         MsgBox("Set to background")
         
     def saveBkg(self):
@@ -163,7 +164,7 @@ class InitBkg(QWidget):
             file = file[0: file.index('.')]
             file = file[-15:] + "-bkg.jpg"
             ## if it's not already a bkg file and the new file doesn't exist
-            if self.bkg.filename.count("-bkg.jpg") == 0 and not \
+            if not self.bkg.filename.lower().endswith("-bkg.jpg") and not \
                 path.exists(self.shared.bkgPath + file):
                 pix = self.parent.view.grab(QRect(QPoint(-1,-1), QSize()))
                 pix.save(self.shared.bkgPath + file, 

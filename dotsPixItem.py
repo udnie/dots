@@ -2,9 +2,11 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
+import dotsQt
+
 # from pubsub  import pub      # PyPubSub - required
 
-import dotsQt
+incZ = .011  # increment zValue 
 
 ### --------------------- dotsPixItem ----------------------
 class PixItem(QGraphicsPixmapItem):
@@ -86,7 +88,7 @@ class PixItem(QGraphicsPixmapItem):
         if  self.key == 'draw':  # to back
             self.setZValue(self.parent.lastZval('pix')-.01)
         else:                    # to front
-            self.setZValue(self.parent.toFront(.011))
+            self.setZValue(self.parent.toFront(incZ))
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -142,7 +144,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
-            self.setZValue(self.parent.toFront(.011))
+            self.setZValue(self.parent.toFront(incZ))
         e.accept()
 
     def moveThis(self, key):

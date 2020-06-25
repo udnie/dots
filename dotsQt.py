@@ -84,9 +84,9 @@ class DotsQt(QWidget):
         # layout.addLayout(vbox)
         ## uncomment for 640 height
 
-        # comment this out for 640
+        ## comment this out for 640
         layout.addWidget(self.canvas, Qt.AlignVCenter)  
-        # comment this out for 640
+        ## comment this out for 640
 
         layout.addWidget(self.sliders)
   

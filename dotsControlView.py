@@ -82,7 +82,6 @@ class ControlView(QGraphicsView):
 ### -------------------------------------------------------
     ## Location I found that works best for reading keys
     ## especially the arrow keys
-
     def keyPressEvent(self, e):
         key = e.key()  
         if key == Qt.Key_A:
@@ -99,8 +98,8 @@ class ControlView(QGraphicsView):
             self.parent.initMap.mapSelectedItems()
         elif key == Qt.Key_U:
             self.parent.unSelect()
-        elif key == Qt.Key_Z:   
-            self.parent.ZDump()
+        # elif key == Qt.Key_Z:   
+        #     self.parent.ZDump()
         elif key == Qt.Key_Left:
             self.setKey('left')
         elif key == Qt.Key_Right:
