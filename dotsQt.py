@@ -152,17 +152,17 @@ class Buttons(QWidget):
         self.backgroundGroup = QGroupBox("Background")
         self.backgroundGroup.setFixedWidth(300)
 
-        btnBkgFiles = QPushButton("Files")
+        self.btnBkgFiles = QPushButton("Files")
         self.btnSetBkg = QPushButton(" Set Background ")      
         self.btnSave = QPushButton("Save")
 
         layout = QHBoxLayout()    
   
-        layout.addWidget(btnBkgFiles) 
+        layout.addWidget(self.btnBkgFiles) 
         layout.addWidget(self.btnSetBkg) 
         layout.addWidget(self.btnSave) 
 
-        btnBkgFiles.clicked.connect(self.parent.canvas.initBkg.bkgfiles)       
+        self.btnBkgFiles.clicked.connect(self.parent.canvas.initBkg.bkgfiles)       
         self.btnSetBkg.clicked.connect(self.parent.canvas.initBkg.setBackground)
         self.btnSave.clicked.connect(self.parent.canvas.initBkg.saveBkg)
 

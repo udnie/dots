@@ -54,6 +54,7 @@ class BkgItem(QGraphicsPixmapItem):
         if self.parent.key == 'shift':          # delete it
             self.parent.scene.removeItem(self)
             self.parent.disableSliders()
+            self.parent.buttons.btnBkgFiles.setEnabled(True)
         elif self.parent.key == 'draw' and self.isBackgroundSet == False \
             and self.key != 'lock':             # flop it
             if self.flopped == False:
@@ -135,7 +136,8 @@ class InitBkg(QWidget):
             self.parent.scene.addItem(self.bkg)
             if '-bkg.jpg' in file:
                 self.lockBkg()
-            else:
+            else:            
+                self.buttons.btnBkgFiles.setEnabled(False)
                 self.enableSave(True)
                 dotsQt.setCursor
                 
@@ -144,6 +146,7 @@ class InitBkg(QWidget):
             self.lockBkg()
         else:
             self.enableSave(False)
+            self.buttons.btnBkgFiles.setEnabled(True)
             MsgBox("Already set to background") 
 
     def lockBkg(self):
@@ -155,11 +158,15 @@ class InitBkg(QWidget):
                     itm.setZValue(self.parent.lastZval('bkg')-1)
         self.bkg.setZValue(bkgZ)
         self.bkg.isBackgroundSet = True
-        self.enableSave(False)
+        self.buttons.btnBkgFiles.setEnabled(True)
+        self.buttons.btnSetBkg.setEnabled(False)
+        self.buttons.btnSave.setEnabled(True)
         MsgBox("Set to background")
         
     def saveBkg(self):
-        if self.buttons.btnSave.isEnabled() and self.bkg.isBackgroundSet:
+        if not self.bkg.isBackgroundSet:
+            MsgBox("Set to Background to save as background jpg")
+        else:
             file = os.path.basename(self.bkg.filename)
             file = file[0: file.index('.')]
             file = file[-15:] + "-bkg.jpg"
@@ -173,6 +180,7 @@ class InitBkg(QWidget):
                 MsgBox("Saved as " + file)
             else:
                 MsgBox("Already saved as background jpg")
+            self.buttons.btnBkgFiles.setEnabled(True)
             self.enableSave(False)
          
     def snapShot(self):        
@@ -201,6 +209,7 @@ class MsgBox(QMessageBox):  ## another stackoverflow solution
         self.setStandardButtons(QMessageBox.NoButton)
         self.timer = QTimer(self)
         self.timer.setInterval(1000)
+        self.setGeometry(720,400,125,65)
         self.timer.timeout.connect(self.changeContent)
         self.timer.start()
 

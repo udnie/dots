@@ -132,6 +132,7 @@ class DropCanvas(QMainWindow):
             self.scene.clear()
             self.pixCount = 0
             self.disableSliders()
+            self.buttons.btnBkgFiles.setEnabled(True)
             self.gridSet = False
 
     def disableSliders(self):

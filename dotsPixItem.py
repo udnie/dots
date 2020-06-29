@@ -226,6 +226,8 @@ class PixItem(QGraphicsPixmapItem):
             newW, newH = 350, 500
         elif 'bosch' in self.fileName:     ## not included
             newW, newH = 275, 450
+        elif 'lizard' in self.fileName:     ## not included
+            newW, newH = 300, 600 
         if newW > 450 or newH > 450:
             newW, newH = 500, 500
         return newW, newH
