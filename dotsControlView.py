@@ -109,11 +109,11 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key_Down:
             self.setKey('down')
         elif key == Qt.Key_Control:
-            self.setKey('draw')
+            self.setKey('draw')    ## command key on mac
         elif key == Qt.Key_Shift:
             self.setKey('shift')
         elif key == Qt.Key_Alt:
-            self.setKey('clone')
+            self.setKey('clone')   ## option key on mac
         elif key == Qt.Key_Plus:
             self.setKey('+')  
         elif key == Qt.Key_Underscore:

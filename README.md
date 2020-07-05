@@ -52,6 +52,8 @@ Currently I'm using the graphics item zValue() as a means to order the four type
 
 ***The .011 value for PixItems is arbitrary and could change.
 
+In the code 'draw' refers to the Mac command key, 'clone' to the Mac option key.
+
 The star in scrollPanel isn't currently designed to be dragged to the canvas, without it though, none of this would exist.
 
 ## Requirements
