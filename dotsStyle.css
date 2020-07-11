@@ -36,13 +36,12 @@ QGroupBox {
   border: 1px solid rgb(100,100,100);
   border-radius: 3px;
   font-size: 14px;
-  margin-top: 5px;
+  margin-top: 5px; 
 } 
 
 QGroupBox:title {
-  subcontrol-origin: margin;
-  subcontrol-position: top center;
-  padding: -5px 3px 2px 3px;  
+  background: rgb(195, 195, 195);
+  padding: -10px 3px 5px 3px;  
 } 
 
 QScrollArea:vertical {

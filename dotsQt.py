@@ -119,6 +119,7 @@ class Buttons(QWidget):
     def addScrollBtnGroup(self):  
         self.scrollGroup = QGroupBox("Scroll Panel")
         self.scrollGroup.setFixedWidth(550)
+        self.scrollGroup.setAlignment(Qt.AlignHCenter)
 
         btnAdd = QPushButton("Star")
         btnTop = QPushButton("Top")
@@ -151,6 +152,7 @@ class Buttons(QWidget):
     def addBkgBtnGroup(self):
         self.backgroundGroup = QGroupBox("Background")
         self.backgroundGroup.setFixedWidth(300)
+        self.backgroundGroup.setAlignment(Qt.AlignHCenter)
 
         self.btnBkgFiles = QPushButton("Files")
         self.btnSetBkg = QPushButton(" Set Background ")      
@@ -174,6 +176,7 @@ class Buttons(QWidget):
     def addCanvasBtnGroup(self):
         self.canvasGroup = QGroupBox("Canvas")
         self.canvasGroup.setFixedWidth(400) 
+        self.canvasGroup.setAlignment(Qt.AlignHCenter)
 
         btnClrCanvas = QPushButton("Clear")
         btnSnapShot = QPushButton("Shapshot")  
