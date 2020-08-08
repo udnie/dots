@@ -1,7 +1,7 @@
 import os
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore    import *
+from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
 from functools import partial
@@ -27,9 +27,10 @@ class ImgLabel(QLabel):
         self.shared = dotsQt.Shared()
 
         self.imgFile = imgFile
-        self.id = count 
         self.parent = parent
- 
+
+        self.id = count 
+       
         self.setFrameShape(QFrame.Panel|QFrame.Raised)
         # self.setLineWidth(2)
         # self.setMidLineWidth(2)
@@ -211,7 +212,7 @@ class ScrollPanel(QWidget):
     def scrollFiles(self):
         Q = QFileDialog()
         files, _ = Q.getOpenFileNames(self,
-            "Choose an image file to open", '', 
+            "Choose an image file to open", self.shared.snapShot, 
             "Images Files(*.bmp *.jpg *.png)")
         if len(files) != 0:
             for imgFile in files:
@@ -220,24 +221,25 @@ class ScrollPanel(QWidget):
           
     def loadSprites(self):
         sprites = self.spriteList()
-        for s in sprites:
-            self.add(s)
-        self.top()   # your choice
+        if sprites:
+            for s in sprites:
+                self.add(s)
+            self.top()   # your choice
         # firstwidget = self.layout.itemAt(0).widget()
         # QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, firstwidget))
 
     def spriteList(self):
-        files = os.listdir(self.shared.spritePath)
+        try:
+            files = os.listdir(self.shared.spritePath)
+        except IOError:
+            self.canvas.MsgBox("No Sprite Directory Found!", 5)
+            return None  
         filenames = []
         for file in files:
             if file.lower().endswith('png'): 
-                fp = os.path.abspath(os.path.join(
-                    self.shared.spritePath, 
-                    file))
-                fp = self.shared.spritePath + file
-                filenames.append(fp)
-        if filenames == []:
-            QMessageBox.about(self, "", "No Sprites Found")
+                filenames.append(self.shared.spritePath + file)
+        if not filenames:
+            self.canvas.MsgBox("No Sprites Found!", 5)
         return filenames
 
 ### ------------------- dotsScrollPanel --------------------

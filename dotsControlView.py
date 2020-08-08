@@ -77,6 +77,7 @@ class ControlView(QGraphicsView):
         if m.hasUrls():
             x, y = e.pos().x(),  e.pos().y()
             imgFile = m.urls()[0].toLocalFile()
+            ## None = clone source, False = mirror right/left
             self.parent.addPixItem(imgFile, x, y, None, False)
 
 ### -------------------------------------------------------
@@ -86,16 +87,18 @@ class ControlView(QGraphicsView):
         key = e.key()  
         if key == Qt.Key_A:
             self.parent.selectAll()
+        elif key == Qt.Key_C:
+            self.parent.clear()
         elif key == Qt.Key_D:
             self.parent.deleteSelected()
         elif key == Qt.Key_F:
             self.parent.flopSelected()  
         elif key == Qt.Key_G:
-            self.parent.toggleGrid() 
+            self.parent.sideCar.toggleGrid() 
         elif key == Qt.Key_H:
             self.parent.hideSelected() 
         elif key == Qt.Key_M:
-            self.parent.initMap.mapSelectedItems()
+            self.parent.initMap.toggleMap()
         elif key == Qt.Key_U:
             self.parent.unSelect()
         # elif key == Qt.Key_Z:   
@@ -109,11 +112,13 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key_Down:
             self.setKey('down')
         elif key == Qt.Key_Control:
-            self.setKey('draw')    ## command key on mac
+            self.setKey('cmd')    ## command key on mac
+        elif key == Qt.Key_Return:
+            self.setKey('retn')
         elif key == Qt.Key_Shift:
             self.setKey('shift')
         elif key == Qt.Key_Alt:
-            self.setKey('clone')   ## option key on mac
+            self.setKey('opt')   ## option key on mac
         elif key == Qt.Key_Plus:
             self.setKey('+')  
         elif key == Qt.Key_Underscore:

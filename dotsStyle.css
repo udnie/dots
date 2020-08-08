@@ -5,13 +5,13 @@ QPushButton {
   background: white;
   color: black;
   font-size: 13px;
-  border: 1px solid rgb(180, 174, 238);
+  border: 1px solid rgb(120, 120, 120);
   border-radius: 3px;
   padding: 2px 2px 2px 2px;
 } 
- 
+
 QPushButton:Pressed {
-  background: rgb(47,123,222);
+  background: rgb(160, 183, 214);
   color:white;
   border: 1px solid white;
 }
@@ -57,8 +57,3 @@ QScrollBar:handle:vertical {
   background-color: rgb(210, 210, 210);
   min-height: 100px;
 } 
-
-QHeaderView:section {
-  background-color: lightgray;
-  border: .5px solid rgb(190,190,190);
-}

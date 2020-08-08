@@ -1,4 +1,3 @@
-
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
@@ -36,46 +35,47 @@ class SliderPanel(QWidget):
 ### -----------------------------------------------------
     def addTableGroup(self):
         self.tableGroup = QGroupBox("")
-        self.tableGroup.setFixedSize(sliderW,350)
+        self.tableGroup.setFixedSize(sliderW,352)
 
         self.tableGroup.setStyleSheet("QGroupBox {\n"
             "background-color: rgb(250,250,250);\n"
-            "border: 1px solid rgb(125,125,125);\n"
+            "border: .5px solid rgb(125,125,125);\n"
             "}")
 
-        header = ['Key', 'Action']
+        header = ['Keys', 'Action']
         keylist = [
-            ('  A ', 'Select All'),
-            ('  D ', 'Delete Selected'),
-            ('  F ', 'Flop Selected'),
-            ('  G ', 'Add/Hide Grid'),
-            ('  H ', 'Hide/UnHide'),
-            ('  M ', 'Map Selected'),
-            ('  U ', 'UnSelect All'),
-            (' X, Q', 'Escape to Quit'),
-            (' _/+ ', 'Toggle Size'),
-            (' {/} ', 'Rotate 45 deg'),
-            (' </> ', 'Rotate 15 deg'),
-            (' :/" ', 'Rotate 1 deg'),
-            (' U/D ', 'Arrow Keys'),
-            (' L/R ', 'Arrow Keys'),
-            ('     ', 'Clk to Front'),
-            (' Shift', 'Clk to Delete'),
-            (' Opt ', 'DbClk to Clone'),
-            (' Opt ', 'Drag Clones'),
-            (' Cmd ', 'Drag Box Maps'),
-            (' Cmd ', 'Clk Pix to Back'),
-            (' Cmd ', 'Clk Flop Bkgnd')]
+            ('A', 'Select All'),   
+            ('C', 'Clear Canvas'),     
+            ('D', 'Delete Selected'),
+            ('F', 'Flop Selected'),
+            ('G', 'Add/Hide Grid'),
+            ('H', 'Hide/UnHide'),
+            ('M', 'Map Selected'),
+            ('U', 'UnSelect All'),
+            ('X, Q', 'Escape to Quit'),
+            ('_/+', 'Toggle Size'),
+            ('{/}', 'Rotate 45 deg'),
+            ('</>', 'Rotate 15 deg'),
+            (':/"', 'Rotate 1 deg'),
+            ('U/D', 'Arrow Keys'),
+            ('L/R', 'Arrow Keys'),
+            ('', 'Clk to Front'),
+            ('Shift', 'Clk to Delete'),
+            ('Opt', 'Clk Flops Pix'),
+            ('Opt', 'Clk Flops Bkg'),
+            ('Rtn', 'DbClk to Clone'),
+            ('Rtn', 'Drag Clones'), 
+            ('Cmd', 'Clk Pix to Back'),
+            ('Cmd', 'Drag to Select')]
           
-
         self.model = TableModel(keylist, header)
         self.tableView = QTableView()
-
         self.tableView.setAlternatingRowColors(True) 
         self.tableView.setStyleSheet("QTableView {\n"
             "alternate-background-color: rgb(220,220,220);\n"
+            "border: .5px solid rgb(200,200,200);\n"
             "background-color: white;\n"
-            "}")  ## see css for header settings
+            "}")  
         
         ## make it read-only
         self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -83,12 +83,17 @@ class SliderPanel(QWidget):
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
+        self.tableView.horizontalHeader().setStyleSheet("QHeaderView {\n"
+            "border: .5px solid rgb(200,200,200);\n"
+            "font-size: 13px;\n"
+            "}")  
+
         self.tableView.setModel(self.model)
-        self.tableView.setColumnWidth(0, 45)
+        self.tableView.setColumnWidth(0, 45) 
         self.tableView.setColumnWidth(1, 107)
 
         layout = QVBoxLayout()    
-        layout.addWidget(self.tableView, Qt.AlignHCenter)
+        layout.addWidget(self.tableView, Qt.AlignHCenter|Qt.AlignVCenter)
 
         self.tableGroup.setLayout(layout)
 
@@ -206,7 +211,7 @@ class SliderPanel(QWidget):
             self.signal[str, int].emit("opacity", int(val))
 
 ### --------------------- TableModel -----------------------  
-class TableModel(QAbstractTableModel):  ## stackoverflow
+class TableModel(QAbstractTableModel):  ## thanks stackoverflow 
     def __init__(self, data, hdr):
         super(TableModel,self).__init__()
         self.data = data
@@ -221,6 +226,8 @@ class TableModel(QAbstractTableModel):  ## stackoverflow
     def data(self, index, role):
         if not index.isValid():
             return None
+        elif index.column() == 0 and role == Qt.TextAlignmentRole:
+            return Qt.AlignHCenter + Qt.AlignVCenter
         elif role == Qt.DisplayRole:
             return self.data[index.row()][index.column()]
 

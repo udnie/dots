@@ -3,15 +3,17 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import dotsQt
+import dotsSideCar as sidecar
 
 # from pubsub  import pub      # PyPubSub - required
 
-incZ = .011  # increment zValue 
+incZ = 1.0      # increment zValue
+pixfactor = .30  # beginnig size factor 
 
 ### --------------------- dotsPixItem ----------------------
 class PixItem(QGraphicsPixmapItem):
     
-    def __init__(self, imgFile, x, y, id, parent, mirror=False):
+    def __init__(self, imgFile, id, x, y, parent, mirror=False):
         super().__init__()
 
         self.shared = dotsQt.Shared()
@@ -20,7 +22,6 @@ class PixItem(QGraphicsPixmapItem):
         self.fileName = imgFile
    
         self.id = id
-        self.type = 'pix'
 
         self.x = x
         self.y = y
@@ -28,24 +29,28 @@ class PixItem(QGraphicsPixmapItem):
         img = QImage(imgFile)
 
         newW, newH = self.setPixSizes( 
-            img.width() * self.shared.factor, 
-            img.height() * self.shared.factor)
+            img.width() * pixfactor, 
+            img.height() * pixfactor)
 
+        ## don't change
         img = img.scaled(newW, newH,
             Qt.KeepAspectRatio,
             Qt.SmoothTransformation)
 
         self.width = img.width()
         self.height = img.height()
-        self.imgFile = img  
+        
+        self.imgFile = img
 
         self.key = ""
         self.dragCnt = 0
+
+        self.type = 'pix'
+        self.flopped = mirror
         self.rotation = 0
         self.scale = 1.0
-        self.setZValue(0.0)
+        self.setZValue(self.id)
         
-        self.flopped = mirror
         self.isHidden = False
  
         self.dragAnchor = QPoint(0,0)
@@ -59,7 +64,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsPixmapItem.ItemIsSelectable)
       
         # pub.subscribe(self.setPixKeys, 'setKeys')
-
+        
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def setPixKeys(self, key):
@@ -73,22 +78,25 @@ class PixItem(QGraphicsPixmapItem):
                 self.moveThis(key)
 
     def setMirrored(self, mirror):
-        self.flopped = mirror        
-        self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-            horizontal=mirror,
-            vertical=False)))
-        self.setTransformationMode(Qt.SmoothTransformation)
+        sidecar.mirrorSet(self, mirror)
 
     def mousePressEvent(self, e):
-        if self.key == 'shift':
+        if self.key == 'shift':  # delete
             self.parent.scene.removeItem(self)
         else:      
-            self.initX, self.initY = self.x, self.y
+            self.initX, self.initY = self.x, self.y   # set position
             self.dragAnchor = self.mapToScene(e.pos())
-        if  self.key == 'draw':  # to back
-            self.setZValue(self.parent.lastZval('pix')-.01)
-        else:                    # to front
-            self.setZValue(self.parent.toFront(incZ))
+        if  self.key == 'opt':  # flop if selected or hidden
+            if self.flopped:
+                wuf = False
+            else:
+                wuf = True
+            self.setMirrored(wuf)
+        elif self.key == 'cmd': # send to back
+            self.setZValue(self.parent.lastZval('pix')-.011)
+        else:                    # single click to front
+            self.parent.pixCount = self.parent.toFront(incZ)
+            self.setZValue(self.parent.pixCount)
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -96,22 +104,24 @@ class PixItem(QGraphicsPixmapItem):
         dragX = pos.x() - self.dragAnchor.x()
         dragY = pos.y() - self.dragAnchor.y()
         self.updateWidthHeight()
-        self.x = int(dotsQt.constrain(self.initX + dragX, 
+        self.x = int(sidecar.constrain(
+            self.initX + dragX, 
             self.width, 
             self.shared.viewW, 
             self.width * -self.shared.factor))
-        self.y = int(dotsQt.constrain(self.initY + dragY,
+        self.y = int(sidecar.constrain(
+            self.initY + dragY,
             self.height, 
             self.shared.viewH, 
             self.height * -self.shared.factor))
         self.setPos(self.x, self.y)
         self.dragCnt +=1
-        if self.key == 'clone' and self.dragCnt % 5 == 0:  
-            self.cloneThis(e)
+        if self.key == 'retn' and self.dragCnt % 5 == 0:  
+            self.cloneThis(e)  # clones
         e.accept()
 
     def mouseDoubleClickEvent(self, e):
-        if self.key == 'clone':  
+        if self.key == 'retn':  
             self.cloneThis(e)
         elif self.parent.key == 'noMap': 
             ## consumed map's dblclk need to set it back 
@@ -124,7 +134,7 @@ class PixItem(QGraphicsPixmapItem):
             ## selected as the others will become hidden 
             self.setSelected(True) 
             self.isHidden = False  
-        else:
+        elif not self.parent.key in ['opt','cmd','retn']:
             if self.isSelected() == False:
                 self.setSelected(True)  
             elif self.isSelected():
@@ -135,8 +145,8 @@ class PixItem(QGraphicsPixmapItem):
     def cloneThis(self, e):
         self.parent.addPixItem(
             self.fileName, 
-            self.x+20, 
-            self.y+5,
+            self.x+25, 
+            self.y+10,
             self,
             self.flopped)
         e.accept()
@@ -144,11 +154,12 @@ class PixItem(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
-            self.setZValue(self.parent.toFront(incZ))
+            self.parent.pixCount = self.parent.toFront(incZ)
+            self.setZValue(self.parent.pixCount)
         e.accept()
 
     def moveThis(self, key):
-        self.setOriginPt()
+        self.setOriginPt()  ## updates width and height also
         pts = 2        
         if key == 'right':
             self.x += pts
@@ -158,20 +169,20 @@ class PixItem(QGraphicsPixmapItem):
             self.y -= pts
         elif key == 'down':
             self.y += pts
-        self.x = int(dotsQt.constrain(self.x, 
+        self.x = int(sidecar.constrain(self.x, 
             self.width, 
             self.shared.viewW, 
             self.width * -self.shared.factor))
-        self.y = int(dotsQt.constrain(self.y, 
+        self.y = int(sidecar.constrain(self.y, 
             self.height, 
             self.shared.viewH, 
             self.height * -self.shared.factor))
         self.setPos(self.x, self.y) 
   
     def rotateThis(self, key):
-        self.setOriginPt()
+        self.setOriginPt() 
         if key in ('>', '}', '"'):
-            if self.rotation >= 360:  # forces back to zero
+            if self.rotation >= 360:  ## forces back to zero
                 self.rotation = 0
             if key == '>':
                 angle = 15
@@ -181,7 +192,7 @@ class PixItem(QGraphicsPixmapItem):
                 angle = 1
             p = self.rotation + angle
         elif key in ('<', '{', ':'):
-            if self.rotation <= 0:  # forces back to 360
+            if self.rotation <= 0:  ## forces back to 360
                 self.rotation = 360
             if key == '<':
                 angle = -15
@@ -213,9 +224,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setTransformationMode(Qt.SmoothTransformation)
 
     def updateWidthHeight(self):
-        brt = self.boundingRect()
-        self.width = brt.width()
-        self.height = brt.height()
+        sidecar.widthHeightSet(self)
               
     def setPixSizes(self, newW, newH):
         if newW < 100 or newH < 100:
@@ -226,7 +235,7 @@ class PixItem(QGraphicsPixmapItem):
             newW, newH = 350, 500
         elif 'bosch' in self.fileName:     ## not included
             newW, newH = 275, 450
-        elif 'lizard' in self.fileName:     ## not included
+        elif 'lizard' in self.fileName:    ## not included
             newW, newH = 300, 600 
         if newW > 450 or newH > 450:
             newW, newH = 500, 500
