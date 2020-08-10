@@ -89,7 +89,7 @@ class ImgLabel(QLabel):
         return self.minimumSizeHint()
 
     def mousePressEvent(self, event):
-        if self.parent.canvas.key == 'shift':
+        if self.parent.canvas.key == 'del':
             self.parent.deleteImgLabel(self)
 
     def mouseMoveEvent(self, event):

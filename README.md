@@ -66,6 +66,9 @@ Inital posting followed by minor bug fixes and fussy changes.
 **August 2020:**  
 Added two new buttons. The save button maps the canvas items, pixitems and background to a json file written to the ./plays directory as a .play file.  The load button reconstructs the saved canvas layout from the named .play file. 
 
+**August 2020.09:**  
+Changed delete from the shift key to the actual delete key. Seems it shows up as a backspace key on some installs which is why I may not have used it earlier. 
+
 ##Videos	
 * Demonstrates the save and load functions. <https://youtu.be/RPwEjgAcITk>
 

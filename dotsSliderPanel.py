@@ -1,5 +1,5 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore    import *
+from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
 ### ------------------- dotsSliderPanel ----------------
@@ -60,7 +60,7 @@ class SliderPanel(QWidget):
             ('U/D', 'Arrow Keys'),
             ('L/R', 'Arrow Keys'),
             ('', 'Clk to Front'),
-            ('Shift', 'Clk to Delete'),
+            ('Del', 'Clk to Delete'),
             ('Opt', 'Clk Flops Pix'),
             ('Opt', 'Clk Flops Bkg'),
             ('Rtn', 'DbClk to Clone'),

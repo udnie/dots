@@ -85,7 +85,10 @@ class ControlView(QGraphicsView):
     ## especially the arrow keys
     def keyPressEvent(self, e):
         key = e.key()  
-        if key == Qt.Key_A:
+        ## print("key event: ", QKeySequence(e.key()).toString())
+        if key in (Qt.Key_Backspace, Qt.Key_Delete):  ## can vary
+            self.setKey('del')
+        elif key == Qt.Key_A:
             self.parent.selectAll()
         elif key == Qt.Key_C:
             self.parent.clear()
@@ -101,7 +104,7 @@ class ControlView(QGraphicsView):
             self.parent.initMap.toggleMap()
         elif key == Qt.Key_U:
             self.parent.unSelect()
-        # elif key == Qt.Key_Z:   
+        # elif key == Qt.Key_Z:   ## out of service
         #     self.parent.ZDump()
         elif key == Qt.Key_Left:
             self.setKey('left')
@@ -115,8 +118,8 @@ class ControlView(QGraphicsView):
             self.setKey('cmd')    ## command key on mac
         elif key == Qt.Key_Return:
             self.setKey('retn')
-        elif key == Qt.Key_Shift:
-            self.setKey('shift')
+        # elif key == Qt.Key_Shift:  ## out of service
+        #     self.setKey('shift')
         elif key == Qt.Key_Alt:
             self.setKey('opt')   ## option key on mac
         elif key == Qt.Key_Plus:

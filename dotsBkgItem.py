@@ -56,7 +56,7 @@ class BkgItem(QGraphicsPixmapItem):
 
 ### --------------------------------------------------------
     def mousePressEvent(self, e):
-        if self.parent.key == 'shift':          # delete it
+        if self.parent.key == 'del':          # delete it
             self.parent.scene.removeItem(self)
             self.parent.disableSliders()
             self.parent.buttons.btnBkgFiles.setEnabled(True)

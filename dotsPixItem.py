@@ -81,20 +81,19 @@ class PixItem(QGraphicsPixmapItem):
         sidecar.mirrorSet(self, mirror)
 
     def mousePressEvent(self, e):
-        if self.key == 'shift':  # delete
+        if self.key == 'del':  # delete
             self.parent.scene.removeItem(self)
-        else:      
+        else:
             self.initX, self.initY = self.x, self.y   # set position
             self.dragAnchor = self.mapToScene(e.pos())
-        if  self.key == 'opt':  # flop if selected or hidden
+        if self.key == 'opt':  # flop if selected or hidden
             if self.flopped:
-                wuf = False
+                sidecar.mirrorSet(self, False)
             else:
-                wuf = True
-            self.setMirrored(wuf)
+                sidecar.mirrorSet(self, True)
         elif self.key == 'cmd': # send to back
             self.setZValue(self.parent.lastZval('pix')-.011)
-        else:                    # single click to front
+        else:                   # single click to front
             self.parent.pixCount = self.parent.toFront(incZ)
             self.setZValue(self.parent.pixCount)
         e.accept()

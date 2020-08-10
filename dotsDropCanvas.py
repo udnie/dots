@@ -13,7 +13,7 @@ from dotsBkgItem      import *
 ## ----- for testing and comparison
 # from pubsub  import pub      # PyPubSub - required
 
-mapStr = ":,\",<,>,{,},-,+,left,right,up,down,cmd,shift,retn,opt"
+mapStr = ":,\",<,>,{,},-,+,left,right,up,down,cmd,del,retn,opt"
 
 ### -------------------- dotsDropCanvas --------------------
 class DropCanvas(QMainWindow):
