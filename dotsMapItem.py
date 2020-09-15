@@ -1,12 +1,15 @@
 import os
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore    import *
+from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-import dotsQt
+from dotsShared      import common
 
 ### ---------------------- dotsMapItem ---------------------
+''' dotsMapItem: handles the mapItem selection box.
+    Includes MapItem and InitMap classes. '''
+### --------------------------------------------------------
 class MapItem(QGraphicsItem):
 
     def __init__(self, rect):
@@ -45,27 +48,26 @@ class InitMap(QWidget):
     def __init__(self, parent):
         super().__init__()
 
-        self.parent = parent
-        self.mapRect = None
+        self.canvas  = parent
+        self.sideCar = self.canvas.sideCar
 
-        self.shared = dotsQt.Shared()
-        self.gridZ = self.shared.gridZ
-
+        self.gridZ   = common["gridZ"]
+        self.mapRect = QRectF()
+        self.mapSet  = False
         self.selections = []
-        self.mapSet = False
-
+      
 ### --------------------------------------------------------
     def addSelectionsFromCanvas(self):
-        if len(self.selections) == 0:
+        if not self.selections:
             self.mapSelections()
-        if len(self.selections) > 0:
+        if self.selections:
             self.addMapItem()
 
     def mapSelections(self):
         self.selections = []
-        rect = QRect(self.parent.rubberBand.geometry())
-        for pix in self.parent.scene.items():
-            if pix.zValue() > self.gridZ and pix.type == 'pix':
+        rect = QRect(self.canvas.rubberBand.geometry())
+        for pix in self.canvas.scene.items():
+            if pix.type == 'pix':
                 p = pix.sceneBoundingRect()
                 x = int(p.x() + p.width()/2)
                 y = int(p.y() + p.height()/2)
@@ -80,8 +82,8 @@ class InitMap(QWidget):
         self.mapSet = True
         self.mapRect = self.mapBoundingRects()
         self.map = MapItem(self.mapRect)
-        self.map.setZValue(self.parent.toFront(10.0))
-        self.parent.scene.addItem(self.map)
+        self.map.setZValue(self.canvas.sideCar.toFront(40.0)) ## higher up than tags
+        self.canvas.scene.addItem(self.map)
 
     def updateMap(self):
         self.updatePixItemPos()
@@ -92,62 +94,60 @@ class InitMap(QWidget):
         self.clearMap()
 
     def clearMap(self):
-        self.removeMapItem()
-        self.origin = QPoint(0,0)
-        self.mapRect = None
-        self.selections = []
-        self.mapSet = False
-        self.parent.rubberBand.setGeometry(QRect(self.origin, QSize()))
+        if self.mapSet:
+            self.removeMapItem()
+            self.mapRect = QRectF()
+            self.selections = []
+            self.mapSet = False
+            self.canvas.rubberBand.setGeometry(
+                QRect(self.canvas.origin, 
+                QSize(0,0)))
 
     def removeMapItem(self):
-        for pix in self.parent.scene.items():
-            if pix.zValue() > self.gridZ  and pix.type == 'map':
-                self.parent.scene.removeItem(pix)
-            elif pix.type != 'map': 
+        for pix in self.canvas.scene.items():
+            if pix.type == 'map':
+                pix.clearFocus()
+                self.canvas.scene.removeItem(pix)
+            elif pix.type != 'map':
                 break
 
     def mapBoundingRects(self):
-        tx, ty = self.shared.viewW, self.shared.viewH
+        tx, ty = common["viewW"], common["viewH"]
         bx, by = 0, 0
-        for pix in self.parent.scene.items():
-            if pix.type == 'pix':
-                if pix.id in self.selections:
-                    p = pix.sceneBoundingRect()
-                    x, y, w, h = p.x(), p.y(), p.width(), p.height()
-                    if x < tx:
-                        tx = x
-                    if y < ty:
-                        ty = y
-                    if x + w > bx:
-                        bx = x + w
-                    if y + h > by:
-                        by = y + h
+        for pix in self.canvas.scene.items():
+            if pix.type == 'pix' and pix.id in self.selections:
+                p = pix.sceneBoundingRect()
+                x, y, w, h = p.x(), p.y(), p.width(), p.height()
+                if x < tx:  ## setting top left
+                    tx = x
+                if y < ty:
+                    ty = y
+                if x + w > bx:  ## setting bottom right
+                    bx = x + w
+                if y + h > by:
+                    by = y + h
             elif pix.zValue() <= self.gridZ:
                 break
         return QRectF(tx, ty, bx-tx, by-ty)
 
     def updatePixItemPos(self):
-        for pix in self.parent.scene.items():
+        for pix in self.canvas.scene.items():
             if pix.type == 'pix':
-                if pix.id in self.selections or pix.isSelected():
-                    p = pix.pos()
-                    pix.x = int(p.x())
-                    pix.y = int(p.y())
-                    pix.setPos(pix.x, pix.y)
+                p = pix.pos()
+                pix.x = int(p.x())
+                pix.y = int(p.y())
             elif pix.zValue() <= self.gridZ:
                 break
 
     def toggleMap(self):    
         if self.mapSet == False:
             self.selections = []
-            for pix in self.parent.scene.selectedItems():
+            for pix in self.canvas.scene.selectedItems():
                 self.selections.append(pix.id)
-            if len(self.selections) > 0 or self.parent.hasHiddenPix():
+            if self.selections or self.canvas.hasHiddenPix():
                 self.addMapItem()
         else:
             self.removeMap()
 
 ### --------------------- dotsMapItem ----------------------
-
-
 

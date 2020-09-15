@@ -1,38 +1,30 @@
 import os
 import sys
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PyQt5.QtCore    import *
+from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-import dotsQt
+from dotsShared      import common
 
+### ------------------ dotsControlView ---------------------
+''' dotsControlView: Base class to create the control view from 
+    tpoveda / ControlView.py  https://gist.github.com/tpoveda ''' 
 ### --------------------------------------------------------
 class ControlView(QGraphicsView):
-    ''' Base class to create the control view
-        tpoveda / ControlView.py 
-        https://gist.github.com/tpoveda     ''' 
-
     ## adds drag and drop to a QGraphicsView instance
-    ## big thanks to tpoveda for posting this and to
-    ## google search
- 
+    ## big thanks to tpoveda for posting this
     keysSignal = pyqtSignal([str])
 
     def __init__(self, scene, parent):
-        '''
-        @param scene: QGraphicsScene that defines the scene we want to visualize
-        @param parent: QWidget parent
-        '''
+
         super().__init__(parent)
 
         self.setObjectName('ControlView')
         self.setScene(scene)
-        
-        self.shared = dotsQt.Shared()
-      
+           
         self.scene = scene
-        self.parent = parent
+        self.canvas = parent
         self.dragOver = False
 
         # didn't seem to need it
@@ -40,7 +32,7 @@ class ControlView(QGraphicsView):
         # self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
     
         # added 2px to prevent noticable screen movement - curious 
-        self.setFixedSize(self.shared.viewW+2, self.shared.viewH+2)
+        self.setFixedSize(common["viewW"]+2, common["viewH"]+2)
   
         self.setRenderHints(QPainter.Antialiasing | 
             QPainter.TextAntialiasing | 
@@ -48,8 +40,8 @@ class ControlView(QGraphicsView):
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setAcceptDrops(True)
-        
+
+        self.setAcceptDrops(True)        
         self.setStyleSheet("border: 1px solid black;")
 
         self.setFocusPolicy(Qt.StrongFocus)
@@ -78,8 +70,8 @@ class ControlView(QGraphicsView):
             x, y = e.pos().x(),  e.pos().y()
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
-            self.parent.addPixItem(imgFile, x, y, None, False)
-
+            self.canvas.addPixItem(imgFile, x, y, None, False)
+   
 ### -------------------------------------------------------
     ## Location I found that works best for reading keys
     ## especially the arrow keys
@@ -89,23 +81,29 @@ class ControlView(QGraphicsView):
         if key in (Qt.Key_Backspace, Qt.Key_Delete):  ## can vary
             self.setKey('del')
         elif key == Qt.Key_A:
-            self.parent.selectAll()
+            self.canvas.selectAll()
+        elif key == Qt.Key_B:
+            self.setKey('bak')
         elif key == Qt.Key_C:
-            self.parent.clear()
+            self.canvas.clear()
         elif key == Qt.Key_D:
-            self.parent.deleteSelected()
+            self.canvas.deleteSelected()
         elif key == Qt.Key_F:
-            self.parent.flopSelected()  
+            self.canvas.flopSelected()  
         elif key == Qt.Key_G:
-            self.parent.sideCar.toggleGrid() 
+            self.canvas.sideCar.toggleGrid() 
         elif key == Qt.Key_H:
-            self.parent.hideSelected() 
+            self.canvas.hideSelected() 
         elif key == Qt.Key_M:
-            self.parent.initMap.toggleMap()
+            self.canvas.initMap.toggleMap()
+        elif key == Qt.Key_P:
+            self.canvas.sideShow.play()
+        elif key == Qt.Key_T:
+            self.canvas.sideShow.toggleTagItems()
         elif key == Qt.Key_U:
-            self.parent.unSelect()
-        # elif key == Qt.Key_Z:   ## out of service
-        #     self.parent.ZDump()
+            self.canvas.unSelect()
+        elif key == Qt.Key_Z:   ## out of service
+            self.canvas.ZDump()
         elif key == Qt.Key_Left:
             self.setKey('left')
         elif key == Qt.Key_Right:
@@ -116,12 +114,10 @@ class ControlView(QGraphicsView):
             self.setKey('down')
         elif key == Qt.Key_Control:
             self.setKey('cmd')    ## command key on mac
-        elif key == Qt.Key_Return:
-            self.setKey('retn')
-        # elif key == Qt.Key_Shift:  ## out of service
-        #     self.setKey('shift')
+        elif key == Qt.Key_Shift:  
+            self.setKey('shift')
         elif key == Qt.Key_Alt:
-            self.setKey('opt')   ## option key on mac
+            self.setKey('opt')    ## option key on mac
         elif key == Qt.Key_Plus:
             self.setKey('+')  
         elif key == Qt.Key_Underscore:

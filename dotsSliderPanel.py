@@ -6,11 +6,14 @@ from PyQt5.QtWidgets import *
 sliderW, sliderH = 195, 682
 
 ### ----------------------------------------------------
+''' dotsSliderPanel contains the TableGroup and the SliderGroup
+    and the TableModel class used by the TableView '''
+### --------------------------------------------------------
 class SliderPanel(QWidget):
 
     signal = pyqtSignal(str, int)
 
-    def __init__(self, parent):
+    def __init__(self):
         super().__init__()
         
         self.setFixedSize(sliderW, sliderH) 
@@ -45,12 +48,14 @@ class SliderPanel(QWidget):
         header = ['Keys', 'Action']
         keylist = [
             ('A', 'Select All'),   
+            ('B', 'Clk to Back'),
             ('C', 'Clear Canvas'),     
             ('D', 'Delete Selected'),
             ('F', 'Flop Selected'),
             ('G', 'Add/Hide Grid'),
             ('H', 'Hide/UnHide'),
             ('M', 'Map Selected'),
+            ('T', 'Toggle Tags'),
             ('U', 'UnSelect All'),
             ('X, Q', 'Escape to Quit'),
             ('_/+', 'Toggle Size'),
@@ -61,11 +66,9 @@ class SliderPanel(QWidget):
             ('L/R', 'Arrow Keys'),
             ('', 'Clk to Front'),
             ('Del', 'Clk to Delete'),
-            ('Opt', 'Clk Flops Pix'),
-            ('Opt', 'Clk Flops Bkg'),
-            ('Rtn', 'DbClk to Clone'),
-            ('Rtn', 'Drag Clones'), 
-            ('Cmd', 'Clk Pix to Back'),
+            ('Shift', 'Clk to Flop'),  
+            ('Opt', 'DbClk to Clone'),
+            ('Opt', 'Drag Clones'), 
             ('Cmd', 'Drag to Select')]
           
         self.model = TableModel(keylist, header)
@@ -209,7 +212,7 @@ class SliderPanel(QWidget):
         self.opacityValue.setText("{0:.2f}".format(val/100.0))
         if self.isEnabled:
             self.signal[str, int].emit("opacity", int(val))
-
+    
 ### --------------------- TableModel -----------------------  
 class TableModel(QAbstractTableModel):  ## thanks stackoverflow 
     def __init__(self, data, hdr):
@@ -235,5 +238,5 @@ class TableModel(QAbstractTableModel):  ## thanks stackoverflow
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return self.header[col]
         return None
-    
+
 ### -------------------- dotsSliderPanel -------------------

@@ -8,21 +8,22 @@ from os import path
 from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 
-import dotsQt
-
-from dotsBkgItem      import *
-from dotsPixItem      import PixItem
+from dotsShared      import common, paths
+from dotsBkgItem     import *
+from dotsPixItem     import PixItem
 
 ### ---------------------- dotsSideCar ---------------------
+''' dotsSideCar: handles the load, save, pixtest, and grid 
+    functions as well as the MsgBox class  '''
+### --------------------------------------------------------
 class SideCar():
 
     def __init__(self, parent):
         super().__init__()
  
-        self.parent = parent
-        self.shared = dotsQt.Shared()
-        self.gridZ  = self.shared.gridZ
-        
+        self.canvas = parent
+        self.gridZ  = common["gridZ"] 
+
         self.gridSet = False
         self.openPlayFile = ''
     
@@ -30,8 +31,8 @@ class SideCar():
     def loadPlay(self):
         dlist = []
         Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self.parent,
-             "Choose a file to open", self.shared.playPath, "Files (*.play)")
+        file, _ = Q.getOpenFileName(self.canvas,
+             "Choose a file to open", paths["playPath"], "Files (*.play)")
         if file:
             try:
                 with open(file, 'r') as fp:  ## read a play file
@@ -40,42 +41,45 @@ class SideCar():
                 MsgBox("Error loading file")
                 return
         if dlist:
-            if self.parent.initMap.mapSet:
-                self.parent.initMap.removeMap()
-            self.parent.pixCount = self.parent.toFront(0.0)  
+            if self.canvas.initMap.mapSet:
+                self.canvas.initMap.removeMap()
+            self.canvas.pixCount = self.toFront(0.0)  
             for dict in dlist:          
-                self.parent.pixCount += 1
+                self.canvas.pixCount += 1
                 if dict['type'] == 'bkg':
-                    if not path.exists(self.shared.bkgPath + dict['fname']):       
+                    if not path.exists(paths["bkgPath"] + dict['fname']):       
                         continue  
-                    pix = BkgItem(self.shared.bkgPath + dict['fname'],
-                        self.shared.viewW+2, 
-                        self.shared.viewH+2,
-                        self.parent)
+                    pix = BkgItem(paths["bkgPath"] + dict['fname'],
+                        self.canvas)
                     ## lock all
                     pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
                 else:
-                    if not path.exists(self.shared.spritePath + dict['fname']):       
-                        continue  
-                    pix = PixItem(self.shared.spritePath + dict['fname'],
-                        self.parent.pixCount,
+                    if not path.exists(paths["spritePath"] + dict['fname']):       
+                        continue  ## could be outside of paths or deleted
+                    pix = PixItem(paths["spritePath"] + dict['fname'],
+                        self.canvas.pixCount,
                         0, 0, 
-                        self.parent)
+                        self.canvas)
                 ## set for both
                 pix.x = dict['x']
                 pix.y = dict['y']
                 pix.setPos(pix.x,pix.y)
-                pix.setZValue(dict['z']),  ## zval may not match id
+                if dict['type'] == 'bkg':
+                    pix.setZValue(dict['z']),  ## zval may not match id
                 pix.setMirrored(dict['mirror']),
                 pix.rotation = dict['rotation']
-                pix.scale = dict['scale']             
+                pix.scale = dict['scale'] 
+                if 'tag' not in dict.keys():  ## seriously good to know
+                    dict['tag'] = ''
+                else:
+                    pix.tag = dict['tag']          
                 self.transFormPixItem(pix, pix.rotation, pix.scale)
             self.openPlayFile = file
-            self.parent.disableSliders()
+            self.canvas.disableSliders()
 
     def savePlay(self):
         dlist = []  
-        for pix in self.parent.scene.items(Qt.AscendingOrder):
+        for pix in self.canvas.scene.items(Qt.AscendingOrder):
             if pix.type in "pix,bkg":
                 if not path.exists(pix.fileName):
                     continue
@@ -88,15 +92,17 @@ class SideCar():
                     "mirror": pix.flopped,
                     "rotation": pix.rotation,
                     "scale": pix.scale,
-                    }
+                    "tag": pix.tag,
+                }
                 dlist.append(dict)
         if dlist:
             Q = QFileDialog()
             if self.openPlayFile == '':
-                self.openPlayFile = self.shared.playPath + 'tmp.play'
-            f = Q.getSaveFileName(self.parent, self.shared.playPath,  
+                self.openPlayFile = paths["playPath"] + 'tmp.play'
+            f = Q.getSaveFileName(self.canvas, 
+                paths["playPath"],  
                 self.openPlayFile)
-            if not len(f[0]): 
+            if not f[0]: 
                 return
             elif not f[0].lower().endswith('.play'):
                 MsgBox("Wrong file extention - use '.play'")    
@@ -104,7 +110,7 @@ class SideCar():
                 try:
                     with open(f[0], 'w') as fp:
                         json.dump(dlist, fp)
-                        MsgBox("Saved as " +  os.path.basename(f[0]))
+                        # MsgBox("Saved as " +  os.path.basename(f[0]))
                 except IOError:
                         MsgBox("Error loading file")
                         return
@@ -113,27 +119,27 @@ class SideCar():
 
 ### --------------------------------------------------------
     def pixTest(self):
-        self.parent.pixCount = self.parent.toFront(0.0)  
+        self.canvas.pixCount = self.toFront(0.0)  
         for _ in range(10):
-            self.parent.pixCount += 1
-            pix = PixItem(self.shared.spritePath + 'apple.png',
-                    self.parent.pixCount,
+            self.canvas.pixCount += 1
+            pix = PixItem(paths["spritePath"] + 'apple.png',
+                    self.canvas.pixCount,
                     0, 0, 
-                    self.parent)
+                    self.canvas)
             x = int(constrain(
-                    xy(self.shared.viewW),
+                    xy(common["viewW"]),
                     pix.width, 
-                    self.shared.viewW, 
-                    pix.width * -self.shared.factor))
+                    common["viewW"], 
+                    pix.width * -common["factor"]))
             y = int(constrain(
-                    xy(self.shared.viewH),
+                    xy(common["viewH"]),
                     pix.height, 
-                    self.shared.viewH,
-                    pix.height * -self.shared.factor))
+                    common["viewH"],
+                    pix.height * -common["factor"]))
             pix.x, pix.y = x, y
             pix.setPos(x,y)
             rotation = random.randrange(1, 24) * 15
-            scale = random.randrange(50, 150) / 100
+            scale = random.randrange(50, 150)/100.0
             self.transFormPixItem(pix, rotation, scale)
          
     def transFormPixItem(self, pix, rotation, scale):
@@ -143,33 +149,50 @@ class SideCar():
         pix.scale, pix.rotation = scale, rotation
         pix.setScale(scale)
         pix.setRotation(rotation)
-        self.parent.scene.addItem(pix)
+        self.canvas.scene.addItem(pix)
+  
+    def toFront(self, inc):  ## finds the highest pixitem zValue
+        first = 0.0           ## returns it plus the increment
+        for pix in self.canvas.scene.items():
+            if pix.type == 'pix': 
+                first = pix.zValue()
+                break
+            elif pix.zValue() <= self.gridZ:
+                break
+        return inc + first
+
+    def lastZval(self, str): ## finds the lowest pix or bkg zValue
+        last = 100000.0
+        for itm in self.canvas.scene.items():
+            if itm.type == str and itm.zValue() < last:
+                last = itm.zValue()
+        return last
 
 ### --------------------------------------------------------
     def initGrid(self):
         self.gridGroup = QGraphicsItemGroup()
-        gs = self.shared.gridSize
+        gs = common["gridSize"]
         pen = QPen(QColor(0,0,255))
-        for i in range(int(self.shared.viewH/gs)):
+        for i in range(int(common["viewH"]/gs)):
             self.addLines(QGraphicsLineItem(0.0, gs*i,
-                float(self.shared.viewW), gs*i), pen)
-        for j in range(int(self.shared.viewW/gs)):
+                float(common["viewW"]), gs*i), pen)
+        for j in range(int(common["viewW"]/gs)):
             self.addLines(QGraphicsLineItem(gs*j, 0.0,
-                gs*j, float(self.shared.viewH)), pen)
+                gs*j, float(common["viewH"])), pen)
         self.gridGroup.setZValue(self.gridZ)     
-        self.parent.scene.addItem(self.gridGroup)
+        self.canvas.scene.addItem(self.gridGroup)
         self.gridSet = True
 
     def addLines(self, line, pen):
         line.type = 'grid'
         line.setPen(pen)
-        line.setOpacity(.40)
+        line.setOpacity(common["factor"])
         line.setZValue(self.gridZ)
         line.setFlag(QGraphicsLineItem.ItemIsMovable, False)
         self.gridGroup.addToGroup(line)
         
     def toggleGrid(self):
-        if len(self.parent.scene.items()) == 0 or self.gridSet == False:
+        if not self.canvas.scene.items() or self.gridSet == False:
             self.initGrid()
         else: 
             if self.gridGroup.isVisible():
@@ -216,7 +239,7 @@ def mirrorSet(self, mirror):
     self.setTransformationMode(Qt.SmoothTransformation)
 
 def widthHeightSet(self):
-    # sidecar.mirrorSet(self)
+    # sideCar.mirrorSet(self)
     brt = self.boundingRect()
     self.width = brt.width()
     self.height = brt.height()
@@ -239,4 +262,11 @@ def snapTag():
 def xy(max):
     return random.randrange(-40, max+40)
 
+## save for now
+    # timer = QTimer()
+    # timer.start(50)
+    # timer.setSingleShot(True)
+    # QTimer.singleShot(1000, self.hide)
+
 ### ---------------------- dotsSideCar ---------------------
+

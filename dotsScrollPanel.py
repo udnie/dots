@@ -4,12 +4,14 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-from functools import partial
-
-import dotsQt 
+from dotsShared      import common, paths
+from functools       import partial
+from dotsSideCar     import MsgBox
 
 ### ------------------- dotsScrollPanel --------------------
-
+''' dotsScrollPanel: handles scrolling sprite selections.
+    Includes ImgLabel and ScrollPanel classes. '''
+### --------------------------------------------------------
 maxH, maxW = 135, 165         # max image size
 labelH, labelW = 170, 195     # max label size
 scrollW, scrollH = 215, 682   # panel size
@@ -24,11 +26,10 @@ class ImgLabel(QLabel):
     def __init__(self, imgFile, count, parent):
         super().__init__()
    
-        self.shared = dotsQt.Shared()
+        self.dots = parent
+        self.dots.canvas = parent.canvas
 
         self.imgFile = imgFile
-        self.parent = parent
-
         self.id = count 
        
         self.setFrameShape(QFrame.Panel|QFrame.Raised)
@@ -76,7 +77,7 @@ class ImgLabel(QLabel):
         qp.setPen(pen)  
         qp.setFont(font)
         imgFile = os.path.basename(self.imgFile)
-        metrics = QFontMetrics(font)
+        metrics = QFontMetrics(font)    
 
         p = (labelW - metrics.width(imgFile))/2 
         qp.drawText(p, 160, imgFile)
@@ -89,8 +90,8 @@ class ImgLabel(QLabel):
         return self.minimumSizeHint()
 
     def mousePressEvent(self, event):
-        if self.parent.canvas.key == 'del':
-            self.parent.deleteImgLabel(self)
+        if self.dots.canvas.key == 'del':
+            self.dots.deleteImgLabel(self)
 
     def mouseMoveEvent(self, event):
         self.startDrag()
@@ -102,7 +103,7 @@ class ImgLabel(QLabel):
     
         data.setUrls([QUrl.fromLocalFile(self.imgFile)])
         drag.setMimeData(data)
-        drag.setPixmap(QPixmap(self.shared.imagePath + 'dnd2.png'))
+        drag.setPixmap(QPixmap(paths['imagePath'] + 'dnd2.png'))
         drag.exec_()
      
     def drawStar(self):
@@ -139,10 +140,10 @@ class ScrollPanel(QWidget):
     def __init__(self, parent):
         super().__init__()
         
-        self.parent = parent
-        self.canvas = parent.canvas
+        self.dots = parent
+        self.canvas = parent.canvas ## used in imgLabel
+        self.scene  = parent.scene 
 
-        self.shared = dotsQt.Shared()
         self.setFixedSize(scrollW,scrollH)
    
         self.layout = QVBoxLayout(self)
@@ -173,7 +174,7 @@ class ScrollPanel(QWidget):
         self.scrollList = []
 
     def leaveEvent(self, e):
-        self.parent.view.setFocus()
+        self.scene.setFocus()
 
 ### --------------------------------------------------------
     def add(self, fname):   
@@ -212,9 +213,9 @@ class ScrollPanel(QWidget):
     def scrollFiles(self):
         Q = QFileDialog()
         files, _ = Q.getOpenFileNames(self,
-            "Choose an image file to open", self.shared.snapShot, 
+            "Choose an image file to open", paths['snapShot'], 
             "Images Files(*.bmp *.jpg *.png)")
-        if len(files) != 0:
+        if files:
             for imgFile in files:
                 self.add(imgFile)
         Q.done(0)
@@ -230,16 +231,16 @@ class ScrollPanel(QWidget):
 
     def spriteList(self):
         try:
-            files = os.listdir(self.shared.spritePath)
+            files = os.listdir(paths['spritePath'])
         except IOError:
-            self.canvas.MsgBox("No Sprite Directory Found!", 5)
+            MsgBox("No Sprite Directory Found!", 5)
             return None  
         filenames = []
         for file in files:
             if file.lower().endswith('png'): 
-                filenames.append(self.shared.spritePath + file)
+                filenames.append(paths['spritePath'] + file)
         if not filenames:
-            self.canvas.MsgBox("No Sprites Found!", 5)
+            MsgBox("No Sprites Found!", 5)
         return filenames
 
 ### ------------------- dotsScrollPanel --------------------

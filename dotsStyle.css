@@ -1,5 +1,5 @@
-/*css stylesheet file for buttons
-  and button groups in dotsQt.py*/
+/*css stylesheet file for buttons, groups,
+scrollbars in dotsQt.py*/
 
 QPushButton { 
   background: white;
@@ -36,7 +36,7 @@ QGroupBox {
   border: 1px solid rgb(100,100,100);
   border-radius: 3px;
   font-size: 14px;
-  margin-top: 5px; 
+  margin-top: 5px;
 } 
 
 QGroupBox:title {
@@ -57,3 +57,4 @@ QScrollBar:handle:vertical {
   background-color: rgb(210, 210, 210);
   min-height: 100px;
 } 
+
