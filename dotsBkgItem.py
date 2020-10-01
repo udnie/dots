@@ -67,17 +67,18 @@ class BkgItem(QGraphicsPixmapItem):
     def mousePressEvent(self, e):
         if e.button() == Qt.RightButton:
             self.ungrabMouse()   
+
         if self.canvas.key == 'del':       # delete it
             self.canvas.scene.removeItem(self)
             self.canvas.disableSliders()
             self.canvas.buttons.btnBkgFiles.setEnabled(True)
+
         elif self.canvas.key == 'bak':    # send to back
             self.setZValue(self.sideCar.lastZval('bkg')-1)
+
         elif self.canvas.key == 'shift':
-            if self.flopped == False:
-                self.flopped = True
-            else:
-                self.flopped = False
+            # Toggle flopped state.
+            self.flopped = not self.flopped
             self.setMirrored(self.flopped)
 
     def setMirrored(self, mirror):
@@ -160,34 +161,36 @@ class InitBkg(QWidget):
     def saveBkg(self):
         if not self.bkg.isBackgroundSet:
             self.canvas.MsgBox("Set to Background inorder to save", 3)
+            return
+
+        file = os.path.basename(self.bkg.fileName)
+        file = file[0: file.index('.')]
+        file = file[:15] + "-bkg.jpg"
+        ## if it's not already a bkg file and the new file doesn't exist
+        if not self.bkg.fileName.lower().endswith("-bkg.jpg") and not \
+            path.exists(paths["bkgPath"]+ file):
+            self.bkg.fileName = paths["bkgPath"] + file
+            flopped = self.bkg.flopped
+            pix = self.canvas.view.grab(QRect(QPoint(1,1), QSize()))
+            pix.save(paths["bkgPath"] + file,
+                format='jpg',
+                quality=100)
+            self.canvas.MsgBox("Saved as " + file, 3)
+            self.canvas.clear() ## replace current background with "-bkg.jpg" copy   
+            self.addBkg(self.bkg.fileName, flopped)
         else:
-            file = os.path.basename(self.bkg.fileName)
-            file = file[0: file.index('.')]
-            file = file[:15] + "-bkg.jpg"
-            ## if it's not already a bkg file and the new file doesn't exist
-            if not self.bkg.fileName.lower().endswith("-bkg.jpg") and not \
-                path.exists(paths["bkgPath"]+ file):
-                self.bkg.fileName = paths["bkgPath"] + file
-                flopped = self.bkg.flopped
-                pix = self.canvas.view.grab(QRect(QPoint(1,1), QSize()))
-                pix.save(paths["bkgPath"] + file,
-                    format='jpg',
-                    quality=100)
-                self.canvas.MsgBox("Saved as " + file, 3)
-                self.canvas.clear() ## replace current background with "-bkg.jpg" copy   
-                self.addBkg(self.bkg.fileName, flopped)
-            else:
-                self.canvas.MsgBox("Already saved as background jpg")
-            self.buttons.btnBkgFiles.setEnabled(True)
-            self.enableSave(False)
+            self.canvas.MsgBox("Already saved as background jpg")
+        self.buttons.btnBkgFiles.setEnabled(True)
+        self.enableSave(False)
 
     def setBkg(self):  ## from set background button
         if self.bkg.isBackgroundSet == False and self.bkg.key != 'lock':
             self.lockBkg()
-        else:
-            self.enableSave(False)
-            self.buttons.btnBkgFiles.setEnabled(True)
-            self.canvas.MsgBox("Already set to background")
+            return
+
+        self.enableSave(False)
+        self.buttons.btnBkgFiles.setEnabled(True)
+        self.canvas.MsgBox("Already set to background")
 
     def lockBkg(self):
         self.sliders.enableSliders(False)

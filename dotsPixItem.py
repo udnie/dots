@@ -14,6 +14,20 @@ import dotsAnimation  as animat
 incZ = 1.0      # increment zValue
 pixfactor = .30  # beginnig size factor 
 
+KEYS_MOVE = ("left","right","up", "down")
+KEYS_ROTATE = (":", '"', ">", "<", "{", "}")
+KEYS_SCALE = ("-","+")
+
+ROTATION_VALS = {
+    '}': 45,
+    '>': +15,
+    '"': 1,
+    ':': -1,
+    '<': -15,
+    '{': -45,
+}
+
+
 ### --------------------- dotsPixItem ----------------------
 ''' dotsPixItem: primary dots screen object '''
 ### --------------------------------------------------------
@@ -76,11 +90,11 @@ class PixItem(QGraphicsPixmapItem):
     def setPixKeys(self, key):
         self.key = key  
         if self.isHidden or self.isSelected():
-            if key in(":", '"', ">", "<", "{", "}"):
+            if key in KEYS_ROTATE:
                 self.rotateThis(key)
-            elif key in("-","+"):
+            elif key in KEYS_SCALE:
                 self.scaleThis(key)  
-            elif key in("left","right","up", "down"):
+            elif key in KEYS_MOVE:
                 self.moveThis(key)
 
     def setMirrored(self, mirror):
@@ -215,30 +229,14 @@ class PixItem(QGraphicsPixmapItem):
   
     def rotateThis(self, key):
         self.setOriginPt() 
-        if key in ('>', '}', '"'):
-            if self.rotation >= 360:  ## forces back to zero
-                self.rotation = 0
-            if key == '>':
-                angle = 15
-            elif key == '}':
-                angle = 45
-            else:
-                angle = 1
-            p = self.rotation + angle
-        elif key in ('<', '{', ':'):
-            if self.rotation <= 0:  ## forces back to 360
-                self.rotation = 360
-            if key == '<':
-                angle = -15
-            elif key == '{':
-                angle = -45
-            else:
-                angle = -1
-            p = self.rotation + angle
-            if p > 360: 
-                p = p - 360
-            elif p < 0:
-                p = p + 360
+
+        angle = ROTATION_VALS[key]
+        p = self.rotation + angle
+        if p > 360: 
+            p = p - 360
+        elif p < 0:
+            p = p + 360
+        
         self.rotation = p
         self.setRotation(self.rotation) 
 

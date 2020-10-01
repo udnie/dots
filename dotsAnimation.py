@@ -41,28 +41,34 @@ class Node(QObject):
     rotate = pyqtProperty(int, fset=_setRotate) 
     opacity = pyqtProperty(float, fset=_setOpacity) 
 
+
 ### --------------------------------------------------------
+
 def setAnimation(anime, pix):
     if anime == 'Random':
         anime = _random()
         pix.tag = pix.tag + ',' + anime
-    if anime == 'Vibrate':
-        return vibrate(pix)
-    elif anime == 'Pulse':
-        return pulse(pix)
-    elif anime == 'Bobble':
-        return bobble(pix)
-    elif anime == 'Idle':
-        return idle(pix)
-    elif anime == 'Rain':
+    
+    _animation_operations = {
+    'Vibrate': vibrate,
+    'Pulse': pulse,
+    'Bobble': bobble,
+    'Idle': idle,
+    'Reprise': reprise
+}
+
+    if anime in _animation_operations:
+        fn = _animation_operations[anime]
+        return fn(pix)
+
+    if anime == 'Rain':
         return rain(pix, Node(pix))
-    elif anime == 'Reprise':
-        return reprise(pix)
-    elif anime in ['Stage Left', 'Stage Right']:
+    if anime in ['Stage Left', 'Stage Right']:
         return stage(pix, anime)
-    elif anime in ['Spin Left', 'Spin Right']:
+    if anime in ['Spin Left', 'Spin Right']:
         return spin(pix, anime, Node(pix))
-    elif anime in pathList:
+
+    if anime in pathList:
         return setPaths(pix, anime, Node(pix))
 
 ### --------------------------------------------------------
@@ -243,34 +249,10 @@ def stage(pix, which):
     right = viewW+node.pix.width*3
 
     if which.endswith('Left'):
-        stage1 = QPropertyAnimation(node, b'pos')
-        stage1.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage1.setStartValue(pos)
-        stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
-        stage1.setEndValue(pos + QPointF(-left, 0))
-
-        stage2 = QPropertyAnimation(node, b'pos')
-        stage2.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage2.setStartValue(QPointF(right, 0))
-        stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
-        stage2.setEndValue(pos)
+        stage1, stage2 = self._stage_left(node, pos, left, right)
     else:
-        stage1 = QPropertyAnimation(node, b'pos')
-        stage1.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage1.setStartValue(pos)
-        stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))
-        stage1.setEndValue(pos + QPointF(right, 0))
+        stage1, stage2 = self._stage_right(node, pos, left, right)
 
-        stage2 = QPropertyAnimation(node, b'pos')
-        stage2.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage2.setStartValue(pos + QPointF(-left, 0))
-        stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
-        stage2.setEndValue(pos)
-   
     stage = QSequentialAnimationGroup()
     stage.addAnimation(stage1)
     stage.addAnimation(stage2)
@@ -278,6 +260,40 @@ def stage(pix, which):
     stage.setLoopCount(-1)
 
     return stage
+
+def _stage_left(node, pos, left, right):
+    stage1 = QPropertyAnimation(node, b'pos')
+    stage1.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage1.setStartValue(pos)
+    stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
+    stage1.setEndValue(pos + QPointF(-left, 0))
+
+    stage2 = QPropertyAnimation(node, b'pos')
+    stage2.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage2.setStartValue(QPointF(right, 0))
+    stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
+    stage2.setEndValue(pos) 
+    
+    return stage1, stage2
+
+def _stage_right(node, pos, left, right):
+    stage1 = QPropertyAnimation(node, b'pos')
+    stage1.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage1.setStartValue(pos)
+    stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))
+    stage1.setEndValue(pos + QPointF(right, 0))
+
+    stage2 = QPropertyAnimation(node, b'pos')
+    stage2.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage2.setStartValue(pos + QPointF(-left, 0))
+    stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
+    stage2.setEndValue(pos)
+
+    return stage1, stage2
 
 def spin(pix, anime, node):           
     node.pix.setOriginPt()
@@ -372,13 +388,13 @@ def pathLoader(anime):
         poly = QPainterPath()
         # file = paths["paths"] + anime  
         with open(file, 'r') as fp:
-            ln = fp.readline().rstrip() 
-            while ln:  
+            for line in fp:
+                ln = line.rstrip()
                 ln = list(map(float, ln.split(',')))
                 if not poly.elementCount():
                     poly.moveTo(QPointF(ln[0], ln[1]))
-                poly.lineTo(QPointF(ln[0], ln[1])) 
-                ln = fp.readline()
+                poly.lineTo(QPointF(ln[0], ln[1]))
+
         poly.closeSubpath()
         return poly
     except IOError:

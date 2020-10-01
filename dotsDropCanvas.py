@@ -211,11 +211,10 @@ class DropCanvas(QMainWindow):
         return False
 
     def itemsPixcount(self):
-        k = 0
-        for pix in self.scene.items():
-            if pix.type == 'pix':
-                k += 1
-        return k
+        return sum(
+            pix.type == 'pix' 
+            for pix in self.scene.items()
+        )
 
     def ZDump(self):
         for pix in self.scene.items():
