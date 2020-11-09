@@ -33,8 +33,6 @@ class ImgLabel(QLabel):
         self.id = count 
        
         self.setFrameShape(QFrame.Panel|QFrame.Raised)
-        # self.setLineWidth(2)
-        # self.setMidLineWidth(2)
      
 ### --------------------------------------------------------
     def paintEvent(self, e):
@@ -76,11 +74,11 @@ class ImgLabel(QLabel):
 
         qp.setPen(pen)  
         qp.setFont(font)
-        imgFile = os.path.basename(self.imgFile)
+        imgfile = os.path.basename(self.imgFile)
         metrics = QFontMetrics(font)    
 
-        p = (labelW - metrics.width(imgFile))/2 
-        qp.drawText(p, 160, imgFile)
+        p = (labelW - metrics.width(imgfile))/2 
+        qp.drawText(p, 160, imgfile)
         qp.end()
 
     def minimumSizeHint(self):
@@ -140,7 +138,7 @@ class ScrollPanel(QWidget):
     def __init__(self, parent):
         super().__init__()
         
-        self.dots = parent
+        self.dots   = parent
         self.canvas = parent.canvas ## used in imgLabel
         self.scene  = parent.scene 
 
@@ -172,9 +170,6 @@ class ScrollPanel(QWidget):
 
         self.scrollCount = 0
         self.scrollList = []
-
-    def leaveEvent(self, e):
-        self.scene.setFocus()
 
 ### --------------------------------------------------------
     def add(self, fname):   

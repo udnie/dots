@@ -36,7 +36,7 @@ class DotsQt(QWidget):
 
         self.resize(dotsW,dotsH)            
         self.scrollpanel = scrollPanel.ScrollPanel(self)
-
+   
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.addMainGroup())
         mainLayout.addLayout(self.addButtonGroup())   
@@ -49,8 +49,8 @@ class DotsQt(QWidget):
         self.setFixedSize(dotsW,dotsH)
         self.canvas.disableSliders()
      
-        ## just in case the sprite ditectory is missing
-        QTimer.singleShot(350, self.canvas.loadSprites)
+        ## just in case the sprite directory is missing
+        QTimer.singleShot(250, self.canvas.loadSprites)
 
         sideCar.setCursor()
         self.show()
@@ -97,7 +97,7 @@ class Buttons(QWidget):
 ### --------------------------------------------------------
     def addScrollBtnGroup(self):  
         self.scrollGroup = QGroupBox("Scroll Panel")
-        self.scrollGroup.setFixedWidth(475)
+        self.scrollGroup.setFixedWidth(425)
         ## this sets the position of the title
         self.scrollGroup.setAlignment(Qt.AlignHCenter)
 
@@ -133,10 +133,9 @@ class Buttons(QWidget):
 ### -----------------------------------------------------
     def addPlayBtnGroup(self):
         self.playGroup = QGroupBox("Play")
-        self.playGroup.setFixedWidth(375) 
+        self.playGroup.setFixedWidth(350) 
         self.playGroup.setAlignment(Qt.AlignHCenter)
 
-        self.sideCar = self.dots.canvas.sideCar
         self.sideShow = self.dots.canvas.sideShow
 
         btnLoad = QPushButton("Load")
@@ -153,12 +152,13 @@ class Buttons(QWidget):
         layout.addWidget(self.btnStop)
         layout.addWidget(btnSave)
 
-        btnLoad.clicked.connect(self.sideCar.loadPlay)
+        btnLoad.clicked.connect(self.sideShow.loadPlay)
+        btnSave.clicked.connect(self.sideShow.savePlay) 
+
         self.btnPlay.clicked.connect(self.sideShow.play)
         self.btnPause.clicked.connect(self.sideShow.pause)
         self.btnStop.clicked.connect(self.sideShow.stop)
-        btnSave.clicked.connect(self.sideCar.savePlay)
-
+    
         self.playGroup.setLayout(layout)
 
         return self.playGroup
@@ -166,7 +166,7 @@ class Buttons(QWidget):
 ### -----------------------------------------------------
     def addBkgBtnGroup(self):
         self.backgroundGroup = QGroupBox("Background")
-        self.backgroundGroup.setFixedWidth(250)
+        self.backgroundGroup.setFixedWidth(225)
         self.backgroundGroup.setAlignment(Qt.AlignHCenter)
 
         self.btnBkgFiles = QPushButton(" Add ")
@@ -192,27 +192,31 @@ class Buttons(QWidget):
 ### -----------------------------------------------------
     def addCanvasBtnGroup(self):
         self.canvasGroup = QGroupBox("Canvas")
-        self.canvasGroup.setFixedWidth(325) 
+        self.canvasGroup.setFixedWidth(400) 
         self.canvasGroup.setAlignment(Qt.AlignHCenter)
 
         self.canvas = self.dots.canvas
+        self.pathMaker = self.dots.canvas.pathMaker
 
         btnClrCanvas = QPushButton("Clear")
+        self.btnPathMaker = QPushButton("Path Maker")
         btnSnapShot = QPushButton("Shapshot")  
         btnPixTest = QPushButton("Pix Test")
         btnExit = QPushButton("Exit")
 
         layout = QHBoxLayout()    
 
-        layout.addWidget(btnClrCanvas)  
+        layout.addWidget(btnClrCanvas) 
+        layout.addWidget(self.btnPathMaker)  
         layout.addWidget(btnSnapShot)      
         layout.addWidget(btnPixTest)
         layout.addWidget(btnExit)
         
-        btnClrCanvas.clicked.connect(self.canvas.clear)        
+        self.btnPathMaker.clicked.connect(self.pathMaker.setPathMaker)      
+        btnClrCanvas.clicked.connect(self.canvas.clear)   
         btnSnapShot.clicked.connect(self.canvas.initBkg.snapShot)
         btnPixTest.clicked.connect(self.canvas.sideCar.pixTest)
-        btnExit.clicked.connect(self.dots.close)
+        btnExit.clicked.connect(self.canvas.exit)
 
         self.canvasGroup.setLayout(layout)
 

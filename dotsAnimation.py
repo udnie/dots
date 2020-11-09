@@ -2,20 +2,23 @@ import sys
 import random
 import time
 
-from PyQt5.QtCore  import *
-from PyQt5.QtGui   import *
+from PyQt5.QtCore     import *
+from PyQt5.QtGui      import *
+from PyQt5.QtWidgets  import *
 
-from dotsShared    import common, paths
-from dotsSideCar   import MsgBox
+from dotsSideCar      import MsgBox
+from dotsShared       import common
 
-animeList = ['Vibrate', 'Pulse','Bobble','Idle','Rain','Spin Left',
-        'Spin Right','Stage Left','Stage Right']
+import dotsSidePath   as sidePath
 
-pathList = ['11.path', 'a-12.path', 'ort.path']
+animeList = ['Vibrate', 'Pulse','Bobble','Idle']
+oneOffs = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
+
+animeList += oneOffs
 
 ### -------------------- dotsAnimation ---------------------
-''' dotsAnimation: contains many the dotsFx basic animations,
-    pathLoader and the Node class - just like in java '''
+''' dotsAnimation: contains many basic animations and the  
+    Node class - just like in java. Moved paths to dotsPaths '''
 ### --------------------------------------------------------
 class Node(QObject):
 
@@ -39,38 +42,53 @@ class Node(QObject):
     pos = pyqtProperty(QPointF, fset=_setPos)
     scale = pyqtProperty(float, fset=_setScale) 
     rotate = pyqtProperty(int, fset=_setRotate) 
-    opacity = pyqtProperty(float, fset=_setOpacity) 
+    opacity = pyqtProperty(float, fset=_setOpacity)
+
+### -------------------------------------------------------- 
+class Animation():
+    
+    def __init__(self, parent):
+        super().__init__()
+
+        self.canvas    = parent 
+        self.pathMaker = parent.pathMaker
+  
+        self.singleFunctions = {  ## values are objects 
+            'Vibrate': vibrate,  
+            'Pulse': pulse,
+            'Bobble': bobble,
+            'Idle': idle
+        }
 
 ### --------------------------------------------------------
-def setAnimation(anime, pix):
-    if anime == 'Random':
-        anime = _random()
-        pix.tag = pix.tag + ',' + anime
-    if anime == 'Vibrate':
-        return vibrate(pix)
-    elif anime == 'Pulse':
-        return pulse(pix)
-    elif anime == 'Bobble':
-        return bobble(pix)
-    elif anime == 'Idle':
-        return idle(pix)
-    elif anime == 'Rain':
-        return rain(pix, Node(pix))
-    elif anime == 'Reprise':
-        return reprise(pix)
-    elif anime in ['Stage Left', 'Stage Right']:
-        return stage(pix, anime)
-    elif anime in ['Spin Left', 'Spin Right']:
-        return spin(pix, anime, Node(pix))
-    elif anime in pathList:
-        return setPaths(pix, anime, Node(pix))
+    def setAnimation(self, anime, pix):
+        ## pathList comes from self.canvas.pathList
+        ## this function returns an animation to a pixitem
+        if anime == 'Random':
+            anime = self._random()   ## add the animation type to the tag
+            pix.tag = pix.tag + ',' + anime 
+
+        if anime in self.singleFunctions:  ## thanks again to Martin
+            fn = self.singleFunctions[anime]  ## objects passed as functions
+            return fn(pix)
+
+        ## one-offs
+        if anime == 'Rain':
+            return rain(pix, Node(pix))
+        elif anime in ['Stage Left', 'Stage Right']:
+            return stage(pix, anime)
+        elif anime in ['Spin Left', 'Spin Right']:
+            return spin(pix, anime, Node(pix))
+        elif anime == 'demo.path':
+            return sidePath.demo(pix, anime, Node(pix))
+        elif anime in self.canvas.pathList:
+            return sidePath.setPaths(pix, anime, Node(pix))
 
 ### --------------------------------------------------------
-def _random():  
-    random.seed()
-    r = animeList + pathList
-    r = r[random.randint(0,len(r)-1)]
-    return r
+    def _random(self):  
+        random.seed()
+        r = animeList + self.canvas.pathList 
+        return r[random.randint(0,len(r)-1)]
 
 ### --------------------------------------------------------
 def vibrate(pix):  
@@ -243,33 +261,9 @@ def stage(pix, which):
     right = viewW+node.pix.width*3
 
     if which.endswith('Left'):
-        stage1 = QPropertyAnimation(node, b'pos')
-        stage1.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage1.setStartValue(pos)
-        stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
-        stage1.setEndValue(pos + QPointF(-left, 0))
-
-        stage2 = QPropertyAnimation(node, b'pos')
-        stage2.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage2.setStartValue(QPointF(right, 0))
-        stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
-        stage2.setEndValue(pos)
+        stage1, stage2 = stageLeft(node, pos, left, right)
     else:
-        stage1 = QPropertyAnimation(node, b'pos')
-        stage1.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage1.setStartValue(pos)
-        stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))
-        stage1.setEndValue(pos + QPointF(right, 0))
-
-        stage2 = QPropertyAnimation(node, b'pos')
-        stage2.setDuration(random.randint(14, 23) * 75)
-        val = (random.randint(7, 13) * 5) / 100
-        stage2.setStartValue(pos + QPointF(-left, 0))
-        stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
-        stage2.setEndValue(pos)
+        stage1, stage2 = stageRight(node, pos, left, right)
    
     stage = QSequentialAnimationGroup()
     stage.addAnimation(stage1)
@@ -278,6 +272,40 @@ def stage(pix, which):
     stage.setLoopCount(-1)
 
     return stage
+
+def stageLeft(node, pos, left, right):
+    stage1 = QPropertyAnimation(node, b'pos')
+    stage1.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage1.setStartValue(pos)
+    stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
+    stage1.setEndValue(pos + QPointF(-left, 0))
+
+    stage2 = QPropertyAnimation(node, b'pos')
+    stage2.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage2.setStartValue(QPointF(right, 0))
+    stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
+    stage2.setEndValue(pos) 
+    
+    return stage1, stage2
+
+def stageRight(node, pos, left, right):
+    stage1 = QPropertyAnimation(node, b'pos')
+    stage1.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage1.setStartValue(pos)
+    stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))
+    stage1.setEndValue(pos + QPointF(right, 0))
+
+    stage2 = QPropertyAnimation(node, b'pos')
+    stage2.setDuration(random.randint(14, 23) * 75)
+    val = (random.randint(7, 13) * 5) / 100
+    stage2.setStartValue(pos + QPointF(-left, 0))
+    stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
+    stage2.setEndValue(pos)
+
+    return stage1, stage2
 
 def spin(pix, anime, node):           
     node.pix.setOriginPt()
@@ -343,45 +371,5 @@ def rain(pix, node):
 
     return rain
 
-### --------------------------------------------------------
-def setPaths(pix, anime, node):           
-    node.pix.setOriginPt()
-    pos  = node.pix.pos()
-    sync = random.randint(73,173) * 100  ## very arbitrary
-
-    path = QPropertyAnimation(node, b'pos')
-    path.setDuration(sync)
-
-    waypts = pathLoader(anime)
-    if not waypts: return
-    ## offset needed for paths for this setup
-    waypts.translate(-165.0,-65.0)
-
-    path.setStartValue(waypts.pointAtPercent(0.0)) 
-    for i in range(1, 99):    
-        path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0))
-    path.setEndValue(waypts.pointAtPercent(1.0))  
-    path.setLoopCount(-1) 
-
-    return path
-    
-### --------------------------------------------------------
-def pathLoader(anime):
-    file = paths["paths"] + anime  ## includes '.path'
-    try:
-        poly = QPainterPath()
-        # file = paths["paths"] + anime  
-        with open(file, 'r') as fp:
-            ln = fp.readline().rstrip() 
-            while ln:  
-                ln = list(map(float, ln.split(',')))
-                if not poly.elementCount():
-                    poly.moveTo(QPointF(ln[0], ln[1]))
-                poly.lineTo(QPointF(ln[0], ln[1])) 
-                ln = fp.readline()
-        poly.closeSubpath()
-        return poly
-    except IOError:
-        MsgBox("Error loading path file")
-
 ### -------------------- dotsAnimation ---------------------
+

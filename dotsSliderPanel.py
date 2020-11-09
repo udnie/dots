@@ -2,6 +2,8 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
+from dotsShared      import keyMenu, pathMenu
+
 ### ------------------- dotsSliderPanel ----------------
 sliderW, sliderH = 195, 682
 
@@ -19,9 +21,9 @@ class SliderPanel(QWidget):
         self.setFixedSize(sliderW, sliderH) 
   
         self.isEnabled = False
+        self.pathMenuSet = False
 
-        layout = QVBoxLayout(self)
-        
+        layout = QVBoxLayout(self)        
         layout.addWidget(self.addTableGroup())     
         layout.addWidget(self.addSliderGroup())
 
@@ -39,39 +41,11 @@ class SliderPanel(QWidget):
     def addTableGroup(self):
         self.tableGroup = QGroupBox("")
         self.tableGroup.setFixedSize(sliderW,352)
-
         self.tableGroup.setStyleSheet("QGroupBox {\n"
             "background-color: rgb(250,250,250);\n"
             "border: .5px solid rgb(125,125,125);\n"
             "}")
 
-        header = ['Keys', 'Action']
-        keylist = [
-            ('A', 'Select All'),   
-            ('B', 'Clk to Back'),
-            ('C', 'Clear Canvas'),     
-            ('D', 'Delete Selected'),
-            ('F', 'Flop Selected'),
-            ('G', 'Add/Hide Grid'),
-            ('H', 'Hide/UnHide'),
-            ('M', 'Map Selected'),
-            ('T', 'Toggle Tags'),
-            ('U', 'UnSelect All'),
-            ('X, Q', 'Escape to Quit'),
-            ('_/+', 'Toggle Size'),
-            ('{/}', 'Rotate 45 deg'),
-            ('</>', 'Rotate 15 deg'),
-            (':/"', 'Rotate 1 deg'),
-            ('U/D', 'Arrow Keys'),
-            ('L/R', 'Arrow Keys'),
-            ('', 'Clk to Front'),
-            ('Del', 'Clk to Delete'),
-            ('Shift', 'Clk to Flop'),  
-            ('Opt', 'DbClk to Clone'),
-            ('Opt', 'Drag Clones'), 
-            ('Cmd', 'Drag to Select')]
-          
-        self.model = TableModel(keylist, header)
         self.tableView = QTableView()
         self.tableView.setAlternatingRowColors(True) 
         self.tableView.setStyleSheet("QTableView {\n"
@@ -85,13 +59,12 @@ class SliderPanel(QWidget):
         self.tableView.setSelectionMode(self.tableView.NoSelection)
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-
         self.tableView.horizontalHeader().setStyleSheet("QHeaderView {\n"
             "border: .5px solid rgb(200,200,200);\n"
             "font-size: 13px;\n"
             "}")  
 
-        self.tableView.setModel(self.model)
+        self.setTableModel(keyMenu)
         self.tableView.setColumnWidth(0, 45) 
         self.tableView.setColumnWidth(1, 107)
 
@@ -102,7 +75,40 @@ class SliderPanel(QWidget):
 
         return self.tableGroup
 
-### -----------------------------------------------------
+### --------------------------------------------------------
+    def setTableModel(self, list):
+        header = ['Keys', 'Action']
+        model = TableModel(list, header)
+        self.tableView.setModel(model)
+        if list != keyMenu:
+            header[1] = 'PathMaker'
+            self.tableView.horizontalHeader().setStyleSheet(
+                "QHeaderView::section{\n"
+                "background-color: rgb(144,238,144);\n"
+                "border: .5px solid lightgray;\n"
+                "}")  
+            self.tableView.setStyleSheet("QTableView {\n"
+                "alternate-background-color: rgb(144,238,144);\n"
+                "}")  
+        else:
+            header[1] = 'Action'
+            self.tableView.horizontalHeader().setStyleSheet(
+                "QHeaderView::section{\n"
+                "background-color: rgb(220,220,220);\n"
+                "border: .5px solid lightgray;\n"
+                "}") 
+            self.tableView.setStyleSheet("QTableView {\n"
+                "alternate-background-color: rgb(220,220,220);\n"
+                "}")  
+
+    def toggleMenu(self):
+        if self.pathMenuSet:
+            self.setTableModel(keyMenu)
+            self.pathMenuSet = False
+        else:
+            self.setTableModel(pathMenu)
+            self.pathMenuSet = True
+
     def addSliderGroup(self):
         self.sliderGroup = QGroupBox("")
         self.sliderGroup.setFixedSize(sliderW,325)

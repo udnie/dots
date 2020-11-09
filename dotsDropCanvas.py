@@ -6,20 +6,21 @@ from PyQt5.QtWidgets import *
 
 from dotsShared      import common
 
-import dotsAnimation as anima
-
+from dotsAnimation   import *
 from dotsSideCar     import SideCar, MsgBox
 from dotsControlView import ControlView
 from dotsPixItem     import PixItem
 from dotsMapItem     import InitMap
 from dotsBkgItem     import *
 from dotsSideShow    import SideShow
-from dotsAnimation   import animeList, pathList
+from dotsAnimation   import animeList
+from dotsPathMaker   import *
 
 ## -- for testing and comparison ----------------
 # from pubsub  import pub      # PyPubSub - required
 
-mapStr = ":,\",<,>,{,},-,+,bak,left,right,up,down,cmd,del,shift,opt"
+pathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,<,>,:,\",_,+,-,="
+mapStr = ":,\",<,>,{,},[,],_,+,/,left,right,up,down,cmd,del,shift,opt"
 
 ### -------------------- dotsDropCanvas --------------------
 ''' dotsDropCanvas: where everything comes together, includes context 
@@ -27,31 +28,38 @@ mapStr = ":,\",<,>,{,},-,+,bak,left,right,up,down,cmd,del,shift,opt"
 ### --------------------------------------------------------
 class DropCanvas(QMainWindow):
 
+    pathSignal = pyqtSignal([str])
+
     def __init__(self, sliders, buttons, parent):
         QMainWindow.__init__(self)
 
         self.scene = QGraphicsScene(self)
-        self.view = ControlView(self.scene, self)
+        self.view  = ControlView(self.scene, self)
 
         self.dots    = parent
         self.sliders = sliders 
-        self.buttons = buttons
+        self.buttons = buttons  
+      
+        self.chooser = None       ## placeholder for popup_widget
+        self.pathMakerOn = False  ## shared
+        self.pathList = []        ## used also by animations, updated here
 
-        self.sideCar  = SideCar(self)  
-        self.initMap  = InitMap(self)  
+        self.mapper    = InitMap(self) 
+        self.sideCar   = SideCar(self) 
+        self.pathMaker = PathMaker(self)
 
-        self.initBkg  = InitBkg(self)
-        self.sideShow = SideShow(self)
-        self.MsgBox   = MsgBox
-
+        self.animation = Animation(self)
+        self.sideShow  = SideShow(self)
+        self.initBkg   = InitBkg(self, MsgBox)
+        
         self.scene.setSceneRect(0, 0,
             common["viewW"],
             common["viewH"])
-      
-        self.gridZ = common["gridZ"]
+
+        self.pathZ = common["pathZ"]
         self.key = ''
         self.pixCount = 0
- 
+     
         self.origin = QPoint(0,0)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
 
@@ -62,51 +70,58 @@ class DropCanvas(QMainWindow):
     @pyqtSlot(str)
     def setKeys(self, key):
         self.key = key
-        if self.key in mapStr or self.key == '':
-            self.sendPixKeys()
+        if not self.pathMakerOn:
+            if self.key in mapStr or self.key == '':
+                self.sendPixKeys()
+        else:
+            if self.key in pathStr:
+                self.pathSignal[str].emit(self.key)
+      
             # pub.sendMessage('setKeys', key=key)  ## pypubsub solution
-            # if self.initMap.mapSet: ## already in sendPixKeys
-            #     self.initMap.updateMap()  ## redraw mapper
-
+            # if self.mapper.mapSet: ## already in sendPixKeys
+            #     self.mapper.updateMap()  ## redraw mapper
+    
     def eventFilter(self, source, e): ## handles mostly mapping selections
         if source is self.view.viewport():
             self.scene.clearFocus()
             if e.type() == QEvent.MouseButtonPress: 
                 self.origin = QPoint(e.pos())
-                self.sideShow.clearTagItems()
-                if self.key == 'cmd':
-                    self.initMap.updatePixItemPos()
-                    self.initMap.clearMap() ## set rubberband if mapset
-                    self.unSelect()
-                elif self.hasHiddenPix() and self.initMap.selections:
-                    self.initMap.updatePixItemPos()
+                self.mapper.clearTagGroup()
+                if self.key == 'cmd':   ## only used by eventFilter
+                    if not self.pathMakerOn:  ## otherwise shows in pathmaker  
+                        self.mapper.updatePixItemPos()
+                        self.mapper.clearMap() ## set rubberband if mapset
+                        self.unSelect()
+                elif self.hasHiddenPix() and self.mapper.selections:
+                    self.mapper.updatePixItemPos()
             elif e.type() == QEvent.MouseMove:
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
-                    if self.initMap.mapSet: self.initMap.removeMap()
-                    self.rubberBand.show()
-                    self.rubberBand.setGeometry(QRect(self.origin, 
-                        e.pos()).normalized())
-                elif self.initMap.mapSet and not self.scene.selectedItems():
-                    self.initMap.removeMap()
+                    if not self.pathMakerOn: ## ditto
+                        if self.mapper.mapSet: self.mapper.removeMap()
+                        self.rubberBand.show()
+                        self.rubberBand.setGeometry(QRect(self.origin, 
+                            e.pos()).normalized())
+                elif self.mapper.mapSet and not self.scene.selectedItems():
+                    self.mapper.removeMap()
                 else:
-                    self.initMap.updatePixItemPos()  ## costly but necessary
+                    self.mapper.updatePixItemPos()  ## costly but necessary
             elif e.type() == QEvent.MouseButtonRelease:
-                if self.initMap.mapSet == False:
+                if self.mapper.mapSet == False:
                     self.rubberBand.hide()
-                    self.initMap.addSelectionsFromCanvas()
-                elif self.initMap.mapSet and self.key == 'cmd':
+                    self.mapper.addSelectionsFromCanvas()
+                elif self.mapper.mapSet and self.key == 'cmd':
                     self.setKeys('')
                 elif self.hasHiddenPix() and self.key != 'cmd':
-                    self.initMap.removeMap()
-                elif self.initMap.mapSet and not self.scene.selectedItems():
-                    self.initMap.removeMap()
+                    self.mapper.removeMap()
+                elif self.mapper.mapSet and not self.scene.selectedItems():
+                    self.mapper.removeMap()
             elif e.type() == QEvent.MouseButtonDblClick and self.key != 'cmd':
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
-                if self.initMap.selections or self.hasHiddenPix():
-                    if self.initMap.mapSet:
-                        self.initMap.removeMap()
+                if self.mapper.selections or self.hasHiddenPix():
+                    if self.mapper.mapSet:
+                        self.mapper.removeMap()
                         self.setKeys('noMap')
         return QWidget.eventFilter(self, source, e)
 
@@ -118,7 +133,7 @@ class DropCanvas(QMainWindow):
         if clone != None: 
             self.sideCar.transFormPixItem(pix,
                 clone.rotation,
-                clone.scale * random.randrange(80, 120)/100.0)
+                clone.scale * random.randrange(95, 105)/100.0)
         else:
             self.scene.addItem(pix)
 
@@ -126,22 +141,28 @@ class DropCanvas(QMainWindow):
         for pix in self.scene.items(): 
             if pix.type == 'pix':
                 pix.setPixKeys(self.key)
-            elif pix.zValue() <= self.gridZ:
+            elif pix.zValue() <= self.pathZ:
                 break
-        if self.initMap.mapSet: 
-            self.initMap.updateMap()
+        if self.mapper.mapSet: 
+            self.mapper.updateMap()
+
+    def exit(self):
+        self.clear()
+        self.dots.close()
 
     def clear(self):
-        if self.scene.items():
-            self.selectAll()
-            self.sideShow.stop('clear')
-            self.initMap.clearMap()
-            self.scene.clear()
-            self.pixCount = 0
-            self.disableSliders()
-            self.buttons.btnBkgFiles.setEnabled(True)
-            self.sideCar.gridSet = False
-            self.sideCar.openPlayFile = ''
+        if self.pathMakerOn:
+            self.pathMaker.pathMakerOff()
+        if self.pathMaker.pathChooserSet:
+            del self.pathMaker.chooser
+        self.sideShow.stop('stop')
+        self.disableSliders()     
+        self.mapper.clearMap()
+        self.buttons.btnBkgFiles.setEnabled(True)
+        self.pixCount = 0
+        self.sideCar.gridSet = False
+        self.mapper.openPlayFile = ''
+        self.scene.clear()
 
     def disableSliders(self):
         self.sliders.enableSliders(False)
@@ -157,39 +178,41 @@ class DropCanvas(QMainWindow):
             if pix.type == 'pix':
                 pix.setSelected(True)
                 pix.isHidden = False
-            elif pix.zValue() <= self.gridZ:
+            elif pix.zValue() <= self.pathZ:
                 break
 
     def unSelect(self):
-        self.initMap.clearMap()
+        self.mapper.clearMap()
         for pix in self.scene.items():
             if pix.type == 'pix':
                 pix.isHidden = False
                 pix.setSelected(False)
-                pix.clearFocus()
-            elif pix.zValue() <= self.gridZ:
+            elif pix.zValue() <= self.pathZ:
                 break
        
     def deleteSelected(self):
-        self.initMap.clearMap()
-        for pix in self.scene.selectedItems():
-            pix.deletePix()
+        if not self.pathMakerOn:
+            self.mapper.clearMap()
+            for pix in self.scene.selectedItems():
+                pix.deletePix()
+            self.sideShow.enablePlay()
     
     def flopSelected(self):    
-        for pix in self.scene.items():
-            if pix.type == 'pix':
-                if pix.isSelected() or pix.isHidden:
-                    if pix.flopped:
-                        pix.setMirrored(False)
-                    else:
-                        pix.setMirrored(True)
-            elif pix.zValue() <= self.gridZ:
-                break
+        if not self.pathMakerOn:
+            for pix in self.scene.items():
+                if pix.type == 'pix':
+                    if pix.isSelected() or pix.isHidden:
+                        if pix.flopped:
+                            pix.setMirrored(False)
+                        else:
+                            pix.setMirrored(True)
+                elif pix.zValue() <= self.pathZ:
+                    break
 
     ## added dlbclk if hidden to re-select ##
     def hideSelected(self): 
-        # if self.initMap.mapSet and self.hasHiddenPix():  
-        self.initMap.removeMap()  ## also updates pix.pos()
+        # if self.mapper.mapSet and self.hasHiddenPix():  
+        self.mapper.removeMap()  ## also updates pix.pos()
         for pix in self.scene.items():
             if pix.type == 'pix':
                 if pix.isSelected():
@@ -198,7 +221,7 @@ class DropCanvas(QMainWindow):
                 elif pix.isHidden:
                     pix.setSelected(True)
                     pix.isHidden = False
-            elif pix.zValue() <= self.gridZ:
+            elif pix.zValue() <= self.pathZ:
                 break
 
     def hasHiddenPix(self):
@@ -206,21 +229,20 @@ class DropCanvas(QMainWindow):
             if pix.type == 'pix':
                 if pix.isHidden: 
                     return True  ## found one
-            elif pix.zValue() <= self.gridZ:
+            elif pix.zValue() <= self.pathZ:
                 break
         return False
 
-    def itemsPixcount(self):
-        k = 0
-        for pix in self.scene.items():
-            if pix.type == 'pix':
-                k += 1
-        return k
+    def itemsPixcount(self):   ## may not be used
+        return sum(
+            pix.type == 'pix' 
+            for pix in self.scene.items()
+        )
 
     def ZDump(self):
         for pix in self.scene.items():
-            if pix.zValue() != self.gridZ:  ## skip grid zvalue
-                print(pix.type + "  " + str(pix.zValue()))
+            # if pix.zValue() != self.pathZ:  ## skip grid zvalue
+            print(pix.zValue())
         print("bkg: " + str(self.initBkg.hasBackGround()))
 
     def contextMenuEvent(self, e):
@@ -229,10 +251,12 @@ class DropCanvas(QMainWindow):
         menu = QMenu(self)
         menu.setStyleSheet("QMenu {\n"
             "font-size: 14px;\n"
-            "border: 1.5px solid rgb(125,125,125);\n"
+            "border: 1px solid rgb(125,125,125);\n"
             "}")
         alst = sorted(animeList)
-        rlst = sorted(pathList)    
+        ## basing pathlist on what's in the directory
+        self.pathList = self.pathMaker.getPathList(True)  ## names only
+        rlst = sorted(self.pathList)    
         alst.extend(["Random"])
         for anime in alst:
             action = menu.addAction(anime)

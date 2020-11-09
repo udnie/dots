@@ -6,13 +6,26 @@ from PyQt5.QtWidgets  import *
 
 from dotsShared       import common
 
-import dotsSideCar    as sideCar
-import dotsAnimation  as animat
+import dotsSideCar    as sideCar 
+import dotsAnimation  as anima
 
 # from pubsub  import pub      # PyPubSub - required
 
 incZ = 1.0      # increment zValue
 pixfactor = .30  # beginnig size factor 
+
+moveKeys = ("left","right","up", "down")
+rotateKeys = ("_", '+', '"', ':', "{", "}")
+scaleKeys  = ("<",">")
+
+rotationVals = {
+    '}': 45,
+    '"': +15,
+    '+': 1,
+    '_': -1,
+    ':': -15,
+    '{': -45,
+}
 
 ### --------------------- dotsPixItem ----------------------
 ''' dotsPixItem: primary dots screen object '''
@@ -22,8 +35,9 @@ class PixItem(QGraphicsPixmapItem):
     def __init__(self, imgFile, id, x, y, parent, mirror=False):
         super().__init__()
 
-        self.canvas  = parent
-        self.sideCar = self.canvas.sideCar
+        self.canvas = parent
+        self.mapper = parent.mapper
+
         self.fileName = imgFile
    
         self.id = id  ## used by mapItem
@@ -76,11 +90,11 @@ class PixItem(QGraphicsPixmapItem):
     def setPixKeys(self, key):
         self.key = key  
         if self.isHidden or self.isSelected():
-            if key in(":", '"', ">", "<", "{", "}"):
+            if key in rotateKeys:
                 self.rotateThis(key)
-            elif key in("-","+"):
+            elif key in scaleKeys:
                 self.scaleThis(key)  
-            elif key in("left","right","up", "down"):
+            elif key in moveKeys:
                 self.moveThis(key)
 
     def setMirrored(self, mirror):
@@ -99,34 +113,33 @@ class PixItem(QGraphicsPixmapItem):
                 self.setMirrored(False)
             else:
                 self.setMirrored(True)
-        elif self.key == 'bak': # send to back
-            self.setZValue(self.sideCar.lastZval('pix')-.011)
+        elif self.key == '/': # send to back
+            self.setZValue(self.mapper.lastZval('pix')-.011)
         else:                   # single click to front
-            self.canvas.pixCount = self.sideCar.toFront(incZ)
+            self.canvas.pixCount = self.mapper.toFront(incZ)
             self.setZValue(self.canvas.pixCount)
         e.accept()
 
     def reprise(self):
         self.anime = None
-        self.anime = animat.reprise(self)
+        self.anime = anima.reprise(self)
         self.anime.start()
         self.anime.finished.connect(self.anime.stop)
         self.clearFocus()
  
     def deletePix(self):
-        self.anime = animat.fin(self)
+        self.anime = anima.fin(self)
         self.anime.start()
         self.anime.finished.connect(self.removeThis)
 
     def removeThis(self):
         self.canvas.scene.removeItem(self)
-        # print(self.canvas.itemsPixcount())
 
     def mouseMoveEvent(self, e):
         pos = self.mapToScene(e.pos())     
         dragX = pos.x() - self.dragAnchor.x()
         dragY = pos.y() - self.dragAnchor.y()
-        self.updateWidthHeight()
+        self.mapper.updateWidthHeight(self)
         self.x = int(sideCar.constrain(
             self.initX + dragX, 
             self.width, 
@@ -188,7 +201,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
-            self.canvas.pixCount = self.sideCar.toFront(incZ)
+            self.canvas.pixCount = self.mapper.toFront(incZ)
             self.setZValue(self.canvas.pixCount)
         e.accept()
 
@@ -215,50 +228,27 @@ class PixItem(QGraphicsPixmapItem):
   
     def rotateThis(self, key):
         self.setOriginPt() 
-        if key in ('>', '}', '"'):
-            if self.rotation >= 360:  ## forces back to zero
-                self.rotation = 0
-            if key == '>':
-                angle = 15
-            elif key == '}':
-                angle = 45
-            else:
-                angle = 1
-            p = self.rotation + angle
-        elif key in ('<', '{', ':'):
-            if self.rotation <= 0:  ## forces back to 360
-                self.rotation = 360
-            if key == '<':
-                angle = -15
-            elif key == '{':
-                angle = -45
-            else:
-                angle = -1
-            p = self.rotation + angle
-            if p > 360: 
-                p = p - 360
-            elif p < 0:
-                p = p + 360
+        angle = rotationVals[key]  ## thanks Martin
+        p = self.rotation + angle
+        if p > 360: 
+            p = p - 360
+        elif p < 0:
+            p = p + 360
         self.rotation = p
         self.setRotation(self.rotation) 
 
     def scaleThis(self, key):
         self.setOriginPt()
-        if key == '+':
+        if key == '>':
             scale = .03
-        else:
+        elif key == '<':
             scale = -.03
         self.scale += scale
         self.setScale(self.scale)
     
     def setOriginPt(self):
-        self.updateWidthHeight()
-        op = QPointF(self.width/2, self.height/2)
-        self.setTransformOriginPoint(op)
+        self.mapper.setOriginPt(self)
         self.setTransformationMode(Qt.SmoothTransformation)
-
-    def updateWidthHeight(self):
-        sideCar.widthHeightSet(self)
               
     def setPixSizes(self, newW, newH):
         if newW < 100 or newH < 100:
