@@ -30,6 +30,7 @@ class SideShow():
         self.animation = parent.animation
         self.pathMaker = parent.pathMaker
 
+        self.runThis = 'demo.path'
         self.pathZ = common["pathZ"]
  
 ### --------------------------------------------------------
@@ -58,6 +59,20 @@ class SideShow():
     def dummy(self):
         pass
 
+    def keysInPlay(self, key):
+        if key == 'L':
+            if self.canvas.openPlayFile == '' and \
+                self.canvas.control == '':
+                self.loadPlay()
+                return
+        elif key == 'P' and self.canvas.openPlayFile != '' and \
+            self.canvas.control == '':
+                self.play()
+                return
+        elif key == 'S' and self.canvas.openPlayFile != '' and \
+            self.canvas.control != '':
+                self.stop()
+        
     def loadPlay(self):
         if self.canvas.pathMakerOn:
             self.pathMaker.openFiles()
@@ -70,7 +85,6 @@ class SideShow():
             if file:
                 self.openPlay(file)   
             else:
-                MsgBox("loadPlay: Error loading: " + file)
                 return
 
     def openPlay(self, file):
@@ -115,17 +129,17 @@ class SideShow():
                     pix.tag = dict['tag']        
                 ## may require rotation or scaling 
                 self.canvas.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
-            self.mapper.openPlayFile = file
+            self.canvas.openPlayFile = file
             self.canvas.disableSliders()
 
     def play(self):   
-        if self.mapper.control != '': 
+        if self.canvas.control != '': 
             return
         if self.mapper.mapSet:   
             self.mapper.clearMap()
         self.clearPathsandTags()  
         self.canvas.unSelect()
-        if not self.canvas.pathList:  ## moved from animations
+        if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = self.pathMaker.getPathList(True)       
         k = 0
         scale = .65
@@ -134,13 +148,13 @@ class SideShow():
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
                     pix.tag = pix.tag[0:len('Random')]
-                if pix.tag.endswith('demo.path') and k >= 0:  
-                    pix.scale = (67-(k*3))/ 100.0  ## 3 * 22 screen items
+                if pix.tag.endswith(self.runThis) and k >= 0:  
+                    pix.scale = scale * (67-(k*3))/100.0  ## 3 * 22 screen items
                 pix.anime = self.animation.setAnimation(          
                     pix.tag, 
                     pix)   
                 k += 1
-                if pix.tag.endswith('demo.path'):  ## increase the delay to start  
+                if pix.tag.endswith(self.runThis):  ## increase the delay to start  
                     QTimer.singleShot(100 + (k * 50), pix.anime.start)
                 else:
                     if pix.anime: pix.anime.start()
@@ -148,11 +162,11 @@ class SideShow():
                 break 
         if k > 0:
             self.disablePlay()  
-            self.mapper.control = 'pause'
-
+            self.canvas.control = 'pause'
+   
     def pause(self):
         self.clearPathsandTags()  
-        if self.mapper.control == 'resume':
+        if self.canvas.control == 'resume':
            self.resume()
         else:          
             for pix in self.scene.items():
@@ -190,7 +204,7 @@ class SideShow():
         else:
             dlist = []  
             for pix in self.scene.items(Qt.AscendingOrder):
-                if pix.type in ["pix","bkg"]:
+                if pix.type in ("pix","bkg"):
                     if not path.exists(pix.fileName):
                         next
                     dict = {
@@ -207,11 +221,11 @@ class SideShow():
                     dlist.append(dict)
             if dlist:
                 Q = QFileDialog()
-                if self.mapper.openPlayFile == '':
-                    self.mapper.openPlayFile = paths["playPath"] + 'tmp.play'
+                if self.canvas.openPlayFile == '':
+                    self.canvas.openPlayFile = paths["playPath"] + 'tmp.play'
                 f = Q.getSaveFileName(self.canvas, 
                     paths["playPath"],  
-                    self.mapper.openPlayFile)
+                    self.canvas.openPlayFile)
                 if not f[0]: 
                     return
                 if not f[0].lower().endswith('.play'):
@@ -224,8 +238,6 @@ class SideShow():
                     except IOError:
                             MsgBox("savePlay: Error saving file")
                             return
-            else:
-                MsgBox("savePlay: Nothing saved")
 
 ### -------------------------------------------------------- 
     def clearPathsandTags(self):
@@ -235,23 +247,23 @@ class SideShow():
             self.mapper.clearTagGroup()
 
     def enablePlay(self):
-        self.mapper.control = ''
+        self.canvas.control = ''
         self.buttons.btnPlay.setEnabled(True)
         self.buttons.btnPause.setEnabled(False)
         self.buttons.btnStop.setEnabled(False) 
  
     def disablePlay(self):
-        self.mapper.control = 'pause'
+        self.canvas.control = 'pause'
         self.buttons.btnPlay.setEnabled(False)
         self.buttons.btnPause.setEnabled(True)
         self.buttons.btnStop.setEnabled(True)  
 
     def setPauseKey(self):        
-        if self.mapper.control == 'pause': 
+        if self.canvas.control == 'pause': 
             self.buttons.btnPause.setText( "Resume" );
-            self.mapper.control = 'resume'
-        elif self.mapper.control == 'resume':
+            self.canvas.control = 'resume'
+        elif self.canvas.control == 'resume':
             self.buttons.btnPause.setText( "Pause" );
-            self.mapper.control = 'pause'
+            self.canvas.control = 'pause'
 
 ### ---------------------- dotsSideShow --------------------

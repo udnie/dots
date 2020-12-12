@@ -8,12 +8,13 @@ from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
 from dotsShared      import common, pathcolors
+from dotsSideCar     import TagIt
 
 import dotsSidePath  as sidePath
 
 ### ---------------------- dotsMapItem ---------------------
 ''' dotsMapItem: handles the mapItem, tags and paths display.
-    Includes MapItem, InitMap and TagIt classes'''
+    Classes: MapItem, InitMap '''
 ### --------------------------------------------------------
 class MapItem(QGraphicsItem):
 
@@ -64,10 +65,8 @@ class InitMap(QWidget):
         self.tagSet = False
         self.pathsSet = False
 
-        self.control = ''
         self.mapRect = QRectF()
         self.selections = []
-        self.openPlayFile = ''    ## shared 
 
         self.pathGroup = None 
         self.tagGroup  = None
@@ -177,7 +176,9 @@ class InitMap(QWidget):
         else: 
             if self.scene.items():
                 k = 0
-                QTimer.singleShot(200, self.clearPaths)
+                self.tagSet = False
+                if self.pathsSet:
+                    QTimer.singleShot(200, self.clearPaths)
                 self.addTagGroup()
                 for pix in self.scene.items():
                     if pix.type == 'pix' and pix.tag:  
@@ -195,7 +196,7 @@ class InitMap(QWidget):
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
-   
+
     def clearTagGroup(self):
         if self.tagSet:
             self.scene.removeItem(self.tagGroup)
@@ -207,8 +208,9 @@ class InitMap(QWidget):
         y = int(p.y() + p.height()*.30)
         if  p.width() + p.height() < 30: ## too small??
             return
-        tag = TagIt(self.control, pix.tag, '')
+        tag = TagIt(self.canvas.control, pix.tag, '')
         tag.setPos(x,y)
+        tag.setZValue(self.tagZ) 
         self.tagGroup.addToGroup(tag)
 
 ### --------------------------------------------------------
@@ -241,26 +243,25 @@ class InitMap(QWidget):
     def addPathGroup(self):
         self.pathGroup = QGraphicsItemGroup()
         self.pathGroup.setZValue(self.pathZ)     
-        self.canvas.scene.addItem(self.pathGroup)
+        self.scene.addItem(self.pathGroup)
     
     def addPathTagGroup(self):
         ## add pathTags group to keep tags separate and visible
         self.pathTagZ = self.toFront(25.0)     
         self.pathTagGroup = QGraphicsItemGroup()
         self.pathTagGroup.setZValue(self.pathTagZ)     
-        self.canvas.scene.addItem(self.pathTagGroup)
-        return self.pathTagZ
+        self.scene.addItem(self.pathTagGroup)
 
     def clearPaths(self):
-        if self.pathGroup:     
-            self.scene.removeItem(self.pathGroup)
-        if self.pathTagGroup:  
-            self.scene.removeItem(self.pathTagGroup)
         if self.pathsSet:
+            if self.pathGroup:     
+                self.scene.removeItem(self.pathGroup)
+            if self.pathTagGroup:  
+                self.scene.removeItem(self.pathTagGroup)
             for pix in self.scene.items():
                 if pix.type == 'pix' and not pix.tag.endswith('.path'):
                     if pix.anime and pix.anime.state() == 1:  ## paused
-                        if self.control != 'resume':
+                        if self.canvas.control != 'resume':
                             pix.anime.resume()
                 elif pix.zValue() <= self.pathZ:
                     break
@@ -285,7 +286,7 @@ class InitMap(QWidget):
 
     def addPainterPath(self, tag):
         color = self.getColorStr()
-        path = sidePath.pathLoader(tag) 
+        path = sidePath.pathLoader(tag) ## return painter path
         pathPt = path.pointAtPercent(0.0)  ## so its consistent
         ## use painter path
         pathItem = QGraphicsPathItem(path)
@@ -326,47 +327,6 @@ class InitMap(QWidget):
         brt = pix.boundingRect()
         pix.width = brt.width()
         pix.height = brt.height()
-
-### --------------------------------------------------------
-class TagIt(QGraphicsSimpleTextItem):
-
-    def __init__(self, control, tag, color):
-        super().__init__()
-
-        if control in ['pause','resume'] and "Random" in tag:
-            tag = tag[7:]
-            self.color = QColor(0,255,127)
-        elif control == 'pathMaker':
-            if " 0%" in tag:
-                color = QColor("LIGHTSEAGREEN")
-            if len(tag.strip()) > 0: self.color = QColor(color)
-        else:
-            self.color = QColor(255,165,0)
-            if "Random" in tag: tag = tag[0:6] 
-        if color:
-            self.color = QColor(color)
-
-        self.type = 'tag'
-        self.text = tag   
-        self.font = QFont('Modern', 12)
-        metrics   = QFontMetrics(self.font)
-        self.rect = QRectF(0, 0, metrics.width(self.text)+13, 19)
-        self.waypt = 0
-
-    def boundingRect(self):
-        return self.rect
-
-    def paint(self, painter, option, widget): 
-        brush = QBrush()
-        brush.setColor(self.color)
-        brush.setStyle(Qt.SolidPattern)
-
-        painter.fillRect(self.boundingRect(), brush)
-        painter.setRenderHint(QPainter.Antialiasing)
-
-        painter.setPen(Qt.black)
-        painter.setFont(self.font)
-        painter.drawText(self.boundingRect(), Qt.AlignCenter, self.text)
 
 ### --------------------- dotsMapItem ----------------------
 

@@ -5,13 +5,13 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-from dotsSideCar     import MsgBox
+from dotsSideCar     import MsgBox, DoodleMaker
 from dotsShared      import common, paths
-from dotsSideWays    import SideWays, DoodleMaker
+from dotsSideWays    import SideWays
 
 moveKeys = ("left","right","up", "down")
 scaleRotateKeys = ('+','_','<','>',':','\"','=','-')
-wayPtsKeys = ('<','>','R', '!')
+wayPtsKeys = ('<','>','R', '!', 'P')
 notNewPathKeys = ('S','T','W','N')
 
 ### -------------------- dotsPathMaker ---------------------
@@ -23,18 +23,20 @@ class PathMaker(QWidget):
         super().__init__()
 
         self.canvas  = parent
-        self.chooser = self.canvas.chooser
+        self.chooser = parent.chooser
         self.scene   = parent.scene
         self.view    = parent.view
+        self.mapper  = parent.mapper
         self.sliders = parent.sliders
         self.buttons = parent.buttons
    
+        self.key = ""
         self.initThis()
         self.tagZ = common["pathZ"]
         self.tic = 3  ## points to move using arrow keys
 
         ## extends pathMaker
-        self.sideWays = SideWays(self, parent.scene, parent.mapper)
+        self.sideWays = SideWays(self)
 
         self.canvas.pathSignal[str].connect(self.pathKeys)
         self.view.viewport().installEventFilter(self)
@@ -59,6 +61,7 @@ class PathMaker(QWidget):
         self.wayPtsSet = False
         self.pathChooserSet = False
         self.pathTestSet = False
+        self.ptsSet = False
         
         self.ball = None
         self.polygon = None
@@ -73,12 +76,13 @@ class PathMaker(QWidget):
                 self.sideWays.addPathPts(QPoint(e.pos()))
             elif e.type() == QEvent.MouseButtonRelease: 
                 self.sideWays.addPathPts(QPoint(e.pos()))
-                self.sideWays.drawPolyline()  
+                self.sideWays.drawPolyline() 
         return QWidget.eventFilter(self, source, e)
 
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def pathKeys(self, key):
+        self.key = key
         if key == 'D':  ## always
             self.delete()
             return
@@ -118,6 +122,8 @@ class PathMaker(QWidget):
                 self.sideWays.reverseIt()
             elif key == '!':
                 self.halfPath()
+            elif key == 'P':
+                self.sideWays.addPts()
             else:
                 self.sideWays.shiftWayPts(key)
 
@@ -135,6 +141,7 @@ class PathMaker(QWidget):
                 self.sliders.toggleMenu()
             self.buttons.btnPathMaker.setStyleSheet(
                 "background-color: LIGHTGREEN")
+            QTimer.singleShot(250, self.pathChooser)
 
     def pathChooser(self): 
         if not self.pathChooserSet:
@@ -143,8 +150,11 @@ class PathMaker(QWidget):
             self.chooser.show()
             self.pathChooserSet = True
         else:  
-            self.chooser = QWidget()
-            self.pathChooserSet = False
+            self.pathChooserOff()
+
+    def pathChooserOff(self):
+        self.chooser = QWidget()
+        self.pathChooserSet = False
 
     def getPathList(self, bool=False):  ## used by DoodleMaker
         try:                            ## also by context menu
@@ -167,7 +177,7 @@ class PathMaker(QWidget):
 ### --------------------------------------------------------
     def drawPolygon(self):
         self.removePolygon() 
-        self.polygon = QGraphicsPolygonItem(QPolygonF(self.pts)) 
+        self.polygon = QGraphicsPolygonItem(QPolygonF(self.pts))
         self.polygon.setPen(QPen(QColor(self.color), 3, Qt.DashDotLine))
         self.polygon.setZValue(self.tagZ)  
         self.scene.addItem(self.polygon)
@@ -178,16 +188,19 @@ class PathMaker(QWidget):
         self.removeWayPts()
         self.sideWays.removePolyline()
         self.sideWays.newPathOff()
+        self.sideWays.removePts()
         self.removePathTest()
         self.initThis()
+        self.pathChooserOff()
           
     def centerPoly(self):
-        p = self.polygon.sceneBoundingRect()
-        w = (common["viewW"] - p.width()) /2
-        h = (common["viewH"] - p.height()) / 2
-        x, y = w - p.x(), h - p.y()
-        self.polygon.setPos(self.polygon.x()+x, self.polygon.y()+y)
-        self.updpts(x, y)
+        if self.polySet:
+            p = self.polygon.sceneBoundingRect()
+            w = (common["viewW"] - p.width()) /2
+            h = (common["viewH"] - p.height()) / 2
+            x, y = w - p.x(), h - p.y()
+            self.polygon.setPos(self.polygon.x()+x, self.polygon.y()+y)
+            self.updpts(x, y)
 
     def flipPath(self):  
         p = self.polygon.sceneBoundingRect()
@@ -243,6 +256,8 @@ class PathMaker(QWidget):
             self.scene.removeItem(self.sideWays.tagGroup) 
             self.sideWays.tagGroup = None
             self.wayPtsSet = False
+        if self.ptsSet:
+            self.sideWays.removePts()
      
     def removePathTest(self):
         if self.pathTestSet:
@@ -260,8 +275,7 @@ class PathMaker(QWidget):
         self.openPathFile = ""
         self.canvas.pathMakerOn = False
         if self.pathChooserSet:
-            self.chooser = QWidget()
-            self.pathChooserSet = False
+            self.pathMaker.pathChooserOff()
         if self.sliders.pathMenuSet:
             self.sliders.toggleMenu()
         self.buttons.btnPathMaker.setStyleSheet(

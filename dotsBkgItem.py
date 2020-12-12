@@ -214,10 +214,10 @@ class InitBkg(QWidget):
             self.canvas.unSelect()  ## turn off any select borders
             if self.mapper.mapSet:
                 self.mapper.removeMap()
-            if self.mapper.openPlayFile == '':
+            if self.canvas.openPlayFile == '':
                 snap = "dots_" + snapTag() + ".jpg"
             else:
-                snap = os.path.basename(self.mapper.openPlayFile)
+                snap = os.path.basename(self.canvas.openPlayFile)
                 snap = snap[:-5] + ".jpg"
             if snap[:4] != "dots":  ## always ask unless
                 Q = QFileDialog()

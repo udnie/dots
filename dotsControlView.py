@@ -17,7 +17,8 @@ fileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
     drop. Thanks to tpoveda @ https://gist.github.com/tpoveda for posting''' 
 ### --------------------------------------------------------
 class ControlView(QGraphicsView):
-    ## adds drag and drop to a QGraphicsView instance
+    ## adds drag and drop to a QGraphicsView instance and 
+    ## keyboard capture 
     keysSignal = pyqtSignal([str])
 
     def __init__(self, scene, parent):
@@ -26,9 +27,10 @@ class ControlView(QGraphicsView):
 
         self.setObjectName('ControlView')
         self.setScene(scene)
-           
-        self.scene = scene
-        self.canvas = parent
+    
+        self.canvas = parent   
+        self.scene  = parent.scene
+    
         self.dragOver = False
   
         # added 2px to prevent noticable screen movement - curious 
@@ -100,16 +102,17 @@ class ControlView(QGraphicsView):
                 self.setKey('F')    ## if pathMaker on
                 self.canvas.flopSelected()  
             elif key == Qt.Key_P:
-                self.setKey('P')  
-                self.canvas.mapper.togglePaths()
+                if self.canvas.openPlayFile != '': 
+                    self.canvas.mapper.togglePaths() 
+                # self.setKey('P')  ## your choice
             elif key == Qt.Key_R:
                 if self.canvas.pathMakerOn:
                     self.setKey('R') ## if pathMaker on
                 else:  ## if you're testing an animation over again
                     self.canvas.sideShow.runDemo('demo.play')
             elif key == Qt.Key_T:  
-                self.setKey('T')    ## if pathMaker on and tags
-                self.canvas.mapper.toggleTagItems()
+                if self.canvas.openPlayFile != '':
+                    self.canvas.mapper.toggleTagItems()
 
         if key in self.direct: 
             self.direct[key]()  ## OK...

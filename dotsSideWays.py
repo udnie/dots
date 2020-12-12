@@ -7,10 +7,10 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-from dotsShared      import common, paths
-from dotsMapItem     import TagIt
 from dotsAnimation   import Node
-
+from dotsShared      import common, paths
+from dotsSideCar     import TagIt, PointItem
+ 
 import dotsSidePath  as sidePath
 
 scaleUpKeys = ('>','\"', '=')
@@ -18,17 +18,16 @@ scaleDnKeys = ('<',':','-')
 
 ### --------------------- dotsSideWays ---------------------
 ''' dotsSideWays: pathmaker extension. Includes path and
-    waypoints functions, scaleRotate and pathTest. DoodleMaker 
-    and Doodle clases '''
-### --------------------------------------------------------
+    waypoints functions, scaleRotate and pathTest '''
+### -------------------------------------------------------
 class SideWays():
 
-    def __init__(self, parent, scene, mapper):
+    def __init__(self, parent):
         super().__init__()
  
         self.pathMaker = parent
-        self.scene  = scene
-        self.mapper = mapper 
+        self.scene  = parent.scene
+        self.mapper = parent.mapper 
          
         self.npts = 0
         self.tagZ = common["pathZ"]
@@ -56,7 +55,7 @@ class SideWays():
     def addPathPts(self, pt):
         if self.npts == 0:
             self.pathMaker.pts.append(pt)
-        self.npts +=1
+        self.npts += 1
         if self.npts % 3 == 0:
             self.pathMaker.pts.append(pt)
             self.drawPolyline()
@@ -70,11 +69,45 @@ class SideWays():
         self.scene.addItem(self.polyline)
         self.pathMaker.polylineSet = True
 
-    def newPathOff(self):
-        if self.pathMaker.newPath:
-            self.pathMaker.buttons.btnPathMaker.setStyleSheet(
-                "background-color: rgba(0,255,0,100)")
-            self.pathMaker.newPath = False
+    def addPts(self):
+        if self.pathMaker.ptsSet:
+            self.removePts()
+            return
+        idx = 0
+        for pt in self.pathMaker.pts:
+            itm = PointItem(self, pt, idx)
+            self.scene.addItem(itm)
+            idx += 1
+        self.pathMaker.ptsSet = True
+
+    def addPointItem(self, itm):
+        idx, pt = itm.idx + 1, itm.pt
+        if idx == len(self.pathMaker.pts): idx = 0     
+        pt1 = self.pathMaker.pts[idx]
+        pt1 = QPointF(pt1.x() - pt.x(), pt1.y() - pt.y())
+        pt1 = pt + QPointF(pt1)*.5       
+        self.pathMaker.pts.insert(idx, pt1)
+        self.redrawPts()
+   
+    def deletePointItem(self, itm):
+        self.pathMaker.pts.pop(itm.idx)
+        self.redrawPts()
+
+    def redrawPts(self):
+        self.removePts()
+        self.pathMaker.removeWayPts()
+        self.pathMaker.removePolygon()
+        self.pathMaker.drawPolygon()
+        self.addWayPts()
+        self.addPts()
+
+    def removePts(self):
+        for pts in self.scene.items():
+            if pts.type == 'pt':
+                self.scene.removeItem(pts)
+            elif pts.zValue() <= self.tagZ:
+                break
+        self.pathMaker.ptsSet = False
 
     def removePolyline(self):    
         if self.pathMaker.polylineSet and self.polyline != None:
@@ -84,6 +117,12 @@ class SideWays():
     def resetPolyline(self):
         self.pathMaker.polylineSet = False
         self.polyline = None
+
+    def newPathOff(self):
+        if self.pathMaker.newPath:
+            self.pathMaker.buttons.btnPathMaker.setStyleSheet(
+                "background-color: rgba(0,255,0,100)")
+            self.pathMaker.newPath = False
 
     def changePathColor(self):
         self.pathMaker.color = self.mapper.getColorStr()
@@ -98,23 +137,28 @@ class SideWays():
             self.pathMaker.removeWayPts()
             return   ## added
         else:
-            path = self.setPaintPath(True)
-            c = path.elementCount()
-            if c:                     ## make some tags
+            lnn = len(self.pathMaker.pts)
+            if lnn:                     ## make some tags
                 self.addTagGroup()
-                for i in range(0,10):
-                    p = path.pointAtPercent(i/10.0)
-                    s = "(" + str("{:2d}".format(int(p.x())))
-                    s = s + ", " + str("{:2d}".format(int(p.y()))) + ")"
-                    s = s + "  " + str("{:2d}%".format(i * 10))
-                    if i > 0:
-                        s = s + "  " + str("{:2d}".format(int(c*(i*10)/100.0)))
-                    else:
-                        s = s + "  " + str("{:2d}".format(int(c)))
-                    self.addPathTag(s, p)
-                if self.pathMaker.openPathFile:
+                inc = int(lnn/10)  # approximate a 10% increment
+                list = [x*inc for x in range(0,10)]  ## get the indexes
+                for idx in list:
+                    pt = self.pathMaker.pts[idx]
+                    pct = (idx/lnn)*100
+                    if pct == 0.0: idx = lnn
+                    self.addPathTag(
+                        self.makePtsTag(pt, idx, pct), 
+                        pt)
+                if self.pathMaker.openPathFile:  ## filename top left corner
                     self.addPathTag(self.pathMaker.openPathFile, QPointF(5.0,5.0))
                 self.pathMaker.wayPtsSet = True
+ 
+    def makePtsTag(self, pt, idx, pct):
+        s = "(" + str("{:2d}".format(int(pt.x())))
+        s = s + ", " + str("{:2d}".format(int(pt.y()))) + ")"
+        s = s + "  " + str("{0:.2f}%".format(pct)) 
+        s = s + "  " + str("{:2d}".format(idx))
+        return s
 
     def addPathTag(self, tag, pt):
         self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
@@ -122,6 +166,16 @@ class SideWays():
         self.tag.setZValue(self.tagZ) 
         self.scene.addItem(self.tag)   ## do this as well 
         self.tagGroup.addToGroup(self.tag)
+
+    def addPtsTag(self, tag, pt):
+        self.ptsTag = TagIt('points', tag, QColor("YELLOW"))   
+        p = QPointF(0,-20)
+        self.ptsTag.setPos(pt+p)
+        self.ptsTag.setZValue(self.tagZ+10) 
+        self.scene.addItem(self.ptsTag) 
+
+    def removePtsTag(self):
+        self.scene.removeItem(self.ptsTag) 
     
     def addTagGroup(self):
         self.tagGroup = QGraphicsItemGroup()
@@ -220,7 +274,7 @@ class SideWays():
         for i in range(0, len(self.pathMaker.pts)):
             k = l-i
             tmp.append(self.pathMaker.pts[k])
-        tmp.insert(0,self.pathMaker.pts[0])
+        tmp.insert(0,self.pathMaker.pts[0])   ## start at zero
         tmp = tmp[:-1]
         self.pathMaker.pts = tmp
         self.updateWayPts()
@@ -246,74 +300,5 @@ class SideWays():
         self.pathMaker.drawPolygon()
         self.addWayPts()
      
-### --------------------------------------------------------
-class DoodleMaker(QWidget):   
-    def __init__(self, parent):
-        super().__init__()
-        self.resize(490,320)
-
-        widget = QWidget()
-        gLayout = QGridLayout(widget)
-        gLayout.setDefaultPositioning(3, Qt.Horizontal)
-        gLayout.setHorizontalSpacing(5)
-        gLayout.setOriginCorner(0)
-        gLayout.setContentsMargins(0, 0, 0, 0)
-
-        for file in parent.getPathList(): ## from pathMaker   
-            df = Doddle(file, parent)
-            gLayout.addWidget(df)
-
-        scroll = QScrollArea()
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(False)
-        scroll.setWidget(widget)
-   
-        vLayout = QVBoxLayout(self)
-        vLayout.addWidget(scroll)
-
-### --------------------------------------------------------
-class Doddle(QLabel):   
-    def __init__(self, file, parent):
-        super().__init__()
-        self.pathmaker = parent
-
-        self.file = file
-        scalor = .10
-        self.W, self.H = 140, 100
-
-        self.font = QFont('Modern', 13)
-        self.pen = QPen(QColor(0,0,0))                     
-        self.pen.setWidth(1)                                       
-        self.brush = QBrush(QColor(255,255,255,255)) 
-        ## scale down screen drawing --  file, scalor, offset
-        self.df = self.pathmaker.getpts(self.file, scalor, 10)  
-  
-    def minimumSizeHint(self):
-        return QSize(self.W, self.H)
-
-    def sizeHint(self):
-        return self.minimumSizeHint()
-
-    def mousePressEvent(self, e): 
-        self.pathmaker.pts = self.pathmaker.getpts(self.file)
-        self.pathmaker.drawPolygon()
-        self.pathmaker.openPathFile = os.path.basename(self.file)
-        self.pathmaker.pathChooser()  ## shuts it down
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setBrush(self.brush) 
-        painter.setPen(QPen(QColor("DODGERBLUE"), 2, Qt.DashDotLine))
-        painter.drawPolygon(QPolygonF(self.df))
-        painter.setBrush(Qt.NoBrush) 
-        painter.setPen(QPen(Qt.darkGray, 2)) 
-        painter.drawRect(0, 0, self.W, self.H)
-        painter.setPen(QPen(Qt.black, 2)) 
-        metrics = QFontMetrics(self.font)
-        txt = os.path.basename(self.file)
-        p = int((self.W - metrics.width(txt))/2 )
-        painter.drawText(p, self.H-10, txt)
-
 ### --------------------- dotsSideWays ---------------------
 

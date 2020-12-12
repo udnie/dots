@@ -19,8 +19,8 @@ from dotsPathMaker   import *
 ## -- for testing and comparison ----------------
 # from pubsub  import pub      # PyPubSub - required
 
-pathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,<,>,:,\",_,+,-,="
-mapStr = ":,\",<,>,{,},[,],_,+,/,left,right,up,down,cmd,del,shift,opt"
+pathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
+mapStr = "L,P,S,C,:,\",<,>,{,},[,],_,+,/,left,right,up,down,cmd,del,shift,opt"
 
 ### -------------------- dotsDropCanvas --------------------
 ''' dotsDropCanvas: where everything comes together, includes context 
@@ -41,7 +41,11 @@ class DropCanvas(QMainWindow):
         self.buttons = buttons  
       
         self.chooser = None       ## placeholder for popup_widget
+        
+        self.control = ''         ## shared
         self.pathMakerOn = False  ## shared
+        self.openPlayFile = ''    ## shared 
+
         self.pathList = []        ## used also by animations, updated here
 
         self.mapper    = InitMap(self) 
@@ -72,7 +76,12 @@ class DropCanvas(QMainWindow):
         self.key = key
         if not self.pathMakerOn:
             if self.key in mapStr or self.key == '':
-                self.sendPixKeys()
+                if self.key in ('L','P', 'S'):
+                    self.sideShow.keysInPlay(self.key)
+                elif self.key == 'C':
+                    self.clear()
+                else:
+                    self.sendPixKeys()
         else:
             if self.key in pathStr:
                 self.pathSignal[str].emit(self.key)
@@ -153,15 +162,14 @@ class DropCanvas(QMainWindow):
     def clear(self):
         if self.pathMakerOn:
             self.pathMaker.pathMakerOff()
-        if self.pathMaker.pathChooserSet:
-            del self.pathMaker.chooser
+        self.pathMaker.pathChooserOff()
         self.sideShow.stop('stop')
         self.disableSliders()     
         self.mapper.clearMap()
         self.buttons.btnBkgFiles.setEnabled(True)
         self.pixCount = 0
         self.sideCar.gridSet = False
-        self.mapper.openPlayFile = ''
+        self.openPlayFile = ''
         self.scene.clear()
 
     def disableSliders(self):

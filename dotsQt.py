@@ -197,7 +197,7 @@ class Buttons(QWidget):
 
         self.canvas = self.dots.canvas
         self.pathMaker = self.dots.canvas.pathMaker
-
+  
         btnClrCanvas = QPushButton("Clear")
         self.btnPathMaker = QPushButton("Path Maker")
         btnSnapShot = QPushButton("Shapshot")  
