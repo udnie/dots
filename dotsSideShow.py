@@ -24,7 +24,7 @@ class SideShow():
  
         self.canvas  = parent
         self.scene   = parent.scene
-        self.buttons = parent.buttons
+        self.dots    = parent.dots
         self.mapper  = parent.mapper
 
         self.animation = parent.animation
@@ -34,19 +34,6 @@ class SideShow():
         self.pathZ = common["pathZ"]
  
 ### --------------------------------------------------------
-    def setAction(self, tag):
-        if self.mapper.tagSet and tag == "Clear Tags":
-            self.mapper.clearTagGroup()
-        for pix in self.scene.selectedItems():
-            if tag == "Clear Tags":
-                pix.tag = ''
-            else:
-                pix.tag = tag
-            pix.anime = None        ## set by play
-            pix.setSelected(False)  ## when tagged 
-        if self.mapper.mapSet: 
-            self.mapper.removeMap()
-
     def runDemo(self, file):
         if not self.scene.items():
             self.openPlay(paths["playPath"] + file)
@@ -65,13 +52,14 @@ class SideShow():
                 self.canvas.control == '':
                 self.loadPlay()
                 return
-        elif key == 'P' and self.canvas.openPlayFile != '' and \
-            self.canvas.control == '':
-                self.play()
-                return
-        elif key == 'S' and self.canvas.openPlayFile != '' and \
-            self.canvas.control != '':
-                self.stop()
+        elif key == 'O':  ## always
+            self.mapper.togglePaths() 
+            return
+        elif key == 'P' and self.canvas.control == '':  
+            self.play()   ## show paths once its running
+            return
+        elif key == 'S' and self.canvas.control != '':
+            self.stop()
         
     def loadPlay(self):
         if self.canvas.pathMakerOn:
@@ -80,8 +68,12 @@ class SideShow():
         else:
             dlist = []
             Q = QFileDialog()
-            file, _ = Q.getOpenFileName(self.canvas,
-                "Choose a file to open", paths["playPath"], "Files (*.play)")
+            options = Q.Options()
+            options |= Q.DontUseNativeDialog  ## used to work without it
+            file, _ = Q.getOpenFileName(self.canvas,  ## only way to delete
+                "Choose a file to open", paths["playPath"], "Files (*.play)",
+                None, options)
+
             if file:
                 self.openPlay(file)   
             else:
@@ -97,42 +89,45 @@ class SideShow():
         if dlist:
             if self.mapper.mapSet:
                 self.mapper.removeMap()
+            k = 0
             self.canvas.pixCount = self.mapper.toFront(0.0)  
-            for dict in dlist:          
+            for tmp in dlist:          
                 self.canvas.pixCount += 1
-                if dict['type'] == 'bkg':
-                    if not path.exists(paths["bkgPath"] + dict['fname']):       
+                if tmp['type'] == 'bkg':
+                    if not path.exists(paths["bkgPath"] + tmp['fname']):       
                         continue  
-                    pix = BkgItem(paths["bkgPath"] + dict['fname'],
+                    pix = BkgItem(paths["bkgPath"] + tmp['fname'],
                         self.canvas)
                     ## lock all
                     pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
                 else:
-                    if not path.exists(paths["spritePath"] + dict['fname']):       
+                    if not path.exists(paths["spritePath"] + tmp['fname']):       
                         continue  ## could be outside of paths or deleted
-                    pix = PixItem(paths["spritePath"] + dict['fname'],
+                    k += 1
+                    pix = PixItem(paths["spritePath"] + tmp['fname'],
                         self.canvas.pixCount,
                         0, 0, 
-                        self.canvas)
+                        self.canvas)  ## passing self.canvas which references self.mapper
                 ## set for both
-                pix.x = dict['x']
-                pix.y = dict['y']
+                pix.x = tmp['x']
+                pix.y = tmp['y']
                 pix.setPos(pix.x,pix.y)
-                if dict['type'] == 'bkg':
-                    pix.setZValue(dict['z']),  ## zval may not match id
-                pix.setMirrored(dict['mirror']),
-                pix.rotation = dict['rotation']
-                pix.scale = dict['scale'] 
-                if 'tag' not in dict.keys():  ## seriously good to know
-                    dict['tag'] = ''
+                if tmp['type'] == 'bkg':
+                    pix.setZValue(tmp['z']),  ## zval may not match id
+                pix.setMirrored(tmp['mirror']),
+                pix.rotation = tmp['rotation']
+                pix.scale = tmp['scale'] 
+                if 'tag' not in tmp.keys():  ## seriously good to know
+                    tmp['tag'] = ''
                 else:
-                    pix.tag = dict['tag']        
+                    pix.tag = tmp['tag']        
                 ## may require rotation or scaling 
                 self.canvas.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
             self.canvas.openPlayFile = file
-            self.canvas.disableSliders()
-
-    def play(self):   
+            self.canvas.initBkg.disableSliders()
+            self.dots.statusBar.showMessage("Number of Pixitems:  {}".format(k),5000)
+ 
+    def play(self):  
         if self.canvas.control != '': 
             return
         if self.mapper.mapSet:   
@@ -141,21 +136,22 @@ class SideShow():
         self.canvas.unSelect()
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = self.pathMaker.getPathList(True)       
-        k = 0
+        k, r = 0, 0  ## k counts all non r items (demo)
         scale = .65
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.tag:
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
                     pix.tag = pix.tag[0:len('Random')]
-                if pix.tag.endswith(self.runThis) and k >= 0:  
-                    pix.scale = scale * (67-(k*3))/100.0  ## 3 * 22 screen items
+                if pix.tag.endswith(self.runThis) and r >= 0:  
+                    pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
                 pix.anime = self.animation.setAnimation(          
                     pix.tag, 
                     pix)   
                 k += 1
                 if pix.tag.endswith(self.runThis):  ## increase the delay to start  
-                    QTimer.singleShot(100 + (k * 50), pix.anime.start)
+                    r += 1
+                    QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
                     if pix.anime: pix.anime.start()
             elif pix.zValue() <= self.pathZ:
@@ -207,7 +203,7 @@ class SideShow():
                 if pix.type in ("pix","bkg"):
                     if not path.exists(pix.fileName):
                         next
-                    dict = {
+                    tmp = {
                         "fname": os.path.basename(pix.fileName),
                         "type": pix.type,
                         "x": pix.x,
@@ -218,7 +214,7 @@ class SideShow():
                         "scale": pix.scale,
                         "tag": pix.tag,
                     }
-                    dlist.append(dict)
+                    dlist.append(tmp)
             if dlist:
                 Q = QFileDialog()
                 if self.canvas.openPlayFile == '':
@@ -248,22 +244,22 @@ class SideShow():
 
     def enablePlay(self):
         self.canvas.control = ''
-        self.buttons.btnPlay.setEnabled(True)
-        self.buttons.btnPause.setEnabled(False)
-        self.buttons.btnStop.setEnabled(False) 
+        self.dots.btnPlay.setEnabled(True)
+        self.dots.btnPause.setEnabled(False)
+        self.dots.btnStop.setEnabled(False) 
  
     def disablePlay(self):
         self.canvas.control = 'pause'
-        self.buttons.btnPlay.setEnabled(False)
-        self.buttons.btnPause.setEnabled(True)
-        self.buttons.btnStop.setEnabled(True)  
+        self.dots.btnPlay.setEnabled(False)
+        self.dots.btnPause.setEnabled(True)
+        self.dots.btnStop.setEnabled(True)  
 
     def setPauseKey(self):        
         if self.canvas.control == 'pause': 
-            self.buttons.btnPause.setText( "Resume" );
+            self.dots.btnPause.setText( "Resume" );
             self.canvas.control = 'resume'
         elif self.canvas.control == 'resume':
-            self.buttons.btnPause.setText( "Pause" );
+            self.dots.btnPause.setText( "Pause" );
             self.canvas.control = 'pause'
 
 ### ---------------------- dotsSideShow --------------------

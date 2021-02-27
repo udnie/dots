@@ -13,8 +13,8 @@ from dotsSideCar     import TagIt, PointItem
  
 import dotsSidePath  as sidePath
 
-scaleUpKeys = ('>','\"', '=')
-scaleDnKeys = ('<',':','-')
+ScaleUpKeys = ('>','\"', '=')
+ScaleDnKeys = ('<',':','-')
 
 ### --------------------- dotsSideWays ---------------------
 ''' dotsSideWays: pathmaker extension. Includes path and
@@ -22,9 +22,10 @@ scaleDnKeys = ('<',':','-')
 ### -------------------------------------------------------
 class SideWays():
 
-    def __init__(self, parent):
+    def __init__(self, parent, dots):
         super().__init__()
  
+        self.dots = dots
         self.pathMaker = parent
         self.scene  = parent.scene
         self.mapper = parent.mapper 
@@ -40,7 +41,7 @@ class SideWays():
         if not self.pathMaker.newPath:
             self.pathMaker.pts = []   
             self.resetPolyline()
-            self.pathMaker.buttons.btnPathMaker.setStyleSheet(
+            self.dots.btnPathMaker.setStyleSheet(
                 "background-color: rgb(255,120,90)")
             self.pathMaker.newPath = True
         else:
@@ -59,6 +60,19 @@ class SideWays():
         if self.npts % 3 == 0:
             self.pathMaker.pts.append(pt)
             self.drawPolyline()
+
+        #### save for now ########################
+        # lnn = len(self.pathMaker.pts)
+        # last = QPointF(0.0, 0.0)  ## save for now
+        # for pt in self.pathMaker.pts:
+        #     itm = PointItem(self, pt, idx, lnn)
+        #     self.scene.addItem(itm)
+        #     idx += 1
+            # if last != QPointF(0.0, 0.0):   ## save for now
+            #     print(int(self.distance(pt.x(), last.x(), 
+            #         pt.y(), last.y())))
+            # last = pt
+        #### save for now ########################
 
     def drawPolyline(self):
         if self.pathMaker.polylineSet:
@@ -120,7 +134,7 @@ class SideWays():
 
     def newPathOff(self):
         if self.pathMaker.newPath:
-            self.pathMaker.buttons.btnPathMaker.setStyleSheet(
+            self.dots.btnPathMaker.setStyleSheet(
                 "background-color: rgba(0,255,0,100)")
             self.pathMaker.newPath = False
 
@@ -207,9 +221,9 @@ class SideWays():
                     self.pathMaker.pts[i].y(), centerY)
             inc, xdist, ydist = 0, dist, dist
             ## scale up, scale down
-            if key in scaleUpKeys:  
+            if key in ScaleUpKeys:  
                 dist = dist + ( dist * .01 )         
-            elif key in scaleDnKeys:  
+            elif key in ScaleDnKeys:  
                 dist = dist - ( dist * .01 )
             ## rotate 1 degree
             if key == '+':  

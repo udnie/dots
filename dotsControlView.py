@@ -7,10 +7,10 @@ from PyQt5.QtWidgets import *
 
 from dotsShared      import common, singleKeys
 
-toglKeys = (Qt.Key_G, Qt.Key_K, Qt.Key_M)
-mixKeys  = (Qt.Key_D, Qt.Key_F, Qt.Key_P, Qt.Key_R, Qt.Key_T)
-exitKeys = (Qt.Key_X, Qt.Key_Q, Qt.Key_Escape)
-fileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
+ToglKeys  = (Qt.Key_G, Qt.Key_K, Qt.Key_M)
+MixKeys   = (Qt.Key_D, Qt.Key_F, Qt.Key_P, Qt.Key_R, Qt.Key_T)
+ExitKeys  = (Qt.Key_X, Qt.Key_Q, Qt.Key_Escape)
+FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -34,8 +34,8 @@ class ControlView(QGraphicsView):
         self.dragOver = False
   
         # added 2px to prevent noticable screen movement - curious 
-        self.setFixedSize(common["viewW"]+2, common["viewH"]+2)
-  
+        self.setFixedSize(common["ViewW"]+2, common["ViewH"]+2)
+    
         self.setRenderHints(QPainter.Antialiasing | 
             QPainter.TextAntialiasing | 
             QPainter.SmoothPixmapTransform)
@@ -44,7 +44,7 @@ class ControlView(QGraphicsView):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setAcceptDrops(True)        
-        self.setStyleSheet("border: 1px solid black;")
+        self.setStyleSheet("border: 1px solid rgb(125,125,125)")
 
         self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
@@ -63,7 +63,7 @@ class ControlView(QGraphicsView):
         pass
 
     def dragEnterEvent(self, e):
-        ext = fileTypes
+        ext = FileTypes
         if e.mimeData().hasUrls():
             m = e.mimeData()
             imgFile = m.urls()[0].toLocalFile()
@@ -94,7 +94,7 @@ class ControlView(QGraphicsView):
             self.setKey('del')
 
         ## mix of setKey and direct run
-        if key in mixKeys:
+        if key in MixKeys:
             if key == Qt.Key_D:    
                 self.setKey('D') 
                 self.canvas.deleteSelected()
@@ -102,23 +102,24 @@ class ControlView(QGraphicsView):
                 self.setKey('F')    ## if pathMaker on
                 self.canvas.flopSelected()  
             elif key == Qt.Key_P:
-                if self.canvas.openPlayFile != '': 
-                    self.canvas.mapper.togglePaths() 
+                self.canvas.mapper.togglePaths() 
                 # self.setKey('P')  ## your choice
             elif key == Qt.Key_R:
                 if self.canvas.pathMakerOn:
                     self.setKey('R') ## if pathMaker on
                 else:  ## if you're testing an animation over again
                     self.canvas.sideShow.runDemo('demo.play')
-            elif key == Qt.Key_T:  
-                if self.canvas.openPlayFile != '':
+            elif key == Qt.Key_T:
+                if self.canvas.pathMakerOn:
+                    self.setKey('T') ## if pathMaker on
+                else:  
                     self.canvas.mapper.toggleTagItems()
 
         if key in self.direct: 
             self.direct[key]()  ## OK...
 
         ## too many references
-        if key in toglKeys:
+        if key in ToglKeys:
             if key == Qt.Key_G:
                 self.canvas.sideCar.toggleGrid() 
             elif key == Qt.Key_K:
@@ -128,8 +129,8 @@ class ControlView(QGraphicsView):
   
         if key in singleKeys: ## in dotsShared.py
             self.setKey(singleKeys[key])
-        elif e.key() in exitKeys:
-            sys.exit() 
+        elif e.key() in ExitKeys:
+            self.canvas.exit() 
 
     def setKey(self, key):  ## sending key to dropCanvas
         self.key = key

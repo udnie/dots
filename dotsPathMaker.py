@@ -9,17 +9,17 @@ from dotsSideCar     import MsgBox, DoodleMaker
 from dotsShared      import common, paths
 from dotsSideWays    import SideWays
 
-moveKeys = ("left","right","up", "down")
-scaleRotateKeys = ('+','_','<','>',':','\"','=','-')
-wayPtsKeys = ('<','>','R', '!', 'P')
-notNewPathKeys = ('S','T','W','N')
+MoveKeys = ("left","right","up", "down")
+ScaleRotateKeys = ('+','_','<','>',':','\"','=','-')
+WayPtsKeys = ('<','>','R', '!', 'P')
+NotNewPathKeys = ('S','T','W','N')
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, drawpolygon, pathchooser,
     pathlist, and path modifier functions '''
 ### --------------------------------------------------------
 class PathMaker(QWidget):    
-    def __init__(self, parent):  
+    def __init__(self, parent, sliders):  
         super().__init__()
 
         self.canvas  = parent
@@ -27,8 +27,8 @@ class PathMaker(QWidget):
         self.scene   = parent.scene
         self.view    = parent.view
         self.mapper  = parent.mapper
-        self.sliders = parent.sliders
-        self.buttons = parent.buttons
+        self.sliders = sliders  ## for toggling key menu
+        self.dots    = parent.dots
    
         self.key = ""
         self.initThis()
@@ -36,9 +36,9 @@ class PathMaker(QWidget):
         self.tic = 3  ## points to move using arrow keys
 
         ## extends pathMaker
-        self.sideWays = SideWays(self)
+        self.sideWays = SideWays(self, self.dots)
 
-        self.canvas.pathSignal[str].connect(self.pathKeys)
+        self.canvas.pathMakerSignal[str].connect(self.pathKeys)
         self.view.viewport().installEventFilter(self)
 
         self.direct = {
@@ -85,15 +85,12 @@ class PathMaker(QWidget):
         self.key = key
         if key == 'D':  ## always
             self.delete()
-            return
         elif key == '/':
             self.sideWays.changePathColor()
+        elif self.newPath and key == 'cmd':
+            self.sideWays.closePath()    
 
-        ## newpath - not newpath
-        if self.newPath:
-            if key == 'cmd':
-                self.sideWays.closePath()    
-        elif key in notNewPathKeys:
+        if key in NotNewPathKeys:
             if key == 'S':
                 self.savePath()
             elif key == 'T':
@@ -111,13 +108,13 @@ class PathMaker(QWidget):
         if not self.wayPtsSet and not self.newPath:
             if key in self.direct: 
                 self.direct[key]()  ## OK...
-            elif key in moveKeys:
+            elif key in MoveKeys:
                 self.movePath(key)
-            elif key in scaleRotateKeys: 
+            elif key in ScaleRotateKeys: 
                 self.sideWays.scaleRotate(key)
 
         ##  waypts only
-        if self.wayPtsSet and key in wayPtsKeys:
+        if self.wayPtsSet and key in WayPtsKeys:
             if key == 'R':
                 self.sideWays.reverseIt()
             elif key == '!':
@@ -139,7 +136,7 @@ class PathMaker(QWidget):
             self.initThis()
             if not self.sliders.pathMenuSet:
                 self.sliders.toggleMenu()
-            self.buttons.btnPathMaker.setStyleSheet(
+            self.dots.btnPathMaker.setStyleSheet(
                 "background-color: LIGHTGREEN")
             QTimer.singleShot(250, self.pathChooser)
 
@@ -196,8 +193,8 @@ class PathMaker(QWidget):
     def centerPoly(self):
         if self.polySet:
             p = self.polygon.sceneBoundingRect()
-            w = (common["viewW"] - p.width()) /2
-            h = (common["viewH"] - p.height()) / 2
+            w = (common["ViewW"] - p.width()) /2
+            h = (common["ViewH"] - p.height()) / 2
             x, y = w - p.x(), h - p.y()
             self.polygon.setPos(self.polygon.x()+x, self.polygon.y()+y)
             self.updpts(x, y)
@@ -206,16 +203,14 @@ class PathMaker(QWidget):
         p = self.polygon.sceneBoundingRect()
         max = p.y() + p.height()
         for i in range(0, len(self.pts)):
-            pt = QPointF(self.pts[i].x(), max - self.pts[i].y() + p.y())
-            self.pts[i] = pt
+            self.pts[i] = QPointF(self.pts[i].x(), max - self.pts[i].y() + p.y())
         self.drawPolygon()
   
     def flopPath(self): 
         p = self.polygon.sceneBoundingRect()
         max = p.x() + p.width()
         for i in range(0, len(self.pts)):
-            pt = QPointF(max - self.pts[i].x() + p.x(), self.pts[i].y())
-            self.pts[i] = pt
+            self.pts[i] = QPointF(max - self.pts[i].x() + p.x(), self.pts[i].y())
         self.drawPolygon()
 
     def halfPath(self):  
@@ -278,7 +273,7 @@ class PathMaker(QWidget):
             self.pathMaker.pathChooserOff()
         if self.sliders.pathMenuSet:
             self.sliders.toggleMenu()
-        self.buttons.btnPathMaker.setStyleSheet(
+        self.dots.btnPathMaker.setStyleSheet(
             "background-color: white")
     
 ### --------------------------------------------------------
@@ -289,8 +284,7 @@ class PathMaker(QWidget):
                 for line in fp:
                     ln = line.rstrip()  
                     ln = list(map(float, ln.split(',')))   
-                    pt = QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc)
-                    tmp.append(pt)
+                    tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
             return tmp
         except IOError:
             MsgBox("getrpts: Error reading pts file")

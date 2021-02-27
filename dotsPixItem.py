@@ -9,16 +9,17 @@ from dotsShared       import common
 import dotsSideCar    as sideCar 
 import dotsAnimation  as anima
 
-# from pubsub  import pub      # PyPubSub - required
+## -- for testing and comparison ----------------
+#from pubsub  import pub      # PyPubSub - required
 
-incZ = 1.0      # increment zValue
-pixfactor = .30  # beginnig size factor 
+IncZ = 1.0      # increment zValue
+Pixfactor = .30  # beginnig size factor 
 
-moveKeys = ("left","right","up", "down")
-rotateKeys = ("_", '+', '"', ':', "{", "}")
-scaleKeys  = ("<",">")
+MoveKeys = ("left","right","up", "down")
+RotateKeys = ("_", '+', '"', ':', "{", "}")
+ScaleKeys  = ("<",">")
 
-rotationVals = {
+RotationVals = {
     '}': 45,
     '"': +15,
     '+': 1,
@@ -28,7 +29,7 @@ rotationVals = {
 }
 
 ### --------------------- dotsPixItem ----------------------
-''' dotsPixItem: primary dots screen object '''
+''' dotsPixItem: primary dots screen object - like a sprite '''
 ### --------------------------------------------------------
 class PixItem(QGraphicsPixmapItem):
     
@@ -47,8 +48,8 @@ class PixItem(QGraphicsPixmapItem):
         img = QImage(imgFile)
 
         newW, newH = self.setPixSizes( 
-            img.width() * pixfactor, 
-            img.height() * pixfactor)
+            img.width() * Pixfactor, 
+            img.height() * Pixfactor)
 
         ## don't change
         img = img.scaled(newW, newH,
@@ -90,11 +91,11 @@ class PixItem(QGraphicsPixmapItem):
     def setPixKeys(self, key):
         self.key = key  
         if self.isHidden or self.isSelected():
-            if key in rotateKeys:
+            if key in RotateKeys:
                 self.rotateThis(key)
-            elif key in scaleKeys:
+            elif key in ScaleKeys:
                 self.scaleThis(key)  
-            elif key in moveKeys:
+            elif key in MoveKeys:
                 self.moveThis(key)
 
     def setMirrored(self, mirror):
@@ -116,11 +117,11 @@ class PixItem(QGraphicsPixmapItem):
         elif self.key == '/': # send to back
             self.setZValue(self.mapper.lastZval('pix')-.011)
         else:                   # single click to front
-            self.canvas.pixCount = self.mapper.toFront(incZ)
+            self.canvas.pixCount = self.mapper.toFront(IncZ)
             self.setZValue(self.canvas.pixCount)
         e.accept()
 
-    def reprise(self):
+    def reprise(self):  ## return pixitem to original position
         self.anime = None
         self.anime = anima.reprise(self)
         self.anime.start()
@@ -128,6 +129,7 @@ class PixItem(QGraphicsPixmapItem):
         self.clearFocus()
  
     def deletePix(self):
+        self.anime 
         self.anime = anima.fin(self)
         self.anime.start()
         self.anime.finished.connect(self.removeThis)
@@ -143,12 +145,12 @@ class PixItem(QGraphicsPixmapItem):
         self.x = int(sideCar.constrain(
             self.initX + dragX, 
             self.width, 
-            common["viewW"], 
+            common["ViewW"], 
             self.width * -common["factor"]))
         self.y = int(sideCar.constrain(
             self.initY + dragY,
             self.height, 
-            common["viewH"], 
+            common["ViewH"], 
             self.height * -common["factor"]))
         self.setPos(self.x, self.y)
         self.dragCnt +=1
@@ -170,7 +172,7 @@ class PixItem(QGraphicsPixmapItem):
             ## selected as the others will become hidden 
             self.setSelected(True) 
             self.isHidden = False  
-        elif not self.canvas.key in ['opt','cmd','shift']:
+        elif not self.canvas.key in ('opt','cmd','shift'):
             if self.isSelected() == False:
                 self.setSelected(True)  
             elif self.isSelected():
@@ -188,7 +190,7 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
 
     def pixVals(self):
-        dict = {
+        tmp = {
             "x": self.x,
             "y": self.y,
             "mirror": self.flopped,
@@ -196,12 +198,12 @@ class PixItem(QGraphicsPixmapItem):
             "scale": self.scale,
             "tag": self.tag
         }
-        return dict
+        return tmp
 
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
-            self.canvas.pixCount = self.mapper.toFront(incZ)
+            self.canvas.pixCount = self.mapper.toFront(IncZ)
             self.setZValue(self.canvas.pixCount)
         e.accept()
 
@@ -218,17 +220,17 @@ class PixItem(QGraphicsPixmapItem):
             self.y += pts
         self.x = int(sideCar.constrain(self.x, 
             self.width, 
-            common["viewW"], 
+            common["ViewW"], 
             self.width * -common["factor"]))
         self.y = int(sideCar.constrain(self.y, 
             self.height, 
-            common["viewH"], 
+            common["ViewH"], 
             self.height * -common["factor"]))
         self.setPos(self.x, self.y) 
   
     def rotateThis(self, key):
         self.setOriginPt() 
-        angle = rotationVals[key]  ## thanks Martin
+        angle = RotationVals[key]  ## thanks Martin
         p = self.rotation + angle
         if p > 360: 
             p = p - 360

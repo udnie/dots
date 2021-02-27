@@ -128,7 +128,7 @@ class InitMap(QWidget):
                 break
 
     def mapBoundingRects(self):
-        tx, ty = common["viewW"], common["viewH"]
+        tx, ty = common["ViewW"], common["ViewH"]
         bx, by = 0, 0
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.id in self.selections:
@@ -220,25 +220,24 @@ class InitMap(QWidget):
         if self.pathsSet:
             self.clearPaths()
             return
-        else:
-            if self.scene.items():
-                k = 0
-                self.pathsSet = False  ## force clearPaths if fails
-                QTimer.singleShot(200, self.clearTagGroup)  ## the other tags
-                self.addPathGroup()
-                self.addPathTagGroup()
-                for pix in self.scene.items():
-                    if pix.type == 'pix':
-                        if  pix.tag.endswith('.path'):
-                            k += self.displayPath(pix)
-                        elif pix.anime and pix.anime.state() == 2: ## running
-                            pix.anime.pause()
-                    elif pix.zValue() <= self.pathZ:
-                        break
-                if k > 0: 
-                    self.pathsSet = True
-                else:
-                    self.clearPaths()
+        if self.scene.items():
+            k = 0
+            self.pathsSet = False  ## force clearPaths if fails
+            QTimer.singleShot(200, self.clearTagGroup)  ## the other tags
+            self.addPathGroup()
+            self.addPathTagGroup()
+            for pix in self.scene.items():
+                if pix.type == 'pix':
+                    if  pix.tag.endswith('.path'):
+                        k += self.displayPath(pix)
+                    elif pix.anime and pix.anime.state() == 2: ## running
+                        pix.anime.pause()
+                elif pix.zValue() <= self.pathZ:
+                    break
+            if k > 0: 
+                self.pathsSet = True
+            else:
+                self.clearPaths()
 
     def addPathGroup(self):
         self.pathGroup = QGraphicsItemGroup()

@@ -6,15 +6,15 @@ from PyQt5.QtCore     import *
 from PyQt5.QtGui      import *
 from PyQt5.QtWidgets  import *
 
-from dotsSideCar      import MsgBox
+# from dotsSideCar      import MsgBox
 from dotsShared       import common
 
 import dotsSidePath   as sidePath
 
-animeList = ['Vibrate', 'Pulse','Bobble','Idle']
-oneOffs = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
+AnimeList = ['Vibrate', 'Pulse','Bobble','Idle']
+OneOffs = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
 
-animeList += oneOffs
+AnimeList += OneOffs
 
 ### -------------------- dotsAnimation ---------------------
 ''' dotsAnimation: contains many basic animations and the  
@@ -75,9 +75,9 @@ class Animation():
         ## one-offs
         if anime == 'Rain':
             return rain(pix, Node(pix))
-        elif anime in ['Stage Left', 'Stage Right']:
+        elif anime in ('Stage Left', 'Stage Right'):
             return stage(pix, anime)
-        elif anime in ['Spin Left', 'Spin Right']:
+        elif anime in ('Spin Left', 'Spin Right'):
             return spin(pix, anime, Node(pix))
         elif anime == 'demo.path':
             return sidePath.demo(pix, anime, Node(pix))
@@ -87,7 +87,7 @@ class Animation():
 ### --------------------------------------------------------
     def _random(self):  
         random.seed()
-        r = animeList + self.canvas.pathList 
+        r = AnimeList + self.canvas.pathList 
         return r[random.randint(0,len(r)-1)]
 
 ### --------------------------------------------------------
@@ -256,9 +256,9 @@ def stage(pix, which):
     node.pix.setOriginPt()    
 
     x = int(pos.x())
-    viewW = common["viewW"]
+    ViewW = common["ViewW"]
     left = x+node.pix.width*3
-    right = viewW+node.pix.width*3
+    right = ViewW+node.pix.width*3
 
     if which.endswith('Left'):
         stage1, stage2 = stageLeft(node, pos, left, right)
@@ -330,8 +330,8 @@ def rain(pix, node):
     sync = random.randint(17, 31) * 50
 
     y = int(pos.y())
-    viewH  = common["viewH"]
-    bottom = y+viewH+node.pix.height*2
+    ViewH  = common["ViewH"]
+    bottom = y+ViewH+node.pix.height*2
     top    = y+node.pix.height*2
 
     rain1 = QPropertyAnimation(node, b'pos')

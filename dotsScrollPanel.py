@@ -12,13 +12,13 @@ from dotsSideCar     import MsgBox
 ''' dotsScrollPanel: handles scrolling sprite selections.
     Includes ImgLabel and ScrollPanel classes. '''
 ### --------------------------------------------------------
-maxH, maxW = 135, 165         # max image size
-labelH, labelW = 170, 195     # max label size
-scrollW, scrollH = 215, 682   # panel size
+MaxW, MaxH = 165, 135         # max image size
+LabelW, LabelH = 195, 170     # max label size
+ScrollW, ScrollH = 215, 682   # scroll panel size
 
-star = [(100, 20), (112, 63), (158, 63), (122, 91), 
+Star = ((100, 20), (112, 63), (158, 63), (122, 91), 
         (136, 133), (100, 106), (63, 132), (77, 90), 
-        (41, 63), (86, 63)]
+        (41, 63), (86, 63))
 
 ### --------------------------------------------------------
 class ImgLabel(QLabel):
@@ -39,36 +39,36 @@ class ImgLabel(QLabel):
         qp = QPainter()
         qp.begin(self)
 
-        if self.imgFile == 'star':
+        if self.imgFile == 'Star':
             qp.setPen(QPen(Qt.black, 1, Qt.SolidLine))
             qp.setBrush(QBrush(Qt.red, Qt.SolidPattern))
             qp.drawPolygon(QPolygon(self.drawStar()))  
             qp.setBrush(Qt.NoBrush) 
         else:    
             img = QImage(self.imgFile)
-            newW, newH = self.scaleTo(img, maxW, maxH)
+            newW, newH = self.scaleTo(img)
             img = img.scaled(newW, newH,   
                 Qt.KeepAspectRatio|
                 Qt.SmoothTransformation)
-            posX = ((labelW - newW) /2 )
-            posY = ((maxH - newH) /2 ) + 10
+            posX = ((LabelW - newW) /2 )
+            posY = ((MaxH - newH) /2 ) + 10
             qp.drawImage(posX, posY, img)
 
         pen = QPen(Qt.darkGray)   
         pen.setWidth(2)
         qp.setPen(pen) 
-        qp.drawRect(0, 0, labelW, labelH)
+        qp.drawRect(0, 0, LabelW, LabelH)
 
         pen = QPen(Qt.white) 
         pen.setWidth(3)
         pen.setJoinStyle(Qt.BevelJoin)
         qp.setPen(pen) 
-        qp.drawLine(0, 2, 0, labelH) # left border
-        qp.drawLine(1, 1, labelW, 1) # top border
+        qp.drawLine(0, 2, 0, LabelH) # left border
+        qp.drawLine(1, 1, LabelW, 1) # top border
 
         font = QFont()
         pen = QPen(Qt.black)
-        font.setFamily('Modern')
+        font.setFamily('Arial')
         font.setBold(True)
         font.setPointSize(13)
 
@@ -77,12 +77,12 @@ class ImgLabel(QLabel):
         imgfile = os.path.basename(self.imgFile)
         metrics = QFontMetrics(font)    
 
-        p = (labelW - metrics.width(imgfile))/2 
+        p = (LabelW - metrics.width(imgfile))/2 
         qp.drawText(p, 160, imgfile)
         qp.end()
 
     def minimumSizeHint(self):
-        return QSize(labelW, labelH)
+        return QSize(LabelW, LabelH)
 
     def sizeHint(self):
         return self.minimumSizeHint()
@@ -92,9 +92,9 @@ class ImgLabel(QLabel):
             self.dots.deleteImgLabel(self)
 
     def mouseMoveEvent(self, event):
-        self.startDrag()
+        self.StartDrag()
  
-    def startDrag(self):
+    def StartDrag(self):
         drag = QDrag(self)
         data = QMimeData()
         data.setText(None)
@@ -106,29 +106,29 @@ class ImgLabel(QLabel):
      
     def drawStar(self):
         poly = QPolygon()
-        for s in star:
+        for s in Star:
             poly.append(QPoint(s[0], s[1]))
         return poly
 
-    def scaleTo(self, img, maxW, maxH):
+    def scaleTo(self, img):
         W, H = img.width(), img.height()
-        newW, newH = maxW, maxH
+        newW, newH = MaxW, MaxH
 
         if W == H:
-            newW, newH = maxH, maxH
+            newW, newH = MaxH, MaxH
         elif W > H:
-            newW = maxW
-            p = maxW / W
+            newW = MaxW
+            p = MaxW/ W
             newH = p * H
-            if newH > maxH:
-                r = maxH / newH
+            if newH > MaxH:
+                r = MaxH / newH
                 newH, newW = r * newH, newW * r
         elif W < H:
-            newH = maxH
-            p = maxH / H
+            newH = MaxH
+            p = MaxH / H
             newW = p * W
-            if newW > maxW:
-                r = maxW / newW
+            if newW > MaxW:
+                r = MaxW/ newW
                 newH, newW = r * newH, newW * r
         return newW, newH   
 
@@ -142,7 +142,7 @@ class ScrollPanel(QWidget):
         self.canvas = parent.canvas ## used in imgLabel
         self.scene  = parent.scene 
 
-        self.setFixedSize(scrollW,scrollH)
+        self.setFixedSize(ScrollW,ScrollH)
    
         self.layout = QVBoxLayout(self)
         self.layout.setSizeConstraint(3)  # fixed size
@@ -175,29 +175,30 @@ class ScrollPanel(QWidget):
     def add(self, fname):   
         self.scrollCount += 1
         self.scrollList.append(self.scrollCount) 
-        img = ImgLabel(fname, self.scrollCount, self)
-        self.layout.addWidget(img)
+        self.layout.addWidget(ImgLabel(fname, self.scrollCount, self))
         self.bottom()
 
-    def star(self):    
-        self.add('star')
+    def Star(self):    
+        self.add('Star')
         
     def deleteImgLabel(self, this):
         p = self.scrollList.index(this.id)
         del self.scrollList[p]    
         self.layout.itemAt(p).widget().deleteLater()
-        p = (p-1) * labelH
+        p = (p-1) * LabelH
         self.scroll.verticalScrollBar().setSliderPosition(p)
 
     def top(self):           
         if self.layout.count() > 0:
             firstItem = self.layout.itemAt(0).widget()
-            QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, firstItem))
+            QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
+                firstItem))
 
     def bottom(self):         ## thanks stackoverflow
         if self.layout.count() > 0:
             lastItem = self.layout.itemAt(self.layout.count()-1).widget()
-            QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, lastItem))
+            QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
+                lastItem))
 
     def clear(self):
         for i in reversed(range(self.layout.count())): 
@@ -216,7 +217,7 @@ class ScrollPanel(QWidget):
         Q.done(0)
           
     def loadSprites(self):
-        sprites = self.spriteList()
+        sprites = sorted(self.spriteList())
         if sprites:
             for s in sprites:
                 self.add(s)
@@ -233,7 +234,7 @@ class ScrollPanel(QWidget):
         filenames = []
         for file in files:
             if file.lower().endswith('png'): 
-                filenames.append(paths['spritePath'] + file)
+                filenames.append(paths['spritePath'] + file.lower())
         if not filenames:
             MsgBox("No Sprites Found!", 5)
         return filenames

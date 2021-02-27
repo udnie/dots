@@ -7,6 +7,7 @@ from PyQt5.QtGui      import *
 from PyQt5.QtWidgets  import *
 
 from dotsShared       import paths
+from dotsSideCar      import MsgBox
 
 ### ---------------------- dotsSidePath --------------------
 ''' dotsPaths contains demo, setPath, getOffset and pathLoader '''
@@ -103,20 +104,19 @@ def setPaths(pix, anime, node):
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
         path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
-    path.setEndValue(waypts.pointAtPercent(1.0)-pt)  
+    path.setEndValue(waypts.pointAtPercent(1.0)-pt)
+
     path.setLoopCount(-1) 
-
-    path.setLoopCount(-1)
-
+    
     return path
 
+### --------------------------------------------------------
 def getOffset(pix):
     b = pix.boundingRect()
     w = (b.width()*.5)
     h = (b.height()*.5)
     return QPointF(w,h)
 
-### --------------------------------------------------------
 def pathLoader(anime):
     file = paths["paths"] + anime  ## includes '.path'
     try:

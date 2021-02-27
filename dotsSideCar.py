@@ -39,14 +39,14 @@ class SideCar():
                         0, 0, 
                         self.canvas)
                 x = int(constrain(
-                        self.xy(common["viewW"]),
+                        self.xy(common["ViewW"]),
                         pix.width, 
-                        common["viewW"], 
+                        common["ViewW"], 
                         pix.width * -common["factor"]))
                 y = int(constrain(
-                        self.xy(common["viewH"]),
+                        self.xy(common["ViewH"]),
                         pix.height, 
-                        common["viewH"],
+                        common["ViewH"],
                         pix.height * -common["factor"]))
                 pix.x, pix.y = x, y
                 pix.setPos(x,y)
@@ -80,12 +80,12 @@ class SideCar():
             gs = common["gridSize"]
             pen = QPen(QColor(0,0,255))
 
-            for i in range(int(common["viewH"]/gs)):
+            for i in range(int(common["ViewH"]/gs)):
                 self.addLines(QGraphicsLineItem(0.0, gs*i,
-                    float(common["viewW"]), gs*i), pen)
-            for j in range(int(common["viewW"]/gs)):
+                    float(common["ViewW"]), gs*i), pen)
+            for j in range(int(common["ViewW"]/gs)):
                 self.addLines(QGraphicsLineItem(gs*j, 0.0,
-                    gs*j, float(common["viewH"])), pen)
+                    gs*j, float(common["ViewH"])), pen)
         
     def addLines(self, line, pen):
         line.type = 'grid'
@@ -168,7 +168,7 @@ class TagIt(QGraphicsSimpleTextItem):
 
         self.type = 'tag'
         self.text = tag   
-        self.font = QFont('Modern', 12)
+        self.font = QFont('Arial', 12)
         metrics   = QFontMetrics(self.font)
         self.rect = QRectF(0, 0, metrics.width(self.text)+13, 19)
         self.waypt = 0
@@ -277,7 +277,7 @@ class Doddle(QLabel):
         scalor = .10
         self.W, self.H = 140, 100
 
-        self.font = QFont('Modern', 13)
+        self.font = QFont('Arial', 13)
         self.pen = QPen(QColor(0,0,0))                     
         self.pen.setWidth(1)                                       
         self.brush = QBrush(QColor(255,255,255,255)) 

@@ -4,14 +4,18 @@ from PyQt5.QtCore    import *
 ''' dotsShared: common and paths dictionaries shared across classes and files '''
 ### --------------------------------------------------------
 common = {
-    "viewW": 1056,  ## canvas width
-    "viewH": 704,   ## canvas height
+    "ViewW": 1056,  ## canvas width  or 33 X 32
+    "ViewH": 704,   ## canvas height or 22 X 32
     "factor": 0.35,     
     "gridSize": 32,
     "gridZ": -50.0, 
-    "pathZ": -25.0,     
+    "pathZ": -25.0,  
+    "bkgZ":  -99.0,
 }
-     
+
+MapStr = "L,O,P,S,C,:,\",<,>,{,},[,],_,+,/,cmd,left,right,up,down,del,shift,opt"   
+PathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
+
 paths = {
     "snapShot": "./",
     "bkgPath": "./backgrounds/",
@@ -31,6 +35,7 @@ keyMenu = [                     ## pixitems and bkgitems
     ('K', 'Toggle KeyList'),
     ('L', 'Load Play'),
     ('M', 'Map Selected'),
+    ('O', 'Toggle Paths 2'),
     ('P', 'Play Tggl Paths'),
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
@@ -57,14 +62,9 @@ pathMenu = [
     ('C', 'Center Path'),
     ("D", "Delete Screen"), 
     ("N", "New Path"),
+    ("T", "Test"),
     ("/", "Path Color"),
     ("cmd", "Closes Path"),
-    ("T", "Test"),
-    ("W", "Way Points"),
-    (">", "  Shift Pts +5%"),
-    ("<", "  Shift Pts -5%"),
-    ("R", "  Reverse Path"),
-    ("! ","  Half Path Size"),
     ('_/+', "Rotate 1 deg"),
     ('<,>', 'Toggle Size'),
     ("} ", "Flop Path"),
@@ -72,9 +72,17 @@ pathMenu = [
     (':/\"', "Scale X"),
     ('-,=', 'Scale Y'),
     ('U/D', 'Arrow Keys'),
-    ('L/R', 'Arrow Keys')]
+    ('L/R', 'Arrow Keys'),
+    ("W", "Way Points"),
+    ("P", "Show Way Pts"),
+    ("opt", "Add a Point"),
+    ("del", "Delete a Point"),
+    (">", "  Shift Pts +5%"),
+    ("<", "  Shift Pts -5%"),
+    ("R", "  Reverse Path"),
+    ("! ","  Half Path Size")]
 
-pathcolors = [
+pathcolors = (
     "DODGERBLUE",    
     "AQUAMARINE", 
     "CORAL",         
@@ -92,7 +100,7 @@ pathcolors = [
     "TOMATO",
     "ORANGERED", 
     "RED",    
-    "YELLOW"]        
+    "YELLOW")       
 
 singleKeys = {  ## wish I had done this earlier
     Qt.Key_Up: 'up',          
@@ -105,6 +113,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_C: 'C',  
     Qt.Key_L: 'L',
     Qt.Key_N: 'N',   
+    Qt.Key_O: 'O',  
     Qt.Key_P: 'P',
     Qt.Key_S: 'S', 
     Qt.Key_W: 'W',  

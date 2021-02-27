@@ -4,7 +4,7 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-from dotsShared      import common
+from dotsShared      import common, MapStr, PathStr
 
 from dotsAnimation   import *
 from dotsSideCar     import SideCar, MsgBox
@@ -13,33 +13,29 @@ from dotsPixItem     import PixItem
 from dotsMapItem     import InitMap
 from dotsBkgItem     import *
 from dotsSideShow    import SideShow
-from dotsAnimation   import animeList
+from dotsAnimation   import AnimeList
 from dotsPathMaker   import *
 
 ## -- for testing and comparison ----------------
-# from pubsub  import pub      # PyPubSub - required
-
-pathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
-mapStr = "L,P,S,C,:,\",<,>,{,},[,],_,+,/,left,right,up,down,cmd,del,shift,opt"
+#from pubsub  import pub      # PyPubSub - required
 
 ### -------------------- dotsDropCanvas --------------------
 ''' dotsDropCanvas: where everything comes together, includes context 
     menu and screen handling for selecting screen objects '''
 ### --------------------------------------------------------
-class DropCanvas(QMainWindow):
+class DropCanvas(QWidget):
 
-    pathSignal = pyqtSignal([str])
+    pathMakerSignal = pyqtSignal([str])
 
-    def __init__(self, sliders, buttons, parent):
+    def __init__(self, parent):
         QMainWindow.__init__(self)
 
         self.scene = QGraphicsScene(self)
         self.view  = ControlView(self.scene, self)
 
-        self.dots    = parent
-        self.sliders = sliders 
-        self.buttons = buttons  
-      
+        self.dots = parent
+        self.sliders = self.dots.sliderpanel
+       
         self.chooser = None       ## placeholder for popup_widget
         
         self.control = ''         ## shared
@@ -50,15 +46,15 @@ class DropCanvas(QMainWindow):
 
         self.mapper    = InitMap(self) 
         self.sideCar   = SideCar(self) 
-        self.pathMaker = PathMaker(self)
+        self.pathMaker = PathMaker(self, self.sliders)
 
         self.animation = Animation(self)
         self.sideShow  = SideShow(self)
         self.initBkg   = InitBkg(self, MsgBox)
         
         self.scene.setSceneRect(0, 0,
-            common["viewW"],
-            common["viewH"])
+            common["ViewW"],
+            common["ViewH"])
 
         self.pathZ = common["pathZ"]
         self.key = ''
@@ -75,21 +71,23 @@ class DropCanvas(QMainWindow):
     def setKeys(self, key):
         self.key = key
         if not self.pathMakerOn:
-            if self.key in mapStr or self.key == '':
-                if self.key in ('L','P', 'S'):
+            if self.key in MapStr or self.key == '':
+                if self.key in ('L','O','P', 'S'):  ## this can change
                     self.sideShow.keysInPlay(self.key)
                 elif self.key == 'C':
                     self.clear()
                 else:
                     self.sendPixKeys()
-        else:
-            if self.key in pathStr:
-                self.pathSignal[str].emit(self.key)
-      
-            # pub.sendMessage('setKeys', key=key)  ## pypubsub solution
+
+            # pub.sendMessage('setKeys', key=key)  ## pypubsub solution   
+            # if used - requires some work to coordinate with mapper
             # if self.mapper.mapSet: ## already in sendPixKeys
             #     self.mapper.updateMap()  ## redraw mapper
-    
+
+        elif self.key in PathStr:
+            self.pathMakerSignal[str].emit(self.key)
+
+### --------------------------------------------------------
     def eventFilter(self, source, e): ## handles mostly mapping selections
         if source is self.view.viewport():
             self.scene.clearFocus()
@@ -164,18 +162,14 @@ class DropCanvas(QMainWindow):
             self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()
         self.sideShow.stop('stop')
-        self.disableSliders()     
+        self.initBkg.disableSliders()
+        self.dots.statusBar.clearMessage()
         self.mapper.clearMap()
-        self.buttons.btnBkgFiles.setEnabled(True)
+        self.dots.btnBkgFiles.setEnabled(True)
         self.pixCount = 0
         self.sideCar.gridSet = False
         self.openPlayFile = ''
         self.scene.clear()
-
-    def disableSliders(self):
-        self.sliders.enableSliders(False)
-        self.buttons.btnSetBkg.setEnabled(False)
-        self.buttons.btnSave.setEnabled(False)
 
     def loadSprites(self):
         self.sideShow.enablePlay()
@@ -201,9 +195,20 @@ class DropCanvas(QMainWindow):
     def deleteSelected(self):
         if not self.pathMakerOn:
             self.mapper.clearMap()
-            for pix in self.scene.selectedItems():
+        for pix in self.scene.selectedItems():
+            if pix.anime != None and \
+                pix.anime.state() == QAbstractAnimation.Running:
+                continue
+            else:
                 pix.deletePix()
-            self.sideShow.enablePlay()
+        self.anySprites()
+
+    def anySprites(self):
+        for pix in self.scene.items():
+            if pix.type == 'pix': ## still some left
+                break
+            elif pix.zValue() <= self.pathZ:
+                self.sideShow.enablePlay()
     
     def flopSelected(self):    
         if not self.pathMakerOn:
@@ -261,7 +266,7 @@ class DropCanvas(QMainWindow):
             "font-size: 14px;\n"
             "border: 1px solid rgb(125,125,125);\n"
             "}")
-        alst = sorted(animeList)
+        alst = sorted(AnimeList)
         ## basing pathlist on what's in the directory
         self.pathList = self.pathMaker.getPathList(True)  ## names only
         rlst = sorted(self.pathList)    
@@ -269,17 +274,32 @@ class DropCanvas(QMainWindow):
         for anime in alst:
             action = menu.addAction(anime)
             action.triggered.connect(
-                lambda chk, anime=anime: self.sideShow.setAction(anime))
+                lambda chk, anime=anime: self.setAnimationTag(anime))
         menu.addSeparator()
         for anime in rlst:
             action = menu.addAction(anime)
             action.triggered.connect(
-                lambda chk, anime=anime: self.sideShow.setAction(anime))
+                lambda chk, anime=anime: self.setAnimationTag(anime))
         menu.addSeparator()
         anime = "Clear Tags"
         action = menu.addAction(anime)
         action.triggered.connect(
-            lambda chk, anime=anime: self.sideShow.setAction(anime))
+            lambda chk, anime=anime: self.setAnimationTag(anime))
         menu.exec_(e.globalPos())
     
+    def setAnimationTag(self, tag):
+        if self.mapper.tagSet and tag == "Clear Tags":
+            self.mapper.clearTagGroup()
+        for pix in self.scene.selectedItems():
+            if tag == "Clear Tags":
+                if pix.anime != None and \
+                    pix.anime.state() != QAbstractAnimation.Running:
+                    pix.tag = ''
+            else:
+                pix.tag = tag
+            pix.anime = None        ## set by play
+            pix.setSelected(False)  ## when tagged 
+        if self.mapper.mapSet: 
+            self.mapper.removeMap()
+
 ### -------------------- dotsDropCanvas --------------------

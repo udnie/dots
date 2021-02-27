@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import *
 from dotsShared      import keyMenu, pathMenu
 
 ### ------------------- dotsSliderPanel ----------------
-sliderW, sliderH = 195, 682
+SliderW, SliderH = 195, 682
 
 ### ----------------------------------------------------
 ''' dotsSliderPanel contains the TableGroup and the SliderGroup
@@ -13,12 +13,14 @@ sliderW, sliderH = 195, 682
 ### --------------------------------------------------------
 class SliderPanel(QWidget):
 
-    signal = pyqtSignal(str, int)
+    sliderSignal = pyqtSignal(str, int)
 
-    def __init__(self):
+    def __init__(self, parent):
         super().__init__()
         
-        self.setFixedSize(sliderW, sliderH) 
+        self.dots = parent
+
+        self.setFixedSize(SliderW, SliderH) 
   
         self.isEnabled = False
         self.pathMenuSet = False
@@ -30,18 +32,18 @@ class SliderPanel(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
 
 ### -----------------------------------------------------
-    def enableSliders(self, key): 
-        self.isEnabled = key
+    def enableSliders(self, bool): 
+        self.isEnabled = bool
         self.rotateSldr.setValue(0)
         self.scaleSldr.setValue(100)
         self.opacitySldr.setValue(100)
-        self.sliderGroup.setEnabled(key)
+        self.sliderGroup.setEnabled(bool)
 
 ### -----------------------------------------------------
     def addTableGroup(self):
-        self.tableGroup = QGroupBox("")
-        self.tableGroup.setFixedSize(sliderW,352)
-        self.tableGroup.setStyleSheet("QGroupBox {\n"
+        tableGroup = QGroupBox("")
+        tableGroup.setFixedSize(SliderW,352)
+        tableGroup.setStyleSheet("QGroupBox {\n"
             "background-color: rgb(250,250,250);\n"
             "border: .5px solid rgb(125,125,125);\n"
             "}")
@@ -71,9 +73,9 @@ class SliderPanel(QWidget):
         layout = QVBoxLayout()    
         layout.addWidget(self.tableView, Qt.AlignHCenter|Qt.AlignVCenter)
 
-        self.tableGroup.setLayout(layout)
+        tableGroup.setLayout(layout)
 
-        return self.tableGroup
+        return tableGroup
 
 ### --------------------------------------------------------
     def setTableModel(self, list):
@@ -111,7 +113,7 @@ class SliderPanel(QWidget):
 
     def addSliderGroup(self):
         self.sliderGroup = QGroupBox("")
-        self.sliderGroup.setFixedSize(sliderW,325)
+        self.sliderGroup.setFixedSize(SliderW,325)
         self.sliderGroup.setStyleSheet("QGroupBox {\n"
             "background-color: rgb(250,250,250);\n"
             "border: 1px solid rgb(125,125,125);\n"
@@ -202,13 +204,13 @@ class SliderPanel(QWidget):
         if val < 0 or val > 360: val = 0 
         self.rotateValue.setText("{:3d}".format(val))
         if self.isEnabled:  
-            self.signal[str, int].emit("rotate", int(val))
+            self.sliderSignal[str, int].emit("rotate", int(val))
 
     def setScale(self, val):
         if val >= 99 and val <= 101: val= 100
         self.scaleValue.setText("{0:.2f}".format(val/100.0))
         if self.isEnabled:
-            self.signal[str, int].emit("scale", int(val))
+            self.sliderSignal[str, int].emit("scale", int(val))
  
     def setOpacity(self, val):
         if val >= 99 and val <= 101: 
@@ -217,7 +219,7 @@ class SliderPanel(QWidget):
             val = 0
         self.opacityValue.setText("{0:.2f}".format(val/100.0))
         if self.isEnabled:
-            self.signal[str, int].emit("opacity", int(val))
+            self.sliderSignal[str, int].emit("opacity", int(val))
     
 ### --------------------- TableModel -----------------------  
 class TableModel(QAbstractTableModel):  ## thanks stackoverflow 
