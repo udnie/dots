@@ -155,7 +155,7 @@ class SideWays():
             if lnn:                     ## make some tags
                 self.addTagGroup()
                 inc = int(lnn/10)  # approximate a 10% increment
-                list = [x*inc for x in range(0,10)]  ## get the indexes
+                list = (x*inc for x in range(0,10)) ## get the indexes
                 for idx in list:
                     pt = self.pathMaker.pts[idx]
                     pct = (idx/lnn)*100
