@@ -78,7 +78,7 @@ Changed delete from the shift key to the actual delete key. Seems it shows up as
 **June 2020:**  
 Initial posting followed by minor bug fixes and fussy changes.
 
-##Videos	
+## Videos	
 * The original video that illustrates some of the features of this app. <https://youtu.be/rd4LtR88UjE> 
 
 * Demonstrates some basic animations and how to add them to a screen pixItem. <https://youtu.be/SHDmcySukGg>
