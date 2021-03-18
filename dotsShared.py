@@ -4,10 +4,10 @@ from PyQt5.QtCore    import *
 ''' dotsShared: common and paths dictionaries shared across classes and files '''
 ### --------------------------------------------------------
 common = {
-    "ViewW": 1056,  ## canvas width  or 33 X 32
-    "ViewH": 704,   ## canvas height or 22 X 32
+    "ViewW": 1080,  ## canvas width 
+    "ViewH": 720,   ## canvas height
     "factor": 0.35,     
-    "gridSize": 32,
+    "gridSize": 30,   
     "gridZ": -50.0, 
     "pathZ": -25.0,  
     "bkgZ":  -99.0,
@@ -25,7 +25,11 @@ paths = {
     "spritePath": "./sprites/",
 }
 
-keyMenu = [                     ## pixitems and bkgitems
+Star = ((100, 20), (112, 63), (158, 63), (122, 91), 
+        (136, 133), (100, 106), (63, 132), (77, 90), 
+        (41, 63), (86, 63))
+
+keyMenu = (                    ## pixitems and bkgitems
     ('A', 'Select All'),   
     ('C', 'Clear Canvas'),     
     ('D', 'Delete Selected'),
@@ -43,6 +47,8 @@ keyMenu = [                     ## pixitems and bkgitems
     ('X, Q', 'Escape to Quit'),
     ('', 'Clk to Front'),
     ('/', 'Clk to Back'),
+    ('opt', 'Clk Back One Z'),
+    ('cmd', 'Clk Up One Z'),
     ('Del', 'Clk to Delete'),
     ('Shift', 'Clk to Flop'),  
     ('Opt', 'DbClk to Clone'),
@@ -53,9 +59,9 @@ keyMenu = [                     ## pixitems and bkgitems
     ('{/}', 'Rotate 45 deg'),
     ('</>', 'Toggle Size'),
     ('U/D', 'Arrow Keys'),
-    ('L/R', 'Arrow Keys')]
+    ('L/R', 'Arrow Keys'))
 
-pathMenu = [
+pathMenu = (
     ("F", "Files"),
     ("S", "Save Path"),
     ("P", "Path Chooser"),
@@ -80,7 +86,7 @@ pathMenu = [
     (">", "  Shift Pts +5%"),
     ("<", "  Shift Pts -5%"),
     ("R", "  Reverse Path"),
-    ("! ","  Half Path Size")]
+    ("! ","  Half Path Size"))
 
 pathcolors = (
     "DODGERBLUE",    
@@ -88,7 +94,8 @@ pathcolors = (
     "CORAL",         
     "CYAN",        
     "DEEPSKYBLUE",   
-    "LAWNGREEN",     
+    "LAWNGREEN", 
+    "GREEN",    
     "HOTPINK",  
     "WHITESMOKE",
     "LIGHTCORAL", 

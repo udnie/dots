@@ -10,7 +10,8 @@ from dotsShared       import paths
 from dotsSideCar      import MsgBox
 
 ### ---------------------- dotsSidePath --------------------
-''' dotsPaths contains demo, setPath, getOffset and pathLoader '''
+''' dotsPaths is used by animations and pathmaker and contains 
+    demo, setPath, getOffset and pathLoader '''
 ### --------------------------------------------------------
 def demo(pix, anime, node):           
     pos  = node.pix.pos()

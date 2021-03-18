@@ -17,8 +17,8 @@ ScaleUpKeys = ('>','\"', '=')
 ScaleDnKeys = ('<',':','-')
 
 ### --------------------- dotsSideWays ---------------------
-''' dotsSideWays: pathmaker extension. Includes path and
-    waypoints functions, scaleRotate and pathTest '''
+''' dotsSideWays: extends pathMaker. Includes path and
+    waypoints functions - scaleRotate and pathTest '''
 ### -------------------------------------------------------
 class SideWays():
 

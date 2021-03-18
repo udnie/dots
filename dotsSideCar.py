@@ -30,8 +30,8 @@ class SideCar():
 
 ### --------------------------------------------------------
     def pixTest(self):
-        if not self.canvas.pathMakerOn:
-            self.canvas.pixCount = self.mapper.toFront(0.0)  
+        if not self.canvas.pathMakerOn:  
+            self.canvas.pixCount = self.mapper.toFront(0)
             for _ in range(10):
                 self.canvas.pixCount += 1
                 pix = PixItem(paths["spritePath"] + 'apple.png',
@@ -148,10 +148,10 @@ def setCursor():
 ### --------------------------------------------------------
 class TagIt(QGraphicsSimpleTextItem):
     
-    def __init__(self, control, tag, color):
+    def __init__(self, control, tag, color, zval=None):
         super().__init__()
 
-        if control in ['pause','resume'] and "Random" in tag:
+        if control in ('pause','resume') and "Random" in tag:
             tag = tag[7:]
             self.color = QColor(0,255,127)
         elif control == 'pathMaker':
@@ -165,6 +165,12 @@ class TagIt(QGraphicsSimpleTextItem):
             if "Random" in tag: tag = tag[0:6] 
         if color:
             self.color = QColor(color)
+
+        if zval != None:
+            if len(tag) > 0:  
+                tag = tag + ": " + str(zval)
+            else:
+                tag =  str(zval)
 
         self.type = 'tag'
         self.text = tag   

@@ -5,6 +5,7 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
+from dotsSideCar     import MsgBox
 from dotsShared      import common, singleKeys
 
 ToglKeys  = (Qt.Key_G, Qt.Key_K, Qt.Key_M)
@@ -30,22 +31,22 @@ class ControlView(QGraphicsView):
     
         self.canvas = parent   
         self.scene  = parent.scene
+
+        self.dots    = parent.dots
+        self.sliders = self.dots.sliderpanel  
     
         self.dragOver = False
-  
-        # added 2px to prevent noticable screen movement - curious 
-        self.setFixedSize(common["ViewW"]+2, common["ViewH"]+2)
     
         self.setRenderHints(QPainter.Antialiasing | 
             QPainter.TextAntialiasing | 
             QPainter.SmoothPixmapTransform)
 
+        self.setStyleSheet("border: 1px solid rgb(110,110,110)")
+
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.setAcceptDrops(True)        
-        self.setStyleSheet("border: 1px solid rgb(125,125,125)")
-
         self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
 
@@ -63,13 +64,15 @@ class ControlView(QGraphicsView):
         pass
 
     def dragEnterEvent(self, e):
+        if self.canvas.pathMakerOn:  ## added for pathmaker
+            e.setAccepted(False)
+            MsgBox("Can't add sprites to PathMaker")
+            return
         ext = FileTypes
         if e.mimeData().hasUrls():
             m = e.mimeData()
             imgFile = m.urls()[0].toLocalFile()
-            if self.canvas.pathMakerOn:  ## added for pathmaker
-                e.setAccepted(False)
-            elif imgFile != 'star' and imgFile.lower().endswith(ext): 
+            if imgFile != 'star' and imgFile.lower().endswith(ext): 
                 e.setAccepted(True)
                 self.dragOver = True
             else:
@@ -80,6 +83,7 @@ class ControlView(QGraphicsView):
         if m.hasUrls():
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
+            self.canvas.pixCount = self.canvas.mapper.toFront(0)
             self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(), 
                 None, False)
    

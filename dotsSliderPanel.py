@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import *
 from dotsShared      import keyMenu, pathMenu
 
 ### ------------------- dotsSliderPanel ----------------
-SliderW, SliderH = 195, 682
+SliderW, SliderH = 185, 682
 
 ### ----------------------------------------------------
 ''' dotsSliderPanel contains the TableGroup and the SliderGroup
@@ -13,6 +13,7 @@ SliderW, SliderH = 195, 682
 ### --------------------------------------------------------
 class SliderPanel(QWidget):
 
+    ## transfers slider output to initBkg
     sliderSignal = pyqtSignal(str, int)
 
     def __init__(self, parent):
@@ -21,7 +22,7 @@ class SliderPanel(QWidget):
         self.dots = parent
 
         self.setFixedSize(SliderW, SliderH) 
-  
+
         self.isEnabled = False
         self.pathMenuSet = False
 
@@ -32,7 +33,7 @@ class SliderPanel(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
 
 ### -----------------------------------------------------
-    def enableSliders(self, bool): 
+    def enableSliders(self, bool=False): 
         self.isEnabled = bool
         self.rotateSldr.setValue(0)
         self.scaleSldr.setValue(100)
@@ -63,12 +64,12 @@ class SliderPanel(QWidget):
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
         self.tableView.horizontalHeader().setStyleSheet("QHeaderView {\n"
             "border: .5px solid rgb(200,200,200);\n"
-            "font-size: 13px;\n"
+            "font-size: 12px;\n"
             "}")  
 
         self.setTableModel(keyMenu)
-        self.tableView.setColumnWidth(0, 45) 
-        self.tableView.setColumnWidth(1, 107)
+        self.tableView.setColumnWidth(0, 38) 
+        self.tableView.setColumnWidth(1, 103)
 
         layout = QVBoxLayout()    
         layout.addWidget(self.tableView, Qt.AlignHCenter|Qt.AlignVCenter)
@@ -101,6 +102,7 @@ class SliderPanel(QWidget):
                 "}") 
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(220,220,220);\n"
+                "font-size: 12px;\n"
                 "}")  
 
     def toggleMenu(self):
@@ -223,7 +225,7 @@ class SliderPanel(QWidget):
     
 ### --------------------- TableModel -----------------------  
 class TableModel(QAbstractTableModel):  ## thanks stackoverflow 
-    def __init__(self, data, hdr):
+    def __init__(self, data, hdr):      ## my mods
         super(TableModel,self).__init__()
         self.data = data
         self.header = hdr

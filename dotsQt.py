@@ -10,10 +10,9 @@ import dotsSliderPanel  as sliderPanel
 import dotsSideCar      as sideCar
 
 from datetime       import datetime
-from dotsShared     import common
 from dotsDocks      import *
 
-DotsW, DotsH = 1518, 810
+DotsW, DotsH = 1503, 825
  
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widget panels, and
@@ -25,11 +24,12 @@ class DotsQt(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        ## the sliderpanel needs to be referenced by canvas
         self.sliderpanel = sliderPanel.SliderPanel(self)
         self.canvas = dropCanvas.DropCanvas(self)
       
         self.scene = self.canvas.scene
-        self.view = self.canvas.view
+        self.view  = self.canvas.view
 
         self.setCentralWidget(self.canvas)    
         self.scrollpanel = scrollPanel.ScrollPanel(self)
@@ -44,7 +44,7 @@ class DotsQt(QMainWindow):
         self.setStyleSheet(open('./dotsStyle.css').read())
 
         self.setFixedSize(DotsW,DotsH)
-        self.canvas.initBkg.disableSliders()
+        self.canvas.initBkg.disableBkgBtns()  ## toggles bkg sliders off as well
   
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)

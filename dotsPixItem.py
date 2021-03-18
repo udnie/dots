@@ -41,15 +41,19 @@ class PixItem(QGraphicsPixmapItem):
 
         self.fileName = imgFile
    
-        self.id = id  ## used by mapItem
+        self.id = id  ## used by mapper
         self.x  = x
         self.y  = y
 
         img = QImage(imgFile)
 
-        newW, newH = self.setPixSizes( 
-            img.width() * Pixfactor, 
-            img.height() * Pixfactor)
+        if 'frame' in self.fileName: 
+            newW, newH = common["ViewW"],common["ViewH"]
+            self.x, self.y = 0,0
+        else:
+            newW, newH = self.setPixSizes( 
+                img.width() * Pixfactor, 
+                img.height() * Pixfactor)
 
         ## don't change
         img = img.scaled(newW, newH,
@@ -68,7 +72,8 @@ class PixItem(QGraphicsPixmapItem):
 
         self.rotation = 0
         self.scale = 1.0
-        self.setZValue(self.id)
+        ## zValue may reset by loadPlay
+        self.setZValue(self.id)  
         
         self.isHidden = False
         self.anime = None
@@ -81,7 +86,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setPos(self.x, self.y)
         self.setMirrored(mirror)
 
-        self.setFlag(QGraphicsPixmapItem.ItemIsMovable)
+        self.setFlag(QGraphicsPixmapItem.ItemIsMovable, True)
         self.setFlag(QGraphicsPixmapItem.ItemIsSelectable)
   
         # pub.subscribe(self.setPixKeys, 'setKeys')
@@ -106,19 +111,24 @@ class PixItem(QGraphicsPixmapItem):
             self.ungrabMouse()   
         if self.key == 'del':  # delete
             self.deletePix()
-        else:
+        if self.key == '/': # send to back of pixItems
+            self.setZValue(self.mapper.lastZval('pix')-1)
+        elif self.key == 'opt':  # send it back one Z
+            p = self.zValue()-1  # so as not to confuse things
+            self.setZValue(p)
+        elif self.key == 'cmd': # send it forward one Z
+            p = self.zValue()+1  
+            self.setZValue(p)
+        else:                   # single click to front
+            self.setZValue(self.mapper.toFront(IncZ))
+        if 'frame' not in self.fileName:
             self.initX, self.initY = self.x, self.y   # set position
             self.dragAnchor = self.mapToScene(e.pos())
-        if self.key == 'shift':  # flop if selected or hidden
-            if self.flopped:
-                self.setMirrored(False)
-            else:
-                self.setMirrored(True)
-        elif self.key == '/': # send to back
-            self.setZValue(self.mapper.lastZval('pix')-.011)
-        else:                   # single click to front
-            self.canvas.pixCount = self.mapper.toFront(IncZ)
-            self.setZValue(self.canvas.pixCount)
+            if self.key == 'shift':  # flop if selected or hidden
+                if self.flopped:
+                    self.setMirrored(False)
+                else:
+                    self.setMirrored(True)
         e.accept()
 
     def reprise(self):  ## return pixitem to original position
@@ -129,15 +139,20 @@ class PixItem(QGraphicsPixmapItem):
         self.clearFocus()
  
     def deletePix(self):
-        self.anime 
-        self.anime = anima.fin(self)
-        self.anime.start()
-        self.anime.finished.connect(self.removeThis)
+        if 'frame' in self.fileName:
+            self.removeThis()
+        else:
+            self.anime 
+            self.anime = anima.fin(self)
+            self.anime.start()
+            self.anime.finished.connect(self.removeThis)
 
     def removeThis(self):
         self.canvas.scene.removeItem(self)
 
     def mouseMoveEvent(self, e):
+        if 'frame' in self.fileName:
+            return
         pos = self.mapToScene(e.pos())     
         dragX = pos.x() - self.dragAnchor.x()
         dragY = pos.y() - self.dragAnchor.y()
@@ -159,6 +174,8 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
 
     def mouseDoubleClickEvent(self, e):
+        if 'frame' in self.fileName:
+            return
         if self.key == 'opt':  
             self.cloneThis(e)
         elif self.canvas.key == 'noMap': 
@@ -203,8 +220,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
-            self.canvas.pixCount = self.mapper.toFront(IncZ)
-            self.setZValue(self.canvas.pixCount)
+            self.setZValue(self.mapper.toFront(IncZ))
         e.accept()
 
     def moveThis(self, key):

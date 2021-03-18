@@ -181,7 +181,7 @@ class InitMap(QWidget):
                     QTimer.singleShot(200, self.clearPaths)
                 self.addTagGroup()
                 for pix in self.scene.items():
-                    if pix.type == 'pix' and pix.tag:  
+                    if pix.type == 'pix':  
                         self.tagIt(pix) 
                         k += 1
                     elif pix.zValue() <= self.pathZ:
@@ -208,10 +208,11 @@ class InitMap(QWidget):
         y = int(p.y() + p.height()*.30)
         if  p.width() + p.height() < 30: ## too small??
             return
-        tag = TagIt(self.canvas.control, pix.tag, '')
+        tag = TagIt(self.canvas.control, pix.tag, '', pix.zValue())
         tag.setPos(x,y)
         tag.setZValue(self.tagZ) 
         self.tagGroup.addToGroup(tag)
+        self.tagSet = True
 
 ### --------------------------------------------------------
     def togglePaths(self):

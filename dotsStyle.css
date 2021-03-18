@@ -4,9 +4,9 @@ scrollbars in dotsQt.py*/
 QPushButton { 
   background: white;
   color: black;
-  font-size: 13px;
+  font-size: 12px;
   border: 1px solid rgb(120, 120, 120);
-  border-radius: 3px;
+  border-radius: 2px;
   padding: 2px 2px 2px 2px;
 } 
 
@@ -26,16 +26,16 @@ QMessageBox QPushButton {
   background: rgb(38, 168, 228);
   color: white;
   border: 1px solid rgb(200,200,200);
-  font-size: 13px;
-  border-radius: 3px;
+  font-size: 12px;
+  border-radius: 2px;
   padding: 3px 12px 3px 12px;
 }
 
 QGroupBox {
   background: rgb(195, 195, 195);
   border: 1px solid rgb(100,100,100);
-  border-radius: 3px;
-  font-size: 14px;
+  border-radius: 2px;
+  font-size: 13px;
   color:  rgb(40,40,40);
   margin-top: 5px;
 } 

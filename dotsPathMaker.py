@@ -19,7 +19,7 @@ NotNewPathKeys = ('S','T','W','N')
     pathlist, and path modifier functions '''
 ### --------------------------------------------------------
 class PathMaker(QWidget):    
-    def __init__(self, parent, sliders):  
+    def __init__(self, parent):  
         super().__init__()
 
         self.canvas  = parent
@@ -27,9 +27,10 @@ class PathMaker(QWidget):
         self.scene   = parent.scene
         self.view    = parent.view
         self.mapper  = parent.mapper
-        self.sliders = sliders  ## for toggling key menu
+
         self.dots    = parent.dots
-   
+        self.sliders = self.dots.sliderpanel  ## for toggling key menu
+    
         self.key = ""
         self.initThis()
         self.tagZ = common["pathZ"]
@@ -67,7 +68,7 @@ class PathMaker(QWidget):
         self.polygon = None
         self.wayPath = None
                 
-    def eventFilter(self, source, e):  
+    def eventFilter(self, source, e): ## shares same view as canvas
         if self.newPath:
             if e.type() == QEvent.MouseButtonPress:      
                 self.sideWays.npts = 0  
@@ -138,7 +139,7 @@ class PathMaker(QWidget):
                 self.sliders.toggleMenu()
             self.dots.btnPathMaker.setStyleSheet(
                 "background-color: LIGHTGREEN")
-            QTimer.singleShot(250, self.pathChooser)
+            # QTimer.singleShot(250, self.pathChooser)  ## optional
 
     def pathChooser(self): 
         if not self.pathChooserSet:

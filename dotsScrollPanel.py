@@ -4,7 +4,7 @@ from PyQt5.QtCore    import *
 from PyQt5.QtGui     import *
 from PyQt5.QtWidgets import *
 
-from dotsShared      import common, paths
+from dotsShared      import paths, Star
 from functools       import partial
 from dotsSideCar     import MsgBox
 
@@ -12,13 +12,9 @@ from dotsSideCar     import MsgBox
 ''' dotsScrollPanel: handles scrolling sprite selections.
     Includes ImgLabel and ScrollPanel classes. '''
 ### --------------------------------------------------------
-MaxW, MaxH = 165, 135         # max image size
-LabelW, LabelH = 195, 170     # max label size
-ScrollW, ScrollH = 215, 682   # scroll panel size
-
-Star = ((100, 20), (112, 63), (158, 63), (122, 91), 
-        (136, 133), (100, 106), (63, 132), (77, 90), 
-        (41, 63), (86, 63))
+MaxW, MaxH = 135, 105         # max image size
+LabelW, LabelH = 160, 135     # max label size
+ScrollW, ScrollH = 183, 686   # scroll panel size - changed for dotsDocks
 
 ### --------------------------------------------------------
 class ImgLabel(QLabel):
@@ -31,7 +27,7 @@ class ImgLabel(QLabel):
 
         self.imgFile = imgFile
         self.id = count 
-       
+  
         self.setFrameShape(QFrame.Panel|QFrame.Raised)
      
 ### --------------------------------------------------------
@@ -69,8 +65,7 @@ class ImgLabel(QLabel):
         font = QFont()
         pen = QPen(Qt.black)
         font.setFamily('Arial')
-        font.setBold(True)
-        font.setPointSize(13)
+        font.setPointSize(12)
 
         qp.setPen(pen)  
         qp.setFont(font)
@@ -78,7 +73,7 @@ class ImgLabel(QLabel):
         metrics = QFontMetrics(font)    
 
         p = (LabelW - metrics.width(imgfile))/2 
-        qp.drawText(p, 160, imgfile)
+        qp.drawText(p, 128, imgfile)
         qp.end()
 
     def minimumSizeHint(self):
@@ -107,7 +102,7 @@ class ImgLabel(QLabel):
     def drawStar(self):
         poly = QPolygon()
         for s in Star:
-            poly.append(QPoint(s[0], s[1]))
+            poly.append(QPoint(s[0], s[1])*.85)
         return poly
 
     def scaleTo(self, img):
@@ -163,7 +158,7 @@ class ScrollPanel(QWidget):
         self.scroll.setWidget(widget)
        
         vBoxLayout = QVBoxLayout(self)
-        vBoxLayout.setContentsMargins(0, 0, 0, 0)
+        vBoxLayout.setContentsMargins(0, 10, 0, 0)  ## change for dotsDocks
         vBoxLayout.addWidget(self.scroll)
          
         self.setLayout(vBoxLayout) 

@@ -1,21 +1,10 @@
 ## DotsQt  
-**DotsQt** is a program for creating photo-collage and 2D animations using transparent pngs as sprites/clip-art. It comes with some basic animations and paths that can be attached to the sprite screen objects plus a set of functions to create and modify paths.
+**DotsQt** is a program for creating photo-collage and 2D animations using transparent pngs as sprites/clip-art. It comes with some basic animations and paths that can be attached to the sprite screen objects plus a set of functions to create and modify paths as well as setting the background color.
 
-The original dots was/is a program written in JavaFX that added animation to the photo-collage portion of the dotsFX app as well as providing a means to create sprites. DotsQt is a PyQt implementation of the storyboard, animations and pathMaker sections. 
-
-**Note:** Dots was the original front end and is no longer required as the pixItem screen objects are now based on transparent pngs.
-
-## Why
- 
-
-* I did have some questions, I think I've answered them myself for now.
-
-* I never got the chance to publish the original JavaFX version as Oracle stopped supporting FX in 2018.  I felt it was worth the effort to try once again in Python. I haven't been disappointed.
-
-
+The original dots was written in JavaFX which added animation to the photo-collage portion of the DotsFX app as well as providing a means to create sprites. The dots front end is no longer required as the screen objects, sprites, are now based on transparent pngs.
 
 ## Stuff to know
-One of the few coding decisions I made was to try and keep my files, modules, under 300 lines when possible. Also, I use camel case after many years of coding in snake.
+One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible. Also, I use camel case after many years of coding in snake.
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on dropCanvas.
 
@@ -45,11 +34,11 @@ I use the graphicsitem **zValue()** as a means to order the six graphic types wh
   
   
 ## Changes
+**March 2021:**  	
+Added the **Color** button to launch a color picker widget. A color can be saved to the backgrounds directory as a named file that ends in **'.bkg'**, this allows it to be recalled and added to a play file as a regular background object. The expected color token is a hex string - **#FFFFFF**, there is no saved image file. Also added the pixItems zValue to tags and keys to send a pixItem back one zValue using **option-click** or forward one zValue using **command-click**. Frames are now a special case sprite rather than a background item.  DropCanvas now 1080X720 pixels.  
 
 **February 2021:**	
-Added the **'O'** key to the main window to toggle the paths prior to running animations as the **'P'** is now the **play** hot-key. Both keys can toggle the paths display once the animations are running. Also updated the parent window from a QGroupBox widget to QMainWindow adding QDockWidgets, a CentralWidget and a statusBar.  This update now running in Python 3.9.2 and PyQt 5.15.3 on Mac OSX  10.14.6.  The file dialog in native mode no longer lets the user delete a file thru the context menu. 
-
-Some bug fixes. Relocated code. No new videos.
+Added the **'O'** key to the main window to toggle the paths prior to running animations as the **'P'** is now the **play** hot-key. Both keys can toggle the paths display once the animations are running. Also updated the parent window from a QGroupBox widget to QMainWindow adding QDockWidgets, a CentralWidget and a statusBar.  Currently running in Python 3.9.2 and PyQt 5.15.3 on a Mac, OSX  10.14.6.  QFileDialog in native mode no longer lets the user delete files. 
 
 **December 2020:**	
 Added the **'L','P','S'** keys to dropCanvas to Load, Play, and Stop animations, same as the buttons - also reinstated **'C'** to clear the screen in dropCanvas. Clicking on the clear button will close pathMaker and as well as clicking on the pathMaker button if it's green. The **'C'** key is also used in pathMaker to center a path.
@@ -61,31 +50,21 @@ The method used to calculate percents has changed. The old method was based on a
 **November 2020:**  
 Added **'P'** key to toggle paths if found in a play file or if assigned when running and the **'K'** key to toggle the help keyList from dropCanvas to pathMaker.  Added a new **button** for pathMaker functions.  Reassigned some dropKeys to match up with similar functions in pathMaker and pixItems. Added **'R'** key to run the animation path demo. It's looks a little odd when it starts but the end result matches the original. It required a few work arounds to get the effect I was after.   
   
-Use the **'!'** key in **pathMaker** to reduce the path points size. I found that around 200 points should be sufficient in most cases.
-Also, you can use the snapshot button to record the waypoint tags and paths, plus any background.
+Use the **'!'** key in **pathMaker** to reduce the path points size. I found that around 200 points should be sufficient in most cases. Also, you can use the snapshot button to record the waypoint tags and paths, plus any background. See video: <https://youtu.be/kalDltrQkWs>
 
 **September 2020:**   
 Added the play, pause/resume and stop buttons to run animations. Added **paths** to animations.  Added a right-click **context menu** for adding animations to screen selections.  
 
-Added **tags** to show a screen items current animation. After selecting an animation you can type 'T' to toggle the tags on and off. Tags will be orange initially if there are no animations running.  Once running and if set to Random, tags will appear green and display the animation that was randomly assigned. The **context menu** only works if something is selected, even to clear **tags**.
+Added **tags** to show a screen items current animation. After selecting an animation you can type 'T' to toggle the tags on and off. Tags will be orange initially if there are no animations running.  Once running and if set to Random, tags will appear green and display the animation that was randomly assigned. The **context menu** only works if something is selected, even to clear **tags**. A video showing some basic animations and how to add them to a screen object - pixitem. <https://youtu.be/SHDmcySukGg>
+
 
 **August 2020:**  
-Added two new buttons. The save button maps the canvas items, pixItems and background to a Json file written to the ./plays directory as a .play file.  The load button reconstructs the saved canvas layout from the named .play file. 
+Added two new buttons. The save button maps the canvas items, pixItems and background to a Json file written to the ./plays directory as a .play file.  The load button reconstructs the saved canvas layout from the named .play file. Changed delete from the shift key to the actual delete key. Seems it shows up as a backspace key on some installs which is why I may not have used it earlier. Video to illustrate the save and load functions. <https://youtu.be/RPwEjgAcITk> 
  
-Changed delete from the shift key to the actual delete key. Seems it shows up as a backspace key on some installs which is why I may not have used it earlier. 
-
 
 **June 2020:**  
-Initial posting followed by minor bug fixes and fussy changes.
+Initial posting followed by minor bug fixes and fussy changes. The original video that illustrates some of the features of this app. <https://youtu.be/rd4LtR88UjE> 
 
-## Videos	
-* The original video that illustrates some of the features of this app. <https://youtu.be/rd4LtR88UjE> 
-
-* Demonstrates some basic animations and how to add them to a screen pixItem. <https://youtu.be/SHDmcySukGg>
-
-* Demonstrates the save and load functions. <https://youtu.be/RPwEjgAcITk>
-
-* Introduces pathMaker. <https://youtu.be/kalDltrQkWs>
 
 ## Requirements
 * PyQt5

@@ -30,12 +30,10 @@ class DropCanvas(QWidget):
     def __init__(self, parent):
         QMainWindow.__init__(self)
 
+        self.dots  = parent 
         self.scene = QGraphicsScene(self)
         self.view  = ControlView(self.scene, self)
-
-        self.dots = parent
-        self.sliders = self.dots.sliderpanel
-       
+             
         self.chooser = None       ## placeholder for popup_widget
         
         self.control = ''         ## shared
@@ -46,7 +44,7 @@ class DropCanvas(QWidget):
 
         self.mapper    = InitMap(self) 
         self.sideCar   = SideCar(self) 
-        self.pathMaker = PathMaker(self, self.sliders)
+        self.pathMaker = PathMaker(self)
 
         self.animation = Animation(self)
         self.sideShow  = SideShow(self)
@@ -55,6 +53,9 @@ class DropCanvas(QWidget):
         self.scene.setSceneRect(0, 0,
             common["ViewW"],
             common["ViewH"])
+
+        self.setFixedSize(common["ViewW"]+2,
+            common["ViewH"]+2)
 
         self.pathZ = common["pathZ"]
         self.key = ''
@@ -93,8 +94,8 @@ class DropCanvas(QWidget):
             self.scene.clearFocus()
             if e.type() == QEvent.MouseButtonPress: 
                 self.origin = QPoint(e.pos())
-                self.mapper.clearTagGroup()
-                if self.key == 'cmd':   ## only used by eventFilter
+                self.mapper.clearTagGroup()   ## chks if set
+                if self.key == 'cmd':         ## only used by eventFilter
                     if not self.pathMakerOn:  ## otherwise shows in pathmaker  
                         self.mapper.updatePixItemPos()
                         self.mapper.clearMap() ## set rubberband if mapset
@@ -137,13 +138,16 @@ class DropCanvas(QWidget):
     def addPixItem(self, imgFile, x, y, clone, mirror):    
         self.pixCount += 1  
         pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
-        if clone != None: 
+        if clone != None: ## clone it
             self.sideCar.transFormPixItem(pix,
                 clone.rotation,
                 clone.scale * random.randrange(95, 105)/100.0)
         else:
+            if 'frame' in pix.fileName: ## center it on dnd
+                pix.setPos(0,0)
+                pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
             self.scene.addItem(pix)
-
+           
     def sendPixKeys(self):  ## update pixitems thru setPixKeys
         for pix in self.scene.items(): 
             if pix.type == 'pix':
@@ -161,11 +165,11 @@ class DropCanvas(QWidget):
         if self.pathMakerOn:
             self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()
-        self.sideShow.stop('stop')
-        self.initBkg.disableSliders()
+        self.sideShow.stop('clear')
+        self.initBkg.disableBkgBtns()
         self.dots.statusBar.clearMessage()
         self.mapper.clearMap()
-        self.dots.btnBkgFiles.setEnabled(True)
+        self.dots.btnAddBkg.setEnabled(True)
         self.pixCount = 0
         self.sideCar.gridSet = False
         self.openPlayFile = ''
@@ -254,9 +258,8 @@ class DropCanvas(QWidget):
 
     def ZDump(self):
         for pix in self.scene.items():
-            # if pix.zValue() != self.pathZ:  ## skip grid zvalue
             print(pix.zValue())
-        print("bkg: " + str(self.initBkg.hasBackGround()))
+        # print("bkg: " + str(self.initBkg.hasBackGround()))
 
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():
@@ -290,11 +293,9 @@ class DropCanvas(QWidget):
     def setAnimationTag(self, tag):
         if self.mapper.tagSet and tag == "Clear Tags":
             self.mapper.clearTagGroup()
-        for pix in self.scene.selectedItems():
+        for pix in self.scene.selectedItems(): 
             if tag == "Clear Tags":
-                if pix.anime != None and \
-                    pix.anime.state() != QAbstractAnimation.Running:
-                    pix.tag = ''
+                pix.tag = ''
             else:
                 pix.tag = tag
             pix.anime = None        ## set by play
