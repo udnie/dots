@@ -5,14 +5,12 @@ import time
 
 from os import path
 
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore    import QTimer
 
 from dotsPixItem     import PixItem
 from dotsBkgItem     import *
 from dotsShared      import common, paths
-from dotsSideCar     import MsgBox
+from dotsSideGig     import MsgBox
 
 ### ---------------------- dotsSideShow --------------------
 ''' dotsSideShow: handles play, pause, stop '''
@@ -23,7 +21,6 @@ class SideShow():
         super().__init__()
  
         self.canvas  = parent
-        self.scene   = parent.scene
         self.dots    = parent.dots
         self.mapper  = parent.mapper
 
@@ -31,11 +28,10 @@ class SideShow():
         self.pathMaker = parent.pathMaker
 
         self.runThis = 'demo.path'
-        self.pathZ = common["pathZ"]
- 
+    
 ### --------------------------------------------------------
     def runDemo(self, file):
-        if not self.scene.items():
+        if not self.canvas.scene.items():
             self.openPlay(paths["playPath"] + file)
             QTimer.singleShot(250, self.dummy)
             self.play()
@@ -63,15 +59,13 @@ class SideShow():
         
     def loadPlay(self):
         if self.canvas.pathMakerOn:
-            self.pathMaker.openFiles()
+            self.pathMaker.sideWays.openFiles()
             return
         else:
             Q = QFileDialog()
-            options = Q.Options()
-            options |= Q.DontUseNativeDialog  ## used to work without it
-            file, _ = Q.getOpenFileName(self.canvas,  ## only way to delete
+            file, _ = Q.getOpenFileName(self.canvas, 
                 "Choose a file to open", paths["playPath"], "Files (*.play)",
-                None, options)
+                None)
             if file:
                 self.openPlay(file) 
             else:
@@ -86,8 +80,7 @@ class SideShow():
             MsgBox("openPlay: Error loading file")
             return
         if dlist:
-            if self.mapper.mapSet:
-                self.mapper.removeMap()
+            self.mapper.clearMap()  ## just clear it
             k, b = 0, 0   ## number of pixitems, test for bkg zval
             lnn = len(dlist)
             lnn = lnn + self.mapper.toFront(0)  ## start at the top
@@ -154,10 +147,10 @@ class SideShow():
         self.clearPathsandTags()  
         self.canvas.unSelect()
         if not self.canvas.pathList:  ## should already exist - moved from animations
-            self.canvas.pathList = self.pathMaker.getPathList(True)       
+            self.canvas.pathList = self.pathMaker.sideWays.getPathList(True)       
         k, r = 0, 0  ## k counts all non r items (demo)
         scale = .65
-        for pix in self.scene.items():
+        for pix in self.canvas.scene.items():
             if pix.type == 'pix' and pix.tag:
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
@@ -177,7 +170,7 @@ class SideShow():
                     QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
                     if pix.anime: pix.anime.start()
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 break 
         if k > 0:
             self.disablePlay()  
@@ -188,48 +181,53 @@ class SideShow():
         if self.canvas.control == 'resume':
            self.resume()
         else:          
-            for pix in self.scene.items():
+            for pix in self.canvas.scene.items():
                 if pix.type == 'pix' and pix.anime:
                     if pix.anime.state() == 2: ## running
-                        pix.anime.pause()
-                if pix.zValue() <= self.pathZ:
+                        pix.anime.pause()       
+                if pix.zValue() <= common["pathZ"]:
                     break
             self.setPauseKey()
 
     def resume(self):   
-        for pix in self.scene.items():
+        for pix in self.canvas.scene.items():
             if pix.type == 'pix' and pix.anime:
                 if pix.anime.state() == 1: ## paused
                     pix.anime.resume()
-            if pix.zValue() <= self.pathZ:
+            if pix.zValue() <= common["pathZ"]:
                 break
         self.setPauseKey()
  
     def stop(self, action=''):
         self.clearPathsandTags()    
-        for pix in self.scene.items():
+        self.setPauseKey()
+        for pix in self.canvas.scene.items():
             if pix.type == 'pix':
                 if pix.anime: pix.anime.stop()  
                 if action != 'clear': 
                     if 'frame' in pix.fileName:
                         continue  
                     pix.reprise() 
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 break
         self.enablePlay() 
       
     def savePlay(self):
         if self.canvas.pathMakerOn:
-            self.pathMaker.savePath()
+            self.pathMaker.sideWays.savePath()
+            return
+        elif len(self.canvas.scene.items()) == 0:
             return
         else:
             dlist = []  
-            for pix in self.scene.items():
-                if pix.type in ("pix","bkg"):
+            for pix in self.canvas.scene.items():
+                if pix.type in ("pix","bkg"):     
+                    # if 'frame' in pix.fileName and pix.scale > 2.0:
+                    #     continue   ## bad rec
                     if pix.fileName != 'flat' and \
                         not path.exists(pix.fileName):  ## note
                         continue   
-                if pix.type == "pix": 
+                if pix.type == "pix":      
                     dlist.append(self.returnPixBkg(pix))
                 elif pix.type == "bkg":
                     if pix.fileName != 'flat' and \
@@ -264,7 +262,7 @@ class SideShow():
                 MsgBox("saveToJson: Error saving file")
             return
 
-    def returnPixBkg(self, pix):
+    def returnPixBkg(self, pix):  ## used by both 
         tmp = {
             "fname": os.path.basename(pix.fileName),
             "type": pix.type,
@@ -289,10 +287,7 @@ class SideShow():
 
 ### -------------------------------------------------------- 
     def clearPathsandTags(self):
-        if self.mapper.pathsSet: 
-            self.mapper.clearPaths()
-        if self.mapper.tagSet:   
-            self.mapper.clearTagGroup()
+        self.mapper.clearPaths()  ## clears tags as well
 
     def enablePlay(self):
         self.canvas.control = ''

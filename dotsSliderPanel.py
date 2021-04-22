@@ -1,11 +1,12 @@
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore    import Qt, pyqtSignal, QAbstractTableModel
+from PyQt5.QtWidgets import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
+                            QTableView, QHeaderView, QAbstractItemView, QLabel
+                        
 
 from dotsShared      import keyMenu, pathMenu
 
 ### ------------------- dotsSliderPanel ----------------
-SliderW, SliderH = 185, 682
+SliderW, SliderH, OffSet = 180, 685, 20
 
 ### ----------------------------------------------------
 ''' dotsSliderPanel contains the TableGroup and the SliderGroup
@@ -28,9 +29,11 @@ class SliderPanel(QWidget):
 
         layout = QVBoxLayout(self)        
         layout.addWidget(self.addTableGroup())     
+        layout.addSpacing(20)
         layout.addWidget(self.addSliderGroup())
 
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(18, 0, 0, 0)
+        layout.setAlignment(Qt.AlignCenter)
 
 ### -----------------------------------------------------
     def enableSliders(self, bool=False): 
@@ -42,41 +45,22 @@ class SliderPanel(QWidget):
 
 ### -----------------------------------------------------
     def addTableGroup(self):
-        tableGroup = QGroupBox("")
-        tableGroup.setFixedSize(SliderW,352)
-        tableGroup.setStyleSheet("QGroupBox {\n"
-            "background-color: rgb(250,250,250);\n"
-            "border: .5px solid rgb(125,125,125);\n"
-            "}")
-
         self.tableView = QTableView()
+        self.tableView.setFixedSize(SliderW-OffSet,350)
         self.tableView.setAlternatingRowColors(True) 
-        self.tableView.setStyleSheet("QTableView {\n"
-            "alternate-background-color: rgb(220,220,220);\n"
-            "border: .5px solid rgb(200,200,200);\n"
-            "background-color: white;\n"
-            "}")  
-        
+ 
         ## make it read-only
         self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableView.setSelectionMode(self.tableView.NoSelection)
         self.tableView.verticalHeader().setVisible(False)
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-        self.tableView.horizontalHeader().setStyleSheet("QHeaderView {\n"
-            "border: .5px solid rgb(200,200,200);\n"
-            "font-size: 12px;\n"
-            "}")  
-
+    
+        ## stylesheets set in self.setTableModel()
         self.setTableModel(keyMenu)
         self.tableView.setColumnWidth(0, 38) 
-        self.tableView.setColumnWidth(1, 103)
+        self.tableView.setColumnWidth(1, 105)
 
-        layout = QVBoxLayout()    
-        layout.addWidget(self.tableView, Qt.AlignHCenter|Qt.AlignVCenter)
-
-        tableGroup.setLayout(layout)
-
-        return tableGroup
+        return self.tableView
 
 ### --------------------------------------------------------
     def setTableModel(self, list):
@@ -99,6 +83,7 @@ class SliderPanel(QWidget):
                 "QHeaderView::section{\n"
                 "background-color: rgb(220,220,220);\n"
                 "border: .5px solid lightgray;\n"
+                "font-size: 12px;\n"
                 "}") 
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(220,220,220);\n"
@@ -113,13 +98,10 @@ class SliderPanel(QWidget):
             self.setTableModel(pathMenu)
             self.pathMenuSet = True
 
+### -----------------------------------------------------
     def addSliderGroup(self):
-        self.sliderGroup = QGroupBox("")
-        self.sliderGroup.setFixedSize(SliderW,325)
-        self.sliderGroup.setStyleSheet("QGroupBox {\n"
-            "background-color: rgb(250,250,250);\n"
-            "border: 1px solid rgb(125,125,125);\n"
-            "}")
+        self.sliderGroup = QLabel()
+        self.sliderGroup.setFixedSize(SliderW-OffSet,335)
 
         rotateLabel = QLabel("Rotate")
         self.rotateValue = QLabel("  0")
@@ -153,45 +135,36 @@ class SliderPanel(QWidget):
             valueChanged=self.setOpacity)
         self.opacitySldr.setTickPosition(QSlider.TicksBothSides)
         self.opacitySldr.setTickInterval(5)
-        
-        mainLayout = QVBoxLayout() 
+            
+        lbox = QHBoxLayout()    ## labels
+        lbox.addWidget(rotateLabel)
+        lbox.addSpacing(-2) 
+        lbox.addWidget(scaleLabel)     
+        lbox.addSpacing(-5) 
+        lbox.addWidget(opacityLabel)
 
-        hbox = QHBoxLayout()     
-        hbox.addSpacing(10)  
-        hbox.addWidget(rotateLabel, Qt.AlignTop|Qt.AlignLeft)
-        hbox.addSpacing(10) 
-        hbox.addWidget(scaleLabel, Qt.AlignTop|Qt.AlignRight) 
-        hbox.addSpacing(0) 
-        hbox.addWidget(opacityLabel, Qt.AlignTop|Qt.AlignRight) 
+        vabox = QHBoxLayout()    ## values
+        vabox.addSpacing(8) 
+        vabox.addWidget(self.rotateValue)
+        vabox.addSpacing(-15) 
+        vabox.addWidget(self.scaleValue)     
+        vabox.addSpacing(2) 
+        vabox.addWidget(self.opacityValue)
 
-        hbox1 = QHBoxLayout()   
-        hbox1.addSpacing(25) 
-        hbox1.addWidget(self.rotateValue)
-        hbox1.addSpacing(-5) 
-        hbox1.addWidget(self.scaleValue)        
-        hbox1.addSpacing(23) 
-        hbox1.addWidget(self.opacityValue)  
+        sbox = QHBoxLayout()    ## sliders      
+        sbox.addWidget(self.rotateSldr) 
+        sbox.addWidget(self.scaleSldr)                  
+        sbox.addWidget(self.opacitySldr) 
 
-        hbox2 = QHBoxLayout()
-        hbox2.addStretch(2)    
-        hbox2.addWidget(self.rotateSldr)
-        hbox2.addStretch(2)
-        hbox2.addWidget(self.scaleSldr)
-        hbox2.addStretch(2)
-        hbox2.addWidget(self.opacitySldr)
-        hbox2.addStretch(1)
+        vbox = QVBoxLayout()  
+        vbox.addLayout(lbox)
+        vbox.addLayout(vabox)
+        vbox.addLayout(sbox)
 
-        mainLayout.addSpacing(5) 
-        mainLayout.addLayout(hbox)
-        mainLayout.addSpacing(2) 
-        mainLayout.addLayout(hbox1)
-        mainLayout.addSpacing(2) 
-        mainLayout.addLayout(hbox2)
-
-        mainLayout.addSpacing(10)
-        mainLayout.setContentsMargins(0, 0, 5, 0)
-
-        self.sliderGroup.setLayout(mainLayout)
+        self.sliderGroup.setLayout(vbox)
+        self.sliderGroup.setContentsMargins(-5, 5, 0, 10)
+        self.sliderGroup.setFrameStyle(QFrame.Box|QFrame.Plain)
+        self.sliderGroup.setLineWidth(1)
 
         return self.sliderGroup
 

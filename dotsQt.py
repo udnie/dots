@@ -1,18 +1,17 @@
 import sys
 import platform
 
-from PyQt5.QtCore       import *
-from PyQt5.QtGui        import *
+from PyQt5.QtWidgets import QApplication, QStatusBar, \
+                            QDesktopWidget, QMainWindow
 
 import dotsDropCanvas   as dropCanvas
 import dotsScrollPanel  as scrollPanel
 import dotsSliderPanel  as sliderPanel
 import dotsSideCar      as sideCar
 
+from dotsShared     import common
 from datetime       import datetime
 from dotsDocks      import *
-
-DotsW, DotsH = 1503, 825
  
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widget panels, and
@@ -21,7 +20,7 @@ DotsW, DotsH = 1503, 825
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, parent=None):
         super().__init__()
 
         ## the sliderpanel needs to be referenced by canvas
@@ -43,7 +42,7 @@ class DotsQt(QMainWindow):
         self.move(getX(), 35)  # offset for app width and preferred height
         self.setStyleSheet(open('./dotsStyle.css').read())
 
-        self.setFixedSize(DotsW,DotsH)
+        self.setFixedSize(common['DotsW'], common['DotsH'])
         self.canvas.initBkg.disableBkgBtns()  ## toggles bkg sliders off as well
   
         self.statusBar = QStatusBar()
@@ -52,7 +51,7 @@ class DotsQt(QMainWindow):
         ## just in case the sprite directory is missing
         QTimer.singleShot(250, self.canvas.loadSprites)
 
-        sideCar.setCursor()
+        sideCar.setCursor()  
         self.show()
 
         # from PyQt5.Qt import PYQT_VERSION_STR 
@@ -66,7 +65,7 @@ def getDate():
 
 def getX():
     ctr = QDesktopWidget().availableGeometry().center()
-    return int(((ctr.x() * 2 ) - DotsW)/2)
+    return int(((ctr.x() * 2 ) - common['DotsW'])/2)
         
 ### --------------------------------------------------------
 if __name__ == '__main__':
@@ -75,5 +74,4 @@ if __name__ == '__main__':
     dots = DotsQt()
     sys.exit(app.exec_())
 
-### ----------------------- dotsQt -------------------------
-
+### ----------------------- dotsQt -----------------------

@@ -2,12 +2,12 @@ import sys
 import random
 import time
 
-from PyQt5.QtCore     import *
-from PyQt5.QtGui      import *
-from PyQt5.QtWidgets  import *
+from PyQt5.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
+                               QParallelAnimationGroup, QSequentialAnimationGroup     
+from PyQt5.QtGui        import QPainterPath
 
-from dotsShared       import paths
-from dotsSideCar      import MsgBox
+from dotsShared         import paths
+from dotsSideGig        import MsgBox
 
 ### ---------------------- dotsSidePath --------------------
 ''' dotsPaths is used by animations and pathmaker and contains 

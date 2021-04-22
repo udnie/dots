@@ -2,17 +2,18 @@ import sys
 import random
 import time
 
-from PyQt5.QtCore     import *
-from PyQt5.QtGui      import *
-from PyQt5.QtWidgets  import *
+from PyQt5.QtCore    import QPointF, pyqtProperty, QPropertyAnimation, \
+                            QParallelAnimationGroup, QSequentialAnimationGroup, \
+                            QEasingCurve, QObject
 
-# from dotsSideCar      import MsgBox
-from dotsShared       import common
+from dotsShared      import common
 
-import dotsSidePath   as sidePath
+import dotsSidePath  as sidePath
 
 AnimeList = ['Vibrate', 'Pulse','Bobble','Idle']
 OneOffs = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
+Stages = ('Stage Left', 'Stage Right')
+Spins = ('Spin Left', 'Spin Right')
 
 AnimeList += OneOffs
 
@@ -75,9 +76,9 @@ class Animation():
         ## one-offs
         if anime == 'Rain':
             return rain(pix, Node(pix))
-        elif anime in ('Stage Left', 'Stage Right'):
+        elif anime in Stages:
             return stage(pix, anime)
-        elif anime in ('Spin Left', 'Spin Right'):
+        elif anime in Spins:
             return spin(pix, anime, Node(pix))
         elif anime == 'demo.path':
             return sidePath.demo(pix, anime, Node(pix))

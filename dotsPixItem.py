@@ -1,23 +1,24 @@
 import random
 
-from PyQt5.QtCore     import *
-from PyQt5.QtGui      import *
-from PyQt5.QtWidgets  import *
+from PyQt5.QtCore     import QPoint
+from PyQt5.QtGui      import QImage
 
 from dotsShared       import common
+from dotsSideCar      import *
 
-import dotsSideCar    as sideCar 
+import dotsSideCar    as sideCar
 import dotsAnimation  as anima
+
 
 ## -- for testing and comparison ----------------
 #from pubsub  import pub      # PyPubSub - required
 
-IncZ = 1.0      # increment zValue
-Pixfactor = .30  # beginnig size factor 
-
-MoveKeys = ("left","right","up", "down")
+PixFactor = .30  # beginnig size factor 
+PlayKeys = ('resume','pause')
+MoveKeys  = ("left","right","up", "down")
 RotateKeys = ("_", '+', '"', ':', "{", "}")
 ScaleKeys  = ("<",">")
+TagKeys = ('[', ']','/','enter','return')
 
 RotationVals = {
     '}': 45,
@@ -37,11 +38,12 @@ class PixItem(QGraphicsPixmapItem):
         super().__init__()
 
         self.canvas = parent
+        self.scene  = parent.scene
         self.mapper = parent.mapper
 
         self.fileName = imgFile
    
-        self.id = id  ## used by mapper
+        self.id = int(id)  ## used by mapper
         self.x  = x
         self.y  = y
 
@@ -52,8 +54,8 @@ class PixItem(QGraphicsPixmapItem):
             self.x, self.y = 0,0
         else:
             newW, newH = self.setPixSizes( 
-                img.width() * Pixfactor, 
-                img.height() * Pixfactor)
+                img.width() * PixFactor, 
+                img.height() * PixFactor)
 
         ## don't change
         img = img.scaled(newW, newH,
@@ -86,11 +88,14 @@ class PixItem(QGraphicsPixmapItem):
         self.setPos(self.x, self.y)
         self.setMirrored(mirror)
 
-        self.setFlag(QGraphicsPixmapItem.ItemIsMovable, True)
-        self.setFlag(QGraphicsPixmapItem.ItemIsSelectable)
+        if 'frame' in self.fileName:
+            self.setFlags(False)
+        else:
+            self.setFlags(True)
   
+        self.setAcceptHoverEvents(True)
         # pub.subscribe(self.setPixKeys, 'setKeys')
-        
+      
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def setPixKeys(self, key):
@@ -103,33 +108,43 @@ class PixItem(QGraphicsPixmapItem):
             elif key in MoveKeys:
                 self.moveThis(key)
 
+# ### --------------------------------------------------------
+    def hoverLeaveEvent(self, e):
+        self.mapper.clearTagGroup()
+        e.accept()
+
+    def setFlags(self, bool):
+        self.setFlag(QGraphicsPixmapItem.ItemIsMovable, bool)
+        self.setFlag(QGraphicsPixmapItem.ItemIsSelectable, bool)
+
     def setMirrored(self, mirror):
         sideCar.mirrorSet(self, mirror)
 
-    def mousePressEvent(self, e):           
-        if e.button() == Qt.RightButton:
-            self.ungrabMouse()   
-        if self.key == 'del':  # delete
-            self.deletePix()
-        if self.key == '/': # send to back of pixItems
-            self.setZValue(self.mapper.lastZval('pix')-1)
-        elif self.key == 'opt':  # send it back one Z
-            p = self.zValue()-1  # so as not to confuse things
-            self.setZValue(p)
-        elif self.key == 'cmd': # send it forward one Z
-            p = self.zValue()+1  
-            self.setZValue(p)
-        else:                   # single click to front
-            self.setZValue(self.mapper.toFront(IncZ))
-        if 'frame' not in self.fileName:
-            self.initX, self.initY = self.x, self.y   # set position
-            self.dragAnchor = self.mapToScene(e.pos())
-            if self.key == 'shift':  # flop if selected or hidden
+    def mousePressEvent(self, e):   
+        if self.canvas.control not in PlayKeys: 
+            if e.button() == Qt.RightButton:
+                self.mapper.toggleTagItems(self.id)
+            elif self.key == 'del':  # delete
+                self.deletePix()
+            elif self.key == 'shift':  # flop if selected or hidden
                 if self.flopped:
                     self.setMirrored(False)
                 else:
                     self.setMirrored(True)
-        e.accept()
+            elif self.key in TagKeys:  
+                if self.key == '/':        # send to back of pixItems
+                    p = self.mapper.lastZval('pix')-1
+                elif self.key in('enter','return'): # send to front
+                    p = self.mapper.toFront(1)
+                elif self.key == '[':
+                    p = self.zValue()-1  
+                else:
+                    p = self.zValue()+1  
+                self.setZValue(p)
+                self.mapper.toggleTagItems(self.id)
+            self.initX, self.initY = self.x, self.y   # set position
+            self.dragAnchor = self.mapToScene(e.pos())
+            e.accept()
 
     def reprise(self):  ## return pixitem to original position
         self.anime = None
@@ -148,54 +163,65 @@ class PixItem(QGraphicsPixmapItem):
             self.anime.finished.connect(self.removeThis)
 
     def removeThis(self):
-        self.canvas.scene.removeItem(self)
+        self.clearFocus() 
+        self.setEnabled(False)
+        self.scene.removeItem(self)
 
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName:
             return
-        pos = self.mapToScene(e.pos())     
-        dragX = pos.x() - self.dragAnchor.x()
-        dragY = pos.y() - self.dragAnchor.y()
-        self.mapper.updateWidthHeight(self)
-        self.x = int(sideCar.constrain(
-            self.initX + dragX, 
-            self.width, 
-            common["ViewW"], 
-            self.width * -common["factor"]))
-        self.y = int(sideCar.constrain(
-            self.initY + dragY,
-            self.height, 
-            common["ViewH"], 
-            self.height * -common["factor"]))
-        self.setPos(self.x, self.y)
-        self.dragCnt +=1
-        if self.key == 'opt' and self.dragCnt % 5 == 0:  
-            self.cloneThis(e) 
-        e.accept()
+        if self.canvas.control not in PlayKeys:
+            if self.key in TagKeys or self.mapper.tagSet:
+                self.clearTag() 
+            pos = self.mapToScene(e.pos())     
+            dragX = pos.x() - self.dragAnchor.x()
+            dragY = pos.y() - self.dragAnchor.y()
+            self.mapper.updateWidthHeight(self)
+            self.x = int(sideCar.constrain(
+                self.initX + dragX, 
+                self.width, 
+                common["ViewW"], 
+                self.width * -common["factor"]))
+            self.y = int(sideCar.constrain(
+                self.initY + dragY,
+                self.height, 
+                common["ViewH"], 
+                self.height * -common["factor"]))
+            self.setPos(self.x, self.y)
+            self.dragCnt +=1
+            if self.key == 'opt' and self.dragCnt % 5 == 0:  
+                self.cloneThis(e) 
+            e.accept()
 
+    def clearTag(self):   ## reset canvas key to '' 
+        self.key == ""
+        self.mapper.clearTagGroup()
+        self.canvas.setKeys('') 
+             
     def mouseDoubleClickEvent(self, e):
-        if 'frame' in self.fileName:
+        if 'frame' in self.fileName or self.key in TagKeys: 
             return
-        if self.key == 'opt':  
-            self.cloneThis(e)
-        elif self.canvas.key == 'noMap': 
-            ## consumed map's dblclk need to set it back 
-            self.canvas.setKeys('')      
-            if self.isHidden == False or self.isSelected():
+        if self.canvas.control not in PlayKeys:
+            if self.key == 'opt':  
+                self.cloneThis(e)
+            elif self.canvas.key == 'noMap': 
+                ## consumed map's dblclk need to set it back 
+                self.canvas.setKeys('')      
+                if self.isHidden == False or self.isSelected():
+                    self.setSelected(True) 
+                    return
+            elif self.isHidden:   
+                ## otherwise you're stuck if others are 
+                ## selected as the others will become hidden 
                 self.setSelected(True) 
-                return
-        elif self.isHidden:   
-            ## otherwise you're stuck if others are 
-            ## selected as the others will become hidden 
-            self.setSelected(True) 
-            self.isHidden = False  
-        elif not self.canvas.key in ('opt','cmd','shift'):
-            if self.isSelected() == False:
-                self.setSelected(True)  
-            elif self.isSelected():
-                self.setSelected(False)
-            self.isHidden = False 
-        e.accept()
+                self.isHidden = False  
+            elif not self.canvas.key in ('opt','cmd','shift'):
+                if self.isSelected() == False:
+                    self.setSelected(True)  
+                elif self.isSelected():
+                    self.setSelected(False)
+                self.isHidden = False 
+            e.accept()
 
     def cloneThis(self, e):
         self.canvas.addPixItem(
@@ -220,7 +246,6 @@ class PixItem(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
-            self.setZValue(self.mapper.toFront(IncZ))
         e.accept()
 
     def moveThis(self, key):

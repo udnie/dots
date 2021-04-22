@@ -1,13 +1,14 @@
 import random
 
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
-
-from dotsShared      import common, MapStr, PathStr
+from PyQt5.QtCore    import pyqtSignal, QAbstractAnimation
+from PyQt5.QtWidgets import QMenu, QRubberBand, QGraphicsScene,\
+                            QGraphicsItemGroup
+                      
+from dotsShared      import common, CanvasStr, PathStr
 
 from dotsAnimation   import *
-from dotsSideCar     import SideCar, MsgBox
+from dotsSideGig     import MsgBox, TagIt
+from dotsSideCar     import SideCar
 from dotsControlView import ControlView
 from dotsPixItem     import PixItem
 from dotsMapItem     import InitMap
@@ -16,8 +17,11 @@ from dotsSideShow    import SideShow
 from dotsAnimation   import AnimeList
 from dotsPathMaker   import *
 
+Loops = ('L','O','P', 'S')
+PlayKeys = ('resume','pause')
+
 ## -- for testing and comparison ----------------
-#from pubsub  import pub      # PyPubSub - required
+# from pubsub  import pub      # PyPubSub - required
 
 ### -------------------- dotsDropCanvas --------------------
 ''' dotsDropCanvas: where everything comes together, includes context 
@@ -25,30 +29,26 @@ from dotsPathMaker   import *
 ### --------------------------------------------------------
 class DropCanvas(QWidget):
 
-    pathMakerSignal = pyqtSignal([str])
-
     def __init__(self, parent):
-        QMainWindow.__init__(self)
+        super().__init__()
 
         self.dots  = parent 
         self.scene = QGraphicsScene(self)
-        self.view  = ControlView(self.scene, self)
-             
-        self.chooser = None       ## placeholder for popup_widget
-        
+        self.view  = ControlView(self)
+
+        self.chooser = None       ## placeholder for popup_widget   
         self.control = ''         ## shared
         self.pathMakerOn = False  ## shared
         self.openPlayFile = ''    ## shared 
-
-        self.pathList = []        ## used also by animations, updated here
+        self.pathList = []        ## used by animations, updated here
 
         self.mapper    = InitMap(self) 
-        self.sideCar   = SideCar(self) 
         self.pathMaker = PathMaker(self)
+        self.sideCar   = SideCar(self) 
 
         self.animation = Animation(self)
         self.sideShow  = SideShow(self)
-        self.initBkg   = InitBkg(self, MsgBox)
+        self.initBkg   = InitBkg(self)
         
         self.scene.setSceneRect(0, 0,
             common["ViewW"],
@@ -57,72 +57,98 @@ class DropCanvas(QWidget):
         self.setFixedSize(common["ViewW"]+2,
             common["ViewH"]+2)
 
-        self.pathZ = common["pathZ"]
         self.key = ''
         self.pixCount = 0
      
         self.origin = QPoint(0,0)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
-
+ 
         self.view.viewport().installEventFilter(self)
         self.view.keysSignal[str].connect(self.setKeys)
-
+        
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def setKeys(self, key):
         self.key = key
+
+        if self.pathMakerOn and self.key == 'C' and \
+            len(self.scene.items()) == 0:
+            self.clear()
+            return
+
         if not self.pathMakerOn:
-            if self.key in MapStr or self.key == '':
-                if self.key in ('L','O','P', 'S'):  ## this can change
+            if self.key in CanvasStr or self.key == '':
+                if self.key in Loops:  ## canvas hotkeys
                     self.sideShow.keysInPlay(self.key)
                 elif self.key == 'C':
                     self.clear()
                 else:
                     self.sendPixKeys()
-
-            # pub.sendMessage('setKeys', key=key)  ## pypubsub solution   
-            # if used - requires some work to coordinate with mapper
-            # if self.mapper.mapSet: ## already in sendPixKeys
-            #     self.mapper.updateMap()  ## redraw mapper
-
         elif self.key in PathStr:
-            self.pathMakerSignal[str].emit(self.key)
+            self.pathMaker.pathKeys(self.key)
+
+        # pub.sendMessage('setKeys', key=key)  ## pypubsub solution   
+        # if used - requires some work to coordinate with mapper
+        # if self.mapper.mapSet: ## already in sendPixKeys
+        #     self.mapper.updateMap()  ## redraw mapper
 
 ### --------------------------------------------------------
-    def eventFilter(self, source, e): ## handles mostly mapping selections
-        if source is self.view.viewport():
-            self.scene.clearFocus()
-            if e.type() == QEvent.MouseButtonPress: 
+    ''' Problem: newPath can lose focus after displaying pointItems or if 
+    started after either running play or pixtext. The mouse events used by
+    newPath no-longer respond and it just keeps drawing. I'm pretty sure 
+    the problem is with this eventFilter. It probably would have been a better 
+    solution if the eventFilter for newPath was in pathMaker but I wasn't 
+    sure how to wire it up. There are no problems interacting with background 
+    functions once pathMaker is lit as initBkg doesn't use mouse tracking. 
+    Any help would be appreciated. There's a commented-out copy of the filter 
+    for newPath in pathMaker for starters. Thanks in advance ..'''
+    ## pathMaker mouse events for drawing a path
+    def eventFilter(self, source, e):  
+        if self.pathMakerOn and self.pathMaker.newPathSet:
+            if e.type() == QEvent.MouseButtonPress:
+                self.pathMaker.npts = 0  
+                self.pathMaker.addNewPts(QPoint(e.pos()))
+            elif e.type() == QEvent.MouseMove:
+                self.pathMaker.addNewPts(QPoint(e.pos()))      
+            elif e.type() == QEvent.MouseButtonRelease:
+                self.pathMaker.addNewPts(QPoint(e.pos()))
+                self.pathMaker.addNewPath()    
+            return False
+        ## dropCanvas mouse events for selecting multiple pixItems    
+        if not self.pathMakerOn:
+            if e.type() == QEvent.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()   ## chks if set
                 if self.key == 'cmd':         ## only used by eventFilter
-                    if not self.pathMakerOn:  ## otherwise shows in pathmaker  
-                        self.mapper.updatePixItemPos()
-                        self.mapper.clearMap() ## set rubberband if mapset
-                        self.unSelect()
+                    self.mapper.clearMap()    ## set rubberband if mapset
+                    self.unSelect()
                 elif self.hasHiddenPix() and self.mapper.selections:
-                    self.mapper.updatePixItemPos()
+                    if self.control not in PlayKeys:
+                        self.mapper.updatePixItemPos()
+                return False
             elif e.type() == QEvent.MouseMove:
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
-                    if not self.pathMakerOn: ## ditto
-                        if self.mapper.mapSet: self.mapper.removeMap()
-                        self.rubberBand.show()
-                        self.rubberBand.setGeometry(QRect(self.origin, 
-                            e.pos()).normalized())
+                    if self.mapper.mapSet: 
+                        self.mapper.removeMap()
+                    self.rubberBand.show()
+                    self.rubberBand.setGeometry(QRect(self.origin, 
+                        e.pos()).normalized())
                 elif self.mapper.mapSet and not self.scene.selectedItems():
                     self.mapper.removeMap()
-                else:
-                    self.mapper.updatePixItemPos()  ## costly but necessary
+                elif self.control not in PlayKeys:  ## animations running
+                    self.mapper.updatePixItemPos()  ## costly but necessary 
+                return False
             elif e.type() == QEvent.MouseButtonRelease:
                 if self.mapper.mapSet == False:
-                    self.rubberBand.hide()
-                    self.mapper.addSelectionsFromCanvas()
-                elif self.mapper.mapSet and self.key == 'cmd':
+                    self.rubberBand.hide()  ## supposes something is selected
+                    self.mapper.addSelectionsFromCanvas() 
+                if self.mapper.mapSet and self.key == 'cmd':
                     self.setKeys('')
                 elif self.hasHiddenPix() and self.key != 'cmd':
                     self.mapper.removeMap()
                 elif self.mapper.mapSet and not self.scene.selectedItems():
                     self.mapper.removeMap()
+                return False
             elif e.type() == QEvent.MouseButtonDblClick and self.key != 'cmd':
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
@@ -130,9 +156,10 @@ class DropCanvas(QWidget):
                 if self.mapper.selections or self.hasHiddenPix():
                     if self.mapper.mapSet:
                         self.mapper.removeMap()
-                        self.setKeys('noMap')
+                        self.setKeys('noMap')  
+            return False
         return QWidget.eventFilter(self, source, e)
-
+    
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, imgFile, x, y, clone, mirror):    
@@ -143,16 +170,16 @@ class DropCanvas(QWidget):
                 clone.rotation,
                 clone.scale * random.randrange(95, 105)/100.0)
         else:
-            if 'frame' in pix.fileName: ## center it on dnd
+            if 'frame' in pix.fileName: ## pin it on dnd
                 pix.setPos(0,0)
                 pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
             self.scene.addItem(pix)
-           
+        
     def sendPixKeys(self):  ## update pixitems thru setPixKeys
         for pix in self.scene.items(): 
             if pix.type == 'pix':
                 pix.setPixKeys(self.key)
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 break
         if self.mapper.mapSet: 
             self.mapper.updateMap()
@@ -184,7 +211,7 @@ class DropCanvas(QWidget):
             if pix.type == 'pix':
                 pix.setSelected(True)
                 pix.isHidden = False
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 break
 
     def unSelect(self):
@@ -193,25 +220,25 @@ class DropCanvas(QWidget):
             if pix.type == 'pix':
                 pix.isHidden = False
                 pix.setSelected(False)
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 break
-       
-    def deleteSelected(self):
-        if not self.pathMakerOn:
-            self.mapper.clearMap()
+    
+### --------------------------------------------------------
+    def deleteSelected(self):   # self.pathMakerOn equals false
+        self.mapper.clearMap()
+        self.mapper.clearTagGroup()
         for pix in self.scene.selectedItems():
             if pix.anime != None and \
                 pix.anime.state() == QAbstractAnimation.Running:
-                continue
-            else:
-                pix.deletePix()
+                pix.anime.stop()  
+            pix.deletePix()
         self.anySprites()
 
     def anySprites(self):
         for pix in self.scene.items():
             if pix.type == 'pix': ## still some left
                 break
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 self.sideShow.enablePlay()
     
     def flopSelected(self):    
@@ -223,8 +250,17 @@ class DropCanvas(QWidget):
                             pix.setMirrored(False)
                         else:
                             pix.setMirrored(True)
-                elif pix.zValue() <= self.pathZ:
+                elif pix.zValue() <= common["pathZ"]:
                     break
+
+    def hasHiddenPix(self):
+        for pix in self.scene.items():
+            if pix.type == 'pix':
+                if pix.isHidden: 
+                    return True  ## found one
+            elif pix.zValue() <= common["pathZ"]:
+                break
+        return False
 
     ## added dlbclk if hidden to re-select ##
     def hideSelected(self): 
@@ -238,29 +274,15 @@ class DropCanvas(QWidget):
                 elif pix.isHidden:
                     pix.setSelected(True)
                     pix.isHidden = False
-            elif pix.zValue() <= self.pathZ:
+            elif pix.zValue() <= common["pathZ"]:
                 break
-
-    def hasHiddenPix(self):
-        for pix in self.scene.items():
-            if pix.type == 'pix':
-                if pix.isHidden: 
-                    return True  ## found one
-            elif pix.zValue() <= self.pathZ:
-                break
-        return False
-
-    def itemsPixcount(self):   ## may not be used
-        return sum(
-            pix.type == 'pix' 
-            for pix in self.scene.items()
-        )
 
     def ZDump(self):
         for pix in self.scene.items():
             print(pix.zValue())
         # print("bkg: " + str(self.initBkg.hasBackGround()))
 
+### --------------------------------------------------------
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():
             return
@@ -271,7 +293,7 @@ class DropCanvas(QWidget):
             "}")
         alst = sorted(AnimeList)
         ## basing pathlist on what's in the directory
-        self.pathList = self.pathMaker.getPathList(True)  ## names only
+        self.pathList = self.pathMaker.sideWays.getPathList(True)  ## names only
         rlst = sorted(self.pathList)    
         alst.extend(["Random"])
         for anime in alst:

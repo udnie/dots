@@ -1,133 +1,156 @@
 import sys
 import os
 
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
-
-from dotsSideCar     import MsgBox, DoodleMaker
+from PyQt5.QtCore    import Qt, QEvent, QObject, QTimer, QPointF, QPoint, pyqtSlot
+from PyQt5.QtGui     import QColor, QPen
+from PyQt5.QtWidgets import QFileDialog, QGraphicsPathItem, QWidget
+                            
+from dotsSideGig     import DoodleMaker, MsgBox, TagIt, PointItem
 from dotsShared      import common, paths
 from dotsSideWays    import SideWays
 
 MoveKeys = ("left","right","up", "down")
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-')
 WayPtsKeys = ('<','>','R', '!', 'P')
-NotNewPathKeys = ('S','T','W','N')
+NotPathSetKeys = ('R','S','T','W','N')
+Tick = 3  ## points to move using arrow keys
 
 ### -------------------- dotsPathMaker ---------------------
-''' dotsPathMaker: contains load, save, drawpolygon, pathchooser,
+''' dotsPathMaker: contains load, save, addPath, pathchooser,
     pathlist, and path modifier functions '''
 ### --------------------------------------------------------
-class PathMaker(QWidget):    
+class PathMaker(QWidget):
+
     def __init__(self, parent):  
         super().__init__()
 
-        self.canvas  = parent
-        self.chooser = parent.chooser
-        self.scene   = parent.scene
-        self.view    = parent.view
-        self.mapper  = parent.mapper
+        self.canvas = parent  
+        self.scene  = parent.scene
 
+        self.chooser = parent.chooser
+        self.mapper  = parent.mapper
         self.dots    = parent.dots
+
         self.sliders = self.dots.sliderpanel  ## for toggling key menu
     
         self.key = ""
-        self.initThis()
-        self.tagZ = common["pathZ"]
-        self.tic = 3  ## points to move using arrow keys
+        self.pts = []
+        self.npts = 0
 
-        ## extends pathMaker
-        self.sideWays = SideWays(self, self.dots)
-
-        self.canvas.pathMakerSignal[str].connect(self.pathKeys)
-        self.view.viewport().installEventFilter(self)
+        self.color = "DODGERBLUE"
+        self.openPathFile = ''
+        self.pointTag = ""  
+        self.tag = ''
+        
+        self.sideWays = SideWays(self, self.canvas)  ## extends canvas
 
         self.direct = {
-            'F': self.openFiles,
-            'C': self.centerPoly,
+            'F': self.sideWays.openFiles,
+            'C': self.centerPath,
             'P': self.pathChooser,
             '{': self.flipPath,
             '}': self.flopPath,
         }
 
+        self.pathSet = False
+        self.newPathSet = False
+        self.pathChooserSet = False
+        self.pointsSet = False 
+      
+        self.ball = None
+        self.path = None                 
+        self.newPath = None
+        
 ### --------------------------------------------------------
     def initThis(self):
         self.pts = []
+        self.npts = 0
+        self.key = ""
         self.color = "DODGERBLUE"
         self.openPathFile = ''
-
-        self.newPath = False
-        self.polySet = False
-        self.polylineSet = False
-        self.wayPtsSet = False
+        self.pointTag = ""  
+        self.tag = ''
+ 
+        self.pathSet = False
+        self.newPathSet = False
         self.pathChooserSet = False
-        self.pathTestSet = False
-        self.ptsSet = False
-        
+        self.pointsSet = False 
+       
         self.ball = None
-        self.polygon = None
-        self.wayPath = None
-                
-    def eventFilter(self, source, e): ## shares same view as canvas
-        if self.newPath:
-            if e.type() == QEvent.MouseButtonPress:      
-                self.sideWays.npts = 0  
-                self.sideWays.addPathPts(QPoint(e.pos()))
-            elif e.type() == QEvent.MouseMove:  
-                self.sideWays.addPathPts(QPoint(e.pos()))
-            elif e.type() == QEvent.MouseButtonRelease: 
-                self.sideWays.addPathPts(QPoint(e.pos()))
-                self.sideWays.drawPolyline() 
-        return QWidget.eventFilter(self, source, e)
-
+        self.path = None                 
+        self.newPath = None
+ 
+    def delete(self):
+        self.sideWays.stopPathTest()
+        self.removePath()
+        self.sideWays.removeWayPtTags()
+        self.removeNewPath()
+        self.sideWays.newPathOff()
+        self.removePoints()
+        self.pathChooserOff() 
+        self.initThis()
+   
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def pathKeys(self, key):
         self.key = key
-        if key == 'D':  ## always
+        if self.key == 'D':  ## always
             self.delete()
-        elif key == '/':
-            self.sideWays.changePathColor()
-        elif self.newPath and key == 'cmd':
-            self.sideWays.closePath()    
+        elif self.key == '/':
+            self.changePathColor()
+        elif self.newPathSet and self.key == 'cmd':  ## note
+            self.sideWays.closeNewPath()   
 
-        if key in NotNewPathKeys:
-            if key == 'S':
-                self.savePath()
-            elif key == 'T':
+        if key in NotPathSetKeys:
+            if self.key == 'R':
+                self.sideWays.reversePath()
+            elif self.key == 'S':
+                self.sideWays.savePath()
+            elif self.key == 'T':
                 self.sideWays.pathTest()
-            elif key == 'W':
-                self.sideWays.addWayPts()
-            elif key == 'N':
-                if not self.polySet and not self.wayPtsSet:
-                    self.sideWays.addNewPath()
+            elif self.key == 'W':
+                self.sideWays.addWayPtTags()
+            elif self.key == 'N': 
+                if not self.pathSet and not self.sideWays.wayPtsSet:
+                    self.delete()
+                    self.sideWays.setNewPath()
                 else:
-                    MsgBox("pathKeys: Can't Add with Path on Screen", 4)
-                    return
-
+                    self.delete()
+               
         ## not waypts and not new path
-        if not self.wayPtsSet and not self.newPath:
+        if not self.sideWays.wayPtsSet and not self.newPathSet:
             if key in self.direct: 
-                self.direct[key]()  ## OK...
+                self.direct[key]()  ## OK..
             elif key in MoveKeys:
                 self.movePath(key)
             elif key in ScaleRotateKeys: 
                 self.sideWays.scaleRotate(key)
 
         ##  waypts only
-        if self.wayPtsSet and key in WayPtsKeys:
-            if key == 'R':
-                self.sideWays.reverseIt()
-            elif key == '!':
-                self.halfPath()
-            elif key == 'P':
-                self.sideWays.addPts()
-            else:
+        if self.sideWays.wayPtsSet and key in WayPtsKeys:
+            if self.key == '!':
+                self.sideWays.halfPath()
+            elif self.key == 'P':
+                self.togglePoints()
+            elif self.key in ('<', '>'):
                 self.sideWays.shiftWayPts(key)
 
- ### --------------------------------------------------------
-    def setPathMaker(self):
-        if self.scene.items() and not self.canvas.pathMakerOn:
+    ## pathMaker mouse events for drawing a path
+    # def eventFilter(self, source, e):  
+    #     if self.canvas.pathMakerOn and self.newPathSet:
+    #         if e.type() == QEvent.MouseButtonPress:
+    #             self.npts = 0  
+    #             self.addNewPts(QPoint(e.pos()))
+    #         elif e.type() == QEvent.MouseMove:
+    #             self.addNewPts(QPoint(e.pos()))      
+    #         elif e.type() == QEvent.MouseButtonRelease:
+    #             self.addNewPts(QPoint(e.pos()))
+    #             self.addNewPath()    
+    #         return False
+
+### --------------------------------------------------------
+    def initPathMaker(self):  ## from docks button
+        if self.canvas.scene.items() and not self.canvas.pathMakerOn:
             MsgBox("Clear Scene First to run PathMaker")
             return
         if self.canvas.pathMakerOn:
@@ -139,10 +162,18 @@ class PathMaker(QWidget):
                 self.sliders.toggleMenu()
             self.dots.btnPathMaker.setStyleSheet(
                 "background-color: LIGHTGREEN")
-            # QTimer.singleShot(250, self.pathChooser)  ## optional
+            # QTimer.singleShot(200, self.pathChooser)  ## optional
+
+    def pathMakerOff(self):
+        self.delete()   
+        self.canvas.pathMakerOn = False
+        if self.sliders.pathMenuSet:
+            self.sliders.toggleMenu()
+        self.dots.btnPathMaker.setStyleSheet(
+            "background-color: white")
 
     def pathChooser(self): 
-        if not self.pathChooserSet:
+        if not self.pathChooserSet and not self.newPathSet:
             self.chooser = DoodleMaker(self)  
             self.chooser.move(600,200)
             self.chooser.show()
@@ -151,186 +182,157 @@ class PathMaker(QWidget):
             self.pathChooserOff()
 
     def pathChooserOff(self):
-        self.chooser = QWidget()
+        self.chooser = None
         self.pathChooserSet = False
 
-    def getPathList(self, bool=False):  ## used by DoodleMaker
-        try:                            ## also by context menu
-            files = os.listdir(paths['paths'])
-        except IOError:
-            MsgBox("getPathList: No Path Directory Found!", 5)
-            return None  
-        filenames = []
-        for file in files:
-            if file.lower().endswith('path'): 
-                if bool:    
-                    file = os.path.basename(file)  ## short list
-                    filenames.append(file)
-                else:
-                    filenames.append(paths['paths'] + file)
-        if not filenames:
-            MsgBox("getPathList: No Paths Found!", 5)
-        return filenames
-       
 ### --------------------------------------------------------
-    def drawPolygon(self):
-        self.removePolygon() 
-        self.polygon = QGraphicsPolygonItem(QPolygonF(self.pts))
-        self.polygon.setPen(QPen(QColor(self.color), 3, Qt.DashDotLine))
-        self.polygon.setZValue(self.tagZ)  
-        self.scene.addItem(self.polygon)
-        self.polySet = True
+    def addPath(self):
+        self.removePath() 
+        self.path = QGraphicsPathItem(self.sideWays.setPaintPath(True))
+        self.path.setPen(QPen(QColor(self.color), 3, Qt.DashDotLine))
+        self.path.setZValue(common['pathZ']) 
+        self.scene.addItem(self.path)
+        self.pathSet = True
 
-    def delete(self):
-        self.removePolygon()
-        self.removeWayPts()
-        self.sideWays.removePolyline()
-        self.sideWays.newPathOff()
-        self.sideWays.removePts()
-        self.removePathTest()
-        self.initThis()
-        self.pathChooserOff()
-          
-    def centerPoly(self):
-        if self.polySet:
-            p = self.polygon.sceneBoundingRect()
+    def centerPath(self):
+        if self.pathSet:
+            p = self.path.sceneBoundingRect()
             w = (common["ViewW"] - p.width()) /2
             h = (common["ViewH"] - p.height()) / 2
             x, y = w - p.x(), h - p.y()
-            self.polygon.setPos(self.polygon.x()+x, self.polygon.y()+y)
-            self.updpts(x, y)
+            self.path.setPos(self.path.x()+x, self.path.y()+y)
+            self.updPts(x, y)
 
     def flipPath(self):  
-        p = self.polygon.sceneBoundingRect()
+        p = self.path.sceneBoundingRect()
         max = p.y() + p.height()
         for i in range(0, len(self.pts)):
             self.pts[i] = QPointF(self.pts[i].x(), max - self.pts[i].y() + p.y())
-        self.drawPolygon()
+        self.addPath()
   
     def flopPath(self): 
-        p = self.polygon.sceneBoundingRect()
+        p = self.path.sceneBoundingRect()
         max = p.x() + p.width()
         for i in range(0, len(self.pts)):
             self.pts[i] = QPointF(max - self.pts[i].x() + p.x(), self.pts[i].y())
-        self.drawPolygon()
-
-    def halfPath(self):  
-        tmp = []        
-        for i in range(0, len(self.pts)):
-            if i % 2 == 1:
-                tmp.append(self.pts[i])
-        self.pts = tmp
-        self.removeWayPts()
-        self.sideWays.updateWayPts()
+        self.addPath()
 
     def movePath(self, key):   
         if key == 'right':
-            self.polygon.setPos(
-                self.polygon.x()+self.tic, self.polygon.y())
-            self.updpts(self.tic, 0)
+            self.path.setPos(
+                self.path.x()+Tick, self.path.y())
+            self.updPts(Tick, 0)
         elif key == 'left':
-            self.polygon.setPos(
-                self.polygon.x()-self.tic, self.polygon.y())
-            self.updpts(-self.tic, 0)
+            self.path.setPos(
+                self.path.x()-Tick, self.path.y())
+            self.updPts(-Tick, 0)
         elif key == 'up':
-            self.polygon.setPos(
-                self.polygon.x()+0, self.polygon.y()-self.tic)
-            self.updpts(0, -self.tic)
+            self.path.setPos(
+                self.path.x()+0, self.path.y()-Tick)
+            self.updPts(0, -Tick)
         elif key == 'down':
-            self.polygon.setPos(
-                self.polygon.x()+0, self.polygon.y()+self.tic)
-            self.updpts(0, self.tic)
+            self.path.setPos(
+                self.path.x()+0, self.path.y()+Tick)
+            self.updPts(0, Tick)
  
-    def removePolygon(self):       
-        if self.polySet:
-            self.scene.removeItem(self.polygon)
-        self.polySet = False
-        self.polygon = None
+    def removePath(self):       
+        if  self.path:
+            self.scene.removeItem(self.path)
+        self.pathSet = False
+        self.path = None
 
-    def removeWayPts(self):    
-        if self.sideWays.tagGroup or self.wayPtsSet:
-            self.scene.removeItem(self.sideWays.tagGroup) 
-            self.sideWays.tagGroup = None
-            self.wayPtsSet = False
-        if self.ptsSet:
-            self.sideWays.removePts()
-     
-    def removePathTest(self):
-        if self.pathTestSet:
-            self.sideWays.stopPathTest()
-
-    def updpts(self, tx, ty):
+    def updPts(self, tx, ty):    ## used by movePath
         pt = QPoint(float(tx), float(ty))
         for p in self.pts:  ## pts on the screen 
-            p += pt
+            p += pt         ## increment by this
 
-    def pathMakerOff(self):
-        self.delete()
-        if self.sideWays.tagGroup:
-            self.sideWays.tagGroup = None
-        self.openPathFile = ""
-        self.canvas.pathMakerOn = False
-        if self.pathChooserSet:
-            self.pathMaker.pathChooserOff()
-        if self.sliders.pathMenuSet:
-            self.sliders.toggleMenu()
-        self.dots.btnPathMaker.setStyleSheet(
-            "background-color: white")
-    
-### --------------------------------------------------------
-    def getpts(self, file, scalor=1.0, inc=0):  ## used by pathChooser
-        try:
-            tmp = []
-            with open(file, 'r') as fp: 
-                for line in fp:
-                    ln = line.rstrip()  
-                    ln = list(map(float, ln.split(',')))   
-                    tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
-            return tmp
-        except IOError:
-            MsgBox("getrpts: Error reading pts file")
-
-    def openFiles(self):
-        if self.pts:
-            MsgBox("getrpts: Clear Scene First")
-            return
-        Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self,
-            "Choose a path file to open", paths["paths"],
-            "Files(*.path)")
-        Q.accept()
-        if file:
-            self.pts = self.getpts(file)  ## read the file
-            self.openPathFile = os.path.basename(file)
-            self.drawPolygon()
-  
-    def savePath(self):
-        if self.pts:
-            Q = QFileDialog()
-            if self.openPathFile == '':
-                self.openPathFile = paths["paths"] + 'tmp.path'
-            f = Q.getSaveFileName(self,
-                paths["paths"],
-                self.openPathFile)
-            Q.accept()
-            if not f[0]: 
-                return
-            elif not f[0].lower().endswith('.path'):
-                MsgBox("savePath: Wrong file extention - use '.path'")    
-            else:
-                try:
-                    with open(f[0], 'w') as fp:
-                        for i in range(0, len(self.pts)):
-                            p = self.pts[i]
-                            x = str("{0:.2f}".format(p.x()))
-                            y = str("{0:.2f}".format(p.y()))
-                            fp.write(x + ", " + y + "\n")
-                        fp.close()
-                except IOError:
-                    MsgBox("savePath: Error saving file")
-                    return
+    def changePathColor(self):
+        self.color = self.mapper.getColorStr()
+        if self.newPathSet:
+            self.addNewPath()
         else:
-            MsgBox("savePath: Nothing saved")
-     
+            self.addPath()
+
+### -------------------------------------------------------
+    def addNewPts(self, pt):  
+        if self.npts == 0:
+            self.pts.append(pt)
+        self.npts += 1
+        if self.npts % 3 == 0:
+            self.pts.append(pt)
+            self.addNewPath()
+
+    def addNewPath(self):
+        if self.pts:  ## list of points
+            self.removeNewPath() ## clean up just in case
+            self.newPath = QGraphicsPathItem(self.sideWays.setPaintPath())
+            self.newPath.setPen(QPen(QColor(self.color), 3, Qt.DashDotLine))
+            self.newPath.setZValue(common['pathZ']) 
+            self.scene.addItem(self.newPath)  ## only one - no group needed
+            self.newPathSet = True
+
+    def removeNewPath(self):    
+        if self.newPath:
+            self.scene.removeItem(self.newPath)
+        self.newPathSet = False
+        self.newPath = None
+    
+### --------------------- pointItems -----------------------
+    def addPoints(self): 
+        idx = 0
+        for pt in self.pts:   ## all 'pt' points
+            self.scene.addItem(PointItem(self, pt, idx))
+            idx += 1
+        self.pointsSet = True
+
+    def removePoints(self):   ## all 'pt' points including tag
+        for pt in self.canvas.scene.items():
+            if pt.type == 'pt':
+                self.scene.removeItem(pt)
+        self.pointsSet = False 
+
+    def togglePoints(self):  ## all 'pt' pointItems
+        if self.pts:
+            if self.pointsSet:  
+                self.removePoints()
+                return
+            else:
+                self.addPoints()
+
+    def addPointItem(self, pointItem):
+        idx, pt = pointItem.idx + 1, pointItem.pt
+        if idx == len(self.pts): idx = 0     
+        pt1 = self.pts[idx]
+        pt1 = QPointF(pt1.x() - pt.x(), pt1.y() - pt.y())
+        pt1 = pt + QPointF(pt1)*.5       
+        self.pts.insert(idx, pt1)
+        self.redrawPoints()  
+
+    def delPointItem(self, pointItem):
+        self.pts.pop(pointItem.idx)
+        self.redrawPoints()
+
+    def redrawPoints(self, bool=True):     ## pointItems points
+        self.removePoints()
+        self.sideWays.removeWayPtTags()
+        self.removePath()
+        self.addPath()
+        self.sideWays.addWayPtTags()
+        if bool: self.addPoints()
+
+    def addPointTag(self, pnt):  ## single tag
+        pct = (pnt.idx/len(self.pts))*100
+        tag = self.sideWays.makePtsTag(pnt.pt, pnt.idx, pct)
+        self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
+        p = QPointF(0,-20)
+        self.pointTag.setPos(pnt.pt+p)
+        self.pointTag.setZValue(len(self.pts)*.5)
+        self.scene.addItem(self.pointTag)
+
+    def removePointTag(self):  ## single tag
+        if self.pointTag:
+            self.scene.removeItem(self.pointTag)
+            self.pointTag = ''
+          
 ### -------------------- dotsPathMaker ---------------------
 

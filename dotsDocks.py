@@ -1,5 +1,6 @@
-from PyQt5.QtCore       import *
-from PyQt5.QtWidgets    import *
+from PyQt5.QtCore        import Qt, QTimer
+from PyQt5.QtWidgets     import QWidget, QDockWidget, QPushButton, \
+                                QGroupBox, QHBoxLayout, QVBoxLayout
  
 ### ---------------------- dotsDocks -----------------------
 ''' dotsDocks: dockwidgets and buttons groups '''
@@ -29,7 +30,10 @@ def addSliderDock(self):
 
     self.rdocked.setTitleBarWidget(QWidget(self))
     self.rdocked.setWidget(self.dockedWidget)  
-    self.dockedWidget.setLayout(QVBoxLayout())
+
+    layout = QVBoxLayout()      
+    layout.setSizeConstraint(3)  # fixed size - stopped movement
+    self.dockedWidget.setLayout(layout)
 
     vbox = self.dockedWidget.layout() 
     vbox.addWidget(self.sliderpanel)
@@ -180,7 +184,7 @@ def addCanvasBtnGroup(self):
     canvas = self.canvas
     pathMaker = self.canvas.pathMaker
 
-    self.btnPathMaker.clicked.connect(pathMaker.setPathMaker)      
+    self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
     btnClrCanvas.clicked.connect(canvas.clear)   
     btnSnapShot.clicked.connect(canvas.initBkg.snapShot)
     btnPixTest.clicked.connect(canvas.sideCar.pixTest)

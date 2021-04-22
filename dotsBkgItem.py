@@ -5,10 +5,12 @@ import random
 import os.path
 from os import path
 
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore    import Qt, QEvent, QPointF, QPoint, pyqtSlot, QSize, QRect
+from PyQt5.QtGui     import QColor, QImage, QPixmap
+from PyQt5.QtWidgets import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
+                            QGraphicsPixmapItem
 
+from dotsSideGig     import MsgBox
 from dotsShared      import common, paths
 
 import dotsSideCar as sideCar
@@ -22,9 +24,11 @@ class BkgItem(QGraphicsPixmapItem):
     def __init__(self, imgFile, canvas, zval=0):
         super().__init__()
 
-        self.canvas = canvas
-        self.mapper = self.canvas.mapper
-        self.dots   = canvas.dots
+        self.canvas  = canvas
+        self.scene   = canvas.scene
+
+        self.mapper  = self.canvas.mapper
+        self.dots    = canvas.dots
         self.initBkg = canvas.initBkg
  
         self.ViewW = common["ViewW"]
@@ -65,10 +69,8 @@ class BkgItem(QGraphicsPixmapItem):
 
 ### --------------------------------------------------------
     def mousePressEvent(self, e):
-        if e.button() == Qt.RightButton:
-            self.ungrabMouse()   
         if self.canvas.key == 'del':       # delete it
-            self.canvas.scene.removeItem(self)
+            self.scene.removeItem(self)
             self.initBkg.disableBkgBtns()
             self.dots.btnAddBkg.setEnabled(True)
         elif self.canvas.key == '/':    # send to back
@@ -115,6 +117,8 @@ class Flat(QGraphicsPixmapItem):
         super().__init__()
 
         self.canvas = canvas
+        self.scene  = canvas.scene
+
         self.dots   = canvas.dots
         self.mapper = self.canvas.mapper
         self.initBkg = canvas.initBkg
@@ -136,7 +140,7 @@ class Flat(QGraphicsPixmapItem):
 ### --------------------------------------------------------
     def mousePressEvent(self, e):
         if self.canvas.key == 'del':     
-            self.canvas.scene.removeItem(self)
+            self.scene.removeItem(self)
             self.initBkg.disableBkgBtns()
             self.dots.btnAddBkg.setEnabled(True)
         elif self.canvas.key == '/':   
@@ -147,13 +151,13 @@ class Flat(QGraphicsPixmapItem):
 ### --------------------------------------------------------
 class InitBkg(QWidget):
 
-    def __init__(self, parent, msg):
+    def __init__(self, parent):
         super().__init__()
 
         self.canvas = parent
+        self.scene  = parent.scene
         self.dots   = parent.dots
-        self.MsgBox = msg
-
+     
         self.mapper   = self.canvas.mapper
         self.sideShow = self.canvas.sideShow
         self.sliders  = self.dots.sliderpanel
@@ -189,7 +193,7 @@ class InitBkg(QWidget):
         if self.mapper.mapSet:
             self.mapper.removeMap()
         self.bkg = BkgItem(file, self.canvas)
-        self.canvas.scene.addItem(self.bkg)
+        self.scene.addItem(self.bkg)
         if file.endswith('-bkg.jpg'):
             self.bkg.setScale(1.003)   ## for white space???
             self.bkg.centerBkg()
@@ -201,7 +205,7 @@ class InitBkg(QWidget):
 
     def saveBkg(self):
         if not self.bkg.isBackgroundSet:
-            self.MsgBox("Set to Background inorder to save", 3)
+            MsgBox("Set to Background inorder to save", 3)
             return
         if self.bkg.fileName == 'flat':
             self.saveBkgColor()
@@ -218,22 +222,21 @@ class InitBkg(QWidget):
                 pix.save(paths["bkgPath"] + file,
                     format='jpg',
                     quality=100)
-                self.MsgBox("Saved as " + file, 3)
+                MsgBox("Saved as " + file, 3)
                 self.canvas.clear() ## replace current background with "-bkg.jpg" copy   
                 self.addBkg(self.bkg.fileName, flopped)
             else:
-                self.MsgBox("Already saved as background jpg")
+                MsgBox("Already saved as background jpg")
         self.dots.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
 
-    def bkgColor(self):        ## triggered by button
-        if self.canvas.pathMakerOn == False:  
-            self.setBkgColor(QColorDialog.getColor())
+    def bkgColor(self):        ## triggered by "/" 
+        self.setBkgColor(QColorDialog.getColor())
 
     def setBkgColor(self, color, val=0): ## add a flat color to canvas
         if color.isValid():
             self.bkg = Flat(color, self.canvas, val)
-            self.canvas.scene.addItem(self.bkg)
+            self.scene.addItem(self.bkg)
             if val != 0:
                 self.bkg.isBackgroundSet = True
                 self.disableSetBkg()  ##
@@ -271,14 +274,14 @@ class InitBkg(QWidget):
         else:
             self.disableBkgBtns()
             self.dots.btnAddBkg.setEnabled(True)
-            self.MsgBox("Already set to background")
+            MsgBox("Already set to background")
 
     def lockBkg(self):
         self.sliders.enableSliders()  ## default is false
         self.mapKeys("lock", 0)   ## 0 is a place holder
         if self.hasBackGround():  ## reset zvals of existing bkgs to by -1
             ## seems to work best in descending order
-            for itm in self.canvas.scene.items():
+            for itm in self.scene.items():
                 if itm.type == 'bkg' and itm.zValue() <= common['bkgZ']:
                     itm.setZValue(self.canvas.mapper.lastZval('bkg')-1)
         self.settingBkgMsg()
@@ -289,10 +292,10 @@ class InitBkg(QWidget):
         self.disableSetBkg()  ## turn off setting it again
         if self.bkg.fileName != 'flat':
             txt = os.path.basename(self.bkg.fileName)
-            self.MsgBox(txt + " " +  "set to background")
+            MsgBox(txt + " " +  "set to background")
 
     def snapShot(self):
-        if self.hasBackGround() or self.canvas.scene.items():
+        if self.hasBackGround() or self.scene.items():
             self.canvas.unSelect()  ## turn off any select borders
             if self.mapper.mapSet:
                 self.mapper.removeMap()
@@ -308,14 +311,14 @@ class InitBkg(QWidget):
                 if not f[0]:
                     return
                 elif not f[0].lower().endswith('.jpg'):
-                    self.MsgBox("Wrong file extention - use '.jpg'")
+                    MsgBox("Wrong file extention - use '.jpg'")
                     return
                 snap = os.path.basename(f[0])
             pix = self.canvas.view.grab(QRect(QPoint(0,0), QSize()))
             pix.save(paths["snapShot"] + snap,
                 format='jpg',
                 quality=100)
-            self.MsgBox("Saved as " + snap, 3)
+            MsgBox("Saved as " + snap, 3)
 
     def enableBkgBtns(self, bool):
         self.sliders.enableSliders(bool)
@@ -331,7 +334,7 @@ class InitBkg(QWidget):
         self.dots.btnSaveBkg.setEnabled(True)
 
     def hasBackGround(self):
-        for itms in self.canvas.scene.items(Qt.AscendingOrder):
+        for itms in self.scene.items(Qt.AscendingOrder):
             if itms.type == 'bkg':
                 return True
         return False

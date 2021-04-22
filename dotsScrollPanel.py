@@ -1,21 +1,18 @@
 import os
 
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl
+from PyQt5.QtGui     import QPainter, QImage, QColor, QPen, QFont, \
+                            QFontMetrics, QBrush, QPolygon, QDrag, QPixmap 
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
+                            QFrame, QFileDialog
 
-from dotsShared      import paths, Star
+from dotsShared      import paths, Star, common
 from functools       import partial
-from dotsSideCar     import MsgBox
+from dotsSideGig     import MsgBox
 
 ### ------------------- dotsScrollPanel --------------------
 ''' dotsScrollPanel: handles scrolling sprite selections.
     Includes ImgLabel and ScrollPanel classes. '''
-### --------------------------------------------------------
-MaxW, MaxH = 135, 105         # max image size
-LabelW, LabelH = 160, 135     # max label size
-ScrollW, ScrollH = 183, 686   # scroll panel size - changed for dotsDocks
-
 ### --------------------------------------------------------
 class ImgLabel(QLabel):
 
@@ -46,21 +43,21 @@ class ImgLabel(QLabel):
             img = img.scaled(newW, newH,   
                 Qt.KeepAspectRatio|
                 Qt.SmoothTransformation)
-            posX = ((LabelW - newW) /2 )
-            posY = ((MaxH - newH) /2 ) + 10
+            posX = ((common['LabelW'] - newW) /2 )
+            posY = ((common['MaxH'] - newH) /2 ) + 9
             qp.drawImage(posX, posY, img)
 
         pen = QPen(Qt.darkGray)   
         pen.setWidth(2)
         qp.setPen(pen) 
-        qp.drawRect(0, 0, LabelW, LabelH)
+        qp.drawRect(0, 0, common['LabelW'], common['LabelH'])
 
         pen = QPen(Qt.white) 
         pen.setWidth(3)
         pen.setJoinStyle(Qt.BevelJoin)
         qp.setPen(pen) 
-        qp.drawLine(0, 2, 0, LabelH) # left border
-        qp.drawLine(1, 1, LabelW, 1) # top border
+        qp.drawLine(0, 2, 0, common['LabelH']) # left border
+        qp.drawLine(1, 1, common['LabelW'], 1) # top border
 
         font = QFont()
         pen = QPen(Qt.black)
@@ -72,12 +69,12 @@ class ImgLabel(QLabel):
         imgfile = os.path.basename(self.imgFile)
         metrics = QFontMetrics(font)    
 
-        p = (LabelW - metrics.width(imgfile))/2 
-        qp.drawText(p, 128, imgfile)
+        p = (common['LabelW'] - metrics.width(imgfile))/2 
+        qp.drawText(p, common['Type'], imgfile)
         qp.end()
 
     def minimumSizeHint(self):
-        return QSize(LabelW, LabelH)
+        return QSize(common['LabelW'], common['LabelH'])
 
     def sizeHint(self):
         return self.minimumSizeHint()
@@ -102,28 +99,28 @@ class ImgLabel(QLabel):
     def drawStar(self):
         poly = QPolygon()
         for s in Star:
-            poly.append(QPoint(s[0], s[1])*.85)
+            poly.append(QPoint(s[0]-3, s[1])*common['Star'])
         return poly
 
     def scaleTo(self, img):
         W, H = img.width(), img.height()
-        newW, newH = MaxW, MaxH
+        newW, newH = common['MaxW'], common['MaxH']
 
         if W == H:
-            newW, newH = MaxH, MaxH
+            newW, newH = common['MaxH'], common['MaxH']
         elif W > H:
-            newW = MaxW
-            p = MaxW/ W
+            newW = common['MaxW']
+            p = common['MaxW']/ W
             newH = p * H
-            if newH > MaxH:
-                r = MaxH / newH
+            if newH > common['MaxH']:
+                r = common['MaxH'] / newH
                 newH, newW = r * newH, newW * r
         elif W < H:
-            newH = MaxH
-            p = MaxH / H
+            newH = common['MaxH']
+            p = common['MaxH'] / H
             newW = p * W
-            if newW > MaxW:
-                r = MaxW/ newW
+            if newW > common['MaxW']:
+                r = common['MaxW']/ newW
                 newH, newW = r * newH, newW * r
         return newW, newH   
 
@@ -137,7 +134,7 @@ class ScrollPanel(QWidget):
         self.canvas = parent.canvas ## used in imgLabel
         self.scene  = parent.scene 
 
-        self.setFixedSize(ScrollW,ScrollH)
+        self.setFixedSize(common['ScrollW'],common['ScrollH'])
    
         self.layout = QVBoxLayout(self)
         self.layout.setSizeConstraint(3)  # fixed size
@@ -158,7 +155,7 @@ class ScrollPanel(QWidget):
         self.scroll.setWidget(widget)
        
         vBoxLayout = QVBoxLayout(self)
-        vBoxLayout.setContentsMargins(0, 10, 0, 0)  ## change for dotsDocks
+        vBoxLayout.setContentsMargins(0, common['Margin'], 0, 0)  ## change for dotsDocks
         vBoxLayout.addWidget(self.scroll)
          
         self.setLayout(vBoxLayout) 
@@ -180,7 +177,7 @@ class ScrollPanel(QWidget):
         p = self.scrollList.index(this.id)
         del self.scrollList[p]    
         self.layout.itemAt(p).widget().deleteLater()
-        p = (p-1) * LabelH
+        p = (p-1) * common['LabelH']
         self.scroll.verticalScrollBar().setSliderPosition(p)
 
     def top(self):           

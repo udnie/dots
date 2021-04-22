@@ -1,11 +1,11 @@
 import os
 import sys
 
-from PyQt5.QtCore    import *
-from PyQt5.QtGui     import *
-from PyQt5.QtWidgets import *
+from PyQt5.QtCore    import Qt, pyqtSignal
+from PyQt5.QtGui     import QPainter
+from PyQt5.QtWidgets import QGraphicsView
 
-from dotsSideCar     import MsgBox
+from dotsSideGig     import MsgBox
 from dotsShared      import common, singleKeys
 
 ToglKeys  = (Qt.Key_G, Qt.Key_K, Qt.Key_M)
@@ -22,16 +22,15 @@ class ControlView(QGraphicsView):
     ## keyboard capture 
     keysSignal = pyqtSignal([str])
 
-    def __init__(self, scene, parent):
+    def __init__(self, parent):
 
         super().__init__(parent)
 
-        self.setObjectName('ControlView')
-        self.setScene(scene)
-    
         self.canvas = parent   
-        self.scene  = parent.scene
-
+    
+        self.setObjectName('ControlView')
+        self.setScene(parent.scene)
+    
         self.dots    = parent.dots
         self.sliders = self.dots.sliderpanel  
     
@@ -41,12 +40,13 @@ class ControlView(QGraphicsView):
             QPainter.TextAntialiasing | 
             QPainter.SmoothPixmapTransform)
 
-        self.setStyleSheet("border: 1px solid rgb(110,110,110)")
+        self.setStyleSheet("border: 1px solid rgb(100,100,100)")
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        self.setAcceptDrops(True)        
+        self.setAcceptDrops(True)  
+      
         self.setFocusPolicy(Qt.StrongFocus)
         self.setFocus()
 
@@ -127,7 +127,7 @@ class ControlView(QGraphicsView):
             if key == Qt.Key_G:
                 self.canvas.sideCar.toggleGrid() 
             elif key == Qt.Key_K:
-                self.canvas.sliders.toggleMenu()
+                self.sliders.toggleMenu()
             elif key == Qt.Key_M:
                 self.canvas.mapper.toggleMap()
   

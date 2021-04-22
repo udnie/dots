@@ -1,27 +1,39 @@
-from PyQt5.QtCore    import *
+from PyQt5.QtCore    import Qt
 
 ### --------------------- dotsShared.py --------------------
 ''' dotsShared: common and paths dictionaries shared across classes and files '''
 ### --------------------------------------------------------
 common = {
-    "ViewW": 1080,  ## canvas width 
-    "ViewH": 720,   ## canvas height
     "factor": 0.35,     
-    "gridSize": 30,   
     "gridZ": -50.0, 
     "pathZ": -25.0,  
     "bkgZ":  -99.0,
+    "DotsW":  1445,  # app width 
+    "DotsH":   825,  # app height
+    "ViewW":  1080,  # canvas width  30 X 36
+    "ViewH":   720,  # canvas height 30 X 24
+    "gridSize": 30,
+    "ScrollW": 152,  
+    "ScrollH": 685,  
+    "LabelW":  133,
+    "LabelH":  112,    
+    "MaxW":    110,
+    "MaxH":     85,  
+    "Star":    .70,
+    "Type":    106,
+    "Margin":   13,
 }
 
-MapStr = "L,O,P,S,C,:,\",<,>,{,},[,],_,+,/,cmd,left,right,up,down,del,shift,opt"   
+          
+CanvasStr = "L,O,P,S,C,:,\",<,>,{,},[,],_,+,/,cmd,left,right,up,down,del,shift,opt,return,enter"   
 PathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
 
 paths = {
-    "snapShot": "./",
-    "bkgPath": "./backgrounds/",
-    "imagePath": "./images/",
-    "playPath": "./plays/",
-    "paths": "./paths/",
+    "snapShot":   "./",
+    "bkgPath":    "./backgrounds/",
+    "imagePath":  "./images/",
+    "playPath":   "./plays/",
+    "paths":      "./paths/",
     "spritePath": "./sprites/",
 }
 
@@ -40,15 +52,15 @@ keyMenu = (                    ## pixitems and bkgitems
     ('L', 'Load Play'),
     ('M', 'Map Selected'),
     ('O', 'Toggle Paths 2'),
-    ('P', 'Play Tggl Paths'),
+    ('P', 'Toggle Paths'),
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
     ('U', 'UnSelect All'),
     ('X, Q', 'Escape to Quit'),
-    ('', 'Clk to Front'),
+    ('Rtn', 'Enter to Front'),
     ('/', 'Clk to Back'),
-    ('opt', 'Clk Back One Z'),
-    ('cmd', 'Clk Up One Z'),
+    ('[', 'Clk Back One Z'),
+    (']', 'Clk Up One Z'),
     ('Del', 'Clk to Delete'),
     ('Shift', 'Clk to Flop'),  
     ('Opt', 'DbClk to Clone'),
@@ -117,6 +129,8 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_Alt: 'opt',    
     Qt.Key_Shift: 'shift',
     Qt.Key_Control: 'cmd',
+    Qt.Key_Enter: 'enter',
+    Qt.Key_Return: 'return',
     Qt.Key_C: 'C',  
     Qt.Key_L: 'L',
     Qt.Key_N: 'N',   
@@ -138,6 +152,5 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_BracketLeft: '[',
     Qt.Key_BracketRight: ']', 
 }
-
 ### --------------------- dotsShared.py --------------------
 
