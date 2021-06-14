@@ -76,7 +76,6 @@ class BkgItem(QGraphicsPixmapItem):
         elif self.canvas.key == '/':    # send to back
             ## lastZval uses the string to return the last zvalue
             self.setZValue(self.mapper.lastZval('bkg')-1)
-            return
         elif self.canvas.key == 'shift':
             self.flopped = not self.flopped 
             self.setMirrored(self.flopped)

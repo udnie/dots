@@ -1,7 +1,11 @@
 from PyQt5.QtCore        import Qt, QTimer
 from PyQt5.QtWidgets     import QWidget, QDockWidget, QPushButton, \
-                                QGroupBox, QHBoxLayout, QVBoxLayout
+                                QGroupBox, QHBoxLayout, QVBoxLayout, \
+                                QDesktopWidget
  
+from dotsShared     import common
+from datetime       import datetime
+
 ### ---------------------- dotsDocks -----------------------
 ''' dotsDocks: dockwidgets and buttons groups '''
 ### --------------------------------------------------------
@@ -63,11 +67,11 @@ def addButtonDock(self):
 
 ### --------------------------------------------------------
 def addScrollBtnGroup(self):  
-    groupBox = QGroupBox("Scroll Panel")
+    self.scrollGroup = QGroupBox("Scroll Panel")
 
-    groupBox.setFixedWidth(400)
+    self.scrollGroup.setFixedWidth(400)
     ## this sets the position of the title
-    groupBox.setAlignment(Qt.AlignHCenter)
+    self.scrollGroup.setAlignment(Qt.AlignHCenter)
 
     btnAdd = QPushButton("Star")
     btnTop = QPushButton("Top")
@@ -94,19 +98,19 @@ def addScrollBtnGroup(self):
     btnFiles.clicked.connect(panel.scrollFiles)
     btnLoad.clicked.connect(panel.loadSprites)
     
-    groupBox.setLayout(layout)
+    self.scrollGroup.setLayout(layout)
 
-    return groupBox
+    return  self.scrollGroup
 
 ### -----------------------------------------------------
 def addPlayBtnGroup(self):
-    playGroup = QGroupBox("Play")
+    self.playGroup = QGroupBox("Play")
 
-    playGroup.setFixedWidth(325) 
-    playGroup.setAlignment(Qt.AlignHCenter)
+    self.playGroup.setFixedWidth(325) 
+    self.playGroup.setAlignment(Qt.AlignHCenter)
 
     btnLoad = QPushButton("Load")
-    self.btnPlay = QPushButton("Play")  
+    self.btnPlay = QPushButton("Run")  
     self.btnPause = QPushButton("Pause")
     self.btnStop = QPushButton("Stop")
     self.btnSave = QPushButton("Save")
@@ -128,13 +132,14 @@ def addPlayBtnGroup(self):
     self.btnPause.clicked.connect(sideShow.pause)
     self.btnStop.clicked.connect(sideShow.stop)
 
-    playGroup.setLayout(layout)
+    self.playGroup.setLayout(layout)
 
-    return playGroup
+    return self.playGroup
         
 ### -----------------------------------------------------
 def addBkgBtnGroup(self):
     bkgGroup = QGroupBox("Background")
+
     bkgGroup.setFixedWidth(275)
     bkgGroup.setAlignment(Qt.AlignHCenter)
 
@@ -193,6 +198,15 @@ def addCanvasBtnGroup(self):
     canvasGroup.setLayout(layout)
 
     return canvasGroup
+
+### -----------------------------------------------------
+def getDate():
+    d = datetime.now()
+    return d.strftime("%m-%d-%Y")
+
+def getX():
+    ctr = QDesktopWidget().availableGeometry().center()
+    return int(((ctr.x() * 2 ) - common['DotsW'])/2)
 
 ### -------------------- dotsDocks ----------------------
 

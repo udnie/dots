@@ -8,7 +8,7 @@ from PyQt5.QtGui     import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup
 
 from dotsShared      import common, pathcolors
-from dotsSideGig     import TagIt
+from dotsSideGig     import TagIt, getColorStr
 
 import dotsSidePath  as sidePath
 
@@ -176,7 +176,8 @@ class InitMap():
         if self.canvas.pathMakerOn:
             return
         if self.tagSet: 
-            self.clearTagGroup() 
+            self.clearTagGroup()
+            self.clearPaths()  
             return
         if self.scene.items():
             if self.pathSet:
@@ -189,7 +190,7 @@ class InitMap():
                     k += 1
                     if pid == All:
                         self.tagIt(pix) 
-                    elif pid == pix.id:  
+                    elif pid == pix.id:  ## single tag
                         self.tagIt(pix) 
                         break
                 elif pix.zValue() <= common["pathZ"]:
@@ -200,7 +201,7 @@ class InitMap():
                 self.clearTagGroup()
 
     def addTagGroup(self):
-        self.tagZ = self.toFront(20.0)     
+        self.tagZ = self.toFront(20.0)   ## otherwise it can be hidden  
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
@@ -256,7 +257,7 @@ class InitMap():
     
     def addPathTagGroup(self):
         ## add pathTags group to keep tags separate and visible
-        self.pathTagZ = self.toFront(25.0)     
+        self.pathTagZ = self.toFront(25.0)  ## otherwise it can be hidden 
         self.pathTagGroup = QGraphicsItemGroup()
         self.pathTagGroup.setZValue(self.pathTagZ)     
         self.scene.addItem(self.pathTagGroup)
@@ -288,13 +289,8 @@ class InitMap():
         else:
             return 0
 
-    def getColorStr(self):  
-        random.seed()
-        p = pathcolors
-        return p[random.randint(0,len(p)-1)]
-
     def addPainterPath(self, tag):
-        color = self.getColorStr()
+        color = getColorStr()
         path = sidePath.pathLoader(tag) ## return painter path
         pathPt = path.pointAtPercent(0.0)  ## so its consistent
         ## use painter path
@@ -310,6 +306,13 @@ class InitMap():
         tag.setZValue(self.pathTagZ)  ## use pathTagZ instead of tagZ
         self.pathTagGroup.addToGroup(tag)
 
+    def lastZval(self, str): ## finds the lowest pix or bkg zValue
+        last = 100000.0
+        for itm in self.scene.items():
+            if itm.type == str and itm.zValue() < last:
+                last = itm.zValue()
+        return last
+
     def toFront(self, inc):  ## finds the highest pixitem zValue
         first = 0           ## returns it plus the increment
         for pix in self.scene.items():
@@ -319,13 +322,6 @@ class InitMap():
             elif pix.zValue() <= common["pathZ"]:
                 break
         return inc + first
-
-    def lastZval(self, str): ## finds the lowest pix or bkg zValue
-        last = 100000.0
-        for itm in self.scene.items():
-            if itm.type == str and itm.zValue() < last:
-                last = itm.zValue()
-        return last
 
     def setOriginPt(self, pix):
         self.updateWidthHeight(pix)

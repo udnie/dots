@@ -9,7 +9,7 @@ from dotsSideGig     import MsgBox
 from dotsShared      import common, singleKeys
 
 ToglKeys  = (Qt.Key_G, Qt.Key_K, Qt.Key_M)
-MixKeys   = (Qt.Key_D, Qt.Key_F, Qt.Key_P, Qt.Key_R, Qt.Key_T)
+MixKeys   = (Qt.Key_D, Qt.Key_F, Qt.Key_T)
 ExitKeys  = (Qt.Key_X, Qt.Key_Q, Qt.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 
@@ -23,7 +23,6 @@ class ControlView(QGraphicsView):
     keysSignal = pyqtSignal([str])
 
     def __init__(self, parent):
-
         super().__init__(parent)
 
         self.canvas = parent   
@@ -96,9 +95,8 @@ class ControlView(QGraphicsView):
             self.setKey('!')
         elif key in (Qt.Key_Backspace, Qt.Key_Delete):  ## can vary
             self.setKey('del')
-
         ## mix of setKey and direct run
-        if key in MixKeys:
+        elif key in MixKeys:
             if key == Qt.Key_D:    
                 self.setKey('D') 
                 self.canvas.deleteSelected()
@@ -108,30 +106,22 @@ class ControlView(QGraphicsView):
             elif key == Qt.Key_P:
                 self.canvas.mapper.togglePaths() 
                 # self.setKey('P')  ## your choice
-            elif key == Qt.Key_R:
-                if self.canvas.pathMakerOn:
-                    self.setKey('R') ## if pathMaker on
-                else:  ## if you're testing an animation over again
-                    self.canvas.sideShow.runDemo('demo.play')
             elif key == Qt.Key_T:
                 if self.canvas.pathMakerOn:
                     self.setKey('T') ## if pathMaker on
                 else:  
                     self.canvas.mapper.toggleTagItems()
-
-        if key in self.direct: 
+        elif key in self.direct: 
             self.direct[key]()  ## OK...
-
         ## too many references
-        if key in ToglKeys:
+        elif key in ToglKeys:
             if key == Qt.Key_G:
                 self.canvas.sideCar.toggleGrid() 
             elif key == Qt.Key_K:
                 self.sliders.toggleMenu()
             elif key == Qt.Key_M:
                 self.canvas.mapper.toggleMap()
-  
-        if key in singleKeys: ## in dotsShared.py
+        elif key in singleKeys: ## in dotsShared.py
             self.setKey(singleKeys[key])
         elif e.key() in ExitKeys:
             self.canvas.exit() 

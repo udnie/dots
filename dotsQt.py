@@ -1,8 +1,7 @@
 import sys
 import platform
 
-from PyQt5.QtWidgets import QApplication, QStatusBar, \
-                            QDesktopWidget, QMainWindow
+from PyQt5.QtWidgets import QApplication, QStatusBar, QMainWindow
 
 import dotsDropCanvas   as dropCanvas
 import dotsScrollPanel  as scrollPanel
@@ -10,7 +9,6 @@ import dotsSliderPanel  as sliderPanel
 import dotsSideCar      as sideCar
 
 from dotsShared     import common
-from datetime       import datetime
 from dotsDocks      import *
  
 ### ----------------------- dotsQt -------------------------
@@ -27,13 +25,10 @@ class DotsQt(QMainWindow):
         self.sliderpanel = sliderPanel.SliderPanel(self)
         self.canvas = dropCanvas.DropCanvas(self)
       
-        self.scene = self.canvas.scene
-        self.view  = self.canvas.view
-
         self.setCentralWidget(self.canvas)    
         self.scrollpanel = scrollPanel.ScrollPanel(self)
 
-        ## from dotsDocks  
+        ## add groups from dotsDocks  
         addScrollDock(self)
         addSliderDock(self)
         addButtonDock(self)       
@@ -49,7 +44,7 @@ class DotsQt(QMainWindow):
         self.setStatusBar(self.statusBar)
      
         ## just in case the sprite directory is missing
-        QTimer.singleShot(250, self.canvas.loadSprites)
+        QTimer.singleShot(200, self.canvas.loadSprites)
 
         sideCar.setCursor()  
         self.show()
@@ -57,16 +52,7 @@ class DotsQt(QMainWindow):
         # from PyQt5.Qt import PYQT_VERSION_STR 
         # print("PyQt version:", PYQT_VERSION_STR) 
         # print("Python version:",platform.python_version())
-     
-### --------------------------------------------------------
-def getDate():
-    d = datetime.now()
-    return d.strftime("%m-%d-%Y")
-
-def getX():
-    ctr = QDesktopWidget().availableGeometry().center()
-    return int(((ctr.x() * 2 ) - common['DotsW'])/2)
-        
+             
 ### --------------------------------------------------------
 if __name__ == '__main__':
     app = QApplication(sys.argv)

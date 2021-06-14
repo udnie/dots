@@ -4,7 +4,8 @@ from PyQt5.QtCore    import Qt
 ''' dotsShared: common and paths dictionaries shared across classes and files '''
 ### --------------------------------------------------------
 common = {
-    "factor": 0.35,     
+    "factor": 0.35,
+    "tagZ":   20.0,    
     "gridZ": -50.0, 
     "pathZ": -25.0,  
     "bkgZ":  -99.0,
@@ -22,11 +23,12 @@ common = {
     "Star":    .70,
     "Type":    106,
     "Margin":   13,
+    "runThis":  "demo.play",
 }
 
           
-CanvasStr = "L,O,P,S,C,:,\",<,>,{,},[,],_,+,/,cmd,left,right,up,down,del,shift,opt,return,enter"   
-PathStr = "F,S,C,D,N,T,P,R,W,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
+CanvasStr = "L,R,P,S,C,:,\",<,>,{,},[,],_,+,/,cmd,left,right,up,down,del,shift,opt,return,enter"   
+PathStr = "F,S,C,D,N,T,P,R,W,V,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
 
 paths = {
     "snapShot":   "./",
@@ -51,8 +53,8 @@ keyMenu = (                    ## pixitems and bkgitems
     ('K', 'Toggle KeyList'),
     ('L', 'Load Play'),
     ('M', 'Map Selected'),
-    ('O', 'Toggle Paths 2'),
     ('P', 'Toggle Paths'),
+    ('R', 'Run Play/Demo'),
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
     ('U', 'UnSelect All'),
@@ -74,13 +76,16 @@ keyMenu = (                    ## pixitems and bkgitems
     ('L/R', 'Arrow Keys'))
 
 pathMenu = (
-    ("F", "Files"),
-    ("S", "Save Path"),
-    ("P", "Path Chooser"),
     ('C', 'Center Path'),
     ("D", "Delete Screen"), 
+    ("F", "Files"),
     ("N", "New Path"),
+    ("P", "Path Chooser"),
+    ("R", "Reverse Path"),
+    ("S", "Save Path"),
     ("T", "Test"),
+    ("W", "Way Points"),
+    ("V", "..View WayPts"),
     ("/", "Path Color"),
     ("cmd", "Closes Path"),
     ('_/+', "Rotate 1 deg"),
@@ -91,13 +96,10 @@ pathMenu = (
     ('-,=', 'Scale Y'),
     ('U/D', 'Arrow Keys'),
     ('L/R', 'Arrow Keys'),
-    ("W", "Way Points"),
-    ("P", "Show Way Pts"),
     ("opt", "Add a Point"),
     ("del", "Delete a Point"),
     (">", "  Shift Pts +5%"),
     ("<", "  Shift Pts -5%"),
-    ("R", "  Reverse Path"),
     ("! ","  Half Path Size"))
 
 pathcolors = (
@@ -136,7 +138,9 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_N: 'N',   
     Qt.Key_O: 'O',  
     Qt.Key_P: 'P',
+    Qt.Key_R: 'R',
     Qt.Key_S: 'S', 
+    Qt.Key_V: 'V', 
     Qt.Key_W: 'W',  
     Qt.Key_Plus: '+',         
     Qt.Key_Equal: '=',    

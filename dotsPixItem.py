@@ -9,7 +9,6 @@ from dotsSideCar      import *
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
 
-
 ## -- for testing and comparison ----------------
 #from pubsub  import pub      # PyPubSub - required
 

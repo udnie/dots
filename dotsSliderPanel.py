@@ -63,6 +63,14 @@ class SliderPanel(QWidget):
         return self.tableView
 
 ### --------------------------------------------------------
+    def toggleMenu(self):
+        if self.pathMenuSet:
+            self.setTableModel(keyMenu)
+            self.pathMenuSet = False
+        else:
+            self.setTableModel(pathMenu)
+            self.pathMenuSet = True
+
     def setTableModel(self, list):
         header = ['Keys', 'Action']
         model = TableModel(list, header)
@@ -89,14 +97,6 @@ class SliderPanel(QWidget):
                 "alternate-background-color: rgb(220,220,220);\n"
                 "font-size: 12px;\n"
                 "}")  
-
-    def toggleMenu(self):
-        if self.pathMenuSet:
-            self.setTableModel(keyMenu)
-            self.pathMenuSet = False
-        else:
-            self.setTableModel(pathMenu)
-            self.pathMenuSet = True
 
 ### -----------------------------------------------------
     def addSliderGroup(self):

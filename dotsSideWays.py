@@ -3,63 +3,61 @@ import os
 
 from os import path
 
-from PyQt5.QtCore    import Qt, QPointF, QTimer, QPropertyAnimation
+from PyQt5.QtCore    import Qt, QPointF, QPoint, QTimer, QPropertyAnimation
 from PyQt5.QtGui     import QPen, QColor, QPainterPath, QPixmap
 from PyQt5.QtWidgets import QFileDialog, QGraphicsPixmapItem, QGraphicsItemGroup
 
 from dotsAnimation   import Node
 from dotsShared      import common, paths
-from dotsSideGig     import TagIt, MsgBox
+from dotsSideGig     import TagIt, MsgBox, getColorStr, getPts, distance
  
 import dotsSidePath  as sidePath
 
 ScaleUpKeys = ('>','\"', '=')
 ScaleDnKeys = ('<',':','-')
+Tick = 3  ## points to move using arrow keys
 
 ### --------------------- dotsSideWays ---------------------
 ''' dotsSideWays: extends pathMaker. Includes path and
-    waypoints functions - scaleRotate and pathTest '''
+    waypoints functions - scaleRotate and pathTest...'''
+''' moved all scene references to pathMaker '''
 ### --------------------------------------------------------
 class SideWays():
 
-    def __init__(self, parent, canvas):
+    def __init__(self, parent):
         super().__init__()
  
         self.pathMaker = parent
-        self.canvas    = canvas
-        self.scene     = canvas.scene
-        self.dots      = canvas.dots
            
-        self.pathBall = None
-        self.tagGroup = None        
-
-        self.pathTestSet = False
-        self.wayPtsSet = False  ## appear as tags
-
 ### ----------------------- paths --------------------------
-    def setNewPath(self):
-        if not self.pathMaker.pathSet and not self.wayPtsSet:
-            if not self.pathMaker.newPathSet: 
-                self.pathMaker.delete()  
-                self.closeNewPath()
-                self.dots.btnPathMaker.setStyleSheet(
-                    "background-color: rgb(215,165,255)")
-                self.pathMaker.newPath = None
-                self.pathMaker.newPathSet = True
-        else:
-            MsgBox("addNewPath: Can't Add Path on Screen", 4)
-      
-    def closeNewPath(self):  ## applies only to newPath
-        self.pathMaker.removeNewPath()  
-        self.pathMaker.addPath()  ## add the completed path
-        self.newPathOff() 
-   
-    def newPathOff(self):
-        if not self.pathMaker.newPath:
-            self.dots.btnPathMaker.setStyleSheet(
-                "background-color: LIGHTGREEN")
-            self.pathMaker.newPath = None
-            self.pathMaker.newPathSet = False
+    def centerPath(self):
+        if self.pathMaker.pathSet:
+            p = self.pathMaker.path.sceneBoundingRect()
+            w = (common["ViewW"] - p.width()) /2
+            h = (common["ViewH"] - p.height()) / 2
+            x, y = w - p.x(), h - p.y()
+            self.pathMaker.path.setPos(
+                self.pathMaker.path.x()+x, 
+                self.pathMaker.path.y()+y)
+            self.updPts(x, y)
+
+    def flipPath(self):  
+        p = self.pathMaker.path.sceneBoundingRect()
+        max = p.y() + p.height()
+        for i in range(0, len(self.pathMaker.pts)):
+            self.pathMaker.pts[i] = QPointF(
+                self.pathMaker.pts[i].x(), 
+                max - self.pathMaker.pts[i].y() + p.y())
+        self.pathMaker.addPath()
+  
+    def flopPath(self): 
+        p = self.pathMaker.path.sceneBoundingRect()
+        max = p.x() + p.width()
+        for i in range(0, len(self.pathMaker.pts)):
+            self.pathMaker.pts[i] = QPointF(
+                max - self.pathMaker.pts[i].x() + p.x(), 
+                self.pathMaker.pts[i].y())
+        self.pathMaker.addPath()
 
     def halfPath(self):  
         tmp = []        
@@ -68,9 +66,36 @@ class SideWays():
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
         self.pathMaker.redrawPoints(False)  ## redraw canvas without points
-        if self.pathTestSet:
-            self.stopPathTest()
+        if self.pathMaker.pathTestSet:
+            self.pathMaker.stopPathTest()
             QTimer.singleShot(200, self.pathTest)  ## optional
+
+    def movePath(self, key):   
+        if key == 'right':
+            self.pathMaker.path.setPos(
+                self.pathMaker.path.x()+Tick, 
+                self.pathMaker.path.y())
+            self.updPts(Tick, 0)
+        elif key == 'left':
+            self.pathMaker.path.setPos(
+                self.pathMaker.path.x()-Tick, 
+                self.pathMaker.path.y())
+            self.updPts(-Tick, 0)
+        elif key == 'up':
+            self.pathMaker.path.setPos(
+                self.pathMaker.path.x()+0, 
+                self.pathMaker.path.y()-Tick)
+            self.updPts(0, -Tick)
+        elif key == 'down':
+            self.pathMaker.path.setPos(
+                self.pathMaker.path.x()+0, 
+                self.pathMaker.path.y()+Tick)
+            self.updPts(0, Tick)
+
+    def updPts(self, tx, ty):    ## used by movePath
+        pt = QPoint(float(tx), float(ty))
+        for p in self.pathMaker.pts:  ## pts on the screen 
+            p += pt     
 
     def reversePath(self):  
         if self.pathMaker.pts:
@@ -82,10 +107,10 @@ class SideWays():
             tmp.insert(0,self.pathMaker.pts[0])   ## start at zero
             tmp = tmp[:-1]
             self.pathMaker.pts = tmp
-            if self.wayPtsSet:
+            if self.pathMaker.wayPtsSet:
                 self.updateWayPts()
-            if self.pathTestSet:
-                self.stopPathTest()
+            if self.pathMaker.pathTestSet:
+                self.pathMaker.stopPathTest()
          
     def setPaintPath(self, bool=False):  ## also used by waypts
         path = QPainterPath()
@@ -96,47 +121,38 @@ class SideWays():
         if bool: path.closeSubpath()
         return path
 
+    def changePathColor(self):
+        self.pathMaker.color = getColorStr()
+        if self.pathMaker.newPathSet:
+            self.pathMaker.updateNewPath()
+        else:
+            self.pathMaker.addPath()
+
 ### ---------------------- waypoints -----------------------
     def addWayPtTags(self):
-        self.pathMaker.removePoints()
         if self.pathMaker.newPathSet:
             return
-        if self.wayPtsSet:  ## toggle it off
-            self.removeWayPtTags()
+        if self.pathMaker.wayPtsSet:  ## toggle it off
+            self.pathMaker.removeWayPtTags()
             return   ## added
         lnn = len(self.pathMaker.pts)
         if lnn:                     ## make some tags
-            self.addWayPtTagsGroup()
+            self.pathMaker.addWayPtTagsGroup()
             inc = int(lnn/10)  # approximate a 10% increment
             list = (x*inc for x in range(0,10)) ## get the indexes
             for idx in list:
                 pt = self.pathMaker.pts[idx]
                 pct = (idx/lnn)*100
                 if pct == 0.0: idx = lnn
-                self.addWayPtTag(
+                self.pathMaker.addWayPtTag(
                     self.makePtsTag(pt, idx, pct), 
                     pt)
             if self.pathMaker.openPathFile:  ## filename top left corner
-                self.addWayPtTag(self.pathMaker.openPathFile, QPointF(5.0,5.0))
-            self.wayPtsSet = True
+                self.pathMaker.addWayPtTag(
+                    self.pathMaker.openPathFile, 
+                    QPointF(5.0,5.0))
+            self.pathMaker.wayPtsSet = True
  
-    def addWayPtTagsGroup(self):
-        self.tagGroup = QGraphicsItemGroup()
-        self.scene.addItem(self.tagGroup)
-        self.tagGroup.setZValue(common["pathZ"]+5)
-
-    def addWayPtTag(self, tag, pt):
-        self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
-        self.tag.setPos(pt)
-        self.tag.setZValue(common["pathZ"]+5) 
-        self.tagGroup.addToGroup(self.tag)
- 
-    def removeWayPtTags(self):   
-        if self.tagGroup or self.wayPtsSet:
-            self.scene.removeItem(self.tagGroup) 
-            self.tagGroup = None
-            self.wayPtsSet = False
-
     def makePtsTag(self, pt, idx, pct):  ## used by pointItem as well
         s = "(" + str("{:2d}".format(int(pt.x())))
         s = s + ", " + str("{:2d}".format(int(pt.y()))) + ")"
@@ -145,92 +161,60 @@ class SideWays():
         return s
 
     def shiftWayPts(self, key):  
-        l = int(len(self.pathMaker.pts)/20)  ## 5% solution
+        lnn = int(len(self.pathMaker.pts)/20)  ## 5% solution
         tmp = []
         if key == '>':
-            for i in range(l, len(self.pathMaker.pts)):
+            for i in range(lnn, len(self.pathMaker.pts)):
                 tmp.append(self.pathMaker.pts[i])
             for i in range(0, len(self.pathMaker.pts)-len(tmp)):
                 tmp.append(self.pathMaker.pts[i])
         else:
-            for i in range(len(self.pathMaker.pts)-l, len(self.pathMaker.pts)):
+            for i in range(len(self.pathMaker.pts)-lnn, len(self.pathMaker.pts)):
                 tmp.append(self.pathMaker.pts[i])
             for i in range(0, len(self.pathMaker.pts)-len(tmp)):
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
-        if self.wayPtsSet:
+        if self.pathMaker.wayPtsSet:
             self.updateWayPts()
 
     def updateWayPts(self):
-        self.removeWayPtTags()
+        self.pathMaker.removeWayPtTags()
         self.pathMaker.addPath()
         self.addWayPtTags()
 
 ### --------------------------------------------------------
     def pathTest(self):
         if self.pathMaker.pts and self.pathMaker.pathSet:
-            if not self.pathTestSet:
-                self.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + 
+            if not self.pathMaker.pathTestSet:
+                self.pathMaker.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + 
                     'ball.png'))
-                node = Node(self.ball)
-                self.ball.setZValue(50)
+                node = Node(self.pathMaker.ball)
+                self.pathMaker.ball.setZValue(50)
 
-                self.pathBall = QPropertyAnimation(node, b'pos')
-                self.pathBall.setDuration(10000)  ## 10 seconds
+                self.pathMaker.pathBall = QPropertyAnimation(node, b'pos')
+                self.pathMaker.pathBall.setDuration(10000)  ## 10 seconds
 
                 waypts = self.setPaintPath(True) ## close subpath
-                pt = sidePath.getOffset(self.ball)
+                pt = sidePath.getOffset(self.pathMaker.ball)
 
-                self.pathBall.setStartValue(waypts.pointAtPercent(0.0)-pt)
+                self.pathMaker.pathBall.setStartValue(waypts.pointAtPercent(0.0)-pt)
                 for i in range(1, 99):   
-                    self.pathBall.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
-                self.pathBall.setEndValue(waypts.pointAtPercent(1.0)-pt)  
-                self.pathBall.setLoopCount(-1) 
+                    self.pathMaker.pathBall.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
+                self.pathMaker.pathBall.setEndValue(waypts.pointAtPercent(1.0)-pt)  
+                self.pathMaker.pathBall.setLoopCount(-1) 
 
-                self.scene.addItem(self.ball)
-                self.pathBall.start()
-                self.pathTestSet = True
+                self.pathMaker.startPathTest()
             else:
-                self.stopPathTest()
-
-    def stopPathTest(self): 
-        if self.pathTestSet:  
-            self.pathBall.stop()
-            self.scene.removeItem(self.ball)
-            self.pathBall = None
-            self.pathTestSet = False
+                self.pathMaker.stopPathTest()
 
 ### --------------------------------------------------------
-    def distance(self, x1, x2, y1, y2):
-        dx = x1 - x2
-        dy = y1 - y2
-        return math.sqrt((dx * dx ) + (dy * dy))
-
-    def getPathList(self, bool=False):  ## used by DoodleMaker
-        try:                            ## also by context menu
-            files = os.listdir(paths['paths'])
-        except IOError:
-            MsgBox("getPathList: No Path Directory Found!", 5)
-            return None  
-        filenames = []
-        for file in files:
-            if file.lower().endswith('path'): 
-                if bool:    
-                    file = os.path.basename(file)  ## short list
-                    filenames.append(file)
-                else:
-                    filenames.append(paths['paths'] + file)
-        if not filenames:
-            MsgBox("getPathList: No Paths Found!", 5)
-        return filenames
-
     def scaleRotate(self, key): 
         p = self.pathMaker.path.sceneBoundingRect()
         centerX = p.x() + p.width() /2
         centerY = p.y() + p.height() /2
         ## for each pt compute distance from center
         for i in range(0, len(self.pathMaker.pts)):    
-            dist = self.distance(
+            dist = distance(
                     self.pathMaker.pts[i].x(), centerX, 
                     self.pathMaker.pts[i].y(), centerY)
             inc, xdist, ydist = 0, dist, dist
@@ -267,18 +251,6 @@ class SideWays():
         self.pathMaker.addPath()
 
 ### --------------------------------------------------------
-    def getPts(self, file, scalor=1.0, inc=0):  ## also used by pathChooser
-        try:
-            tmp = []
-            with open(file, 'r') as fp: 
-                for line in fp:
-                    ln = line.rstrip()  
-                    ln = list(map(float, ln.split(',')))   
-                    tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
-            return tmp
-        except IOError:
-            MsgBox("getPts: Error reading pts file")
-
     def openFiles(self):
         if self.pathMaker.pts:
             MsgBox("openFiles: Clear Scene First")
@@ -289,7 +261,7 @@ class SideWays():
             "Files(*.path)")
         Q.accept()
         if file:
-            self.pathMaker.pts = self.getPts(file)  ## read the file
+            self.pathMaker.pts = getPts(file)  ## read the file
             self.pathMaker.openPathFile = os.path.basename(file)
             self.pathMaker.addPath()
        

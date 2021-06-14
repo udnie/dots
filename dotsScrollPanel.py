@@ -132,7 +132,6 @@ class ScrollPanel(QWidget):
         
         self.dots   = parent
         self.canvas = parent.canvas ## used in imgLabel
-        self.scene  = parent.scene 
 
         self.setFixedSize(common['ScrollW'],common['ScrollH'])
    

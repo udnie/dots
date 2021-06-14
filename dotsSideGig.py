@@ -1,5 +1,6 @@
 import random
 import os
+import math
 
 from os import path
 
@@ -11,7 +12,7 @@ from PyQt5.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
                             QGraphicsItemGroup, QGraphicsLineItem, QScrollArea, \
                             QGridLayout, QVBoxLayout, QGraphicsEllipseItem
 
-from dotsShared      import common, paths
+from dotsShared      import common, paths, pathcolors
 
 PlayKeys = ('resume','pause')
 
@@ -29,7 +30,7 @@ class PointItem(QGraphicsEllipseItem):
         self.pt = pt
         self.idx = idx
 
-        self.setZValue(idx * -.05) 
+        self.setZValue(idx) 
         self.type = 'pt'
      
         v = 6  ## so its centered
@@ -57,7 +58,7 @@ class PointItem(QGraphicsEllipseItem):
         if self.pathMaker.key == 'del':  
             self.pathMaker.delPointItem(self)
         elif self.pathMaker.key == 'opt': 
-            self.pathMaker.addPointItem(self)
+            self.pathMaker.insertPointItem(self)
         self.pathMaker.key = ''
         e.accept()
         
@@ -152,7 +153,7 @@ class DoodleMaker(QWidget):
         self.pathMaker = parent
         self.sideWays  = self.pathMaker.sideWays
 
-        self.resize(490,320)
+        self.resize(530,320)
 
         widget = QWidget()
         gLayout = QGridLayout(widget)
@@ -161,8 +162,8 @@ class DoodleMaker(QWidget):
         gLayout.setOriginCorner(0)
         gLayout.setContentsMargins(0, 0, 0, 0)
 
-        for file in self.sideWays.getPathList(): ## from pathMaker   
-            df = Doddle(file, parent)
+        for file in getPathList():    
+            df = Doddle(parent, file)
             gLayout.addWidget(df)
 
         scroll = QScrollArea()
@@ -177,7 +178,7 @@ class DoodleMaker(QWidget):
 ### --------------------------------------------------------
 class Doddle(QLabel):  
 
-    def __init__(self, file, parent):
+    def __init__(self, parent, file):
         super().__init__()
 
         self.pathMaker = parent
@@ -185,14 +186,14 @@ class Doddle(QLabel):
    
         self.file = file
         scalor = .10
-        self.W, self.H = 140, 100
+        self.W, self.H = 150, 100
 
         self.font = QFont('Arial', 13)
         self.pen = QPen(QColor(0,0,0))                     
         self.pen.setWidth(1)                                       
         self.brush = QBrush(QColor(255,255,255,255)) 
         ## scale down screen drawing --  file, scalor, offset
-        self.df = self.sideWays.getPts(self.file, scalor, 10)  
+        self.df = getPts(self.file, scalor, 10)  
   
     def minimumSizeHint(self):
         return QSize(self.W, self.H)
@@ -201,7 +202,7 @@ class Doddle(QLabel):
         return self.minimumSizeHint()
 
     def mousePressEvent(self, e): 
-        self.pathMaker.pts = self.sideWays.getPts(self.file)
+        self.pathMaker.pts = getPts(self.file)
         self.pathMaker.addPath()
         self.pathMaker.openPathFile = os.path.basename(self.file)
         self.pathMaker.pathChooserOff() 
@@ -220,6 +221,47 @@ class Doddle(QLabel):
         txt = os.path.basename(self.file)
         p = int((self.W - metrics.width(txt))/2 )
         painter.drawText(p, self.H-10, txt)
+
+### --------------------------------------------------------
+def distance(x1, x2, y1, y2):
+    dx = x1 - x2
+    dy = y1 - y2
+    return math.sqrt((dx * dx ) + (dy * dy))
+
+def getPathList(bool=False):  ## used by DoodleMaker
+    try:                            ## also by context menu
+        files = os.listdir(paths['paths'])
+    except IOError:
+        MsgBox("getPathList: No Path Directory Found!", 5)
+        return None  
+    filenames = []
+    for file in files:
+        if file.lower().endswith('path'): 
+            if bool:    
+                file = os.path.basename(file)  ## short list
+                filenames.append(file)
+            else:
+                filenames.append(paths['paths'] + file)
+    if not filenames:
+        MsgBox("getPathList: No Paths Found!", 5)
+    return filenames
+
+def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
+    try:
+        tmp = []
+        with open(file, 'r') as fp: 
+            for line in fp:
+                ln = line.rstrip()  
+                ln = list(map(float, ln.split(',')))   
+                tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
+        return tmp
+    except IOError:
+        MsgBox("getPts: Error reading pts file")
+
+def getColorStr():  
+    random.seed()
+    p = pathcolors
+    return p[random.randint(0,len(p)-1)]
 
 ### --------------------- dotsSideGig ----------------------
 
