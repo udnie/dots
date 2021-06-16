@@ -1,7 +1,7 @@
 import sys
 import os
 
-from PyQt5.QtCore    import Qt, QEvent, QObject, QTimer, QPointF, pyqtSlot
+from PyQt5.QtCore    import Qt, QEvent, QObject, QTimer, QPointF, QPoint, pyqtSlot
 from PyQt5.QtGui     import QColor, QPen
 from PyQt5.QtWidgets import QFileDialog, QGraphicsPathItem, QWidget, QGraphicsItemGroup
                             
@@ -27,6 +27,7 @@ class PathMaker(QWidget):
         self.canvas  = parent  
 
         self.scene   = parent.scene
+        self.view    = parent.view
         self.chooser = parent.chooser
         self.dots    = parent.dots
 
@@ -42,6 +43,8 @@ class PathMaker(QWidget):
             '{': self.sideWays.flipPath,
             '}': self.sideWays.flopPath,
         }
+
+        self.view.viewport().installEventFilter(self)
 
 ### --------------------------------------------------------
     def initThis(self):
@@ -112,21 +115,19 @@ class PathMaker(QWidget):
                 self.sideWays.shiftWayPts(key)
 
 ### ----------------- event filter..not used  ---------------
-    ''' PathMaker mouse events for drawing a path.
-        Saving this for now - possible use in a multiple 
-        window app. '''
-    # def eventFilter(self, source, e):  
-    #     if self.canvas.pathMakerOn and self.newPathSet:
-    #         if e.type() == QEvent.MouseButtonPress:
-    #             self.npts = 0  
-    #             self.addNewPts(QPoint(e.pos()))
-    #         elif e.type() == QEvent.MouseMove:
-    #             self.addNewPts(QPoint(e.pos()))      
-    #         elif e.type() == QEvent.MouseButtonRelease:
-    #             self.addNewPts(QPoint(e.pos()))
-    #             self.updateNewPath()    
-    # #         return False
-    #     return QWidget.eventFilter(self, source, e)
+    ''' PathMaker mouse events for drawing a path '''
+    def eventFilter(self, source, e):  
+        if self.canvas.pathMakerOn and self.newPathSet:
+            if e.type() == QEvent.MouseButtonPress:
+                self.npts = 0  
+                self.addNewPathPts(QPoint(e.pos()))
+            elif e.type() == QEvent.MouseMove:
+                self.addNewPathPts(QPoint(e.pos()))      
+            elif e.type() == QEvent.MouseButtonRelease:
+                self.addNewPathPts(QPoint(e.pos()))
+                self.updateNewPath()    
+            return False
+        return QWidget.eventFilter(self, source, e)
 
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
@@ -137,6 +138,7 @@ class PathMaker(QWidget):
             self.pathMakerOff()
         else:
             self.canvas.pathMakerOn = True
+            self.scene.clear()
             self.initThis()
             if not self.sliders.pathMenuSet:
                 self.sliders.toggleMenu()
@@ -154,6 +156,7 @@ class PathMaker(QWidget):
         self.removeWayPtTags()
         self.removeNewPath()
         self.pathChooserOff() 
+        self.scene.clear()
         self.initThis()
       
     def pathMakerOff(self):
@@ -336,4 +339,6 @@ class PathMaker(QWidget):
             self.pathTestSet = False
 
 ### -------------------- dotsPathMaker ---------------------
+
+
 

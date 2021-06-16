@@ -91,34 +91,22 @@ class DropCanvas(QWidget):
         #     self.mapper.updateMap()  ## redraw mapper
 
 ### --------------------------------------------------------
-    ''' Problem: Starting a new path drawing session can lose focus if 
-    it's started again after displaying pointItems or if started after either 
-    running play or pixtest. The mouse events used by the newPath functions 
-    no-longer respond - it doesn't stop drawing. Annoying but not fatal.
-    I'm pretty sure the problem is with this eventFilter though focus and 
-    ownership may also be involved. It probably would have been a better 
-    solution if the eventFilter for newPath was in pathMaker but I wasn't 
-    sure how to wire it up. There are no problems interacting with the background 
-    functions once pathMaker is lit as initBkg doesn't use mouse tracking. 
+    ''' Problem: Starting a new path drawing session, typing 'N' in 
+    pathMaker, will immeadiately start drawing without having to register
+    a mousePress event if entered after displaying pointItems or 
+    if started after either running play or pixtest. The mouse events used 
+    by the newPath functions no-longer respond - it won't stop drawing. 
+    Annoying but not fatal. I'm pretty sure the problem is with the eventFilter 
+    though scene ownership may also be involved. I just moved the event filter to
+    pathMaker and it seems to work thought not a fix. 
+    The one thing the three funtions, running an animation, pixtext, and displaying
+    pointItems have in common is they all add graphicsitems to the scene and delete 
+    them from the scene.  Hope that helps.
     Any help would be appreciated. I may want to add additional pathMaker
     like classes later and how to share the canvas would be useful. 
-    There's a commented-out copy of the filter for newPath in pathMaker 
-    for starters. Thanks in advance ..'''
-    ## pathMaker mouse events for drawing a path
-    def eventFilter(self, source, e):  
-        if self.pathMakerOn:
-            if self.pathMaker.newPathSet:
-                if e.type() == QEvent.MouseButtonPress:
-                    self.pathMaker.npts = 0  
-                    self.pathMaker.addNewPathPts(QPoint(e.pos()))
-                elif e.type() == QEvent.MouseMove:
-                    self.pathMaker.addNewPathPts(QPoint(e.pos()))    
-                elif e.type() == QEvent.MouseButtonRelease:
-                    self.pathMaker.addNewPathPts(QPoint(e.pos()))
-                    self.pathMaker.updateNewPath() 
-            return False
-        ## dropCanvas mouse events for selecting multiple pixItems    
-        elif not self.pathMakerOn:
+    Thanks in advance ..'''
+    def eventFilter(self, source, e):     
+        if not self.pathMakerOn:
             if e.type() == QEvent.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()   ## chks if set
