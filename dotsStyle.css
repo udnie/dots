@@ -35,6 +35,8 @@ QStatusBar {
   background: rgb(38, 168, 228);
   color: white;
   font-size: 13px;
+  font-weight: bold;
+  max-height: 20px;
 }
 
 QGroupBox {

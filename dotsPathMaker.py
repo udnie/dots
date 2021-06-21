@@ -25,11 +25,10 @@ class PathMaker(QWidget):
         super().__init__()
 
         self.canvas  = parent  
-
         self.scene   = parent.scene
         self.view    = parent.view
-        self.chooser = parent.chooser
         self.dots    = parent.dots
+        self.chooser = None       ## placeholder for popup_widget  
 
         self.initThis()
 
@@ -44,8 +43,9 @@ class PathMaker(QWidget):
             '}': self.sideWays.flopPath,
         }
 
+        self.setMouseTracking(True)
         self.view.viewport().installEventFilter(self)
-
+        
 ### --------------------------------------------------------
     def initThis(self):
         self.pts = []
@@ -256,10 +256,19 @@ class PathMaker(QWidget):
         self.addPath()
         self.sideWays.addWayPtTags()
 
+    def findTop(self):
+        for itm in self.scene.items():
+            return itm.zValue()
+        return 0
+
+    def printZ(self):  ## alternate
+        print(self.scene.items()[0].zValue())
+
     def addPointItems(self): 
-        idx = 0
+        idx = 0 
+        add = self.findTop() + 10 
         for pt in self.pts:  
-            self.scene.addItem(PointItem(self, pt, idx))
+            self.scene.addItem(PointItem(self, pt, idx, add))
             idx += 1
 
     def removePointItems(self):   
@@ -300,9 +309,14 @@ class PathMaker(QWidget):
         self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
         p = QPointF(0,-20)
         self.pointTag.setPos(pnt.pt+p)
-        # self.pointTag.setZValue(len(self.pts)*.5)
-        self.pointTag.setZValue(common['tagZ'])
+        self.pointTag.setZValue(self.findTop()+5)
         self.scene.addItem(self.pointTag)
+
+    def addWayPtTag(self, tag, pt):
+        self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
+        self.tag.setPos(pt)
+        self.tag.setZValue(common["tagZ"]+5) 
+        self.tagGroup.addToGroup(self.tag)
 
     def removePointTag(self):  ## single tag
         if self.pointTag:
@@ -313,12 +327,6 @@ class PathMaker(QWidget):
         self.tagGroup = QGraphicsItemGroup()
         self.scene.addItem(self.tagGroup)
         self.tagGroup.setZValue(common["tagZ"]+5)
-
-    def addWayPtTag(self, tag, pt):
-        self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
-        self.tag.setPos(pt)
-        self.tag.setZValue(common["tagZ"]+5) 
-        self.tagGroup.addToGroup(self.tag)
 
     def removeWayPtTags(self):   
         if self.tagGroup or self.wayPtsSet:

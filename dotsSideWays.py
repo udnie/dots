@@ -157,7 +157,7 @@ class SideWays():
         s = "(" + str("{:2d}".format(int(pt.x())))
         s = s + ", " + str("{:2d}".format(int(pt.y()))) + ")"
         s = s + "  " + str("{0:.2f}%".format(pct)) 
-        s = s + "  " + str("{:2d}".format(idx))
+        s = s + "  " + str("{0:2d}".format(idx))
         return s
 
     def shiftWayPts(self, key):  
@@ -178,9 +178,13 @@ class SideWays():
             self.updateWayPts()
 
     def updateWayPts(self):
+        bol = self.pathMaker.pointItemsSet()
+        if bol: self.pathMaker.removePointItems()
         self.pathMaker.removeWayPtTags()
+        self.pathMaker.removePath()
         self.pathMaker.addPath()
         self.addWayPtTags()
+        if bol: self.pathMaker.addPointItems()
 
 ### --------------------------------------------------------
     def pathTest(self):

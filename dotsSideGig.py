@@ -22,7 +22,7 @@ PlayKeys = ('resume','pause')
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
     
-    def __init__(self, parent, pt, idx):
+    def __init__(self, parent, pt, idx, add):
         super().__init__()
 
         self.pathMaker = parent
@@ -30,7 +30,7 @@ class PointItem(QGraphicsEllipseItem):
         self.pt = pt
         self.idx = idx
 
-        self.setZValue(idx) 
+        self.setZValue(idx+add) 
         self.type = 'pt'
      
         v = 6  ## so its centered
