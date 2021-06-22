@@ -36,7 +36,6 @@ class DropCanvas(QWidget):
         self.scene = QGraphicsScene(self)
         self.view  = ControlView(self)
 
-        self.chooser = None       ## placeholder for popup_widget   
         self.control = ''         ## shared
         self.pathMakerOn = False  ## shared
         self.openPlayFile = ''    ## shared 
@@ -63,6 +62,7 @@ class DropCanvas(QWidget):
         self.origin = QPoint(0,0)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
  
+        self.setMouseTracking(True)
         self.view.viewport().installEventFilter(self)
         self.view.keysSignal[str].connect(self.setKeys)
         
@@ -131,11 +131,10 @@ class DropCanvas(QWidget):
                 if self.mapper.mapSet == False:
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas() 
-                elif self.mapper.mapSet and self.key == 'cmd':
+                if self.mapper.mapSet and self.key == 'cmd':
                     self.setKeys('')
-                elif self.hasHiddenPix() and self.key != 'cmd':
-                    self.mapper.removeMap()
-                elif self.mapper.mapSet and not self.scene.selectedItems():
+                if self.hasHiddenPix() and self.key != 'cmd' or \
+                    self.mapper.mapSet and not self.scene.selectedItems():
                     self.mapper.removeMap()
             elif e.type() == QEvent.MouseButtonDblClick and self.key != 'cmd':
                 ## to preseve selections dblclk on an selection otherwise it 
@@ -145,12 +144,11 @@ class DropCanvas(QWidget):
                     if self.mapper.mapSet:
                         self.mapper.removeMap()
                         self.setKeys('noMap')  
-            return False
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
-    def addPixItem(self, imgFile, x, y, clone, mirror):    
+    def addPixItem(self, imgFile, x, y, clone, mirror):   
         self.pixCount += 1  
         pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
         if clone != None: ## clone it

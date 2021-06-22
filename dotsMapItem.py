@@ -80,7 +80,7 @@ class InitMap():
     def addSelectionsFromCanvas(self):
         if not self.selections:
             self.mapSelections()
-        if self.selections:
+        if len(self.selections) > 0:
             self.addMapItem()
 
     def mapSelections(self):
@@ -100,12 +100,10 @@ class InitMap():
     def addMapItem(self):
         self.removeMapItem()
         self.mapSet = True
-
+        self.mapRect = self.mapBoundingRects()
         self.canvas.rubberBand.setGeometry(
             QRect(self.canvas.origin, 
             QSize(0,0)))
-
-        self.mapRect = self.mapBoundingRects()
         self.map = MapItem(self.mapRect, self)
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
@@ -124,14 +122,13 @@ class InitMap():
             self.mapRect = QRectF()
             self.selections = []
             self.mapSet = False
-
+       
     def removeMapItem(self):
         for pix in self.scene.items():
             if pix.type == 'map':
                 self.scene.removeItem(pix)
-            elif pix.type != 'map':
                 break
-
+ 
     def mapBoundingRects(self):
         tx, ty = common["ViewW"], common["ViewH"]
         bx, by = 0, 0
