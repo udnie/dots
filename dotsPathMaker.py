@@ -152,6 +152,7 @@ class PathMaker(QWidget):
                 "background-color: LIGHTGREEN")
 
     def delete(self):
+        self.delNewPath()
         self.stopPathTest()
         self.removePointItems()
         self.removeWayPtTags()
