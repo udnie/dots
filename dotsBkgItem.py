@@ -115,12 +115,10 @@ class Flat(QGraphicsPixmapItem):
     def __init__(self, color, canvas, zval=0):
         super().__init__()
 
-        self.canvas = canvas
-        self.scene  = canvas.scene
-
-        self.dots   = canvas.dots
-        self.mapper = self.canvas.mapper
-        self.initBkg = canvas.initBkg
+        self.canvas  = canvas
+        self.scene   = canvas.scene
+        self.dots    = canvas.dots
+        self.mapper  = self.canvas.mapper
         
         self.type = 'bkg'
         self.color = color
