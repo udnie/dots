@@ -25,14 +25,12 @@ class ControlView(QGraphicsView):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.canvas = parent   
-    
+        self.canvas = parent       
+        self.dots   = parent.dots
+
         self.setObjectName('ControlView')
         self.setScene(parent.scene)
-    
-        self.dots    = parent.dots
-        self.sliders = self.dots.sliderpanel  
-    
+      
         self.dragOver = False
     
         self.setRenderHints(QPainter.Antialiasing | 
@@ -90,7 +88,8 @@ class ControlView(QGraphicsView):
     ## Location I found that works best for reading keys
     ## especially the arrow keys
     def keyPressEvent(self, e):
-        key = e.key()  
+        key = e.key() 
+        mod = e.modifiers()
         if e.key() == 33 and self.canvas.pathMakerOn:  ## '!' on a mac
             self.setKey('!')
         elif key in (Qt.Key_Backspace, Qt.Key_Delete):  ## can vary
@@ -105,12 +104,14 @@ class ControlView(QGraphicsView):
                 self.canvas.flopSelected()  
             elif key == Qt.Key_P:
                 self.canvas.mapper.togglePaths() 
-                # self.setKey('P')  ## your choice
             elif key == Qt.Key_T:
                 if self.canvas.pathMakerOn:
-                    self.setKey('T') ## if pathMaker on
+                    self.setKey('T')      ## run test if pathMaker on
+                elif mod & Qt.ShiftModifier:
+                    self.canvas.mapper.toggleTagItems('select')
                 else:  
-                    self.canvas.mapper.toggleTagItems()
+                    self.canvas.mapper.toggleTagItems('all')
+        ## A,H,U,Z
         elif key in self.direct: 
             self.direct[key]()  ## OK...
         ## too many references
@@ -118,11 +119,14 @@ class ControlView(QGraphicsView):
             if key == Qt.Key_G:
                 self.canvas.sideCar.toggleGrid() 
             elif key == Qt.Key_K:
-                self.sliders.toggleMenu()
+                self.dots.sliderpanel.toggleMenu()
             elif key == Qt.Key_M:
                 self.canvas.mapper.toggleMap()
-        elif key in singleKeys: ## in dotsShared.py
-            self.setKey(singleKeys[key])
+        elif key in singleKeys: ## in dotsShared.py   
+            if key in (Qt.Key_L, Qt.Key_R) and mod & Qt.ShiftModifier:
+                self.canvas.togglePixLocks(singleKeys[key])
+            else:
+                self.setKey(singleKeys[key]) 
         elif e.key() in ExitKeys:
             self.canvas.exit() 
 

@@ -22,16 +22,21 @@ PlayKeys = ('resume','pause')
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
     
-    def __init__(self, parent, pt, idx, add):
+    def __init__(self, canvas, pt, idx, add):
         super().__init__()
 
-        self.pathMaker = parent
+        self.canvas = canvas
+        self.scene  = canvas.scene
+
+        self.pathMaker = self.canvas.pathMaker
+        self.sideWays = self.canvas.pathMaker.sideWays
       
         self.pt = pt
         self.idx = idx
+        self.setZValue(int(idx+add)) 
 
-        self.setZValue(idx+add) 
         self.type = 'pt'
+        self.pointTag = ''
      
         v = 6  ## so its centered
         self.setRect(pt.x()-v*.5, pt.y()-v*.5, v, v)
@@ -44,24 +49,35 @@ class PointItem(QGraphicsEllipseItem):
 
  ### --------------------------------------------------------
     def hoverEnterEvent(self, e):
-        if self.pathMaker.pathSet:
-            self.pathMaker.addPointTag(self)   
-   
+        if self.pathMaker.pathSet:  
+            pct = (self.idx/len(self.pathMaker.pts))*100
+            tag = self.sideWays.makePtsTag(self.pt, self.idx, pct)
+            self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
+            p = QPointF(0,-20)
+            self.pointTag.setPos(self.pt+p)
+            self.pointTag.setZValue(self.pathMaker.findTop()+5)
+            self.scene.addItem(self.pointTag)
+        e.accept()
+
     def hoverLeaveEvent(self, e):
-        if self.pathMaker.pathSet:
-            self.pathMaker.removePointTag() 
+        self.removePointTag()
+        e.accept()
 
     def mousePressEvent(self, e):    
-        if self.pathMaker.key not in ('del','opt'):   
-            return
-        self.pathMaker.removePointTag()
-        if self.pathMaker.key == 'del':  
-            self.pathMaker.delPointItem(self)
-        elif self.pathMaker.key == 'opt': 
-            self.pathMaker.insertPointItem(self)
-        self.pathMaker.key = ''
+        if self.pathMaker.key in ('del','opt'):   
+            self.removePointTag()
+            if self.pathMaker.key == 'del':  
+                self.pathMaker.delPointItem(self)
+            elif self.pathMaker.key == 'opt': 
+                self.pathMaker.insertPointItem(self)
+            self.pathMaker.key = ''
         e.accept()
         
+    def removePointTag(self):
+        if self.pointTag:
+            self.scene.removeItem(self.pointTag)
+            self.pointTag = ''
+
 ### --------------------------------------------------------
 class MsgBox(QMessageBox):  ## thanks stackoverflow
 
@@ -96,7 +112,7 @@ class TagIt(QGraphicsSimpleTextItem):
     
     def __init__(self, control, tag, color, zval=None):
         super().__init__()
-
+    
         if control in PlayKeys and "Random" in tag:
             tag = tag[7:]
             self.color = QColor(0,255,127)
@@ -108,7 +124,10 @@ class TagIt(QGraphicsSimpleTextItem):
             self.color = QColor(color)
         else:
             self.color = QColor(255,165,0)
-            if "Random" in tag: tag = tag[0:6] 
+            if "Locked Random" in tag:
+                tag = tag[0:13] 
+            elif "Random" in tag:
+                tag = tag[0:6] 
         if color:
             self.color = QColor(color)
 
@@ -151,8 +170,6 @@ class DoodleMaker(QWidget):
         super().__init__()
 
         self.pathMaker = parent
-        self.sideWays  = self.pathMaker.sideWays
-
         self.resize(530,320)
 
         widget = QWidget()
@@ -182,7 +199,6 @@ class Doddle(QLabel):
         super().__init__()
 
         self.pathMaker = parent
-        self.sideWays  = self.pathMaker.sideWays
    
         self.file = file
         scalor = .10

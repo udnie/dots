@@ -35,8 +35,12 @@ I use the graphicsitem **zValue()** as a means to order the six graphic types wh
   
   
 ## Changes
+**July 2021:**		
+Holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** either locked or unlocked. The second method, **shift-R**, sets **all pixItems** to locked. The last, **apostrophe**, toggles individual pixItems. You will need to save the changes for them to take effect. The annoyance still persists. Still working on it.
+
+
 **June 2021:**  
-Decided to change things around again and reassigned some keys from February changes. In dropCanvas **'R'**, for run, replaces **'P'** for play. Typing **'R'** on a blank screen will run the demo or any play file you've set in dotsShared under 'runThis'. **'P'** will toggle paths replacing **'O'** - from February again. In pathMaker **'P'**, under wayPoint to show pointItems, has been replaced with **'V'** to view pointItems. Changed statusbar color. No video. The annoyance still persists.  Still working on it.
+Decided to change things around again and reassigned some keys from February changes. In dropCanvas **'R'**, for run, replaces **'P'** for play. Typing **'R'** on a blank screen will run the demo or any play file you've set in dotsShared under 'runThis'. **'P'** will toggle paths replacing **'O'** - from February again. In pathMaker **'P'**, under wayPoint to show pointItems, has been replaced with **'V'** to view pointItems. Changed status-bar color. No video. The annoyance still persists.  Still working on it.
 
 
 **April 2021:**  

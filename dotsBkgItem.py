@@ -24,13 +24,11 @@ class BkgItem(QGraphicsPixmapItem):
     def __init__(self, imgFile, canvas, zval=0):
         super().__init__()
 
-        self.canvas  = canvas
-        self.scene   = canvas.scene
-
-        self.mapper  = self.canvas.mapper
-        self.dots    = canvas.dots
-        self.initBkg = canvas.initBkg
- 
+        self.canvas = canvas
+        self.scene  = canvas.scene
+        self.dots   = canvas.dots
+        self.mapper = self.canvas.mapper
+       
         self.ViewW = common["ViewW"]
         self.ViewH = common["ViewH"]
 
@@ -44,6 +42,8 @@ class BkgItem(QGraphicsPixmapItem):
             Qt.SmoothTransformation)
 
         self.key = ""
+        self.id = 0          ## not used except for conisistency
+        self.locked = False  ## not used except by json r/w
 
         self.type = 'bkg'
         self.flopped = False
@@ -71,7 +71,7 @@ class BkgItem(QGraphicsPixmapItem):
     def mousePressEvent(self, e):
         if self.canvas.key == 'del':       # delete it
             self.scene.removeItem(self)
-            self.initBkg.disableBkgBtns()
+            self.canvas.initBkg.disableBkgBtns()
             self.dots.btnAddBkg.setEnabled(True)
         elif self.canvas.key == '/':    # send to back
             ## lastZval uses the string to return the last zvalue
@@ -126,6 +126,7 @@ class Flat(QGraphicsPixmapItem):
         self.color = color
         self.fileName = 'flat'
         self.key = ""
+        self.id = 0   
 
         self.setZValue(zval)
 
@@ -140,7 +141,7 @@ class Flat(QGraphicsPixmapItem):
     def mousePressEvent(self, e):
         if self.canvas.key == 'del':     
             self.scene.removeItem(self)
-            self.initBkg.disableBkgBtns()
+            self.canvas.initBkg.disableBkgBtns()
             self.dots.btnAddBkg.setEnabled(True)
         elif self.canvas.key == '/':   
             self.setZValue(self.mapper.lastZval('bkg')-1)
@@ -153,15 +154,14 @@ class InitBkg(QWidget):
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas = parent
-        self.scene  = parent.scene
-        self.dots   = parent.dots
-     
-        self.mapper   = self.canvas.mapper
-        self.sideShow = self.canvas.sideShow
-        self.sliders  = self.dots.sliderpanel
+        self.canvas  = parent
+        self.scene   = parent.scene
+        self.dots    = parent.dots 
 
-        self.sliders.sliderSignal[str, int].connect(self.mapKeys)
+        self.mapper  = self.canvas.mapper
+        self.sliders = self.dots.sliderpanel
+
+        self.dots.sliderpanel.sliderSignal[str, int].connect(self.mapKeys)
 
 ### --------------------------------------------------------
     @pyqtSlot(str, int)
@@ -177,9 +177,10 @@ class InitBkg(QWidget):
             self.bkg.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
         self.bkg.update()
 
+### --------------------------------------------------------
     def openBkgFiles(self):
         Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self,
+        file, _ = Q.getOpenFileName(self.canvas,
             "Choose an image file to open", paths["bkgPath"],
             "Images Files(*.bmp *.jpg *.png *.bkg)")
         if file:
@@ -188,9 +189,10 @@ class InitBkg(QWidget):
             else:
                 self.addBkg(file)
 
-    def addBkg(self, file, flopped=False): ## also used by saveBkg
-        if self.mapper.mapSet:
-            self.mapper.removeMap()
+    def addBkg(self, file, flopped=False): ## also used by saveBkg'
+        if self.canvas.pathMakerOn == False:
+            if self.mapper.mapSet:
+                self.mapper.removeMap()
         self.bkg = BkgItem(file, self.canvas)
         self.scene.addItem(self.bkg)
         if file.endswith('-bkg.jpg'):
@@ -282,7 +284,7 @@ class InitBkg(QWidget):
             ## seems to work best in descending order
             for itm in self.scene.items():
                 if itm.type == 'bkg' and itm.zValue() <= common['bkgZ']:
-                    itm.setZValue(self.canvas.mapper.lastZval('bkg')-1)
+                    itm.setZValue(self.mapper.lastZval('bkg')-1)
         self.settingBkgMsg()
 
     def settingBkgMsg(self):
@@ -296,8 +298,9 @@ class InitBkg(QWidget):
     def snapShot(self):
         if self.hasBackGround() or self.scene.items():
             self.canvas.unSelect()  ## turn off any select borders
-            if self.mapper.mapSet:
-                self.mapper.removeMap()
+            if self.canvas.pathMakerOn == False:
+                if self.mapper.mapSet:
+                    self.mapper.removeMap()
             if self.canvas.openPlayFile == '':
                 snap = "dots_" + snapTag() + ".jpg"
             else:
@@ -305,7 +308,7 @@ class InitBkg(QWidget):
                 snap = snap[:-5] + ".jpg"
             if snap[:4] != "dots":  ## always ask unless
                 Q = QFileDialog()
-                f = Q.getSaveFileName(self, paths["snapShot"],
+                f = Q.getSaveFileName(self.canvas, paths["snapShot"],
                     paths["snapShot"] + snap)
                 if not f[0]:
                     return

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication, QStatusBar, QMainWindow
 
 import dotsDropCanvas   as dropCanvas
 import dotsScrollPanel  as scrollPanel
-import dotsSliderPanel  as sliderPanel
+import dotsSliderPanel as sliderPanel
 import dotsSideCar      as sideCar
 
 from dotsShared     import common
@@ -21,7 +21,7 @@ class DotsQt(QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
 
-        ## the sliderpanel needs to be referenced by canvas
+        ## the sliderpanel needs to be referenced before canvas
         self.sliderpanel = sliderPanel.SliderPanel(self)
         self.canvas = dropCanvas.DropCanvas(self)
       
@@ -45,7 +45,6 @@ class DotsQt(QMainWindow):
      
         ## just in case the sprite directory is missing
         QTimer.singleShot(200, self.canvas.loadSprites)
-
         sideCar.setCursor()  
         self.show()
 
@@ -58,6 +57,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle('QtCurve') 
     dots = DotsQt()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 ### ----------------------- dotsQt -----------------------

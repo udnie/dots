@@ -24,10 +24,10 @@ Tick = 3  ## points to move using arrow keys
 ### --------------------------------------------------------
 class SideWays():
 
-    def __init__(self, parent):
+    def __init__(self, pathMaker):
         super().__init__()
  
-        self.pathMaker = parent
+        self.pathMaker = pathMaker
            
 ### ----------------------- paths --------------------------
     def centerPath(self):
@@ -195,17 +195,17 @@ class SideWays():
                 node = Node(self.pathMaker.ball)
                 self.pathMaker.ball.setZValue(50)
 
-                self.pathMaker.pathBall = QPropertyAnimation(node, b'pos')
-                self.pathMaker.pathBall.setDuration(10000)  ## 10 seconds
+                self.pathMaker.pathTestNode = QPropertyAnimation(node, b'pos')
+                self.pathMaker.pathTestNode.setDuration(10000)  ## 10 seconds
 
                 waypts = self.setPaintPath(True) ## close subpath
                 pt = sidePath.getOffset(self.pathMaker.ball)
 
-                self.pathMaker.pathBall.setStartValue(waypts.pointAtPercent(0.0)-pt)
+                self.pathMaker.pathTestNode.setStartValue(waypts.pointAtPercent(0.0)-pt)
                 for i in range(1, 99):   
-                    self.pathMaker.pathBall.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
-                self.pathMaker.pathBall.setEndValue(waypts.pointAtPercent(1.0)-pt)  
-                self.pathMaker.pathBall.setLoopCount(-1) 
+                    self.pathMaker.pathTestNode.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
+                self.pathMaker.pathTestNode.setEndValue(waypts.pointAtPercent(1.0)-pt)  
+                self.pathMaker.pathTestNode.setLoopCount(-1) 
 
                 self.pathMaker.startPathTest()
             else:
@@ -260,7 +260,7 @@ class SideWays():
             MsgBox("openFiles: Clear Scene First")
             return
         Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self.pathMaker,
+        file, _ = Q.getOpenFileName(self.pathMaker.canvas,
             "Choose a path file to open", paths["paths"],
             "Files(*.path)")
         Q.accept()
@@ -271,10 +271,13 @@ class SideWays():
        
     def savePath(self):
         if self.pathMaker.pts:
+            if self.pathMaker.newPathSet != False: 
+                MsgBox("savePath: Close the new path using 'cmd'")  
+                return
             Q = QFileDialog()
             if self.pathMaker.openPathFile == '':
                 self.pathMaker.openPathFile = paths["paths"] + 'tmp.path'
-            f = Q.getSaveFileName(self.pathMaker,
+            f = Q.getSaveFileName(self.pathMaker.canvas,
                 paths["paths"],
                 self.pathMaker.openPathFile)
             Q.accept()

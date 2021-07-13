@@ -24,16 +24,15 @@ class PathMaker(QWidget):
     def __init__(self, parent):  
         super().__init__()
 
-        self.canvas  = parent  
-        self.scene   = parent.scene
-        self.view    = parent.view
-        self.dots    = parent.dots
-        self.chooser = None       ## placeholder for popup_widget  
+        self.canvas   = parent  
+        self.scene    = parent.scene
+        self.view     = parent.view
+        self.dots     = parent.dots
 
-        self.initThis()
-
-        self.sliders  = self.dots.sliderpanel  ## for toggling key menu       
+        self.chooser  = None ## placeholder for popup_widget   
         self.sideWays = SideWays(self)  ## extends pathMaker
+        
+        self.initThis()
     
         self.direct = {
             'F': self.sideWays.openFiles,
@@ -65,7 +64,7 @@ class PathMaker(QWidget):
         self.path = None                 
         self.newPath = None
 
-        self.pathBall = None
+        self.pathTestNode = None
         self.tagGroup = None        
 
         self.pathTestSet = False
@@ -95,7 +94,7 @@ class PathMaker(QWidget):
                     if not self.newPathSet:
                         self.addNewPath()
                     else:
-                        self.newPathOff()  ## changed your mind
+                        self.delNewPath()  ## changed your mind
                         self.delete()
         ## not waypts and not new path
         elif not self.wayPtsSet and not self.newPathSet:
@@ -117,16 +116,19 @@ class PathMaker(QWidget):
 ### ----------------- event filter..not used  ---------------
     ''' PathMaker mouse events for drawing a path '''
     def eventFilter(self, source, e):  
-        if self.canvas.pathMakerOn and self.newPathSet:
-            if e.type() == QEvent.MouseButtonPress:
+        if self.canvas.pathMakerOn: 
+
+            if e.type() == QEvent.MouseButtonPress and self.newPathSet:
                 self.npts = 0  
                 self.addNewPathPts(QPoint(e.pos()))
-            elif e.type() == QEvent.MouseMove:
-                self.addNewPathPts(QPoint(e.pos()))      
-            elif e.type() == QEvent.MouseButtonRelease:
+        
+            elif e.type() == QEvent.MouseMove and self.newPathSet:
+                self.addNewPathPts(QPoint(e.pos()))    
+            
+            elif e.type() == QEvent.MouseButtonRelease and self.newPathSet:
                 self.addNewPathPts(QPoint(e.pos()))
-                self.updateNewPath()    
-            return False
+                self.updateNewPath()  
+        
         return QWidget.eventFilter(self, source, e)
 
 ### --------------------------------------------------------
@@ -134,17 +136,17 @@ class PathMaker(QWidget):
         if self.scene.items() and not self.canvas.pathMakerOn:
             MsgBox("Clear Scene First to run PathMaker")
             return
-        elif self.canvas.pathMakerOn:
+        if self.canvas.pathMakerOn:
             self.pathMakerOff()
         else:
-            self.canvas.pathMakerOn = True
-            self.scene.clear()
+            self.canvas.clear()
+            self.canvas.pathMakerOn = True 
             self.initThis()
-            if not self.sliders.pathMenuSet:
-                self.sliders.toggleMenu()
+            if not self.dots.sliderpanel.pathMenuSet:
+                self.dots.sliderpanel.toggleMenu()
             self.turnGreen()
             # QTimer.singleShot(200, self.pathChooser)  ## optional
-
+      
     def turnGreen(self):
         self.dots.btnPathMaker.setStyleSheet(
                 "background-color: LIGHTGREEN")
@@ -152,8 +154,8 @@ class PathMaker(QWidget):
     def delete(self):
         self.stopPathTest()
         self.removePointItems()
-        self.removePath()
         self.removeWayPtTags()
+        self.removePath()
         self.removeNewPath()
         self.pathChooserOff() 
         self.scene.clear()
@@ -162,8 +164,8 @@ class PathMaker(QWidget):
     def pathMakerOff(self):
         self.delete()   
         self.canvas.pathMakerOn = False
-        if self.sliders.pathMenuSet:
-            self.sliders.toggleMenu()
+        if self.dots.sliderpanel.pathMenuSet:
+            self.dots.sliderpanel.toggleMenu()
         self.dots.btnPathMaker.setStyleSheet(
             "background-color: white")
 
@@ -181,7 +183,7 @@ class PathMaker(QWidget):
         self.pathChooserSet = False
 
 ### -------------------- new path -------------------------
-    def addNewPathPts(self, pt):  ## called by dropCanvas eventfilter
+    def addNewPathPts(self, pt): 
         if self.npts == 0:
             self.pts.append(pt)
         self.npts += 1
@@ -192,24 +194,19 @@ class PathMaker(QWidget):
     def addNewPath(self):
         self.dots.btnPathMaker.setStyleSheet(
             "background-color: rgb(215,165,255)")
-        self.initNewPath(True)
- 
-    def initNewPath(self, bool):
+        self.newPathSet = True
         self.newPath = None
-        self.newPathSet = bool
-        self.pts = []
         self.npts = 0
-
-    def closeNewPath(self):  ## applies only to newPath
+        self.pts = []
+ 
+    def closeNewPath(self):  ## applies only to adding a path
         self.removeNewPath()  
         self.addPath()  ## add the completed path
         self.turnGreen()
 
-    def newPathOff(self):
+    def delNewPath(self):  ## changed your mind, doesn't save pts
         if self.newPathSet:
-            if self.newPath:
-                self.scene.removeItem(self.newPath)
-            self.initNewPath(False)
+            self.removeNewPath()
             self.turnGreen()
             
     def updateNewPath(self):
@@ -226,6 +223,7 @@ class PathMaker(QWidget):
             self.scene.removeItem(self.newPath)
             self.newPathSet = False
             self.newPath = None
+            self.npts = 0
            
 ### -------------------- path stuff ------------------------
     def addPath(self):
@@ -261,14 +259,14 @@ class PathMaker(QWidget):
             return itm.zValue()
         return 0
 
-    def printZ(self):  ## alternate
+    def printZ(self):  ## only if there's something there
         print(self.scene.items()[0].zValue())
 
     def addPointItems(self): 
         idx = 0 
         add = self.findTop() + 10 
         for pt in self.pts:  
-            self.scene.addItem(PointItem(self, pt, idx, add))
+            self.scene.addItem(PointItem(self.canvas, pt, idx, add))
             idx += 1
 
     def removePointItems(self):   
@@ -303,25 +301,12 @@ class PathMaker(QWidget):
         self.sideWays.addWayPtTags()
         if bool: self.addPointItems()
 
-    def addPointTag(self, pnt):  ## single tag
-        pct = (pnt.idx/len(self.pts))*100
-        tag = self.sideWays.makePtsTag(pnt.pt, pnt.idx, pct)
-        self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
-        p = QPointF(0,-20)
-        self.pointTag.setPos(pnt.pt+p)
-        self.pointTag.setZValue(self.findTop()+5)
-        self.scene.addItem(self.pointTag)
-
+### ------------- wayPtTags and pathTest -------------------
     def addWayPtTag(self, tag, pt):
         self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
         self.tag.setPos(pt)
         self.tag.setZValue(common["tagZ"]+5) 
         self.tagGroup.addToGroup(self.tag)
-
-    def removePointTag(self):  ## single tag
-        if self.pointTag:
-            self.scene.removeItem(self.pointTag)
-            self.pointTag = ''
 
     def addWayPtTagsGroup(self):
         self.tagGroup = QGraphicsItemGroup()
@@ -336,14 +321,14 @@ class PathMaker(QWidget):
 
     def startPathTest(self):
         self.scene.addItem(self.ball)
-        self.pathBall.start()
+        self.pathTestNode.start()
         self.pathTestSet = True
 
     def stopPathTest(self): 
         if self.pathTestSet:  
-            self.pathBall.stop()
+            self.pathTestNode.stop()
             self.scene.removeItem(self.ball)
-            self.pathBall = None
+            self.pathTestNode = None
             self.pathTestSet = False
 
 ### -------------------- dotsPathMaker ---------------------

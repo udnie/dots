@@ -1,4 +1,7 @@
 import random
+import os
+
+from os import path
 
 from PyQt5.QtCore    import pyqtSignal, QAbstractAnimation
 from PyQt5.QtWidgets import QMenu, QRubberBand, QGraphicsScene,\
@@ -15,7 +18,7 @@ from dotsMapItem     import InitMap
 from dotsBkgItem     import *
 from dotsSideShow    import SideShow
 from dotsAnimation   import AnimeList
-from dotsPathMaker   import *
+from dotsPathMaker   import PathMaker
 
 Loops = ('L','R','P','S')
 PlayKeys = ('resume','pause')
@@ -40,14 +43,14 @@ class DropCanvas(QWidget):
         self.pathMakerOn = False  ## shared
         self.openPlayFile = ''    ## shared 
         self.pathList = []        ## used by animations, updated here
-
-        self.pathMaker = PathMaker(self)
+    
         self.mapper    = InitMap(self) 
-        self.sideCar   = SideCar(self) 
-
-        self.animation = Animation(self)
-        self.sideShow  = SideShow(self)
         self.initBkg   = InitBkg(self)
+        self.pathMaker = PathMaker(self)
+
+        self.sideCar   = SideCar(self) 
+        self.animation = Animation(self)    
+        self.sideShow  = SideShow(self)
         
         self.scene.setSceneRect(0, 0,
             common["ViewW"],
@@ -58,14 +61,15 @@ class DropCanvas(QWidget):
 
         self.key = ''
         self.pixCount = 0
-
+       
         self.origin = QPoint(0,0)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
  
         self.setMouseTracking(True)
         self.view.viewport().installEventFilter(self)
-        self.view.keysSignal[str].connect(self.setKeys)
-        
+
+        self.view.keysSignal[str].connect(self.setKeys)    
+
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def setKeys(self, key):
@@ -91,51 +95,62 @@ class DropCanvas(QWidget):
         #     self.mapper.updateMap()  ## redraw mapper
 
 ### --------------------------------------------------------
-    ''' Problem: Starting a new path drawing session, typing 'N' in 
+    ''' Problem: Starting a new path drawing session, by typing 'N' in 
     pathMaker, will immeadiately start drawing without having to register
-    a mousePress event if entered after displaying pointItems or 
-    if started after either running play or pixtest. The mouse events used 
-    by the newPath functions no-longer respond - it won't stop drawing. 
+    a mousePress event if entered after displaying pointItems or if 
+    started after either running an animation or pixtest. The mouse events 
+    used by the pathMaker newPath functions no-longer respond - it won't stop drawing. 
     Annoying but not fatal. I'm pretty sure the problem is with the eventFilter 
-    though scene ownership may also be involved. I just moved the event filter to
-    pathMaker and it seems to work thought not a fix. 
-    The one thing the three funtions, running an animation, pixtext, and displaying
-    pointItems have in common is they all add graphicsitems to the scene and delete 
-    them from the scene.  Hope that helps.
-    Any help would be appreciated. I may want to add additional pathMaker
-    like classes later and how to share the canvas would be useful. 
-    Thanks in advance ..'''
-    def eventFilter(self, source, e):     
+    though scene ownership may also be involved. 
+    The one thing animations, pixtext, and pointItems have in common is they
+    all add and delete graphicItems to and from the scene - which should 
+    be owned by dropCanvas, at least that's the idea.  Hope that helps.
+    I may want to add additional pathMaker like classes later and how to share 
+    the canvas would be useful.  Thanks in advance ..'''
+### --------------------------------------------------------
+    def eventFilter(self, source, e):   ## mapper controls 
         if not self.pathMakerOn:
+    
             if e.type() == QEvent.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()   ## chks if set
+
                 if self.key == 'cmd':         ## only used by eventFilter
                     self.mapper.clearMap()    ## set rubberband if mapset
                     self.unSelect()
-                elif self.hasHiddenPix() and self.mapper.selections:
+
+                elif self.hasHiddenPix() or self.mapper.selections:
                     if self.control not in PlayKeys:
                         self.mapper.updatePixItemPos()
+
             elif e.type() == QEvent.MouseMove:
+    
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.mapSet: 
                         self.mapper.removeMap()
                     self.rubberBand.show()
                     self.rubberBand.setGeometry(QRect(self.origin, 
                         e.pos()).normalized())
+
                 elif self.mapper.mapSet and not self.scene.selectedItems():
                     self.mapper.removeMap()
-                elif self.control not in PlayKeys:  ## animations running
+
+                elif self.control not in PlayKeys:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary 
+
             elif e.type() == QEvent.MouseButtonRelease:
+    
                 if self.mapper.mapSet == False:
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas() 
+
                 if self.mapper.mapSet and self.key == 'cmd':
                     self.setKeys('')
+
                 if self.hasHiddenPix() and self.key != 'cmd' or \
                     self.mapper.mapSet and not self.scene.selectedItems():
                     self.mapper.removeMap()
+
             elif e.type() == QEvent.MouseButtonDblClick and self.key != 'cmd':
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
@@ -148,7 +163,7 @@ class DropCanvas(QWidget):
     
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
-    def addPixItem(self, imgFile, x, y, clone, mirror):   
+    def addPixItem(self, imgFile, x, y, clone, mirror):  
         self.pixCount += 1  
         pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
         if clone != None: ## clone it
@@ -169,6 +184,21 @@ class DropCanvas(QWidget):
                 break
         if self.mapper.mapSet: 
             self.mapper.updateMap()
+
+    def togglePixLocks(self, key):
+        stub = ''
+        for pix in self.scene.items(): 
+            if pix.type == 'pix':
+                if key == 'R': 
+                    pix.locked = True
+                    stub = 'all'
+                elif key == 'L' and pix.isSelected():
+                    pix.togglelock()  ## wait to toggleTagItems
+                    stub = 'select'
+            elif pix.zValue() <= common["pathZ"]:
+                break
+        self.mapper.clearMap()
+        self.mapper.toggleTagItems(stub)
 
     def exit(self):
         self.clear()
@@ -265,7 +295,7 @@ class DropCanvas(QWidget):
 
     def ZDump(self):
         for pix in self.scene.items():
-            print(pix.zValue())
+            print(os.path.basename(pix.fileName), pix.id, pix.zValue())
         print("bkg: " + str(self.initBkg.hasBackGround()))
 
 ### --------------------------------------------------------

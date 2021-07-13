@@ -110,7 +110,7 @@ def addPlayBtnGroup(self):
     self.playGroup.setAlignment(Qt.AlignHCenter)
 
     btnLoad = QPushButton("Load")
-    self.btnPlay = QPushButton("Run")  
+    self.btnRun = QPushButton("Run")  
     self.btnPause = QPushButton("Pause")
     self.btnStop = QPushButton("Stop")
     self.btnSave = QPushButton("Save")
@@ -118,7 +118,7 @@ def addPlayBtnGroup(self):
     layout = QHBoxLayout()    
 
     layout.addWidget(btnLoad)  
-    layout.addWidget(self.btnPlay)      
+    layout.addWidget(self.btnRun)      
     layout.addWidget(self.btnPause)
     layout.addWidget(self.btnStop)
     layout.addWidget(self.btnSave)
@@ -127,8 +127,7 @@ def addPlayBtnGroup(self):
 
     btnLoad.clicked.connect(sideShow.loadPlay)
     self.btnSave.clicked.connect(sideShow.savePlay) 
-
-    self.btnPlay.clicked.connect(sideShow.play)
+    self.btnRun.clicked.connect(lambda: sideShow.keysInPlay('R'))
     self.btnPause.clicked.connect(sideShow.pause)
     self.btnStop.clicked.connect(sideShow.stop)
 

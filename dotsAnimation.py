@@ -52,7 +52,7 @@ class Animation():
         super().__init__()
 
         self.canvas    = parent 
-        self.pathMaker = parent.pathMaker
+        # self.pathMaker = parent.pathMaker
   
         self.singleFunctions = {  ## values are objects 
             'Vibrate': vibrate,  

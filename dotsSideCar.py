@@ -3,13 +3,14 @@ import os
 
 from os import path
 
-from PyQt5.QtCore    import Qt, QTimer, QPointF, pyqtSlot, QRectF,QSize
+from PyQt5.QtCore    import Qt, QTimer, QPointF, QPoint, pyqtSlot, QRectF,QSize
 from PyQt5.QtGui     import QCursor, QPixmap, QPainter, QBrush, QFontMetrics, \
                             QPen, QPolygonF, QColor, QFont
 from PyQt5.QtWidgets import QWidget, QGraphicsPixmapItem, QMessageBox, \
                             QGraphicsSimpleTextItem, QLabel, QDesktopWidget, \
                             QGraphicsItemGroup, QGraphicsLineItem, QScrollArea, \
-                            QGridLayout, QVBoxLayout
+                            QGridLayout, QVBoxLayout, QGraphicsDropShadowEffect, \
+                            QGraphicsWidget
 
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
@@ -26,26 +27,24 @@ class SideCar():
     def __init__(self, parent):
         super().__init__()
  
-        self.canvas = parent
+        self.parent = parent
         self.scene  = parent.scene
-        self.mapper = parent.mapper 
-    
-        self.sideWays = parent.pathMaker.sideWays
-        
+        self.mapper = parent.mapper
+      
         self.gridZ   = common["gridZ"] 
         self.gridSet = False
         self.gridGroup = None
 
 ### --------------------------------------------------------
     def pixTest(self):
-        if not self.canvas.pathMakerOn:  
-            self.canvas.pixCount = self.mapper.toFront(0)
+        if not self.parent.pathMakerOn:  
+            self.parent.pixCount = self.mapper.toFront()
             for _ in range(10):
-                self.canvas.pixCount += 1
+                self.parent.pixCount += 1
                 pix = PixItem(paths["spritePath"] + 'apple.png',
-                        self.canvas.pixCount,
+                        self.parent.pixCount,
                         0, 0, 
-                        self.canvas)
+                        self.parent)
                 x = int(constrain(
                         self.xy(common["ViewW"]),
                         pix.width, 
@@ -70,7 +69,10 @@ class SideCar():
         pix.setScale(scale)
         pix.setRotation(rotation)
         self.scene.addItem(pix)
-  
+
+        #     shadow = QGraphicsDropShadowEffect(blurRadius=10, xOffset=10, yOffset=5)
+        #     pix.setGraphicsEffect(shadow)
+
     def xy(self, max):
         return random.randrange(-40, max+40)
 
@@ -123,10 +125,10 @@ def setCursor():
     cur = QCursor()
     cur.setPos(QDesktopWidget().availableGeometry().center())
 
-def itemsPixcount(self):   ## not be used
+def itemsPixcount(self):   ## not used
     return sum(
         pix.type == 'pix' 
-        for pix in self.canvas.scene.items()
+        for pix in self.parent.scene.items()
     )
 
 ### ---------------------- dotsSideCar ---------------------

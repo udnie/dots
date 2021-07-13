@@ -43,6 +43,9 @@ class PixItem(QGraphicsPixmapItem):
         self.fileName = imgFile
    
         self.id = int(id)  ## used by mapper
+        self.side = ""     ## used by wings
+        self.locked = False
+
         self.x  = x
         self.y  = y
 
@@ -99,29 +102,35 @@ class PixItem(QGraphicsPixmapItem):
     @pyqtSlot(str)
     def setPixKeys(self, key):
         self.key = key  
-        if self.isHidden or self.isSelected():
+        if self.isHidden or self.isSelected() and \
+            self.locked == False:
             if key in RotateKeys:
                 self.rotateThis(key)
             elif key in ScaleKeys:
                 self.scaleThis(key)  
             elif key in MoveKeys:
                 self.moveThis(key)
-
+ 
 # ### --------------------------------------------------------
     def hoverLeaveEvent(self, e):
         self.mapper.clearTagGroup()
         e.accept()
 
     def setFlags(self, bool):
+        self.setFlag(QGraphicsPixmapItem.ItemIsSelectable, bool)  
         self.setFlag(QGraphicsPixmapItem.ItemIsMovable, bool)
-        self.setFlag(QGraphicsPixmapItem.ItemIsSelectable, bool)
-
+        if self.locked:
+            self.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+  
     def setMirrored(self, mirror):
         sideCar.mirrorSet(self, mirror)
 
     def mousePressEvent(self, e):   
         if self.canvas.control not in PlayKeys: 
-            if e.button() == Qt.RightButton:
+            if self.key == 'space' and e.button() == Qt.LeftButton:
+                self.mapper.toggleTagItems(self.id)
+            elif self.key == '\'': 
+                self.togglelock()  ## single tag
                 self.mapper.toggleTagItems(self.id)
             elif self.key == 'del':  # delete
                 self.deletePix()
@@ -130,7 +139,7 @@ class PixItem(QGraphicsPixmapItem):
                     self.setMirrored(False)
                 else:
                     self.setMirrored(True)
-            elif self.key in TagKeys:  
+            elif self.key in TagKeys: 
                 if self.key == '/':        # send to back of pixItems
                     p = self.mapper.lastZval('pix')-1
                 elif self.key in('enter','return'): # send to front
@@ -152,6 +161,14 @@ class PixItem(QGraphicsPixmapItem):
         self.anime.finished.connect(self.anime.stop)
         self.clearFocus()
  
+    def togglelock(self):
+        if self.locked == False:
+            self.locked = True
+            self.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+        else:
+            self.locked = False
+            self.setFlag(QGraphicsPixmapItem.ItemIsMovable, True)
+    
     def deletePix(self):
         if 'frame' in self.fileName:
             self.removeThis()
@@ -167,7 +184,7 @@ class PixItem(QGraphicsPixmapItem):
         self.scene.removeItem(self)
 
     def mouseMoveEvent(self, e):
-        if 'frame' in self.fileName:
+        if 'frame' in self.fileName or self.locked:
             return
         if self.canvas.control not in PlayKeys:
             if self.key in TagKeys or self.mapper.tagSet:
@@ -193,12 +210,12 @@ class PixItem(QGraphicsPixmapItem):
             e.accept()
 
     def clearTag(self):   ## reset canvas key to '' 
-        self.key == ""
         self.mapper.clearTagGroup()
         self.canvas.setKeys('') 
              
     def mouseDoubleClickEvent(self, e):
-        if 'frame' in self.fileName or self.key in TagKeys: 
+        if 'frame' in self.fileName or \
+            self.key in TagKeys or self.locked:
             return
         if self.canvas.control not in PlayKeys:
             if self.key == 'opt':  
@@ -294,7 +311,7 @@ class PixItem(QGraphicsPixmapItem):
               
     def setPixSizes(self, newW, newH):
         if newW < 100 or newH < 100:
-            newW, newH = 165, 165
+            newW, newH = 200, 200
         elif 'can_man' in self.fileName:   ## not included
             newW, newH = 300, 375   
         elif 'michelin' in self.fileName:  ## not included

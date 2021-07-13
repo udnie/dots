@@ -6,6 +6,7 @@ import time
 from os import path
 
 from PyQt5.QtCore    import QTimer
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect
 
 from dotsPixItem     import PixItem
 from dotsBkgItem     import *
@@ -33,25 +34,27 @@ class SideShow():
         if not self.scene.items():
             self.openPlay(paths["playPath"] + file)
             QTimer.singleShot(200, self.dummy)
-            self.play()
+            self.run()
   
     def dummy(self):
         pass
-
+    
     def keysInPlay(self, key):
         if key == 'L':
             if self.canvas.openPlayFile == '' and \
                 self.canvas.control == '':
                 self.loadPlay()
                 return
+            else:
+                pass
         elif key == 'P':  ## always
             self.mapper.togglePaths() 
             return
-        elif key == 'R' and self.canvas.control == '':  
+        elif key == 'R':    
             if len(self.scene.items()) == 0:
-                self.runThis(common['runThis'])  ## 
+                self.runThis(common['runThis'])  
             else:
-                self.play()   
+                self.run()
             return
         elif key == 'S' and self.canvas.control != '':
             self.stop()
@@ -76,7 +79,7 @@ class SideShow():
             with open(file, 'r') as fp:  ## read a play file
                 dlist = json.load(fp)
         except IOError:
-            MsgBox("openPlay: Error loading file")
+            MsgBox("openPlay: Error loading " + file, 5)
             return
         if dlist:
             self.mapper.clearMap()  ## just clear it
@@ -123,7 +126,7 @@ class SideShow():
             self.dots.statusBar.showMessage("Number of Pixitems:  {}".format(k),5000)
  
     def addPixToScene(self, pix, tmp):
-        pix.type = tmp['type']                    
+        pix.type = tmp['type']                 
         pix.x = float("{0:.2f}".format(tmp['x']))
         pix.y = float("{0:.2f}".format(tmp['y']))
         pix.setPos(pix.x,pix.y)
@@ -131,18 +134,22 @@ class SideShow():
         pix.setMirrored(tmp['mirror']),
         pix.rotation = tmp['rotation']
         pix.scale = float("{0:.4f}".format(tmp['scale']))
+        ## ------- adding keys to an existing json file -------
         if 'tag' not in tmp.keys():  ## seriously good to know
             tmp['tag'] = ''
         else:
-            pix.tag = tmp['tag']  
+            pix.tag = tmp['tag'] 
+        if 'locked' not in tmp.keys():  ## pix shares with bkg
+            tmp['locked'] = False
+        else:
+            pix.locked = tmp['locked']
         ## may require rotation or scaling - adds to scene items
         self.canvas.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
 
-    def play(self):  
+    def run(self):  
         if self.canvas.control != '': 
-            return
-        if self.mapper.mapSet:   
-            self.mapper.clearMap()
+            return 
+        self.mapper.clearMap()
         self.clearPathsandTags()  
         self.canvas.unSelect()
         if not self.canvas.pathList:  ## should already exist - moved from animations
@@ -164,11 +171,15 @@ class SideShow():
                     pix)   
                 k += 1
                 ''' increase the delay to start animation if demoPath  '''
-                if pix.tag.endswith('demo.path'):  
+                if pix.tag.endswith('demo.path'):   
                     r += 1
                     QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
                     if pix.anime: pix.anime.start()
+
+                # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)
+                # pix.setGraphicsEffect(shadow)
+
             elif pix.zValue() <= common["pathZ"]:
                 break 
         if k > 0:
@@ -199,8 +210,7 @@ class SideShow():
         self.setPauseKey()
  
     def stop(self, action=''):
-        self.clearPathsandTags()    
-        self.setPauseKey()
+        self.clearPathsandTags()  
         for pix in self.scene.items():
             if pix.type == 'pix':
                 if pix.anime: pix.anime.stop()  
@@ -211,7 +221,8 @@ class SideShow():
             elif pix.zValue() <= common["pathZ"]:
                 break
         self.enablePlay() 
-      
+        self.dots.btnPause.setText( "Pause" )
+   
     def savePlay(self):
         if self.canvas.pathMakerOn:    ## using load in pathMaker
             self.pathMaker.sideWays.savePath()
@@ -222,17 +233,12 @@ class SideShow():
             dlist = []  
             for pix in self.scene.items():
                 if pix.type in ("pix","bkg"):     
-                    # if 'frame' in pix.fileName and pix.scale > 2.0:
-                    #     continue   ## bad rec
                     if pix.fileName != 'flat' and \
                         not path.exists(pix.fileName):  ## note
                         continue   
                 if pix.type == "pix":      
                     dlist.append(self.returnPixBkg(pix))
                 elif pix.type == "bkg":
-                    if pix.fileName != 'flat' and \
-                        not path.exists(pix.fileName):  ## note
-                        continue   
                     if pix.fileName != 'flat': 
                         dlist.append(self.returnPixBkg(pix))
                     else:
@@ -273,6 +279,7 @@ class SideShow():
             "rotation": pix.rotation,
             "scale": float("{0:.4f}".format(pix.scale)),
             "tag": pix.tag,
+            "locked": pix.locked,
         }
         return tmp
     
@@ -292,14 +299,14 @@ class SideShow():
 
     def enablePlay(self):
         self.canvas.control = ''
-        self.dots.btnPlay.setEnabled(True)
+        self.dots.btnRun.setEnabled(True)
         self.dots.btnPause.setEnabled(False)
         self.dots.btnStop.setEnabled(False) 
         self.dots.btnSave.setEnabled(True) 
  
     def disablePlay(self):
         self.canvas.control = 'pause'
-        self.dots.btnPlay.setEnabled(False)
+        self.dots.btnRun.setEnabled(False)
         self.dots.btnPause.setEnabled(True)
         self.dots.btnStop.setEnabled(True)  
         self.dots.btnSave.setEnabled(False)  

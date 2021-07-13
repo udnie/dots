@@ -25,9 +25,8 @@ common = {
     "Margin":   13,
     "runThis":  "demo.play",
 }
-
           
-CanvasStr = "L,R,P,S,C,:,\",<,>,{,},[,],_,+,/,cmd,left,right,up,down,del,shift,opt,return,enter"   
+CanvasStr = "L,R,P,S,C,:,\",\',<,>,{,},[,],_,+,/,lock,space,cmd,left,right,up,down,del,shift,opt,return,enter"   
 PathStr = "F,S,C,D,N,T,P,R,W,V,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
 
 paths = {
@@ -58,6 +57,11 @@ keyMenu = (                    ## pixitems and bkgitems
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
     ('U', 'UnSelect All'),
+    ('Shift', '+L ToggleLocks'),
+    ('Shift', '+R Locks All'),
+    ('Shift', '+T TagSelected'),
+    ('Space', 'Show this Tag'),
+    ('\'', 'Toggle this lock'),
     ('X, Q', 'Escape to Quit'),
     ('Rtn', 'Enter to Front'),
     ('/', 'Clk to Back'),
@@ -85,7 +89,7 @@ pathMenu = (
     ("S", "Save Path"),
     ("T", "Test"),
     ("W", "Way Points"),
-    ("V", "..View WayPts"),
+    ("V", "..View Points"),
     ("/", "Path Color"),
     ("cmd", "Closes Path"),
     ('_/+', "Rotate 1 deg"),
@@ -133,13 +137,15 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_Control: 'cmd',
     Qt.Key_Enter: 'enter',
     Qt.Key_Return: 'return',
+    Qt.Key_Space: 'space',             
     Qt.Key_C: 'C',  
-    Qt.Key_L: 'L',
-    Qt.Key_N: 'N',   
+    Qt.Key_L: 'L',   
+    Qt.Key_N: 'N', 
     Qt.Key_O: 'O',  
     Qt.Key_P: 'P',
     Qt.Key_R: 'R',
     Qt.Key_S: 'S', 
+    Qt.Key_T: 'T',
     Qt.Key_V: 'V', 
     Qt.Key_W: 'W',  
     Qt.Key_Plus: '+',         
@@ -147,7 +153,8 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_Minus: '-',  
     Qt.Key_Less: '<',     
     Qt.Key_Greater: '>',
-    Qt.Key_Colon: ':',        
+    Qt.Key_Colon: ':',   
+    Qt.Key_Apostrophe: '\'',      
     Qt.Key_QuoteDbl: '"', 
     Qt.Key_Slash: '/',
     Qt.Key_Underscore: '_', 

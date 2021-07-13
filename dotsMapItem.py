@@ -5,7 +5,8 @@ from os import path
 
 from PyQt5.QtCore    import Qt, QTimer, QPointF, QSize, QRect, QRectF
 from PyQt5.QtGui     import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
+                            QGraphicsPixmapItem
 
 from dotsShared      import common, pathcolors
 from dotsSideGig     import TagIt, getColorStr
@@ -16,7 +17,7 @@ All = -999
 
 ### ---------------------- dotsMapItem ---------------------
 ''' dotsMapItem: handles the mapItem, tags and paths display.
-    Classes: MapItem, InitMap '''
+    Classes: MapItem, InitMap - uses self.parent for parent '''
 ### --------------------------------------------------------
 class MapItem(QGraphicsItem):
 
@@ -46,7 +47,8 @@ class MapItem(QGraphicsItem):
         QGraphicsItem.mousePressEvent(self, e)
 
     def mouseMoveEvent(self, e):
-        if self.mapper.tagSet: self.mapper.clearTagGroup()
+        if self.mapper.tagSet: 
+            self.mapper.clearTagGroup()
         QGraphicsItem.mouseMoveEvent(self, e)
 
     def mouseReleaseEvent(self, e):
@@ -58,8 +60,9 @@ class InitMap():
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas = parent
+        self.parent = parent
         self.scene  = parent.scene
+        self.dots   = parent.dots
 
         self.tagZ = 0
         self.pathTagZ = 0  ## only by paths
@@ -77,58 +80,42 @@ class InitMap():
         self.paths = []
       
 ### --------------------------------------------------------
-    def addSelectionsFromCanvas(self):
-        if not self.selections:
-            self.mapSelections()
-        if len(self.selections) > 0:
-            self.addMapItem()
-
-    def mapSelections(self):
+    def addSelectionsFromCanvas(self): ## uses rubberband to select items
+        k = 0
         self.selections = []
-        rect = QRect(self.canvas.rubberBand.geometry())
+        rect = QRect(self.parent.rubberBand.geometry())
         for pix in self.scene.items():
             if pix.type == 'pix':
+                if 'frame' in pix.fileName: 
+                    continue
                 p = pix.sceneBoundingRect()
                 x = int(p.x() + p.width()/2)
                 y = int(p.y() + p.height()/2)
-                if rect.contains(x, y):
+                if rect.contains(x, y):  
                     pix.setSelected(True)
                     self.selections.append(pix.id)
+                    if pix.locked:
+                        pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+                    k += 1
+                    # print(os.path.basename(pix.fileName), pix.isSelected(), pix.locked, pix.zValue())
             elif pix.zValue() <= common["pathZ"]: 
                 break
+        if k == 0:
+            self.clearMap()
+        else:
+            self.addMapItem()
  
     def addMapItem(self):
         self.removeMapItem()
         self.mapSet = True
         self.mapRect = self.mapBoundingRects()
-        self.canvas.rubberBand.setGeometry(
-            QRect(self.canvas.origin, 
+        self.parent.rubberBand.setGeometry(
+            QRect(self.parent.origin, 
             QSize(0,0)))
-        self.map = MapItem(self.mapRect, self)
+        self.map = MapItem(self.mapRect, self)  
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
 
-    def updateMap(self):
-        self.updatePixItemPos()
-        self.addMapItem()
-
-    def removeMap(self):
-        self.updatePixItemPos()
-        self.clearMap()
-
-    def clearMap(self):
-        if self.mapSet:
-            self.removeMapItem()
-            self.mapRect = QRectF()
-            self.selections = []
-            self.mapSet = False
-       
-    def removeMapItem(self):
-        for pix in self.scene.items():
-            if pix.type == 'map':
-                self.scene.removeItem(pix)
-                break
- 
     def mapBoundingRects(self):
         tx, ty = common["ViewW"], common["ViewH"]
         bx, by = 0, 0
@@ -146,9 +133,35 @@ class InitMap():
                     by = y + h
             elif pix.zValue() <= common["pathZ"]:
                 break
+        k = len(self.selections)
+        self.dots.statusBar.showMessage("Number Selected:  {}".format(k),2500)
         return QRectF(tx, ty, bx-tx, by-ty)
-        selections = []
+      
+    def clearMap(self):
+        if self.mapSet:
+            self.removeMapItem()
+            self.mapRect = QRectF()
+            # self.selections = []  ## not necessarily the selections
+            self.mapSet = False
 
+    def toggleMap(self):   ## not based on rubberband geometry
+        if self.mapSet == False:
+            self.selections = []  
+            for pix in self.scene.selectedItems():  ## only items selected
+                self.selections.append(pix.id)
+            if self.selections or self.parent.hasHiddenPix():
+                self.addMapItem()
+        else:
+            self.removeMap()
+
+    def updateMap(self):
+        self.updatePixItemPos()
+        self.addMapItem()
+
+    def removeMap(self):
+        self.updatePixItemPos()
+        self.clearMap()
+        
     def updatePixItemPos(self):
         for pix in self.scene.items():
             if pix.type == 'pix':
@@ -158,44 +171,53 @@ class InitMap():
             elif pix.zValue() <= common["pathZ"]:
                 break
 
-    def toggleMap(self):    
-        if self.mapSet == False:
-            self.selections = []
-            for pix in self.scene.selectedItems():
-                self.selections.append(pix.id)
-            if self.selections or self.canvas.hasHiddenPix():
-                self.addMapItem()
-        else:
-            self.removeMap()
+    def removeMapItem(self):
+        for pix in self.scene.items():
+            if pix.type == 'map':
+                self.scene.removeItem(pix)
+                break
 
 ### --------------------------------------------------------
-    def toggleTagItems(self, pid=All):  
-        if self.canvas.pathMakerOn:
+    def toggleTagItems(self, pid):  
+        if self.parent.pathMakerOn:
             return
         if self.tagSet: 
             self.clearTagGroup()
             self.clearPaths()  
             return
+        if self.mapSet:
+            self.clearMap()
         if self.scene.items():
             if self.pathSet:
                 QTimer.singleShot(200, self.clearPaths)
             self.addTagGroup()
-            k = 0
-            self.tagSet = False
-            for pix in self.scene.items():
-                if pix.type == 'pix':  
+            self.tagWorks(pid)
+
+    def tagWorks(self, pid):
+        k = 0
+        self.tagSet = False
+        if pid == '': 
+            pid = 'all'
+        for pix in self.scene.items():
+            if pix.type == 'pix':  
+                if pid == 'all':
+                    self.tagIt(pix) 
                     k += 1
-                    if pid == All:
-                        self.tagIt(pix) 
-                    elif pid == pix.id:  ## single tag
-                        self.tagIt(pix) 
-                        break
-                elif pix.zValue() <= common["pathZ"]:
+                # elif pid == 'select' and pix.isSelected():
+                elif pix.isSelected():
+                    self.tagIt(pix)
+                    k += 1
+                elif pid == pix.id:  ## single tag
+                    self.tagIt(pix) 
+                    k = 1
                     break
-            if k > 0: 
-                self.tagSet = True
-            else:
-                self.clearTagGroup()
+            elif pix.zValue() <= common["pathZ"]:
+                break
+        if k > 0: 
+            self.tagSet = True
+            self.dots.statusBar.showMessage("Number Tagged:  {}".format(k),2500)
+        else:
+            self.clearTagGroup()
 
     def addTagGroup(self):
         self.tagZ = self.toFront(20.0)   ## otherwise it can be hidden  
@@ -215,7 +237,10 @@ class InitMap():
         if 'frame' in pix.fileName: 
             x, y = common["ViewW"]*.47, common["ViewH"]-35
             pix.tag = ""
-        tag = TagIt(self.canvas.control, pix.tag, '', pix.zValue())
+        tag = pix.tag
+        if pix.locked == True:
+            tag = "Locked " + tag 
+        tag = TagIt(self.parent.control, tag, '', pix.zValue())
         tag.setPos(x,y)
         tag.setZValue(self.tagZ) 
         self.tagGroup.addToGroup(tag)
@@ -223,7 +248,7 @@ class InitMap():
 
 ### --------------------------------------------------------
     def togglePaths(self):
-        if self.canvas.pathMakerOn:
+        if self.parent.pathMakerOn:
             return
         if self.pathSet:
             self.clearPaths()
@@ -268,7 +293,7 @@ class InitMap():
             for pix in self.scene.items():
                 if pix.type == 'pix' and not pix.tag.endswith('.path'):
                     if pix.anime and pix.anime.state() == 1:  ## paused
-                        if self.canvas.control != 'resume':
+                        if self.parent.control != 'resume':
                             pix.anime.resume()
                 elif pix.zValue() <= common["pathZ"]:
                     break
@@ -310,7 +335,7 @@ class InitMap():
                 last = itm.zValue()
         return last
 
-    def toFront(self, inc):  ## finds the highest pixitem zValue
+    def toFront(self, inc=0):  ## finds the highest pixitem zValue
         first = 0           ## returns it plus the increment
         for pix in self.scene.items():
             if pix.type == 'pix': 
