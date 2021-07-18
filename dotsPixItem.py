@@ -32,7 +32,7 @@ RotationVals = {
 ''' dotsPixItem: primary dots screen object - like a sprite '''
 ### --------------------------------------------------------
 class PixItem(QGraphicsPixmapItem):
-    
+### --------------------------------------------------------
     def __init__(self, imgFile, id, x, y, parent, mirror=False):
         super().__init__()
 

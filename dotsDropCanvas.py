@@ -47,7 +47,7 @@ class DropCanvas(QWidget):
         self.mapper    = InitMap(self) 
         self.initBkg   = InitBkg(self)
         self.pathMaker = PathMaker(self)
-
+   
         self.sideCar   = SideCar(self) 
         self.animation = Animation(self)    
         self.sideShow  = SideShow(self)
@@ -94,22 +94,24 @@ class DropCanvas(QWidget):
         # if self.mapper.mapSet: ## already in sendPixKeys
         #     self.mapper.updateMap()  ## redraw mapper
 
-### --------------------------------------------------------
+### -------------- the annoyance starts here ---------------
     ''' Problem: Starting a new path drawing session, by typing 'N' in 
-    pathMaker, will immeadiately start drawing without having to register
-    a mousePress event if entered after displaying pointItems or if 
-    started after either running an animation or pixtest. The mouse events 
-    used by the pathMaker newPath functions no-longer respond - it won't stop drawing. 
-    Annoying but not fatal. I'm pretty sure the problem is with the eventFilter 
-    though scene ownership may also be involved. 
-    The one thing animations, pixtext, and pointItems have in common is they
-    all add and delete graphicItems to and from the scene - which should 
+    pathMaker will immeadiately start drawing without having to register a 
+    mousePress event if entered after displaying pointItems or if 
+    started after either running an animation or pixtest. 
+        The mouse events used by the pathMaker newPath functions no-longer respond -
+    it doesn't stop drawing. Annoying but not fatal. I'm pretty sure the problem 
+    is with the eventFilter in DrawingWidget though scene ownership may also be 
+    involved. 
+        The one thing animations, pixtext, and pointItems all have in common is 
+    they all add and delete graphicItems to and from the scene - which should 
     be owned by dropCanvas, at least that's the idea.  Hope that helps.
-    I may want to add additional pathMaker like classes later and how to share 
-    the canvas would be useful.  Thanks in advance ..'''
+        I may want to add additional pathMaker like classes/fearures later and 
+    knowing how to share the canvas would be useful - unless there's an 
+    another way to do this.  Many thanks in advance ..'''
 ### --------------------------------------------------------
-    def eventFilter(self, source, e):   ## mapper controls 
-        if not self.pathMakerOn:
+    def eventFilter(self, source, e):   ## mapper controls - this appears to work
+        if not self.pathMakerOn:        ## correctly
     
             if e.type() == QEvent.MouseButtonPress:
                 self.origin = QPoint(e.pos())
@@ -159,6 +161,7 @@ class DropCanvas(QWidget):
                     if self.mapper.mapSet:
                         self.mapper.removeMap()
                         self.setKeys('noMap')  
+
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
@@ -248,7 +251,8 @@ class DropCanvas(QWidget):
                 pix.anime.state() == QAbstractAnimation.Running:
                 pix.anime.stop()  
             pix.deletePix()
-        self.anySprites()
+            del pix
+        self.anySprites()  ## flip play keys
 
     def anySprites(self):
         for pix in self.scene.items():

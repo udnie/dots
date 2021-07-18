@@ -17,67 +17,7 @@ from dotsShared      import common, paths, pathcolors
 PlayKeys = ('resume','pause')
 
 ### ---------------------- dotsSideGig ---------------------
-''' dotsSideGigs: DoodleMaker, Pointitem, Doodle, TagIt, and 
-    MsgBox. '''
-### --------------------------------------------------------
-class PointItem(QGraphicsEllipseItem):
-    
-    def __init__(self, canvas, pt, idx, add):
-        super().__init__()
-
-        self.canvas = canvas
-        self.scene  = canvas.scene
-
-        self.pathMaker = self.canvas.pathMaker
-        self.sideWays = self.canvas.pathMaker.sideWays
-      
-        self.pt = pt
-        self.idx = idx
-        self.setZValue(int(idx+add)) 
-
-        self.type = 'pt'
-        self.pointTag = ''
-     
-        v = 6  ## so its centered
-        self.setRect(pt.x()-v*.5, pt.y()-v*.5, v, v)
-        self.setBrush(QColor("white"))
-
-        self.setFlag(QGraphicsEllipseItem.ItemIsMovable, False)
-        self.setFlag(QGraphicsEllipseItem.ItemIsSelectable, False)
-          
-        self.setAcceptHoverEvents(True)
-
- ### --------------------------------------------------------
-    def hoverEnterEvent(self, e):
-        if self.pathMaker.pathSet:  
-            pct = (self.idx/len(self.pathMaker.pts))*100
-            tag = self.sideWays.makePtsTag(self.pt, self.idx, pct)
-            self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
-            p = QPointF(0,-20)
-            self.pointTag.setPos(self.pt+p)
-            self.pointTag.setZValue(self.pathMaker.findTop()+5)
-            self.scene.addItem(self.pointTag)
-        e.accept()
-
-    def hoverLeaveEvent(self, e):
-        self.removePointTag()
-        e.accept()
-
-    def mousePressEvent(self, e):    
-        if self.pathMaker.key in ('del','opt'):   
-            self.removePointTag()
-            if self.pathMaker.key == 'del':  
-                self.pathMaker.delPointItem(self)
-            elif self.pathMaker.key == 'opt': 
-                self.pathMaker.insertPointItem(self)
-            self.pathMaker.key = ''
-        e.accept()
-        
-    def removePointTag(self):
-        if self.pointTag:
-            self.scene.removeItem(self.pointTag)
-            self.pointTag = ''
-
+''' dotsSideGigs: DoodleMaker, Doodle, TagIt, and MsgBox. '''
 ### --------------------------------------------------------
 class MsgBox(QMessageBox):  ## thanks stackoverflow
 

@@ -20,7 +20,7 @@ import dotsSideCar as sideCar
     items.  Includes BkgItem, Flat and InitBkg classes. '''
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):
-
+### --------------------------------------------------------
     def __init__(self, imgFile, canvas, zval=0):
         super().__init__()
 
@@ -111,7 +111,7 @@ class BkgItem(QGraphicsPixmapItem):
 
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):
-    
+### --------------------------------------------------------   
     def __init__(self, color, canvas, zval=0):
         super().__init__()
 
@@ -148,7 +148,7 @@ class Flat(QGraphicsPixmapItem):
      
 ### --------------------------------------------------------
 class InitBkg(QWidget):
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
 

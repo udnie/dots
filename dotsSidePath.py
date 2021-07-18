@@ -11,7 +11,7 @@ from dotsSideGig        import MsgBox
 
 ### ---------------------- dotsSidePath --------------------
 ''' dotsPaths is used by animations and pathmaker and contains 
-    demo, setPath, getOffset and pathLoader '''
+    demo, setPath, getOffSet and pathLoader '''
 ### --------------------------------------------------------
 def demo(pix, anime, node):           
     pos  = node.pix.pos()
@@ -28,7 +28,7 @@ def demo(pix, anime, node):
     waypts = pathLoader(anime)
     if not waypts: return
     ## offset for origin pt - setOrigin wasn't working
-    pt = getOffset(node.pix)
+    pt = getOffSet(node.pix)
 
     path = QPropertyAnimation(node, b'pos')
     path.setDuration(sync)
@@ -100,7 +100,7 @@ def setPaths(pix, anime, node):
     waypts = pathLoader(anime)
     if not waypts: return
     ## offset for origin pt - setOrigin wasn't working
-    pt = getOffset(node.pix)
+    pt = getOffSet(node.pix)
 
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
@@ -112,7 +112,7 @@ def setPaths(pix, anime, node):
     return path
 
 ### --------------------------------------------------------
-def getOffset(pix):
+def getOffSet(pix):
     b = pix.boundingRect()
     w = (b.width()*.5)
     h = (b.height()*.5)

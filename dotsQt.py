@@ -1,11 +1,12 @@
 import sys
 import platform
+import os
 
 from PyQt5.QtWidgets import QApplication, QStatusBar, QMainWindow
 
 import dotsDropCanvas   as dropCanvas
 import dotsScrollPanel  as scrollPanel
-import dotsSliderPanel as sliderPanel
+import dotsSliderPanel  as sliderPanel
 import dotsSideCar      as sideCar
 
 from dotsShared     import common
@@ -42,7 +43,8 @@ class DotsQt(QMainWindow):
   
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
-     
+        self.statusBar.showMessage(os.getcwd(),4000)
+
         ## just in case the sprite directory is missing
         QTimer.singleShot(200, self.canvas.loadSprites)
         sideCar.setCursor()  
@@ -59,4 +61,6 @@ if __name__ == '__main__':
     dots = DotsQt()
     sys.exit(app.exec())
 
-### ----------------------- dotsQt -----------------------
+### ----------------------- dotsQt ----------------------
+
+

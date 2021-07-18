@@ -36,7 +36,7 @@ I use the graphicsitem **zValue()** as a means to order the six graphic types wh
   
 ## Changes
 **July 2021:**		
-Holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** either locked or unlocked. The second method, **shift-R**, sets **all pixItems** to locked. The last, **apostrophe**, toggles individual pixItems. You will need to save the changes for them to take effect. The annoyance still persists. Still working on it.
+Changed, holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** locked or unlocked. The second method, **shift-R**, locks **all pixItems**. The last method, **apostrophe** and a **mouse-click** toggles individual pixItems. You will need to save the changes for them to take effect. There's a new file, **dotsDrawWidget**, that isolates the code that draws the path   and displays pointItems. The annoyance still persists. Still working on it.
 
 
 **June 2021:**  

@@ -7,28 +7,28 @@ from PyQt5.QtCore    import Qt, QPointF, QPoint, QTimer, QPropertyAnimation
 from PyQt5.QtGui     import QPen, QColor, QPainterPath, QPixmap
 from PyQt5.QtWidgets import QFileDialog, QGraphicsPixmapItem, QGraphicsItemGroup
 
-from dotsAnimation   import Node
 from dotsShared      import common, paths
-from dotsSideGig     import TagIt, MsgBox, getColorStr, getPts, distance
+from dotsSideGig     import TagIt, MsgBox, getPts, distance
  
-import dotsSidePath  as sidePath
-
 ScaleUpKeys = ('>','\"', '=')
 ScaleDnKeys = ('<',':','-')
 Tick = 3  ## points to move using arrow keys
 
 ### --------------------- dotsSideWays ---------------------
-''' dotsSideWays: extends pathMaker. Includes path and
-    waypoints functions - scaleRotate and pathTest...'''
-''' moved all scene references to pathMaker '''
+''' dotsSideWays: extends pathMaker. Includes path and wayPoints
+    functions - scaleRotate, flopPath, reversePath, etc..'''
 ### --------------------------------------------------------
 class SideWays():
 
-    def __init__(self, pathMaker):
+    def __init__(self, pathMaker, drawing, parent):
         super().__init__()
  
         self.pathMaker = pathMaker
-           
+
+        self.canvas    = parent
+        self.scene     = parent.scene
+        self.drawing   = drawing
+
 ### ----------------------- paths --------------------------
     def centerPath(self):
         if self.pathMaker.pathSet:
@@ -65,7 +65,8 @@ class SideWays():
             if i % 2 == 1:
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
-        self.pathMaker.redrawPoints(False)  ## redraw canvas without points
+        del tmp
+        self.drawing.redrawPoints(False)  ## redraw canvas without points
         if self.pathMaker.pathTestSet:
             self.pathMaker.stopPathTest()
             QTimer.singleShot(200, self.pathTest)  ## optional
@@ -93,9 +94,9 @@ class SideWays():
             self.updPts(0, Tick)
 
     def updPts(self, tx, ty):    ## used by movePath
-        pt = QPoint(float(tx), float(ty))
+        pt = QPoint(float(tx), float(ty)) ## either x or y, + or -
         for p in self.pathMaker.pts:  ## pts on the screen 
-            p += pt     
+            p += pt  ## add pt to point 'p' in pts
 
     def reversePath(self):  
         if self.pathMaker.pts:
@@ -107,11 +108,12 @@ class SideWays():
             tmp.insert(0,self.pathMaker.pts[0])   ## start at zero
             tmp = tmp[:-1]
             self.pathMaker.pts = tmp
+            del tmp
             if self.pathMaker.wayPtsSet:
                 self.updateWayPts()
             if self.pathMaker.pathTestSet:
                 self.pathMaker.stopPathTest()
-         
+           
     def setPaintPath(self, bool=False):  ## also used by waypts
         path = QPainterPath()
         for pt in self.pathMaker.pts:  ## pts on the screen 
@@ -121,16 +123,95 @@ class SideWays():
         if bool: path.closeSubpath()
         return path
 
-    def changePathColor(self):
-        self.pathMaker.color = getColorStr()
-        if self.pathMaker.newPathSet:
-            self.pathMaker.updateNewPath()
-        else:
+    def scaleRotate(self, key): 
+        p = self.pathMaker.path.sceneBoundingRect()
+        centerX = p.x() + p.width() /2
+        centerY = p.y() + p.height() /2
+        ## for each pt compute distance from center
+        for i in range(0, len(self.pathMaker.pts)):    
+            dist = distance(
+                    self.pathMaker.pts[i].x(), centerX, 
+                    self.pathMaker.pts[i].y(), centerY)
+            inc, xdist, ydist = 0, dist, dist
+            ## scale up, scale down
+            if key in ScaleUpKeys:  
+                dist = dist + ( dist * .01 )         
+            elif key in ScaleDnKeys:  
+                dist = dist - ( dist * .01 )
+            ## rotate 1 degree
+            if key == '+':  
+                inc = -1.0   
+            elif key == '_': 
+                inc = 1.0      
+            ## more scale stuff
+            if key in('<','>'):
+                xdist = dist                
+                ydist = dist  
+            elif key in(':','\"'): ## scale X
+                xdist = dist              
+            elif key in('-','='):  ## scale Y
+                ydist = dist
+            ## do the math 
+            deltaX = self.pathMaker.pts[i].x() - centerX
+            deltaY = self.pathMaker.pts[i].y() - centerY
+
+            angle = math.degrees(math.atan2(deltaX, deltaY))
+            angle = angle + math.ceil( angle / 360) * 360
+
+            plotX = centerX + xdist * math.sin(math.radians(angle + inc))
+            plotY = centerY + ydist * math.cos(math.radians(angle + inc))
+           
+            self.pathMaker.pts[i] = QPointF(plotX, plotY)
+        self.pathMaker.addPath()
+
+    def openFiles(self):
+        if self.pathMaker.pts:
+            MsgBox("openFiles: Clear Scene First")
+            return
+        Q = QFileDialog()
+        file, _ = Q.getOpenFileName(self.pathMaker.canvas,
+            "Choose a path file to open", paths["paths"],
+            "Files(*.path)")
+        Q.accept()
+        if file:
+            self.pathMaker.pts = getPts(file)  ## read the file
+            self.pathMaker.openPathFile = os.path.basename(file)
             self.pathMaker.addPath()
+       
+    def savePath(self):
+        if self.pathMaker.pts:
+            if self.pathMaker.addingNewPath != False: 
+                MsgBox("savePath: Close the new path using 'cmd'")  
+                return
+            Q = QFileDialog()
+            if self.pathMaker.openPathFile == '':
+                self.pathMaker.openPathFile = paths["paths"] + 'tmp.path'
+            f = Q.getSaveFileName(self.pathMaker.canvas,
+                paths["paths"],
+                self.pathMaker.openPathFile)
+            Q.accept()
+            if not f[0]: 
+                return
+            elif not f[0].lower().endswith('.path'):
+                MsgBox("savePath: Wrong file extention - use '.path'")    
+            else:
+                try:
+                    with open(f[0], 'w') as fp:
+                        for i in range(0, len(self.pathMaker.pts)):
+                            p = self.pathMaker.pts[i]
+                            x = str("{0:.2f}".format(p.x()))
+                            y = str("{0:.2f}".format(p.y()))
+                            fp.write(x + ", " + y + "\n")
+                        fp.close()
+                except IOError:
+                    MsgBox("savePath: Error saving file")
+                    return
+        else:
+            MsgBox("savePath: Nothing saved")
 
 ### ---------------------- waypoints -----------------------
     def addWayPtTags(self):
-        if self.pathMaker.newPathSet:
+        if self.pathMaker.addingNewPath:
             return
         if self.pathMaker.wayPtsSet:  ## toggle it off
             self.pathMaker.removeWayPtTags()
@@ -174,144 +255,19 @@ class SideWays():
             for i in range(0, len(self.pathMaker.pts)-len(tmp)):
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
+        del tmp
         if self.pathMaker.wayPtsSet:
             self.updateWayPts()
 
     def updateWayPts(self):
-        bol = self.pathMaker.pointItemsSet()
-        if bol: self.pathMaker.removePointItems()
+        # bol = self.pathMaker.pointItemsSet()
+        # if bol: self.pathMaker.removePointItems()
         self.pathMaker.removeWayPtTags()
         self.pathMaker.removePath()
         self.pathMaker.addPath()
         self.addWayPtTags()
-        if bol: self.pathMaker.addPointItems()
-
-### --------------------------------------------------------
-    def pathTest(self):
-        if self.pathMaker.pts and self.pathMaker.pathSet:
-            if not self.pathMaker.pathTestSet:
-                self.pathMaker.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + 
-                    'ball.png'))
-                node = Node(self.pathMaker.ball)
-                self.pathMaker.ball.setZValue(50)
-
-                self.pathMaker.pathTestNode = QPropertyAnimation(node, b'pos')
-                self.pathMaker.pathTestNode.setDuration(10000)  ## 10 seconds
-
-                waypts = self.setPaintPath(True) ## close subpath
-                pt = sidePath.getOffset(self.pathMaker.ball)
-
-                self.pathMaker.pathTestNode.setStartValue(waypts.pointAtPercent(0.0)-pt)
-                for i in range(1, 99):   
-                    self.pathMaker.pathTestNode.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
-                self.pathMaker.pathTestNode.setEndValue(waypts.pointAtPercent(1.0)-pt)  
-                self.pathMaker.pathTestNode.setLoopCount(-1) 
-
-                self.pathMaker.startPathTest()
-            else:
-                self.pathMaker.stopPathTest()
-
-### --------------------------------------------------------
-    def scaleRotate(self, key): 
-        p = self.pathMaker.path.sceneBoundingRect()
-        centerX = p.x() + p.width() /2
-        centerY = p.y() + p.height() /2
-        ## for each pt compute distance from center
-        for i in range(0, len(self.pathMaker.pts)):    
-            dist = distance(
-                    self.pathMaker.pts[i].x(), centerX, 
-                    self.pathMaker.pts[i].y(), centerY)
-            inc, xdist, ydist = 0, dist, dist
-            ## scale up, scale down
-            if key in ScaleUpKeys:  
-                dist = dist + ( dist * .01 )         
-            elif key in ScaleDnKeys:  
-                dist = dist - ( dist * .01 )
-            ## rotate 1 degree
-            if key == '+':  
-                inc = -1.0   
-            elif key == '_': 
-                inc = 1.0      
-            ## more scale stuff
-            if key in('<','>'):
-                xdist = dist                
-                ydist = dist  
-            elif key in(':','\"'): ## scale X
-                xdist = dist              
-            elif key in('-','='):  ## scale Y
-                ydist = dist
-            ## do the math 
-            deltaX = self.pathMaker.pts[i].x() - centerX
-            deltaY = self.pathMaker.pts[i].y() - centerY
-
-            angle = math.degrees(math.atan2(deltaX, deltaY))
-            angle = angle + math.ceil( angle / 360) * 360
-
-            plotX = centerX + xdist * math.sin(math.radians(angle + inc))
-            plotY = centerY + ydist * math.cos(math.radians(angle + inc))
-           
-            self.pathMaker.pts[i] = QPointF(plotX, plotY)
-
-        self.pathMaker.addPath()
-
-### --------------------------------------------------------
-    def openFiles(self):
-        if self.pathMaker.pts:
-            MsgBox("openFiles: Clear Scene First")
-            return
-        Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self.pathMaker.canvas,
-            "Choose a path file to open", paths["paths"],
-            "Files(*.path)")
-        Q.accept()
-        if file:
-            self.pathMaker.pts = getPts(file)  ## read the file
-            self.pathMaker.openPathFile = os.path.basename(file)
-            self.pathMaker.addPath()
-       
-    def savePath(self):
-        if self.pathMaker.pts:
-            if self.pathMaker.newPathSet != False: 
-                MsgBox("savePath: Close the new path using 'cmd'")  
-                return
-            Q = QFileDialog()
-            if self.pathMaker.openPathFile == '':
-                self.pathMaker.openPathFile = paths["paths"] + 'tmp.path'
-            f = Q.getSaveFileName(self.pathMaker.canvas,
-                paths["paths"],
-                self.pathMaker.openPathFile)
-            Q.accept()
-            if not f[0]: 
-                return
-            elif not f[0].lower().endswith('.path'):
-                MsgBox("savePath: Wrong file extention - use '.path'")    
-            else:
-                try:
-                    with open(f[0], 'w') as fp:
-                        for i in range(0, len(self.pathMaker.pts)):
-                            p = self.pathMaker.pts[i]
-                            x = str("{0:.2f}".format(p.x()))
-                            y = str("{0:.2f}".format(p.y()))
-                            fp.write(x + ", " + y + "\n")
-                        fp.close()
-                except IOError:
-                    MsgBox("savePath: Error saving file")
-                    return
-        else:
-            MsgBox("savePath: Nothing saved")
+        # if bol: self.pathMaker.addPointItems()
 
 ### --------------------- dotsSideWays ---------------------
 
-        #### save for now ########################
-        # lnn = len(self.pathMaker.pts)
-        # last = QPointF(0.0, 0.0)  ## save for now
-        # for pt in self.pathMaker.pts:
-        #     itm = PointItem(self, pt, idx, lnn)
-        #     self.scene.addItem(itm)
-        #     idx += 1
-            # if last != QPointF(0.0, 0.0):   ## save for now
-            #     print(int(self.distance(pt.x(), last.x(), 
-            #         pt.y(), last.y())))
-            # last = pt
-        #### save for now ########################
 
