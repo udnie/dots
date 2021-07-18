@@ -215,6 +215,7 @@ class SideWays():
             return
         if self.pathMaker.wayPtsSet:  ## toggle it off
             self.pathMaker.removeWayPtTags()
+            self.drawing.removePointItems()
             return   ## added
         lnn = len(self.pathMaker.pts)
         if lnn:                     ## make some tags
