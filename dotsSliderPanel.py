@@ -2,18 +2,17 @@ from PyQt5.QtCore    import Qt, pyqtSignal, QAbstractTableModel
 from PyQt5.QtWidgets import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
                             QTableView, QHeaderView, QAbstractItemView, QLabel
                         
-
 from dotsShared      import keyMenu, pathMenu
 
-### ------------------- dotsSliderPanel ----------------
 SliderW, SliderH, OffSet = 180, 685, 20
 
-### ----------------------------------------------------
+
+### --------------------- dotsSliderPanel ------------------
 ''' dotsSliderPanel contains the TableGroup and the SliderGroup
     and the TableModel class used by the TableView '''
 ### --------------------------------------------------------
 class SliderPanel(QWidget):
-
+### --------------------------------------------------------
     ## transfers slider output to initBkg
     sliderSignal = pyqtSignal(str, int)
 
@@ -35,15 +34,14 @@ class SliderPanel(QWidget):
         layout.setContentsMargins(18, 0, 0, 0)
         layout.setAlignment(Qt.AlignCenter)
 
-### -----------------------------------------------------
+### --------------------------------------------------------
     def enableSliders(self, bool=False): 
         self.isEnabled = bool
         self.rotateSldr.setValue(0)
         self.scaleSldr.setValue(100)
         self.opacitySldr.setValue(100)
         self.sliderGroup.setEnabled(bool)
-
-### -----------------------------------------------------
+### --------------------------------------------------------
     def addTableGroup(self):
         self.tableView = QTableView()
         self.tableView.setFixedSize(SliderW-OffSet,350)
@@ -98,7 +96,7 @@ class SliderPanel(QWidget):
                 "font-size: 12px;\n"
                 "}")  
 
-### -----------------------------------------------------
+### --------------------------------------------------------
     def addSliderGroup(self):
         self.sliderGroup = QLabel()
         self.sliderGroup.setFixedSize(SliderW-OffSet,335)

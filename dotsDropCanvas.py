@@ -31,7 +31,7 @@ PlayKeys = ('resume','pause')
     menu and screen handling for selecting screen objects '''
 ### --------------------------------------------------------
 class DropCanvas(QWidget):
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
 
@@ -70,7 +70,7 @@ class DropCanvas(QWidget):
 
         self.view.keysSignal[str].connect(self.setKeys)    
 
-### --------------------------------------------------------
+### ---------------------- send keys -----------------------
     @pyqtSlot(str)
     def setKeys(self, key):
         self.key = key
@@ -117,7 +117,7 @@ class DropCanvas(QWidget):
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()   ## chks if set
 
-                if self.key == 'cmd':         ## only used by eventFilter
+                if self.key == 'cmd':  ## only used by eventFilter
                     self.mapper.clearMap()    ## set rubberband if mapset
                     self.unSelect()
 
@@ -128,13 +128,13 @@ class DropCanvas(QWidget):
             elif e.type() == QEvent.MouseMove:
     
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
-                    if self.mapper.mapSet: 
+                    if self.mapper.isMapSet(): 
                         self.mapper.removeMap()
                     self.rubberBand.show()
                     self.rubberBand.setGeometry(QRect(self.origin, 
                         e.pos()).normalized())
 
-                elif self.mapper.mapSet and not self.scene.selectedItems():
+                elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
 
                 elif self.control not in PlayKeys:  ## no animations running
@@ -142,26 +142,28 @@ class DropCanvas(QWidget):
 
             elif e.type() == QEvent.MouseButtonRelease:
     
-                if self.mapper.mapSet == False:
+                if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas() 
 
-                if self.mapper.mapSet and self.key == 'cmd':
+                if self.key == 'cmd'and self.mapper.isMapSet():
                     self.setKeys('')
 
-                if self.hasHiddenPix() and self.key != 'cmd' or \
-                    self.mapper.mapSet and not self.scene.selectedItems():
+                if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
 
-            elif e.type() == QEvent.MouseButtonDblClick and self.key != 'cmd':
+                self.mapper.updatePixItemPos()  
+ 
+            elif e.type() == QEvent.MouseButtonDblClick:
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
+    
                 if self.mapper.selections or self.hasHiddenPix():
-                    if self.mapper.mapSet:
+                    if self.mapper.isMapSet():
                         self.mapper.removeMap()
                         self.setKeys('noMap')  
-
+         
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
@@ -185,7 +187,7 @@ class DropCanvas(QWidget):
                 pix.setPixKeys(self.key)
             elif pix.zValue() <= common["pathZ"]:
                 break
-        if self.mapper.mapSet: 
+        if self.mapper.isMapSet(): 
             self.mapper.updateMap()
 
     def togglePixLocks(self, key):
@@ -342,7 +344,7 @@ class DropCanvas(QWidget):
                 pix.tag = tag
             pix.anime = None        ## set by play
             pix.setSelected(False)  ## when tagged 
-        if self.mapper.mapSet: 
+        if self.mapper.isMapSet(): 
             self.mapper.removeMap()
 
 ### -------------------- dotsDropCanvas --------------------

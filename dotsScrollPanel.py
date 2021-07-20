@@ -15,7 +15,7 @@ from dotsSideGig     import MsgBox
     Includes ImgLabel and ScrollPanel classes. '''
 ### --------------------------------------------------------
 class ImgLabel(QLabel):
-
+### --------------------------------------------------------
     def __init__(self, imgFile, count, parent):
         super().__init__()
    
@@ -126,7 +126,7 @@ class ImgLabel(QLabel):
 
 ### --------------------------------------------------------
 class ScrollPanel(QWidget):
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
         

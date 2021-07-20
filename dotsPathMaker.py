@@ -17,8 +17,6 @@ from dotsDrawWidget  import DrawingWidget
 
 MoveKeys = ("left","right","up", "down")
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-')
-WayPtsKeys = ('<','>','R','!','V')
-NotPathSetKeys = ('R','S','T','W','N')
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,
@@ -42,12 +40,33 @@ class PathMaker(QWidget):
         self.drawing  = DrawingWidget(self, parent)  
         self.sideWays = SideWays(self, self.drawing, parent)  ## extends pathMaker
 
+        self.doFirst = {
+            'D': self.delete,
+            '/': self.changePathColor,
+            'cmd': self.drawing.closeNewPath,
+        }
+
         self.direct = {
             'F': self.sideWays.openFiles,
             'C': self.sideWays.centerPath,
             'P': self.pathChooser,
             '{': self.sideWays.flipPath,
             '}': self.sideWays.flopPath,
+        }
+
+        self.noPathKeysSet = {
+            'R': self.sideWays.reversePath,
+            'S': self.sideWays.savePath,
+            'T': self.pathTest,
+            'W': self.sideWays.addWayPtTags,
+            'N': self.drawing.toggleNewPath,
+        }
+
+        self.WayPtsKeys = {
+            '!': self.sideWays.halfPath,
+            'V': self.drawing.togglePointItems,
+            '<': self.sideWays.shiftWayPtsLeft,
+            '>': self.sideWays.shiftWayPtsRight,
         }
 
 ### --------------------------------------------------------
@@ -76,44 +95,19 @@ class PathMaker(QWidget):
     @pyqtSlot(str)
     def pathKeys(self, key):
         self.key = key
-        if self.key == 'D':  ## always
-            self.delete()
-        elif self.key == '/':
-            self.changePathColor()
-        elif self.addingNewPath and self.key == 'cmd':  ## note
-            self.drawing.closeNewPath()   
-        elif key in NotPathSetKeys:
-            if self.key == 'R':
-                self.sideWays.reversePath()
-            elif self.key == 'S':
-                self.sideWays.savePath()
-            elif self.key == 'T':
-                self.pathTest()
-            elif self.key == 'W':
-                self.sideWays.addWayPtTags()
-            elif self.key == 'N':
-                if self.addingNewPath:
-                    self.drawing.delNewPath()  ## changed your mind
-                    self.delete()
-                elif not self.pathSet and not self.wayPtsSet:
-                    self.drawing.addNewPath()
-                    self.addPath()  ## add the completed path
-        ## not waypts and not new path
+        if key in self.doFirst:
+            self.doFirst[key]() 
+        elif key in self.noPathKeysSet:
+            self.noPathKeysSet[key]()  
         elif not self.wayPtsSet and not self.addingNewPath:
             if key in self.direct: 
-                self.direct[key]()  ## OK..
+                self.direct[key]()  
             elif key in MoveKeys:
                 self.sideWays.movePath(key)
             elif key in ScaleRotateKeys: 
                 self.sideWays.scaleRotate(key)
-        ##  waypts only
-        elif self.wayPtsSet and key in WayPtsKeys:
-            if self.key == '!':
-                self.sideWays.halfPath()
-            elif self.key == 'V':
-                self.drawing.togglePointItems()  
-            elif self.key in ('<','>'):
-                self.sideWays.shiftWayPts(key)
+        elif self.wayPtsSet and key in self.WayPtsKeys:
+            self.WayPtsKeys[key]() 
 
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
@@ -209,8 +203,8 @@ class PathMaker(QWidget):
 
     def addWayPtTagsGroup(self):
         self.tagGroup = QGraphicsItemGroup()
-        self.scene.addItem(self.tagGroup)
         self.tagGroup.setZValue(common["tagZ"]+5)
+        self.scene.addItem(self.tagGroup)
 
     def removeWayPtTags(self):   
         if self.tagGroup or self.wayPtsSet:
@@ -224,8 +218,8 @@ class PathMaker(QWidget):
             if not self.pathTestSet:
                 self.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + 'ball.png'))
                 node = Node(self.ball)
-                self.ball.setZValue(50)
-
+                self.ball.setZValue(self.findTop()+10)
+       
                 self.pathTestNode = QPropertyAnimation(node, b'pos')
                 self.pathTestNode.setDuration(10000)  ## 10 seconds
 

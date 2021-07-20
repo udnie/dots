@@ -17,7 +17,7 @@ from dotsSideGig     import MsgBox, getPathList
 ''' dotsSideShow: handles play, pause, stop '''
 ### --------------------------------------------------------
 class SideShow():
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  

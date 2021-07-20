@@ -22,7 +22,7 @@ AnimeList += OneOffs
     Node class - just like in java. Moved paths to dotsPaths '''
 ### --------------------------------------------------------
 class Node(QObject):
-
+### --------------------------------------------------------
     def __init__(self, pix):
         super().__init__()
         
@@ -47,13 +47,12 @@ class Node(QObject):
 
 ### -------------------------------------------------------- 
 class Animation():
-    
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas    = parent 
-        # self.pathMaker = parent.pathMaker
-  
+        self.canvas = parent 
+    
         self.singleFunctions = {  ## values are objects 
             'Vibrate': vibrate,  
             'Pulse': pulse,

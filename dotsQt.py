@@ -18,7 +18,7 @@ from dotsDocks      import *
     shared across classes and files''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
-
+### --------------------------------------------------------
     def __init__(self, parent=None):
         super().__init__()
 
@@ -62,5 +62,4 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ----------------------- dotsQt ----------------------
-
 

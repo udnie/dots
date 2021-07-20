@@ -189,7 +189,7 @@ class InitBkg(QWidget):
 
     def addBkg(self, file, flopped=False): ## also used by saveBkg'
         if self.canvas.pathMakerOn == False:
-            if self.mapper.mapSet:
+            if self.mapper.isMapSet():
                 self.mapper.removeMap()
         self.bkg = BkgItem(file, self.canvas)
         self.scene.addItem(self.bkg)
@@ -297,7 +297,7 @@ class InitBkg(QWidget):
         if self.hasBackGround() or self.scene.items():
             self.canvas.unSelect()  ## turn off any select borders
             if self.canvas.pathMakerOn == False:
-                if self.mapper.mapSet:
+                if self.mapper.isMapSet():
                     self.mapper.removeMap()
             if self.canvas.openPlayFile == '':
                 snap = "dots_" + snapTag() + ".jpg"

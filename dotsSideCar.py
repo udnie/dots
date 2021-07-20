@@ -23,7 +23,7 @@ PlayKeys = ('resume','pause')
     toggleGrid and MsgBox plus some small functions '''
 ### --------------------------------------------------------
 class SideCar():
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  

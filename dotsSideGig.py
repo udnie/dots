@@ -20,7 +20,7 @@ PlayKeys = ('resume','pause')
 ''' dotsSideGigs: DoodleMaker, Doodle, TagIt, and MsgBox. '''
 ### --------------------------------------------------------
 class MsgBox(QMessageBox):  ## thanks stackoverflow
-
+### --------------------------------------------------------
     def __init__(self, text, pause=2):
         super().__init__()
 
@@ -49,7 +49,7 @@ class MsgBox(QMessageBox):  ## thanks stackoverflow
 
 ### --------------------------------------------------------
 class TagIt(QGraphicsSimpleTextItem):
-    
+### --------------------------------------------------------   
     def __init__(self, control, tag, color, zval=None):
         super().__init__()
     
@@ -105,7 +105,7 @@ class TagIt(QGraphicsSimpleTextItem):
  
 ### --------------------------------------------------------
 class DoodleMaker(QWidget): 
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
 
@@ -134,7 +134,7 @@ class DoodleMaker(QWidget):
 
 ### --------------------------------------------------------
 class Doddle(QLabel):  
-
+### --------------------------------------------------------
     def __init__(self, parent, file):
         super().__init__()
 

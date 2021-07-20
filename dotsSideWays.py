@@ -19,7 +19,7 @@ Tick = 3  ## points to move using arrow keys
     functions - scaleRotate, flopPath, reversePath, etc..'''
 ### --------------------------------------------------------
 class SideWays():
-
+### --------------------------------------------------------
     def __init__(self, pathMaker, drawing, parent):
         super().__init__()
  
@@ -241,6 +241,12 @@ class SideWays():
         s = s + "  " + str("{0:.2f}%".format(pct)) 
         s = s + "  " + str("{0:2d}".format(idx))
         return s
+
+    def shiftWayPtsLeft(self):  
+        self.shiftWayPts('<')
+
+    def shiftWayPtsRight(self):  
+        self.shiftWayPts('>')
 
     def shiftWayPts(self, key):  
         lnn = int(len(self.pathMaker.pts)/20)  ## 5% solution

@@ -20,7 +20,7 @@ All = -999
     Classes: MapItem, InitMap - uses self.parent for parent '''
 ### --------------------------------------------------------
 class MapItem(QGraphicsItem):
-
+### --------------------------------------------------------
     def __init__(self, rect, parent):
         super().__init__()
 
@@ -56,7 +56,7 @@ class MapItem(QGraphicsItem):
 
 ### ---------------------- dotsMapItem ---------------------
 class InitMap():
-
+### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
 
@@ -67,7 +67,6 @@ class InitMap():
         self.tagZ = 0
         self.pathTagZ = 0  ## only by paths
 
-        self.mapSet = False
         self.tagSet = False
         self.pathSet = False
 
@@ -107,7 +106,6 @@ class InitMap():
  
     def addMapItem(self):
         self.removeMapItem()
-        self.mapSet = True
         self.mapRect = self.mapBoundingRects()
         self.parent.rubberBand.setGeometry(
             QRect(self.parent.origin, 
@@ -115,12 +113,14 @@ class InitMap():
         self.map = MapItem(self.mapRect, self)  
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
+        k = len(self.selections)
+        self.dots.statusBar.showMessage("Number Selected:  {}".format(k),2500)
 
     def mapBoundingRects(self):
         tx, ty = common["ViewW"], common["ViewH"]
         bx, by = 0, 0
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.id in self.selections:
+            if pix.type == 'pix' and pix.isSelected():
                 p = pix.sceneBoundingRect()
                 x, y, w, h = p.x(), p.y(), p.width(), p.height()
                 if x < tx:  ## setting top left
@@ -133,23 +133,24 @@ class InitMap():
                     by = y + h
             elif pix.zValue() <= common["pathZ"]:
                 break
-        k = len(self.selections)
-        self.dots.statusBar.showMessage("Number Selected:  {}".format(k),2500)
         return QRectF(tx, ty, bx-tx, by-ty)
       
+    def isMapSet(self):
+        for itm in self.scene.items():
+            if itm.type == 'map':
+                return True
+        return False
+
     def clearMap(self):
-        if self.mapSet:
-            self.removeMapItem()
-            self.mapRect = QRectF()
-            # self.selections = []  ## not necessarily the selections
-            self.mapSet = False
+        self.removeMapItem()
+        self.mapRect = QRectF()
 
     def toggleMap(self):   ## not based on rubberband geometry
-        if self.mapSet == False:
+        if self.isMapSet() == False:
             self.selections = []  
             for pix in self.scene.selectedItems():  ## only items selected
                 self.selections.append(pix.id)
-            if self.selections or self.parent.hasHiddenPix():
+            if self.scene.selectedItems() or self.parent.hasHiddenPix():
                 self.addMapItem()
         else:
             self.removeMap()
@@ -177,7 +178,7 @@ class InitMap():
                 self.scene.removeItem(pix)
                 break
 
-### --------------------------------------------------------
+### ------------------- tags and paths ---------------------
     def toggleTagItems(self, pid):  
         if self.parent.pathMakerOn:
             return
@@ -185,7 +186,7 @@ class InitMap():
             self.clearTagGroup()
             self.clearPaths()  
             return
-        if self.mapSet:
+        if self.isMapSet():
             self.clearMap()
         if self.scene.items():
             if self.pathSet:
@@ -228,6 +229,7 @@ class InitMap():
     def clearTagGroup(self):
         if self.tagSet:
             self.scene.removeItem(self.tagGroup)
+            self.tagGroup = None
             self.tagSet = False  
 
     def tagIt(self, pix):  
@@ -246,7 +248,7 @@ class InitMap():
         self.tagGroup.addToGroup(tag)
         self.tagSet = True
 
-### --------------------------------------------------------
+### -------------------- mostly paths ----------------------
     def togglePaths(self):
         if self.parent.pathMakerOn:
             return

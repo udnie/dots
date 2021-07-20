@@ -7,8 +7,9 @@ from PyQt5.QtWidgets import QGraphicsView
 
 from dotsSideGig     import MsgBox
 from dotsShared      import common, singleKeys
+from dotsSideCar     import SideCar
+from dotsMapItem     import InitMap
 
-ToglKeys  = (Qt.Key_G, Qt.Key_K, Qt.Key_M)
 MixKeys   = (Qt.Key_D, Qt.Key_F, Qt.Key_T)
 ExitKeys  = (Qt.Key_X, Qt.Key_Q, Qt.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
@@ -18,6 +19,7 @@ FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
     drop. Thanks to tpoveda @ https://gist.github.com/tpoveda for posting''' 
 ### --------------------------------------------------------
 class ControlView(QGraphicsView):
+### --------------------------------------------------------
     ## adds drag and drop to a QGraphicsView instance and 
     ## keyboard capture 
     keysSignal = pyqtSignal([str])
@@ -27,6 +29,9 @@ class ControlView(QGraphicsView):
 
         self.canvas = parent       
         self.dots   = parent.dots
+
+        self.canvas.mapper = InitMap(self.canvas)
+        self.sideCar = SideCar(self.canvas)
 
         self.setObjectName('ControlView')
         self.setScene(parent.scene)
@@ -54,6 +59,12 @@ class ControlView(QGraphicsView):
             Qt.Key_H: self.canvas.hideSelected,
             Qt.Key_U: self.canvas.unSelect,
             Qt.Key_Z: self.canvas.ZDump,
+        }
+
+        self.ToggleKeys = {
+            Qt.Key_G: self.sideCar.toggleGrid,
+            Qt.Key_K: self.dots.sliderpanel.toggleMenu,
+            Qt.Key_M: self.canvas.mapper.toggleMap,
         }
 
 ### --------------------------------------------------------
@@ -85,8 +96,7 @@ class ControlView(QGraphicsView):
                 None, False)
    
 ### -------------------------------------------------------
-    ## Location I found that works best for reading keys
-    ## especially the arrow keys
+    ## best location for reading keys - especially arrow keys
     def keyPressEvent(self, e):
         key = e.key() 
         mod = e.modifiers()
@@ -104,6 +114,7 @@ class ControlView(QGraphicsView):
                 self.canvas.flopSelected()  
             elif key == Qt.Key_P:
                 self.canvas.mapper.togglePaths() 
+                self.setKey('P')
             elif key == Qt.Key_T:
                 if self.canvas.pathMakerOn:
                     self.setKey('T')      ## run test if pathMaker on
@@ -111,17 +122,10 @@ class ControlView(QGraphicsView):
                     self.canvas.mapper.toggleTagItems('select')
                 else:  
                     self.canvas.mapper.toggleTagItems('all')
-        ## A,H,U,Z
         elif key in self.direct: 
-            self.direct[key]()  ## OK...
-        ## too many references
-        elif key in ToglKeys:
-            if key == Qt.Key_G:
-                self.canvas.sideCar.toggleGrid() 
-            elif key == Qt.Key_K:
-                self.dots.sliderpanel.toggleMenu()
-            elif key == Qt.Key_M:
-                self.canvas.mapper.toggleMap()
+            self.direct[key]()  
+        elif key in self.ToggleKeys:
+            self.ToggleKeys[key]()  
         elif key in singleKeys: ## in dotsShared.py   
             if key in (Qt.Key_L, Qt.Key_R) and mod & Qt.ShiftModifier:
                 self.canvas.togglePixLocks(singleKeys[key])

@@ -130,6 +130,14 @@ class DrawingWidget(QWidget):
         return QWidget.eventFilter(self, source, e)
            
 ### --------------------- new path -------------------------
+    def toggleNewPath(self):
+        if self.pathMaker.addingNewPath:
+            self.delNewPath()  ## changed your mind
+            self.pathMaker.delete()
+        elif not self.pathMaker.pathSet and not self.pathMaker.wayPtsSet:
+            self.addNewPath()
+            self.pathMaker.addPath()  ## add the completed path
+
     def addNewPathPts(self, pt): 
         if self.npts == 0:
             self.pathMaker.pts.append(pt)
@@ -147,9 +155,10 @@ class DrawingWidget(QWidget):
         self.pathMaker.pts = []
  
     def closeNewPath(self):  ## applies only to adding a path
-        self.removeNewPath()  
-        self.pathMaker.turnGreen()
-        self.pathMaker.addPath()
+        if self.pathMaker.addingNewPath:  ## note
+            self.removeNewPath()  
+            self.pathMaker.turnGreen()
+            self.pathMaker.addPath()
 
     def delNewPath(self):  ## changed your mind, doesn't save pts
         if self.pathMaker.addingNewPath:
@@ -178,7 +187,8 @@ class DrawingWidget(QWidget):
             self.removePointItems()
         else:
             self.addPointItems()
-        QTimer.singleShot(200, self.redrawPathsAndTags)  
+        if self.pathMaker.wayPtsSet:
+            QTimer.singleShot(200, self.redrawPathsAndTags)  
 
     def redrawPathsAndTags(self):
         self.pathMaker.removeWayPtTags()
