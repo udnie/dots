@@ -28,7 +28,6 @@ class PathMaker(QWidget):
     def __init__(self, parent):  
         super().__init__()
 
-        self.scene    = parent.scene
         self.canvas = parent  
         self.scene  = parent.scene
         self.view   = parent.view
@@ -85,7 +84,7 @@ class PathMaker(QWidget):
         self.color = "DODGERBLUE"
         self.openPathFile = '' 
         self.tag = ''
-
+ 
         self.pathSet = False
         self.addingNewPath = False
         self.pathChooserSet = False
