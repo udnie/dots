@@ -9,7 +9,7 @@ common = {
     "gridZ": -50.0, 
     "pathZ": -25.0,  
     "bkgZ":  -99.0,
-    "DotsW":  1445,  # app width 
+    "DotsW":  1460,  # app width 
     "DotsH":   825,  # app height
     "ViewW":  1080,  # canvas width  30 X 36
     "ViewH":   720,  # canvas height 30 X 24

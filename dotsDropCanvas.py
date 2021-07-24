@@ -300,6 +300,7 @@ class DropCanvas(QWidget):
                 break
 
     def ZDump(self):
+        return
         for pix in self.scene.items():
             print(os.path.basename(pix.fileName), pix.id, pix.zValue())
         print("bkg: " + str(self.initBkg.hasBackGround()))

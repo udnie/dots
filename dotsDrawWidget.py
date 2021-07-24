@@ -6,34 +6,27 @@ from PyQt5.QtGui     import QColor, QPen
 from PyQt5.QtWidgets import QFileDialog, QGraphicsPathItem, QWidget, QGraphicsItemGroup, \
                             QGraphicsEllipseItem
                             
-from dotsSideGig     import TagIt
+from dotsSideGig     import TagIt, distance
 from dotsShared      import common, paths
-from dotsSideWays    import SideWays
 
-### -------------------- dotsPathMaker ---------------------
-''' dotsPathMaker: contains load, save, addPath, pathChooser,
-    pathlist, and path modifier functions...'''
+### ------------------- dotsDrawWidget ---------------------
+''' dotsDrawWidget: PointItem and DrawingWidget classes '''
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
-    def __init__(self, drawing, pathMaker, parent, pt, idx, add):
+    def __init__(self, drawing, pt, idx, adto):
         super().__init__()
 
         self.drawing   = drawing
-        self.pathMaker = pathMaker
-
-        self.canvas    = parent
-        self.scene     = parent.scene
-
-        self.sideWays  = pathMaker.sideWays
-
+        self.pathMaker = drawing.pathMaker
+     
         self.pt = pt
         self.idx = idx
-        self.setZValue(int(idx+add)) 
+        self.setZValue(int(idx+adto)) 
 
         self.type = 'pt'
         self.pointTag = ''
-     
+
         v = 6  ## so its centered
         self.setRect(pt.x() -v*.5, pt.y() -v*.5, v, v)
         self.setBrush(QColor("white"))
@@ -47,21 +40,20 @@ class PointItem(QGraphicsEllipseItem):
     def hoverEnterEvent(self, e):
         if self.pathMaker.pathSet:  
             pct = (self.idx/len(self.pathMaker.pts))*100
-            tag = self.sideWays.makePtsTag(self.pt, self.idx, pct)
+            tag = self.pathMaker.makePtsTag(self.pt, self.idx, pct)
             self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
-            p = QPointF(0,-20)
-            self.pointTag.setPos(self.pt+p)
+            self.pointTag.setPos(self.pt+QPointF(0,-20))
             self.pointTag.setZValue(self.pathMaker.findTop()+5)
-            self.scene.addItem(self.pointTag)
+            self.drawing.addPointItemTag(self.pointTag)
         e.accept()
 
     def hoverLeaveEvent(self, e):
-        self.removePointTag()
+        self.removePointTag()  ## used twice
         e.accept()
 
     def mousePressEvent(self, e):    
         if self.pathMaker.key in ('del','opt'):   
-            self.removePointTag()
+            self.removePointTag()  ## second time
             if self.pathMaker.key == 'del':  
                 self.drawing.delPointItem(self)
             elif self.pathMaker.key == 'opt': 
@@ -71,25 +63,22 @@ class PointItem(QGraphicsEllipseItem):
         
     def removePointTag(self):
         if self.pointTag:
-            self.scene.removeItem(self.pointTag)
+            self.drawing.removePointItemTag(self.pointTag)
             self.pointTag = ''
      
- ### --------------------------------------------------------
+### --------------------------------------------------------
 class DrawingWidget(QWidget):
 ### --------------------------------------------------------
     def __init__(self, pathMaker, parent):  
         super().__init__()
 
-        self.pathMaker = pathMaker  
-
         self.canvas    = parent
         self.scene     = parent.scene
         self.view      = parent.view
         self.dots      = parent.dots
+        self.pathMaker = pathMaker  
 
-        self.sideWays  = SideWays(self.pathMaker, self, parent) 
-
-        self.npts = 0 ## counter used by addNewPathPts
+        self.npts = 0  ## counter used by addNewPathPts
         self.newPath = None
 
         self.setMouseTracking(True)
@@ -112,39 +101,30 @@ class DrawingWidget(QWidget):
     another way to do this.  Many thanks in advance ..'''
 ### --------------------- event filter ----------------------                
     def eventFilter(self, source, e):  
-        if self.canvas.pathMakerOn: 
+        if self.canvas.pathMakerOn:
             
             if self.pathMaker.addingNewPath:
     
                 if e.type() == QEvent.MouseButtonPress:
                     self.npts = 0  
-                    self.addNewPathPts(QPoint(e.pos()))
-               
+                    self.addNewPathPts(QPoint(e.pos()))  
+
                 elif e.type() == QEvent.MouseMove:
-                    self.addNewPathPts(QPoint(e.pos()))    
-               
+                    self.addNewPathPts(QPoint(e.pos()))  
+
                 elif e.type() == QEvent.MouseButtonRelease:
                     self.addNewPathPts(QPoint(e.pos()))
                     self.updateNewPath()  
- 
+
         return QWidget.eventFilter(self, source, e)
-           
+       
 ### --------------------- new path -------------------------
     def toggleNewPath(self):
-        if self.pathMaker.addingNewPath:
+        if self.pathMaker.addingNewPath: 
             self.delNewPath()  ## changed your mind
             self.pathMaker.delete()
         elif not self.pathMaker.pathSet and not self.pathMaker.wayPtsSet:
             self.addNewPath()
-            self.pathMaker.addPath()  ## add the completed path
-
-    def addNewPathPts(self, pt): 
-        if self.npts == 0:
-            self.pathMaker.pts.append(pt)
-        self.npts += 1
-        if self.npts % 3 == 0:
-            self.pathMaker.pts.append(pt)
-            self.updateNewPath()
 
     def addNewPath(self):
         self.dots.btnPathMaker.setStyleSheet(
@@ -153,6 +133,14 @@ class DrawingWidget(QWidget):
         self.newPath = None
         self.npts = 0
         self.pathMaker.pts = []
+
+    def addNewPathPts(self, pt): 
+        if self.npts == 0:
+            self.pathMaker.pts.append(pt)
+        self.npts += 1
+        if self.npts % 3 == 0:
+            self.pathMaker.pts.append(pt)
+            self.updateNewPath()
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note
@@ -167,14 +155,14 @@ class DrawingWidget(QWidget):
             
     def updateNewPath(self):
         if self.pathMaker.addingNewPath:  ## list of points
-            self.removeNewPath() ## clean up just in case
-            self.newPath = QGraphicsPathItem(self.sideWays.setPaintPath())
+            self.removeNewPath()  ## clean up just in case
+            self.newPath = QGraphicsPathItem(self.pathMaker.setPaintPath())
             self.newPath.setPen(QPen(QColor(self.pathMaker.color), 3, Qt.DashDotLine))
             self.newPath.setZValue(common['pathZ']) 
             self.scene.addItem(self.newPath)  ## only one - no group needed
             self.pathMaker.addingNewPath = True
 
-    def removeNewPath(self):   ## keep self.pathMaker.pts  
+    def removeNewPath(self):  ## keep self.pathMaker.pts for path
         if self.newPath:
             self.scene.removeItem(self.newPath)
             self.pathMaker.addingNewPath = False
@@ -188,13 +176,13 @@ class DrawingWidget(QWidget):
         else:
             self.addPointItems()
         if self.pathMaker.wayPtsSet:
-            QTimer.singleShot(200, self.redrawPathsAndTags)  
+            QTimer.singleShot(200, self.pathMaker.redrawPathsAndTags)  
 
-    def redrawPathsAndTags(self):
-        self.pathMaker.removeWayPtTags()
-        self.pathMaker.removePath()
-        self.pathMaker.addPath()
-        self.sideWays.addWayPtTags()
+    def addPointItemTag(self, tag):
+        self.scene.addItem(tag)
+
+    def removePointItemTag(self, tag):
+        self.scene.removeItem(tag)
 
     def findTop(self):
         for itm in self.scene.items():
@@ -203,13 +191,9 @@ class DrawingWidget(QWidget):
 
     def addPointItems(self): 
         idx = 0 
-        add = self.findTop() + 10 ## added to idx to set zvalue
+        add = self.findTop() + 10  ## added to idx to set zvalue
         for pt in self.pathMaker.pts:  
-            self.scene.addItem(PointItem(
-                self, 
-                self.pathMaker,
-                self.canvas, 
-                pt, idx, add))
+            self.scene.addItem(PointItem(self, pt, idx, add))
             idx += 1
 
     def removePointItems(self):   
@@ -224,42 +208,37 @@ class DrawingWidget(QWidget):
                 return True
         return False
 
-    def insertPointItem(self, pointItem):
+    def insertPointItem(self, pointItem):  ## halfway between points
         idx, pt = pointItem.idx + 1, pointItem.pt
         if idx == len(self.pathMaker.pts): idx = 0     
         pt1 = self.pathMaker.pts[idx]
         pt1 = QPointF(pt1.x() - pt.x(), pt1.y() - pt.y())
         pt1 = pt + QPointF(pt1)*.5       
         self.pathMaker.pts.insert(idx, pt1)
-        self.redrawPoints()  
+        self.pathMaker.redrawPoints()  
 
     def delPointItem(self, pointItem):
         self.pathMaker.pts.pop(pointItem.idx)
         del pointItem
-        self.redrawPoints()
-
-    def redrawPoints(self, bool=True):     ## pointItems points
-        self.removePointItems()
-        self.pathMaker.removeWayPtTags()
-        self.pathMaker.removePath()
-        self.pathMaker.addPath()
-        self.sideWays.addWayPtTags()
-        if bool: self.addPointItems()
+        self.pathMaker.redrawPoints()
 
 ### ------------------ dotsDrawWidget -----------------------
 
+####### save for now ########
 
-    #### save for now ########################
-    # lnn = len(self.pathMaker.pts)
-    # last = QPointF(0.0, 0.0)  ## save for now
-    # for pt in self.pathMaker.pts:
-    #     itm = PointItem(self, pt, idx, lnn)
-    #     self.scene.addItem(itm)
-    #     idx += 1
-        # if last != QPointF(0.0, 0.0):   ## save for now
-        #     print(int(self.distance(pt.x(), last.x(), 
-        #         pt.y(), last.y())))
-        # last = pt
-    #### save for now ########################
+        # x = pt.x()
+        # y = pt.y()
 
+        # if self.lastX == 0:
+        #     self.lastX = x
+        #     self.lastY = y
+
+        # k = int(distance( x, self.lastX, y, self.lastY))
+
+        # if k > 20:
+        #     self.lastX = x
+        #     self.lastY = y
+        #     print(k)
+        #     self.pathMaker.pts.append(pt)
+        #     self.updateNewPath()
 

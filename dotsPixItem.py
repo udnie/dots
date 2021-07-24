@@ -18,6 +18,7 @@ MoveKeys  = ("left","right","up", "down")
 RotateKeys = ("_", '+', '"', ':', "{", "}")
 ScaleKeys  = ("<",">")
 TagKeys = ('[', ']','/','enter','return')
+Tick = 2  ## points to move using arrow keys
 
 RotationVals = {
     '}': 45,
@@ -102,8 +103,7 @@ class PixItem(QGraphicsPixmapItem):
     @pyqtSlot(str)
     def setPixKeys(self, key):
         self.key = key  
-        if self.isHidden or self.isSelected() and \
-            self.locked == False:
+        if self.isHidden or self.isSelected() and self.locked == False:
             if key in RotateKeys:
                 self.rotateThis(key)
             elif key in ScaleKeys:

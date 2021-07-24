@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, 
                         
 from dotsShared      import keyMenu, pathMenu
 
-SliderW, SliderH, OffSet = 180, 685, 20
+SliderW, SliderH, OffSet = 195, 685, 20
 
 
 ### --------------------- dotsSliderPanel ------------------
@@ -55,8 +55,8 @@ class SliderPanel(QWidget):
     
         ## stylesheets set in self.setTableModel()
         self.setTableModel(keyMenu)
-        self.tableView.setColumnWidth(0, 38) 
-        self.tableView.setColumnWidth(1, 105)
+        self.tableView.setColumnWidth(0, 50) 
+        self.tableView.setColumnWidth(1, 108)
 
         return self.tableView
 
@@ -70,7 +70,7 @@ class SliderPanel(QWidget):
             self.pathMenuSet = True
 
     def setTableModel(self, list):
-        header = ['Keys', 'Action']
+        header = [' Keys ', 'Action']
         model = TableModel(list, header)
         self.tableView.setModel(model)
         if list != keyMenu:
@@ -79,9 +79,11 @@ class SliderPanel(QWidget):
                 "QHeaderView::section{\n"
                 "background-color: rgb(144,238,144);\n"
                 "border: .5px solid lightgray;\n"
+                "font-size: 13px;\n"
                 "}")  
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(144,238,144);\n"
+                "font-size: 13px;\n"
                 "}")  
         else:
             header[1] = 'Action'
@@ -89,11 +91,11 @@ class SliderPanel(QWidget):
                 "QHeaderView::section{\n"
                 "background-color: rgb(220,220,220);\n"
                 "border: .5px solid lightgray;\n"
-                "font-size: 12px;\n"
+                "font-size: 13px;\n"
                 "}") 
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(220,220,220);\n"
-                "font-size: 12px;\n"
+                "font-size: 13px;\n"
                 "}")  
 
 ### --------------------------------------------------------

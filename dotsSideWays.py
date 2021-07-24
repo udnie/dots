@@ -4,7 +4,7 @@ import os
 from os import path
 
 from PyQt5.QtCore    import Qt, QPointF, QPoint, QTimer, QPropertyAnimation
-from PyQt5.QtGui     import QPen, QColor, QPainterPath, QPixmap
+from PyQt5.QtGui     import QPen, QColor, QPixmap
 from PyQt5.QtWidgets import QFileDialog, QGraphicsPixmapItem, QGraphicsItemGroup
 
 from dotsShared      import common, paths
@@ -12,7 +12,6 @@ from dotsSideGig     import TagIt, MsgBox, getPts, distance
  
 ScaleUpKeys = ('>','\"', '=')
 ScaleDnKeys = ('<',':','-')
-Tick = 3  ## points to move using arrow keys
 
 ### --------------------- dotsSideWays ---------------------
 ''' dotsSideWays: extends pathMaker. Includes path and wayPoints
@@ -20,15 +19,11 @@ Tick = 3  ## points to move using arrow keys
 ### --------------------------------------------------------
 class SideWays():
 ### --------------------------------------------------------
-    def __init__(self, pathMaker, drawing, parent):
+    def __init__(self, parent):
         super().__init__()
  
-        self.pathMaker = pathMaker
-
-        self.canvas    = parent
-        self.scene     = parent.scene
-        self.drawing   = drawing
-
+        self.pathMaker = parent
+     
 ### ----------------------- paths --------------------------
     def centerPath(self):
         if self.pathMaker.pathSet:
@@ -66,35 +61,19 @@ class SideWays():
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
         del tmp
-        self.drawing.redrawPoints(False)  ## redraw canvas without points
+        self.pathMaker.redrawPoints(False)  ## redraw canvas without points
         if self.pathMaker.pathTestSet:
             self.pathMaker.stopPathTest()
             QTimer.singleShot(200, self.pathTest)  ## optional
 
-    def movePath(self, key):   
-        if key == 'right':
-            self.pathMaker.path.setPos(
-                self.pathMaker.path.x()+Tick, 
-                self.pathMaker.path.y())
-            self.updPts(Tick, 0)
-        elif key == 'left':
-            self.pathMaker.path.setPos(
-                self.pathMaker.path.x()-Tick, 
-                self.pathMaker.path.y())
-            self.updPts(-Tick, 0)
-        elif key == 'up':
-            self.pathMaker.path.setPos(
-                self.pathMaker.path.x()+0, 
-                self.pathMaker.path.y()-Tick)
-            self.updPts(0, -Tick)
-        elif key == 'down':
-            self.pathMaker.path.setPos(
-                self.pathMaker.path.x()+0, 
-                self.pathMaker.path.y()+Tick)
-            self.updPts(0, Tick)
+    def movePath(self, key): 
+        self.pathMaker.path.setPos(
+            self.pathMaker.path.x() + key[0],
+            self.pathMaker.path.y() + key[1])   
+        self.updPts(key[0], key[1])
 
-    def updPts(self, tx, ty):    ## used by movePath
-        pt = QPoint(float(tx), float(ty)) ## either x or y, + or -
+    def updPts(self, x, y):
+        pt = QPoint(x, y)   
         for p in self.pathMaker.pts:  ## pts on the screen 
             p += pt  ## add pt to point 'p' in pts
 
@@ -114,15 +93,6 @@ class SideWays():
             if self.pathMaker.pathTestSet:
                 self.pathMaker.stopPathTest()
            
-    def setPaintPath(self, bool=False):  ## also used by waypts
-        path = QPainterPath()
-        for pt in self.pathMaker.pts:  ## pts on the screen 
-            if not path.elementCount():
-                path.moveTo(QPointF(pt))
-            path.lineTo(QPointF(pt)) 
-        if bool: path.closeSubpath()
-        return path
-
     def scaleRotate(self, key): 
         p = self.pathMaker.path.sceneBoundingRect()
         centerX = p.x() + p.width() /2
@@ -130,8 +100,8 @@ class SideWays():
         ## for each pt compute distance from center
         for i in range(0, len(self.pathMaker.pts)):    
             dist = distance(
-                    self.pathMaker.pts[i].x(), centerX, 
-                    self.pathMaker.pts[i].y(), centerY)
+                self.pathMaker.pts[i].x(), centerX, 
+                self.pathMaker.pts[i].y(), centerY)
             inc, xdist, ydist = 0, dist, dist
             ## scale up, scale down
             if key in ScaleUpKeys:  
@@ -209,39 +179,7 @@ class SideWays():
         else:
             MsgBox("savePath: Nothing saved")
 
-### ---------------------- waypoints -----------------------
-    def addWayPtTags(self):
-        if self.pathMaker.addingNewPath:
-            return
-        if self.pathMaker.wayPtsSet:  ## toggle it off
-            self.pathMaker.removeWayPtTags()
-            self.drawing.removePointItems()
-            return   ## added
-        lnn = len(self.pathMaker.pts)
-        if lnn:                     ## make some tags
-            self.pathMaker.addWayPtTagsGroup()
-            inc = int(lnn/10)  # approximate a 10% increment
-            list = (x*inc for x in range(0,10)) ## get the indexes
-            for idx in list:
-                pt = self.pathMaker.pts[idx]
-                pct = (idx/lnn)*100
-                if pct == 0.0: idx = lnn
-                self.pathMaker.addWayPtTag(
-                    self.makePtsTag(pt, idx, pct), 
-                    pt)
-            if self.pathMaker.openPathFile:  ## filename top left corner
-                self.pathMaker.addWayPtTag(
-                    self.pathMaker.openPathFile, 
-                    QPointF(5.0,5.0))
-            self.pathMaker.wayPtsSet = True
- 
-    def makePtsTag(self, pt, idx, pct):  ## used by pointItem as well
-        s = "(" + str("{:2d}".format(int(pt.x())))
-        s = s + ", " + str("{:2d}".format(int(pt.y()))) + ")"
-        s = s + "  " + str("{0:.2f}%".format(pct)) 
-        s = s + "  " + str("{0:2d}".format(idx))
-        return s
-
+### ---------------------- waypoints ----------------------- 
     def shiftWayPtsLeft(self):  
         self.shiftWayPts('<')
 
@@ -272,7 +210,7 @@ class SideWays():
         self.pathMaker.removeWayPtTags()
         self.pathMaker.removePath()
         self.pathMaker.addPath()
-        self.addWayPtTags()
+        self.pathMaker.addWayPtTags()
         # if bol: self.pathMaker.addPointItems()
 
 ### --------------------- dotsSideWays ---------------------

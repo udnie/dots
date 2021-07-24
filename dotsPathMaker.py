@@ -3,7 +3,7 @@ import os
 
 from PyQt5.QtCore    import Qt, QEvent, QObject, QTimer, QPointF, QPoint, pyqtSlot, \
                             QPropertyAnimation
-from PyQt5.QtGui     import QColor, QPen, QPixmap
+from PyQt5.QtGui     import QColor, QPen, QPixmap, QPainterPath
 from PyQt5.QtWidgets import QFileDialog, QGraphicsPathItem, QGraphicsPixmapItem, \
                             QWidget, QGraphicsItemGroup 
 
@@ -15,8 +15,8 @@ from dotsSidePath    import getOffSet
 from dotsSideWays    import SideWays
 from dotsDrawWidget  import DrawingWidget
 
-MoveKeys = ("left","right","up", "down")
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-')
+Tick = 3  ## points to move using arrow keys
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,
@@ -28,21 +28,22 @@ class PathMaker(QWidget):
     def __init__(self, parent):  
         super().__init__()
 
-        self.canvas   = parent  
         self.scene    = parent.scene
-        self.view     = parent.view
-        self.dots     = parent.dots
-   
-        self.chooser  = None ## placeholder for popup_widget 
+        self.canvas = parent  
+        self.scene  = parent.scene
+        self.view   = parent.view
+        self.dots   = parent.dots  ## connection to sliderpanel
+
+        self.chooser = None  ## placeholder for popup_widget 
       
         self.initThis()
-
-        self.drawing  = DrawingWidget(self, parent)  
-        self.sideWays = SideWays(self, self.drawing, parent)  ## extends pathMaker
+ 
+        self.sideWays = SideWays(self)  ## extends pathMaker
+        self.drawing  = DrawingWidget(self, parent) 
 
         self.doFirst = {
-            'D': self.delete,
-            '/': self.changePathColor,
+            'D':   self.delete,
+            '/':   self.changePathColor,
             'cmd': self.drawing.closeNewPath,
         }
 
@@ -58,7 +59,7 @@ class PathMaker(QWidget):
             'R': self.sideWays.reversePath,
             'S': self.sideWays.savePath,
             'T': self.pathTest,
-            'W': self.sideWays.addWayPtTags,
+            'W': self.addWayPtTags,
             'N': self.drawing.toggleNewPath,
         }
 
@@ -69,6 +70,13 @@ class PathMaker(QWidget):
             '>': self.sideWays.shiftWayPtsRight,
         }
 
+        self.moveKeys = {
+            "right": (Tick, 0),
+            "left":  (-Tick, 0),
+            "up":    (0, -Tick),
+            "down":  (0, Tick),
+        }
+
 ### --------------------------------------------------------
     def initThis(self):
         self.pts = []
@@ -77,7 +85,7 @@ class PathMaker(QWidget):
         self.color = "DODGERBLUE"
         self.openPathFile = '' 
         self.tag = ''
- 
+
         self.pathSet = False
         self.addingNewPath = False
         self.pathChooserSet = False
@@ -96,16 +104,17 @@ class PathMaker(QWidget):
     def pathKeys(self, key):
         self.key = key
         if key in self.doFirst:
-            self.doFirst[key]() 
+            self.doFirst[key]()  ## run the function
         elif key in self.noPathKeysSet:
             self.noPathKeysSet[key]()  
         elif not self.wayPtsSet and not self.addingNewPath:
             if key in self.direct: 
                 self.direct[key]()  
-            elif key in MoveKeys:
-                self.sideWays.movePath(key)
-            elif key in ScaleRotateKeys: 
-                self.sideWays.scaleRotate(key)
+            elif len(self.pts) > 0:
+                if key in self.moveKeys: 
+                    self.sideWays.movePath(self.moveKeys[key])
+                elif key in ScaleRotateKeys:
+                    self.sideWays.scaleRotate(key)
         elif self.wayPtsSet and key in self.WayPtsKeys:
             self.WayPtsKeys[key]() 
 
@@ -127,7 +136,7 @@ class PathMaker(QWidget):
 
     def turnGreen(self):
         self.dots.btnPathMaker.setStyleSheet(
-                "background-color: LIGHTGREEN")
+            "background-color: LIGHTGREEN")
 
     def delete(self):
         self.drawing.delNewPath()  ## turns green if nothing else
@@ -164,7 +173,7 @@ class PathMaker(QWidget):
 ### -------------------- path stuff ------------------------
     def addPath(self):
         self.removePath() 
-        self.path = QGraphicsPathItem(self.sideWays.setPaintPath(True))
+        self.path = QGraphicsPathItem(self.setPaintPath(True))
         self.path.setPen(QPen(QColor(self.color), 3, Qt.DashDotLine))
         self.path.setZValue(common['pathZ']) 
         self.scene.addItem(self.path)
@@ -180,7 +189,7 @@ class PathMaker(QWidget):
         self.removeWayPtTags()
         self.removePath()
         self.addPath()
-        self.sideWays.addWayPtTags()
+        self.addWayPtTags()
 
     def findTop(self):
         for itm in self.scene.items():
@@ -194,7 +203,48 @@ class PathMaker(QWidget):
         else:
             self.addPath()
 
+    def setPaintPath(self, bool=False):  ## also used by waypts
+        path = QPainterPath()
+        for pt in self.pts:  ## pts on the screen 
+            if not path.elementCount():
+                path.moveTo(QPointF(pt))
+            path.lineTo(QPointF(pt)) 
+        if bool: path.closeSubpath()
+        return path
+
+    def redrawPoints(self, bool=True):  ## pointItems points
+        self.drawing.removePointItems()
+        self.redrawPathsAndTags()
+        if bool: self.drawing.addPointItems()
+
 ### --------------------- wayPtTags ------------------------
+    def addWayPtTags(self):
+        if self.addingNewPath:
+            return
+        if self.wayPtsSet:  ## toggle it off
+            self.removeWayPtTags()
+            self.drawing.removePointItems()
+            return  ## added
+        lnn = len(self.pts)
+        if lnn:                ## make some tags
+            self.addWayPtTagsGroup()
+            inc = int(lnn/10)  ## approximate a 10% increment
+            list = (x*inc for x in range(0,10))  ## get the indexes
+            for idx in list:
+                pt = self.pts[idx]
+                pct = (idx/lnn)*100
+                if pct == 0.0: idx = lnn
+                self.addWayPtTag(
+                    self.makePtsTag(pt, idx, pct), 
+                    pt
+                    )
+            if self.openPathFile:  ## filename top left corner
+                self.addWayPtTag(
+                    self.openPathFile, 
+                    QPointF(5.0,5.0)
+                    )
+            self.wayPtsSet = True
+
     def addWayPtTag(self, tag, pt):
         self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
         self.tag.setPos(pt)
@@ -212,6 +262,13 @@ class PathMaker(QWidget):
             self.tagGroup = None
             self.wayPtsSet = False
         
+    def makePtsTag(self, pt, idx, pct):  ## used by pointItem as well
+        s = "(" + str("{:2d}".format(int(pt.x())))
+        s = s + ", " + str("{:2d}".format(int(pt.y()))) + ")"
+        s = s + "  " + str("{0:.2f}%".format(pct)) 
+        s = s + "  " + str("{0:2d}".format(idx))
+        return s
+
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
         if self.pts and self.pathSet:
@@ -223,12 +280,15 @@ class PathMaker(QWidget):
                 self.pathTestNode = QPropertyAnimation(node, b'pos')
                 self.pathTestNode.setDuration(10000)  ## 10 seconds
 
-                waypts = self.sideWays.setPaintPath(True) ## close subpath
+                waypts = self.setPaintPath(True)  ## close subpath
                 pt = getOffSet(self.ball)
 
                 self.pathTestNode.setStartValue(waypts.pointAtPercent(0.0)-pt)
                 for i in range(1, 99):   
-                    self.pathTestNode.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
+                    self.pathTestNode.setKeyValueAt(
+                        i/100.0, 
+                        waypts.pointAtPercent(i/100.0)-pt
+                        )
                 self.pathTestNode.setEndValue(waypts.pointAtPercent(1.0)-pt)  
                 self.pathTestNode.setLoopCount(-1) 
                 self.startPathTest()

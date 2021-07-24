@@ -5,7 +5,7 @@ The original dots was written in JavaFX which added animation to the photo-colla
 
 
 ## Stuff to know
-One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible. Also, I use camel case after many years of coding in snake.
+The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible. Also, I use camel case after many years of coding in snake.
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on dropCanvas.
 
