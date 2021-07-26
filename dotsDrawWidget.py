@@ -14,8 +14,11 @@ from dotsShared      import common, paths
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
-    def __init__(self, drawing, pt, idx, adto):
+    def __init__(self, drawing, parent, pt, idx, adto):
         super().__init__()
+
+        self.canvas  = parent
+        self.scene   = parent.scene
 
         self.drawing   = drawing
         self.pathMaker = drawing.pathMaker
@@ -44,7 +47,7 @@ class PointItem(QGraphicsEllipseItem):
             self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
             self.pointTag.setPos(self.pt+QPointF(0,-20))
             self.pointTag.setZValue(self.pathMaker.findTop()+5)
-            self.drawing.addPointItemTag(self.pointTag)
+            self.scene.addItem(self.pointTag)
         e.accept()
 
     def hoverLeaveEvent(self, e):
@@ -62,8 +65,8 @@ class PointItem(QGraphicsEllipseItem):
         e.accept()
         
     def removePointTag(self):
-        if self.pointTag:
-            self.drawing.removePointItemTag(self.pointTag)
+        if self.pointTag != '':
+            self.scene.removeItem(self.pointTag)
             self.pointTag = ''
      
 ### --------------------------------------------------------
@@ -178,12 +181,6 @@ class DrawingWidget(QWidget):
         if self.pathMaker.wayPtsSet:
             QTimer.singleShot(200, self.pathMaker.redrawPathsAndTags)  
 
-    def addPointItemTag(self, tag):
-        self.scene.addItem(tag)
-
-    def removePointItemTag(self, tag):
-        self.scene.removeItem(tag)
-
     def findTop(self):
         for itm in self.scene.items():
             return itm.zValue()
@@ -193,7 +190,7 @@ class DrawingWidget(QWidget):
         idx = 0 
         add = self.findTop() + 10  ## added to idx to set zvalue
         for pt in self.pathMaker.pts:  
-            self.scene.addItem(PointItem(self, pt, idx, add))
+            self.scene.addItem(PointItem(self, self.canvas, pt, idx, add))
             idx += 1
 
     def removePointItems(self):   
