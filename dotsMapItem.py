@@ -10,8 +10,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup
 
 from dotsShared      import common, pathcolors
 from dotsSideGig     import TagIt, getColorStr
-
-import dotsSidePath  as sidePath
+from dotsSidePath    import pathLoader
 
 All = -999
 
@@ -196,24 +195,26 @@ class InitMap():
 
     def tagWorks(self, pid):
         k = 0
+        tf = self.toFront()  ## only once
         self.tagSet = False
         if pid == '': 
             pid = 'all'
-        for pix in self.scene.items():
+        ## changed order - otherwise the top tag can be hidden 
+        for pix in self.scene.items(Qt.AscendingOrder):
             if pix.type == 'pix':  
                 if pid == 'all':
-                    self.tagIt(pix) 
+                    self.tagIt(pix, tf) 
                     k += 1
                 # elif pid == 'select' and pix.isSelected():
                 elif pix.isSelected():
-                    self.tagIt(pix)
+                    self.tagIt(pix, tf)
                     k += 1
                 elif pid == pix.id:  ## single tag
-                    self.tagIt(pix) 
+                    self.tagIt(pix, tf) 
                     k = 1
                     break
-            elif pix.zValue() <= common["pathZ"]:
-                break
+            # elif pix.zValue() <= common["pathZ"]:
+            #     break
         if k > 0: 
             self.tagSet = True
             self.dots.statusBar.showMessage("Number Tagged:  {}".format(k),2500)
@@ -232,7 +233,7 @@ class InitMap():
             self.tagGroup = None
             self.tagSet = False  
 
-    def tagIt(self, pix):  
+    def tagIt(self, pix, tf):  
         p = pix.sceneBoundingRect()
         x = p.x() + p.width()*.45
         y = p.y() + p.height()*.45
@@ -240,9 +241,12 @@ class InitMap():
             x, y = common["ViewW"]*.47, common["ViewH"]-35
             pix.tag = ""
         tag = pix.tag
+        color = ''
         if pix.locked == True:
             tag = "Locked " + tag 
-        tag = TagIt(self.parent.control, tag, '', pix.zValue())
+        if pix.zValue() == tf: 
+            color = 'yellow'
+        tag = TagIt(self.parent.control, tag, color, pix.zValue())
         tag.setPos(x,y)
         tag.setZValue(self.tagZ) 
         self.tagGroup.addToGroup(tag)
@@ -315,7 +319,7 @@ class InitMap():
 
     def addPainterPath(self, tag):
         color = getColorStr()
-        path = sidePath.pathLoader(tag) ## return painter path
+        path = pathLoader(tag)  ## return painter path
         pathPt = path.pointAtPercent(0.0)  ## so its consistent
         ## use painter path
         pathItem = QGraphicsPathItem(path)
@@ -324,13 +328,13 @@ class InitMap():
         self.pathGroup.addToGroup(pathItem)
         self.addTag(tag, color, pathPt)
 
-    def addTag(self, tag, color, pt): ## use same offsets and color as path     
+    def addTag(self, tag, color, pt):  ## use same offsets and color as path     
         tag = TagIt('', tag, color)   
         tag.setPos(pt)
-        tag.setZValue(self.pathTagZ)  ## use pathTagZ instead of tagZ
+        tag.setZValue(self.pathTagZ)   ## use pathTagZ instead of tagZ
         self.pathTagGroup.addToGroup(tag)
 
-    def lastZval(self, str): ## finds the lowest pix or bkg zValue
+    def lastZval(self, str):  ## finds the lowest pix or bkg zValue
         last = 100000.0
         for itm in self.scene.items():
             if itm.type == str and itm.zValue() < last:
@@ -338,7 +342,7 @@ class InitMap():
         return last
 
     def toFront(self, inc=0):  ## finds the highest pixitem zValue
-        first = 0           ## returns it plus the increment
+        first = 0               ## returns it plus the increment
         for pix in self.scene.items():
             if pix.type == 'pix': 
                 first = pix.zValue()

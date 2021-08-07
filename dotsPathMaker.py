@@ -13,9 +13,9 @@ from dotsShared      import common, paths
 from dotsSidePath    import getOffSet
 
 from dotsSideWays    import SideWays
-from dotsDrawWidget  import DrawingWidget
+from dotsDrawsPaths  import DrawsPaths
 
-ScaleRotateKeys = ('+','_','<','>',':','\"','=','-')
+ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'')
 Tick = 3  ## points to move using arrow keys
 
 ### -------------------- dotsPathMaker ---------------------
@@ -34,11 +34,9 @@ class PathMaker(QWidget):
         self.dots   = parent.dots  ## connection to sliderpanel
 
         self.chooser = None  ## placeholder for popup_widget 
-      
-        self.initThis()
- 
+       
         self.sideWays = SideWays(self)  ## extends pathMaker
-        self.drawing  = DrawingWidget(self, parent) 
+        self.drawing  = DrawsPaths(self, parent) 
 
         self.doFirst = {
             'D':   self.delete,
@@ -76,6 +74,11 @@ class PathMaker(QWidget):
             "down":  (0, Tick),
         }
 
+        self.setMouseTracking(True)
+        self.view.viewport().installEventFilter(self)
+
+        self.initThis()
+
 ### --------------------------------------------------------
     def initThis(self):
         self.pts = []
@@ -85,8 +88,11 @@ class PathMaker(QWidget):
         self.openPathFile = '' 
         self.tag = ''
  
-        self.pathSet = False
+        self.npts = 0  ## counter used by addNewPathPts
+        self.newPath = None
         self.addingNewPath = False
+
+        self.pathSet = False
         self.pathChooserSet = False
        
         self.ball = None
@@ -116,6 +122,20 @@ class PathMaker(QWidget):
                     self.sideWays.scaleRotate(key)
         elif self.wayPtsSet and key in self.WayPtsKeys:
             self.WayPtsKeys[key]() 
+
+### --------------------- event filter ----------------------   
+    def eventFilter(self, source, e):     
+        if self.canvas.pathMakerOn:
+            if self.addingNewPath:
+                if e.type() == QEvent.MouseButtonPress and e.buttons() & Qt.LeftButton:
+                    self.drawing.npts = 0  
+                    self.drawing.addNewPathPts(QPoint(e.pos()))  
+                elif e.type() == QEvent.MouseMove and e.buttons() & Qt.LeftButton:
+                    self.drawing.addNewPathPts(QPoint(e.pos()))  
+                elif e.type() == QEvent.MouseButtonRelease and e.buttons() & Qt.LeftButton:
+                    self.drawing.addNewPathPts(QPoint(e.pos()))
+                    self.drawing.updateNewPath()  
+        return QWidget.eventFilter(self, source, e)
 
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
@@ -288,7 +308,7 @@ class PathMaker(QWidget):
                         i/100.0, 
                         waypts.pointAtPercent(i/100.0)-pt
                         )
-                self.pathTestNode.setEndValue(waypts.pointAtPercent(1.0)-pt)  
+                self.pathTestNode.setEndValue(waypts.pointAtPercent(1.0)-pt) 
                 self.pathTestNode.setLoopCount(-1) 
                 self.startPathTest()
             else:

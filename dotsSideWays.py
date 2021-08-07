@@ -10,8 +10,8 @@ from PyQt5.QtWidgets import QFileDialog, QGraphicsPixmapItem, QGraphicsItemGroup
 from dotsShared      import common, paths
 from dotsSideGig     import TagIt, MsgBox, getPts, distance
  
-ScaleUpKeys = ('>','\"', '=')
-ScaleDnKeys = ('<',':','-')
+ScaleUpKeys = ('>','\"','\'')
+ScaleDnKeys = ('<',':',';')
 
 ### --------------------- dotsSideWays ---------------------
 ''' dotsSideWays: extends pathMaker. Includes path and wayPoints
@@ -97,30 +97,39 @@ class SideWays():
         p = self.pathMaker.path.sceneBoundingRect()
         centerX = p.x() + p.width() /2
         centerY = p.y() + p.height() /2
+
         ## for each pt compute distance from center
         for i in range(0, len(self.pathMaker.pts)):    
             dist = distance(
                 self.pathMaker.pts[i].x(), centerX, 
                 self.pathMaker.pts[i].y(), centerY)
             inc, xdist, ydist = 0, dist, dist
+
             ## scale up, scale down
             if key in ScaleUpKeys:  
                 dist = dist + ( dist * .01 )         
             elif key in ScaleDnKeys:  
                 dist = dist - ( dist * .01 )
+
             ## rotate 1 degree
             if key == '+':  
                 inc = -1.0   
             elif key == '_': 
                 inc = 1.0      
+            elif key == '-':  
+                inc = 15.0   
+            elif key == '=': 
+                inc = -15.0
+
             ## more scale stuff
             if key in('<','>'):
                 xdist = dist                
                 ydist = dist  
             elif key in(':','\"'): ## scale X
                 xdist = dist              
-            elif key in('-','='):  ## scale Y
+            elif key in(';','\''):  ## scale Y
                 ydist = dist
+
             ## do the math 
             deltaX = self.pathMaker.pts[i].x() - centerX
             deltaY = self.pathMaker.pts[i].y() - centerY
@@ -205,13 +214,10 @@ class SideWays():
             self.updateWayPts()
 
     def updateWayPts(self):
-        # bol = self.pathMaker.pointItemsSet()
-        # if bol: self.pathMaker.removePointItems()
         self.pathMaker.removeWayPtTags()
         self.pathMaker.removePath()
         self.pathMaker.addPath()
         self.pathMaker.addWayPtTags()
-        # if bol: self.pathMaker.addPointItems()
 
 ### --------------------- dotsSideWays ---------------------
 

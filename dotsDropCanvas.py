@@ -3,7 +3,7 @@ import os
 
 from os import path
 
-from PyQt5.QtCore    import pyqtSignal, QAbstractAnimation
+from PyQt5.QtCore    import pyqtSignal, QAbstractAnimation, QTimer
 from PyQt5.QtWidgets import QMenu, QRubberBand, QGraphicsScene,\
                             QGraphicsItemGroup
                       
@@ -94,31 +94,15 @@ class DropCanvas(QWidget):
         # if self.mapper.mapSet: ## already in sendPixKeys
         #     self.mapper.updateMap()  ## redraw mapper
 
-### -------------- the annoyance starts here ---------------
-    ''' Problem: Starting a new path drawing session, by typing 'N' in 
-    pathMaker will immeadiately start drawing without having to register a 
-    mousePress event if entered after displaying pointItems or if 
-    started after either running an animation or pixtest. 
-        The mouse events used by the pathMaker newPath functions no-longer respond -
-    it doesn't stop drawing. Annoying but not fatal. I'm pretty sure the problem 
-    is with the eventFilter in DrawingWidget though scene ownership may also be 
-    involved. 
-        The one thing animations, pixtext, and pointItems all have in common is 
-    they all add and delete graphicItems to and from the scene - which should 
-    be owned by dropCanvas, at least that's the idea.  Hope that helps.
-        I may want to add additional pathMaker like classes/fearures later and 
-    knowing how to share the canvas would be useful - unless there's an 
-    another way to do this.  Many thanks in advance ..'''
-### --------------------------------------------------------
-    def eventFilter(self, source, e):   ## mapper controls - this appears to work
-        if not self.pathMakerOn:        ## correctly
-    
+### --------------------- event filter ---------------------- 
+    def eventFilter(self, source, e):   ## mainly used by mapper 
+        if not self.pathMakerOn:      
             if e.type() == QEvent.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()   ## chks if set
 
                 if self.key == 'cmd':  ## only used by eventFilter
-                    self.mapper.clearMap()    ## set rubberband if mapset
+                    self.mapper.clearMap()  ## set rubberband if mapset
                     self.unSelect()
 
                 elif self.hasHiddenPix() or self.mapper.selections:
@@ -126,10 +110,10 @@ class DropCanvas(QWidget):
                         self.mapper.updatePixItemPos()
 
             elif e.type() == QEvent.MouseMove:
-    
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
                         self.mapper.removeMap()
+
                     self.rubberBand.show()
                     self.rubberBand.setGeometry(QRect(self.origin, 
                         e.pos()).normalized())
@@ -141,7 +125,6 @@ class DropCanvas(QWidget):
                     self.mapper.updatePixItemPos()  ## costly but necessary 
 
             elif e.type() == QEvent.MouseButtonRelease:
-    
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas() 
@@ -158,7 +141,6 @@ class DropCanvas(QWidget):
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
-    
                 if self.mapper.selections or self.hasHiddenPix():
                     if self.mapper.isMapSet():
                         self.mapper.removeMap()
@@ -207,7 +189,7 @@ class DropCanvas(QWidget):
 
     def exit(self):
         self.clear()
-        self.dots.close()
+        QTimer.singleShot(250, self.dots.close)
 
     def clear(self):
         if self.pathMakerOn:
@@ -222,7 +204,7 @@ class DropCanvas(QWidget):
         self.sideCar.gridSet = False
         self.openPlayFile = ''
         self.scene.clear()
-
+      
     def loadSprites(self):
         self.sideShow.enablePlay()
         self.dots.scrollpanel.loadSprites()

@@ -211,15 +211,18 @@ class SideShow():
  
     def stop(self, action=''):
         self.clearPathsandTags()  
+     
         for pix in self.scene.items():
             if pix.type == 'pix':
-                if pix.anime: pix.anime.stop()  
+                if pix.anime: ## running: 
+                    pix.anime.stop()  
                 if action != 'clear': 
                     if 'frame' in pix.fileName:
                         continue  
                     pix.reprise() 
             elif pix.zValue() <= common["pathZ"]:
                 break
+
         self.enablePlay() 
         self.dots.btnPause.setText( "Pause" )
    

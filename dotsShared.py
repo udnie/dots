@@ -26,8 +26,8 @@ common = {
     "runThis":  "demo.play",
 }
           
-CanvasStr = "L,R,P,S,C,:,\",\',<,>,{,},[,],_,+,/,lock,space,cmd,left,right,up,down,del,shift,opt,return,enter"   
-PathStr = "F,S,C,D,N,T,P,R,W,V,{,},/,!,cmd,left,right,up,down,del,opt,<,>,:,\",_,+,-,="
+CanvasStr = "L,R,P,S,C,:,\",\',<,>,{,},[,],_,+,/,-,=,lock,space,cmd,left,right,up,down,del,shift,opt,return,enter"   
+PathStr = "F,S,C,D,N,T,P,R,W,V,{,},/,!,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt"
 
 paths = {
     "snapShot":   "./",
@@ -42,7 +42,7 @@ Star = ((100, 20), (112, 63), (158, 63), (122, 91),
         (136, 133), (100, 106), (63, 132), (77, 90), 
         (41, 63), (86, 63))
 
-keyMenu = (                    ## pixitems and bkgitems
+keyMenu = (               ## used by pixitems and bkgitems
     ('A', 'Select All'),   
     ('C', 'Clear Canvas'),     
     ('D', 'Delete Selected'),
@@ -79,7 +79,7 @@ keyMenu = (                    ## pixitems and bkgitems
     ('U/D', 'Arrow Keys'),
     ('L/R', 'Arrow Keys'))
 
-pathMenu = (
+pathMenu = (              
     ('C', 'Center Path'),
     ("D", "Delete Screen"), 
     ("F", "Files"),
@@ -92,12 +92,13 @@ pathMenu = (
     ("V", "..View Points"),
     ("/", "Path Color"),
     ("cmd", "Closes Path"),
-    ('_/+', "Rotate 1 deg"),
+    ('_/+', "Rotate 1 deg"),  
+    ('-/=', "Rotate 15 deg"),
     ('<,>', 'Toggle Size'),
     ("} ", "Flop Path"),
     ("{ ", "Flip Path"),  
     (':/\"', "Scale X"),
-    ('-,=', 'Scale Y'),
+    (';/\'', 'Scale Y'),
     ('U/D', 'Arrow Keys'),
     ('L/R', 'Arrow Keys'),
     ("opt", "Add a Point"),
@@ -154,6 +155,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key_Less: '<',     
     Qt.Key_Greater: '>',
     Qt.Key_Colon: ':',   
+    Qt.Key_Semicolon: ';',  
     Qt.Key_Apostrophe: '\'',      
     Qt.Key_QuoteDbl: '"', 
     Qt.Key_Slash: '/',

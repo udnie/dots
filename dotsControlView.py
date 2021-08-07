@@ -141,4 +141,5 @@ class ControlView(QGraphicsView):
     def keyReleaseEvent(self, e):   
         self.keysSignal[str].emit('')
 
-### -------------------- dotsDropCanvas --------------------
+### ------------------ dotsControlView ---------------------
+
