@@ -125,16 +125,19 @@ class PathMaker(QWidget):
 
 ### --------------------- event filter ----------------------   
     def eventFilter(self, source, e):     
-        if self.canvas.pathMakerOn:
-            if self.addingNewPath:
-                if e.type() == QEvent.MouseButtonPress and e.buttons() & Qt.LeftButton:
-                    self.drawing.npts = 0  
-                    self.drawing.addNewPathPts(QPoint(e.pos()))  
-                elif e.type() == QEvent.MouseMove and e.buttons() & Qt.LeftButton:
-                    self.drawing.addNewPathPts(QPoint(e.pos()))  
-                elif e.type() == QEvent.MouseButtonRelease and e.buttons() & Qt.LeftButton:
-                    self.drawing.addNewPathPts(QPoint(e.pos()))
-                    self.drawing.updateNewPath()  
+        if self.canvas.pathMakerOn and self.addingNewPath:
+    
+            if e.type() == QEvent.MouseButtonPress and e.buttons() & Qt.LeftButton:
+                self.drawing.npts = 0  
+
+                self.drawing.addNewPathPts(QPoint(e.pos()))  
+            elif e.type() == QEvent.MouseMove and e.buttons() & Qt.LeftButton:
+                self.drawing.addNewPathPts(QPoint(e.pos()))  
+
+            elif e.type() == QEvent.MouseButtonRelease and e.buttons() & Qt.LeftButton:
+                self.drawing.addNewPathPts(QPoint(e.pos()))
+                self.drawing.updateNewPath()  
+
         return QWidget.eventFilter(self, source, e)
 
 ### --------------------------------------------------------

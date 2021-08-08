@@ -40,24 +40,25 @@ class SideShow():
         pass
     
     def keysInPlay(self, key):
-        if key == 'L':
-            if self.canvas.openPlayFile == '' and \
-                self.canvas.control == '':
-                self.loadPlay()
+        if self.canvas.pathMakerOn == False:
+            if key == 'L':
+                if self.canvas.openPlayFile == '' \
+                    and self.canvas.control == '':
+                    self.loadPlay()
+                    return
+                else:
+                    pass
+            elif key == 'P':  ## always
+                self.mapper.togglePaths() 
                 return
-            else:
-                pass
-        elif key == 'P':  ## always
-            self.mapper.togglePaths() 
-            return
-        elif key == 'R':    
-            if len(self.scene.items()) == 0:
-                self.runThis(common['runThis'])  
-            else:
-                self.run()
-            return
-        elif key == 'S' and self.canvas.control != '':
-            self.stop()
+            elif key == 'R':    
+                if len(self.scene.items()) == 0:
+                    self.runThis(common['runThis'])  
+                else:
+                    self.run()
+                return
+            elif key == 'S' and self.canvas.control != '':
+                self.stop()
         
     def loadPlay(self):
         if self.canvas.pathMakerOn:       ## using load in pathMaker
