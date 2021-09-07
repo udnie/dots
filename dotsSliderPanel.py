@@ -41,6 +41,7 @@ class SliderPanel(QWidget):
         self.scaleSldr.setValue(100)
         self.opacitySldr.setValue(100)
         self.sliderGroup.setEnabled(bool)
+
 ### --------------------------------------------------------
     def addTableGroup(self):
         self.tableView = QTableView()
@@ -123,7 +124,7 @@ class SliderPanel(QWidget):
         self.rotateSldr.setTickInterval(90)
         
         self.scaleSldr = QSlider(Qt.Vertical, 
-            minimum=50, maximum=225,
+            minimum=25, maximum=300,
             singleStep=2, value=100, 
             valueChanged=self.setScale)
         self.scaleSldr.setTickPosition(QSlider.TicksBothSides)

@@ -43,8 +43,7 @@ class BkgItem(QGraphicsPixmapItem):
 
         self.key = ""
         self.id = 0          ## not used except for conisistency
-        self.locked = False  ## not used except by json r/w
-
+ 
         self.type = 'bkg'
         self.flopped = False
 
@@ -52,7 +51,6 @@ class BkgItem(QGraphicsPixmapItem):
         self.scale = 1.0
 
         self.setZValue(zval)
-        self.tag = ''
         self.isBackgroundSet = False
 
         self.width = self.imgFile.width()

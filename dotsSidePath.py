@@ -1,6 +1,9 @@
+import os
 import sys
 import random
 import time
+
+from os import path
 
 from PyQt5.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
                                QParallelAnimationGroup, QSequentialAnimationGroup     
@@ -91,7 +94,6 @@ def demo(pix, anime, node):
 
 ### --------------------------------------------------------
 def setPaths(pix, anime, node):           
-    pos  = node.pix.pos()
     sync = random.randint(73,173) * 100  ## very arbitrary
 
     path = QPropertyAnimation(node, b'pos')
@@ -108,15 +110,39 @@ def setPaths(pix, anime, node):
     path.setEndValue(waypts.pointAtPercent(1.0)-pt)
 
     path.setLoopCount(-1) 
-    
+
     return path
+
+### --------------------------------------------------------
+def flapper(pix, anime, node):          
+    baseName = os.path.basename(pix.fileName)
+
+    if pix.part == 'right':
+        node.pix.setTransformOriginPoint(QPointF(pix.width*0.25, pix.height*0.65))
+        rot = 25.0
+    else:
+        rot = -25.0
+        node.pix.setTransformOriginPoint(QPointF(pix.width*0.75, pix.height*0.65))
+
+    rotate = QPropertyAnimation(node, b'rotate')
+    rotate.setDuration(1200)  ## butterfiles
+
+    if 'bat' in baseName:
+        rotate.setDuration(300)
+
+    rotate.setStartValue(node.pix.rotation)
+    rotate.setKeyValueAt(0.50, rot+pix.rotation)
+    rotate.setEndValue(node.pix.rotation)
+    rotate.setEasingCurve(QEasingCurve.Linear)
+
+    rotate.setLoopCount(-1) 
+
+    return rotate
 
 ### --------------------------------------------------------
 def getOffSet(pix):
     b = pix.boundingRect()
-    w = (b.width()*.5)
-    h = (b.height()*.5)
-    return QPointF(w,h)
+    return QPointF(b.width()*.5, b.height()*.5)
 
 def pathLoader(anime):
     file = paths["paths"] + anime  ## includes '.path'

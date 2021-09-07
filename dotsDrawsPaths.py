@@ -70,7 +70,7 @@ class PointItem(QGraphicsEllipseItem):
             self.pointTag = ''
      
 ### --------------------------------------------------------
-class DrawsPaths():
+class DrawsPaths:
 ### --------------------------------------------------------
     def __init__(self, pathMaker, parent):  
         super().__init__()

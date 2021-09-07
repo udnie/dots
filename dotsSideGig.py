@@ -53,7 +53,15 @@ class TagIt(QGraphicsSimpleTextItem):
     def __init__(self, control, tag, color, zval=None):
         super().__init__()
     
-        if control in PlayKeys and "Random" in tag:
+        if control == 'paths':
+            color = 'lime'
+            if "Locked Random" in tag:
+                tag = tag[14:] 
+            elif "Random" in tag:
+                tag = tag[7:]
+            n = tag.find('path') + 5
+            tag = tag[0:n]
+        elif control in PlayKeys and "Random" in tag:
             tag = tag[7:]
             self.color = QColor(0,255,127)
         elif control == 'pathMaker':
@@ -71,7 +79,7 @@ class TagIt(QGraphicsSimpleTextItem):
         if color:
             self.color = QColor(color)
 
-        if zval != None:
+        if zval != None and control != 'paths':
             if len(tag) > 0:  
                 tag = tag + ": " + str(zval)
             else:

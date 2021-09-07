@@ -26,8 +26,8 @@ common = {
     "runThis":  "demo.play",
 }
           
-CanvasStr = "L,R,P,S,C,:,\",\',<,>,{,},[,],_,+,/,-,=,lock,space,cmd,left,right,up,down,del,shift,opt,return,enter"   
-PathStr = "F,S,C,D,N,T,P,R,W,V,{,},/,!,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt"
+CanvasStr = "L,R,P,S,C,:,\",\',<,>,{,},[,],_,+,/,-,=,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+PathStr = "C,D,F,N,P,R,S,T,W,V,{,},[,],/,!,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt"
 
 paths = {
     "snapShot":   "./",
@@ -42,7 +42,7 @@ Star = ((100, 20), (112, 63), (158, 63), (122, 91),
         (136, 133), (100, 106), (63, 132), (77, 90), 
         (41, 63), (86, 63))
 
-keyMenu = (               ## used by pixitems and bkgitems
+keyMenu = (                    ## pixitems and bkgitems
     ('A', 'Select All'),   
     ('C', 'Clear Canvas'),     
     ('D', 'Delete Selected'),
@@ -79,7 +79,7 @@ keyMenu = (               ## used by pixitems and bkgitems
     ('U/D', 'Arrow Keys'),
     ('L/R', 'Arrow Keys'))
 
-pathMenu = (              
+pathMenu = (
     ('C', 'Center Path'),
     ("D", "Delete Screen"), 
     ("F", "Files"),
@@ -94,6 +94,7 @@ pathMenu = (
     ("cmd", "Closes Path"),
     ('_/+', "Rotate 1 deg"),  
     ('-/=', "Rotate 15 deg"),
+    ('[/]', 'Rotate 45 deg'),
     ('<,>', 'Toggle Size'),
     ("} ", "Flop Path"),
     ("{ ", "Flip Path"),  

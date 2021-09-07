@@ -11,9 +11,9 @@ from dotsShared      import common
 import dotsSidePath  as sidePath
 
 AnimeList = ['Vibrate', 'Pulse','Bobble','Idle']
-OneOffs = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
-Stages = ('Stage Left', 'Stage Right')
-Spins = ('Spin Left', 'Spin Right')
+OneOffs   = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
+Stages    = ('Stage Left', 'Stage Right')
+Spins     = ('Spin Left', 'Spin Right')
 
 AnimeList += OneOffs
 
@@ -46,7 +46,7 @@ class Node(QObject):
     opacity = pyqtProperty(float, fset=_setOpacity)
 
 ### -------------------------------------------------------- 
-class Animation():
+class Animation:
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -57,7 +57,7 @@ class Animation():
             'Vibrate': vibrate,  
             'Pulse': pulse,
             'Bobble': bobble,
-            'Idle': idle
+            'Idle': idle,
         }
 
 ### --------------------------------------------------------
@@ -77,6 +77,8 @@ class Animation():
             return rain(pix, Node(pix))
         elif anime in Stages:
             return stage(pix, anime)
+        elif anime == 'Flapper':
+            return sidePath.flapper(pix, anime, Node(pix)) 
         elif anime in Spins:
             return spin(pix, anime, Node(pix))
         elif anime == 'demo.path':
@@ -169,6 +171,7 @@ def bobble(pix):
 def fin(pix):            ## delete pixitem 
     node = Node(pix)
     node.pix.setOriginPt()
+
     sync = random.randint(6,10) * 75
     rot = 270 
     if not random.randint(0,1): rot = -270
@@ -209,6 +212,9 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     reprise.setStartValue(node.pix.pos())
     reprise.setEndValue(QPointF(pix.x, pix.y))
 
+    if pix.part == "pivot":
+        return reprise
+
     spin = QPropertyAnimation(node, b'rotate')
     spin.setDuration(sync)
     spin.setStartValue(node.pix.rotation)
@@ -222,7 +228,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
 
     opacity = QPropertyAnimation(node, b'opacity')
     opacity.setDuration(sync)
-    opacity.setStartValue(node.pix.opacity())
+    opacity.setStartValue(node.pix.opacity())  ## reset to 1.0
     opacity.setEndValue(1)
 
     group = QParallelAnimationGroup()
@@ -257,6 +263,7 @@ def stage(pix, which):
 
     x = int(pos.x())
     ViewW = common["ViewW"]
+
     left = x+node.pix.width*3
     right = ViewW+node.pix.width*3
 
@@ -269,28 +276,32 @@ def stage(pix, which):
     stage.addAnimation(stage1)
     stage.addAnimation(stage2)
 
-    stage.setLoopCount(-1)
+    stage.setLoopCount(-1) 
 
     return stage
 
+### --------------------------------------------------------
 def stageLeft(node, pos, left, right):
+    
     stage1 = QPropertyAnimation(node, b'pos')
-    stage1.setDuration(random.randint(14, 23) * 75)
-    val = (random.randint(7, 13) * 5) / 100
+    stage1.setDuration(random.randint(16, 23) * 110)
+    val = (random.randint(7, 13) * 5) / 125
     stage1.setStartValue(pos)
     stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
     stage1.setEndValue(pos + QPointF(-left, 0))
 
     stage2 = QPropertyAnimation(node, b'pos')
-    stage2.setDuration(random.randint(14, 23) * 75)
-    val = (random.randint(7, 13) * 5) / 100
+    stage2.setDuration(random.randint(16, 23) * 100)
+    val = (random.randint(7, 13) * 5) / 125
     stage2.setStartValue(QPointF(right, 0))
     stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
     stage2.setEndValue(pos) 
     
     return stage1, stage2
 
+### --------------------------------------------------------
 def stageRight(node, pos, left, right):
+    
     stage1 = QPropertyAnimation(node, b'pos')
     stage1.setDuration(random.randint(14, 23) * 75)
     val = (random.randint(7, 13) * 5) / 100
@@ -307,11 +318,13 @@ def stageRight(node, pos, left, right):
 
     return stage1, stage2
 
-def spin(pix, anime, node):           
+### --------------------------------------------------------
+def spin(pix, anime, node):  ## rotate
     node.pix.setOriginPt()
 
     sync = random.randint(14, 23) * 50
     rot  = 360 
+
     if anime.endswith('Left'): rot = -360
 
     spin = QPropertyAnimation(node, b'rotate')

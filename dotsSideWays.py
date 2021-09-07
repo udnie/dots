@@ -54,17 +54,19 @@ class SideWays():
                 self.pathMaker.pts[i].y())
         self.pathMaker.addPath()
 
-    def halfPath(self):  
-        tmp = []        
-        for i in range(0, len(self.pathMaker.pts)):
-            if i % 2 == 1:
-                tmp.append(self.pathMaker.pts[i])
-        self.pathMaker.pts = tmp
-        del tmp
-        self.pathMaker.redrawPoints(False)  ## redraw canvas without points
+    def halfPath(self):
         if self.pathMaker.pathTestSet:
             self.pathMaker.stopPathTest()
-            QTimer.singleShot(200, self.pathTest)  ## optional
+        tmp = []
+        lnn = int(len(self.pathMaker.pts)/2)
+        wayPts = self.pathMaker.setPaintPath(True)  ## close subpath, uses self.pts
+        vals = [p/lnn for p in range(0, lnn+1)]     ## evenly spaced points
+        for i in vals:
+            tmp.append(QPointF(wayPts.pointAtPercent(i)))
+        self.pathMaker.pts = tmp
+        del tmp
+        del vals
+        QTimer.singleShot(200, self.pathMaker.redrawPoints)
 
     def movePath(self, key): 
         self.pathMaker.path.setPos(
@@ -120,6 +122,10 @@ class SideWays():
                 inc = 15.0   
             elif key == '=': 
                 inc = -15.0
+            elif key == ']':  
+                inc = -45.0   
+            elif key == '[': 
+                inc = 45.0
 
             ## more scale stuff
             if key in('<','>'):

@@ -110,14 +110,11 @@ class ControlView(QGraphicsView):
                 self.setKey('D') 
                 self.canvas.deleteSelected()
             elif key == Qt.Key_F:
-                self.setKey('F')    ## if pathMaker on
+                self.setKey('F')  ## if pathMaker on
                 self.canvas.flopSelected()  
-            elif key == Qt.Key_P:
-                self.canvas.mapper.togglePaths() 
-                self.setKey('P')
             elif key == Qt.Key_T:
                 if self.canvas.pathMakerOn:
-                    self.setKey('T')      ## run test if pathMaker on
+                    self.setKey('T')  ## run test if pathMaker on
                 elif mod & Qt.ShiftModifier:
                     self.canvas.mapper.toggleTagItems('select')
                 else:  
@@ -126,7 +123,11 @@ class ControlView(QGraphicsView):
             self.direct[key]()  
         elif key in self.ToggleKeys:
             self.ToggleKeys[key]()  
-        elif key in singleKeys: ## in dotsShared.py   
+        elif key in singleKeys:  ## in dotsShared.py  
+            if key == Qt.Key_P and mod & Qt.ShiftModifier:  ## show pix path tags
+                if not self.canvas.pathMakerOn:
+                    self.canvas.mapper.toggleTagItems('paths')
+                    return
             if key in (Qt.Key_L, Qt.Key_R) and mod & Qt.ShiftModifier:
                 self.canvas.togglePixLocks(singleKeys[key])
             else:

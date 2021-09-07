@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import time
+import random
 
 from os import path
 
@@ -12,32 +13,30 @@ from dotsPixItem     import PixItem
 from dotsBkgItem     import *
 from dotsShared      import common, paths
 from dotsSideGig     import MsgBox, getPathList
+from dotsSideCar     import SideCar
 
 ### ---------------------- dotsSideShow --------------------
-''' dotsSideShow: handles play, pause, stop '''
+''' dotsSideShow: functions to run, pause, stop, etc.. .play animations'''
 ### --------------------------------------------------------
-class SideShow():
+class SideShow:
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  
         self.canvas  = parent
-        self.scene   = parent.scene
-        self.dots    = parent.dots
-        self.mapper  = parent.mapper
+        self.scene   = self.canvas.scene
+        self.dots    = self.canvas.dots
+        self.mapper  = self.canvas.mapper
+        self.sideCar = SideCar(self.canvas)  ## additional extentions 
 
-        self.animation = parent.animation
-        self.pathMaker = parent.pathMaker
+        self.animation = self.canvas.animation
+        self.pathMaker = self.canvas.pathMaker
 
 ### --------------------------------------------------------
     def runThis(self, file):
         if not self.scene.items():
             self.openPlay(paths["playPath"] + file)
-            QTimer.singleShot(200, self.dummy)
-            self.run()
-  
-    def dummy(self):
-        pass
+            QTimer.singleShot(200, self.run)
     
     def keysInPlay(self, key):
         if self.canvas.pathMakerOn == False:
@@ -61,7 +60,7 @@ class SideShow():
                 self.stop()
         
     def loadPlay(self):
-        if self.canvas.pathMakerOn:       ## using load in pathMaker
+        if self.canvas.pathMakerOn:  ## using load in pathMaker
             self.pathMaker.sideWays.openFiles()
             return
         else:
@@ -124,7 +123,7 @@ class SideShow():
                 self.addPixToScene(pix, tmp)
             self.canvas.openPlayFile = file
             self.canvas.initBkg.disableBkgBtns() 
-            self.dots.statusBar.showMessage("Number of Pixitems:  {}".format(k),5000)
+            self.dots.statusBar.showMessage("Number of Pixitems: {}".format(k),5000)
  
     def addPixToScene(self, pix, tmp):
         pix.type = tmp['type']                 
@@ -135,23 +134,27 @@ class SideShow():
         pix.setMirrored(tmp['mirror']),
         pix.rotation = tmp['rotation']
         pix.scale = float("{0:.4f}".format(tmp['scale']))
-        ## ------- adding keys to an existing json file -------
+
+       ### ------ adding keys to an existing json file -------
         if 'tag' not in tmp.keys():  ## seriously good to know
             tmp['tag'] = ''
         else:
             pix.tag = tmp['tag'] 
-        if 'locked' not in tmp.keys():  ## pix shares with bkg
-            tmp['locked'] = False
-        else:
+
+        if pix.type == 'pix':
             pix.locked = tmp['locked']
-        ## may require rotation or scaling - adds to scene items
-        self.canvas.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
+            pix.part   = tmp['part']
+            if 'frame' not in pix.fileName:
+                self.lookForStrays(pix)    
+
+        ## may require rotation or scaling - adds to scene items here  
+        self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
 
     def run(self):  
         if self.canvas.control != '': 
             return 
         self.mapper.clearMap()
-        self.clearPathsandTags()  
+        self.sideCar.clearPathsandTags()  
         self.canvas.unSelect()
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = getPathList(True)       
@@ -176,77 +179,91 @@ class SideShow():
                     r += 1
                     QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
-                    if pix.anime: pix.anime.start()
-
+                    if pix.part == 'pivot':
+                        pix.setPos(pix.x, pix.y)    
+                    if pix.anime: 
+                        pix.anime.start()
+                ### optional drop shadow ###
                 # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)
                 # pix.setGraphicsEffect(shadow)
-
             elif pix.zValue() <= common["pathZ"]:
                 break 
         if k > 0:
-            self.disablePlay()  
+            self.sideCar.disablePlay()  
             self.canvas.control = 'pause'
             self.dots.statusBar.showMessage("Number of Pixitems:  {}".format(k),5000)
    
     def pause(self):
-        self.clearPathsandTags()  
+        self.sideCar.clearPathsandTags()  
         if self.canvas.control == 'resume':
            self.resume()
         else:          
             for pix in self.scene.items():
                 if pix.type == 'pix' and pix.anime:
-                    if pix.anime.state() == 2: ## running
+                    if pix.anime.state() == 2:  ## running
                         pix.anime.pause()       
                 if pix.zValue() <= common["pathZ"]:
                     break
-            self.setPauseKey()
+            self.sideCar.setPauseKey()
 
     def resume(self):   
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.anime:
-                if pix.anime.state() == 1: ## paused
+                if pix.anime.state() == 1:  ## paused
                     pix.anime.resume()
             if pix.zValue() <= common["pathZ"]:
                 break
-        self.setPauseKey()
+        self.sideCar.setPauseKey()
  
     def stop(self, action=''):
-        self.clearPathsandTags()  
-     
+        self.sideCar.clearPathsandTags()     
         for pix in self.scene.items():
             if pix.type == 'pix':
-                if pix.anime: ## running: 
+                if 'frame' in pix.fileName:
+                    continue  
+                if pix.anime:  ## running: 
                     pix.anime.stop()  
-                if action != 'clear': 
-                    if 'frame' in pix.fileName:
-                        continue  
+                if 'wings' in os.path.basename(pix.fileName):
+                    continue  ## no reprise
+                if action != 'clear':    
                     pix.reprise() 
             elif pix.zValue() <= common["pathZ"]:
                 break
-
-        self.enablePlay() 
+        self.sideCar.enablePlay() 
         self.dots.btnPause.setText( "Pause" )
    
     def savePlay(self):
-        if self.canvas.pathMakerOn:    ## using load in pathMaker
+        if self.canvas.pathMakerOn:  ## using load in pathMaker
             self.pathMaker.sideWays.savePath()
             return
         elif len(self.scene.items()) == 0:
             return
         else:
             dlist = []  
+            ## save the path in rightWing for later
+            for pix in self.scene.items(Qt.AscendingOrder):
+                if pix.type == "pix":      
+                    if pix.part == 'pivot':  ## pivot comes up first
+                        t = pix.tag
+                        p = pix.sceneBoundingRect()
+                    if pix.part == 'right':
+                        pix.tag = t
+                        pix.x = p.x()
+                        pix.y = p.y()
             for pix in self.scene.items():
                 if pix.type in ("pix","bkg"):     
                     if pix.fileName != 'flat' and \
                         not path.exists(pix.fileName):  ## note
                         continue   
-                if pix.type == "pix":      
-                    dlist.append(self.returnPixBkg(pix))
+                if pix.type == "pix": 
+                    if pix.part in ('left','pivot'):  ## only need the right wing
+                        continue    
+                    dlist.append(self.savePix(pix))
                 elif pix.type == "bkg":
                     if pix.fileName != 'flat': 
-                        dlist.append(self.returnPixBkg(pix))
+                        dlist.append(self.saveBkg(pix))
                     else:
-                        dlist.append(self.returnFlat(pix))
+                        dlist.append(self.saveFlat(pix))
             if dlist:
                 self.saveToJson(dlist)
             else:
@@ -272,55 +289,49 @@ class SideShow():
                 MsgBox("saveToJson: Error saving file")
             return
 
-    def returnPixBkg(self, pix):  ## used by both 
+    def savePix(self, pix):  
         tmp = {
             "fname": os.path.basename(pix.fileName),
-            "type": pix.type,
-            "x": float("{0:.2f}".format(pix.x)),
-            "y": float("{0:.2f}".format(pix.y)),
-            "z": pix.zValue(),
-            "mirror": pix.flopped,
+            "type":  pix.type,
+            "x":     float("{0:.2f}".format(pix.x)),
+            "y":     float("{0:.2f}".format(pix.y)),
+            "z":     pix.zValue(),
+            "mirror":   pix.flopped,
             "rotation": pix.rotation,
-            "scale": float("{0:.4f}".format(pix.scale)),
-            "tag": pix.tag,
-            "locked": pix.locked,
+            "scale":    float("{0:.2f}".format(pix.scale)),
+            "tag":      pix.tag,
+            "locked":   pix.locked,
+            "part":     pix.part,
         }
         return tmp
     
-    def returnFlat(self, pix):
+    def saveBkg(self, pix): 
         tmp = {
-            "fname": 'flat',
-            "type": pix.type,
-            "z": pix.zValue(),
-            "tag": pix.color.name(),
+            "fname": os.path.basename(pix.fileName),
+            "type":  pix.type,
+            "x":     float("{0:.2f}".format(pix.x)),
+            "y":     float("{0:.2f}".format(pix.y)),
+            "z":     pix.zValue(),
+            "mirror":   pix.flopped,
+            "rotation": pix.rotation,
+            "scale":    float("{0:.2f}".format(pix.scale)),
         }
         return tmp
 
-### -------------------------------------------------------- 
-    def clearPathsandTags(self):
-        self.mapper.clearTagGroup()
-        self.mapper.clearPaths()  ## clears tags as well
+    def saveFlat(self, pix):
+        tmp = {
+            "fname": 'flat',
+            "type":  pix.type,
+            "z":     pix.zValue(),
+            "tag":   pix.color.name(),
+        }
+        return tmp
 
-    def enablePlay(self):
-        self.canvas.control = ''
-        self.dots.btnRun.setEnabled(True)
-        self.dots.btnPause.setEnabled(False)
-        self.dots.btnStop.setEnabled(False) 
-        self.dots.btnSave.setEnabled(True) 
- 
-    def disablePlay(self):
-        self.canvas.control = 'pause'
-        self.dots.btnRun.setEnabled(False)
-        self.dots.btnPause.setEnabled(True)
-        self.dots.btnStop.setEnabled(True)  
-        self.dots.btnSave.setEnabled(False)  
-
-    def setPauseKey(self):        
-        if self.canvas.control == 'pause': 
-            self.dots.btnPause.setText( "Resume" );
-            self.canvas.control = 'resume'
-        elif self.canvas.control == 'resume':
-            self.dots.btnPause.setText( "Pause" );
-            self.canvas.control = 'pause'
+    def lookForStrays(self, pix):
+        if pix.x < -15 or pix.x > common["ViewW"]-35:
+            pix.x = float(random.randint(25, 100) * 2.5)
+        if pix.y < -15 or pix.y > common["ViewH"]-35:
+            pix.y = random.randint(25, 100) * 1.5
+        pix.setPos(pix.x, pix.y)
 
 ### ---------------------- dotsSideShow --------------------

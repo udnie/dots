@@ -1,21 +1,20 @@
 import sys
 import os
 
-from PyQt5.QtCore    import Qt, QEvent, QObject, QTimer, QPointF, QPoint, pyqtSlot, \
-                            QPropertyAnimation
-from PyQt5.QtGui     import QColor, QPen, QPixmap, QPainterPath
-from PyQt5.QtWidgets import QFileDialog, QGraphicsPathItem, QGraphicsPixmapItem, \
-                            QWidget, QGraphicsItemGroup 
+from PyQt5.QtCore       import Qt, QEvent, QObject, QTimer, QPointF, QPoint, pyqtSlot, \
+                               QPropertyAnimation
+from PyQt5.QtGui        import QColor, QPen, QPixmap, QPainterPath
+from PyQt5.QtWidgets    import QFileDialog, QGraphicsPathItem, QGraphicsPixmapItem, \
+                               QWidget, QGraphicsItemGroup 
 
-from dotsAnimation   import Node                           
-from dotsSideGig     import DoodleMaker, MsgBox, TagIt, getColorStr
-from dotsShared      import common, paths
-from dotsSidePath    import getOffSet
+from dotsAnimation      import Node                           
+from dotsSideGig        import DoodleMaker, MsgBox, TagIt, getColorStr
+from dotsShared         import common, paths
 
-from dotsSideWays    import SideWays
-from dotsDrawsPaths  import DrawsPaths
+from dotsSideWays       import SideWays
+from dotsDrawsPaths     import DrawsPaths
 
-ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'')
+ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 Tick = 3  ## points to move using arrow keys
 
 ### -------------------- dotsPathMaker ---------------------
@@ -195,7 +194,7 @@ class PathMaker(QWidget):
 ### -------------------- path stuff ------------------------
     def addPath(self):
         self.removePath() 
-        self.path = QGraphicsPathItem(self.setPaintPath(True))
+        self.path = QGraphicsPathItem(self.setPaintPath(True))  ## uses self.pts
         self.path.setPen(QPen(QColor(self.color), 3, Qt.DashDotLine))
         self.path.setZValue(common['pathZ']) 
         self.scene.addItem(self.path)
@@ -225,7 +224,7 @@ class PathMaker(QWidget):
         else:
             self.addPath()
 
-    def setPaintPath(self, bool=False):  ## also used by waypts
+    def setPaintPath(self, bool=False):  ## also used by wayPts
         path = QPainterPath()
         for pt in self.pts:  ## pts on the screen 
             if not path.elementCount():
@@ -302,16 +301,17 @@ class PathMaker(QWidget):
                 self.pathTestNode = QPropertyAnimation(node, b'pos')
                 self.pathTestNode.setDuration(10000)  ## 10 seconds
 
-                waypts = self.setPaintPath(True)  ## close subpath
-                pt = getOffSet(self.ball)
-
-                self.pathTestNode.setStartValue(waypts.pointAtPercent(0.0)-pt)
+                wayPts = self.setPaintPath(True)  ## close subpath, uses    
+                b = self.ball.boundingRect() 
+                pt = QPointF(b.width()/2, b.height()/2)
+         
+                self.pathTestNode.setStartValue(wayPts.pointAtPercent(0.0)-pt)
                 for i in range(1, 99):   
                     self.pathTestNode.setKeyValueAt(
                         i/100.0, 
-                        waypts.pointAtPercent(i/100.0)-pt
+                        wayPts.pointAtPercent(i/100.0)-pt
                         )
-                self.pathTestNode.setEndValue(waypts.pointAtPercent(1.0)-pt) 
+                self.pathTestNode.setEndValue(wayPts.pointAtPercent(1.0)-pt) 
                 self.pathTestNode.setLoopCount(-1) 
                 self.startPathTest()
             else:

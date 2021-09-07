@@ -1,4 +1,7 @@
 import random
+import os
+
+from os import path
 
 from PyQt5.QtCore     import QPoint
 from PyQt5.QtGui      import QImage
@@ -14,19 +17,34 @@ import dotsAnimation  as anima
 
 PixFactor = .30  # beginnig size factor 
 PlayKeys = ('resume','pause')
-MoveKeys  = ("left","right","up", "down")
-RotateKeys = ("_", '+', '"', ':', "{", "}")
 ScaleKeys  = ("<",">")
 TagKeys = ('[', ']','/','enter','return')
 Tick = 2  ## points to move using arrow keys
 
 RotationVals = {
     '}': 45,
-    '"': +15,
+    '=': +15,
     '+': 1,
     '_': -1,
-    ':': -15,
+    '-': -15,
     '{': -45,
+}
+
+PixSizes = {
+    'dorot': (300, 500),
+    'can_m': (300, 375),
+    'miche': (350, 375),
+    'bosch': (250, 375),
+    'lizar': (600, 225),
+    'pivot': (150, 150),
+    'mike_': (300, 500),
+}
+
+MoveKeys = {
+    "right": (Tick, 0),
+    "left":  (-Tick, 0),
+    "up":    (0, -Tick),
+    "down":  (0, Tick),
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -44,11 +62,11 @@ class PixItem(QGraphicsPixmapItem):
         self.fileName = imgFile
    
         self.id = int(id)  ## used by mapper
-        self.side = ""     ## used by wings
+        self.part = ""     ## used by wings
         self.locked = False
 
-        self.x  = x
-        self.y  = y
+        self.x = x
+        self.y = y
 
         img = QImage(imgFile)
 
@@ -104,14 +122,24 @@ class PixItem(QGraphicsPixmapItem):
     def setPixKeys(self, key):
         self.key = key  
         if self.isHidden or self.isSelected() and self.locked == False:
-            if key in RotateKeys:
+            if key in RotationVals:
                 self.rotateThis(key)
             elif key in ScaleKeys:
                 self.scaleThis(key)  
             elif key in MoveKeys:
-                self.moveThis(key)
+                self.moveThis(MoveKeys[key])
  
-# ### --------------------------------------------------------
+### --------------------------------------------------------
+    def paint(self, painter, option, widget=None):
+        super().paint(painter, option, widget)
+        if self.isSelected():
+            painter.save()
+            pen = QPen(QColor("lime"))
+            pen.setWidth(2.5)
+            painter.setPen(pen)
+            painter.drawRect(self.boundingRect())
+            painter.restore()
+
     def hoverLeaveEvent(self, e):
         self.mapper.clearTagGroup()
         e.accept()
@@ -146,7 +174,7 @@ class PixItem(QGraphicsPixmapItem):
                     p = self.mapper.toFront(1)
                 elif self.key == '[':
                     p = self.zValue()-1  
-                else:
+                elif self.key == ']':
                     p = self.zValue()+1  
                 self.setZValue(p)
                 self.mapper.toggleTagItems(self.id)
@@ -155,6 +183,8 @@ class PixItem(QGraphicsPixmapItem):
             e.accept()
 
     def reprise(self):  ## return pixitem to original position
+        if self.tag == '':  ## you're done
+            return
         self.anime = None
         self.anime = anima.reprise(self)
         self.anime.start()
@@ -248,17 +278,6 @@ class PixItem(QGraphicsPixmapItem):
             self.flopped)
         e.accept()
 
-    def pixVals(self):
-        tmp = {
-            "x": self.x,
-            "y": self.y,
-            "mirror": self.flopped,
-            "rotation": self.rotation,
-            "scale": self.scale,
-            "tag": self.tag
-        }
-        return tmp
-
     def mouseReleaseEvent(self, e):
         if self.dragCnt > 0:
             self.dragCnt = 0   
@@ -266,15 +285,8 @@ class PixItem(QGraphicsPixmapItem):
 
     def moveThis(self, key):
         self.setOriginPt()  ## updates width and height also
-        pts = 2        
-        if key == 'right':
-            self.x += pts
-        elif key == 'left':
-            self.x -= pts
-        elif key == 'up':
-            self.y -= pts
-        elif key == 'down':
-            self.y += pts
+        self.x += key[0]
+        self.y += key[1]
         self.x = int(sideCar.constrain(self.x, 
             self.width, 
             common["ViewW"], 
@@ -308,19 +320,15 @@ class PixItem(QGraphicsPixmapItem):
     def setOriginPt(self):
         self.mapper.setOriginPt(self)
         self.setTransformationMode(Qt.SmoothTransformation)
-              
-    def setPixSizes(self, newW, newH):
-        if newW < 100 or newH < 100:
-            newW, newH = 200, 200
-        elif 'can_man' in self.fileName:   ## not included
-            newW, newH = 300, 375   
-        elif 'michelin' in self.fileName:  ## not included
-            newW, newH = 350, 375
-        elif 'bosch' in self.fileName:     ## not included
-            newW, newH = 250, 375
-        elif 'lizard' in self.fileName:    ## not included
-            newW, newH = 300, 600 
-        if newW > 400 or newH > 400:
+            
+    def setPixSizes(self, newW, newH):  
+        p = os.path.basename(self.fileName)[0:5]
+        if p in PixSizes:
+            p = PixSizes[p]
+            return p[0], p[1]
+        elif newW < 100 or newH < 100:
+            newW, newH = 200, 200 
+        elif newW > 400 or newH > 400:
             newW, newH = 425, 425
         return newW, newH
             

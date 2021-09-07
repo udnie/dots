@@ -54,7 +54,7 @@ class MapItem(QGraphicsItem):
         QGraphicsItem.mouseReleaseEvent(self, e)
 
 ### ---------------------- dotsMapItem ---------------------
-class InitMap():
+class InitMap:
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -175,6 +175,7 @@ class InitMap():
         for pix in self.scene.items():
             if pix.type == 'map':
                 self.scene.removeItem(pix)
+                del pix
                 break
 
 ### ------------------- tags and paths ---------------------
@@ -202,19 +203,20 @@ class InitMap():
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.AscendingOrder):
             if pix.type == 'pix':  
+                if 'path' in pix.tag and pid == 'paths':
+                    self.tagIt('paths', pix, tf) 
+                    k += 1
                 if pid == 'all':
-                    self.tagIt(pix, tf) 
+                    self.tagIt('',pix, tf) 
                     k += 1
                 # elif pid == 'select' and pix.isSelected():
                 elif pix.isSelected():
-                    self.tagIt(pix, tf)
+                    self.tagIt('',pix, tf)
                     k += 1
                 elif pid == pix.id:  ## single tag
-                    self.tagIt(pix, tf) 
+                    self.tagIt('',pix, tf) 
                     k = 1
                     break
-            # elif pix.zValue() <= common["pathZ"]:
-            #     break
         if k > 0: 
             self.tagSet = True
             self.dots.statusBar.showMessage("Number Tagged:  {}".format(k),2500)
@@ -233,20 +235,30 @@ class InitMap():
             self.tagGroup = None
             self.tagSet = False  
 
-    def tagIt(self, pix, tf):  
+    def tagIt(self, token, pix, tf):  
         p = pix.sceneBoundingRect()
         x = p.x() + p.width()*.45
         y = p.y() + p.height()*.45
+
+        tag = pix.tag
+        color = ''
+
         if 'frame' in pix.fileName: 
             x, y = common["ViewW"]*.47, common["ViewH"]-35
             pix.tag = ""
-        tag = pix.tag
-        color = ''
+
         if pix.locked == True:
             tag = "Locked " + tag 
+
         if pix.zValue() == tf: 
             color = 'yellow'
-        tag = TagIt(self.parent.control, tag, color, pix.zValue())
+
+        if token == 'paths':
+            y = y - 20
+        else:
+            token = self.parent.control
+
+        tag = TagIt(token, tag, color, pix.zValue())
         tag.setPos(x,y)
         tag.setZValue(self.tagZ) 
         self.tagGroup.addToGroup(tag)

@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QApplication, QStatusBar, QMainWindow
 import dotsDropCanvas   as dropCanvas
 import dotsScrollPanel  as scrollPanel
 import dotsSliderPanel  as sliderPanel
-import dotsSideCar      as sideCar
 
+from dotsSideCar    import setCursor
 from dotsShared     import common
 from dotsDocks      import *
  
@@ -34,7 +34,8 @@ class DotsQt(QMainWindow):
         addSliderDock(self)
         addButtonDock(self)       
 
-        self.setWindowTitle("DotsQt - " + getDate())
+        self.setWindowTitle("DotsQt - " + os.path.basename(os.getcwd()) + " - " + getDate())
+  
         self.move(getX(), 35)  # offset for app width and preferred height
         self.setStyleSheet(open('./dotsStyle.css').read())
 
@@ -43,11 +44,11 @@ class DotsQt(QMainWindow):
   
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
-        self.statusBar.showMessage(os.getcwd(),4000)
+        # self.statusBar.showMessage(os.getcwd(),4000)
 
         ## just in case the sprite directory is missing
         QTimer.singleShot(200, self.canvas.loadSprites)
-        sideCar.setCursor()  
+        setCursor()  
         self.show()
 
         # from PyQt5.Qt import PYQT_VERSION_STR 
@@ -62,4 +63,8 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ----------------------- dotsQt ----------------------
+
+
+
+
 
