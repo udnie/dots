@@ -9,7 +9,7 @@ The code can change over time.  One of the few coding decisions I made was to tr
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on dropCanvas.
 
-The upper right hand panel is a read only scrolling list of the keys, key combinations and their actions. The panel will switch the key assignment as you switch from DropCanvas to PathMaker. The keys.pdf and this ReadMe file serve as your documentation.    
+The upper right hand panel is a read only scrolling list of the keys, key combinations and their actions. The panel will switch the key assignments as you switch from DropCanvas to PathMaker. The keys.pdf and this ReadMe file serve as your documentation.    
 
 The **background** image doesn't need to reside in the backgrounds folder unless you're planning to reload it. You can save a copy of it to the backgrounds folder using the save button in the background group. The copy will have the first 15 characters of the file name plus **'-bkg'** and will set itself as the background replacing the original image.
 
