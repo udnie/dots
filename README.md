@@ -5,11 +5,11 @@ The original dots was written in JavaFX which added animation to the photo-colla
 
 
 ## Stuff to know
-The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible. Also, I use camel case after many years of coding in snake.
+The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible, doesn't always work. Also I use camel case after many years of coding in snake.
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on dropCanvas.
 
-The upper right hand panel is a read only scrolling list of the keys, key combinations and their actions. Key assignments have changed with the addition of pathMaker. The scrolling lists and this ReadMe file serve as your **help** documentation.    
+The upper right hand panel is a read only scrolling list of the keys, key combinations and their actions. The panel will switch the key assignment as you switch from DropCanvas to PathMaker. The keys.pdf and this ReadMe file serve as your documentation.    
 
 The **background** image doesn't need to reside in the backgrounds folder unless you're planning to reload it. You can save a copy of it to the backgrounds folder using the save button in the background group. The copy will have the first 15 characters of the file name plus **'-bkg'** and will set itself as the background replacing the original image.
 
@@ -21,7 +21,7 @@ It's not advisable to make changes in the pause mode as interesting, unwanted pr
 
 The **star** in scrollPanel isn't currently designed to be dragged to the canvas, but without it none of this would exist.
 
-I use the graphicsitem **zValue()** as a means to order the six graphic types which share the scene items list.  There are two functions, toFront() and lastZval() that help to make sure the different types I've created are good neighbors.
+I use the graphicsitem **zValue()** as a means to order the seven graphic types which share the scene items list.  There are two functions, toFront() and lastZval() that help to make sure the different types I've created are good neighbors.
 
 #### types and zValue range		
 | scene.item  | type  | zValue |
@@ -29,7 +29,7 @@ I use the graphicsitem **zValue()** as a means to order the six graphic types wh
 | PointItem | pt | from topmost item+ |
 | MapItem | map | 50.0 over top pixItem |
 | TagItem | tag|25.0 over top pixItem|
-| pixItem | pix  |  0.0 increasing by 1.0 | 
+| PixItem | pix  |  0.0 increasing by 1.0 | 
 | Paths| path| -25.0 as a group 
 | LineItem  | grid   | -50.0 as a group |
 | BkgItem   | bkg | -99.0 decreasing by -1.0 |    
@@ -38,7 +38,7 @@ I use the graphicsitem **zValue()** as a means to order the six graphic types wh
 ## Changes
 **September 2021:**		
 **Runs on Linux.**
-I wanted to see what it would take and the answer was very little effort but no plans to make it a habit.  I used VirtualBox, as recommended by Martin Fitzpatrick as the VM of choice. After downloading and installing Ubuntu I gradually came to realize that no matter how many more times I downloaded and installed PyQt it was going to land in the python3.8 directory.  So I ran Dots in python3.8 with no problems other than not having vsc display dots full size and having to use the control key in place of the Mac command key. Done.
+I wanted to see what it would take and the answer was very little effort once I got all the players in place but no plans to make it a habit.  I used VirtualBox, as recommended by Martin Fitzpatrick as the VM of choice. After downloading and installing Ubuntu I gradually came to realize that no matter how many more times I downloaded and installed PyQt it was going to land in the python3.8 directory.  So I ran Dots in python3.8 with no problems other than not having vsc display dots full size and having to use the control key in place of the Mac command key. Done.
 
 
 See **keys.pdf** for the current key assignments and hopefully some clarity. I added a **45 degree** toggle to pathMaker and changed the **half path** function to evenly distribute the new points. It looks better that way, uses less data though it may alter the path slightly. In dropCanvas, selecting screen objects will now be outlined by an actually visible lime green boundingRect. Lastly, I posted a remake of the last video I created in DotsJavaFx, **Tableau 2018**, recreated now in DotsQt as **Tableau 2021**, which was sort of the idea and why I spent the last two years writing in PyQt. I've included the code for wings 
