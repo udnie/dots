@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PyQt5.QtCore    import Qt, pyqtSignal
+from PyQt5.QtCore    import Qt, pyqtSignal, QProcess
 from PyQt5.QtGui     import QPainter
 from PyQt5.QtWidgets import QGraphicsView
 
@@ -37,6 +37,7 @@ class ControlView(QGraphicsView):
         self.setScene(parent.scene)
       
         self.dragOver = False
+        self.p = None
     
         self.setRenderHints(QPainter.Antialiasing | 
             QPainter.TextAntialiasing | 
@@ -130,6 +131,8 @@ class ControlView(QGraphicsView):
                     return
             if key in (Qt.Key_L, Qt.Key_R) and mod & Qt.ShiftModifier:
                 self.canvas.togglePixLocks(singleKeys[key])
+            elif key == Qt.Key_V and mod & Qt.ShiftModifier:
+                self.startProcess()
             else:
                 self.setKey(singleKeys[key]) 
         elif e.key() in ExitKeys:
@@ -141,6 +144,17 @@ class ControlView(QGraphicsView):
 
     def keyReleaseEvent(self, e):   
         self.keysSignal[str].emit('')
+
+    def startProcess(self):
+        if self.p is None:
+            self.p = QProcess()  ## thanks to Martin Fitzpatrick
+            self.p.finished.connect(self.processFinished)
+            self.p.start("python3", ["vhx.py"])  ## works in vscode on my mac
+            # self.p.start("/on a mac - full  path to /vhx.app")  ## using autotmator
+ 
+
+    def processFinished(self):
+        self.p = None
 
 ### ------------------ dotsControlView ---------------------
 

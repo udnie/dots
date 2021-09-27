@@ -363,11 +363,6 @@ class InitMap:
                 break
         return inc + first
 
-    def setOriginPt(self, pix):
-        self.updateWidthHeight(pix)
-        op = QPointF(pix.width/2, pix.height/2)
-        pix.setTransformOriginPoint(op)
-   
     def updateWidthHeight(self, pix):
         brt = pix.boundingRect()
         pix.width = brt.width()

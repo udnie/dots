@@ -3,11 +3,12 @@ import os
 
 from os import path
 
-from PyQt5.QtCore     import QPoint
-from PyQt5.QtGui      import QImage
+from PyQt5.QtCore       import Qt, QPoint, QPointF, pyqtSlot
+from PyQt5.QtGui        import QImage, QColor, QPen
+from PyQt5.QtWidgets    import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
+                               QGraphicsPixmapItem
 
 from dotsShared       import common
-from dotsSideCar      import *
 
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
@@ -114,6 +115,8 @@ class PixItem(QGraphicsPixmapItem):
         else:
             self.setFlags(True)
   
+        self.setShapeMode(QGraphicsPixmapItem.BoundingRectShape)
+
         self.setAcceptHoverEvents(True)
         # pub.subscribe(self.setPixKeys, 'setKeys')
       
@@ -317,10 +320,12 @@ class PixItem(QGraphicsPixmapItem):
         self.scale += scale
         self.setScale(self.scale)
     
-    def setOriginPt(self):
-        self.mapper.setOriginPt(self)
+    def setOriginPt(self):    
+        self.mapper.updateWidthHeight(self)
+        op = QPointF(self.width/2, self.height/2)
+        self.setTransformOriginPoint(op)
         self.setTransformationMode(Qt.SmoothTransformation)
-            
+               
     def setPixSizes(self, newW, newH):  
         p = os.path.basename(self.fileName)[0:5]
         if p in PixSizes:

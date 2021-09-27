@@ -3,7 +3,7 @@ import os
 
 from os import path
 
-from PyQt5.QtCore    import Qt, QTimer, QPointF, QPoint, pyqtSlot, QRectF,QSize, \
+from PyQt5.QtCore    import Qt, QTimer, QPointF, QPoint, QRectF,QSize, \
                             QSequentialAnimationGroup, QPropertyAnimation, QEasingCurve
 from PyQt5.QtGui     import QCursor, QPixmap, QPainter, QBrush, QFontMetrics, \
                             QPen, QPolygonF, QColor, QFont
@@ -89,7 +89,7 @@ class SideCar:
 
         pivot.setPos(pivot.x - half, pivot.y - height)
         pivot.setScale(.55)
-        self.mapper.setOriginPt(pivot)
+        pivot.setOriginPt()
 
         rightWing.setPos(half+10, height+2)
         leftWing.setPos(-leftWing.width+(half+5), height)

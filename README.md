@@ -36,7 +36,9 @@ I use the graphicsitem **zValue()** as a means to order the seven graphic types 
   
   
 ## Changes
-**September 2021:**		
+**September 2021:**			
+**Bonus...**  I've added a screen pixel ruler, **vhx.py** to the mix.  It runs both in Dots and on my Mac as a desktop widget - **vhx.app**, created using the MacOS Automator, the same utility that lets me run Dots as a desktop app. **Note:** Also on my Mac, **vhx.py** only runs in Dots when in vscode, otherwise you can run it from the command line. This replaces my JavaFx version. See **keys.pdf** for updates. New video:  <https://youtu.be/98m-fNB16-w> 
+
 **Runs on Linux.**
 I wanted to see what it would take to set up a VM, a virtual machine, and run dots in Ubuntu 20.4 Linux. So I used VirtualBox, as recommended by Martin Fitzpatrick, as the VM of choice. After downloading and installing Ubuntu I gradually came to realize that no matter how many more times I downloaded and installed PyQt it was going to land in the python3.8 directory.  So I ran Dots in python3.8 with no problems other than not having dots displayed full size and having to use the control key in place of the Mac command key. I probably spent half my time with this project in the VM trying to find the menu bar which had disappeared - not an uncommon problem. I was finally able to resize the linux window to pretty much my Mac view and by setting the scaled setting to 200% dots opened up to the same size as I run it in MacOS though it could use a few small 10-15 pixels tweaks to reposition the inner side panels.  **Done.**
 

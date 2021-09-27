@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, 
                         
 from dotsShared      import keyMenu, pathMenu
 
-SliderW, SliderH, OffSet = 195, 685, 20
+SliderW, SliderH, OffSet = 197, 685, 20
 
 
 ### --------------------- dotsSliderPanel ------------------
@@ -57,7 +57,7 @@ class SliderPanel(QWidget):
         ## stylesheets set in self.setTableModel()
         self.setTableModel(keyMenu)
         self.tableView.setColumnWidth(0, 50) 
-        self.tableView.setColumnWidth(1, 108)
+        self.tableView.setColumnWidth(1, 110)
 
         return self.tableView
 
