@@ -155,9 +155,9 @@ class InitBkg(QWidget):
         self.dots    = parent.dots 
 
         self.mapper  = self.canvas.mapper
-        self.sliders = self.dots.sliderpanel
+        self.sliders = self.dots.sliderPanel
 
-        self.dots.sliderpanel.sliderSignal[str, int].connect(self.mapKeys)
+        self.dots.sliderPanel.sliderSignal[str, int].connect(self.mapKeys)
 
 ### --------------------------------------------------------
     @pyqtSlot(str, int)

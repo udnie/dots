@@ -37,13 +37,13 @@ class SideCar:
         self.gridZ   = common["gridZ"] 
         self.gridSet = False
         self.gridGroup = None
+
 ### --------------------------------------------------------
     ''' Things to know about wings. They're brittle, don't pull on them.
     Use the bat portion to move the bat - the pivot sprite which can be 
     found in the images folder. Main thing to know, if you need to move 
-    or change an animation - do so, save it, clear and reload. Once you're 
-    satified with the layout, etc. you should no longer need to resave the 
-    play file. They're brittle. And it works. '''
+    or change an animation - do so, save it, clear and reload.
+    They're brittle. And it works, even better now. '''
 ### --------------------------------------------------------
     def wings(self, pix):
         rightWing = pix
@@ -52,8 +52,6 @@ class SideCar:
         rightWing.part = 'right'
         rightWing.tag  = 'Flapper'  ## applies this animation when run
         rightWing.setZValue(rightWing.zValue() + 200)  ## reset wing zvals
-
-        # rightWing.locked = True
         rightWing.setFlag(QGraphicsPixmapItem.ItemIsSelectable, False)
         
         self.canvas.pixCount += 1
@@ -67,9 +65,7 @@ class SideCar:
         leftWing.part = 'left'
         leftWing.tag  = 'Flapper'
         leftWing.setZValue(leftWing.zValue() + 200)
-    
-        leftWing.locked = True
-        # leftWing.setFlag(QGraphicsPixmapItem.ItemIsSelectable, False) 
+        leftWing.setFlag(QGraphicsPixmapItem.ItemIsSelectable, False) 
 
         self.canvas.pixCount += 1
         pivot = PixItem(paths["imagePath"] + 'bat-pivot.png', 
@@ -81,16 +77,19 @@ class SideCar:
         pivot.part = 'pivot' 
         pivot.tag = pathTag 
         pivot.setZValue(pivot.zValue() + 200)
+        pivot.setFlag(QGraphicsPixmapItem.ItemIsSelectable, True) 
 
-        ''' magic numbers warning - results will vary - wings seem
-        to drift - this is why you don't want to resave them '''    
-        half = pivot.width/2
-        height = 35
+        ''' magic numbers warning - results will vary - seems
+            to be working for bat wings if loaded using file chooser'''    
+        half = pivot.width/2     ## looking better
+        height = pivot.height/5  ## good guess, close
 
-        pivot.setPos(pivot.x - half, pivot.y - height)
+        ## another correction -5 for y
+        pivot.setPos(pivot.x - half, pivot.y - height - 5)
         pivot.setScale(.55)
         pivot.setOriginPt()
 
+        ## center wings around pivot
         rightWing.setPos(half+10, height+2)
         leftWing.setPos(-leftWing.width+(half+5), height)
 
@@ -138,9 +137,6 @@ class SideCar:
             self.wings(pix)
         else:
             self.scene.addItem(pix)
-
-        # shadow = QGraphicsDropShadowEffect(blurRadius=10, xOffset=10, yOffset=5)
-        # pix.setGraphicsEffect(shadow)
 
     def xy(self, max):
         return random.randrange(-40, max+40)

@@ -7,8 +7,8 @@ from dotsShared      import keyMenu, pathMenu
 SliderW, SliderH, OffSet = 197, 685, 20
 
 
-### --------------------- dotsSliderPanel ------------------
-''' dotsSliderPanel contains the TableGroup and the SliderGroup
+### --------------------- dotssliderPanel ------------------
+''' dotssliderPanel contains the TableGroup and the SliderGroup
     and the TableModel class used by the TableView '''
 ### --------------------------------------------------------
 class SliderPanel(QWidget):
@@ -223,4 +223,4 @@ class TableModel(QAbstractTableModel):  ## thanks stackoverflow
             return self.header[col]
         return None
 
-### -------------------- dotsSliderPanel -------------------
+### -------------------- dotssliderPanel -------------------

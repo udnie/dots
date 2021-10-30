@@ -88,7 +88,7 @@ class SideShow:
             lnn = lnn + self.mapper.toFront(0)  ## start at the top
             self.canvas.pixCount = self.mapper.toFront(0)
             for tmp in dlist:
-                ## toss no shows
+                ## toss no shows - no msgs or log
                 if tmp['type'] == 'bkg' and tmp['fname'] != 'flat' and \
                     not path.exists(paths["bkgPath"] + tmp['fname']):       
                     continue 
@@ -133,7 +133,7 @@ class SideShow:
         pix.setZValue(tmp['z']),  ## use the new one
         pix.setMirrored(tmp['mirror']),
         pix.rotation = tmp['rotation']
-        pix.scale = float("{0:.4f}".format(tmp['scale']))
+        pix.scale = float("{0:.3f}".format(tmp['scale']))
 
        ### ------ adding keys to an existing json file -------
         if 'tag' not in tmp.keys():  ## seriously good to know
@@ -141,13 +141,13 @@ class SideShow:
         else:
             pix.tag = tmp['tag'] 
 
-        if pix.type == 'pix':
+        if pix.type == 'pix' and 'frame' not in pix.fileName:
             pix.locked = tmp['locked']
-            pix.part   = tmp['part']
-            if 'frame' not in pix.fileName:
-                self.lookForStrays(pix)    
-
-        ## may require rotation or scaling - adds to scene items here  
+            pix.part = tmp['part']
+            self.lookForStrays(pix)    
+            
+        ## may require rotation or scaling - adds to scene items
+        ## and where wings are created using the 'right' wing pix
         self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
 
     def run(self):  
@@ -166,24 +166,22 @@ class SideShow:
                 if 'Random' in pix.tag:
                     pix.tag = pix.tag[0:len('Random')]
                 if 'frame' in pix.fileName:
-                    pix.tag = 'idle'
-                ''' set scale factor if demoPath '''
-                if pix.tag.endswith('demo.path') and r >= 0:  
-                    pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
+                    pix.tag = 'idle' 
+                ## set the animation using the tag
                 pix.anime = self.animation.setAnimation(          
                     pix.tag, 
                     pix)   
                 k += 1
-                ''' increase the delay to start animation if demoPath  '''
-                if pix.tag.endswith('demo.path'):   
+                ## set scale factor if demoPath and alien
+                if pix.tag.endswith('demo.path') and r >= 0:  
+                    if 'alien' in pix.fileName:  ## just to make sure you don't scale everything
+                        pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
                     r += 1
                     QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
-                    if pix.part == 'pivot':
-                        pix.setPos(pix.x, pix.y)    
                     if pix.anime: 
                         pix.anime.start()
-                ### optional drop shadow ###
+                ### --- optional drop shadow -- ###
                 # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)
                 # pix.setGraphicsEffect(shadow)
             elif pix.zValue() <= common["pathZ"]:
@@ -223,7 +221,7 @@ class SideShow:
                     continue  
                 if pix.anime:  ## running: 
                     pix.anime.stop()  
-                if 'wings' in os.path.basename(pix.fileName):
+                if 'wings' in pix.fileName:
                     continue  ## no reprise
                 if action != 'clear':    
                     pix.reprise() 
@@ -238,37 +236,39 @@ class SideShow:
             return
         elif len(self.scene.items()) == 0:
             return
+        self.savePivots()  ## saves the pivots path and xy in the right wing for later
+        dlist = [] 
+        for pix in self.scene.items():
+            if pix.type in ("pix","bkg"):     
+                if pix.fileName != 'flat' and \
+                    not path.exists(pix.fileName):  ## note
+                    continue   
+            if pix.type == "pix": 
+                if pix.part in ('left','pivot'):  ## only need the right wing
+                    continue    
+                dlist.append(self.savePix(pix))
+            elif pix.type == "bkg":
+                if pix.fileName != 'flat': 
+                    dlist.append(self.saveBkg(pix))
+                else:
+                    dlist.append(self.saveFlat(pix))
+        if dlist:
+            self.saveToJson(dlist)
         else:
-            dlist = []  
-            ## save the path in rightWing for later
-            for pix in self.scene.items(Qt.AscendingOrder):
-                if pix.type == "pix":      
-                    if pix.part == 'pivot':  ## pivot comes up first
-                        t = pix.tag
-                        p = pix.sceneBoundingRect()
-                    if pix.part == 'right':
-                        pix.tag = t
-                        pix.x = p.x()
-                        pix.y = p.y()
-            for pix in self.scene.items():
-                if pix.type in ("pix","bkg"):     
-                    if pix.fileName != 'flat' and \
-                        not path.exists(pix.fileName):  ## note
-                        continue   
-                if pix.type == "pix": 
-                    if pix.part in ('left','pivot'):  ## only need the right wing
-                        continue    
-                    dlist.append(self.savePix(pix))
-                elif pix.type == "bkg":
-                    if pix.fileName != 'flat': 
-                        dlist.append(self.saveBkg(pix))
-                    else:
-                        dlist.append(self.saveFlat(pix))
-            if dlist:
-                self.saveToJson(dlist)
-            else:
-                MsgBox("savePlay: Error saving file")
+            MsgBox("savePlay: Error saving file")
 
+    def savePivots(self):
+        ## save a pivots path and xy in rightWing for later
+        for pix in self.scene.items(Qt.AscendingOrder):
+            if pix.type == "pix":      
+                if pix.part == 'pivot':  ## pivot comes up first
+                    t = pix.tag
+                    p = pix.sceneBoundingRect()
+                if pix.part == 'right':  ## update the next 'right'
+                    pix.tag = t
+                    pix.x = p.x() + p.width()/2
+                    pix.y = p.y()
+     
     def saveToJson(self, dlist):
         Q = QFileDialog()
         if self.canvas.openPlayFile == '':
@@ -328,10 +328,9 @@ class SideShow:
         return tmp
 
     def lookForStrays(self, pix):
-        if pix.x < -15 or pix.x > common["ViewW"]-35:
-            pix.x = float(random.randint(25, 100) * 2.5)
-        if pix.y < -15 or pix.y > common["ViewH"]-35:
-            pix.y = random.randint(25, 100) * 1.5
-        pix.setPos(pix.x, pix.y)
+        if pix.x < -25 or pix.x > common["ViewW"] -10:
+            pix.setPos(float(random.randint(25, 100) * 2.5), pix.y)      
+        if pix.y < -25 or pix.y > common["ViewH"]-10:
+            pix.setPos(pix.x, random.randint(25, 100) * 1.5)
 
 ### ---------------------- dotsSideShow --------------------

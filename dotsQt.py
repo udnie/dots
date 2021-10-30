@@ -23,7 +23,7 @@ class DotsQt(QMainWindow):
         super().__init__()
 
         ## the sliderpanel needs to be referenced before canvas
-        self.sliderpanel = sliderPanel.SliderPanel(self)
+        self.sliderPanel = sliderPanel.SliderPanel(self)
         self.canvas = dropCanvas.DropCanvas(self)
       
         self.setCentralWidget(self.canvas)    

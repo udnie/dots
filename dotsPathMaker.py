@@ -30,7 +30,7 @@ class PathMaker(QWidget):
         self.canvas = parent  
         self.scene  = parent.scene
         self.view   = parent.view
-        self.dots   = parent.dots  ## connection to sliderpanel
+        self.dots   = parent.dots  ## connection to sliderPanel
 
         self.chooser = None  ## placeholder for popup_widget 
        
@@ -150,8 +150,8 @@ class PathMaker(QWidget):
             self.canvas.clear()
             self.canvas.pathMakerOn = True 
             self.initThis()
-            if not self.dots.sliderpanel.pathMenuSet:
-                self.dots.sliderpanel.toggleMenu()
+            if not self.dots.sliderPanel.pathMenuSet:
+                self.dots.sliderPanel.toggleMenu()
             self.turnGreen()
             # QTimer.singleShot(200, self.pathChooser)  ## optional
 
@@ -173,8 +173,8 @@ class PathMaker(QWidget):
     def pathMakerOff(self):
         self.delete()   
         self.canvas.pathMakerOn = False
-        if self.dots.sliderpanel.pathMenuSet:
-            self.dots.sliderpanel.toggleMenu()
+        if self.dots.sliderPanel.pathMenuSet:
+            self.dots.sliderPanel.toggleMenu()
         self.dots.btnPathMaker.setStyleSheet(
             "background-color: white")
 

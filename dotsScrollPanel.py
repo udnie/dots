@@ -131,7 +131,7 @@ class ScrollPanel(QWidget):
         super().__init__()
         
         self.dots   = parent
-        self.canvas = parent.canvas ## used in imgLabel
+        self.canvas = parent.canvas  ## used in imgLabel
 
         self.setFixedSize(common['ScrollW'],common['ScrollH'])
    
@@ -185,7 +185,7 @@ class ScrollPanel(QWidget):
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
                 firstItem))
 
-    def bottom(self):         ## thanks stackoverflow
+    def bottom(self):  ## thanks stackoverflow
         if self.layout.count() > 0:
             lastItem = self.layout.itemAt(self.layout.count()-1).widget()
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
@@ -231,3 +231,5 @@ class ScrollPanel(QWidget):
         return filenames
 
 ### ------------------- dotsScrollPanel --------------------
+
+

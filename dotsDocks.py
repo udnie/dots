@@ -40,7 +40,7 @@ def addSliderDock(self):
     self.dockedWidget.setLayout(layout)
 
     vbox = self.dockedWidget.layout() 
-    vbox.addWidget(self.sliderpanel)
+    vbox.addWidget(self.sliderPanel)
     
     return vbox
 

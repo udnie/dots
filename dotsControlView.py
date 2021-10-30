@@ -64,7 +64,7 @@ class ControlView(QGraphicsView):
 
         self.ToggleKeys = {
             Qt.Key_G: self.sideCar.toggleGrid,
-            Qt.Key_K: self.dots.sliderpanel.toggleMenu,
+            Qt.Key_K: self.dots.sliderPanel.toggleMenu,
             Qt.Key_M: self.canvas.mapper.toggleMap,
         }
 
@@ -149,9 +149,8 @@ class ControlView(QGraphicsView):
         if self.p is None:
             self.p = QProcess()  ## thanks to Martin Fitzpatrick
             self.p.finished.connect(self.processFinished)
-            self.p.start("python3", ["vhx.py"])  ## works in vscode on my mac
+            self.p.start("python3", ["vhx.py"])  ## works in vscode
             # self.p.start("/on a mac - full  path to /vhx.app")  ## using autotmator
- 
 
     def processFinished(self):
         self.p = None
