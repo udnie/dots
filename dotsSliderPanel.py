@@ -1,11 +1,11 @@
-from PyQt5.QtCore    import Qt, pyqtSignal, QAbstractTableModel
-from PyQt5.QtWidgets import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
-                            QTableView, QHeaderView, QAbstractItemView, QLabel
-                        
+
+from PyQt5.QtCore     import Qt, pyqtSignal, QAbstractTableModel                    
+from PyQt5.QtWidgets  import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
+                             QTableView, QHeaderView, QAbstractItemView, QLabel
+                      
 from dotsShared      import keyMenu, pathMenu
 
-SliderW, SliderH, OffSet = 197, 685, 20
-
+SliderW, SliderH, OffSet = 200, 685, 18
 
 ### --------------------- dotssliderPanel ------------------
 ''' dotssliderPanel contains the TableGroup and the SliderGroup
@@ -19,8 +19,9 @@ class SliderPanel(QWidget):
     def __init__(self, parent):
         super().__init__()
         
-        self.dots = parent
-
+        self.canvas = parent
+        self.view   = parent.view
+    
         self.setFixedSize(SliderW, SliderH) 
 
         self.isEnabled = False
@@ -31,8 +32,8 @@ class SliderPanel(QWidget):
         layout.addSpacing(20)
         layout.addWidget(self.addSliderGroup())
 
-        layout.setContentsMargins(18, 0, 0, 0)
-        layout.setAlignment(Qt.AlignCenter)
+        layout.setContentsMargins(20, 0, 0, 0)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 ### --------------------------------------------------------
     def enableSliders(self, bool=False): 
@@ -42,26 +43,6 @@ class SliderPanel(QWidget):
         self.opacitySldr.setValue(100)
         self.sliderGroup.setEnabled(bool)
 
-### --------------------------------------------------------
-    def addTableGroup(self):
-        self.tableView = QTableView()
-        self.tableView.setFixedSize(SliderW-OffSet,350)
-        self.tableView.setAlternatingRowColors(True) 
- 
-        ## make it read-only
-        self.tableView.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tableView.setSelectionMode(self.tableView.NoSelection)
-        self.tableView.verticalHeader().setVisible(False)
-        self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Fixed)
-    
-        ## stylesheets set in self.setTableModel()
-        self.setTableModel(keyMenu)
-        self.tableView.setColumnWidth(0, 50) 
-        self.tableView.setColumnWidth(1, 110)
-
-        return self.tableView
-
-### --------------------------------------------------------
     def toggleMenu(self):
         if self.pathMenuSet:
             self.setTableModel(keyMenu)
@@ -70,6 +51,28 @@ class SliderPanel(QWidget):
             self.setTableModel(pathMenu)
             self.pathMenuSet = True
 
+### --------------------------------------------------------
+    def addTableGroup(self):
+        self.tableView = QTableView()
+        self.tableView.setFixedSize(SliderW-OffSet,350)
+        self.tableView.setAlternatingRowColors(True) 
+ 
+        ## make it read-only
+        self.tableView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.tableView.setSelectionMode(self.tableView.SelectionMode.NoSelection)
+        self.tableView.verticalHeader().setVisible(False)
+
+        self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
+        self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        ## stylesheets set in self.setTableModel()
+        self.setTableModel(keyMenu)
+        self.tableView.setColumnWidth(0, 50) 
+        self.tableView.setColumnWidth(1, 115)
+
+        return self.tableView
+
+### --------------------------------------------------------
     def setTableModel(self, list):
         header = [' Keys ', 'Action']
         model = TableModel(list, header)
@@ -102,39 +105,39 @@ class SliderPanel(QWidget):
 ### --------------------------------------------------------
     def addSliderGroup(self):
         self.sliderGroup = QLabel()
-        self.sliderGroup.setFixedSize(SliderW-OffSet,335)
+        self.sliderGroup.setFixedSize(SliderW-OffSet-3,335)
 
         rotateLabel = QLabel("Rotate")
         self.rotateValue = QLabel("  0")
-        self.rotateValue.setAlignment(Qt.AlignLeft)
+        self.rotateValue.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         scaleLabel = QLabel("Scale")
         self.scaleValue = QLabel("1.0")
-        self.scaleValue.setAlignment(Qt.AlignHCenter)
+        self.scaleValue.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         opacityLabel = QLabel("Opacity")
         self.opacityValue = QLabel("1.0")
-        self.opacityValue.setAlignment(Qt.AlignLeft)
+        self.opacityValue.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        self.rotateSldr = QSlider(Qt.Vertical, 
+        self.rotateSldr = QSlider(Qt.Orientation.Vertical, 
             minimum=-1, maximum=360,
             singleStep=1, value=1, 
             valueChanged=self.setRotate)  
-        self.rotateSldr.setTickPosition(QSlider.TicksBothSides)
+        self.rotateSldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.rotateSldr.setTickInterval(90)
         
-        self.scaleSldr = QSlider(Qt.Vertical, 
+        self.scaleSldr = QSlider(Qt.Orientation.Vertical, 
             minimum=25, maximum=300,
             singleStep=2, value=100, 
             valueChanged=self.setScale)
-        self.scaleSldr.setTickPosition(QSlider.TicksBothSides)
+        self.scaleSldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSldr.setTickInterval(25)
 
-        self.opacitySldr = QSlider(Qt.Vertical, 
+        self.opacitySldr = QSlider(Qt.Orientation.Vertical, 
             minimum=-1, maximum=100,
             singleStep=1, value=100, 
             valueChanged=self.setOpacity)
-        self.opacitySldr.setTickPosition(QSlider.TicksBothSides)
+        self.opacitySldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.opacitySldr.setTickInterval(5)
             
         lbox = QHBoxLayout()    ## labels
@@ -164,7 +167,7 @@ class SliderPanel(QWidget):
 
         self.sliderGroup.setLayout(vbox)
         self.sliderGroup.setContentsMargins(-5, 5, 0, 10)
-        self.sliderGroup.setFrameStyle(QFrame.Box|QFrame.Plain)
+        self.sliderGroup.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Plain)
         self.sliderGroup.setLineWidth(1)
 
         return self.sliderGroup
@@ -198,9 +201,11 @@ class SliderPanel(QWidget):
             self.sliderSignal[str, int].emit("opacity", int(val))
     
 ### --------------------- TableModel -----------------------  
-class TableModel(QAbstractTableModel):  ## thanks stackoverflow 
-    def __init__(self, data, hdr):      ## my mods
+class TableModel(QAbstractTableModel):  
+
+    def __init__(self, data, hdr):   
         super(TableModel,self).__init__()
+
         self.data = data
         self.header = hdr
  
@@ -213,14 +218,19 @@ class TableModel(QAbstractTableModel):  ## thanks stackoverflow
     def data(self, index, role):
         if not index.isValid():
             return None
-        elif index.column() == 0 and role == Qt.TextAlignmentRole:
-            return Qt.AlignHCenter + Qt.AlignVCenter
-        elif role == Qt.DisplayRole:
+
+        elif role == Qt.ItemDataRole.DisplayRole:
             return self.data[index.row()][index.column()]
 
+        elif index.column() == 0:
+            if role == Qt.ItemDataRole.TextAlignmentRole:
+                return Qt.AlignmentFlag.AlignHCenter + Qt.AlignmentFlag.AlignVCenter
+
     def headerData(self, col, orientation, role):
-        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+        if orientation == Qt.Orientation.Horizontal and \
+            role == Qt.ItemDataRole.DisplayRole:
             return self.header[col]
         return None
 
 ### -------------------- dotssliderPanel -------------------
+

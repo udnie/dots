@@ -1,14 +1,10 @@
-import os
-import random
 
-from os import path
-
-from PyQt5.QtCore    import Qt, QTimer, QPointF, QSize, QRect, QRectF
+from PyQt5.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt5.QtGui     import QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
                             QGraphicsPixmapItem
 
-from dotsShared      import common, pathcolors
+from dotsShared      import common
 from dotsSideGig     import TagIt, getColorStr
 from dotsSidePath    import pathLoader
 
@@ -27,11 +23,11 @@ class MapItem(QGraphicsItem):
         self.rect = rect
         self.type = 'map'
 
-        self.pen = QPen(Qt.SolidLine)
-        self.pen.setColor(Qt.white)
+        self.pen = QPen(Qt.PenStyle.SolidLine)
+        self.pen.setColor(Qt.GlobalColor.white)
         self.pen.setWidth(1)
 
-        self.setFlag(QGraphicsItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, True)
 
 ### --------------------------------------------------------
     def boundingRect(self):
@@ -93,9 +89,8 @@ class InitMap:
                     pix.setSelected(True)
                     self.selections.append(pix.id)
                     if pix.locked:
-                        pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+                        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
                     k += 1
-                    # print(os.path.basename(pix.fileName), pix.isSelected(), pix.locked, pix.zValue())
             elif pix.zValue() <= common["pathZ"]: 
                 break
         if k == 0:
@@ -106,9 +101,7 @@ class InitMap:
     def addMapItem(self):
         self.removeMapItem()
         self.mapRect = self.mapBoundingRects()
-        self.parent.rubberBand.setGeometry(
-            QRect(self.parent.origin, 
-            QSize(0,0)))
+        self.parent.rubberBand.setGeometry(QRect(self.parent.origin, QSize()))
         self.map = MapItem(self.mapRect, self)  
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
@@ -144,7 +137,7 @@ class InitMap:
         self.removeMapItem()
         self.mapRect = QRectF()
 
-    def toggleMap(self):   ## not based on rubberband geometry
+    def toggleMap(self):  ## not based on rubberband geometry
         if self.isMapSet() == False:
             self.selections = []  
             for pix in self.scene.selectedItems():  ## only items selected
@@ -163,20 +156,22 @@ class InitMap:
         self.clearMap()
         
     def updatePixItemPos(self):
-        for pix in self.scene.items():
-            if pix.type == 'pix':
-                p = pix.pos()
-                pix.x = p.x()
-                pix.y = p.y()
-            elif pix.zValue() <= common["pathZ"]:
-                break
+        if len(self.scene.items()) > 0:
+            for pix in self.scene.items():
+                if pix.type == 'pix':
+                    p = pix.pos()
+                    pix.x = p.x()
+                    pix.y = p.y()
+                elif pix.zValue() <= common["pathZ"]:
+                    break
 
     def removeMapItem(self):
-        for pix in self.scene.items():
-            if pix.type == 'map':
-                self.scene.removeItem(pix)
-                del pix
-                break
+        if len(self.scene.items()) > 0:
+            for pix in self.scene.items():
+                if pix.type == 'map':
+                    self.scene.removeItem(pix)
+                    del pix
+                    break
 
 ### ------------------- tags and paths ---------------------
     def toggleTagItems(self, pid):  
@@ -201,7 +196,7 @@ class InitMap:
         if pid == '': 
             pid = 'all'
         ## changed order - otherwise the top tag can be hidden 
-        for pix in self.scene.items(Qt.AscendingOrder):
+        for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
             if pix.type == 'pix':  
                 if 'path' in pix.tag and pid == 'paths':
                     self.tagIt('paths', pix, tf) 
@@ -281,7 +276,7 @@ class InitMap:
                 if pix.type == 'pix':
                     if  pix.tag.endswith('.path'):
                         k += self.displayPath(pix)
-                    elif pix.anime and pix.anime.state() == 2: ## running
+                    elif pix.anime and pix.anime.state() == QAbstractAnimation.State.Running:
                         pix.anime.pause()
                 elif pix.zValue() <= common["pathZ"]:
                     break
@@ -310,7 +305,7 @@ class InitMap:
                 self.scene.removeItem(self.pathTagGroup)
             for pix in self.scene.items():
                 if pix.type == 'pix' and not pix.tag.endswith('.path'):
-                    if pix.anime and pix.anime.state() == 1:  ## paused
+                    if pix.anime and pix.anime.state() ==  QAbstractAnimation.State.Paused:
                         if self.parent.control != 'resume':
                             pix.anime.resume()
                 elif pix.zValue() <= common["pathZ"]:
@@ -335,8 +330,8 @@ class InitMap:
         pathPt = path.pointAtPercent(0.0)  ## so its consistent
         ## use painter path
         pathItem = QGraphicsPathItem(path)
-        pathItem.setPen(QPen(QColor(color), 3, Qt.DashDotLine))
-        pathItem.setFlag(QGraphicsPathItem.ItemIsMovable, False)
+        pathItem.setPen(QPen(QColor(color), 3, Qt.PenStyle.DashDotLine))
+        pathItem.setFlag(QGraphicsPathItem.GraphicsItemFlag.ItemIsMovable, False)
         self.pathGroup.addToGroup(pathItem)
         self.addTag(tag, color, pathPt)
 
@@ -362,11 +357,6 @@ class InitMap:
             elif pix.zValue() <= common["pathZ"]:
                 break
         return inc + first
-
-    def updateWidthHeight(self, pix):
-        brt = pix.boundingRect()
-        pix.width = brt.width()
-        pix.height = brt.height()
 
 ### --------------------- dotsMapItem ----------------------
 

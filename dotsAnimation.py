@@ -1,6 +1,5 @@
-import sys
+
 import random
-import time
 
 from PyQt5.QtCore    import QPointF, pyqtProperty, QPropertyAnimation, \
                             QParallelAnimationGroup, QSequentialAnimationGroup, \
@@ -113,7 +112,7 @@ def vibrate(pix):
     vibrate.setEndValue(pos)
 
     vibrate.setLoopCount(-1)
-    vibrate.setEasingCurve(QEasingCurve.InOutBack)
+    vibrate.setEasingCurve(QEasingCurve.Type.InOutBack)
 
     return vibrate
 
@@ -163,7 +162,7 @@ def bobble(pix):
     bobble.setEndValue(pos)
 
     bobble.setLoopCount(-1)
-    bobble.setEasingCurve(QEasingCurve.InOutCubic)
+    bobble.setEasingCurve(QEasingCurve.Type.InOutCubic)
 
     return bobble
 

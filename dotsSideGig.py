@@ -1,18 +1,15 @@
+
 import random
 import os
 import math
 
-from os import path
-
 from PyQt5.QtCore    import Qt, QTimer, QPointF, QRectF,QSize
-from PyQt5.QtGui     import QCursor, QPixmap, QPainter, QBrush, QFontMetrics, \
+from PyQt5.QtGui     import QPainter, QBrush, QFontMetrics, \
                             QPen, QPolygonF, QColor, QFont
 from PyQt5.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
-                            QLabel, QDesktopWidget, \
-                            QGraphicsItemGroup, QGraphicsLineItem, QScrollArea, \
-                            QGridLayout, QVBoxLayout, QGraphicsEllipseItem
+                            QLabel, QScrollArea, QGridLayout, QVBoxLayout
 
-from dotsShared      import common, paths, pathcolors
+from dotsShared      import paths, pathcolors
 
 PlayKeys = ('resume','pause')
 
@@ -26,14 +23,14 @@ class MsgBox(QMessageBox):  ## thanks stackoverflow
 
         self.timeOut = pause
         self.setText("\n" + text)
-        self.setStandardButtons(QMessageBox.NoButton)
+        self.setStandardButtons(QMessageBox.StandardButton.NoButton)
        
         self.timer = QTimer(self)
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.changeContent)
         self.timer.start()
 
-        self.exec_()
+        self.exec()
 
     def enterEvent(self, e):  
         self.close()
@@ -83,7 +80,7 @@ class TagIt(QGraphicsSimpleTextItem):
             if len(tag) > 0:  
                 tag = tag + ": " + str(zval)
             else:
-                tag =  str(zval)
+                tag = str(zval)
     
         if control == 'points':
             self.type = 'pt'
@@ -91,9 +88,16 @@ class TagIt(QGraphicsSimpleTextItem):
             self.type = 'tag'
 
         self.text = tag   
-        self.font = QFont('Arial', 12)
-        metrics   = QFontMetrics(self.font)
-        self.rect = QRectF(0, 0, metrics.width(self.text)+13, 19)
+
+        self.font = QFont()
+        self.font.setFamily("Helvetica")
+        self.font.setPointSize(12)
+
+        metrics = QFontMetrics(self.font)
+        p = metrics.boundingRect(self.text)
+        p = p.width()
+ 
+        self.rect = QRectF(0, 0, p+13, 19)
         self.waypt = 0
 
     def boundingRect(self):
@@ -102,14 +106,15 @@ class TagIt(QGraphicsSimpleTextItem):
     def paint(self, painter, option, widget): 
         brush = QBrush()
         brush.setColor(self.color)
-        brush.setStyle(Qt.SolidPattern)
+        brush.setStyle(Qt.BrushStyle.SolidPattern)
 
         painter.fillRect(self.boundingRect(), brush)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        painter.setPen(Qt.black)
+        painter.setPen(Qt.GlobalColor.black)
         painter.setFont(self.font)
-        painter.drawText(self.boundingRect(), Qt.AlignCenter, self.text)
+        painter.drawText(self.boundingRect(), 
+            Qt.AlignmentFlag.AlignCenter, self.text)
  
 ### --------------------------------------------------------
 class DoodleMaker(QWidget): 
@@ -122,18 +127,18 @@ class DoodleMaker(QWidget):
 
         widget = QWidget()
         gLayout = QGridLayout(widget)
-        gLayout.setDefaultPositioning(3, Qt.Horizontal)
+        gLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
         gLayout.setHorizontalSpacing(5)
-        gLayout.setOriginCorner(0)
-        gLayout.setContentsMargins(0, 0, 0, 0)
+        # gLayout.setOriginCorner(0)  ## not sure if this is being used anymore
+        gLayout.setContentsMargins(5, 5, 5, 5)
 
         for file in getPathList():    
             df = Doddle(parent, file)
             gLayout.addWidget(df)
 
         scroll = QScrollArea()
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(False)
         scroll.setWidget(widget)
    
@@ -152,7 +157,10 @@ class Doddle(QLabel):
         scalor = .10
         self.W, self.H = 150, 100
 
-        self.font = QFont('Arial', 13)
+        self.font = QFont()
+        self.font.setFamily("Helvetica")
+        self.font.setPointSize(12)
+
         self.pen = QPen(QColor(0,0,0))                     
         self.pen.setWidth(1)                                       
         self.brush = QBrush(QColor(255,255,255,255)) 
@@ -175,15 +183,19 @@ class Doddle(QLabel):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setBrush(self.brush) 
-        painter.setPen(QPen(QColor("DODGERBLUE"), 2, Qt.DashDotLine))
+        painter.setPen(QPen(QColor("DODGERBLUE"), 2, Qt.PenStyle.DashDotLine))
         painter.drawPolygon(QPolygonF(self.df))
-        painter.setBrush(Qt.NoBrush) 
-        painter.setPen(QPen(Qt.darkGray, 2)) 
+        painter.setBrush(Qt.BrushStyle.NoBrush) 
+        painter.setPen(QPen(Qt.GlobalColor.darkGray, 2)) 
         painter.drawRect(0, 0, self.W, self.H)
-        painter.setPen(QPen(Qt.black, 2)) 
+        painter.setPen(QPen(Qt.GlobalColor.black, 2))
+
         metrics = QFontMetrics(self.font)
         txt = os.path.basename(self.file)
-        p = int((self.W - metrics.width(txt))/2 )
+        p = metrics.boundingRect(txt)
+        p = p.width()
+
+        p = int((self.W - p)/2 )
         painter.drawText(p, self.H-10, txt)
 
 ### --------------------------------------------------------

@@ -1,12 +1,9 @@
-import random
-import os
 
-from os import path
+import os
 
 from PyQt5.QtCore       import Qt, QPoint, QPointF, pyqtSlot
 from PyQt5.QtGui        import QImage, QColor, QPen
-from PyQt5.QtWidgets    import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
-                               QGraphicsPixmapItem
+from PyQt5.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared       import common
 
@@ -81,8 +78,8 @@ class PixItem(QGraphicsPixmapItem):
 
         ## don't change
         img = img.scaled(newW, newH,
-            Qt.KeepAspectRatio,
-            Qt.SmoothTransformation)
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
 
         self.width   = img.width()
         self.height  = img.height()  
@@ -115,7 +112,7 @@ class PixItem(QGraphicsPixmapItem):
         else:
             self.setFlags(True)
   
-        self.setShapeMode(QGraphicsPixmapItem.BoundingRectShape)
+        self.setShapeMode(QGraphicsPixmapItem.ShapeMode.BoundingRectShape)
 
         self.setAcceptHoverEvents(True)
         # pub.subscribe(self.setPixKeys, 'setKeys')
@@ -148,10 +145,10 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
 
     def setFlags(self, bool):
-        self.setFlag(QGraphicsPixmapItem.ItemIsSelectable, bool)  
-        self.setFlag(QGraphicsPixmapItem.ItemIsMovable, bool)
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, bool)  
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, bool)
         if self.locked:
-            self.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
   
     def setMirrored(self, mirror):
         sideCar.mirrorSet(self, mirror)
@@ -225,7 +222,7 @@ class PixItem(QGraphicsPixmapItem):
             pos = self.mapToScene(e.pos())     
             dragX = pos.x() - self.dragAnchor.x()
             dragY = pos.y() - self.dragAnchor.y()
-            self.mapper.updateWidthHeight(self)
+            self.updateWidthHeight()
             self.x = int(sideCar.constrain(
                 self.initX + dragX, 
                 self.width, 
@@ -321,10 +318,10 @@ class PixItem(QGraphicsPixmapItem):
         self.setScale(self.scale)
     
     def setOriginPt(self):    
-        self.mapper.updateWidthHeight(self)
+        self.updateWidthHeight()
         op = QPointF(self.width/2, self.height/2)
         self.setTransformOriginPoint(op)
-        self.setTransformationMode(Qt.SmoothTransformation)
+        self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                
     def setPixSizes(self, newW, newH):  
         p = os.path.basename(self.fileName)[0:5]
@@ -336,6 +333,11 @@ class PixItem(QGraphicsPixmapItem):
         elif newW > 400 or newH > 400:
             newW, newH = 425, 425
         return newW, newH
-            
+               
+    def updateWidthHeight(self):
+        brt = self.boundingRect()
+        self.width = brt.width()
+        self.height = brt.height()        
+        
 ### -------------------- dotsPixItem -----------------------
 

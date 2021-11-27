@@ -1,14 +1,22 @@
 import sys
+import PyQt5
 
-from PyQt5.QtCore    import Qt, QPoint
-from PyQt5.QtGui     import QPainter, QColor, QPen, QFont, QFontMetrics, QBrush
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QDesktopWidget
+from PyQt5.QtCore    import Qt, QPointF
+from PyQt5.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
+from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
 
-ExitKeys = (Qt.Key_X, Qt.Key_Q, Qt.Key_Escape)
-SizeKeys = (Qt.Key_Less, Qt.Key_Greater)
+ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
+SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)
 Ticks = (100,50,10)
 
 ctrWidth, ctrHeight = 600, 70
+
+# from PyQt5.QtCore import QT_VERSION_STR
+# from PyQt5.QtCore import PYQT_VERSION_STR
+
+# print( PyQt5.__version__ )
+# print("PyQt version:", PYQT_VERSION_STR) 
+# print("Python version:", QT_VERSION_STR)
 
 ### ------------------------- vhx --------------------------
 class VHX(QMainWindow):  ## yet another screen pixel ruler 
@@ -17,17 +25,17 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         super().__init__()
 
         self.resize(ctrWidth, ctrHeight)
+
+        # self.setWindowFlags(Qt.WindowType.Window.FramelessWindowHint)
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground, True);
-     
-        self.setWindowFlags(  ## my birthday present from stackoverflow
-            Qt.Window | \
-            Qt.CustomizeWindowHint | \
-            Qt.WindowStaysOnTopHint
-        )
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
 
         self.widget = QWidget(self)
-        self.widget.setFocusPolicy(Qt.StrongFocus)
+        self.widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.widget.setFocus()
        
         self.setCentralWidget(self.widget);
@@ -37,6 +45,10 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         self.center()
         self.scrnWidth, self.scrnHeight = getScreenSize()
   
+        self.font = QFont()
+        self.font.setFamily("Helvetica")
+        self.font.setPointSize(13)
+
         self.grabMouse()
 
         self.show()
@@ -46,11 +58,11 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         painter = QPainter(self)
         painter.setBrush(QColor(128, 255, 0, 175)) 
         painter.drawRect(0, 0, self.width(), self.height() )
-        painter.setBrush(Qt.NoBrush) 
-        painter.setPen(QPen(Qt.darkGray, .5)) 
+        painter.setBrush(Qt.BrushStyle.NoBrush) 
+        painter.setPen(QPen(Qt.GlobalColor.darkGray, .5)) 
         painter.drawRect(0, 0, self.width(), self.height())
-        painter.setPen(QPen(Qt.black, 1.0)) 
-        metrics = QFontMetrics(QFont('Arial', 13))
+        painter.setPen(QPen(Qt.GlobalColor.black, 1.0)) 
+        metrics = QFontMetrics(self.font)
         if self.horizontal:
             self.drawHorizontalLines(painter, metrics)  
         else:
@@ -62,7 +74,8 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             for i in range (1, w+1):
                 i = i * t
                 txt = str(i)
-                p = metrics.width(txt) + 5
+                p = metrics.boundingRect(txt)
+                p = p.width()
                 if t > 10:
                     painter.drawLine(i, 20, i, ctrHeight)
                     painter.drawText(i-p, 15, txt)
@@ -76,20 +89,21 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             for i in range (1, h+1):
                 i = i * t
                 txt = str(i)
-                p = metrics.width(txt)
+                p = metrics.boundingRect(txt)
+                p = p.width() - 2
                 if t > 10:
-                    painter.drawLine(5, i, w, i)
+                    painter.drawLine(5, i, w + 2, i)
                     painter.drawText(w-p, i-3, txt)
                 else:
-                    painter.drawLine(5, i, w-25, i)
+                    painter.drawLine(5, i, w-29, i)
        
     def keyPressEvent(self, e):
         key = e.key()
-        if key == Qt.Key_V:
+        if key == Qt.Key.Key_V:
             self.horizontal = False
             self.resize(70,600)
             self.center()
-        elif key == Qt.Key_H:
+        elif key == Qt.Key.Key_H:
             self.horizontal = True
             self.resize(600,70)
             self.center()
@@ -103,7 +117,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         e.accept()
 
     def mouseMoveEvent(self, e):
-        delta = QPoint(e.globalPos() - self.initXY)
+        delta = QPointF(e.globalPos() - self.initXY)
         x = self.x() + delta.x()
         y = self.y() + delta.y()
         ## leave some pixels on the screen -- 200px 
@@ -120,7 +134,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
                 x = int(self.scrnWidth - self.width()/2)
             elif x <= self.width()/2:
                 x = int(self.width()/2)
-        self.move(x,y)
+        self.move(int(x),int(y))
         self.initXY = e.globalPos()
         e.accept()
 
@@ -128,7 +142,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         self.close()
     
     def scaleThis(self, key):
-        if key == Qt.Key_Greater:
+        if key == Qt.Key.Key_Greater:
             scale = 100
         else:
             scale = -100
@@ -139,7 +153,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         self.update()
 
     def center(self):
-        ctr = QDesktopWidget().availableGeometry().center()
+        ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         if self.horizontal:
             x = int(((ctr.x() * 2 ) - ctrWidth)/2)
             self.move(x, ctr.y()-100)
@@ -149,7 +163,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             self.move(x, y-50)
 
 def getScreenSize():
-    d = QDesktopWidget().availableGeometry()
+    d = QGuiApplication.primaryScreen().availableGeometry()
     return d.x() + d.width(), d.y() + d.height()
 
 def constrain(xy, objSize, screenSize, px):
@@ -164,6 +178,6 @@ def constrain(xy, objSize, screenSize, px):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     vhx = VHX()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
 
 ### ------------------------- vhx --------------------------

@@ -1,22 +1,15 @@
+
 import random
-import os
+import json
 
-from os import path
-
-from PyQt5.QtCore    import Qt, QTimer, QPointF, QPoint, QRectF,QSize, \
-                            QSequentialAnimationGroup, QPropertyAnimation, QEasingCurve
-from PyQt5.QtGui     import QCursor, QPixmap, QPainter, QBrush, QFontMetrics, \
-                            QPen, QPolygonF, QColor, QFont
-from PyQt5.QtWidgets import QWidget, QGraphicsPixmapItem, QMessageBox, \
-                            QGraphicsSimpleTextItem, QLabel, QDesktopWidget, \
-                            QGraphicsItemGroup, QGraphicsLineItem, QScrollArea, \
-                            QGridLayout, QVBoxLayout, QGraphicsDropShadowEffect, \
-                            QGraphicsWidget, QHBoxLayout
-
+from PyQt5.QtCore    import Qt, QPointF 
+from PyQt5.QtGui     import QCursor, QPixmap, QPen, QColor, QGuiApplication
+from PyQt5.QtWidgets import QGraphicsPixmapItem, QFileDialog, \
+                            QGraphicsItemGroup, QGraphicsLineItem \
+                           
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
-from dotsSidePath    import getOffSet
-from dotsAnimation   import Node
+from dotsSideGig     import MsgBox
 
 PlayKeys = ('resume','pause')
 
@@ -30,12 +23,10 @@ class SideCar:
         super().__init__()
  
         self.canvas = parent
-        self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
       
         self.gridZ   = common["gridZ"] 
-        self.gridSet = False
         self.gridGroup = None
 
 ### --------------------------------------------------------
@@ -52,7 +43,8 @@ class SideCar:
         rightWing.part = 'right'
         rightWing.tag  = 'Flapper'  ## applies this animation when run
         rightWing.setZValue(rightWing.zValue() + 200)  ## reset wing zvals
-        rightWing.setFlag(QGraphicsPixmapItem.ItemIsSelectable, False)
+        rightWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
+        rightWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
         
         self.canvas.pixCount += 1
         leftWing = PixItem(rightWing.fileName, 
@@ -65,8 +57,9 @@ class SideCar:
         leftWing.part = 'left'
         leftWing.tag  = 'Flapper'
         leftWing.setZValue(leftWing.zValue() + 200)
-        leftWing.setFlag(QGraphicsPixmapItem.ItemIsSelectable, False) 
-
+        leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False) 
+        leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
+       
         self.canvas.pixCount += 1
         pivot = PixItem(paths["imagePath"] + 'bat-pivot.png', 
             self.canvas.pixCount,
@@ -77,7 +70,7 @@ class SideCar:
         pivot.part = 'pivot' 
         pivot.tag = pathTag 
         pivot.setZValue(pivot.zValue() + 200)
-        pivot.setFlag(QGraphicsPixmapItem.ItemIsSelectable, True) 
+        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True) 
 
         ''' magic numbers warning - results will vary - seems
             to be working for bat wings if loaded using file chooser'''    
@@ -127,7 +120,7 @@ class SideCar:
          
     def transFormPixItem(self, pix, rotation, scale):
         op = QPointF(pix.width/2, pix.height/2)
-        pix.setTransformationMode(Qt.SmoothTransformation)
+        pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         pix.setTransformOriginPoint(op)
         pix.scale, pix.rotation = scale, rotation
         pix.setScale(scale)
@@ -143,15 +136,14 @@ class SideCar:
 
 ### --------------------------------------------------------
     def toggleGrid(self):
-        if self.gridSet:
+        if self.gridGroup is not None:
             self.scene.removeItem(self.gridGroup)
-            self.gridSet = False
+            self.gridGroup = None
         else: 
             self.gridGroup = QGraphicsItemGroup()  
             self.gridGroup.setZValue(common["gridZ"])
             self.scene.addItem(self.gridGroup)
-            self.gridSet = True
-
+           
             gs = common["gridSize"]
             pen = QPen(QColor(0,0,255))
          
@@ -168,41 +160,65 @@ class SideCar:
         line.setPen(pen)
         line.setOpacity(common["factor"])
         line.setZValue(common["gridZ"])
-        line.setFlag(QGraphicsLineItem.ItemIsMovable, False)
+        line.setFlag(QGraphicsLineItem.GraphicsItemFlag.ItemIsMovable, False)
         self.gridGroup.addToGroup(line)
 
+    def gridCount(self):  
+        return sum(
+            pix.type == 'grid' 
+            for pix in self.canvas.scene.items()
+        )
+
+### ------------------ moved from sideShow -----------------
     def setPauseKey(self):        
         if self.canvas.control == 'pause': 
-            self.dots.btnPause.setText( "Resume" );
+            self.canvas.btnPause.setText( "Resume" );
             self.canvas.control = 'resume'
         elif self.canvas.control == 'resume':
-            self.dots.btnPause.setText( "Pause" );
+            self.canvas.btnPause.setText( "Pause" );
             self.canvas.control = 'pause'
 
     def enablePlay(self):
         self.canvas.control = ''
-        self.dots.btnRun.setEnabled(True)
-        self.dots.btnPause.setEnabled(False)
-        self.dots.btnStop.setEnabled(False) 
-        self.dots.btnSave.setEnabled(True) 
+        self.canvas.btnRun.setEnabled(True)
+        self.canvas.btnPause.setEnabled(False)
+        self.canvas.btnStop.setEnabled(False) 
+        self.canvas.btnSave.setEnabled(True) 
  
     def disablePlay(self):
         self.canvas.control = 'pause'
-        self.dots.btnRun.setEnabled(False)
-        self.dots.btnPause.setEnabled(True)
-        self.dots.btnStop.setEnabled(True)  
-        self.dots.btnSave.setEnabled(False)  
+        self.canvas.btnRun.setEnabled(False)
+        self.canvas.btnPause.setEnabled(True)
+        self.canvas.btnStop.setEnabled(True)  
+        self.canvas.btnSave.setEnabled(False)  
 
-    def clearPathsandTags(self):
-        self.mapper.clearTagGroup()
-        self.mapper.clearPaths()  ## clears tags as well
+    def saveToJson(self, dlist):
+        Q = QFileDialog()
+        if self.canvas.openPlayFile == '':
+            self.canvas.openPlayFile = paths["playPath"] + 'tmp.play'
+        f = Q.getSaveFileName(self.canvas, 
+            paths["playPath"],  
+            self.canvas.openPlayFile)
+        if not f[0]: 
+            return
+        if not f[0].lower().endswith('.play'):
+            MsgBox("saveToJson: Wrong file extention - use '.play'")  
+            return
+        else:
+            try:
+                with open(f[0], 'w') as fp:
+                    json.dump(dlist, fp)
+            except IOError:
+                MsgBox("saveToJson: Error saving file")
+            del dlist
+            return
 
 ### --------------------------------------------------------
 def mirrorSet(self, mirror):
     self.flopped = mirror   
     self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
         horizontal=self.flopped, vertical=False)))
-    self.setTransformationMode(Qt.SmoothTransformation)
+    self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
 
 def constrain(lastXY, objSize, panelSize, overlap):
     if lastXY + objSize > panelSize - overlap:
@@ -213,17 +229,8 @@ def constrain(lastXY, objSize, panelSize, overlap):
         return lastXY
 
 def setCursor():
-    cur = QCursor()
-    cur.setPos(QDesktopWidget().availableGeometry().center())
-
-def itemsPixcount(self):   ## not used
-    return sum(
-        pix.type == 'pix' 
-        for pix in self.canvas.scene.items()
-    )
+    QGuiApplication.primaryScreen().availableGeometry().center()
 
 ### ---------------------- dotsSideCar ---------------------
-
-
 
 

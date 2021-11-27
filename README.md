@@ -1,9 +1,11 @@
 ## DotsQt  
-**DotsQt** is a program for creating photo-collage and 2D animations using transparent pngs as sprites/clip-art. It comes with some basic animations and paths that can be attached to the sprite screen objects plus a set of functions to create and modify paths as well as setting the background color.
+**DotsQt** is a program for creating photo-collage and 2D animations using transparent pngs as sprites/clip-art. It comes with some basic animations and paths that can be attached to the sprite screen objects plus a set of functions to create and modify paths as well as functions to set the background, either using photos or flat color.
 
 The original dots was written in JavaFX which added animation to the photo-collage portion of the DotsFX app as well as providing a means to create sprites. The dots front end is no longer required as the screen objects, sprites, are now based on transparent pngs.
 
-See **keys.pdf** and **Changes.md** for updates.   
+This is not a finished app - more of a toolkit, an artist's studio, a potter's kick-wheel. In building an animation from scratch the file **dotsAnimation.py** provides the starting point for the code necessary to create your own animations.See **keys.pdf, Changes.md, Start-Here.md** for updated documentation.
+	  
+#### I'd recommend running dots in **PyQt5.15** as it's already been prepped for **PyQt5.2**.  I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them.  I can't speak for earlier versions.
 
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible, it doesn't always work. Also I use camel case after many years of coding in snake.
@@ -14,16 +16,15 @@ The upper right hand panel is a read only scrolling list of the keys, key combin
 
 The **background** image doesn't need to reside in the backgrounds folder unless you're planning to reload it. You can save a copy of it to the backgrounds folder using the save button in the background group. The copy will have the first 15 characters of the file name plus **'-bkg'** and will set itself as the background replacing the original image.
 
-An alternative is to have a **3:2** formatted photo in the backgrounds folder that doesn't need cropping. Adding it as a background and saving it with a **play** animation will set it to the background when reloaded.  Once a background image has been **set** it can deleted, flopped, or sent to the back if more than one background was set.  Flat colors can also be used as backgrounds.
+An alternative is to have a **3:2** formatted photo in the backgrounds folder that doesn't need cropping. Adding it as a background and saving it with **play** will set it to the background when reloaded.  Once a background image has been **set** it can deleted, flopped, or sent to the back if more than one background was set.
 
-If you plan to run it on a Windows machine you'll need to edit the **paths** dictionary in DotsShared.py.   
+If you plan to run it on a Windows machine you'll need to edit the **paths** dictionary in **dotsShared.py**.   
 
-It's not advisable to make changes in the pause mode as interesting, unwanted problems can occur.   
+**It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
 The **star** in scrollPanel isn't currently designed to be dragged to the canvas, but without it none of this would exist.
 
-I use the graphicsitem **zValue()** as a means to order the graphic types which share the scene items list.  There are two functions, toFront() and lastZval() that help to make sure the different types I've created are good neighbors.  Some types may be applied to multiple
-screen items such as backgrounds and flats sharing 'bkg'.
+I use the graphicsitem **zValue()** as a means to order the graphic types which share the scene items list.  There are two functions, toFront() and lastZval() that help to make sure the different types I've created are good neighbors.
 
 #### types and zValue range		
 | scene.item  | type  | zValue |
@@ -66,4 +67,4 @@ Special thanks to Martin Fitzpatrick of <https://www.learnpyqt.com> for taking a
 
 
 
-##  
+##  **

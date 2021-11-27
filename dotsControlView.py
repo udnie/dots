@@ -1,18 +1,17 @@
-import os
-import sys
 
 from PyQt5.QtCore    import Qt, pyqtSignal, QProcess
 from PyQt5.QtGui     import QPainter
 from PyQt5.QtWidgets import QGraphicsView
 
 from dotsSideGig     import MsgBox
-from dotsShared      import common, singleKeys
+from dotsShared      import singleKeys
 from dotsSideCar     import SideCar
 from dotsMapItem     import InitMap
 
-MixKeys   = (Qt.Key_D, Qt.Key_F, Qt.Key_T)
-ExitKeys  = (Qt.Key_X, Qt.Key_Q, Qt.Key_Escape)
+DFTKeys   = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T)
+ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
+LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -28,9 +27,9 @@ class ControlView(QGraphicsView):
         super().__init__(parent)
 
         self.canvas = parent       
-        self.dots   = parent.dots
-
-        self.canvas.mapper = InitMap(self.canvas)
+    
+        self.canvas.mapper = InitMap(self.canvas)  ## carry mapper to sidecar
+        
         self.sideCar = SideCar(self.canvas)
 
         self.setObjectName('ControlView')
@@ -39,33 +38,34 @@ class ControlView(QGraphicsView):
         self.dragOver = False
         self.p = None
     
-        self.setRenderHints(QPainter.Antialiasing | 
-            QPainter.TextAntialiasing | 
-            QPainter.SmoothPixmapTransform)
+        self.setRenderHints(
+            QPainter.RenderHint.Antialiasing | 
+            QPainter.RenderHint.TextAntialiasing | 
+            QPainter.RenderHint.SmoothPixmapTransform
+        )
 
         self.setStyleSheet("border: 1px solid rgb(100,100,100)")
 
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.setAcceptDrops(True)  
       
-        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setFocus()
 
         self.grabKeyboard()  ## happy days
       
         self.direct = {
-            Qt.Key_A: self.canvas.selectAll,
-            Qt.Key_H: self.canvas.hideSelected,
-            Qt.Key_U: self.canvas.unSelect,
-            Qt.Key_Z: self.canvas.ZDump,
+            Qt.Key.Key_A: self.canvas.selectAll,
+            Qt.Key.Key_H: self.canvas.hideSelected,
+            Qt.Key.Key_U: self.canvas.unSelect,
+            Qt.Key.Key_Z: self.canvas.ZDump,
         }
 
         self.ToggleKeys = {
-            Qt.Key_G: self.sideCar.toggleGrid,
-            Qt.Key_K: self.dots.sliderPanel.toggleMenu,
-            Qt.Key_M: self.canvas.mapper.toggleMap,
+            Qt.Key.Key_G: self.sideCar.toggleGrid,
+            Qt.Key.Key_M: self.canvas.mapper.toggleMap,
         }
 
 ### --------------------------------------------------------
@@ -93,6 +93,7 @@ class ControlView(QGraphicsView):
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.canvas.mapper.toFront(0)
+            # self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ##  PyQt5
             self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(), 
                 None, False)
    
@@ -100,38 +101,40 @@ class ControlView(QGraphicsView):
     ## best location for reading keys - especially arrow keys
     def keyPressEvent(self, e):
         key = e.key() 
-        mod = e.modifiers()
-        if e.key() == 33 and self.canvas.pathMakerOn:  ## '!' on a mac
+        mod = e.modifiers()  
+        if e.key() == 33 and self.canvas.pathMakerOn:
             self.setKey('!')
-        elif key in (Qt.Key_Backspace, Qt.Key_Delete):  ## can vary
+        elif e.key() == 64 and self.canvas.pathMakerOn:
+            self.setKey('@')
+        elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
             self.setKey('del')
         ## mix of setKey and direct run
-        elif key in MixKeys:
-            if key == Qt.Key_D:    
+        elif key in DFTKeys:
+            if key == Qt.Key.Key_D:    
                 self.setKey('D') 
                 self.canvas.deleteSelected()
-            elif key == Qt.Key_F:
+            elif key == Qt.Key.Key_F:
                 self.setKey('F')  ## if pathMaker on
                 self.canvas.flopSelected()  
-            elif key == Qt.Key_T:
+            elif key == Qt.Key.Key_T:
                 if self.canvas.pathMakerOn:
                     self.setKey('T')  ## run test if pathMaker on
-                elif mod & Qt.ShiftModifier:
+                elif mod & Qt.KeyboardModifier.ShiftModifier:
                     self.canvas.mapper.toggleTagItems('select')
                 else:  
                     self.canvas.mapper.toggleTagItems('all')
+        elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.canvas.togglePixLocks(singleKeys[key])   
         elif key in self.direct: 
             self.direct[key]()  
         elif key in self.ToggleKeys:
             self.ToggleKeys[key]()  
         elif key in singleKeys:  ## in dotsShared.py  
-            if key == Qt.Key_P and mod & Qt.ShiftModifier:  ## show pix path tags
+            if key == Qt.Key.Key_P and mod & Qt.KeyboardModifier.ShiftModifier:  ## show pix path tags
                 if not self.canvas.pathMakerOn:
                     self.canvas.mapper.toggleTagItems('paths')
                     return
-            if key in (Qt.Key_L, Qt.Key_R) and mod & Qt.ShiftModifier:
-                self.canvas.togglePixLocks(singleKeys[key])
-            elif key == Qt.Key_V and mod & Qt.ShiftModifier:
+            elif key == Qt.Key.Key_V and mod & Qt.KeyboardModifier.ShiftModifier:
                 self.startProcess()
             else:
                 self.setKey(singleKeys[key]) 
@@ -151,7 +154,7 @@ class ControlView(QGraphicsView):
             self.p.finished.connect(self.processFinished)
             self.p.start("python3", ["vhx.py"])  ## works in vscode
             # self.p.start("/on a mac - full  path to /vhx.app")  ## using autotmator
-
+          
     def processFinished(self):
         self.p = None
 

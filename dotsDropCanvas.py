@@ -1,16 +1,14 @@
+
 import random
 import os
 import gc
 
-from os import path
-
-from PyQt5.QtCore    import pyqtSignal, QAbstractAnimation, QTimer
-from PyQt5.QtWidgets import QMenu, QRubberBand, QGraphicsScene,\
-                            QGraphicsItemGroup
-                      
+from PyQt5.QtCore    import QAbstractAnimation, QTimer, QEvent
+from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene
+                       
 from dotsShared      import common, CanvasStr, PathStr
 from dotsAnimation   import *
-from dotsSideGig     import MsgBox, TagIt, getPathList
+from dotsSideGig     import getPathList
 from dotsSideCar     import SideCar
 from dotsControlView import ControlView
 from dotsPixItem     import PixItem
@@ -18,6 +16,9 @@ from dotsMapItem     import InitMap
 from dotsBkgItem     import *
 from dotsSideShow    import SideShow
 from dotsPathMaker   import PathMaker
+from dotsSliderPanel import SliderPanel
+from dotsScrollPanel import ScrollPanel
+from dotsDocks       import *
 
 Loops = ('L','R','P','S')
 PlayKeys = ('resume','pause')
@@ -43,14 +44,21 @@ class DropCanvas(QWidget):
         self.openPlayFile = ''    ## shared 
         self.pathList = []        ## used by animations, updated here
     
+        self.slider    = SliderPanel(self)
+        self.scroll    = ScrollPanel(self)
+        self.pathMaker = PathMaker(self)
+
         self.mapper    = InitMap(self) 
         self.initBkg   = InitBkg(self)
-        self.pathMaker = PathMaker(self)
-   
+     
         self.animation = Animation(self)    
-        self.sideShow  = SideShow(self)
-        self.sideCar   = SideCar(self)  ## additional extentions 
-        
+        self.sideShow  = SideShow(self)  ## additional extentions 
+        self.sideCar   = SideCar(self) 
+         
+        addScrollDock(self)  ## add button groups from dotsDocks
+        addSliderDock(self)
+        addButtonDock(self)  
+
         self.scene.setSceneRect(0, 0,
             common["ViewW"],
             common["ViewH"])
@@ -62,11 +70,11 @@ class DropCanvas(QWidget):
         self.pixCount = 0
        
         self.origin = QPoint(0,0)
-        self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
- 
+        self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self)
+
         self.setMouseTracking(True)
         self.view.viewport().installEventFilter(self)
-
+    
         self.view.keysSignal[str].connect(self.setKeys)    
 
 ### ---------------------- send keys -----------------------
@@ -80,12 +88,14 @@ class DropCanvas(QWidget):
         if not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
                 if self.key in Loops:  ## canvas hotkeys
-                    self.sideShow.keysInPlay(self.key)
+                    self.sideShow.keysInPlay(self.key)        
                 elif self.key == 'C':
                     self.clear()
+                elif self.key == 'K':
+                    self.slider.toggleMenu()
                 else:
                     self.sendPixKeys()
-        elif self.key in PathStr:    ## pathMaker
+        elif self.key in PathStr:  ## send key to pathMaker
             self.pathMaker.pathKeys(self.key)
 
         # pub.sendMessage('setKeys', key=key)  ## pypubsub solution   
@@ -94,10 +104,10 @@ class DropCanvas(QWidget):
         #     self.mapper.updateMap()  ## redraw mapper
 
 ### --------------------- event filter ---------------------- 
-    def eventFilter(self, source, e):   ## used by mapper for selecting
+    def eventFilter(self, source, e):  ## used by mapper for selecting
         if not self.pathMakerOn:      
 
-            if e.type() == QEvent.MouseButtonPress:
+            if e.type() == QEvent.Type.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()  ## chks if set
                 if self.key == 'cmd':        ## only used by eventFilter
@@ -107,19 +117,18 @@ class DropCanvas(QWidget):
                     if self.control not in PlayKeys:
                         self.mapper.updatePixItemPos()
 
-            elif e.type() == QEvent.MouseMove:
+            elif e.type() == QEvent.Type.MouseMove:
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
                         self.mapper.removeMap()
                     self.rubberBand.show()
-                    self.rubberBand.setGeometry(QRect(self.origin, 
-                        e.pos()).normalized())
+                    self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
                 elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                 elif self.control not in PlayKeys:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary 
 
-            elif e.type() == QEvent.MouseButtonRelease:
+            elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas() 
@@ -128,16 +137,21 @@ class DropCanvas(QWidget):
                 if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                 self.mapper.updatePixItemPos()  
- 
-            elif e.type() == QEvent.MouseButtonDblClick:
+
+            elif e.type() == QEvent.Type.MouseButtonDblClick:
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
                 if self.mapper.selections or self.hasHiddenPix():
                     if self.mapper.isMapSet():
                         self.mapper.removeMap()
-                        self.setKeys('noMap')  
-         
+                        self.setKeys('noMap')    
+       
+            if e.type() == QEvent.Type.MouseButtonPress and \
+                e.button() == Qt.MouseButton.RightButton:
+                if len(self.scene.selectedItems()) == 0:
+                    self.sideShow.loadPlay()
+
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
@@ -170,10 +184,14 @@ class DropCanvas(QWidget):
 
     def togglePixLocks(self, key):
         stub = ''
+        print(key)
         for pix in self.scene.items(): 
             if pix.type == 'pix':
                 if key == 'R': 
                     pix.locked = True
+                    stub = 'all'
+                elif key == 'U': 
+                    pix.locked = False
                     stub = 'all'
                 elif key == 'L' and pix.isSelected():
                     pix.togglelock()  ## wait to toggleTagItems
@@ -195,15 +213,15 @@ class DropCanvas(QWidget):
         self.initBkg.disableBkgBtns()
         self.dots.statusBar.clearMessage()
         self.mapper.clearMap()
-        self.dots.btnAddBkg.setEnabled(True)
+        self.btnAddBkg.setEnabled(True)
         self.pixCount = 0
-        self.sideCar.gridSet = False
+        self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.scene.clear()
       
     def loadSprites(self):
         self.sideCar.enablePlay()
-        self.dots.scrollpanel.loadSprites()
+        self.scroll.loadSprites()
  
     def selectAll(self):
         for pix in self.scene.items():
@@ -228,12 +246,13 @@ class DropCanvas(QWidget):
         self.mapper.clearTagGroup()
         for pix in self.scene.selectedItems():
             if pix.anime != None and \
-                pix.anime.state() == QAbstractAnimation.Running:
+                pix.anime.state() == QAbstractAnimation.State.Running:
                 pix.anime.stop()  
             pix.setSelected(False)
             pix.deletePix()
             del pix
-        self.anySprites()  ## flip play keys
+        # self.anySprites()  ## flip play keys
+        self.sideCar.enablePlay()  ## stop it - otherwise it's hung
         gc.collect()
 
     def anySprites(self):
@@ -313,7 +332,7 @@ class DropCanvas(QWidget):
         action = menu.addAction(anime)
         action.triggered.connect(
             lambda chk, anime=anime: self.setAnimationTag(anime))
-        menu.exec_(e.globalPos())
+        menu.exec(e.globalPos())
     
     def setAnimationTag(self, tag):
         if self.mapper.tagSet and tag == "Clear Tags":
@@ -329,6 +348,5 @@ class DropCanvas(QWidget):
             self.mapper.removeMap()
 
 ### -------------------- dotsDropCanvas --------------------
-
 
 

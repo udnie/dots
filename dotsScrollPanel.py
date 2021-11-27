@@ -1,10 +1,11 @@
+
 import os
 
 from PyQt5.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl
-from PyQt5.QtGui     import QPainter, QImage, QColor, QPen, QFont, \
-                            QFontMetrics, QBrush, QPolygon, QDrag, QPixmap 
+from PyQt5.QtGui     import QPainter, QImage, QPen, QFont, \
+                            QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
-                            QFrame, QFileDialog
+                            QFrame, QFileDialog, QLayout
 
 from dotsShared      import paths, Star, common
 from functools       import partial
@@ -19,57 +20,60 @@ class ImgLabel(QLabel):
     def __init__(self, imgFile, count, parent):
         super().__init__()
    
-        self.dots = parent
-        self.dots.canvas = parent.canvas
+        self.scrollPanel = parent
+        self.canvas = parent.canvas
 
         self.imgFile = imgFile
         self.id = count 
-  
-        self.setFrameShape(QFrame.Panel|QFrame.Raised)
-     
+
+        self.setFrameStyle(QFrame.Shape.Panel|QFrame.Shadow.Raised)
+
 ### --------------------------------------------------------
     def paintEvent(self, e):
         qp = QPainter()
         qp.begin(self)
 
         if self.imgFile == 'Star':
-            qp.setPen(QPen(Qt.black, 1, Qt.SolidLine))
-            qp.setBrush(QBrush(Qt.red, Qt.SolidPattern))
+            qp.setPen(QPen(Qt.GlobalColor.black, 1, Qt.PenStyle.SolidLine))
+            qp.setBrush(QBrush(Qt.GlobalColor.red, Qt.BrushStyle.SolidPattern))
             qp.drawPolygon(QPolygon(self.drawStar()))  
-            qp.setBrush(Qt.NoBrush) 
+            qp.setBrush(Qt.BrushStyle.NoBrush) 
         else:    
             img = QImage(self.imgFile)
             newW, newH = self.scaleTo(img)
             img = img.scaled(newW, newH,   
-                Qt.KeepAspectRatio|
-                Qt.SmoothTransformation)
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation)
             posX = ((common['LabelW'] - newW) /2 )
             posY = ((common['MaxH'] - newH) /2 ) + 9
             qp.drawImage(posX, posY, img)
 
-        pen = QPen(Qt.darkGray)   
+        pen = QPen(Qt.GlobalColor.darkGray)   
         pen.setWidth(2)
         qp.setPen(pen) 
         qp.drawRect(0, 0, common['LabelW'], common['LabelH'])
 
-        pen = QPen(Qt.white) 
+        pen = QPen(Qt.GlobalColor.white) 
         pen.setWidth(3)
-        pen.setJoinStyle(Qt.BevelJoin)
+        pen.setJoinStyle(Qt.PenJoinStyle.BevelJoin)
         qp.setPen(pen) 
         qp.drawLine(0, 2, 0, common['LabelH']) # left border
         qp.drawLine(1, 1, common['LabelW'], 1) # top border
 
         font = QFont()
-        pen = QPen(Qt.black)
+        pen = QPen(Qt.GlobalColor.black)
         font.setFamily('Arial')
         font.setPointSize(12)
 
         qp.setPen(pen)  
         qp.setFont(font)
         imgfile = os.path.basename(self.imgFile)
-        metrics = QFontMetrics(font)    
 
-        p = (common['LabelW'] - metrics.width(imgfile))/2 
+        metrics = QFontMetrics(font)    
+        p = metrics.boundingRect(imgfile)
+        p = p.width()
+        p = (common['LabelW'] - p)/2 
+
         qp.drawText(p, common['Type'], imgfile)
         qp.end()
 
@@ -80,8 +84,8 @@ class ImgLabel(QLabel):
         return self.minimumSizeHint()
 
     def mousePressEvent(self, event):
-        if self.dots.canvas.key == 'del':
-            self.dots.deleteImgLabel(self)
+        if self.canvas.key == 'del':
+            self.scrollPanel.deleteImgLabel(self)
 
     def mouseMoveEvent(self, event):
         self.StartDrag()
@@ -94,7 +98,7 @@ class ImgLabel(QLabel):
         data.setUrls([QUrl.fromLocalFile(self.imgFile)])
         drag.setMimeData(data)
         drag.setPixmap(QPixmap(paths['imagePath'] + 'dnd2.png'))
-        drag.exec_()
+        drag.exec()
      
     def drawStar(self):
         poly = QPolygon()
@@ -130,23 +134,24 @@ class ScrollPanel(QWidget):
     def __init__(self, parent):
         super().__init__()
         
-        self.dots   = parent
-        self.canvas = parent.canvas  ## used in imgLabel
+        self.canvas = parent  ## used in imgLabel
+        self.view   = parent.view  
 
         self.setFixedSize(common['ScrollW'],common['ScrollH'])
    
         self.layout = QVBoxLayout(self)
-        self.layout.setSizeConstraint(3)  # fixed size
+        
+        self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setAlignment(Qt.AlignCenter)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
      
         widget = QWidget()  
         widget.setLayout(self.layout)
 
         self.scroll = QScrollArea()
-        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
       
         self.scroll.setWidgetResizable(True)    # always
         self.scroll.verticalScrollBar().setSingleStep(15)
@@ -212,7 +217,8 @@ class ScrollPanel(QWidget):
         if sprites:
             for s in sprites:
                 self.add(s)
-            self.top()   # your choice
+            self.top()   
+        ## ------ your choice -------------
         # firstwidget = self.layout.itemAt(0).widget()
         # QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, firstwidget))
 
@@ -231,5 +237,4 @@ class ScrollPanel(QWidget):
         return filenames
 
 ### ------------------- dotsScrollPanel --------------------
-
 

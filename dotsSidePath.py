@@ -1,9 +1,6 @@
-import os
-import sys
-import random
-import time
 
-from os import path
+import os
+import random
 
 from PyQt5.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
                                QParallelAnimationGroup, QSequentialAnimationGroup     
@@ -43,13 +40,13 @@ def demo(pix, anime, node):
 
     rotate = QPropertyAnimation(node, b'rotate')
     rotate.setDuration(sync/3)
-    rotate.setEasingCurve(QEasingCurve.InBounce)
+    rotate.setEasingCurve(QEasingCurve.Type.InBounce)
     rotate.setStartValue(node.pix.rotation)    
     rotate.setKeyValueAt(0.25, pix.rotation-45)
     rotate.setKeyValueAt(0.50, pix.rotation)
     rotate.setKeyValueAt(0.75, pix.rotation+45)
     rotate.setEndValue(node.pix.rotation)
-    rotate.setEasingCurve(QEasingCurve.OutBounce)
+    rotate.setEasingCurve(QEasingCurve.Type.OutBounce)
     rotate.setLoopCount(-1)
 
     opacity = QPropertyAnimation(node, b'opacity')
@@ -133,7 +130,7 @@ def flapper(pix, anime, node):
     rotate.setStartValue(node.pix.rotation)
     rotate.setKeyValueAt(0.50, rot+pix.rotation)
     rotate.setEndValue(node.pix.rotation)
-    rotate.setEasingCurve(QEasingCurve.Linear)
+    rotate.setEasingCurve(QEasingCurve.Type.Linear)
 
     rotate.setLoopCount(-1) 
 

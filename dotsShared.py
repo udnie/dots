@@ -1,3 +1,4 @@
+
 from PyQt5.QtCore    import Qt
 
 ### --------------------- dotsShared.py --------------------
@@ -13,8 +14,8 @@ common = {
     "DotsH":   825,  # app height
     "ViewW":  1080,  # canvas width  30 X 36
     "ViewH":   720,  # canvas height 30 X 24
-    "gridSize": 30,
-    "ScrollW": 152,  
+    "gridSize": 30,  # number of pixels per side
+    "ScrollW": 152,  # scrollbar stuff
     "ScrollH": 685,  
     "LabelW":  133,
     "LabelH":  112,    
@@ -26,8 +27,8 @@ common = {
     "runThis":  "demo.play",
 }
           
-CanvasStr = "L,R,P,S,C,:,\",\',<,>,{,},[,],_,+,/,-,=,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
-PathStr = "C,D,F,N,P,R,S,T,W,V,{,},[,],/,!,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt"
+CanvasStr = "L,R,P,S,C,K,\",\',<,>,{,},[,],_,+,/,-,=,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+PathStr = "C,D,E,F,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt"
 
 paths = {
     "snapShot":   "./",
@@ -42,7 +43,7 @@ Star = ((100, 20), (112, 63), (158, 63), (122, 91),
         (136, 133), (100, 106), (63, 132), (77, 90), 
         (41, 63), (86, 63))
 
-keyMenu = (                    ## pixitems and bkgitems
+keyMenu = (                     ## dropCanvas, pixitems and bkgitems
     ('A', 'Select All'),   
     ('C', 'Clear Canvas'),     
     ('D', 'Delete Selected'),
@@ -57,10 +58,11 @@ keyMenu = (                    ## pixitems and bkgitems
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
     ('U', 'UnSelect All'),
-    ('Shift', '+V Pixel Ruler'),
     ('Shift', '+L ToggleLocks'),
     ('Shift', '+R Locks All'),
     ('Shift', '+T TagSelected'),
+    ('Shift', '+U Unlocks All'),
+    ('Shift', '+V Pixel Ruler'),    
     ('Space', 'Show this Tag'),
     ('\'', 'Toggle this lock'),
     ('X, Q', 'Escape to Quit'),
@@ -80,9 +82,10 @@ keyMenu = (                    ## pixitems and bkgitems
     ('U/D', 'Arrow Keys'),
     ('L/R', 'Arrow Keys'))
 
-pathMenu = (
+pathMenu = (     ## pathMaker
     ('C', 'Center Path'),
     ("D", "Delete Screen"), 
+    ("E", "Edit Points"),
     ("F", "Files"),
     ("N", "New Path"),
     ("P", "Path Chooser"),
@@ -91,24 +94,26 @@ pathMenu = (
     ("T", "Test"),
     ("W", "Way Points"),
     ("V", "..View Points"),
-    ("/", "Path Color"),
     ('Shift', '+V Pixel Ruler'),
     ("cmd", "Closes Path"),
+    ("/", "Path Color"),
     ('_/+', "Rotate 1 deg"),  
     ('-/=', "Rotate 15 deg"),
     ('[/]', 'Rotate 45 deg'),
-    ('<,>', 'Toggle Size'),
+    ('</>', 'Toggle Size'),
     ("} ", "Flop Path"),
     ("{ ", "Flip Path"),  
     (':/\"', "Scale X"),
     (';/\'', 'Scale Y'),
     ('U/D', 'Arrow Keys'),
-    ('L/R', 'Arrow Keys'),
+    ('L/R', 'Arrow Keys'),   
     ("opt", "Add a Point"),
     ("del", "Delete a Point"),
     (">", "  Shift Pts +5%"),
     ("<", "  Shift Pts -5%"),
-    ("! ","  Half Path Size"))
+    ("! ","  Half Path Size"),
+    ("@ ","  Redistribute Pts"),
+)
 
 pathcolors = (
     "DODGERBLUE",    
@@ -132,41 +137,44 @@ pathcolors = (
     "YELLOW")       
 
 singleKeys = {  ## wish I had done this earlier
-    Qt.Key_Up: 'up',          
-    Qt.Key_Down: 'down',
-    Qt.Key_Left: 'left',      
-    Qt.Key_Right:'right',
-    Qt.Key_Alt: 'opt',    
-    Qt.Key_Shift: 'shift',
-    Qt.Key_Control: 'cmd',
-    Qt.Key_Enter: 'enter',
-    Qt.Key_Return: 'return',
-    Qt.Key_Space: 'space',             
-    Qt.Key_C: 'C',  
-    Qt.Key_L: 'L',   
-    Qt.Key_N: 'N', 
-    Qt.Key_O: 'O',  
-    Qt.Key_P: 'P',
-    Qt.Key_R: 'R',
-    Qt.Key_S: 'S', 
-    Qt.Key_T: 'T',
-    Qt.Key_V: 'V', 
-    Qt.Key_W: 'W',  
-    Qt.Key_Plus: '+',         
-    Qt.Key_Equal: '=',    
-    Qt.Key_Minus: '-',  
-    Qt.Key_Less: '<',     
-    Qt.Key_Greater: '>',
-    Qt.Key_Colon: ':',   
-    Qt.Key_Semicolon: ';',  
-    Qt.Key_Apostrophe: '\'',      
-    Qt.Key_QuoteDbl: '"', 
-    Qt.Key_Slash: '/',
-    Qt.Key_Underscore: '_', 
-    Qt.Key_BraceLeft: '{',
-    Qt.Key_BraceRight: '}',   
-    Qt.Key_BracketLeft: '[',
-    Qt.Key_BracketRight: ']', 
+    Qt.Key.Key_Up: 'up',          
+    Qt.Key.Key_Down: 'down',
+    Qt.Key.Key_Left: 'left',      
+    Qt.Key.Key_Right:'right',
+    Qt.Key.Key_Alt: 'opt',    
+    Qt.Key.Key_Shift: 'shift',
+    Qt.Key.Key_Control: 'cmd',
+    Qt.Key.Key_Enter: 'enter',
+    Qt.Key.Key_Return: 'return',
+    Qt.Key.Key_Space: 'space',             
+    Qt.Key.Key_C: 'C',
+    Qt.Key.Key_E: 'E',  
+    Qt.Key.Key_K: 'K',  
+    Qt.Key.Key_L: 'L',   
+    Qt.Key.Key_N: 'N', 
+    Qt.Key.Key_O: 'O',  
+    Qt.Key.Key_P: 'P',
+    Qt.Key.Key_R: 'R',
+    Qt.Key.Key_S: 'S', 
+    Qt.Key.Key_T: 'T',
+    Qt.Key.Key_U: 'U',
+    Qt.Key.Key_V: 'V', 
+    Qt.Key.Key_W: 'W',  
+    Qt.Key.Key_Plus: '+',         
+    Qt.Key.Key_Equal: '=',    
+    Qt.Key.Key_Minus: '-',  
+    Qt.Key.Key_Less: '<',     
+    Qt.Key.Key_Greater: '>',
+    Qt.Key.Key_Colon: ':',   
+    Qt.Key.Key_Semicolon: ';',  
+    Qt.Key.Key_Apostrophe: '\'',      
+    Qt.Key.Key_QuoteDbl: '"', 
+    Qt.Key.Key_Slash: '/',
+    Qt.Key.Key_Underscore: '_', 
+    Qt.Key.Key_BraceLeft: '{',
+    Qt.Key.Key_BraceRight: '}',   
+    Qt.Key.Key_BracketLeft: '[',
+    Qt.Key.Key_BracketRight: ']', 
 }
 ### --------------------- dotsShared.py --------------------
 

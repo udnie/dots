@@ -1,8 +1,9 @@
-from PyQt5.QtCore        import Qt, QTimer
-from PyQt5.QtWidgets     import QWidget, QDockWidget, QPushButton, \
-                                QGroupBox, QHBoxLayout, QVBoxLayout, \
-                                QDesktopWidget
- 
+
+from PyQt5.QtCore       import Qt
+from PyQt5.QtGui        import QGuiApplication 
+from PyQt5.QtWidgets    import QWidget, QDockWidget, QPushButton, \
+                               QGroupBox, QHBoxLayout, QVBoxLayout, QLayout
+                       
 from dotsShared     import common
 from datetime       import datetime
 
@@ -11,45 +12,45 @@ from datetime       import datetime
 ### --------------------------------------------------------
 def addScrollDock(self):
     self.ldocked = QDockWidget(None, self)
-    self.addDockWidget(Qt.LeftDockWidgetArea, self.ldocked)
+    self.dots.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.ldocked)
     self.dockedWidget = QWidget(self)
 
     self.ldocked.setTitleBarWidget(QWidget(self))
     self.ldocked.setWidget(self.dockedWidget)  
 
     layout = QVBoxLayout()      
-    layout.setSizeConstraint(3)  # fixed size - stopped movement
+    layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size - stopped movement
     self.dockedWidget.setLayout(layout)
 
     vbox = self.dockedWidget.layout() 
-    vbox.addWidget(self.scrollpanel)
+    vbox.addWidget(self.scroll)
     
     return vbox
 
 ### --------------------------------------------------------
 def addSliderDock(self):
     self.rdocked = QDockWidget(None, self)
-    self.addDockWidget(Qt.RightDockWidgetArea, self.rdocked)
+    self.dots.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.rdocked)
     self.dockedWidget = QWidget(self)
 
     self.rdocked.setTitleBarWidget(QWidget(self))
     self.rdocked.setWidget(self.dockedWidget)  
 
     layout = QVBoxLayout()      
-    layout.setSizeConstraint(3)  # fixed size - stopped movement
+    layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size - stopped movement
     self.dockedWidget.setLayout(layout)
 
     vbox = self.dockedWidget.layout() 
-    vbox.addWidget(self.sliderPanel)
+    vbox.addWidget(self.slider)
     
     return vbox
 
 ### --------------------------------------------------------  
 def addButtonDock(self):  
     self.bdocked = QDockWidget(None, self)
-    self.addDockWidget(Qt.BottomDockWidgetArea, self.bdocked)
+    self.dots.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bdocked)
     self.dockedWidget = QWidget(self)
-    
+
     self.bdocked.setTitleBarWidget(QWidget(self))
     self.bdocked.setWidget(self.dockedWidget)
     self.dockedWidget.setLayout(QHBoxLayout())
@@ -63,15 +64,13 @@ def addButtonDock(self):
     hbox.addStretch(2) 
     hbox.addWidget(addCanvasBtnGroup(self))
 
-    return hbox
-
 ### --------------------------------------------------------
 def addScrollBtnGroup(self):  
     self.scrollGroup = QGroupBox("Scroll Panel")
 
-    self.scrollGroup.setFixedWidth(400)
+    self.scrollGroup.setFixedWidth(375)
     ## this sets the position of the title
-    self.scrollGroup.setAlignment(Qt.AlignHCenter)
+    self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     btnAdd = QPushButton("Star")
     btnTop = QPushButton("Top")
@@ -89,7 +88,7 @@ def addScrollBtnGroup(self):
     layout.addWidget(btnFiles)
     layout.addWidget(btnLoad)
     
-    panel = self.scrollpanel
+    panel = self.scroll
 
     btnAdd.clicked.connect(panel.Star)
     btnTop.clicked.connect(panel.top)
@@ -106,10 +105,10 @@ def addScrollBtnGroup(self):
 def addPlayBtnGroup(self):
     self.playGroup = QGroupBox("Play")
 
-    self.playGroup.setFixedWidth(325) 
-    self.playGroup.setAlignment(Qt.AlignHCenter)
+    self.playGroup.setFixedWidth(350) 
+    self.playGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
-    btnLoad = QPushButton("Load")
+    btnLoad  = QPushButton("Load")
     self.btnRun = QPushButton("Run")  
     self.btnPause = QPushButton("Pause")
     self.btnStop = QPushButton("Stop")
@@ -123,7 +122,7 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnStop)
     layout.addWidget(self.btnSave)
 
-    sideShow = self.canvas.sideShow
+    sideShow = self.sideShow
 
     btnLoad.clicked.connect(sideShow.loadPlay)
     self.btnSave.clicked.connect(sideShow.savePlay) 
@@ -140,7 +139,7 @@ def addBkgBtnGroup(self):
     bkgGroup = QGroupBox("Background")
 
     bkgGroup.setFixedWidth(275)
-    bkgGroup.setAlignment(Qt.AlignHCenter)
+    bkgGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     self.btnAddBkg  = QPushButton(" Add ")
     self.btnSetBkg  = QPushButton(" Set ")      
@@ -154,7 +153,7 @@ def addBkgBtnGroup(self):
     layout.addWidget(self.btnSaveBkg) 
     layout.addWidget(self.btnBkgColor)
 
-    bkg = self.canvas.initBkg
+    bkg = self.initBkg
 
     self.btnAddBkg.clicked.connect(bkg.openBkgFiles)       
     self.btnSetBkg.clicked.connect(bkg.setBkg)
@@ -168,8 +167,8 @@ def addBkgBtnGroup(self):
 ### -----------------------------------------------------
 def addCanvasBtnGroup(self):
     canvasGroup = QGroupBox("Canvas")
-    canvasGroup.setFixedWidth(375) 
-    canvasGroup.setAlignment(Qt.AlignHCenter)
+    canvasGroup.setFixedWidth(360) 
+    canvasGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     btnClrCanvas = QPushButton("Clear")
     self.btnPathMaker = QPushButton("Path Maker")
@@ -185,8 +184,8 @@ def addCanvasBtnGroup(self):
     layout.addWidget(btnPixTest)
     layout.addWidget(btnExit)
     
-    canvas = self.canvas
-    pathMaker = self.canvas.pathMaker
+    canvas = self
+    pathMaker = self.pathMaker
 
     self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
     btnClrCanvas.clicked.connect(canvas.clear)   
@@ -204,7 +203,7 @@ def getDate():
     return d.strftime("%m-%d-%Y")
 
 def getX():
-    ctr = QDesktopWidget().availableGeometry().center()
+    ctr = QGuiApplication.primaryScreen().availableGeometry().center()
     return int(((ctr.x() * 2 ) - common['DotsW'])/2)
 
 ### -------------------- dotsDocks ----------------------

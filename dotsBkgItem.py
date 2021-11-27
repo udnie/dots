@@ -1,11 +1,11 @@
+
 import os
-import sys
 import random
 
 import os.path
 from os import path
 
-from PyQt5.QtCore    import Qt, QEvent, QPointF, QPoint, pyqtSlot, QSize, QRect
+from PyQt5.QtCore    import Qt, QPointF, QPoint, pyqtSlot, QSize, QRect
 from PyQt5.QtGui     import QColor, QImage, QPixmap
 from PyQt5.QtWidgets import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
                             QGraphicsPixmapItem
@@ -26,7 +26,6 @@ class BkgItem(QGraphicsPixmapItem):
 
         self.canvas = canvas
         self.scene  = canvas.scene
-        self.dots   = canvas.dots
         self.mapper = self.canvas.mapper
        
         self.ViewW = common["ViewW"]
@@ -38,8 +37,8 @@ class BkgItem(QGraphicsPixmapItem):
         self.imgFile = img.scaled(  ## fill to width or height
             self.ViewW, 
             self.ViewH,
-            Qt.KeepAspectRatio|
-            Qt.SmoothTransformation)
+            Qt.AspectRatioMode.KeepAspectRatio, 
+            Qt.TransformationMode.SmoothTransformation)
 
         self.key = ""
         self.id = 0          ## not used except for conisistency
@@ -63,15 +62,15 @@ class BkgItem(QGraphicsPixmapItem):
         self.setMirrored(False)
 
         self.setPixmap(QPixmap.fromImage(self.imgFile))
-        self.setFlag(QGraphicsPixmapItem.ItemIsMovable, True)
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
 
 ### --------------------------------------------------------
     def mousePressEvent(self, e):
         if self.canvas.key == 'del':       # delete it
             self.scene.removeItem(self)
             self.canvas.initBkg.disableBkgBtns()
-            self.dots.btnAddBkg.setEnabled(True)
-        elif self.canvas.key == '/':    # send to back
+            self.canvas.btnAddBkg.setEnabled(True)
+        elif self.canvas.key == '/':  # send to back
             ## lastZval uses the string to return the last zvalue
             self.setZValue(self.mapper.lastZval('bkg')-1)
         elif self.canvas.key == 'shift':
@@ -105,7 +104,9 @@ class BkgItem(QGraphicsPixmapItem):
         self.setOpacity(self.opacity)
 
     def updateWidthHeight(self):
-        self.mapper.updateWidthHeight(self)
+        brt = self.boundingRect()
+        self.width = brt.width()
+        self.height = brt.height()
 
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):
@@ -115,7 +116,6 @@ class Flat(QGraphicsPixmapItem):
 
         self.canvas  = canvas
         self.scene   = canvas.scene
-        self.dots    = canvas.dots
         self.mapper  = self.canvas.mapper
         
         self.type = 'bkg'
@@ -131,15 +131,14 @@ class Flat(QGraphicsPixmapItem):
         self.setPixmap(p)
 
         self.isBackgroundSet = False      
-        self.setFlag(QGraphicsItem.ItemIsMovable, False)
-
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
 ### --------------------------------------------------------
     def mousePressEvent(self, e):
         if self.canvas.key == 'del':     
             self.scene.removeItem(self)
             self.canvas.initBkg.disableBkgBtns()
-            self.dots.btnAddBkg.setEnabled(True)
-        elif self.canvas.key == '/':   
+            self.canvas.btnAddBkg.setEnabled(True)
+        elif self.canvas.key == '/': 
             self.setZValue(self.mapper.lastZval('bkg')-1)
             return
         e.accept()
@@ -150,14 +149,14 @@ class InitBkg(QWidget):
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas  = parent
-        self.scene   = parent.scene
-        self.dots    = parent.dots 
+        self.canvas = parent
+        self.scene  = parent.scene
+        self.view   = parent.view  
+        self.mapper = self.canvas.mapper
+        self.slider = self.canvas.slider
 
-        self.mapper  = self.canvas.mapper
-        self.sliders = self.dots.sliderPanel
-
-        self.dots.sliderPanel.sliderSignal[str, int].connect(self.mapKeys)
+        ## receiving key and value from sliderPanel
+        self.slider.sliderSignal[str, int].connect(self.mapKeys)
 
 ### --------------------------------------------------------
     @pyqtSlot(str, int)
@@ -170,7 +169,7 @@ class InitBkg(QWidget):
         elif key == 'opacity':
             self.bkg.setBkgOpacity(val/100.0)
         elif key == 'lock':
-            self.bkg.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+            self.bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         self.bkg.update()
 
 ### --------------------------------------------------------
@@ -196,10 +195,9 @@ class InitBkg(QWidget):
             self.bkg.centerBkg()
             self.lockBkg()
         else:
-            self.dots.btnAddBkg.setEnabled(False)
+            self.canvas.btnAddBkg.setEnabled(False)
             self.enableBkgBtns(True)
-            sideCar.setCursor()
-
+  
     def saveBkg(self):
         if not self.bkg.isBackgroundSet:
             MsgBox("Set to Background inorder to save", 3)
@@ -224,7 +222,7 @@ class InitBkg(QWidget):
                 self.addBkg(self.bkg.fileName, flopped)
             else:
                 MsgBox("Already saved as background jpg")
-        self.dots.btnAddBkg.setEnabled(True)
+        self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
 
     def bkgColor(self):        ## triggered by "/" 
@@ -270,11 +268,11 @@ class InitBkg(QWidget):
             return
         else:
             self.disableBkgBtns()
-            self.dots.btnAddBkg.setEnabled(True)
+            self.canvas.btnAddBkg.setEnabled(True)
             MsgBox("Already set to background")
 
     def lockBkg(self):
-        self.sliders.enableSliders()  ## default is false
+        self.slider.enableSliders()  ## default is false
         self.mapKeys("lock", 0)   ## 0 is a place holder
         if self.hasBackGround():  ## reset zvals of existing bkgs to by -1
             ## seems to work best in descending order
@@ -318,24 +316,25 @@ class InitBkg(QWidget):
                 quality=100)
             MsgBox("Saved as " + snap, 3)
 
+    def hasBackGround(self):
+        for itms in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itms.type == 'bkg':
+                return True
+        return False
+
+### ------------------- background buttons -----------------
     def enableBkgBtns(self, bool):
-        self.sliders.enableSliders(bool)
-        self.dots.btnSetBkg.setEnabled(bool)
-        self.dots.btnSaveBkg.setEnabled(bool)
+        self.slider.enableSliders(bool)
+        self.canvas.btnSetBkg.setEnabled(bool)
+        self.canvas.btnSaveBkg.setEnabled(bool)
 
     def disableBkgBtns(self):
         self.enableBkgBtns(False)
 
     def disableSetBkg(self):
-        self.dots.btnAddBkg.setEnabled(True)
-        self.dots.btnSetBkg.setEnabled(False)
-        self.dots.btnSaveBkg.setEnabled(True)
-
-    def hasBackGround(self):
-        for itms in self.scene.items(Qt.AscendingOrder):
-            if itms.type == 'bkg':
-                return True
-        return False
+        self.canvas.btnAddBkg.setEnabled(True)
+        self.canvas.btnSetBkg.setEnabled(False)
+        self.canvas.btnSaveBkg.setEnabled(True)
 
 def snapTag():
     return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
