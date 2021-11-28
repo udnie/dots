@@ -51,20 +51,3 @@ My background combines degrees in fine arts, photography and ceramics, work as a
 This is my first pyqt app and it wouldn't have been possible without Stack OverFlow and Google Search. I can say pretty much the same about the Java version as well.
 
 Special thanks to Martin Fitzpatrick of <https://www.learnpyqt.com> for taking a look at the last update and for his recommendations and code contributions.  Thanks again, Martin
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-##  **
