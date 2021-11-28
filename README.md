@@ -5,7 +5,7 @@ The original dots was written in JavaFX which added animation to the photo-colla
 
 This is not a finished app - more of a toolkit, an artist's studio, a potter's kick-wheel. In building an animation from scratch the file **dotsAnimation.py** provides the starting point for the code necessary to create your own animations.See **keys.pdf, Changes.md, Start-Here.md** for updated documentation.
 	  
-#### I'd recommend running dots in **PyQt5.15** as it's already been prepped for **PyQt5.2**.  I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them.  I can't speak for earlier versions.
+#### I'd recommend running dots in **PyQt5.15** as it's already been prepped for **PyQt6.2**.  I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them.  I can't speak for earlier versions.
 
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible, it doesn't always work. Also I use camel case after many years of coding in snake.
