@@ -184,7 +184,6 @@ class DropCanvas(QWidget):
 
     def togglePixLocks(self, key):
         stub = ''
-        print(key)
         for pix in self.scene.items(): 
             if pix.type == 'pix':
                 if key == 'R': 
