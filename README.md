@@ -3,7 +3,7 @@
 
 The original dots was written in JavaFX which added animation to the photo-collage portion of the DotsFX app as well as providing a means to create sprites. The dots front end is no longer required as the screen objects, sprites, are now based on transparent pngs.
 
-This is not a finished app - more of a toolkit, an artist's studio, a potter's kick-wheel. In building an animation from scratch the file **dotsAnimation.py** provides the starting point for the code necessary to create your own animations.See **keys.pdf, Changes.md, Start-Here.md** for updated documentation.
+This is not a finished app - more of a toolkit, an artist's studio, a potter's kick-wheel. In building an animation from scratch the file **dotsAnimation.py** provides the starting point for the code necessary to create your own animations.See **keys.pdf, Changes.md, StartHere.md** for updated documentation.
 	  
 #### I'd recommend running dots in **PyQt5.15** as it's already been prepped for **PyQt6.2**.  I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them.  I can't speak for earlier versions.
 
