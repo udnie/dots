@@ -27,8 +27,8 @@ common = {
     "runThis":  "demo.play",
 }
           
-CanvasStr = "L,R,P,S,C,K,\",\',<,>,{,},[,],_,+,/,-,=,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
-PathStr = "C,D,E,F,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt"
+CanvasStr = "L,R,P,S,C,K,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+PathStr = "C,D,E,F,L,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
 paths = {
     "snapShot":   "./",
@@ -39,11 +39,29 @@ paths = {
     "spritePath": "./sprites/",
 }
 
+Tick = 2.0
+
+MoveKeys = {
+    "right": (Tick, 0.0),
+    "left":  (-Tick, 0.0),
+    "up":    (0.0, -Tick),
+    "down":  (0.0, Tick),
+}
+
+RotateKeys = {
+    '+':  -1.0,
+    '_':   1.0,
+    '-':  15.0,   
+    '=': -15.0,
+    ']': -45.0,   
+    '[':  45.0,
+}
+
 Star = ((100, 20), (112, 63), (158, 63), (122, 91), 
         (136, 133), (100, 106), (63, 132), (77, 90), 
         (41, 63), (86, 63))
 
-keyMenu = (                     ## dropCanvas, pixitems and bkgitems
+keyMenu = (                    ## pixitems and bkgitems
     ('A', 'Select All'),   
     ('C', 'Clear Canvas'),     
     ('D', 'Delete Selected'),
@@ -68,25 +86,26 @@ keyMenu = (                     ## dropCanvas, pixitems and bkgitems
     ('X, Q', 'Escape to Quit'),
     ('Rtn', 'Enter to Front'),
     ('/', 'Clk to Back'),
-    ('[', 'Clk Back One Z'),
-    (']', 'Clk Up One Z'),
+    (',', 'Clk Back One Z'),
+    ('.', 'Clk Up One Z'),
     ('Del', 'Clk to Delete'),
     ('Shift', 'Clk to Flop'),  
     ('Opt', 'DbClk to Clone'),
     ('Opt', 'Drag Clones'), 
     ('Cmd', 'Drag to Select'),
-    ('_/+', 'Rotate 1 deg'),
-    (':/"', 'Rotate 15 deg'),
-    ('{/}', 'Rotate 45 deg'),
+    ('_/+', "Rotate 1 deg"),  
+    ('-/=', "Rotate 15 deg"),
+    ('[/]', 'Rotate 45 deg'),
     ('</>', 'Toggle Size'),
     ('U/D', 'Arrow Keys'),
     ('L/R', 'Arrow Keys'))
 
-pathMenu = (     ## pathMaker
+pathMenu = (
     ('C', 'Center Path'),
     ("D", "Delete Screen"), 
     ("E", "Edit Points"),
     ("F", "Files"),
+    ("L", "Lasso"),
     ("N", "New Path"),
     ("P", "Path Chooser"),
     ("R", "Reverse Path"),
@@ -94,6 +113,7 @@ pathMenu = (     ## pathMaker
     ("T", "Test"),
     ("W", "Way Points"),
     ("V", "..View Points"),
+    ("Shift", "+D Delete Pts"),
     ('Shift', '+V Pixel Ruler'),
     ("cmd", "Closes Path"),
     ("/", "Path Color"),
@@ -160,6 +180,8 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_U: 'U',
     Qt.Key.Key_V: 'V', 
     Qt.Key.Key_W: 'W',  
+    Qt.Key.Key_Comma: ',', 
+    Qt.Key.Key_Period: '.',     
     Qt.Key.Key_Plus: '+',         
     Qt.Key.Key_Equal: '=',    
     Qt.Key.Key_Minus: '-',  

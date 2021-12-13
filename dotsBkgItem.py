@@ -81,9 +81,9 @@ class BkgItem(QGraphicsPixmapItem):
     def setMirrored(self, mirror):
         sideCar.mirrorSet(self, mirror)
 
-    def centerBkg(self):
-        self.updateWidthHeight()
-        op = QPointF(self.width/2, self.height/2)
+    def centerBkg(self):  
+        b = self.boundingRect()
+        op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
 
     def setBkgRotate(self, value):
@@ -102,11 +102,6 @@ class BkgItem(QGraphicsPixmapItem):
         self.centerBkg()
         self.opacity = value
         self.setOpacity(self.opacity)
-
-    def updateWidthHeight(self):
-        brt = self.boundingRect()
-        self.width = brt.width()
-        self.height = brt.height()
 
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):

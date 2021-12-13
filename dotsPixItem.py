@@ -5,7 +5,7 @@ from PyQt5.QtCore       import Qt, QPoint, QPointF, pyqtSlot
 from PyQt5.QtGui        import QImage, QColor, QPen
 from PyQt5.QtWidgets    import QGraphicsPixmapItem
 
-from dotsShared       import common
+from dotsShared       import common, MoveKeys, RotateKeys
 
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
@@ -16,17 +16,7 @@ import dotsAnimation  as anima
 PixFactor = .30  # beginnig size factor 
 PlayKeys = ('resume','pause')
 ScaleKeys  = ("<",">")
-TagKeys = ('[', ']','/','enter','return')
-Tick = 2  ## points to move using arrow keys
-
-RotationVals = {
-    '}': 45,
-    '=': +15,
-    '+': 1,
-    '_': -1,
-    '-': -15,
-    '{': -45,
-}
+TagKeys = (',','.','/','enter','return')  ## changed
 
 PixSizes = {
     'dorot': (300, 500),
@@ -36,13 +26,6 @@ PixSizes = {
     'lizar': (600, 225),
     'pivot': (150, 150),
     'mike_': (300, 500),
-}
-
-MoveKeys = {
-    "right": (Tick, 0),
-    "left":  (-Tick, 0),
-    "up":    (0, -Tick),
-    "down":  (0, Tick),
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -122,7 +105,7 @@ class PixItem(QGraphicsPixmapItem):
     def setPixKeys(self, key):
         self.key = key  
         if self.isHidden or self.isSelected() and self.locked == False:
-            if key in RotationVals:
+            if key in RotateKeys:
                 self.rotateThis(key)
             elif key in ScaleKeys:
                 self.scaleThis(key)  
@@ -133,13 +116,11 @@ class PixItem(QGraphicsPixmapItem):
     def paint(self, painter, option, widget=None):
         super().paint(painter, option, widget)
         if self.isSelected():
-            painter.save()
             pen = QPen(QColor("lime"))
             pen.setWidth(2.5)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
-            painter.restore()
-
+            
     def hoverLeaveEvent(self, e):
         self.mapper.clearTagGroup()
         e.accept()
@@ -157,6 +138,8 @@ class PixItem(QGraphicsPixmapItem):
         if self.canvas.control not in PlayKeys: 
             if self.key == 'space' and e.button() == Qt.LeftButton:
                 self.mapper.toggleTagItems(self.id)
+            elif self.key in RotateKeys:
+                self.rotateThis(self.key)
             elif self.key == '\'': 
                 self.togglelock()  ## single tag
                 self.mapper.toggleTagItems(self.id)
@@ -172,9 +155,9 @@ class PixItem(QGraphicsPixmapItem):
                     p = self.mapper.lastZval('pix')-1
                 elif self.key in('enter','return'): # send to front
                     p = self.mapper.toFront(1)
-                elif self.key == '[':
+                elif self.key == ',':
                     p = self.zValue()-1  
-                elif self.key == ']':
+                elif self.key == '.':
                     p = self.zValue()+1  
                 self.setZValue(p)
                 self.mapper.toggleTagItems(self.id)
@@ -221,8 +204,9 @@ class PixItem(QGraphicsPixmapItem):
                 self.clearTag() 
             pos = self.mapToScene(e.pos())     
             dragX = pos.x() - self.dragAnchor.x()
-            dragY = pos.y() - self.dragAnchor.y()
-            self.updateWidthHeight()
+            dragY = pos.y() - self.dragAnchor.y()     
+            b = self.boundingRect()
+            self.width, self.height = b.width(), b.height()
             self.x = int(sideCar.constrain(
                 self.initX + dragX, 
                 self.width, 
@@ -299,9 +283,9 @@ class PixItem(QGraphicsPixmapItem):
   
     def rotateThis(self, key):
         self.setOriginPt() 
-        angle = RotationVals[key]  ## thanks Martin
-        p = self.rotation + angle
-        if p > 360: 
+        angle = RotateKeys[key]  ## thanks Martin
+        p = self.rotation - angle  ## necessary to match scaleRotate in sideways
+        if p > 360:                ## now only one source and one set of keys 
             p = p - 360
         elif p < 0:
             p = p + 360
@@ -318,11 +302,11 @@ class PixItem(QGraphicsPixmapItem):
         self.setScale(self.scale)
     
     def setOriginPt(self):    
-        self.updateWidthHeight()
-        op = QPointF(self.width/2, self.height/2)
+        b = self.boundingRect()
+        op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-               
+                                    
     def setPixSizes(self, newW, newH):  
         p = os.path.basename(self.fileName)[0:5]
         if p in PixSizes:
@@ -333,11 +317,6 @@ class PixItem(QGraphicsPixmapItem):
         elif newW > 400 or newH > 400:
             newW, newH = 425, 425
         return newW, newH
-               
-    def updateWidthHeight(self):
-        brt = self.boundingRect()
-        self.width = brt.width()
-        self.height = brt.height()        
-        
+    
 ### -------------------- dotsPixItem -----------------------
 

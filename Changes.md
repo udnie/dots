@@ -1,9 +1,14 @@
 ## Changes
-**November 2021:**  
-Added a right-mouse click to dropCanvas to trigger the **play** load dialog and to pathMaker to trigger **path chooser**.  Added a path edit function to pathMaker. Entering **E** after choosing a path allows you move, delete, or add a point and also re-distribute or half the number of points that make up the path. Some of these functions are also in wayPoints but not the ability to move individual points. Entering **W** from **edit** will put you into wayPoints and conversely **E** in **wayPoints** drops you into edit.  More work on bat-wings. They're now easier to select and move by clicking anywhere on the bats body but not the wings. Added **Shift U** to unlock all screen items.
+**December 2021:**  
+I've added two new functions/keys to editing a path in pathMaker.
+**L** in **edit** changes the cursor to a crosshair to let you know that things have changed. Holding down the mouse button while moving the mouse draws a closed shape to either select or unselect selected pointItems. Once selected you can use the arrow keys to move the selected points or using the other new key, **shift-D**, to delete them.  Lastly, you can easily move between **editing points** and **waypoints** and and not lose any points you previously selected in **edit** by toggling between **E** and **W** or **W** to **E**.  New video: <https://youtu.be/AMTV3umYyuc>
 
+Additionally, some key reassignments in dropCanvas. I replaced **{/}** for rotating a sprite 45 degrees with **[/]** to match the same command in pathMaker. I also reassigned the keys that increment or decrement a sprite's **ZValue** back to front position. A **comma** sets a sprite back one **ZValue** and **period** up one value.  The four keys that are used to change a sprites **ZValue** are much closer together now. Big Win.
 
 #### I'd recommend running dots in PyQt5.15 as it's already been prepped for PyQt6.2. I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them. I can't speak for earlier versions.
+
+**November 2021:**  
+Added a right-mouse click to dropCanvas to trigger the **play** load dialog and to pathMaker to trigger **path chooser**.  Added a path edit function to pathMaker. Entering **E** after choosing a path allows you move, delete, or add a point and also re-distribute or half the number of points that make up the path. Some of these functions are also in wayPoints but not the ability to move individual points. Entering **W** from **edit** will put you into wayPoints and conversely **E** in **wayPoints** drops you into edit.  More work on bat-wings. They're now easier to select and move by clicking anywhere on the bats body but not the wings. Added **Shift U** to unlock all screen items in dropCanvas.
 
 **October 2021:**   
 I've done some more work on wings and have some observations concerning the tendency for them to drift when stopped. The only differences I can see is using or not using the file chooser somehow affects the reprise animation for the wings screen objects.  

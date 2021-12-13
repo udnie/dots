@@ -3,7 +3,7 @@ from PyQt5.QtCore     import Qt, pyqtSignal, QAbstractTableModel
 from PyQt5.QtWidgets  import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
                              QTableView, QHeaderView, QAbstractItemView, QLabel
                       
-from dotsShared      import keyMenu, pathMenu
+from dotsShared       import keyMenu, pathMenu
 
 SliderW, SliderH, OffSet = 200, 685, 18
 

@@ -6,13 +6,12 @@ from PyQt5.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonIte
 
 from dotsAnimation      import Node                           
 from dotsSideGig        import DoodleMaker, MsgBox, getColorStr
-from dotsShared         import common, paths
+from dotsShared         import common, paths, MoveKeys
 
 from dotsSideWays       import SideWays
 from dotsDrawsPaths     import DrawsPaths
 
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
-Tick = 3  ## points to move using arrow keys
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,
@@ -31,6 +30,8 @@ class PathMaker(QWidget):
 
         self.chooser = None  ## placeholder for doodles_popup_widget 
        
+        self.initThis()
+           
         self.sideWays = SideWays(self)  ## extends pathMaker
         self.drawing  = DrawsPaths(self, self.sideWays, parent) 
  
@@ -55,15 +56,16 @@ class PathMaker(QWidget):
             'T': self.pathTest,   
             '!': self.sideWays.halfPath,
             '@': self.sideWays.fullPath,
+       'delPts': self.drawing.deleteSections,
         }
 
         self.noPathKeysSet = {
+            'T': self.pathTest,
+            'C': self.sideWays.centerPath,    
             'R': self.sideWays.reversePath,
             'S': self.sideWays.savePath,
-            'T': self.pathTest,
-            'W': self.sideWays.addWayPtTags,
+            'W': self.sideWays.addWayPtTags,        
             'N': self.drawing.toggleNewPath,
-            'C': self.sideWays.centerPath,
         }
 
         self.WayPtsKeys = {
@@ -74,28 +76,21 @@ class PathMaker(QWidget):
             '>': self.sideWays.shiftWayPtsRight,
         }
 
-        self.moveKeys = {
-            "right": (Tick, 0),
-            "left":  (-Tick, 0),
-            "up":    (0, -Tick),
-            "down":  (0, Tick),
-        }
-
-        self.setMouseTracking(True)
+        # self.setMouseTracking(True)  ## must carry down from canvas
         self.view.viewport().installEventFilter(self)
-
-        self.initThis()
 
 ### --------------------------------------------------------
     def initThis(self):
-        self.pts = []
-        self.key = ""
-
+        self.pts = []  ## after adding a new path or from a file
+        self.selections = []  ## needs to here, strongest reference
+  
         self.color = "DODGERBLUE"
+        
+        self.key = ""
         self.openPathFile = '' 
         self.tag = ''
  
-        self.npts = 0  ## counter used by addNewPathPts
+        self.npts = 0  ## used by addNewPathPts
         self.newPath = None
         self.addingNewPath = False
 
@@ -113,42 +108,49 @@ class PathMaker(QWidget):
     @pyqtSlot(str)
     def pathKeys(self, key):
         self.key = key
-   
+        
         if key in self.doFirst:
-            self.doFirst[key]()  ## run the function
+            self.doFirst[key]()  ## run the function, value
 
         elif self.key == 'K':
-            self.slider.toggleMenu()
+            self.slider.toggleMenu()  ## keys
                     
         elif self.key == 'E' and self.sideWays.tagCount() > 0:
             self.sideWays.removeWayPtTags()
-            self.drawing.editPointsOff()
-            self.drawing.editPoints()
+            if self.selections:
+                self.editingPts = True
+                self.drawing.updatePath()
+                self.drawing.turnBlue()
+            else:
+                self.drawing.editPointsOff()
+                self.drawing.editPoints()
             
-        elif self.key == 'W' and self.editingPts == True:
-            self.drawing.editPointsOff()   
+        elif self.editingPts == True and self.key == 'W':
             self.sideWays.addWayPtTags()
-            self.drawing.addPointItems()
-                     
+
+        elif self.key == 'L' and self.editingPts == True:
+            self.drawing.toggleLasso()
+                                                                  
         elif self.editingPts == True and self.key in self.editKeys:
             self.editKeys[key]()  
 
-        elif key in self.noPathKeysSet and self.editingPts == False:
+        elif key in self.noPathKeysSet:  
             self.noPathKeysSet[key]()  
+            if self.selections:
+                self.drawing.updatePath()
 
         elif self.sideWays.tagCount() == 0 and self.addingNewPath == False:
             if key in self.direct: 
                 self.direct[key]() 
 
             elif len(self.pts) > 0 and self.editingPts == False:
-                if key in self.moveKeys: 
-                    self.sideWays.movePath(self.moveKeys[key])
+                if key in MoveKeys: 
+                    self.sideWays.movePath(MoveKeys[key])
                 elif key in ScaleRotateKeys:
                     self.sideWays.scaleRotate(key)
 
-        elif self.sideWays.tagGroup and key in self.WayPtsKeys:
-            if self.editingPts == False:
-                self.WayPtsKeys[key]() 
+        elif self.sideWays.tagCount() > 0 and key in self.WayPtsKeys:
+            self.WayPtsKeys[key]() 
 
 ### --------------------- event filter ----------------------   
     def eventFilter(self, source, e):     
@@ -164,11 +166,10 @@ class PathMaker(QWidget):
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.drawing.addNewPathPts(QPoint(e.pos()))  
 
-                elif e.type() == QEvent.Type.MouseButtonRelease and \
-                    e.buttons() == Qt.MouseButton.LeftButton:
+                elif e.type() == QEvent.Type.MouseButtonRelease:
                     self.drawing.addNewPathPts(QPoint(e.pos()))
-                    self.drawing.updateNewPath()  
-
+                    self.drawing.updateNewPath() 
+               
             if e.type() == QEvent.Type.MouseButtonPress and \
                 e.button() == Qt.MouseButton.RightButton:
                 self.pathChooser()
@@ -183,7 +184,7 @@ class PathMaker(QWidget):
         if self.canvas.pathMakerOn:
             self.pathMakerOff()
         else:
-            # self.canvas.clear()  ## leave it messy
+            # self.canvas.clear()  ## leave it messy, backgrounds and flats
             self.canvas.pathMakerOn = True 
             self.initThis()
             if not self.slider.pathMenuSet:
@@ -196,13 +197,13 @@ class PathMaker(QWidget):
             "background-color: LIGHTGREEN")
          
     def delete(self):
-        self.drawing.delNewPath()  ## turns green if nothing else
         self.stopPathTest()
-        self.drawing.removePointItems()
-        self.sideWays.removeWayPtTags()
-        self.removePath()
+        self.drawing.deleteLasso()    ## reset cursor
+        self.drawing.deleteNewPath()  ## turns green if nothing else
         self.drawing.removeNewPath()
         self.drawing.editPointsOff()
+        self.sideWays.removeWayPtTags()
+        self.removePath()
         self.pathChooserOff() 
         self.scene.clear()
         self.initThis()
@@ -233,9 +234,8 @@ class PathMaker(QWidget):
           
 ### -------------------- path stuff ------------------------
     def addPath(self):
-        self.removePath() 
-        # self.path = QGraphicsPathItem(self.setPaintPath(True))  ## uses self.pts
-        self.path = QGraphicsPolygonItem(self.drawing.drawPath())       
+        self.removePath()  ## not for animation
+        self.path = QGraphicsPolygonItem(self.drawing.drawPoly(self.pts))       
         self.path.setPen(QPen(QColor(self.color), 3, Qt.PenStyle.DashDotLine))
         self.path.setZValue(common['pathZ']) 
         self.scene.addItem(self.path)
@@ -243,7 +243,7 @@ class PathMaker(QWidget):
   
     def removePath(self):       
         if self.pathSet:
-            self.sideWays.removeWayPtTags()    
+            self.sideWays.removeWayPtTags()  
             self.scene.removeItem(self.path)
             self.pathSet = False
             self.path = None

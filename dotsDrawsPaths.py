@@ -1,111 +1,60 @@
 
-from PyQt5.QtCore    import Qt, QPointF
-from PyQt5.QtGui     import QColor, QPen, QPolygonF, QTransform
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
+from PyQt5.QtCore    import Qt, QPointF, QEvent, QTimer
+from PyQt5.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
+from PyQt5.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsPolygonItem 
                             
-from dotsSideGig     import TagIt
 from dotsShared      import common
-
-V = 6  ## the diameter of a pointItem
+from dotsPointItem   import PointItem
 
 ### ------------------- dotsDrawsPaths ---------------------
-''' dotsDrawsPaths: PointItems and DrawsPaths classes '''
+''' dotsDrawsPaths: newPath, lasso, pointitems '''
 ### --------------------------------------------------------
-class PointItem(QGraphicsEllipseItem):
-### --------------------------------------------------------
-    def __init__(self, drawing, parent, pt, idx, adto):
-        super().__init__()
-
-        self.canvas = parent
-        self.scene  = parent.scene
-
-        self.drawing = drawing
-        self.pathMaker = drawing.pathMaker
-     
-        self.pt = pt
-        self.idx = idx
-        self.setZValue(int(idx+adto)) 
-
-        self.type = 'pt'
-        self.pointTag = ''
-  
-        ## -V*.5 so it's centered on the path
-        self.setRect(pt.x()-V*.5, pt.y()-V*.5, V, V)
-        self.setBrush(QColor("white"))
-        
-        self.dragCnt = 0
-    
-        self.setFlag(QGraphicsEllipseItem.GraphicsItemFlag.ItemIsMovable, True)
-        self.setFlag(QGraphicsEllipseItem.GraphicsItemFlag.ItemIsSelectable, False)
-          
-        self.setAcceptHoverEvents(True)
-
- ### --------------------------------------------------------
-    def hoverEnterEvent(self, e):
-        if self.pathMaker.editingPts == False:
-            if self.pathMaker.pathSet:  
-                pct = (self.idx/len(self.pathMaker.pts))*100
-                tag = self.pathMaker.sideWays.makePtsTag(self.pt, self.idx, pct)
-                self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
-                self.pointTag.setPos(self.pt+QPointF(0,-20))
-                self.pointTag.setZValue(self.drawing.findTop()+5)
-                self.scene.addItem(self.pointTag)
-        e.accept()
-
-    def hoverLeaveEvent(self, e):
-        if self.pathMaker.editingPts == False:
-            self.removePointTag()  ## used twice
-        e.accept()
-
-    def mousePressEvent(self, e):     
-        self.removePointTag()  ## second time, just in case
-        if self.pathMaker.key == 'del':  
-            self.drawing.delPointItem(self)
-        elif self.pathMaker.key == 'opt': 
-            self.drawing.insertPointItem(self)
-        self.pathMaker.key = ''       
-        e.accept()
-        
-    def mouseMoveEvent(self, e):
-        if self.pathMaker.editingPts == True:
-            self.dragCnt += 1
-            if self.dragCnt % 5 == 0:        
-                pos = self.mapToScene(e.pos())
-                self.setRect(pos.x()-V*.5, pos.y()-V*.5, V,V)             
-                self.pathMaker.pts[self.idx] = pos 
-                ## redrawing the path not the points - not fast enough 
-                self.pathMaker.addPath()                                      
-        e.accept()
-        
-    def mouseReleaseEvent(self, e):
-        if self.pathMaker.editingPts == True:        
-            if self.dragCnt > 0:
-                self.pathMaker.pts[self.idx] = self.mapToScene(e.pos())                
-                self.drawing.updatePath()  ## rewrites pointItems as well
-        e.accept()
-         
-    def removePointTag(self):
-        if self.pointTag != '':  ## there is only one
-            self.scene.removeItem(self.pointTag)
-            self.pointTag = ''
-          
-### --------------------------------------------------------
-class DrawsPaths:
+class DrawsPaths(QWidget):
 ### --------------------------------------------------------
     def __init__(self, pathMaker, sideWays, parent):  
         super().__init__()
 
-        self.canvas    = parent
-        self.scene     = parent.scene
-        self.view      = parent.view
+        self.canvas = parent
+        self.scene  = parent.scene
+        self.view   = parent.view
         
         self.pathMaker = pathMaker  
         self.sideWays  = sideWays
-   
-### --------------------- new path -------------------------
+          
+        self.dragCnt = 0 
+        self.lassoSet = False
+        self.polySet = False
+        
+        self.poly = None
+        self.lasso = []
+        
+        # self.setMouseTracking(True)  ## not needed - probably set by canvas
+        self.view.viewport().installEventFilter(self)
+             
+### --------------------- event filter ----------------------          
+    def eventFilter(self, source, e):     
+        if self.canvas.pathMakerOn:
+    
+            if self.pathMaker.editingPts and self.lassoSet:
+                if e.type() == QEvent.Type.MouseButtonPress and \
+                    e.buttons() == Qt.MouseButton.LeftButton:
+                    self.addLassoPts(e.pos()) 
+
+                elif e.type() == QEvent.Type.MouseMove and \
+                    e.buttons() == Qt.MouseButton.LeftButton:
+                    self.dragCnt += 1
+                    if self.dragCnt % 5 == 0:        
+                        self.addLassoPts(e.pos()) 
+                         
+                elif e.type() == QEvent.Type.MouseButtonRelease:
+                    self.finalizeSelections(e.pos())
+               
+        return QWidget.eventFilter(self, source, e)    
+     
+### ---------------------- new path ------------------------  
     def toggleNewPath(self):
         if self.pathMaker.addingNewPath: 
-            self.delNewPath()  ## changed your mind
+            self.deleteNewPath()  ## changed your mind
             self.pathMaker.delete()
         elif not self.pathMaker.pathSet and self.sideWays.tagCount() == 0:
             self.addNewPath()
@@ -122,7 +71,7 @@ class DrawsPaths:
         if self.pathMaker.npts == 0:
             self.pathMaker.pts.append(pt)
         self.pathMaker.npts += 1
-        if self.pathMaker.npts % 3 == 0:
+        if self.pathMaker.npts % 5 == 0:
             self.pathMaker.pts.append(pt)
             self.updateNewPath()
  
@@ -132,7 +81,7 @@ class DrawsPaths:
             self.pathMaker.turnGreen()
             self.pathMaker.addPath()  ## draws a polygon rather than painter path
 
-    def delNewPath(self):  ## changed your mind, doesn't save pts
+    def deleteNewPath(self):  ## changed your mind, doesn't save pts
         if self.pathMaker.addingNewPath:
             self.removeNewPath()
             self.pathMaker.turnGreen()
@@ -153,20 +102,54 @@ class DrawsPaths:
             self.pathMaker.addingNewPath = False
             self.pathMaker.newPath = None
             self.pathMaker.npts = 0
-    
-    def drawPath(self):  ## simple path graphic, not for animation
-        poly = QPolygonF()  ## and not used by newPath
-        for p in self.pathMaker.pts:
-            poly.append(QPointF(p))
-        return poly
+          
+### ------------------------ lasso ------------------------- 
+    def toggleLasso(self):
+        if self.lassoSet:
+            self.deleteLasso()
+        else:
+            self.newLasso()
+            QGuiApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
+
+    def newLasso(self):  
+        self.lasso = []   
+        self.lassoSet = True
  
-    def updatePath(self):
-        self.removePointItems()
-        self.pathMaker.addPath() 
-        self.addPointItems() 
+    def deleteLasso(self):
+        self.lassoSet = False
+        self.lasso = []
+        QGuiApplication.restoreOverrideCursor()
                
-### -------------------- pointItems ------------------------
+    def addLassoPts(self, p):
+        self.lasso.append(QPointF(p))
+        self.drawLasso()
+                  
+    def drawPoly(self, pts):  ## returns polygon used by qgraphicspolygonitem
+        poly = QPolygonF()    ## not used by newPath or for animation
+        for p in pts:   ## pts can either be from lasso or pathMaker
+            poly.append(QPointF(p))
+        return poly               
+                                
+    def drawLasso(self): 
+        if self.polySet:
+            self.scene.removeItem(self.poly)    
+        self.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
+        self.poly.setBrush(QBrush(QColor(125,125,125,50)))
+        self.poly.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
+        self.poly.setZValue(common['pathZ']) 
+        self.scene.addItem(self.poly)
+        self.polySet = True
+ 
+    def removePoly(self): 
+        if self.polySet:
+            self.scene.removeItem(self.poly)  
+            self.polySet = False
+            self.poly = None
+                                      
+### -------------------- pointItems ------------------------    
     def togglePointItems(self):
+        if self.lassoSet: 
+            self.deleteLasso()
         if self.pointItemsSet():
             self.removePointItems()
         else:
@@ -180,8 +163,11 @@ class DrawsPaths:
             idx += 1
 
     def editPoints(self):
+        if not self.pathMaker.pts:
+            return
         if self.pathMaker.editingPts == False:
             self.pathMaker.editingPts = True
+            self.pathMaker.selections = []  
             self.addPointItems()
             self.turnBlue()
         else:
@@ -189,14 +175,15 @@ class DrawsPaths:
 
     def editPointsOff(self):
         self.pathMaker.editingPts = False
+        self.pathMaker.selections = []
         self.removePointItems()
         self.pathMaker.turnGreen()
-        
+                   
     def removePointItems(self):   
-        for pt in self.scene.items():
-            if pt.type == 'pt':
-                self.scene.removeItem(pt)
-                del pt
+        for ptr in self.scene.items():
+            if ptr.type in ('pt','ptTag'):
+                self.scene.removeItem(ptr)
+                del ptr
 
     def pointItemsSet(self):
         for itm in self.scene.items():
@@ -205,27 +192,123 @@ class DrawsPaths:
         return False
 
     def insertPointItem(self, pointItem):  ## halfway between points
-        idx, pt = pointItem.idx + 1, pointItem.pt
-        if idx == len(self.pathMaker.pts): idx = 0     
-        pt1 = self.pathMaker.pts[idx]
+        idx, pt = pointItem.idx + 1, pointItem.pt  ## idx, the next point
+        if idx == len(self.pathMaker.pts): idx = 0   
+        if self.pathMaker.selections:
+            self.insertSelection(pointItem.idx)  
+        pt1 = self.pathMaker.pts[idx]  ## calculate new x,y
         pt1 = QPointF(pt1.x() - pt.x(), pt1.y() - pt.y())
         pt1 = pt + QPointF(pt1)*.5       
         self.pathMaker.pts.insert(idx, pt1)
         self.redrawPoints()  
-        
-    def delPointItem(self, pointItem):    
-        self.pathMaker.pts.pop(pointItem.idx)
-        del pointItem   
+            
+    def deletePointItem(self, idx):  
+        self.removeSelection(idx)
+        self.pathMaker.pts.pop(idx) 
         self.redrawPoints()
        
-    def redrawPoints(self, bool=True):  ## pointItems points
+    def redrawPoints(self, bool=True):  ## pointItems - non-edit
         self.removePointItems()
-        if self.pathMaker.editingPts == False:
+        if self.sideWays.tagCount() > 0:
             self.pathMaker.redrawPathsAndTags()
         else:
             self.pathMaker.addPath()
         if bool: self.addPointItems()
-        
+
+    def updatePath(self):  ## pointItem responding to mouse events
+        self.removePointItems()      
+        self.pathMaker.addPath() 
+        self.addPointItems()   
+   
+    def finalizeSelections(self, pt): 
+        self.lasso.append(QPointF(pt))
+        poly = self.drawPoly(self.lasso)  ## return a polygon
+        for i in range(0, len(self.pathMaker.pts)):  
+            if poly.containsPoint(self.pathMaker.pts[i], True):  ## match 
+                if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
+                    idx = self.pathMaker.selections.index(i)
+                    # print("a ", i, idx, self.pathMaker.selections)
+                    self.pathMaker.selections.pop(idx)
+                else:
+                    self.pathMaker.selections.append(i)  ## save pts index 
+                    # print("b ", i, self.pathMaker.selections)
+        self.deleteLasso()
+        self.removePoly()
+        if self.pathMaker.selections:
+            self.pathMaker.selections.sort()
+        QTimer.singleShot(200, self.updatePath)  ## it works better this way
+                      
+    def deleteSections(self):
+        if self.pathMaker.selections: 
+            self.pathMaker.selections.sort()  ## works better this way
+            sel = self.pathMaker.selections[::-1]  ## reverse list 
+            for i in sel:
+                self.pathMaker.pts.pop(i)  
+            self.pathMaker.selections = []
+            del sel
+            self.redrawPoints()
+       
+    def insertSelection(self, idx):  ## used only by pointItems 
+        if self.pathMaker.selections:       
+            self.pathMaker.selections.sort()  
+            if idx < self.pathMaker.selections[0]:  ## if first
+                for i in range(0, len(self.pathMaker.selections)):  
+                    self.pathMaker.selections[i] += 1 
+            elif idx > self.pathMaker.selections[-1]:  ## if last
+                return
+            else:
+                self.insertIntoSelection(idx)
+            
+    def insertIntoSelection(self, idx):      
+        if idx in self.pathMaker.selections:      
+            # print("j-insert: ", idx, self.pathMaker.selections)
+            j = self.pathMaker.selections.index(idx) + 1  ## use the index        
+            for k in range(j, len(self.pathMaker.selections)):
+                self.pathMaker.selections[k] += 1         
+        else:
+            for i in range(0, len(self.pathMaker.selections)): 
+                if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
+                    # print("k-insert: ", idx, self.pathMaker.selections[i])
+                    for k in range(i+1, len(self.pathMaker.selections)):
+                        self.pathMaker.selections[k] += 1  
+                    self.pathMaker.selections[i] == idx  
+                    break
+        # print("n-insert", self.pathMaker.selections, "\n")
+   
+    def removeSelection(self, idx):  ## used only by pointItems          
+        if self.pathMaker.selections:
+            self.pathMaker.selections.sort() 
+            # print("a-delete: ", idx, self.pathMaker.selections)  
+            if idx <= self.pathMaker.selections[0]:  ## test for first
+                if idx == self.pathMaker.selections[0]: 
+                    self.pathMaker.selections.pop(0)  
+                for i in range(0, len(self.pathMaker.selections)):
+                    self.pathMaker.selections[i] += -1  
+            elif idx >= self.pathMaker.selections[-1]:
+                if idx == self.pathMaker.selections[-1]:
+                    del self.pathMaker.selections[-1]
+                else:
+                    return
+            else:  
+                self.removeFromSelections(idx)
+                                
+    def removeFromSelections(self, idx):            
+        if idx in self.pathMaker.selections:  ## remove and renumber
+            # print("b-delete: ", idx, self.pathMaker.selections)  
+            idx = self.pathMaker.selections.index(idx)  ## use the index        
+            self.pathMaker.selections.pop(idx)  
+            for i in range(idx, len(self.pathMaker.selections)):  ## only returns index
+                self.pathMaker.selections[i] += -1  ## from this point on  
+        else:             
+            for i in range(0, len(self.pathMaker.selections)):  ## just renumber
+                # print("c-delete: ", idx, self.pathMaker.selections[i])              
+                if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
+                    for k in range(i+1, len(self.pathMaker.selections)):
+                        # print("c-renum: ", k, idx, self.pathMaker.selections[k]) 
+                        self.pathMaker.selections[k] += -1       
+                    break
+        # print("d-delete: ", self.pathMaker.selections, "\n")
+                
     def findTop(self):
         for itm in self.scene.items():
             return itm.zValue()
@@ -234,7 +317,7 @@ class DrawsPaths:
     def turnBlue(self):
         self.canvas.btnPathMaker.setStyleSheet(
         "background-color: rgb(118,214,255)")
-        
+       
 ### ------------------- dotsDrawsPaths ---------------------
 
 

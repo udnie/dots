@@ -83,7 +83,7 @@ class TagIt(QGraphicsSimpleTextItem):
                 tag = str(zval)
     
         if control == 'points':
-            self.type = 'pt'
+            self.type = 'ptTag'  ## changed from 'pt'
         else:
             self.type = 'tag'
 
@@ -228,6 +228,7 @@ def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
         with open(file, 'r') as fp: 
             for line in fp:
                 ln = line.rstrip()  
+                if len(ln) == 0: continue  ## skip empty lines
                 ln = list(map(float, ln.split(',')))   
                 tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
         return tmp

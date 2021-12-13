@@ -26,8 +26,7 @@ class ControlView(QGraphicsView):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.canvas = parent       
-    
+        self.canvas = parent         
         self.canvas.mapper = InitMap(self.canvas)  ## carry mapper to sidecar
         
         self.sideCar = SideCar(self.canvas)
@@ -110,9 +109,12 @@ class ControlView(QGraphicsView):
             self.setKey('del')
         ## mix of setKey and direct run
         elif key in DFTKeys:
-            if key == Qt.Key.Key_D:    
-                self.setKey('D') 
-                self.canvas.deleteSelected()
+            if key == Qt.Key.Key_D:   
+                if mod & Qt.KeyboardModifier.ShiftModifier: 
+                    self.setKey('delPts')  ## send to pathmaker
+                else:
+                    self.setKey('D') 
+                    self.canvas.deleteSelected()
             elif key == Qt.Key.Key_F:
                 self.setKey('F')  ## if pathMaker on
                 self.canvas.flopSelected()  

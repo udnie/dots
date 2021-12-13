@@ -6,13 +6,13 @@ from PyQt5.QtCore    import QPointF, QTimer
 from PyQt5.QtGui     import QColor
 from PyQt5.QtWidgets import QFileDialog,  QGraphicsItemGroup
 
-from dotsShared      import common, paths
+from dotsShared      import common, paths, RotateKeys
 from dotsSideGig     import MsgBox, getPts, distance, TagIt
 from dotsDrawsPaths  import DrawsPaths
  
 ScaleUpKeys = ('>','\"','\'')
 ScaleDnKeys = ('<',':',';')
-
+                
 ### --------------------- dotsSideWays ---------------------
 ''' dotsSideWays: extends pathMaker. Includes path and wayPoints
     functions - scaleRotate, flopPath, reversePath, etc..'''
@@ -27,8 +27,8 @@ class SideWays():
         self.drawing   = DrawsPaths(self.pathMaker, self, parent.canvas) 
         
         self.tagGroup = None  
-     
-### ----------------------- paths --------------------------
+    
+### -------------------- path transforms -------------------
     def centerPath(self):
         if self.pathMaker.pathSet:
             p = self.pathMaker.path.sceneBoundingRect()
@@ -98,51 +98,41 @@ class SideWays():
 
     def reversePath(self):  
         if self.pathMaker.pts:
-            tmp = []
+            if self.pathMaker.pathTestSet:
+                self.pathMaker.stopPathTest()      
+            tmp = []    
             lnn = len(self.pathMaker.pts)-1
             for i in range(0, len(self.pathMaker.pts)):
                 tmp.append(self.pathMaker.pts[lnn - i])
-            tmp.insert(0,self.pathMaker.pts[0])   ## start at zero
-            tmp = tmp[:-1]
-            self.pathMaker.pts = tmp
+            tmp.insert(0,self.pathMaker.pts[0])  ## start at zero
+            self.pathMaker.pts = tmp[:-1] 
             del tmp
-            if self.tagCount() > 0:
-                self.pathMaker.redrawPathsAndTags()
-            if self.pathMaker.pathTestSet:
-                self.pathMaker.stopPathTest()
-           
+            self.cleanUp()
+            
+    def cleanUp(self):
+        if self.tagCount() > 0:
+            self.pathMaker.redrawPathsAndTags() 
+        else: 
+            self.pathMaker.addPath()    
+        self.drawing.redrawPoints(self.drawing.pointItemsSet())
+        
     def scaleRotate(self, key): 
         p = self.pathMaker.path.sceneBoundingRect()
         centerX = p.x() + p.width() /2
-        centerY = p.y() + p.height() /2
-
+        centerY = p.y() + p.height() /2    
         ## for each pt compute distance from center
         for i in range(0, len(self.pathMaker.pts)):    
             dist = distance(
                 self.pathMaker.pts[i].x(), centerX, 
                 self.pathMaker.pts[i].y(), centerY)
-            inc, xdist, ydist = 0, dist, dist
-
+            inc, xdist, ydist = 0, dist, dist  ## initialize    
             ## scale up, scale down
             if key in ScaleUpKeys:  
                 dist = dist + ( dist * .01 )         
             elif key in ScaleDnKeys:  
                 dist = dist - ( dist * .01 )
-
-            ## rotate 1 degree
-            if key == '+':  
-                inc = -1.0   
-            elif key == '_': 
-                inc = 1.0      
-            elif key == '-':  
-                inc = 15.0   
-            elif key == '=': 
-                inc = -15.0
-            elif key == ']':  
-                inc = -45.0   
-            elif key == '[': 
-                inc = 45.0
-
+            if key in RotateKeys: 
+                inc = RotateKeys[key]
             ## more scale stuff
             if key in('<','>'):
                 xdist = dist                
@@ -150,8 +140,7 @@ class SideWays():
             elif key in(':','\"'): ## scale X
                 xdist = dist              
             elif key in(';','\''):  ## scale Y
-                ydist = dist
-
+                ydist = dist      
             ## do the math 
             deltaX = self.pathMaker.pts[i].x() - centerX
             deltaY = self.pathMaker.pts[i].y() - centerY
@@ -164,7 +153,8 @@ class SideWays():
            
             self.pathMaker.pts[i] = QPointF(plotX, plotY)
         self.pathMaker.addPath()
-
+     
+### ----------------- load and save paths ------------------
     def openFiles(self):
         if self.pathMaker.pts:
             MsgBox("openFiles: Clear Scene First")
@@ -232,16 +222,16 @@ class SideWays():
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
         del tmp
-        if self.tagCount() > 0:
-            self.pathMaker.redrawPathsAndTags()
-
+        self.cleanUp()
+        
 ### --------------------- wayPtTags ------------------------
     def addWayPtTags(self):
         if self.pathMaker.addingNewPath:
             return
-        if self.tagCount() > 0 or self.pathMaker.editingPts == True:
+        if not self.pathMaker.pts:
+            return
+        if self.tagCount() > 0: 
             self.removeWayPtTags()
-            self.drawing.removePointItems()
             return
         self.pathMaker.addPath()  ## refresh path
         lnn = len(self.pathMaker.pts)

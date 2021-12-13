@@ -6,7 +6,7 @@ import gc
 from PyQt5.QtCore    import QAbstractAnimation, QTimer, QEvent
 from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene
                        
-from dotsShared      import common, CanvasStr, PathStr
+from dotsShared      import common, CanvasStr, PathStr, MoveKeys
 from dotsAnimation   import *
 from dotsSideGig     import getPathList
 from dotsSideCar     import SideCar
@@ -95,6 +95,10 @@ class DropCanvas(QWidget):
                     self.slider.toggleMenu()
                 else:
                     self.sendPixKeys()
+        ## send move keys to selected pointItems 
+        elif self.pathMaker.drawing.pointItemsSet() == True and \
+            self.key in MoveKeys:
+                self.sendPixKeys()
         elif self.key in PathStr:  ## send key to pathMaker
             self.pathMaker.pathKeys(self.key)
 
@@ -173,11 +177,11 @@ class DropCanvas(QWidget):
                 pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
             self.scene.addItem(pix)
         
-    def sendPixKeys(self):  ## update pixitems thru setPixKeys
-        for pix in self.scene.items(): 
-            if pix.type == 'pix':
-                pix.setPixKeys(self.key)
-            elif pix.zValue() <= common["pathZ"]:
+    def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys
+        for itm in self.scene.items(): 
+            if itm.type in ('pt','pix'): 
+                itm.setPixKeys(self.key)
+            elif itm.zValue() <= common["pathZ"]:
                 break
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
@@ -236,6 +240,8 @@ class DropCanvas(QWidget):
             if pix.type == 'pix':
                 pix.isHidden = False
                 pix.setSelected(False)
+            elif pix.type == 'pt':
+                pix.setSelected(False)   
             elif pix.zValue() <= common["pathZ"]:
                 break
     
@@ -244,22 +250,15 @@ class DropCanvas(QWidget):
         self.mapper.clearMap()
         self.mapper.clearTagGroup()
         for pix in self.scene.selectedItems():
-            if pix.anime != None and \
-                pix.anime.state() == QAbstractAnimation.State.Running:
-                pix.anime.stop()  
+            if pix.type == 'pix':  ## could be something else
+                if pix.anime != None and \
+                    pix.anime.state() == QAbstractAnimation.State.Running:
+                    pix.anime.stop()  
             pix.setSelected(False)
             pix.deletePix()
             del pix
-        # self.anySprites()  ## flip play keys
         self.sideCar.enablePlay()  ## stop it - otherwise it's hung
         gc.collect()
-
-    def anySprites(self):
-        for pix in self.scene.items():
-            if pix.type == 'pix':  ## still some left
-                break
-            elif pix.zValue() <= common["pathZ"]:
-                self.sideCar.enablePlay()
     
     def flopSelected(self):    
         if not self.pathMakerOn:
