@@ -5,16 +5,16 @@ from PyQt5.QtCore       import Qt, QPoint, QPointF, pyqtSlot
 from PyQt5.QtGui        import QImage, QColor, QPen
 from PyQt5.QtWidgets    import QGraphicsPixmapItem
 
-from dotsShared       import common, MoveKeys, RotateKeys
+from dotsShared       import common, MoveKeys, RotateKeys, PlayKeys
 
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
 
-## -- for testing and comparison ----------------
-#from pubsub  import pub      # PyPubSub - required
+## ---------- for testing and comparison---------
+## from pubsub  import pub      # PyPubSub - required
+## ---------------------------------------------
 
 PixFactor = .30  # beginnig size factor 
-PlayKeys = ('resume','pause')
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 

@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
                             QGraphicsPixmapItem
 
 from dotsSideGig     import MsgBox
-from dotsShared      import common, paths
+from dotsShared      import common, paths, PlayKeys
 
 import dotsSideCar as sideCar
 
@@ -169,6 +169,8 @@ class InitBkg(QWidget):
 
 ### --------------------------------------------------------
     def openBkgFiles(self):
+        if self.canvas.control in PlayKeys:
+            return
         Q = QFileDialog()
         file, _ = Q.getOpenFileName(self.canvas,
             "Choose an image file to open", paths["bkgPath"],
@@ -213,17 +215,19 @@ class InitBkg(QWidget):
                     format='jpg',
                     quality=100)
                 MsgBox("Saved as " + file, 3)
-                self.canvas.clear() ## replace current background with "-bkg.jpg" copy   
+                self.canvas.clear()  ## replace current background with "-bkg.jpg" copy   
                 self.addBkg(self.bkg.fileName, flopped)
             else:
                 MsgBox("Already saved as background jpg")
         self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
 
-    def bkgColor(self):        ## triggered by "/" 
+    def bkgColor(self):      
+        if self.canvas.control in PlayKeys:
+            return
         self.setBkgColor(QColorDialog.getColor())
 
-    def setBkgColor(self, color, val=0): ## add a flat color to canvas
+    def setBkgColor(self, color, val=0):  ## add a flat color to canvas
         if color.isValid():
             self.bkg = Flat(color, self.canvas, val)
             self.scene.addItem(self.bkg)

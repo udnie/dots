@@ -12,6 +12,7 @@ DFTKeys   = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T)
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
+ShiftKeys = (Qt.Key.Key_D,Qt.Key.Key_P,Qt.Key.Key_T,Qt.Key.Key_V)
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -62,7 +63,7 @@ class ControlView(QGraphicsView):
             Qt.Key.Key_Z: self.canvas.ZDump,
         }
 
-        self.ToggleKeys = {
+        self.toggleKeys = {
             Qt.Key.Key_G: self.sideCar.toggleGrid,
             Qt.Key.Key_M: self.canvas.mapper.toggleMap,
         }
@@ -100,46 +101,45 @@ class ControlView(QGraphicsView):
     ## best location for reading keys - especially arrow keys
     def keyPressEvent(self, e):
         key = e.key() 
-        mod = e.modifiers()  
+        mod = e.modifiers()     
+        ## special keys - may differ in another OS
         if e.key() == 33 and self.canvas.pathMakerOn:
             self.setKey('!')
         elif e.key() == 64 and self.canvas.pathMakerOn:
             self.setKey('@')
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
             self.setKey('del')
-        ## mix of setKey and direct run
-        elif key in DFTKeys:
+        ## handle shift keys   
+        elif mod & Qt.KeyboardModifier.ShiftModifier and key in ShiftKeys:
             if key == Qt.Key.Key_D:   
-                if mod & Qt.KeyboardModifier.ShiftModifier: 
-                    self.setKey('delPts')  ## send to pathmaker
-                else:
-                    self.setKey('D') 
-                    self.canvas.deleteSelected()
+                self.setKey('delPts')  ## send to pathmaker
+            elif key == Qt.Key.Key_P:  ## show pix path tags
+                if not self.canvas.pathMakerOn:
+                    self.canvas.mapper.toggleTagItems('paths')                
+            elif key == Qt.Key.Key_T:         
+                self.canvas.mapper.toggleTagItems('select')     
+            elif key == Qt.Key.Key_V:
+                self.startProcess()
+        elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
+            self.canvas.togglePixLocks(singleKeys[key])   
+        elif key in DFTKeys:
+            if key == Qt.Key.Key_D:  
+                self.setKey('D') 
+                self.canvas.deleteSelected()
             elif key == Qt.Key.Key_F:
-                self.setKey('F')  ## if pathMaker on
+                self.setKey('F') 
                 self.canvas.flopSelected()  
             elif key == Qt.Key.Key_T:
                 if self.canvas.pathMakerOn:
-                    self.setKey('T')  ## run test if pathMaker on
-                elif mod & Qt.KeyboardModifier.ShiftModifier:
-                    self.canvas.mapper.toggleTagItems('select')
+                    self.setKey('T')  ## run test
                 else:  
                     self.canvas.mapper.toggleTagItems('all')
-        elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier:
-            self.canvas.togglePixLocks(singleKeys[key])   
         elif key in self.direct: 
             self.direct[key]()  
-        elif key in self.ToggleKeys:
-            self.ToggleKeys[key]()  
+        elif key in self.toggleKeys:
+            self.toggleKeys[key]()  
         elif key in singleKeys:  ## in dotsShared.py  
-            if key == Qt.Key.Key_P and mod & Qt.KeyboardModifier.ShiftModifier:  ## show pix path tags
-                if not self.canvas.pathMakerOn:
-                    self.canvas.mapper.toggleTagItems('paths')
-                    return
-            elif key == Qt.Key.Key_V and mod & Qt.KeyboardModifier.ShiftModifier:
-                self.startProcess()
-            else:
-                self.setKey(singleKeys[key]) 
+            self.setKey(singleKeys[key]) 
         elif e.key() in ExitKeys:
             self.canvas.exit() 
 

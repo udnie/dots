@@ -6,7 +6,7 @@ import gc
 from PyQt5.QtCore    import QAbstractAnimation, QTimer, QEvent
 from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene
                        
-from dotsShared      import common, CanvasStr, PathStr, MoveKeys
+from dotsShared      import common, CanvasStr, PathStr, MoveKeys, PlayKeys
 from dotsAnimation   import *
 from dotsSideGig     import getPathList
 from dotsSideCar     import SideCar
@@ -21,7 +21,6 @@ from dotsScrollPanel import ScrollPanel
 from dotsDocks       import *
 
 Loops = ('L','R','P','S')
-PlayKeys = ('resume','pause')
 
 ## -- for testing and comparison ----------------
 # from pubsub  import pub      # PyPubSub - required

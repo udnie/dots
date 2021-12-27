@@ -11,8 +11,6 @@ from dotsShared      import common, paths
 from dotsPixItem     import PixItem
 from dotsSideGig     import MsgBox
 
-PlayKeys = ('resume','pause')
-
 ### ---------------------- dotsSideCar ---------------------
 ''' dotsSideCar: wings, pixTest, transFormPixitem, toggleGrid plus 
     some small functions '''  

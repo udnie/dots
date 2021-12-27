@@ -139,7 +139,7 @@ class InitMap:
 
     def toggleMap(self):  ## not based on rubberband geometry
         if self.isMapSet() == False:
-            self.selections = []  
+            self.selections = []  ## not the same as in drawsPaths
             for pix in self.scene.selectedItems():  ## only items selected
                 self.selections.append(pix.id)
             if self.scene.selectedItems() or self.parent.hasHiddenPix():

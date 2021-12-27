@@ -6,12 +6,10 @@ from PyQt5.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonIte
 
 from dotsAnimation      import Node                           
 from dotsSideGig        import DoodleMaker, MsgBox, getColorStr
-from dotsShared         import common, paths, MoveKeys
+from dotsShared         import common, paths, MoveKeys, ScaleRotateKeys
 
 from dotsSideWays       import SideWays
 from dotsDrawsPaths     import DrawsPaths
-
-ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,

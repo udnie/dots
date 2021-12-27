@@ -9,9 +9,7 @@ from PyQt5.QtGui     import QPainter, QBrush, QFontMetrics, \
 from PyQt5.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
                             QLabel, QScrollArea, QGridLayout, QVBoxLayout
 
-from dotsShared      import paths, pathcolors
-
-PlayKeys = ('resume','pause')
+from dotsShared      import paths, pathcolors, PlayKeys
 
 ### ---------------------- dotsSideGig ---------------------
 ''' dotsSideGigs: DoodleMaker, Doodle, TagIt, and MsgBox. '''

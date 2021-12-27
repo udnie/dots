@@ -2,7 +2,7 @@
 from PyQt5.QtCore    import Qt
 
 ### --------------------- dotsShared.py --------------------
-''' dotsShared: common and paths dictionaries shared across classes and files '''
+''' dotsShared: common data shared across classes and files '''
 ### --------------------------------------------------------
 common = {
     "factor": 0.35,
@@ -29,6 +29,7 @@ common = {
           
 CanvasStr = "L,R,P,S,C,K,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
 PathStr = "C,D,E,F,L,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 paths = {
     "snapShot":   "./",
@@ -47,6 +48,8 @@ MoveKeys = {
     "up":    (0.0, -Tick),
     "down":  (0.0, Tick),
 }
+
+PlayKeys = ('resume','pause')
 
 RotateKeys = {
     '+':  -1.0,
