@@ -1,4 +1,8 @@
 ## Changes
+**January 2022:**		
+Yet another stand-alone app, outline.py. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
+
+  
 **December 2021:**  
 I've added another stand-alone app, shadow.py, a PyQt dropshadow visualizer. It's either run from the command line or thru an editor. It's written to work with transparent .png and .jpg files while also as a template for future such apps. Another new video. <https://youtu.be/V-kkzuURsjg>
 
