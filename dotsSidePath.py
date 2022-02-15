@@ -31,7 +31,7 @@ def demo(pix, anime, node):
     pt = getOffSet(node.pix)
 
     path = QPropertyAnimation(node, b'pos')
-    path.setDuration(sync)
+    path.setDuration(int(sync))
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
         path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
@@ -39,7 +39,7 @@ def demo(pix, anime, node):
     path.setLoopCount(-1) 
 
     rotate = QPropertyAnimation(node, b'rotate')
-    rotate.setDuration(sync/3)
+    rotate.setDuration(int(sync/3))
     rotate.setEasingCurve(QEasingCurve.Type.InBounce)
     rotate.setStartValue(node.pix.rotation)    
     rotate.setKeyValueAt(0.25, pix.rotation-45)
@@ -50,7 +50,7 @@ def demo(pix, anime, node):
     rotate.setLoopCount(-1)
 
     opacity = QPropertyAnimation(node, b'opacity')
-    opacity.setDuration(sync)
+    opacity.setDuration(int(sync))
     opacity.setStartValue(node.pix.opacity())
     opacity.setKeyValueAt(.20, 1.0) 
     opacity.setKeyValueAt(.53, 1.0)
@@ -62,7 +62,7 @@ def demo(pix, anime, node):
     opacity.setLoopCount(-1)
 
     scale = QPropertyAnimation(node, b'scale')
-    scale.setDuration(sync)
+    scale.setDuration(int(sync))
     scale.setStartValue(node.pix.scale*1.05)
     scale.setKeyValueAt(.45, pix.scale*.80)
     scale.setKeyValueAt(.53, pix.scale*.25)
@@ -94,7 +94,7 @@ def setPaths(pix, anime, node):
     sync = random.randint(73,173) * 100  ## very arbitrary
 
     path = QPropertyAnimation(node, b'pos')
-    path.setDuration(sync)
+    path.setDuration(int(sync))
 
     waypts = pathLoader(anime)
     if not waypts: return

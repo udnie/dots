@@ -14,7 +14,8 @@ from dotsDocks      import *
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widget panels, and
     buttons. See dotsShared.py for the common and paths dictionaries 
-    shared across classes and files''' 
+    shared across classes and files....
+    Last Updated:  02/13/2022  PYTHON 3.10.2  PYQT 5.15.6''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
 ### --------------------------------------------------------
@@ -28,7 +29,7 @@ class DotsQt(QMainWindow):
   
         self.move(getX(), 35)  # offset for app width and preferred height
         self.setStyleSheet(open('./dotsStyle.css').read())
-
+      
         self.setFixedSize(common['DotsW'], common['DotsH'])
         self.canvas.initBkg.disableBkgBtns()  ## toggles bkg sliders off as well
 
@@ -40,8 +41,8 @@ class DotsQt(QMainWindow):
 
         self.show()
 
-        # from PyQt5.QtCore import QT_VERSION_STR
-        # from PyQt5.QtCore import PYQT_VERSION_STR
+        from PyQt5.QtCore import QT_VERSION_STR
+        from PyQt5.QtCore import PYQT_VERSION_STR
 
         # print( PySide6.__version__ )
         # print("PyQt version:", PYQT_VERSION_STR) 

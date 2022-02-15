@@ -102,7 +102,7 @@ def vibrate(pix):
     ran  = random.randint(3,7)*2
 
     vibrate = QPropertyAnimation(node, b'pos')
-    vibrate.setDuration(sync)
+    vibrate.setDuration(int(sync))
 
     vibrate.setStartValue(pos)
     vibrate.setKeyValueAt(0.25, pos + QPointF(-ran, ran))  
@@ -124,7 +124,7 @@ def pulse(pix):
     sync = random.gauss(450, 50)
 
     pulse = QPropertyAnimation(node, b'scale')
-    pulse.setDuration(sync)
+    pulse.setDuration(int(sync))
 
     pulse.setStartValue(node.pix.scale * random.gauss(1.25, .25))
     pulse.setEndValue(node.pix.scale * random.gauss(1.25, .25))
@@ -151,7 +151,7 @@ def bobble(pix):
     if random.randint(0, 1): left = left * -1
 
     bobble = QPropertyAnimation(node, b'pos')
-    bobble.setDuration(sync)
+    bobble.setDuration(int(sync))
   
     bobble.setStartValue(pos)
     bobble.setKeyValueAt(0.25, pos + QPointF(-left, -up*1.75))  
@@ -176,17 +176,17 @@ def fin(pix):            ## delete pixitem
     if not random.randint(0,1): rot = -270
 
     rotate = QPropertyAnimation(node, b'rotate')
-    rotate.setDuration(sync)
+    rotate.setDuration(int(sync))
     rotate.setStartValue(node.pix.rotation)
     rotate.setEndValue(rot+node.pix.rotation)
 
     opacity = QPropertyAnimation(node, b'opacity')
-    opacity.setDuration(sync)
+    opacity.setDuration(int(sync))
     opacity.setStartValue(node.pix.opacity())
     opacity.setEndValue(0)
 
     scale = QPropertyAnimation(node, b'scale')
-    scale.setDuration(sync)
+    scale.setDuration(int(sync))
     scale.setStartValue(node.pix.scale)
     scale.setEndValue(node.pix.scale*.25)
 
@@ -207,7 +207,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     sync = 1000
 
     reprise = QPropertyAnimation(node, b'pos') 
-    reprise.setDuration(sync)
+    reprise.setDuration(int(sync))
     reprise.setStartValue(node.pix.pos())
     reprise.setEndValue(QPointF(pix.x, pix.y))
 
@@ -215,18 +215,18 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
         return reprise
 
     spin = QPropertyAnimation(node, b'rotate')
-    spin.setDuration(sync)
+    spin.setDuration(int(sync))
     spin.setStartValue(node.pix.rotation)
     spin.setKeyValueAt(0.50, pix.rotation+random.randint(15, 45))
     spin.setEndValue(pix.rotation)
 
     scale = QPropertyAnimation(node, b'scale')
-    scale.setDuration(sync)
+    scale.setDuration(int(sync))
     scale.setStartValue(node.pix.scale)
     scale.setEndValue(pix.scale)
 
     opacity = QPropertyAnimation(node, b'opacity')
-    opacity.setDuration(sync)
+    opacity.setDuration(int(sync))
     opacity.setStartValue(node.pix.opacity())  ## reset to 1.0
     opacity.setEndValue(1)
 
@@ -246,7 +246,7 @@ def idle(pix):
     sync = 1000
 
     idle = QPropertyAnimation(node, b'pos')
-    idle.setDuration(sync)
+    idle.setDuration(int(sync))
     idle.setStartValue(pos)
     idle.setEndValue(pos)
 
@@ -327,7 +327,7 @@ def spin(pix, anime, node):  ## rotate
     if anime.endswith('Left'): rot = -360
 
     spin = QPropertyAnimation(node, b'rotate')
-    spin.setDuration(sync)
+    spin.setDuration(int(sync))
     spin.setStartValue(node.pix.rotation)
     spin.setEndValue(node.pix.rotation+rot)
 
@@ -347,12 +347,12 @@ def rain(pix, node):
     top    = y+node.pix.height*2
 
     rain1 = QPropertyAnimation(node, b'pos')
-    rain1.setDuration(sync)
+    rain1.setDuration(int(sync))
     rain1.setStartValue(pos)
     rain1.setEndValue(pos+QPointF(0, bottom))
 
     opacity1 = QPropertyAnimation(node, b'opacity')
-    opacity1.setDuration(sync)
+    opacity1.setDuration(int(sync))
     opacity1.setStartValue(node.pix.opacity())
     opacity1.setKeyValueAt(.10, .50)
     opacity1.setEndValue(0)
@@ -362,12 +362,12 @@ def rain(pix, node):
     par1.addAnimation(opacity1)
 
     rain2 = QPropertyAnimation(node, b'pos')
-    rain2.setDuration(sync)
+    rain2.setDuration(int(sync))
     rain2.setStartValue(pos+QPointF(0, -top))
     rain2.setEndValue(pos)
 
     opacity2 = QPropertyAnimation(node, b'opacity')
-    opacity2.setDuration(sync)
+    opacity2.setDuration(int(sync))
     opacity2.setStartValue(node.pix.opacity())
     opacity2.setEndValue(.85)
 

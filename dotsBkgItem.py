@@ -127,6 +127,7 @@ class Flat(QGraphicsPixmapItem):
 
         self.isBackgroundSet = False      
         self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
+        
 ### --------------------------------------------------------
     def mousePressEvent(self, e):
         if self.canvas.key == 'del':     

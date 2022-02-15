@@ -1,4 +1,8 @@
 ## Changes
+**February 2022:**  
+One more stand-alone app, **cast_shadow.py**, a cast shadow emulator.
+Requires, PIL, cv2, and numpy - consequently it takes a while to start when first run but it's worth it. My opinion. Another new video: <https://youtu.be/1VWjhypf0xk>
+
 **January 2022:**		
 Yet another stand-alone app, outline.py. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
 

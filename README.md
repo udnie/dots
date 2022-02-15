@@ -1,11 +1,11 @@
 ## DotsQt  
-**DotsQt** is a program for creating photo-collage and 2D animations using transparent pngs as sprites/clip-art. It comes with some basic animations and paths that can be attached to the sprite screen objects plus a set of functions to create and modify paths as well as functions to set the background, either using photos or flat color.
+**DotsQt** is a program for creating photo-collage and 2D animations using transparent pngs as sprites/clip-art, think "Monty Python's Flying Circus". It comes with some basic animations and paths that can be attached to the sprite screen objects plus functions to create and modify paths as well as functions to set backgrounds using photos or flat color. 
 
-The original dots was written in JavaFX which added animation to the photo-collage portion of the DotsFX app as well as providing a means to create sprites. The dots front end is no longer required as the screen objects, sprites, are now based on transparent pngs.
+The original dots was written in JavaFX which added animation to the photo-collage portion of dots as well as providing a means to create sprites. The sprite creation front end is no longer required as the screen objects are now based on transparent pngs.
 
-This is not a finished app - more of a toolkit, an artist's studio, a potter's kick-wheel. In building an animation from scratch the file **dotsAnimation.py** provides the starting point for the code necessary to create your own animations.See **keys.pdf, Changes.md, StartHere.md** for updated documentation.
+This is not a finished app - it's more of a toolkit, an artist's studio. In building an animation from scratch the files **StartHere.md** and  **dotsAnimation.py** provide a starting point for coding your own  animations.  See **Changes.md** and **keys.pdf** for further documentation.
 	  
-#### I'd recommend running dots in **PyQt5.15** as it's already been prepped for **PyQt6.2**.  I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them.  I can't speak for earlier versions.
+#### I'm currently running dots in PyQt 5.15.6 and Python 3.10.2. It's been prepped for **PyQt 6.2** but 5.15 doesn't seem to notice the new enums.  I can't speak for earlier versions.
 
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under 300 lines whenever possible, it doesn't always work. Also I use camel case after many years of coding in snake.

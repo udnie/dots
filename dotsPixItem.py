@@ -60,7 +60,7 @@ class PixItem(QGraphicsPixmapItem):
                 img.height() * PixFactor)
 
         ## don't change
-        img = img.scaled(newW, newH,
+        img = img.scaled(int(newW), int(newH),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation)
 
@@ -117,7 +117,7 @@ class PixItem(QGraphicsPixmapItem):
         super().paint(painter, option, widget)
         if self.isSelected():
             pen = QPen(QColor("lime"))
-            pen.setWidth(2.5)
+            pen.setWidth(2)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
             

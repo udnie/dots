@@ -180,7 +180,7 @@ class SideWays():
             f = Q.getSaveFileName(self.pathMaker.canvas,
                 paths["paths"],
                 self.pathMaker.openPathFile)
-            Q.accept()
+            Q.accept()        
             if not f[0]: 
                 return
             elif not f[0].lower().endswith('.path'):

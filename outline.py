@@ -6,7 +6,8 @@ import pygame as pg
 from   pygame.constants import HIDDEN
 
 from PyQt5.QtCore       import Qt, QPointF
-from PyQt5.QtGui        import QColor, QImage, QPixmap, QFont, QPolygonF, QPen
+from PyQt5.QtGui        import QColor, QImage, QPixmap, QFont, QPolygonF, QPen, \
+                               QGuiApplication
 from PyQt5.QtWidgets    import QWidget, QApplication, QGraphicsView, QMessageBox, \
                                QGraphicsScene, QGraphicsPixmapItem, QLabel, \
                                QHBoxLayout,  QVBoxLayout, QPushButton, \
@@ -102,9 +103,12 @@ class Caster(QWidget):
         
         self.setFixedSize(Width,Height)
         self.setWindowTitle("outline a transparent .png")
-        
-        self.setTabletTracking(False)
-             
+           
+        ctr = QGuiApplication.primaryScreen().availableGeometry().center()
+        x = int(((ctr.x() * 2 ) - Width)/2)
+     
+        self.setGeometry(x,150,Width,Height)
+                 
         self.display = Display(self)
         self.buttons = self.setButtons()
                      

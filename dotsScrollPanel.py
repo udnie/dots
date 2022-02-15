@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt5.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl
+from PyQt5.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF
 from PyQt5.QtGui     import QPainter, QImage, QPen, QFont, \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
@@ -41,12 +41,12 @@ class ImgLabel(QLabel):
         else:    
             img = QImage(self.imgFile)
             newW, newH = self.scaleTo(img)
-            img = img.scaled(newW, newH,   
+            img = img.scaled(int(newW), int(newH),   
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation)
             posX = ((common['LabelW'] - newW) /2 )
             posY = ((common['MaxH'] - newH) /2 ) + 9
-            qp.drawImage(posX, posY, img)
+            qp.drawImage(QPointF(posX, posY), img)
 
         pen = QPen(Qt.GlobalColor.darkGray)   
         pen.setWidth(2)
@@ -74,7 +74,7 @@ class ImgLabel(QLabel):
         p = p.width()
         p = (common['LabelW'] - p)/2 
 
-        qp.drawText(p, common['Type'], imgfile)
+        qp.drawText(int(p), common['Type'], imgfile)
         qp.end()
 
     def minimumSizeHint(self):
