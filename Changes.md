@@ -1,6 +1,6 @@
 ## Changes
 **February 22, 2022:**   
- **Cast_shadow2.py**, yet another cast shadow emulator. This uses points rather than pixels to create a shadow - as a result I updated **outline.py** to display a larger image, I also set the point limit up to 350. It didn't help the shadow look any better, too edgy, but a good learning experience, more to share. It works best with apple.png - cv2 and numpy required.
+ **Cast_shadow2.py**, another cast shadow emulator. This one uses points rather than pixels to create a shadow - as a result I updated **outline.py** to display a larger image, I also set the point limit up to 350. It didn't help the shadow look any better, too edgy, but a good learning experience, more to share. It works best with apple.png - cv2 and numpy required.
 Video at: <https://youtu.be/eAsH9412Bww>
 
 **February 14, 2022:**  
@@ -8,10 +8,10 @@ One more stand-alone app, **cast_shadow.py**, a cast shadow emulator.
 Requires, PIL, cv2, and numpy - consequently it takes a while to start when first run but it's worth it. My opinion. Another new video: <https://youtu.be/1VWjhypf0xk>
 
 
-#### I'd recommend running dots in PyQt5.15 as it's already been prepped for PyQt6.2. I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them. I can't speak for earlier versions.
+#### I'd recommend running dots in PyQt5.15 as it's already been prepped for PyQt6.2. I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them. I can't speak for earlier versions.####
 
 
-**January 2022:**    	
+**January 2022:**      	
 Yet another stand-alone app, outline.py. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
 
   
