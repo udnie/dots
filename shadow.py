@@ -42,8 +42,8 @@ class Display(QWidget):
   ### --------------------------------------------------------       
     def addPixmap(self, img):  ## the scene is cleared each new image file                     
         ## name = os.path.basename(img)  ##  use it for testing 
-        
-        img = QImage(img)             
+        img = QImage(img) 
+           
         img = img.scaled(250, 250,  ## keep it small
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation)

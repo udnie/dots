@@ -193,7 +193,8 @@ class DrawsPaths(QWidget):
 
     def insertPointItem(self, pointItem):  ## halfway between points
         idx, pt = pointItem.idx + 1, pointItem.pt  ## idx, the next point
-        if idx == len(self.pathMaker.pts): idx = 0   
+        if idx == len(self.pathMaker.pts): 
+            idx = 0   
         if self.pathMaker.selections:
             self.insertSelection(pointItem.idx)  
         pt1 = self.pathMaker.pts[idx]  ## calculate new x,y
@@ -310,6 +311,10 @@ class DrawsPaths(QWidget):
         # print("d-delete: ", self.pathMaker.selections, "\n")
                 
     def findTop(self):
+      
+        ## save
+        #  self.setZValue(self.parent.scene.items()[0].zValue() + 1)
+           
         for itm in self.scene.items():
             return itm.zValue()
         return 0

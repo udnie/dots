@@ -15,9 +15,10 @@ from PyQt5.QtWidgets    import QWidget, QApplication, QGraphicsView, QMessageBox
 from PyQt5.QtSvg        import QGraphicsSvgItem
 ## from PyQt6.QtSvgWidgets import QGraphicsSvgItem
 
-DispWidth, DispHeight = 450, 450
-Width, Height = 495, 560 
-Max = 350
+DispWidth, DispHeight = 650, 650
+Width, Height = 695, 760
+Max = 600     ## width/height
+Points = 350  ## limiting factor
 
 ### --------------------------------------------------------
 ''' outline.py: outline a transparent .png using a pygame function'''
@@ -39,16 +40,18 @@ class Display(QWidget):
         view.setScene(self.scene)
         
         self.scene.setSceneRect(0,0,DispWidth,DispHeight)   
-        
+      
+        self.file = None  
         self.pixmap = None 
-     
+           
     def addPixmap(self, file):  ## the scene is cleared each new image file                            
-        img = QImage(file)     
+        img = QImage(file)                 
+        self.file = file 
                 
-        self.file = file  
-        img = img.scaled(Max, Max,  
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation)
+        if img.width() > Max or img.height() > Max:  ## size it to fit
+            img = img.scaled(Max, Max,  
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation)
      
         self.pixmap = QGraphicsPixmapItem()     
         self.pixmap.setPixmap(QPixmap(img))    
@@ -64,14 +67,15 @@ class Display(QWidget):
     def displayOutline(self, type="pts"): 
         if not self.pixmap:  
             return  
-        pts = getOutline(self.file, self.pixmap.boundingRect(), type)
-        if type == 'pts':  
-            self.poly = QGraphicsPolygonItem(self.drawPoly(pts)) 
-            self.poly.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
-            self.poly.setZValue(100) 
-            self.poly.setPos(self.x, self.y)
-            self.scene.addItem(self.poly)
-                        
+        if self.file:
+            pts = getOutline(self.file, self.pixmap.boundingRect(), type, Points)
+            if type == 'pts':  
+                self.poly = QGraphicsPolygonItem(self.drawPoly(pts)) 
+                self.poly.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
+                self.poly.setZValue(100) 
+                self.poly.setPos(self.x, self.y)
+                self.scene.addItem(self.poly)
+                            
     def drawPoly(self, pts):  
         poly = QPolygonF()   
         for p in pts: 
@@ -79,20 +83,21 @@ class Display(QWidget):
         return poly    
     
     def addSvg(self, file):
-        svg = QGraphicsSvgItem(file)
-        b = svg.boundingRect()   
-        w, h = b.width(), b.height()
-        r = max(w, h )    
-        if r > Max:
-            r = Max/r
-        else:
-            r = r/Max
-        svg.setScale(r)
-        x = (DispWidth-(w*r))/2 
-        y = (DispHeight-(h*r))/2
-        svg.setPos(x,y)
-        self.scene.addItem(svg)
-                                                    
+        if self.file:
+            svg = QGraphicsSvgItem(file)
+            b = svg.boundingRect()   
+            w, h = b.width(), b.height()
+            r = max(w, h )    
+            if r > Max:
+                r = Max/r
+            else:
+                r = r/Max
+            svg.setScale(r)
+            x = (DispWidth-(w*r))/2 
+            y = (DispHeight-(h*r))/2
+            svg.setPos(x,y)
+            self.scene.addItem(svg)
+                                               
 ### --------------------------------------------------------      
 class Caster(QWidget):  
     def __init__(self):
@@ -137,7 +142,7 @@ class Caster(QWidget):
         
         self.svgBtn = QPushButton("SVG")      
         self.svgBtn.clicked.connect(lambda: self.display.displayOutline("svg"))
-    
+        
         self.quitBtn = QPushButton("Quit")
         self.quitBtn.clicked.connect(self.close)
         
@@ -149,7 +154,7 @@ class Caster(QWidget):
         hbox.addWidget(self.pathBtn)
         hbox.addSpacing(5)
         hbox.addWidget(self.svgBtn)
-        hbox.addSpacing(5)
+        hbox.addSpacing(5)             
         hbox.addWidget(self.quitBtn)
             
         self.buttonGroup.setLayout(hbox)
@@ -168,9 +173,11 @@ class Caster(QWidget):
                 self.display.addPixmap(file)
             else:
                 self.display.addSvg(file)
+        else:
+            self.display.file = None
         Q.accept()
                         
-def getOutline(file, b, type):  ## b -> boundingRect
+def getOutline(file, b, type, points):  ## b -> boundingRect
     pg.init()
     
     threshold = 100
@@ -179,24 +186,27 @@ def getOutline(file, b, type):  ## b -> boundingRect
     image = pg.image.load(file).convert_alpha()
     image = pg.transform.smoothscale(image, (b.width(), b.height()))
     
+    w, h = str(int(b.width())), str(int(b.height()))
+               
     mask = pg.mask.from_surface(image, threshold)  
-    dots = 200  ## the limiting factor 
-    
+        
     for i in range(3, 20):     ## save every 3rd, 4th, ... 20th point 
         pts = mask.outline(i)  ## default is 1, all
-        if len(pts) < dots:    ## set a limit otherwise you could get 1000's
-            dots = i  ## save the winning number     
+        if len(pts) < points:    ## set a limit otherwise you could get 1000's
+            points = i  ## save the winning number     
             break
 
     pts = []
-    for p in mask.outline(dots):  ## once more for real
+    for p in mask.outline(points):  ## once more for real
         pts.append(p)
                  
     if type in ("path", "svg"): 
         savePoints(file, type, b, pts)   
     else: 
         QMessageBox.about(None, "OutLine", os.path.basename(file) + 
-                                "{0:4d}".format(len(pts)) + " points")             
+            " - " + "{0:4d}".format(len(pts)) + " points" + "\n" +
+            "width: " +  w + "  height: " + h)
+                                 
     return pts
 
 def savePoints(file, type, b, pts):
@@ -232,7 +242,7 @@ def savePoints(file, type, b, pts):
             cnt += 1
         f = open(f[0], "w")
         f.write(out_str + end_str)
-        f.close()
+        f.close()     
     QMessageBox.about(None, "OutLine", os.path.basename(file) + " saved")  
     return pts
 

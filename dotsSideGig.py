@@ -202,15 +202,15 @@ def distance(x1, x2, y1, y2):
     dy = y1 - y2
     return math.sqrt((dx * dx ) + (dy * dy))
 
-def getPathList(bool=False):  ## used by DoodleMaker
-    try:                            ## also by context menu
+def getPathList(bool=False):  ## used by DoodleMaker & context menu
+    try:                      ## also by 
         files = os.listdir(paths['paths'])
     except IOError:
         MsgBox("getPathList: No Path Directory Found!", 5)
         return None  
     filenames = []
     for file in files:
-        if file.lower().endswith('path'): 
+        if file.lower().endswith('path'):
             if bool:    
                 file = os.path.basename(file)  ## short list
                 filenames.append(file)

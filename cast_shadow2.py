@@ -1,21 +1,18 @@
 
 import sys
 
-import cv2
-import numpy as np
-
 from PyQt5.QtCore    import Qt, QPointF, QTimer
 from PyQt5.QtGui     import QColor, QImage, QPixmap, QFont, QGuiApplication, QPolygonF, QPen, \
-                            QTransform
+                            QTransform, QBrush
 from PyQt5.QtWidgets import QSlider, QWidget, QApplication, QGraphicsView, \
                             QGraphicsScene, QGraphicsPixmapItem, QLabel, QGraphicsPolygonItem, \
-                            QSlider, QHBoxLayout,  QVBoxLayout, QGridLayout, QPushButton, \
+                            QSlider, QHBoxLayout, QVBoxLayout, QGridLayout, QPushButton, \
                             QGraphicsEllipseItem, QFileDialog, QFrame
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 DispWidth, DispHeight = 425, 425
 Width, Height = 920, 470 
-Fixed = 250  ## size
+Fixed = 200  ## size
 Xoff, Yoff, Opacity = 0, 0, 50  ## no scale, no rgb
 V = 10.0  ## the diameter of a pointItem
 PathStr = ["topLeft","topRight","botRight","botLeft"]
@@ -118,8 +115,10 @@ class Display(QWidget):
     def init(self):
         self.pixmap = None 
         self.shadow = None
-        self.cpy    = None 
+        self.pts    = None 
         self.poly   = None
+        
+        self.shawdowSet = False
         
         self.topLeft  = None
         self.topRight = None
@@ -130,21 +129,18 @@ class Display(QWidget):
         self.saveX = 0
         self.alpha = .50
         
-        self.file = ""
         self.path = [] 
      
         self.x = 0
         self.y = 0
         
 ### --------------------------------------------------------       
-    def addPixmap(self, file):                          
-        img = QImage(file)  ## the scene is cleared each new image file  
-        self.file = file
-        
-        if img.width() > Fixed or img.height() > Fixed:  ## size it to fit       
-            img = img.scaled(Fixed, Fixed,  ## keep it small
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)
+    def addPixmap(self, img):  ## the scene is cleared each new image file                     
+        img = QImage(img) 
+                    
+        img = img.scaled(Fixed, Fixed,  ## keep it small
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
      
         self.pixmap = QGraphicsPixmapItem()     
         self.pixmap.setPixmap(QPixmap(img))    
@@ -156,113 +152,129 @@ class Display(QWidget):
         self.pixmap.setY(self.y)     
         self.pixmap.setZValue(20) 
         
-        self.scene.addItem(self.pixmap)
-        self.addPilShadow(img.width(), img.height())
+        self.scene.addItem(self.pixmap) 
+             
+        self.pts = self.loadPoints("apple.path")
+        self.initShadow()
+        self.drawShadow(self.pts)
          
-### --------------------------------------------------------   
-    def addPilShadow(self, w, h):
-        if self.file:
-            from PIL import Image, ImageFilter 
-        
-            img = Image.open(self.file)   
-            img = img.convert("RGBA")  ## transparent .png -- alpha channel 
-
-            data = img.getdata()  ## easier to do in PIL than cv??
-            wuf = []
-
-            for d in data:
-                if d[3] == 0:  ## skip transparent pixels
-                    wuf.append(d)
-                else:
-                    wuf.append((20,20,20,255))
-            
-            b = self.pixmap.boundingRect()
-            w, h = int(b.width()), int(b.height())
-                
-            img.putdata(wuf)
-            
-            img = img.resize((w//2, h//2), resample=Image.ANTIALIAS)  ## try and smooth edges
-            img = img.resize((w, h), resample=Image.ANTIALIAS)
-            img = img.filter(ImageFilter.SMOOTH) 
-
-            self.cpy = img.copy()  ## save it for later
-            
-            self.addCv2Shadow()
-                                  
-    ### --------------------------------------------------------    
-    def addCv2Shadow(self):  
-        img = np.array(self.cpy)        
-                       
-        height, width, ch = img.shape
-        bytesPerLine = ch * width  ## 4 bits of information -- alpha channel 
-        
-        img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)    
-        pixmap = QPixmap.fromImage(img)
+### --------------------------------------------------------    
+    def loadPoints(self, file):       
+        tmp = []
+        with open(file, 'r') as fp: 
+            for line in fp:
+                ln = line.rstrip()  
+                if len(ln) == 0: 
+                    continue  ## skip empty lines
+                ln = list(map(float, ln.split(',')))        
+                tmp.append((ln[0], ln[1]))               
+        return tmp
               
-        self.shadow = QGraphicsPixmapItem()     
-        self.shadow.setPixmap(pixmap)
-                     
-        self.shadow.setX(self.x)  ## same as pixmap
-        self.shadow.setY(self.y)
-        
-        self.shadow.setOpacity(self.alpha)
-        self.shadow.setZValue(10)    
-                       
-        self.scene.addItem(self.shadow)
-        QTimer.singleShot(100, self.drawPolygon)
- 
- ### --------------------------------------------------------
+    def initShadow(self): 
+        b = self.pixmap.boundingRect()  
+               
+        xs = [i[0] for i in self.pts]
+        ys = [i[1] for i in self.pts]
+
+        w = int(max(xs))  ## estimate width and height
+        h = int(max(ys))
+      
+        ## get shrink or expansion rate
+        if w > b.width():
+            x_shrink = b.width() / w
+        else:
+            x_shrink = w / b.width()
+                    
+        if h > b.height() < h:
+            y_shrink = b.height() / h
+        else:
+            y_shrink = h / b.height()
+                    
+        x_center = w * .5 
+        y_center = h * .5 
+                           
+        new_xs = [int((i - x_center) * (x_shrink * .98) + x_center) for i in xs]
+        new_ys = [int((i - y_center) * (y_shrink * .98) + y_center) for i in ys]
+       
+        x, y = w, h  ## set to max size
+       
+        ## try and set points pos(x,y) to (0,0)
+        for i in new_xs:  ## find least x, subtract from all x's
+            if i < x:
+                x = i
+                
+        for i in new_ys:  ## find least y, subtract from all y's
+            if i < y:
+                y = i
+                      
+        ## ideally you need to add a border that makes the graphic-item 
+        ## the same size as the the image width and height                                          
+        new_xs = [float(i - x) for i in new_xs]
+        new_ys = [float(i - y) for i in new_ys]   
+            
+        tmp = [] 
+        l = list(zip(new_xs, new_ys))  ## put x and y back together
+                
+        for p in l:           
+            tmp.append(QPointF(p[0], p[1]))  ## make it look like self.pts
+           
+        self.pts = tmp
+                                    
+ ### --------------------------------------------------------  
     def updateShadow(self): 
-        self.addUpdatedShadow(self.setPerspective())   
-        
-    def setPerspective(self):       
-        tmp = np.array(self.cpy)  
-                     
+        import cv2
+        import numpy as np    
+                      
         p = []
-        for i in range(4):  ## get currnet location of points from path
+        for i in range(4):  ## get current location of points from path
             x,y = int(self.path[i].x()), int(self.path[i].y()) 
             p.append([x,y])
                                                            
         tl, tr = p[0], p[1]  
         br, bl = p[2], p[3]  
-           
-        dst = np.float32([tl,tr,bl,br])        
-        src = np.float32([[0,0],[Fixed,0],[0, Fixed],[Fixed,Fixed]])
+            
+        dst = np.array([tl,tr,bl,br], dtype=np.float32)    
+        src = np.array([[0,0],[Fixed,0],[0, Fixed],[Fixed,Fixed]], dtype=np.float32)
+                         
+        M = cv2.getPerspectiveTransform(src,dst) 
+          
+        tmp = []
+        for p in self.pts:  ## making numpy happy
+            tmp.append((p.x(), p.y())) 
+            
+        tmp = np.array(tmp, dtype=np.float32)
+        tmp = np.array([tmp])       
+   
+        dst = cv2.perspectiveTransform(tmp, M)
+          
+        it = iter(dst.flatten().tolist())  ## turn it into a list 
+        it = zip(*[it]*2)  ## once again    
+        
+        tmp = [] 
+        for p in it:           
+            tmp.append(QPointF(p[0], p[1]))
+
+        self.drawShadow(tmp)
+                           
+    def drawShadow(self, pts):   
+        if self.shawdowSet:
+            self.scene.removeItem(self.shadow)              
+        self.shadow = QGraphicsPolygonItem(self.drawPoly(pts)) 
+        self.shadow.setBrush(QBrush(QColor(20,20,20,255)))
+        self.shadow.setPen(QPen(QColor("lightgray"), 1, Qt.PenStyle.SolidLine))
+        self.shadow.setZValue(10)    
+                         
+        if self.path == []:
+            self.shadow.setPos(self.x+5, self.y+2)
+        else:
+            self.shadow.mapToScene(self.path[0])
+       
+        self.scene.addItem(self.shadow)    
+        self.shadow.setOpacity(self.alpha)
+        self.shawdowSet = True        
          
-        M = cv2.getPerspectiveTransform(src, dst)   
-        ## give it room to move around 
-        img = cv2.warpPerspective(tmp, M, (DispWidth+300, DispHeight+300))  
-    
-        height, width, _ = img.shape
-        bytesPerLine = 4 * width  ## 4 bits of information
+        QTimer.singleShot(100, self.drawPolygon)
         
-        img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)
-        
-        return img    
-     
-    ### --------------------------------------------------------
-    def addUpdatedShadow(self, img):
-        pixmap = QPixmap.fromImage(img)
-        self.scene.removeItem(self.shadow)
-              
-        self.shadow = QGraphicsPixmapItem()     
-        self.shadow.setPixmap(pixmap)
- 
-        pos = self.topLeft.pos()   
-        x,y = int(pos.x()), int(pos.y())
-  
-        self.shadow.setX(x)
-        self.shadow.setY(y)
-        
-        self.shadow.setZValue(10)         
-        self.shadow.setOpacity(self.alpha) 
-             
-        self.scene.addItem(self.shadow)
-                
-        self.cas.xoffSlider.setValue(x)
-        self.cas.yoffSlider.setValue(y)      
-        self.cas.opacitySlider.setValue(int(self.alpha*100))    
-                      
 ### --------------------------------------------------------                                                                      
     def drawPolygon(self):  ## draw a four point polygon around shadow
         if self.path:
@@ -284,7 +296,13 @@ class Display(QWidget):
         
         self.saveX = p.x()
         self.saveY = p.y()
-        
+   
+    def drawPoly(self, pts):  
+        poly = QPolygonF()   
+        for p in pts:  
+            poly.append(QPointF(p))
+        return poly    
+       
     def showTime(self):
         if not self.shadow:
             return
@@ -297,7 +315,7 @@ class Display(QWidget):
             QTimer.singleShot(100, self.addPoints)
     
     def test(self):
-        if not self.scene.itemAt(self.path[0], QTransform()):          
+        if not self.scene.itemAt(self.path[0], QTransform()):  ## QTransform or some instance required       
             self.path[0] = self.shadow.pos()
   
     def addBackground(self, img):  ## img == file name 
@@ -310,23 +328,16 @@ class Display(QWidget):
         self.background.setPixmap(QPixmap(img))    
          
         self.background.setZValue(0) 
-        self.scene.addItem(self.background) 
-          
- ### --------------------------------------------------------                 
+        self.scene.addItem(self.background)   
+                     
     def drawPath(self): 
         if self.poly:
             self.scene.removeItem(self.poly)
-        self.poly = QGraphicsPolygonItem(self.drawPoly()) 
+        self.poly = QGraphicsPolygonItem(self.drawPoly(self.path)) 
         self.poly.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
         self.poly.setZValue(25) 
         self.scene.addItem(self.poly)
-            
-    def drawPoly(self):  
-        poly = QPolygonF()   
-        for p in self.path:  
-            poly.append(QPointF(p))
-        return poly       
-    
+              
     def addPoints(self):
         self.topLeft  = PointItem(self.path[0], "topLeft", self)
         self.topRight = PointItem(self.path[1], "topRight", self)
@@ -433,7 +444,7 @@ class Caster(QWidget):
         self.setFont(QFont('Helvetica', 13))
         
         self.setFixedSize(Width,Height)
-        self.setWindowTitle("a cast shadow emulator")
+        self.setWindowTitle("a cast shadow emulator based on points")
         
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         x = int(((ctr.x() * 2 ) - Width)/2)
@@ -579,5 +590,4 @@ if __name__ == '__main__':
     cas = Caster()
     sys.exit(app.exec())
     
-
 

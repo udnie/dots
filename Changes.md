@@ -1,22 +1,27 @@
 ## Changes
-**February 2022:**  
+**February 22, 2022:**   
+ **Cast_shadow2.py**, yet another cast shadow emulator. This uses points rather than pixels to create a shadow - as a result I updated **outline.py** to display a larger image, I also set the point limit up to 350. It didn't help the shadow look any better, too edgy, but a good learning experience, more to share. It works best with apple.png - cv2 and numpy required.
+Video at: <https://youtu.be/eAsH9412Bww>
+
+**February 14, 2022:**  
 One more stand-alone app, **cast_shadow.py**, a cast shadow emulator.
 Requires, PIL, cv2, and numpy - consequently it takes a while to start when first run but it's worth it. My opinion. Another new video: <https://youtu.be/1VWjhypf0xk>
 
-**January 2022:**		
+
+#### I'd recommend running dots in PyQt5.15 as it's already been prepped for PyQt6.2. I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them. I can't speak for earlier versions.
+
+
+**January 2022:**    	
 Yet another stand-alone app, outline.py. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
 
   
-**December 2021:**  
+**December 2021:**    
 I've added another stand-alone app, shadow.py, a PyQt dropshadow visualizer. It's either run from the command line or thru an editor. It's written to work with transparent .png and .jpg files while also as a template for future such apps. Another new video. <https://youtu.be/V-kkzuURsjg>
 
 I've added two new functions/keys to editing a path in pathMaker.
 **L** in **edit** changes the cursor to a crosshair to let you know that things have changed. Holding down the mouse button while moving the mouse draws a closed shape to either select or unselect selected pointItems. Once selected you can use the arrow keys to move the selected points or using the other new key, **shift-D**, to delete them.  Lastly, you can easily move between **editing points** and **waypoints** and and not lose any points you previously selected in **edit** by toggling between **E** and **W** or **W** to **E**.  New video: <https://youtu.be/AMTV3umYyuc>
 
 Additionally, some key reassignments in dropCanvas. I replaced **{/}** for rotating a sprite 45 degrees with **[/]** to match the same command in pathMaker. I also reassigned the keys that increment or decrement a sprite's **ZValue** back to front position. A **comma** sets a sprite back one **ZValue** and **period** up one value.  The four keys that are used to change a sprites **ZValue** are much closer together now. Big Win.
-
-
-#### I'd recommend running dots in PyQt5.15 as it's already been prepped for PyQt6.2. I've added all the necessary new enums required by 6.2 but 5.15 doesn't seem to notice them. I can't speak for earlier versions.
 
 **November 2021:**  
 Added a right-mouse click to dropCanvas to trigger the **play** load dialog and to pathMaker to trigger **path chooser**.  Added a path edit function to pathMaker. Entering **E** after choosing a path allows you move, delete, or add a point and also re-distribute or half the number of points that make up the path. Some of these functions are also in wayPoints but not the ability to move individual points. Entering **W** from **edit** will put you into wayPoints and conversely **E** in **wayPoints** drops you into edit.  More work on bat-wings. They're now easier to select and move by clicking anywhere on the bats body but not the wings. Added **Shift U** to unlock all screen items in dropCanvas.

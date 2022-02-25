@@ -14,8 +14,7 @@ from dotsDocks      import *
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widget panels, and
     buttons. See dotsShared.py for the common and paths dictionaries 
-    shared across classes and files....
-    Last Updated:  02/13/2022  PYTHON 3.10.2  PYQT 5.15.6''' 
+    shared across classes and files''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
 ### --------------------------------------------------------
