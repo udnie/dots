@@ -157,46 +157,35 @@ class Display(QWidget):
         self.pixmap.setZValue(20) 
         
         self.scene.addItem(self.pixmap)
-        self.addPilShadow(img.width(), img.height())
+        self.addShadow(img.width(), img.height())
          
 ### --------------------------------------------------------   
-    def addPilShadow(self, w, h):
+    def addShadow(self, w, h):
         if self.file:
-            from PIL import Image, ImageFilter 
+            img = cv2.imread(self.file, cv2.IMREAD_UNCHANGED)       
+            rows, cols, _ = img.shape
         
-            img = Image.open(self.file)   
-            img = img.convert("RGBA")  ## transparent .png -- alpha channel 
-
-            data = img.getdata()  ## easier to do in PIL than cv??
-            wuf = []
-
-            for d in data:
-                if d[3] == 0:  ## skip transparent pixels
-                    wuf.append(d)
-                else:
-                    wuf.append((20,20,20,255))
-            
-            b = self.pixmap.boundingRect()
-            w, h = int(b.width()), int(b.height())
+            wuf = img.copy()  
+            for i in range(rows):
+                for j in range(cols):
+                    pixel = img[i,j]
+                    if pixel[-1] != 0:  ## not transparent      
+                       wuf[i,j] = (20,20,20,255)
+                                         
+            img = cv2.resize(np.array(wuf), (w, h))
+            img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT)
                 
-            img.putdata(wuf)
-            
-            img = img.resize((w//2, h//2), resample=Image.ANTIALIAS)  ## try and smooth edges
-            img = img.resize((w, h), resample=Image.ANTIALIAS)
-            img = img.filter(ImageFilter.SMOOTH) 
+            self.cpy = img  ## save it for later    
+            self.initialShadow(self.cpy)                              
 
-            self.cpy = img.copy()  ## save it for later
-            
-            self.addCv2Shadow()
-                                  
     ### --------------------------------------------------------    
-    def addCv2Shadow(self):  
-        img = np.array(self.cpy)        
-                       
+    def initialShadow(self, img):  
         height, width, ch = img.shape
         bytesPerLine = ch * width  ## 4 bits of information -- alpha channel 
         
-        img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)    
+        img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32) 
+        img.smoothScaled(width, height)     
+        
         pixmap = QPixmap.fromImage(img)
               
         self.shadow = QGraphicsPixmapItem()     
@@ -215,28 +204,24 @@ class Display(QWidget):
     def updateShadow(self): 
         self.addUpdatedShadow(self.setPerspective())   
         
-    def setPerspective(self):       
-        tmp = np.array(self.cpy)  
-                     
+    def setPerspective(self):                            
         p = []
         for i in range(4):  ## get currnet location of points from path
             x,y = int(self.path[i].x()), int(self.path[i].y()) 
             p.append([x,y])
-                                                           
-        tl, tr = p[0], p[1]  
-        br, bl = p[2], p[3]  
-           
-        dst = np.float32([tl,tr,bl,br])        
+            
+        dst = np.float32([p[0], p[1], p[3], p[2]])        
         src = np.float32([[0,0],[Fixed,0],[0, Fixed],[Fixed,Fixed]])
          
         M = cv2.getPerspectiveTransform(src, dst)   
         ## give it room to move around 
-        img = cv2.warpPerspective(tmp, M, (DispWidth+300, DispHeight+300))  
+        img = cv2.warpPerspective(self.cpy, M, (DispWidth+300, DispHeight+300))  
     
         height, width, _ = img.shape
         bytesPerLine = 4 * width  ## 4 bits of information
         
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)
+        img.smoothScaled(width, height)  
         
         return img    
      
