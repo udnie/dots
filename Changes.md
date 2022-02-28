@@ -1,4 +1,8 @@
 ## Changes
+**February 27, 2022:**  
+Replaced **PIL** with **cv2**.  Still runs slow from a dead start but one less library to load.
+
+
 **February 22, 2022:**   
  **Cast_shadow2.py**, another cast shadow emulator. This one uses points rather than pixels to create a shadow - as a result I updated **outline.py** to display a larger image, I also set the point limit up to 350. It didn't help the shadow look any better, too edgy, but a good learning experience, more to share. It works best with apple.png - cv2 and numpy required.
 Video at: <https://youtu.be/eAsH9412Bww>
