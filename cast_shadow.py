@@ -7,7 +7,7 @@ import numpy as np
 from PyQt5.QtCore    import Qt, QPointF, QTimer
 from PyQt5.QtGui     import QColor, QImage, QPixmap, QFont, QGuiApplication, QPolygonF, QPen, \
                             QTransform
-from PyQt5.QtWidgets import QSlider, QWidget, QApplication, QGraphicsView, \
+from PyQt5.QtWidgets import QMessageBox, QSlider, QWidget, QApplication, QGraphicsView, \
                             QGraphicsScene, QGraphicsPixmapItem, QLabel, QGraphicsPolygonItem, \
                             QSlider, QHBoxLayout,  QVBoxLayout, QGridLayout, QPushButton, \
                             QGraphicsEllipseItem, QFileDialog, QFrame
@@ -161,23 +161,23 @@ class Display(QWidget):
          
 ### --------------------------------------------------------   
     def addShadow(self, w, h):
-        if self.file:
+        if self.file != "":
             img = cv2.imread(self.file, cv2.IMREAD_UNCHANGED)       
             rows, cols, _ = img.shape
-        
+    
             wuf = img.copy()  
             for i in range(rows):
                 for j in range(cols):
                     pixel = img[i,j]
                     if pixel[-1] != 0:  ## not transparent      
-                       wuf[i,j] = (20,20,20,255)
-                                         
+                        wuf[i,j] = (20,20,20,255)
+                                        
             img = cv2.resize(np.array(wuf), (w, h))
             img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT)
                 
             self.cpy = img  ## save it for later    
-            self.initialShadow(self.cpy)                              
-
+            self.initialShadow(self.cpy)  
+     
     ### --------------------------------------------------------    
     def initialShadow(self, img):  
         height, width, ch = img.shape
@@ -332,19 +332,22 @@ class Display(QWidget):
 
 ### --------------------------------------------------------     
     def xoffSet(self, val):  
-        self.shadow.setX(val)
-        self.cas.xoffValue.setText("{:3d}".format(val))
-        self.updateX(val) 
+        if self.file != "":
+            self.shadow.setX(val)
+            self.cas.xoffValue.setText("{:3d}".format(val))
+            self.updateX(val) 
   
-    def yoffSet(self, val):     
-        self.shadow.setY(val)
-        self.cas.yoffValue.setText("{:3d}".format(val))
-        self.updateY(val) 
+    def yoffSet(self, val):  
+        if self.file != "":  
+            self.shadow.setY(val)
+            self.cas.yoffValue.setText("{:3d}".format(val))
+            self.updateY(val) 
         
     def opacity(self, val):
-        self.alpha = (val/100)
-        self.shadow.setOpacity(self.alpha)
-        self.cas.opacityValue.setText("{:3d}".format(val)) 
+        if self.file != "":
+            self.alpha = (val/100)
+            self.shadow.setOpacity(self.alpha)
+            self.cas.opacityValue.setText("{:3d}".format(val)) 
   
 ### --------------------------------------------------------
     def updateX(self, val):
@@ -450,16 +453,19 @@ class Caster(QWidget):
     def enableSliders(self, bool=False): 
         self.sliderGroup.setEnabled(bool)
         
-    def openFiles(self):
+    def openFiles(self):  ## must be a transparent .png file
         Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self,
-            "Choose an image file to open", "", "Images Files( *.jpg *.png)")
-        if file and file.lower().endswith('.png') or file.lower().endswith('.jpg'):
+        file, _ = Q.getOpenFileName(self,   ## these dialogs don't work
+            "Choose an image file to open", "", "Images Files( *.png)")
+        if file and file.lower().endswith('.png'):
             self.display.scene.clear()
             self.display.init()
             self.enableSliders(True)  
             self.display.addPixmap(file)
-            self.display.resetSliders()       
+            self.display.resetSliders()    
+        else:          
+            QMessageBox.about(None, "", "Must be a transparent .png file") 
+            return   
                               
     def setSliders(self):     
         self.sliderGroup = QLabel()
