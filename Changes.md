@@ -1,6 +1,6 @@
 ## Changes
-**February 27, 2022:**  
-Replaced **PIL** with **cv2**.  Still runs slow from a dead start but one less library to load.
+**February 27-28, 2022:**  
+Replaced **PIL** with **cv2**.  Still runs slow from a dead start but one less library to load.  Changes to insure only .pngs get loaded with the **Files** button.
 
 
 **February 22, 2022:**   
