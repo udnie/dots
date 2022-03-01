@@ -453,9 +453,9 @@ class Caster(QWidget):
     def enableSliders(self, bool=False): 
         self.sliderGroup.setEnabled(bool)
         
-    def openFiles(self):  ## must be a transparent .png file
-        Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self,   ## these dialogs don't work
+    def openFiles(self):  ## filter for *.png - may not be transparent
+        Q = QFileDialog() 
+        file, _ = Q.getOpenFileName(self,  ## these dialogs don't work
             "Choose an image file to open", "", "Images Files( *.png)")
         if file and file.lower().endswith('.png'):
             self.display.scene.clear()
@@ -463,8 +463,7 @@ class Caster(QWidget):
             self.enableSliders(True)  
             self.display.addPixmap(file)
             self.display.resetSliders()    
-        else:          
-            QMessageBox.about(None, "", "Must be a transparent .png file") 
+        else:           
             return   
                               
     def setSliders(self):     
