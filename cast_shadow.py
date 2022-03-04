@@ -206,7 +206,7 @@ class Display(QWidget):
         
     def setPerspective(self):                            
         p = []
-        for i in range(4):  ## get currnet location of points from path
+        for i in range(4):  ## get current location of points from path
             x,y = int(self.path[i].x()), int(self.path[i].y()) 
             p.append([x,y])
             
@@ -219,6 +219,9 @@ class Display(QWidget):
     
         height, width, _ = img.shape
         bytesPerLine = 4 * width  ## 4 bits of information
+        
+        img = cv2.resize(np.array(img), (width, height))  ## helps smooth out edges
+        img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT) 
         
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)
         img.smoothScaled(width, height)  
