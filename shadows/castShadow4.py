@@ -388,7 +388,7 @@ class ShadowFab(QWidget):  ## handles shadow, outline, menu
                 if pixel[-1] != 0:  ## not transparent      
                     wuf[i,j] = (20,20,20,255)
                                         
-        img = cv2.resize(np.array(wuf), (w, h))
+        img = cv2.resize(np.array(wuf), (w, h), interpolation = cv2.INTER_CUBIC)
         img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT)
                 
         self.addShadow(img, parent)
@@ -449,7 +449,7 @@ class ShadowFab(QWidget):  ## handles shadow, outline, menu
         height, width, ch = img.shape
         bytesPerLine = ch * width  ## 4 bits of information
          
-        img = cv2.resize(img, (width, height))  ## helps smooth out edges
+        img = cv2.resize(img, (width, height), interpolation = cv2.INTER_CUBIC)  ## helps smooth out edges
         img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT) 
               
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)
