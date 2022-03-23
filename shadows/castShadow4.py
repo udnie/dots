@@ -156,7 +156,7 @@ class ShadowMenu(QWidget):  ## a true widget
         self.scaleSlider.setTickInterval(10)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
         
-        self.opacityValue = QLabel("1.00")
+        self.opacityValue = QLabel(".50")
         self.opacitySlider = QSlider(Qt.Orientation.Vertical,                   
             minimum=0, maximum=100, singleStep=1, value=50)
         self.opacitySlider.setFocusPolicy(Qt.StrongFocus)
