@@ -3,14 +3,14 @@ import sys
 import platform
 import os
 
-from PyQt5.QtCore    import QTimer
-from PyQt5.QtWidgets import QApplication, QStatusBar, QMainWindow
+from PyQt5.QtCore     import QTimer
+from PyQt5.QtWidgets  import QApplication, QStatusBar, QMainWindow
 
-import dotsDropCanvas   as canvas
+from dotsShared       import common
+from dotsDocks        import *
 
-from dotsShared     import common
-from dotsDocks      import *
- 
+import dotsDropCanvas as canvas
+
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widget panels, and
     buttons. See dotsShared.py for the common and paths dictionaries 

@@ -79,7 +79,7 @@ class BkgItem(QGraphicsPixmapItem):
         e.accept()
 
     def setMirrored(self, mirror):
-        sideCar.mirrorSet(self, mirror)
+        sideCar.setMirror(self, mirror)
 
     def centerBkg(self):  
         b = self.boundingRect()
@@ -100,8 +100,8 @@ class BkgItem(QGraphicsPixmapItem):
 
     def setBkgOpacity(self, value):
         self.centerBkg()
-        self.opacity = value
-        self.setOpacity(self.opacity)
+        # self.opacity = value
+        self.setOpacity(value)
 
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):
@@ -115,6 +115,7 @@ class Flat(QGraphicsPixmapItem):
         
         self.type = 'bkg'
         self.color = color
+        
         self.fileName = 'flat'
         self.key = ""
         self.id = 0   
@@ -177,11 +178,8 @@ class InitBkg(QWidget):
             "Choose an image file to open", paths["bkgPath"],
             "Images Files(*.bmp *.jpg *.png *.bkg)")
         if file:
-            if file.endswith('.bkg'):
-                self.openBkgFile(file)
-            else:
-                self.addBkg(file)
-
+            self.openBkgFile(file) if file.endswith('.bkg') else self.addBkg(file)
+                
     def addBkg(self, file, flopped=False): ## also used by saveBkg'
         if self.canvas.pathMakerOn == False:
             if self.mapper.isMapSet():

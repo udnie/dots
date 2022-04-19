@@ -1,4 +1,26 @@
 ## Changes
+**April 2022:**	 
+I've added shadow emulation to the mix but have it turned off as some folks may not share my interests in shadows and having it on adds 10-12 seconds to dots' startup time which may not be a great first-time user experience.  The two examples below give you the file names and snapshots of what code needs to tweaked inorder to have shadows working.  Comment one line off, uncomment the other line on. Save the files and restart dots. Next load shadowdemo.play and you should have 8 screen items and 8 shadows appearing as in the video. The time can vary but on my 6 year old Mac it's taking around 4 seconds for the shadows to appear once the screen items are up.  I'm using asyncio to restore shadows which has help to make the process 2 to 3 times faster then my first attempts. **cv2 and numpy are required** in order to add shadows.
+
+#### dotsPixItem.py
+
+```
+# from dotsShadowMaker    import ShadowMaker  ## add shadows
+from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+
+```
+##### dotsSideShow.py
+
+```
+# from dotsShadowWorks    import Shadow  ## adds shadows
+from dotsShadow_Dummy    import Shadow  ## turns off shadows
+
+```
+To create a shadow right-mouse click on a screen item and click on the top button labeled 'Shadow' which appears on the pixItem widget. This will work if there are no screen items selected.  See the keys.pdf for more on right-mouse click usage. If you right-mouse click on the shadow it's widget will appear.  I've colored the widgets yellow for pixItems and blue for the shadows to more easily tell them apart. There's only shadow per pixItem and deleting a pixItem deletes it's shadow.  You can't add shadows to frames or bats and you can't add animations to shadows. **Shift-W** will clear all widgets rather than closing them one at a time.  
+
+I added a few lines to dotsSideShow.py that can output the keys and values of a play file as it's loaded and format it for csv.  There's a shadowdemo.csv in the play folder of the output to view in your default spreadsheet app, makes it more readable. Also added a mouse-over tag to alert you if a pixItem is locked. Beats wondering why you can't move it. Lastly, the bat-wing has been replaced with the actual screen bat. Yet another video:
+
+
 **March 2022:**  
 I'm pretty sure **castShadow4.py**, is the last of the shadow apps. It requires both **numpy** and **cv2.** I didn't bother to demo **castShadow3.py** as it was more of an interim process. These two files and the other **'shadow'** files starting with **shadow.py** have been moved to their own folder, **dots/shadows**.  Thanks to Stack Over Flow for rounded corners and borders.  Latest video: <https://youtu.be/yqCDZHhBBww>
 

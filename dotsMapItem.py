@@ -252,6 +252,8 @@ class InitMap:
             y = y - 20
         else:
             token = self.parent.control
+            
+        if tag == 'UnLocked': color = 'orange'
 
         tag = TagIt(token, tag, color, pix.zValue())
         tag.setPos(x,y)

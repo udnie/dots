@@ -12,7 +12,7 @@ DFTKeys   = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T)
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
-ShiftKeys = (Qt.Key.Key_D,Qt.Key.Key_P,Qt.Key.Key_T,Qt.Key.Key_V)
+ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_W)
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -101,14 +101,16 @@ class ControlView(QGraphicsView):
     ## best location for reading keys - especially arrow keys
     def keyPressEvent(self, e):
         key = e.key() 
-        mod = e.modifiers()     
+        mod = e.modifiers()   
+          
         ## special keys - may differ in another OS
         if e.key() == 33 and self.canvas.pathMakerOn:
             self.setKey('!')
         elif e.key() == 64 and self.canvas.pathMakerOn:
             self.setKey('@')
-        elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
+        elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
+            
         ## handle shift keys   
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in ShiftKeys:
             if key == Qt.Key.Key_D:   
@@ -120,8 +122,13 @@ class ControlView(QGraphicsView):
                 self.canvas.mapper.toggleTagItems('select')     
             elif key == Qt.Key.Key_V:
                 self.startProcess()
+            elif key == Qt.Key.Key_W:
+                self.sideCar.shadowTime()
+                
+        ## shift key and lock keys
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
-            self.canvas.togglePixLocks(singleKeys[key])   
+            self.canvas.togglePixLocks(singleKeys[key])  
+                     
         elif key in DFTKeys:
             if key == Qt.Key.Key_D:  
                 self.setKey('D') 
@@ -134,12 +141,16 @@ class ControlView(QGraphicsView):
                     self.setKey('T')  ## run test
                 else:  
                     self.canvas.mapper.toggleTagItems('all')
+                                   
         elif key in self.direct: 
             self.direct[key]()  
+            
         elif key in self.toggleKeys:
             self.toggleKeys[key]()  
+            
         elif key in singleKeys:  ## in dotsShared.py  
             self.setKey(singleKeys[key]) 
+            
         elif e.key() in ExitKeys:
             self.canvas.exit() 
 

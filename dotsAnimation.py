@@ -65,7 +65,7 @@ class Animation:
         ## this function returns an animation to a pixitem
         if anime == 'Random':
             anime = self._random()   ## add the animation type to the tag
-            pix.tag = pix.tag + ',' + anime 
+            pix.tag = pix.tag + ':' + anime 
 
         if anime in self.singleFunctions:  ## thanks again to Martin
             fn = self.singleFunctions[anime]  ## objects passed as functions
@@ -173,8 +173,9 @@ def fin(pix):            ## delete pixitem
 
     sync = random.randint(6,10) * 75
     rot = 270 
+    
     if not random.randint(0,1): rot = -270
-
+    
     rotate = QPropertyAnimation(node, b'rotate')
     rotate.setDuration(int(sync))
     rotate.setStartValue(node.pix.rotation)
@@ -187,6 +188,7 @@ def fin(pix):            ## delete pixitem
 
     scale = QPropertyAnimation(node, b'scale')
     scale.setDuration(int(sync))
+        
     scale.setStartValue(node.pix.scale)
     scale.setEndValue(node.pix.scale*.25)
 
@@ -222,6 +224,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
 
     scale = QPropertyAnimation(node, b'scale')
     scale.setDuration(int(sync))
+                  
     scale.setStartValue(node.pix.scale)
     scale.setEndValue(pix.scale)
 

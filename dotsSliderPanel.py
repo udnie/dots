@@ -232,5 +232,5 @@ class TableModel(QAbstractTableModel):
             return self.header[col]
         return None
 
-### -------------------- dotssliderPanel -------------------
+### -------------------- dotsSliderPanel -------------------
 

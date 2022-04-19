@@ -2,10 +2,11 @@
 import random
 import json
 
-from PyQt5.QtCore    import Qt, QPointF 
-from PyQt5.QtGui     import QCursor, QPixmap, QPen, QColor, QGuiApplication
+from PyQt5.QtCore    import Qt, QPointF
+from PyQt5.QtGui     import QPixmap, QPen, QColor, QGuiApplication
 from PyQt5.QtWidgets import QGraphicsPixmapItem, QFileDialog, \
-                            QGraphicsItemGroup, QGraphicsLineItem \
+                            QGraphicsItemGroup, QGraphicsLineItem, \
+                            QApplication
                            
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
@@ -29,25 +30,52 @@ class SideCar:
 
 ### --------------------------------------------------------
     ''' Things to know about wings. They're brittle, don't pull on them.
-    Use the bat portion to move the bat - the pivot sprite which can be 
-    found in the images folder. Main thing to know, if you need to move 
+    Use the bat portion to move the bat - the pivot sprite and the wing 
+    are in the images folder. Main thing to know, if you need to move 
     or change an animation - do so, save it, clear and reload.
     They're brittle. And it works, even better now. '''
 ### --------------------------------------------------------
-    def wings(self, pix):
-        rightWing = pix
-        pathTag = pix.tag
-  
+    def wings(self, x, y, tag):
+        self.canvas.pixCount += 1         
+        pivot = PixItem(paths["imagePath"] + 'bat-pivot.png', 
+            self.canvas.pixCount,
+            x, y,  
+            self.canvas
+        ) 
+        pivot.part = 'pivot' 
+        pivot.tag  = tag
+        pivot.setZValue(pivot.zValue() + 200)
+        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True) 
+        ''' magic numbers warning - results will vary - seems
+            to be working for bat wings if loaded using file chooser'''    
+        half = pivot.width/2     ## looking better
+        height = pivot.height/5  ## good guess, close
+        try:
+            ## another correction -5 for y
+            # pivot.setPos(pivot.x - half, pivot.y - height - 5)
+            pivot.setScale(.55)
+            pivot.setOriginPt() 
+        except IOError:
+            pass  
+          
+        self.canvas.pixCount += 1
+        rightWing = PixItem(paths["imagePath"] + 'bat-wings.png', 
+            self.canvas.pixCount,
+            x -20, y, 
+            self.canvas,
+            False,
+        )  ## flop it
+ 
         rightWing.part = 'right'
         rightWing.tag  = 'Flapper'  ## applies this animation when run
         rightWing.setZValue(rightWing.zValue() + 200)  ## reset wing zvals
         rightWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
         rightWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
-        
+              
         self.canvas.pixCount += 1
-        leftWing = PixItem(rightWing.fileName, 
+        leftWing = PixItem(paths["imagePath"] + 'bat-wings.png', 
             self.canvas.pixCount,
-            pix.x + pix.width, pix.y, 
+            x + rightWing.width, y, 
             self.canvas,
             True
         )  ## flop it
@@ -58,28 +86,6 @@ class SideCar:
         leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False) 
         leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
        
-        self.canvas.pixCount += 1
-        pivot = PixItem(paths["imagePath"] + 'bat-pivot.png', 
-            self.canvas.pixCount,
-            pix.x, pix.y,  
-            self.canvas
-        ) 
-
-        pivot.part = 'pivot' 
-        pivot.tag = pathTag 
-        pivot.setZValue(pivot.zValue() + 200)
-        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True) 
-
-        ''' magic numbers warning - results will vary - seems
-            to be working for bat wings if loaded using file chooser'''    
-        half = pivot.width/2     ## looking better
-        height = pivot.height/5  ## good guess, close
-
-        ## another correction -5 for y
-        pivot.setPos(pivot.x - half, pivot.y - height - 5)
-        pivot.setScale(.55)
-        pivot.setOriginPt()
-
         ## center wings around pivot
         rightWing.setPos(half+10, height+2)
         leftWing.setPos(-leftWing.width+(half+5), height)
@@ -90,6 +96,22 @@ class SideCar:
 
         self.scene.addItem(pivot) 
 
+### --------------------------------------------------------
+    def transFormPixItem(self, pix, rotation, scale, alpha2):
+        op = QPointF(pix.width/2, pix.height/2)
+        pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
+        pix.setTransformOriginPoint(op)
+         
+        pix.rotation = rotation
+        pix.scale    = scale 
+        pix.alpha2   = alpha2
+        
+        pix.setRotation(pix.rotation)         
+        pix.setScale(pix.scale)     
+        pix.setOpacity(pix.alpha2)
+                
+        self.scene.addItem(pix)
+            
 ### --------------------------------------------------------
     def pixTest(self):
         if not self.canvas.pathMakerOn:  
@@ -113,25 +135,22 @@ class SideCar:
                 pix.x, pix.y = x, y
                 pix.setPos(x,y)
                 rotation = random.randrange(-5, 5) * 5
-                scale = random.randrange(95, 105)/100.0
-                self.transFormPixItem(pix, rotation, scale)
-         
-    def transFormPixItem(self, pix, rotation, scale):
-        op = QPointF(pix.width/2, pix.height/2)
-        pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-        pix.setTransformOriginPoint(op)
-        pix.scale, pix.rotation = scale, rotation
-        pix.setScale(scale)
-        pix.setRotation(rotation)
-
-        if 'wings' in pix.fileName:  
-            self.wings(pix)
-        else:
-            self.scene.addItem(pix)
-
-    def xy(self, max):
-        return random.randrange(-40, max+40)
-
+                scale = random.randrange(90, 110)/100.0
+                self.transFormPixItem(pix, rotation, scale, 1.0)
+                                    
+### --------------------------------------------------------                             
+    def shadowTime(self):
+        self.clearWidgets() 
+        for pix in self.scene.items(): 
+            if pix.type == 'pix' and pix.shadow != None:
+                if pix.shadowMaker.ishidden == False:
+                    pix.shadowMaker.hideAll()        
+                           
+    def clearWidgets(self):                       
+        for widget in QApplication.allWidgets():  ## note!!
+            if widget.accessibleName() == 'widget':  ## shadow menu/widget
+                widget.close()                     
+                                                                  
 ### --------------------------------------------------------
     def toggleGrid(self):
         if self.gridGroup is not None:
@@ -162,10 +181,11 @@ class SideCar:
         self.gridGroup.addToGroup(line)
 
     def gridCount(self):  
-        return sum(
-            pix.type == 'grid' 
-            for pix in self.canvas.scene.items()
-        )
+        return sum(pix.type == 'grid' 
+            for pix in self.canvas.scene.items())
+        
+    def xy(self, max):
+        return random.randrange(-40, max+40)
 
 ### ------------------ moved from sideShow -----------------
     def setPauseKey(self):        
@@ -212,7 +232,7 @@ class SideCar:
             return
 
 ### --------------------------------------------------------
-def mirrorSet(self, mirror):
+def setMirror(self, mirror):
     self.flopped = mirror   
     self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
         horizontal=self.flopped, vertical=False)))

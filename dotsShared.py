@@ -24,6 +24,7 @@ common = {
     "Star":    .70,
     "Type":    106,
     "Margin":   13,
+    "V":      12.0,
     "runThis":  "demo.play",
 }
           

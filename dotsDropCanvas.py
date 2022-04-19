@@ -4,7 +4,9 @@ import os
 import gc
 
 from PyQt5.QtCore    import QAbstractAnimation, QTimer, QEvent
-from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene
+from PyQt5.QtGui     import QTransform
+from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene, \
+                            QApplication
                        
 from dotsShared      import common, CanvasStr, PathStr, MoveKeys, PlayKeys
 from dotsAnimation   import *
@@ -21,9 +23,6 @@ from dotsScrollPanel import ScrollPanel
 from dotsDocks       import *
 
 Loops = ('L','R','P','S')
-
-## -- for testing and comparison ----------------
-# from pubsub  import pub      # PyPubSub - required
 
 ### -------------------- dotsDropCanvas --------------------
 ''' dotsDropCanvas: program hub/canvas, includes context menu and 
@@ -101,11 +100,6 @@ class DropCanvas(QWidget):
         elif self.key in PathStr:  ## send key to pathMaker
             self.pathMaker.pathKeys(self.key)
 
-        # pub.sendMessage('setKeys', key=key)  ## pypubsub solution   
-        # if used - requires some work to coordinate with mapper
-        # if self.mapper.mapSet: ## already in sendPixKeys
-        #     self.mapper.updateMap()  ## redraw mapper
-
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e):  ## used by mapper for selecting
         if not self.pathMakerOn:      
@@ -115,11 +109,15 @@ class DropCanvas(QWidget):
                 self.mapper.clearTagGroup()  ## chks if set
                 if self.key == 'cmd':        ## only used by eventFilter
                     self.mapper.clearMap()   ## set rubberband if mapset
-                    self.unSelect()
+                    self.unSelect()      
                 elif self.hasHiddenPix() or self.mapper.selections:
                     if self.control not in PlayKeys:
-                        self.mapper.updatePixItemPos()
-
+                        self.mapper.updatePixItemPos()     
+                ## show play files on right mouse click if nothing at location       
+                elif e.button() == Qt.MouseButton.RightButton:
+                    if len(self.scene.items()) == 0:
+                        self.sideShow.loadPlay()
+        
             elif e.type() == QEvent.Type.MouseMove:
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
@@ -145,33 +143,28 @@ class DropCanvas(QWidget):
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
-                if self.mapper.selections or self.hasHiddenPix():
-                    if self.mapper.isMapSet():
+                ## do this if nothing at location
+                if p := self.scene.itemAt(QPoint(e.pos()), QTransform()):
+                    if p != None and p.type != 'pix' and self.mapper.isMapSet():
                         self.mapper.removeMap()
                         self.setKeys('noMap')    
        
-            if e.type() == QEvent.Type.MouseButtonPress and \
-                e.button() == Qt.MouseButton.RightButton:
-                if len(self.scene.selectedItems()) == 0:
-                    self.sideShow.loadPlay()
-
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, imgFile, x, y, clone, mirror):  
-        self.pixCount += 1  
-        pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
-        if clone != None:  ## clone it
-            self.sideCar.transFormPixItem(pix,
-                clone.rotation,
-                clone.scale * random.randrange(95, 105)/100.0)
-
-        elif 'wings' in imgFile:  ## see dotsSideCar for wings
-            self.sideCar.wings(pix)
-
+        if 'wings' in imgFile:  ## see dotsSideCar for wings
+            self.sideCar.wings(x, y, '')        
         else:
-            if 'frame' in pix.fileName:  ## pin it on dnd
+            self.pixCount += 1  
+            pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
+            if clone != None:  ## clone it
+                self.sideCar.transFormPixItem(pix,
+                    clone.rotation,
+                    clone.scale * random.randrange(95, 105)/100.0,
+                    pix.alpha2)
+            elif 'frame' in pix.fileName:  ## pin it on dnd
                 pix.setPos(0,0)
                 pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
             self.scene.addItem(pix)
@@ -204,13 +197,13 @@ class DropCanvas(QWidget):
         self.mapper.toggleTagItems(stub)
 
     def exit(self):
-        self.clear()
+        self.clear()     
         QTimer.singleShot(250, self.dots.close)
 
-    def clear(self):
-        if self.pathMakerOn:
-            self.pathMaker.pathMakerOff()
+    def clear(self):  ## do this before exiting app
+        self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()
+        self.sideCar.clearWidgets()
         self.sideShow.stop('clear')
         self.initBkg.disableBkgBtns()
         self.dots.statusBar.clearMessage()
@@ -227,7 +220,7 @@ class DropCanvas(QWidget):
  
     def selectAll(self):
         for pix in self.scene.items():
-            if pix.type == 'pix':
+            if pix.type in ('pix', 'shadow'):
                 pix.setSelected(True)
                 pix.isHidden = False
             elif pix.zValue() <= common["pathZ"]:
@@ -248,14 +241,14 @@ class DropCanvas(QWidget):
     def deleteSelected(self):  ## self.pathMakerOn equals false
         self.mapper.clearMap()
         self.mapper.clearTagGroup()
-        for pix in self.scene.selectedItems():
+        for pix in self.scene.selectedItems():       
             if pix.type == 'pix':  ## could be something else
                 if pix.anime != None and \
                     pix.anime.state() == QAbstractAnimation.State.Running:
                     pix.anime.stop()  
-            pix.setSelected(False)
-            pix.deletePix()
-            del pix
+                pix.setSelected(False)
+                pix.deletePix()  ## deletes shadow as well 
+                del pix
         self.sideCar.enablePlay()  ## stop it - otherwise it's hung
         gc.collect()
     
@@ -335,6 +328,8 @@ class DropCanvas(QWidget):
         if self.mapper.tagSet and tag == "Clear Tags":
             self.mapper.clearTagGroup()
         for pix in self.scene.selectedItems(): 
+            if pix.type != 'pix':
+                continue
             if tag == "Clear Tags":
                 pix.tag = ''
             else:

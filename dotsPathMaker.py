@@ -207,14 +207,15 @@ class PathMaker(QWidget):
         self.initThis()
       
     def pathMakerOff(self):
-        self.delete()   
-        self.canvas.pathMakerOn = False
-        self.canvas.initBkg.disableSetBkg() 
-        self.slider.enableSliders(False)
-        if self.slider.pathMenuSet:
-            self.slider.toggleMenu()
-        self.canvas.btnPathMaker.setStyleSheet(
-            "background-color: white")
+        if self.canvas.pathMakerOn:
+            self.delete()   
+            self.canvas.pathMakerOn = False
+            self.canvas.initBkg.disableSetBkg() 
+            self.slider.enableSliders(False)
+            if self.slider.pathMenuSet:
+                self.slider.toggleMenu()
+            self.canvas.btnPathMaker.setStyleSheet(
+                "background-color: white")
 
     def pathChooser(self): 
         if not self.pathChooserSet and not self.addingNewPath:
