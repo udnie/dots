@@ -1,8 +1,8 @@
 
-from PyQt5.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot, \
+from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot, \
                                QPropertyAnimation
-from PyQt5.QtGui        import QColor, QPen, QPixmap, QPainterPath
-from PyQt5.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonItem 
+from PyQt6.QtGui        import QColor, QPen, QPixmap, QPainterPath
+from PyQt6.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonItem 
 
 from dotsAnimation      import Node                           
 from dotsSideGig        import DoodleMaker, MsgBox, getColorStr

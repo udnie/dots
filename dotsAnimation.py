@@ -1,7 +1,7 @@
 
 import random
 
-from PyQt5.QtCore    import QPointF, pyqtProperty, QPropertyAnimation, \
+from PyQt6.QtCore    import QPointF, pyqtProperty, QPropertyAnimation, \
                             QParallelAnimationGroup, QSequentialAnimationGroup, \
                             QEasingCurve, QObject
 

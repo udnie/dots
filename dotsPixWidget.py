@@ -1,8 +1,8 @@
 
-from PyQt5.QtCore       import Qt, QPoint, QRectF
-from PyQt5.QtGui        import QColor, QPen, QPainterPath, QRegion, QTransform, \
+from PyQt6.QtCore       import Qt, QPoint, QRectF,  QPointF
+from PyQt6.QtGui        import QColor, QPen, QPainterPath, QRegion, QTransform, \
                                QPainter
-from PyQt5.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, \
+from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, \
                                QLabel, QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
                                                  
 ### -------------------- dotsPixWidget ---------------------
@@ -30,7 +30,7 @@ class PixWidget(QWidget):
         self.setStyleSheet("background-color: rgb(230,230,230)")
         self.setContentsMargins(-2,15,-2,-15) 
         
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
@@ -51,17 +51,17 @@ class PixWidget(QWidget):
         
     def paintEvent(self, e):  ## thanks stack over flow
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)   
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)   
         rectPath = QPainterPath()                      
         height = self.height()-5                    
         rectPath.addRoundedRect(QRectF(2, 2, self.width()-5, height), 5, 5)
-        painter.setPen(QPen(QColor(0,125,255), 3, Qt.SolidLine, 
-            Qt.RoundCap, Qt.RoundJoin))
+        painter.setPen(QPen(QColor(0,125,255), 3, Qt.PenStyle.SolidLine, 
+            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
         painter.setBrush(QColor(255,255,0,220))  ## yellow
         painter.drawPath(rectPath)
               
     def mousePressEvent(self, e):
-        self.save = e.globalPos()
+        self.save = e.globalPosition()
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -73,9 +73,9 @@ class PixWidget(QWidget):
         e.accept()
             
     def moveThis(self, e):
-        dif = QPoint(e.globalPos() - self.save)
-        self.move(self.pos() + dif) 
-        self.save = e.globalPos()
+        dif = e.globalPosition() - self.save      
+        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())) )
+        self.save = e.globalPosition()
             
     def mouseDoubleClickEvent(self, e):
         self.pix.closeWidget()
@@ -89,7 +89,7 @@ class PixWidget(QWidget):
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
         groupBox.setStyleSheet("background: rgb(245, 245, 245)")
    
-        self.rotateValue = QLabel("0", alignment=Qt.AlignCenter)
+        self.rotateValue = QLabel("0", alignment=Qt.AlignmentFlag.AlignCenter)
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
@@ -103,7 +103,7 @@ class PixWidget(QWidget):
         self.scaleValue = QLabel("1.00")
         self.scaleSlider = QSlider(Qt.Orientation.Vertical,                   
             minimum=50, maximum=200, singleStep=1, value=100)
-        self.scaleSlider.setFocusPolicy(Qt.StrongFocus)
+        self.scaleSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
@@ -111,7 +111,7 @@ class PixWidget(QWidget):
         self.opacityValue = QLabel("1.00")
         self.opacitySlider = QSlider(Qt.Orientation.Vertical,                   
             minimum=0, maximum=100, singleStep=1, value=100)
-        self.opacitySlider.setFocusPolicy(Qt.StrongFocus)
+        self.opacitySlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.opacitySlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.opacitySlider.setTickInterval(16)  
         self.opacitySlider.valueChanged.connect(self.Opacity)

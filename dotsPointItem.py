@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore    import QPointF, pyqtSlot
-from PyQt5.QtGui     import QColor
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt6.QtCore    import QPointF, pyqtSlot
+from PyQt6.QtGui     import QColor
+from PyQt6.QtWidgets import QGraphicsEllipseItem
    
 from dotsShared      import MoveKeys                         
 from dotsSideGig     import TagIt

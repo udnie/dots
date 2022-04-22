@@ -3,9 +3,9 @@ import random
 import os
 import gc
 
-from PyQt5.QtCore    import QAbstractAnimation, QTimer, QEvent
-from PyQt5.QtGui     import QTransform
-from PyQt5.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene, \
+from PyQt6.QtCore    import QAbstractAnimation, QTimer, QEvent, QPointF
+from PyQt6.QtGui     import QTransform
+from PyQt6.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene, \
                             QApplication
                        
 from dotsShared      import common, CanvasStr, PathStr, MoveKeys, PlayKeys
@@ -144,7 +144,7 @@ class DropCanvas(QWidget):
                 ## will unselect all - possibly a default as it works the 
                 ## same as single click outside the map area 
                 ## do this if nothing at location
-                if p := self.scene.itemAt(QPoint(e.pos()), QTransform()):
+                if p := self.scene.itemAt(QPointF(e.pos()), QTransform()):
                     if p != None and p.type != 'pix' and self.mapper.isMapSet():
                         self.mapper.removeMap()
                         self.setKeys('noMap')    
@@ -166,7 +166,7 @@ class DropCanvas(QWidget):
                     pix.alpha2)
             elif 'frame' in pix.fileName:  ## pin it on dnd
                 pix.setPos(0,0)
-                pix.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+                pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
             self.scene.addItem(pix)
         
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys

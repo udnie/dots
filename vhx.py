@@ -1,20 +1,19 @@
 import sys
-import PyQt5
 
-from PyQt5.QtCore    import Qt, QPointF
-from PyQt5.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
-from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget
+from PyQt6.QtCore    import Qt, QPointF
+from PyQt6.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
+from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)
-Ticks = (100,50,10)
+Ticks = (100,50,10)  ## how often to draw a line and size
 
 ctrWidth, ctrHeight = 600, 70
 
-# from PyQt5.QtCore import QT_VERSION_STR
-# from PyQt5.QtCore import PYQT_VERSION_STR
+# from PyQt6.QtCore import QT_VERSION_STR
+# from PyQt6.QtCore import PYQT_VERSION_STR
 
-# print( PyQt5.__version__ )
+# print( PyQt6.__version__ )
 # print("PyQt version:", PYQT_VERSION_STR) 
 # print("Python version:", QT_VERSION_STR)
 
@@ -26,8 +25,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
 
         self.resize(ctrWidth, ctrHeight)
 
-        # self.setWindowFlags(Qt.WindowType.Window.FramelessWindowHint)
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
         self.setWindowFlags(Qt.WindowType.Window| \
@@ -69,7 +67,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             self.drawVerticalLines(painter, metrics)  
 
     def drawHorizontalLines(self, painter, metrics): 
-        for t in Ticks:
+        for t in Ticks:  ## start at 100
             w = int(self.width() / t) 
             for i in range (1, w+1):
                 i = i * t
@@ -78,6 +76,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
                 p = p.width()
                 if t > 10:
                     painter.drawLine(i, 20, i, ctrHeight)
+                    if i == w * t: p = p + 4
                     painter.drawText(i-p, 15, txt)
                 else:  ## just draw lines
                     painter.drawLine(i, 35, i, ctrHeight)
@@ -113,11 +112,11 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             self.close()
 
     def mousePressEvent(self, e):
-        self.initXY = e.globalPos()
+        self.initXY = e.globalPosition()
         e.accept()
 
     def mouseMoveEvent(self, e):
-        delta = QPointF(e.globalPos() - self.initXY)
+        delta = QPointF(e.globalPosition() - self.initXY)
         x = self.x() + delta.x()
         y = self.y() + delta.y()
         ## leave some pixels on the screen -- 200px 
@@ -135,7 +134,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             elif x <= self.width()/2:
                 x = int(self.width()/2)
         self.move(int(x),int(y))
-        self.initXY = e.globalPos()
+        self.initXY = e.globalPosition()
         e.accept()
 
     def mouseDoubleClickEvent(self, e):

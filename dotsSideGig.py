@@ -3,10 +3,10 @@ import random
 import os
 import math
 
-from PyQt5.QtCore    import Qt, QTimer, QPointF, QRectF,QSize
-from PyQt5.QtGui     import QPainter, QBrush, QFontMetrics, \
+from PyQt6.QtCore    import Qt, QTimer, QPointF, QRectF,QSize
+from PyQt6.QtGui     import QPainter, QBrush, QFontMetrics, \
                             QPen, QPolygonF, QColor, QFont
-from PyQt5.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
+from PyQt6.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
                             QLabel, QScrollArea, QGridLayout, QVBoxLayout
 
 from dotsShared      import paths, pathcolors, PlayKeys

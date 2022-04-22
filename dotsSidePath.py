@@ -2,9 +2,9 @@
 import os
 import random
 
-from PyQt5.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
+from PyQt6.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
                                QParallelAnimationGroup, QSequentialAnimationGroup     
-from PyQt5.QtGui        import QPainterPath
+from PyQt6.QtGui        import QPainterPath
 
 from dotsShared         import paths
 from dotsSideGig        import MsgBox

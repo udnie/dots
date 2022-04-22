@@ -5,9 +5,9 @@ import random
 import os.path
 from os import path
 
-from PyQt5.QtCore    import Qt, QPointF, QPoint, pyqtSlot, QSize, QRect
-from PyQt5.QtGui     import QColor, QImage, QPixmap
-from PyQt5.QtWidgets import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
+from PyQt6.QtCore    import Qt, QPointF, QPoint, pyqtSlot, QSize, QRect
+from PyQt6.QtGui     import QColor, QImage, QPixmap
+from PyQt6.QtWidgets import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
                             QGraphicsPixmapItem
 
 from dotsSideGig     import MsgBox

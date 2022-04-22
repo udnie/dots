@@ -1,15 +1,15 @@
 
 import os
 
-from PyQt5.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot
-from PyQt5.QtGui        import QImage, QColor, QPen, QPixmap
-from PyQt5.QtWidgets    import QGraphicsPixmapItem
+from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot
+from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
+from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 
-# from dotsShadowMaker    import ShadowMaker  ## add shadows
-from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+from dotsShadowMaker    import ShadowMaker  ## add shadows
+# from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
@@ -142,7 +142,7 @@ class PixItem(QGraphicsPixmapItem):
     
     def mousePressEvent(self, e):    
         if self.canvas.control not in PlayKeys: 
-            if e.button() == Qt.RightButton:
+            if e.button() == Qt.MouseButton.RightButton:
                 if 'pivot' in self.fileName or 'frame' in self.fileName:
                     return
                 elif not self.scene.selectedItems():
@@ -169,7 +169,7 @@ class PixItem(QGraphicsPixmapItem):
                     p = self.zValue()+1  
                 self.setZValue(p)
                 self.mapper.toggleTagItems(self.id)
-            self.initX, self.initY = self.x, self.y  # set position
+            self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
             e.accept()
 
@@ -279,12 +279,12 @@ class PixItem(QGraphicsPixmapItem):
     def togglelock(self):
         if self.locked == False:
             self.locked = True
-            self.setFlag(QGraphicsPixmapItem.ItemIsMovable, False)
+            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
             self.mapper.toggleTagItems(self.id)  
             QTimer.singleShot(2000, self.mapper.clearTagGroup)  ## the other tag
         else:
             self.locked = False
-            self.setFlag(QGraphicsPixmapItem.ItemIsMovable, True)
+            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
             self.tag = 'UnLocked'
             self.mapper.toggleTagItems(self.id) 
             QTimer.singleShot(2000, self.mapper.clearTagGroup)

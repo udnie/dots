@@ -2,9 +2,9 @@
 import random
 import json
 
-from PyQt5.QtCore    import Qt, QPointF
-from PyQt5.QtGui     import QPixmap, QPen, QColor, QGuiApplication
-from PyQt5.QtWidgets import QGraphicsPixmapItem, QFileDialog, \
+from PyQt6.QtCore    import Qt, QPointF
+from PyQt6.QtGui     import QPixmap, QPen, QColor, QGuiApplication
+from PyQt6.QtWidgets import QGraphicsPixmapItem, QFileDialog, \
                             QGraphicsItemGroup, QGraphicsLineItem, \
                             QApplication
                            

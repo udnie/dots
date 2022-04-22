@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore    import Qt, QPointF, QEvent, QTimer
-from PyQt5.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
-from PyQt5.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsPolygonItem 
+from PyQt6.QtCore    import Qt, QPointF, QEvent, QTimer
+from PyQt6.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
+from PyQt6.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsPolygonItem 
                             
 from dotsShared      import common
 from dotsPointItem   import PointItem
@@ -109,7 +109,7 @@ class DrawsPaths(QWidget):
             self.deleteLasso()
         else:
             self.newLasso()
-            QGuiApplication.setOverrideCursor(QCursor(Qt.CrossCursor))
+            QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
 
     def newLasso(self):  
         self.lasso = []   
@@ -225,7 +225,8 @@ class DrawsPaths(QWidget):
         self.lasso.append(QPointF(pt))
         poly = self.drawPoly(self.lasso)  ## return a polygon
         for i in range(0, len(self.pathMaker.pts)):  
-            if poly.containsPoint(self.pathMaker.pts[i], True):  ## match 
+            p = QPointF(self.pathMaker.pts[i])
+            if poly.containsPoint(p, Qt.FillRule.WindingFill):  ## match 
                 if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
                     idx = self.pathMaker.selections.index(i)
                     # print("a ", i, idx, self.pathMaker.selections)

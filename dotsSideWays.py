@@ -2,9 +2,9 @@
 import math
 import os
 
-from PyQt5.QtCore    import QPointF, QTimer
-from PyQt5.QtGui     import QColor
-from PyQt5.QtWidgets import QFileDialog,  QGraphicsItemGroup
+from PyQt6.QtCore    import QPointF, QTimer
+from PyQt6.QtGui     import QColor
+from PyQt6.QtWidgets import QFileDialog,  QGraphicsItemGroup
 
 from dotsShared      import common, paths, RotateKeys
 from dotsSideGig     import MsgBox, getPts, TagIt

@@ -1,9 +1,9 @@
 
 import math
 
-from PyQt5.QtCore       import QObject, QPointF, QTimer
-from PyQt5.QtGui        import QImage, QPixmap, QPolygonF
-from PyQt5.QtWidgets    import QGraphicsPolygonItem
+from PyQt6.QtCore       import QObject, QPointF, QTimer
+from PyQt6.QtGui        import QImage, QPixmap, QPolygonF
+from PyQt6.QtWidgets    import QGraphicsPolygonItem
                            
 from dotsShadowWorks    import *
 from dotsShared         import common
@@ -58,8 +58,8 @@ class ShadowMaker:
                                                     
         img, width, height, bytesPerLine = initShadow(file, w, h, flop)
             
-        image = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)   
-        image.smoothScaled(width, height)  
+        image = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32)   
+        # image.smoothScaled(width, height)  ## doesn't work
         
         pixmap = QPixmap.fromImage(image)
               
@@ -125,8 +125,8 @@ class ShadowMaker:
             self.imgSize[1],
             self.cpy, self.viewW, self.viewH)
        
-        img = QImage(img.data, width, height, bytesPerLine, QImage.Format_ARGB32)
-        img.smoothScaled(width, height) 
+        img = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32)
+        ## img.smoothScaled(width, height)   ## still doesn't work
       
         pixmap = QPixmap.fromImage(img) 
         opacity = self.shadow.opacity()

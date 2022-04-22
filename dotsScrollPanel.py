@@ -1,10 +1,10 @@
 
 import os
 
-from PyQt5.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF
-from PyQt5.QtGui     import QPainter, QImage, QPen, QFont, \
+from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF
+from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
+from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
                             QFrame, QFileDialog, QLayout
 
 from dotsShared      import paths, Star, common

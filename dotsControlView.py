@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore    import Qt, pyqtSignal, QProcess
-from PyQt5.QtGui     import QPainter
-from PyQt5.QtWidgets import QGraphicsView
+from PyQt6.QtCore    import Qt, pyqtSignal, QProcess
+from PyQt6.QtGui     import QPainter
+from PyQt6.QtWidgets import QGraphicsView
 
 from dotsSideGig     import MsgBox
 from dotsShared      import singleKeys
@@ -93,8 +93,7 @@ class ControlView(QGraphicsView):
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.canvas.mapper.toFront(0)
-            # self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ##  PyQt5
-            self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(), 
+            self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(), 
                 None, False)
    
 ### -------------------------------------------------------

@@ -3,8 +3,8 @@ import sys
 import platform
 import os
 
-from PyQt5.QtCore     import QTimer
-from PyQt5.QtWidgets  import QApplication, QStatusBar, QMainWindow
+from PyQt6.QtCore     import QTimer
+from PyQt6.QtWidgets  import QApplication, QStatusBar, QMainWindow
 
 from dotsShared       import common
 from dotsDocks        import *
@@ -40,8 +40,8 @@ class DotsQt(QMainWindow):
 
         self.show()
 
-        from PyQt5.QtCore import QT_VERSION_STR
-        from PyQt5.QtCore import PYQT_VERSION_STR
+        from PyQt6.QtCore import QT_VERSION_STR
+        from PyQt6.QtCore import PYQT_VERSION_STR
 
         # print( PySide6.__version__ )
         # print("PyQt version:", PYQT_VERSION_STR) 

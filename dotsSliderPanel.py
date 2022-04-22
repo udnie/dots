@@ -1,6 +1,6 @@
 
-from PyQt5.QtCore     import Qt, pyqtSignal, QAbstractTableModel                    
-from PyQt5.QtWidgets  import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
+from PyQt6.QtCore     import Qt, pyqtSignal, QAbstractTableModel                    
+from PyQt6.QtWidgets  import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
                              QTableView, QHeaderView, QAbstractItemView, QLabel
                       
 from dotsShared       import keyMenu, pathMenu

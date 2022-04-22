@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
-from PyQt5.QtGui     import QColor, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
+from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
+from PyQt6.QtGui     import QColor, QPen
+from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
                             QGraphicsPixmapItem
 
 from dotsShared      import common

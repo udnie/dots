@@ -1,7 +1,7 @@
 
-from PyQt5.QtCore       import Qt
-from PyQt5.QtGui        import QGuiApplication 
-from PyQt5.QtWidgets    import QWidget, QDockWidget, QPushButton, \
+from PyQt6.QtCore       import Qt
+from PyQt6.QtGui        import QGuiApplication 
+from PyQt6.QtWidgets    import QWidget, QDockWidget, QPushButton, \
                                QGroupBox, QHBoxLayout, QVBoxLayout, QLayout
                        
 from dotsShared     import common

@@ -1,5 +1,5 @@
 
-from PyQt5.QtCore    import Qt
+from PyQt6.QtCore    import Qt
 
 ### --------------------- dotsShared.py --------------------
 ''' dotsShared: common data shared across classes and files '''
