@@ -1,6 +1,6 @@
 ## Changes
 **April 2022:**	
-### The News: I finally updated to PyQt6.3 and Python 3.10.4###
+### The News: I finally updated to PyQt6.3 and Python 3.10
 
 If you're on a Mac laptop running either Big Sur or Monterey you may experience this qt warning. 
 
