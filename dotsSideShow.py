@@ -345,7 +345,7 @@ class SideShow:
             "part":     pix.part,
         }               
             
-        if pix.shadowMaker.shadow != None:   
+        if pix.shadow != None:    
             shadow = {
                 "alpha":    float("{0:.2f}".format(pix.shadowMaker.alpha)),
                 "scalor":   float("{0:.2f}".format(pix.shadowMaker.scalor)),
