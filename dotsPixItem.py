@@ -8,8 +8,8 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 
-from dotsShadowMaker    import ShadowMaker  ## add shadows
-# from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+# from dotsShadowMaker    import ShadowMaker  ## add shadows
+from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
