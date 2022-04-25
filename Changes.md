@@ -9,7 +9,7 @@ If you're on a Mac laptop running either Big Sur or Monterey you may experience 
 
 The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another person has it as well.
 
-It appears that only one line that needs to be changed besides replacing 5.15 with 6.3 to run in PyQt6.3.  See line 96 in dotsControlView.py.
+It appears that only one line needs to be changed - besides replacing PyQt5 with PyQt6 inorder to run PyQt6.3.  See line 96 in dotsControlView.py.
 
 I also made some additions that aren't in the video, mainly to do with editing in pathMaker and centering backgrounds.  The big new stuff follows.
   
