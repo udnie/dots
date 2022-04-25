@@ -93,7 +93,8 @@ class ControlView(QGraphicsView):
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.canvas.mapper.toFront(0)
-            self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(), 
+            # self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(),  ## pyqt5 uses pos
+            self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ### pyqt6 take position
                 None, False)
    
 ### -------------------------------------------------------

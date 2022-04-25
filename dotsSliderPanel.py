@@ -1,11 +1,11 @@
 
 from PyQt6.QtCore     import Qt, pyqtSignal, QAbstractTableModel                    
-from PyQt6.QtWidgets  import QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
+from PyQt6.QtWidgets  import QPushButton, QWidget, QFrame, QSlider, QHBoxLayout, QVBoxLayout, \
                              QTableView, QHeaderView, QAbstractItemView, QLabel
                       
 from dotsShared       import keyMenu, pathMenu
 
-SliderW, SliderH, OffSet = 200, 685, 18
+SliderW, SliderH, OffSet = 195, 685, 20
 
 ### --------------------- dotssliderPanel ------------------
 ''' dotssliderPanel contains the TableGroup and the SliderGroup
@@ -67,8 +67,8 @@ class SliderPanel(QWidget):
 
         ## stylesheets set in self.setTableModel()
         self.setTableModel(keyMenu)
-        self.tableView.setColumnWidth(0, 50) 
-        self.tableView.setColumnWidth(1, 115)
+        self.tableView.setColumnWidth(0, 48) 
+        self.tableView.setColumnWidth(1, 110)
 
         return self.tableView
 
@@ -83,11 +83,11 @@ class SliderPanel(QWidget):
                 "QHeaderView::section{\n"
                 "background-color: rgb(144,238,144);\n"
                 "border: .5px solid lightgray;\n"
-                "font-size: 13px;\n"
+                "font-size: 12px;\n"
                 "}")  
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(144,238,144);\n"
-                "font-size: 13px;\n"
+                "font-size: 12px;\n"
                 "}")  
         else:
             header[1] = 'Action'
@@ -95,11 +95,11 @@ class SliderPanel(QWidget):
                 "QHeaderView::section{\n"
                 "background-color: rgb(220,220,220);\n"
                 "border: .5px solid lightgray;\n"
-                "font-size: 13px;\n"
+                "font-size: 12px;\n"
                 "}") 
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(220,220,220);\n"
-                "font-size: 13px;\n"
+                "font-size: 12px;\n"
                 "}")  
 
 ### --------------------------------------------------------
@@ -139,7 +139,10 @@ class SliderPanel(QWidget):
             valueChanged=self.setOpacity)
         self.opacitySldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.opacitySldr.setTickInterval(5)
-            
+        
+        self.ctrBtn = QPushButton("Center")
+        self.ctrBtn.clicked.connect(lambda: self.sliderSignal[str, int].emit("center", 0))
+               
         lbox = QHBoxLayout()    ## labels
         lbox.addWidget(rotateLabel)
         lbox.addSpacing(-2) 
@@ -164,6 +167,7 @@ class SliderPanel(QWidget):
         vbox.addLayout(lbox)
         vbox.addLayout(vabox)
         vbox.addLayout(sbox)
+        vbox.addWidget(self.ctrBtn)
 
         self.sliderGroup.setLayout(vbox)
         self.sliderGroup.setContentsMargins(-5, 5, 0, 10)

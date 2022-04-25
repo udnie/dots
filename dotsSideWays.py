@@ -40,29 +40,31 @@ class SideWays():
                 self.pathMaker.path.x()+x, 
                 self.pathMaker.path.y()+y)
             self.updatePts(float(x), float(y))
-
-    def flipPath(self):  
-        if self.pathMaker.editingPts == False:        
-            p = self.pathMaker.path.sceneBoundingRect()
-            max = p.y() + p.height()
-            for i in range(0, len(self.pathMaker.pts)):
-                self.pathMaker.pts[i] = QPointF(
-                    self.pathMaker.pts[i].x(), 
-                    max - self.pathMaker.pts[i].y() + p.y())
-            self.pathMaker.addPath()
+            self.gofish()  
+        
+    def flipPath(self):         
+        p = self.pathMaker.path.sceneBoundingRect()
+        max = p.y() + p.height()
+        for i in range(0, len(self.pathMaker.pts)):
+            self.pathMaker.pts[i] = QPointF(
+                self.pathMaker.pts[i].x(), 
+                max - self.pathMaker.pts[i].y() + p.y())
+        self.pathMaker.addPath()
+        self.gofish()  
   
-    def flopPath(self): 
-        if self.pathMaker.editingPts == False:  
-            p = self.pathMaker.path.sceneBoundingRect()
-            max = p.x() + p.width()
-            for i in range(0, len(self.pathMaker.pts)):
-                self.pathMaker.pts[i] = QPointF(
-                    max - self.pathMaker.pts[i].x() + p.x(), 
-                    self.pathMaker.pts[i].y())
-            self.pathMaker.addPath()
+    def flopPath(self):  
+        p = self.pathMaker.path.sceneBoundingRect()
+        max = p.x() + p.width()
+        for i in range(0, len(self.pathMaker.pts)):
+            self.pathMaker.pts[i] = QPointF(
+                max - self.pathMaker.pts[i].x() + p.x(), 
+                self.pathMaker.pts[i].y())
+        self.pathMaker.addPath()
+        self.gofish()  
 
     def fullPath(self):
         self.halfPath(True)
+        self.gofish()  
 
     def halfPath(self, full=False):
         if self.pathMaker.pathTestSet:
@@ -88,6 +90,7 @@ class SideWays():
         self.pathMaker.path.setPos(pos.x() + float(key[0]),
             pos.y() + float(key[1]))
         self.updatePts(float(key[0]), float(key[1]))
+        self.gofish()  
    
     def updatePts(self, x, y): 
         tmp = []
@@ -95,7 +98,7 @@ class SideWays():
             tmp.append(QPointF(p) + QPointF(x,y))
         self.pathMaker.pts = tmp
         del tmp
-
+        
     def reversePath(self):  
         if self.pathMaker.pts:
             if self.pathMaker.pathTestSet:
@@ -152,7 +155,13 @@ class SideWays():
             plotY = centerY + ydist * math.cos(math.radians(angle + inc))
            
             self.pathMaker.pts[i] = QPointF(plotX, plotY)
+            
         self.pathMaker.addPath()
+        self.gofish()   
+     
+    def gofish(self):
+        if self.pathMaker.selections == [] and self.pathMaker.editingPts == True:
+            self.drawing.updatePath()
      
 ### ----------------- load and save paths ------------------
     def openFiles(self):

@@ -106,7 +106,6 @@ class PathMaker(QWidget):
     @pyqtSlot(str)
     def pathKeys(self, key):
         self.key = key
-        
         if key in self.doFirst:
             self.doFirst[key]()  ## run the function, value
 
@@ -123,32 +122,32 @@ class PathMaker(QWidget):
                 self.drawing.editPointsOff()
                 self.drawing.editPoints()
             
-        elif self.editingPts == True and self.key == 'W':
+        elif self.key == 'W' and self.editingPts == True:
             self.sideWays.addWayPtTags()
 
         elif self.key == 'L' and self.editingPts == True:
             self.drawing.toggleLasso()
                                                                   
-        elif self.editingPts == True and self.key in self.editKeys:
-            self.editKeys[key]()  
+        elif self.key in self.editKeys and self.editingPts == True:
+            self.editKeys[self.key]()  
 
-        elif key in self.noPathKeysSet:  
-            self.noPathKeysSet[key]()  
+        elif self.key in self.noPathKeysSet:  
+            self.noPathKeysSet[self.key]()  
             if self.selections:
                 self.drawing.updatePath()
 
         elif self.sideWays.tagCount() == 0 and self.addingNewPath == False:
-            if key in self.direct: 
-                self.direct[key]() 
+            if self.key in self.direct: 
+                self.direct[self.key]() 
 
-            elif len(self.pts) > 0 and self.editingPts == False:
-                if key in MoveKeys: 
-                    self.sideWays.movePath(MoveKeys[key])
-                elif key in ScaleRotateKeys:
-                    self.sideWays.scaleRotate(key)
+            elif len(self.pts) > 0:  ## works with edit - no points selected
+                if self.key in MoveKeys and self.selections == []:
+                    self.sideWays.movePath(MoveKeys[self.key])
+                elif self.key in ScaleRotateKeys:
+                    self.sideWays.scaleRotate(self.key)
 
-        elif self.sideWays.tagCount() > 0 and key in self.WayPtsKeys:
-            self.WayPtsKeys[key]() 
+        elif self.sideWays.tagCount() > 0 and self.key in self.WayPtsKeys:
+            self.WayPtsKeys[self.key]() 
 
 ### --------------------- event filter ----------------------   
     def eventFilter(self, source, e):     
@@ -284,7 +283,7 @@ class PathMaker(QWidget):
                 path = self.setPaintPath(True)  ## close subpath, uses    
                 b = self.ball.boundingRect() 
                 pt = QPointF(b.width()/2, b.height()/2)
-                # print(path.length())  ## length of path in pixels?
+           
                 self.pathTestNode.setStartValue(path.pointAtPercent(0.0)-pt)
                 for i in range(1, 99):   
                     self.pathTestNode.setKeyValueAt(

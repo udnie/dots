@@ -1,1 +1,1 @@
-[{"fname": "apple.png", "type": "pix", "x": 299.0, "y": 124.0, "z": 1.0, "mirror": false, "rotation": 0, "scale": 1.01, "tag": "", "alpha2": 1.0, "locked": false, "part": "", "alpha": 0.32, "scalor": 1.16, "rotate": 360, "width": 125, "height": 137, "pathX": [135.92, 392.0, 282.08, 135.92], "pathY": [31.96, 51.0, 192.04, 192.04], "ishidden": false}]
+[{"fname": "bat-pivot.png", "type": "pix", "x": 219.0, "y": 344.0, "z": 201.0, "mirror": false, "rotation": 0, "scale": 1.0, "tag": "", "alpha2": 1.0, "locked": false, "part": "pivot"}]

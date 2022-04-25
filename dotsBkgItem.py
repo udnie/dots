@@ -52,13 +52,7 @@ class BkgItem(QGraphicsPixmapItem):
         self.setZValue(zval)
         self.isBackgroundSet = False
 
-        self.width = self.imgFile.width()
-        self.height = self.imgFile.height()
-
-        self.x = (self.ViewW - self.width)/2
-        self.y = (self.ViewH - self.height)/2
-
-        self.setPos(self.x, self.y)
+        self.centerBkg()
         self.setMirrored(False)
 
         self.setPixmap(QPixmap.fromImage(self.imgFile))
@@ -81,27 +75,32 @@ class BkgItem(QGraphicsPixmapItem):
     def setMirrored(self, mirror):
         sideCar.setMirror(self, mirror)
 
-    def centerBkg(self):  
+    def setOrigin(self):  
         b = self.boundingRect()
         op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
 
     def setBkgRotate(self, value):
-        self.centerBkg()
+        self.setOrigin()
         if value < 0:
             value = 0
         self.rotation = value
         self.setRotation(self.rotation)
 
     def setBkgScale(self, value):
-        self.centerBkg()
+        self.setOrigin()
         self.scale = value
         self.setScale(self.scale)
 
     def setBkgOpacity(self, value):
-        self.centerBkg()
-        # self.opacity = value
         self.setOpacity(value)
+
+    def centerBkg(self):
+        self.width = self.imgFile.width()
+        self.height = self.imgFile.height()
+        self.x = (self.ViewW - self.width)/2
+        self.y = (self.ViewH - self.height)/2
+        self.setPos(self.x, self.y)
 
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):
@@ -167,6 +166,8 @@ class InitBkg(QWidget):
             self.bkg.setBkgOpacity(val/100.0)
         elif key == 'lock':
             self.bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        elif key == 'center':
+            self.bkg.centerBkg()
         self.bkg.update()
 
 ### --------------------------------------------------------
@@ -188,7 +189,7 @@ class InitBkg(QWidget):
         self.scene.addItem(self.bkg)
         if file.endswith('-bkg.jpg'):
             self.bkg.setScale(1.003)   ## for white space???
-            self.bkg.centerBkg()
+            self.bkg.setOrigin()
             self.lockBkg()
         else:
             self.canvas.btnAddBkg.setEnabled(False)

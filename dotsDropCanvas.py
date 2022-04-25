@@ -95,9 +95,10 @@ class DropCanvas(QWidget):
                     self.sendPixKeys()
         ## send move keys to selected pointItems 
         elif self.pathMaker.drawing.pointItemsSet() == True and \
-            self.key in MoveKeys:
+            self.pathMaker.selections and self.key in MoveKeys:
                 self.sendPixKeys()
-        elif self.key in PathStr:  ## send key to pathMaker
+        ## send the rest to pathMaker
+        elif self.key in PathStr: 
             self.pathMaker.pathKeys(self.key)
 
 ### --------------------- event filter ---------------------- 
