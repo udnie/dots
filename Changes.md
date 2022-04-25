@@ -1,13 +1,17 @@
 ## Changes
 **April 2022:**	
-### The News: I finally updated to PyQt6.3 and Python 3.10.4
+### The News: I finally updated to PyQt6.3 and Python 3.10.4###
 
 If you're on a Mac laptop running either Big Sur or Monterey you may experience this qt warning. 
 
     qt.pointer.dispatch: delivering touch release to same window QWindow(0x0) not QWidgetWindow(0x7f888e691040, name="CasterClassWindow")
     qt.pointer.dispatch: skipping QEventPoint(id=1 ts=0 pos=0,0 scn=789.445,580.564 gbl=789.445,580.564 Released ellipse=(1x1 ∡ 0) vel=0,0 press=-789.445,-580.564 last=-789.445,-580.564 Δ 789.445,580.564) : no target window
 
-The easiest way to make it go away is to use a mouse. Read on.
+The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another person has it as well.
+
+It appears that only one line that needs to be changed besides replacing 5.15 with 6.3 to run in PyQt6.3.  See line 96 in dotsControlView.py.
+
+I also made some additions that aren't in the video, mainly to do with editing in pathMaker and centering backgrounds.  The big new stuff follows.
   
 I've added shadow emulation to the mix but have it turned off as some folks may not share my interests in shadows and having it on adds 10-12 seconds to dots' startup time which may not be a great first-time user experience.  The two examples below give you the file names and snapshots of what code needs to tweaked inorder to have shadows working.  Comment one line off, uncomment the other line on. Save the files and restart dots. Next load shadowdemo.play and you should have 8 screen items and 8 shadows appearing as in the video. The time can vary but on my 6 year old Mac it's taking around 4 seconds for the shadows to appear once the screen items are up.  I'm using asyncio to restore shadows which has help to make the process 2 to 3 times faster then my first attempts. **cv2 and numpy are required** in order to add shadows.
 
