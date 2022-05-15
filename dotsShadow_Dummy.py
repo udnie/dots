@@ -25,7 +25,7 @@ class ShadowMaker:
         pass
     
     def addShadow(self, width, height, viewW, viewH):
-        pass
+        return None
     
     def deleteShadow(self):
         pass
