@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 
-# from dotsShadowMaker    import ShadowMaker  ## add shadows
+##from dotsShadowMaker    import ShadowMaker  ## add shadows
 from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsSideCar    as sideCar
@@ -240,6 +240,7 @@ class PixItem(QGraphicsPixmapItem):
     def addShadow(self):
         self.shadowMaker.addShadow(self.width, self.height, common["ViewW"],common["ViewH"])
         self.closeWidget()
+        self.shadow = self.shadowMaker.shadow
         
     def setMirrored(self, bool): 
         self.flopped = bool
