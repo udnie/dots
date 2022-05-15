@@ -12,7 +12,7 @@ from PyQt6.QtWidgets import QGraphicsDropShadowEffect
 from dotsPixItem     import PixItem
 from dotsBkgItem     import *
 
-##from dotsShadowWorks    import Shadow  ## adds shadows
+#from dotsShadowWorks    import Shadow  ## adds shadows
 from dotsShadow_Dummy    import Shadow  ## turns off shadows
 
 from dotsShared      import common, paths

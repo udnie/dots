@@ -16,6 +16,7 @@ class ShadowMaker:
         self.scalor =  0
         self.rotate =  0
         self.imgSize = 0  
+        self.shadow  = None
         
         self.widget  = None
         
