@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsPolygonItem
                             
 from dotsShared      import common
 from dotsPointItem   import PointItem
+from dotsSideGig     import distance
 
 ### ------------------- dotsDrawsPaths ---------------------
 ''' dotsDrawsPaths: newPath, lasso, pointitems '''
@@ -22,6 +23,8 @@ class DrawsPaths(QWidget):
         self.sideWays  = sideWays
           
         self.dragCnt = 0 
+        self.last = 0
+        
         self.lassoSet = False
         self.polySet = False
         
@@ -32,14 +35,14 @@ class DrawsPaths(QWidget):
         self.view.viewport().installEventFilter(self)
              
 ### --------------------- event filter ----------------------          
-    def eventFilter(self, source, e):     
+    def eventFilter(self, source, e):  ## used by lasso    
         if self.canvas.pathMakerOn:
     
             if self.pathMaker.editingPts and self.lassoSet:
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.addLassoPts(e.pos()) 
-
+             
                 elif e.type() == QEvent.Type.MouseMove and \
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.dragCnt += 1
@@ -67,13 +70,15 @@ class DrawsPaths(QWidget):
         self.pathMaker.npts = 0
         self.pathMaker.pts = []
 
-    def addNewPathPts(self, pt): 
+    def addNewPathPts(self, pt):
         if self.pathMaker.npts == 0:
             self.pathMaker.pts.append(pt)
         self.pathMaker.npts += 1
-        if self.pathMaker.npts % 5 == 0:
-            self.pathMaker.pts.append(pt)
-            self.updateNewPath()
+        if self.pathMaker.npts % 5 == 0:    
+            if distance(pt.x(),self.last.x(), pt.y(), self.last.y()) > 15.0:
+                self.last = pt     
+                self.pathMaker.pts.append(pt)
+                self.updateNewPath()
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note

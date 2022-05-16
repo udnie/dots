@@ -233,5 +233,10 @@ def getColorStr():
     p = pathcolors
     return p[random.randint(0,len(p)-1)]
 
+def distance(x1, x2, y1, y2):
+    dx = x1 - x2
+    dy = y1 - y2
+    return math.sqrt((dx * dx ) + (dy * dy)) 
+
 ### --------------------- dotsSideGig ----------------------
 

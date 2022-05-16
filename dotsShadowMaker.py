@@ -7,6 +7,7 @@ from PyQt6.QtWidgets    import QGraphicsPolygonItem
                            
 from dotsShadowWorks    import *
 from dotsShared         import common
+from dotsSideGig        import distance
 
 V = common["V"]  ## the diameter of a pointItem, same as in ShadowWorks
        
@@ -79,7 +80,7 @@ class ShadowMaker:
         self.shadow.setOpacity(self.alpha)  
         self.shadow.setScale(self.scalor)
         self.shadow.setRotation(self.rotate)
-                         
+                          
         self.scene.addItem(self.shadow)
         
         QTimer.singleShot(100, self.shadow.initPoints)
@@ -333,11 +334,6 @@ class ShadowMaker:
         y = self.path[3].y() - self.path[1].y() 
         y = self.path[1].y() + ( y / 2 )
         return x, y
-                                              
-def distance(x1, x2, y1, y2):
-    dx = x1 - x2
-    dy = y1 - y2
-    return math.sqrt((dx * dx ) + (dy * dy))  
-    
+                                                  
 ### ------------------- dotsShadowMaker --------------------
                                                                                                                                                           

@@ -89,6 +89,8 @@ class PathMaker(QWidget):
         self.tag = ''
  
         self.npts = 0  ## used by addNewPathPts
+        self.last = 0
+        
         self.newPath = None
         self.addingNewPath = False
 
@@ -157,6 +159,7 @@ class PathMaker(QWidget):
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.drawing.npts = 0  
+                    self.drawing.last = e.pos()
                     self.drawing.addNewPathPts(QPoint(e.pos()))  
 
                 elif e.type() == QEvent.Type.MouseMove and \

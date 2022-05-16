@@ -40,10 +40,14 @@ class ImgLabel(QLabel):
             qp.setBrush(Qt.BrushStyle.NoBrush) 
         else:    
             img = QImage(self.imgFile)
-            newW, newH = self.scaleTo(img)
-            img = img.scaled(int(newW), int(newH),   
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)
+                        
+            if img.width() > common['MaxW'] or img.height() > common['MaxH']:  ## size it to fit       
+                img = img.scaled(common['MaxW'], common['MaxH'],  ## keep it small
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation)
+      
+            newW, newH = img.width(), img.height()
+          
             posX = ((common['LabelW'] - newW) /2 )
             posY = ((common['MaxH'] - newH) /2 ) + 9
             qp.drawImage(QPointF(posX, posY), img)
@@ -103,30 +107,8 @@ class ImgLabel(QLabel):
     def drawStar(self):
         poly = QPolygon()
         for s in Star:
-            poly.append(QPoint(s[0]-3, s[1])*common['Star'])
+            poly.append(QPoint(s[0],s[1])*common['Star'])
         return poly
-
-    def scaleTo(self, img):
-        W, H = img.width(), img.height()
-        newW, newH = common['MaxW'], common['MaxH']
-
-        if W == H:
-            newW, newH = common['MaxH'], common['MaxH']
-        elif W > H:
-            newW = common['MaxW']
-            p = common['MaxW']/ W
-            newH = p * H
-            if newH > common['MaxH']:
-                r = common['MaxH'] / newH
-                newH, newW = r * newH, newW * r
-        elif W < H:
-            newH = common['MaxH']
-            p = common['MaxH'] / H
-            newW = p * W
-            if newW > common['MaxW']:
-                r = common['MaxW']/ newW
-                newH, newW = r * newH, newW * r
-        return newW, newH   
 
 ### --------------------------------------------------------
 class ScrollPanel(QWidget):

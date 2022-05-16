@@ -7,7 +7,7 @@ from PyQt6.QtGui     import QColor
 from PyQt6.QtWidgets import QFileDialog,  QGraphicsItemGroup
 
 from dotsShared      import common, paths, RotateKeys
-from dotsSideGig     import MsgBox, getPts, TagIt
+from dotsSideGig     import MsgBox, getPts, TagIt, distance
 from dotsDrawsPaths  import DrawsPaths
  
 ScaleUpKeys = ('>','\"','\'')
@@ -297,11 +297,6 @@ class SideWays():
             for pix in self.scene.items()
         )
                 
-def distance(x1, x2, y1, y2):
-    dx = x1 - x2
-    dy = y1 - y2
-    return math.sqrt((dx * dx ) + (dy * dy))
-
 ### --------------------- dotsSideWays ---------------------
 
 
