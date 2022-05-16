@@ -1,6 +1,11 @@
 ## Changes
-**April 2022:**	
-### The News: I finally updated to PyQt6.3 and Python 3.10.4###
+**May 2022:**  
+A few bug fixes. I'm sorry for any inconveniences. 
+
+
+
+**April 2022:**
+#### The News: I finally updated to PyQt6.3 and Python 3.10.4###
 
 If you're on a Mac laptop running either Big Sur or Monterey you may experience this qt warning. 
 
@@ -9,7 +14,7 @@ If you're on a Mac laptop running either Big Sur or Monterey you may experience 
 
 The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another person has it as well.
 
-It appears that only one line of code needs to be changed - besides replacing PyQt6 with PyQt5 inorder to run PyQt5.  See line 96 in dotsControlView.py.
+It appears that only one line of code needs to be changed - besides replacing PyQt6 with PyQt6 inorder to run PyQt6.  See line 96 in dotsControlView.py.
 
 I also made some additions that aren't in the video, mainly to do with editing in pathMaker and centering backgrounds.  The big new stuff follows.
   
