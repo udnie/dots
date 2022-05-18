@@ -3,7 +3,7 @@ import random
 import os
 import math
 
-from PyQt6.QtCore    import Qt, QTimer, QPointF, QRectF,QSize
+from PyQt6.QtCore    import Qt, QTimer, QPointF, QRectF,QSize, QEvent
 from PyQt6.QtGui     import QPainter, QBrush, QFontMetrics, \
                             QPen, QPolygonF, QColor, QFont
 from PyQt6.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
@@ -142,7 +142,7 @@ class DoodleMaker(QWidget):
    
         vLayout = QVBoxLayout(self)
         vLayout.addWidget(scroll)
-
+                   
 ### --------------------------------------------------------
 class Doddle(QLabel):  
 ### --------------------------------------------------------
@@ -172,6 +172,9 @@ class Doddle(QLabel):
         return self.minimumSizeHint()
 
     def mousePressEvent(self, e): 
+        if e.type() == QEvent.Type.MouseButtonPress and \
+            e.button() == Qt.MouseButton.RightButton:
+            return
         self.pathMaker.pts = getPts(self.file)
         self.pathMaker.addPath()
         self.pathMaker.openPathFile = os.path.basename(self.file)

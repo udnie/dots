@@ -61,7 +61,7 @@ class PixWidget(QWidget):
         painter.drawPath(rectPath)
               
     def mousePressEvent(self, e):
-        self.save = e.globalPosition()
+        self.save = e.globalPosition()  ## works the best, needs to change for pyqt5
         e.accept()
 
     def mouseMoveEvent(self, e):

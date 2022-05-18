@@ -160,7 +160,7 @@ class SideWays():
         self.gofish()   
      
     def gofish(self):
-        if self.pathMaker.selections == [] and self.pathMaker.editingPts == True:
+        if self.pathMaker.editingPts == True:
             self.drawing.updatePath()
      
 ### ----------------- load and save paths ------------------
