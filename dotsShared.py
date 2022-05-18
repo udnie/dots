@@ -25,20 +25,47 @@ common = {
     "Type":    106,
     "Margin":   13,
     "V":      12.0,
-    "runThis":  "demo.play",
+    "runThis":  "botanical.play",
+    # --------------- test for video -----------------------
+    # "factor": 0.40,
+    # "DotsW":  1567,  # app width 
+    # "DotsH":   883,  # app height
+    # "ViewW":  1200,  # canvas width  32 X 36
+    # "ViewH":   800,  # canvas height 32 X 24
+    # "gridSize": 33.333,
+    # "ScrollW": 139,  
+    # "ScrollH": 738,   
+    # "LabelW":  120,
+    # "LabelH":  104,    
+    # "MaxW":     96,
+    # "MaxH":     77,  
+    # "Star":    .63,
+    # "Type":     98,
+    # "Margin":   10,
 }
           
 CanvasStr = "L,R,P,S,C,K,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
 PathStr = "C,D,E,F,L,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
-paths = {
+pathsX = {
     "snapShot":   "./",
     "bkgPath":    "./backgrounds/",
     "imagePath":  "./images/",
     "playPath":   "./plays/",
     "paths":      "./paths/",
     "spritePath": "./sprites/",
+}
+
+paths = {
+    "snapShot":     "/users/mel.tearle/Desktop/",  
+    "bkgPath":      "/users/mel.tearle/python/qt5/wrks/backgrounds/",
+    "imagePath":    "/users/mel.tearle/python/qt5/wrks/images/",
+    "playPath":     "/users/mel.tearle/python/qt5/wrks/plays/",
+    "spritePath":   "/users/mel.tearle/python/qt5/wrks/sprites/",
+    "paths":        "/users/mel.tearle/python/qt5/wrks/paths/",
+    "txy":          "/users/mel.tearle/python/qt5/wrks/txy/",
+    "xpaths":       "/users/mel.tearle/Desktop/java/txy/paths/",
 }
 
 Tick = 2.0
