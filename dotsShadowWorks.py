@@ -90,7 +90,7 @@ class ShadowWidget(QWidget):
         self.fab = parent
         
         self.type = 'widget'
-        self.save = QPoint(0,0)
+        self.save = QPointF(0.0,0.0)
                 
         self.setAccessibleName('widget')
                 
