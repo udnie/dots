@@ -169,6 +169,7 @@ class ControlView(QGraphicsView):
             # self.p.start("/on a mac - full  path to /vhx.app")  ## using autotmator
           
     def processFinished(self):
+        self.p.close()
         self.p = None
 
 ### ------------------ dotsControlView ---------------------
