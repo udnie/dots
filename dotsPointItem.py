@@ -57,19 +57,17 @@ class PointItem(QGraphicsEllipseItem):
             self.moveThis(MoveKeys[key])
                                     
     def hoverEnterEvent(self, e):
-        if self.pathMaker.editingPts == False:
-            if self.pathMaker.pathSet:  
-                pct = (self.idx/len(self.pathMaker.pts))*100
-                tag = self.pathMaker.sideWays.makePtsTag(self.pt, self.idx, pct)
-                self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
-                self.pointTag.setPos(self.pt+QPointF(0,-20))
-                self.pointTag.setZValue(self.drawing.findTop()+5)
-                self.scene.addItem(self.pointTag)
+        if self.pathMaker.pathSet:  
+            pct = (self.idx/len(self.pathMaker.pts))*100
+            tag = self.pathMaker.sideWays.makePtsTag(self.pt, self.idx, pct)
+            self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
+            self.pointTag.setPos(self.pt+QPointF(0,-20))
+            self.pointTag.setZValue(self.drawing.findTop()+5)
+            self.scene.addItem(self.pointTag)
         e.accept()
 
     def hoverLeaveEvent(self, e):
-        if self.pathMaker.editingPts == False:
-            self.removePointTag()  ## used twice
+        self.removePointTag()  ## used twice
         e.accept()
 
     def mousePressEvent(self, e):     
