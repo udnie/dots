@@ -160,14 +160,18 @@ class DropCanvas(QWidget):
         else:
             self.pixCount += 1  
             pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
-            if clone != None:  ## clone it
+                
+            if clone != None:  ## clone it                    
                 self.sideCar.transFormPixItem(pix,
-                    clone.rotation,
-                    clone.scale * random.randrange(95, 105)/100.0,
+                    clone[0],
+                    clone[1] * random.randrange(95, 105)/100.0,
                     pix.alpha2)
+                return
+        
             elif 'frame' in pix.fileName:  ## pin it on dnd
                 pix.setPos(0,0)
                 pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+            
             self.scene.addItem(pix)
         
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys

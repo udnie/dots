@@ -316,7 +316,7 @@ class PixItem(QGraphicsPixmapItem):
             self.fileName, 
             self.x+25, 
             self.y+10,
-            self,
+            (self.rotation, self.scale),
             self.flopped)
      
     def moveThis(self, key):
