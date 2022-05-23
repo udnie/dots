@@ -1,20 +1,19 @@
 ## Changes
 **May 2022:**  
-A few bug fixes. I'm sorry for any inconveniences. 
+A few small dumb bug fixes, I'm sorry for any problems they may have caused. I've added a sprite-maker, **spriteMaker.py**, currently standalone as it requires **cv2** and **numpy**. I decided to leave it outside of dots for the present, however it does rely on dotsQt for some data, functions, and directories(folders), so it's not totally standalone. A good deal of its code is based on pathMaker, including being able to add or delete points so it may prove familiar.
 
+As of April dots was updated to **PyQt6.3** and **Python 3.10.4**. If you're on a Mac laptop running either Big Sur or Monterey and you _*_**don't**_*_ use a mouse there's good change you'll see this warning
+many times.
 
-
-**April 2022:**
-#### The News: I finally updated to PyQt6.3 and Python 3.10.4###
-
-If you're on a Mac laptop running either Big Sur or Monterey you may experience this qt warning. 
 
     qt.pointer.dispatch: delivering touch release to same window QWindow(0x0) not QWidgetWindow(0x7f888e691040, name="CasterClassWindow")
     qt.pointer.dispatch: skipping QEventPoint(id=1 ts=0 pos=0,0 scn=789.445,580.564 gbl=789.445,580.564 Released ellipse=(1x1 ∡ 0) vel=0,0 press=-789.445,-580.564 last=-789.445,-580.564 Δ 789.445,580.564) : no target window
 
-The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another person has it as well.
+The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another Mac user has it as well.  You might want to let Qt know if you experience it. I'm going to that as soon as I finish posting the latest to GitHub. The warning also appears running PySide6.
 
-It appears that only one line of code needs to be changed - besides replacing PyQt6 with PyQt6 inorder to run PyQt6.  See line 96 in dotsControlView.py.
+
+**April 2022:**  
+DotsQt has been updated to **PyQt6.3** and **Python 3.10.4**.
 
 I also made some additions that aren't in the video, mainly to do with editing in pathMaker and centering backgrounds.  The big new stuff follows.
   
