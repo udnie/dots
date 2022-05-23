@@ -1,6 +1,7 @@
 ## Changes
 **May 2022:**  
 A few small dumb bug fixes, I'm sorry for any problems they may have caused. I've added a sprite-maker, **spriteMaker.py**, currently standalone as it requires **cv2** and **numpy**. I decided to leave it outside of dots for the present, however it does rely on dotsQt for some data, functions, and directories(folders), so it's not totally standalone. A good deal of its code is based on pathMaker, including being able to add or delete points so it may prove familiar.
+See the demo: <https://youtu.be/sySmphW7bYA>
 
 As of April dots was updated to **PyQt6.3** and **Python 3.10.4**. If you're on a Mac laptop running either Big Sur or Monterey and you _*_**don't**_*_ use a mouse there's good change you'll see this warning
 many times.
