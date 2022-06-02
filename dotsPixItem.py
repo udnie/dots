@@ -101,7 +101,7 @@ class PixItem(QGraphicsPixmapItem):
         
         self.shadowMaker = ShadowMaker(self)
         
-        self.WidgetW, self.WidgetH = 190.0, 210.0
+        self.WidgetW, self.WidgetH = 330.0, 210.0
       
 ### --------------------------------------------------------
     @pyqtSlot(str)

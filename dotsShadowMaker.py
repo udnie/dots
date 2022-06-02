@@ -46,7 +46,7 @@ class ShadowMaker:
        
         self.imgSize = 0,0  ## last width and height of shadow
 
-        self.WidgetW, self.WidgetH = 190.0, 190.0
+        self.WidgetW, self.WidgetH = 330.0, 190.0
         self.viewW, self.viewH = 0,0
                                      
 ### --------------------------------------------------------

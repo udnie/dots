@@ -1,5 +1,5 @@
 
-from PyQt6.QtCore       import Qt, QPoint, QRectF,  QPointF
+from PyQt6.QtCore       import QRect, Qt, QPoint, QRectF,  QPointF
 from PyQt6.QtGui        import QColor, QPen, QPainterPath, QRegion, QTransform, \
                                QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, \
@@ -26,9 +26,9 @@ class PixWidget(QWidget):
         hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignBottom)
         self.setLayout(hbox)
         
-        self.setFixedHeight(int(self.pix.WidgetH))   
-        self.setStyleSheet("background-color: rgb(230,230,230)")
-        self.setContentsMargins(-2,15,-2,-15) 
+        self.setFixedHeight(int(self.pix.WidgetH))  
+        self.setStyleSheet("background-color: rgba(0,0,0,0)")
+        self.setContentsMargins(0,15,0,-15) 
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
@@ -38,27 +38,14 @@ class PixWidget(QWidget):
         self.show()
                 
 ### --------------------------------------------------------                      
-    def resizeEvent(self, e):
-        path = QPainterPath()  ## thanks python fixing - that's a web site
-        # the rectangle must be translated and adjusted by 1 pixel in order to 
-        # correctly map the rounded shape
-        rect = QRectF(self.rect()).adjusted(1.5, 1.5, -2.5, -2.5)
-        path.addRoundedRect(rect, 5, 5)
-        # QRegion is bitmap based, so the returned QPolygonF (which uses float
-        # values must be transformed to an integer based QPolygon
-        region = QRegion(path.toFillPolygon(QTransform()).toPolygon())
-        self.setMask(region) 
-        
-    def paintEvent(self, e):  ## thanks stack over flow
+    def paintEvent(self, e): 
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)   
-        rectPath = QPainterPath()                      
-        height = self.height()-5                    
-        rectPath.addRoundedRect(QRectF(2, 2, self.width()-5, height), 5, 5)
-        painter.setPen(QPen(QColor(0,125,255), 3, Qt.PenStyle.SolidLine, 
-            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
-        painter.setBrush(QColor(255,255,0,220))  ## yellow
-        painter.drawPath(rectPath)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        
+        rect = QRectF(2, 2, self.pix.WidgetW-4, self.pix.WidgetH-4)
+        painter.setPen(QPen(QColor(0,125,255), 5, Qt.PenStyle.SolidLine, 
+            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
+        painter.setBrush(QColor(255,255,0,255))  ## yellow 
+        painter.drawRoundedRect(rect, 15, 15)
               
     def mousePressEvent(self, e):
         self.save = e.globalPosition()  ## works the best, needs to change for pyqt5

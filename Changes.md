@@ -1,4 +1,7 @@
 ## Changes
+**June 2022:**  
+Some cosmetic changes to the right-click widgets. Also, I finally was able to file a bug report with Qt about the pointer.dispatch warnings. It's in their work queue.  Maybe by the next release it will have been taken care of. Remember, you can always use a mouse if the warnings bother you. They're not visible running dots from your desktop.
+
 **May 2022:**  
 A few small dumb bug fixes, I'm sorry for any problems they may have caused. I've added a sprite-maker, **spriteMaker.py**, currently standalone as it requires **cv2** and **numpy**. I decided to leave it outside of dots for the present, however it does rely on dotsQt for some data, functions, and directories(folders), so it's not totally standalone. A good deal of its code is based on pathMaker, including being able to add or delete points so it may prove familiar.
 See the demo: <https://youtu.be/sySmphW7bYA>
