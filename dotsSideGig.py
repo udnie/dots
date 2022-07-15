@@ -122,6 +122,8 @@ class DoodleMaker(QWidget):
 
         self.pathMaker = parent
         self.resize(530,320)
+        self.setWindowFlags(Qt.WindowType.NoDropShadowWindowHint)
+        self.setStyleSheet("background-color: rgb(225,225,225)")
 
         widget = QWidget()
         gLayout = QGridLayout(widget)

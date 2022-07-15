@@ -25,6 +25,7 @@ class PathMaker(QWidget):
         self.scene  = parent.scene
         self.view   = parent.view
         self.slider = parent.slider
+        self.dots   = parent.dots
 
         self.chooser = None  ## placeholder for doodles_popup_widget 
        
@@ -103,7 +104,7 @@ class PathMaker(QWidget):
           
         self.editingPts = False
         self.pathTestSet = False
-  
+        
 ### ---------------------- key handler ---------------------
     @pyqtSlot(str)
     def pathKeys(self, key):
@@ -207,7 +208,8 @@ class PathMaker(QWidget):
         self.pathChooserOff() 
         self.scene.clear()
         self.initThis()
-      
+        self.dots.statusBar.showMessage(self.openPathFile)  ## it's empty, clears status bar
+            
     def pathMakerOff(self):
         if self.canvas.pathMakerOn:
             self.delete()   
@@ -232,7 +234,9 @@ class PathMaker(QWidget):
     def pathChooserOff(self):
         self.chooser = None
         self.pathChooserSet = False
-          
+        if self.openPathFile:  ## filename top left corner
+            self.dots.statusBar.showMessage(self.openPathFile)
+        
 ### -------------------- path stuff ------------------------
     def addPath(self):
         self.removePath()  ## not for animation
@@ -248,7 +252,7 @@ class PathMaker(QWidget):
             self.scene.removeItem(self.path)
             self.pathSet = False
             self.path = None
-    
+      
     def redrawPathsAndTags(self):
         self.sideWays.removeWayPtTags()
         self.removePath()

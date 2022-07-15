@@ -1,7 +1,8 @@
 ## DotsQt  
-**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think "Monty Python's Flying Circus". It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations and create sprites.
+**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations and create sprites.  **SpriteMaker** is now stand-alone and is easily converted to run in **PySide6** - see **SpiteMaker.md**.
 
-As of **April 2022** dots was updated to **PyQt6.3** and **Python 3.10.4**.
+As of **July 2022** dots updated to **PyQt6.3.1** and **Python 3.10.4**, 
+**Qt-warnings** are gone as well. 
 
 The files **StartHere.md** and  **dotsAnimation.py** provide a starting point for coding your own animations. See **Changes.md** and **keys.pdf** for further documentation and links to videos - best watched with closed captions - except for the last few.
 	  

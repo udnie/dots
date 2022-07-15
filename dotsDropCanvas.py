@@ -72,6 +72,7 @@ class DropCanvas(QWidget):
 
         self.setMouseTracking(True)
         self.view.viewport().installEventFilter(self)
+        self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False) 
     
         self.view.keysSignal[str].connect(self.setKeys)    
 

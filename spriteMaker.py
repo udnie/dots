@@ -2,22 +2,22 @@
 import sys
 
 from PyQt6.QtCore       import Qt, QPointF, QEvent
-from PyQt6.QtGui        import QColor, QImage, QPixmap, QGuiApplication, QPen, \
-                               QPainterPath, QCursor
+from PyQt6.QtGui        import QColor, QGuiApplication, QPen, QPainterPath, QCursor                             
 from PyQt6.QtWidgets    import QSlider, QWidget, QApplication, QGraphicsView, QGroupBox, \
-                               QGraphicsScene, QGraphicsPixmapItem, QLabel,  \
-                               QSlider, QHBoxLayout,  QVBoxLayout, QPushButton, QGraphicsPathItem
+                               QGraphicsScene, QLabel, QGraphicsPathItem, \
+                               QSlider, QHBoxLayout,  QVBoxLayout, QPushButton 
                        
-
-from dotsSideGig        import getColorStr, distance
-from spriteWorks        import PointItem, Works
+from spriteWorks        import Works
+from spriteLoupe        import Loupe
+from spritePoints       import PointItem, constrain, getColorStr, distance, Fixed
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 DispWidth, DispHeight = 720, 720
-Width, Height = 860, 840
 Btns = 820
-Fixed = DispHeight  ## max pixmap size
-   
+Width, Height = 860, 840
+
+## --> see spriteWorks to set paths, currently set for dots demo directories <-- ##
+
 ### ------------------- dotsSpriteMaker --------------------                                                                                                                                                                                                                                                                           
 class SpriteMaker(QWidget):  
 ### -------------------------------------------------------- 
@@ -45,22 +45,14 @@ class SpriteMaker(QWidget):
 
         self.init()     
                 
-        self.works   = Works(self)
+        self.works = Works(self)
+        self.loupe = Loupe(self)
+       
         self.buttons = self.setButtons()
         self.sliders = self.setSliders()
         
         self.enableSliders()  ## off 
-        
-        self.buttons.setStyleSheet("QLabel {\n"
-            "background-color: rgb(230,230,230);\n"
-            "border: 1px solid rgb(125,125,125);\n"
-            "}")
-         
-        self.sliders.setStyleSheet("QGroupBox {\n"
-            "background-color: rgb(220,220,220);\n"
-            "border: 1px solid rgb(125,125,125);\n"
-            "}")
-  
+                  
         hbox = QHBoxLayout()            
         hbox.addWidget(self.view) 
         hbox.addWidget(self.sliders) 
@@ -72,10 +64,13 @@ class SpriteMaker(QWidget):
         self.setLayout(vbox)
      
         self.setMouseTracking(True)
-        self.view.viewport().installEventFilter(self)     
+        self.view.viewport().installEventFilter(self)  
+        self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)   
          
         self.addBtn.setDisabled(True)   
         self.closeBtn.setDisabled(True)
+        
+        self.grabKeyboard()  ## makes it easier to use arrow keys
      
         self.show()  
          
@@ -100,45 +95,53 @@ class SpriteMaker(QWidget):
         self.scale  = 1.0        
                       
 ### --------------------- event filter ----------------------                
-    def eventFilter(self, source, e):       
+    def eventFilter(self, source, e):      
         if self.outlineSet:
             if e.type() == QEvent.Type.MouseButtonPress and \
                 e.button() == Qt.MouseButton.LeftButton:
                     self.npts = 0  
-                    self.addPoints(e.pos())
-                    self.last = e.pos()
+                    self.addPoints(e.position())
+                    self.last = e.position()
 
             elif e.type() == QEvent.Type.MouseMove and \
                 e.buttons() == Qt.MouseButton.LeftButton:
-                    self.addPoints(e.pos())
-           
+                    self.addPoints(e.position())
+        
             elif e.type() == QEvent.Type.MouseButtonRelease and \
                 e.button() == Qt.MouseButton.LeftButton:
-                    self.pts.append(e.pos())
-                    self.updateOutline()  
-   
+                    self.pointCheck(e.position())
+                      
+        elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.times2:
+            self.loupe.removeTimes()
+                               
         return QWidget.eventFilter(self, source, e)
                                           
-### --------------------------------------------------------     
+### --------------------------------------------------------
     def addPoints(self, pt): 
         if self.npts == 0:
             self.pts.append(pt)
         self.npts += 1
-        if self.npts % 5 == 0:
-            if distance(pt.x(),self.last.x(), pt.y(), self.last.y()) > 15.0:
-                self.last = pt     
-                self.pts.append(pt)
-                self.updateOutline()
-                                 
+        if self.npts % 5 == 0: 
+            self.pointCheck(pt)      
+
+    def pointCheck(self, pt):
+        pt = self.constrainXY(pt, 1)  
+        if distance(pt.x(), self.last.x(), pt.y(), self.last.y()) > 15.0:
+            self.last = pt     
+            self.pts.append(pt)
+            self.updateOutline()
+        elif distance(pt.x(), self.last.x(), pt.y(), self.last.y()) < 2.5:
+            return
+                                                                               
     def addOutLine(self):
         if self.outlineSet == True:
             return
-        elif len(self.pts) == 0 and self.slidersSet == True:
+        if len(self.pts) == 0 and self.slidersSet == True:
             self.outlineSet = True
             QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
             
     def finalizePixmap(self):  ## the set button in sliders
-        if self.pixmap != None: 
+        if self.pixmap: 
             self.works.replacePixmap() 
             self.sliders.setEnabled(False)
             self.slidersSet = True
@@ -162,9 +165,20 @@ class SpriteMaker(QWidget):
         self.outline.setPen(QPen(QColor(self.color), 3, Qt.PenStyle.SolidLine))
         self.outline.setZValue(100) 
         self.scene.addItem(self.outline)
-        if self.pathClosed and self.works.cropIt == True: 
-            self.works.showCrop()
-    
+            
+    def deleteOutline(self): 
+        if len(self.pts) > 0 and self.outline:
+            self.scene.removeItem(self.outline)
+            self.outline = None
+            
+    def changePathColor(self):
+        self.color = getColorStr()
+        self.updateOutline()
+        if self.loupe.times2:
+            self.loupe.loupeIt(self.loupe.idx)
+            self.removePointItems()
+            self.works.editingOn = False
+        
     def setPaintPath(self, bool=False): 
         path = QPainterPath()
         for pt in self.pts: 
@@ -174,20 +188,17 @@ class SpriteMaker(QWidget):
         if bool: 
             path.closeSubpath()
         return path
-
-    def changePathColor(self):
-        self.color = getColorStr()
-        self.updateOutline()
-        
-    def deleteOutline(self): 
-        if len(self.pts) > 0 and self.outline != None:
-            self.scene.removeItem(self.outline)
-            self.outline = None
-            
+                                      
+    def constrainXY(self, p, v):  
+        x = int(constrain(p.x(), v, Fixed, 15))
+        y = int(constrain(p.y(), v, Fixed, 15))
+        return QPointF(x, y)
+    
 ### --------------------------------------------------------  
     def addPointItems(self): 
         idx = 200  ## Zvalues
         for i in range(0, len(self.pts)):  
+            self.pts[i] = self.constrainXY(self.pts[i],1)
             self.scene.addItem(PointItem(self.pts[i], i, idx, self))
             idx += 1
        
@@ -198,43 +209,12 @@ class SpriteMaker(QWidget):
     
     def removePointItems(self): 
         for p in self.scene.items():
-            if p.zValue() >= 200:  ## should only be points
+            if p.zValue() >= 200 and p.type == 'pt':  ## should only be points
                 self.scene.removeItem(p)
-                                       
-    def hidePoints(self, hide=True): 
-        for p in self.pts:       
-            p.hide() if hide == True else p.show()        
-                                                                                                                                      
-### --------------------------------------------------------         
-    def addPixmap(self, file):                                          
-        img = QImage(file)  ## the scene is cleared each new image file  
-        self.file = file
-        
-        if img.width() > Fixed or img.height() > Fixed:  ## size it to fit       
-            img = img.scaled(Fixed-50, Fixed-50,  
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)
-      
-        self.pixmap = QGraphicsPixmapItem()     
-        self.pixmap.setPixmap(QPixmap(img))    
-        self.pixmap.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
-        
-        self.x = (DispWidth-img.width())/2  ## center it
-        self.y = (DispHeight-img.height())/2
-        
-        self.pixmap.setX(self.x)  
-        self.pixmap.setY(self.y)     
-        self.pixmap.setZValue(-100) 
-                
-        self.scene.addItem(self.pixmap)
-        
-        self.outlineSet = False
-        self.enableSliders(True)
-        self.works.init()
-                  
+                                                                                                                                                                                             
 ### --------------------------------------------------------          
     def setOrigin(self):  
-        if self.pixmap != None:
+        if self.pixmap:
             b = self.pixmap.boundingRect()
             op = QPointF(b.width()/2, b.height()/2)
             self.pixmap.setTransformOriginPoint(op)
@@ -266,30 +246,38 @@ class SpriteMaker(QWidget):
         self.scaleSlider.setValue(int(self.scale*100))
         
     def Rotation(self, val):
-        if self.pixmap != None:
+        if self.pixmap:
             op = (val)
             self.setRotation(op)
             self.rotationValue.setText("{0:.2f}".format(op)) 
         
     def Scale(self, val):
-        if self.pixmap != None:
+        if self.pixmap:
             op = (val/100)
             self.setScale(op)
             self.scaleValue.setText("{0:.2f}".format(op))  
         
     def clear(self):
         self.scene.clear()
-        self.init()    
-        
+        self.init() 
+        self.works.init()
+        self.loupe.init()
+        self.loupe.img = None
+          
 ### -------------------------------------------------------- 
     def setSliders(self):
         groupBox = QGroupBox()
         groupBox.setFixedSize(80,DispHeight)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
+        groupBox.setStyleSheet("QGroupBox {\n"
+            "background-color: rgb(220,220,220);\n"
+            "border: 1px solid rgb(125,125,125);\n"
+            "}")
+        
         self.scaleValue = QLabel("1.00")
         self.scaleSlider = QSlider(Qt.Orientation.Vertical,                   
-            minimum=50, maximum=150, singleStep=1, value=100)
+            minimum=50, maximum=250, singleStep=1, value=100)
         self.scaleSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSlider.setTickInterval(10)  
@@ -344,6 +332,11 @@ class SpriteMaker(QWidget):
         self.buttonGroup = QLabel()
         self.buttonGroup.setFixedSize(Btns,55)
         
+        self.buttonGroup.setStyleSheet("QLabel {\n"
+            "background-color: rgb(230,230,230);\n"
+            "border: 1px solid rgb(125,125,125);\n"
+            "}")
+        
         filesBtn = QPushButton("Files")      
         filesBtn.clicked.connect(self.works.openFiles)
                 
@@ -357,7 +350,7 @@ class SpriteMaker(QWidget):
         self.changeBtn.clicked.connect(self.changePathColor)
 
         self.previewBtn = QPushButton("Preview")
-        self.previewBtn.clicked.connect(self.works.preview)
+        self.previewBtn.clicked.connect(self.works.background)
 
         self.editBtn = QPushButton("Edit")
         self.editBtn.clicked.connect(self.works.edit)
@@ -393,10 +386,15 @@ class SpriteMaker(QWidget):
         elif e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
             self.setKey('del')
         elif e.key() == Qt.Key.Key_Alt:
-            self.setKey('opt')
-        elif e.key() == Qt.Key.Key_Shift: 
-            self.works.toggleCrop()
-                    
+            self.setKey('opt') 
+        elif e.key() == Qt.Key.Key_Control:
+            self.works.edit()      
+        elif self.loupe.times2:    
+            if e.key() == Qt.Key.Key_Up:
+                self.loupe.nextPoint('up')
+            elif e.key() == Qt.Key.Key_Down:
+                self.loupe.nextPoint('down')
+         
     def setKey(self, key): 
         self.key = key
        
@@ -414,4 +412,7 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ------------------- dotsSpriteMaker --------------------
+
+
+
 

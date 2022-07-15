@@ -1,7 +1,6 @@
 
-from PyQt6.QtCore       import QRect, Qt, QPoint, QRectF,  QPointF
-from PyQt6.QtGui        import QColor, QPen, QPainterPath, QRegion, QTransform, \
-                               QPainter
+from PyQt6.QtCore       import Qt, QPoint, QRectF
+from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, \
                                QLabel, QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
                                                  

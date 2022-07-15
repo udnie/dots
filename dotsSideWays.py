@@ -258,10 +258,7 @@ class SideWays():
                 idx = lnn
             tag = self.makePtsTag(pt, idx, pct)
             self.addWayPtTag(tag, pt)
-        if self.pathMaker.openPathFile:  ## filename top left corner
-            self.addWayPtTag(self.pathMaker.openPathFile, 
-                QPointF(5.0,5.0))
-                
+                       
     def addWayPtTag(self, tag, pt):
         self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
         self.tag.setPos(QPointF(pt))
