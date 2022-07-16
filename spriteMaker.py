@@ -154,7 +154,7 @@ class SpriteMaker(QWidget):
             self.outlineSet = False 
             self.pathClosed = True
             self.updateOutline()  ## close it         
-            self.redrawPoints() 
+            self.redrawPoints(True)  ## True = constrain XY
             self.works.editingOn = True     
             self.addBtn.setEnabled(False)
             self.closeBtn.setEnabled(False)
@@ -195,17 +195,17 @@ class SpriteMaker(QWidget):
         return QPointF(x, y)
     
 ### --------------------------------------------------------  
-    def addPointItems(self): 
+    def addPointItems(self, final=False):  ## final check using constraints
         idx = 200  ## Zvalues
         for i in range(0, len(self.pts)):  
-            self.pts[i] = self.constrainXY(self.pts[i],1)
+            if final: self.pts[i] = self.constrainXY(self.pts[i],1)
             self.scene.addItem(PointItem(self.pts[i], i, idx, self))
             idx += 1
        
-    def redrawPoints(self): 
+    def redrawPoints(self, final=False): 
         if self.works.editingOn:
             self.removePointItems()
-        self.addPointItems()
+        self.addPointItems(final)
     
     def removePointItems(self): 
         for p in self.scene.items():
