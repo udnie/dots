@@ -26,7 +26,7 @@ class PointItem(QGraphicsEllipseItem):
 
         self.spriteMaker = parent
         self.works       = parent.works
-        self.loupe        = parent.loupe
+        self.loupe       = parent.loupe
        
         self.pt  = pt
         self.idx = i          

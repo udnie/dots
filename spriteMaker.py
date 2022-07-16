@@ -100,17 +100,20 @@ class SpriteMaker(QWidget):
             if e.type() == QEvent.Type.MouseButtonPress and \
                 e.button() == Qt.MouseButton.LeftButton:
                     self.npts = 0  
-                    self.addPoints(e.position())
-                    self.last = e.position()
+                    self.addPoints(e.pos())
+                    self.last = e.pos()
 
             elif e.type() == QEvent.Type.MouseMove and \
                 e.buttons() == Qt.MouseButton.LeftButton:
-                    self.addPoints(e.position())
+                    self.addPoints(e.pos())
         
             elif e.type() == QEvent.Type.MouseButtonRelease and \
                 e.button() == Qt.MouseButton.LeftButton:
-                    self.pointCheck(e.position())
-                      
+                    pt = self.constrainXY(e.pos(), 1)  
+                    self.last = pt     
+                    self.pts.append(pt)
+                    self.updateOutline()
+                               
         elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.times2:
             self.loupe.removeTimes()
                                
@@ -122,7 +125,7 @@ class SpriteMaker(QWidget):
             self.pts.append(pt)
         self.npts += 1
         if self.npts % 5 == 0: 
-            self.pointCheck(pt)      
+            self.pointCheck(pt)  ## look for overlaping points     
 
     def pointCheck(self, pt):
         pt = self.constrainXY(pt, 1)  
@@ -138,8 +141,9 @@ class SpriteMaker(QWidget):
             return
         if len(self.pts) == 0 and self.slidersSet == True:
             self.outlineSet = True
-            QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
-            
+            # QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
+            self.setCursor(QCursor(Qt.CursorShape.CrossCursor))
+                     
     def finalizePixmap(self):  ## the set button in sliders
         if self.pixmap: 
             self.works.replacePixmap() 
@@ -150,11 +154,12 @@ class SpriteMaker(QWidget):
           
     def closeOutLine(self):
          if self.outlineSet:
-            QGuiApplication.restoreOverrideCursor()
+            # QGuiApplication.restoreOverrideCursor()
+            self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))     
             self.outlineSet = False 
             self.pathClosed = True
             self.updateOutline()  ## close it         
-            self.redrawPoints(True)  ## True = constrain XY
+            self.redrawPoints(True)  ## True - constrain XY
             self.works.editingOn = True     
             self.addBtn.setEnabled(False)
             self.closeBtn.setEnabled(False)
@@ -402,7 +407,7 @@ class SpriteMaker(QWidget):
         self.key = '' 
            
     def aclose(self):
-        QGuiApplication.restoreOverrideCursor()
+        QGuiApplication.restoreOverrideCursor()    
         self.close()
         
 ### -------------------------------------------------------- 
