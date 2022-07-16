@@ -5,10 +5,16 @@
           
        
 **Edits for PySide6:**     
-    1. In all **sprite*.py** files, change **PyQt6** to **PySide6**       
-    2. In **spriteWorks.py** - change **pyqtSignal(s)** to **Signal** and comment out line **181**, look for **comment**    
-    3. In  **spriteLoupe.py**- change **pyqtSlot(s)** to **Slot**  
-    4. Make sure you're in the right directory
+    1. In all **sprite*.py** files, change **PyQt6** to **PySide6**  
+    2. in **spriteMaker.py** - change **e.pos()** to **e.position()**      
+    3. In **spriteWorks.py** - change **pyqtSignal(s)** to **Signal** and comment out line **181**, look for **comment**    
+    4. In  **spriteLoupe.py**- change **pyqtSlot(s)** to **Slot**  
+    5. Make sure you're in the right directory
+
+ **Edits for PyQt5.15:**     
+    ... In all **sprite.py** files, change **PyQt6** to **PyQt5**     
+    
+ 
 
 Keys I'm tracking. I added the Apple **Command** key to toggle the points on and off, it makes it easier to see the contour that way, especially against the gray background. I've also added the **up** and **down arrow keys** to help navigate the points either forward or backward.
 
