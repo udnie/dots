@@ -101,17 +101,18 @@ class SpriteMaker(QWidget):
                 e.button() == Qt.MouseButton.LeftButton:
                     self.npts = 0  
                     self.addPoints(e.pos())
-                    self.last = e.pos()
-
+                    self.last = self.constrainXY(e.pos(), 1) 
+        
             elif e.type() == QEvent.Type.MouseMove and \
                 e.buttons() == Qt.MouseButton.LeftButton:
                     self.addPoints(e.pos())
         
             elif e.type() == QEvent.Type.MouseButtonRelease and \
                 e.button() == Qt.MouseButton.LeftButton:
-                    pt = self.constrainXY(e.pos(), 1)  
-                    self.last = pt     
-                    self.pts.append(pt)
+                    pt = self.constrainXY(e.pos(), 1) 
+                    if self.last != pt:  ## else too many points
+                        self.last = pt   
+                        self.pts.append(pt)
                     self.updateOutline()
                                
         elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.times2:
@@ -137,11 +138,10 @@ class SpriteMaker(QWidget):
             return
                                                                                
     def addOutLine(self):
-        if self.outlineSet == True:
+        if self.outlineSet:
             return
         if len(self.pts) == 0 and self.slidersSet == True:
             self.outlineSet = True
-            # QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
             self.setCursor(QCursor(Qt.CursorShape.CrossCursor))
                      
     def finalizePixmap(self):  ## the set button in sliders
@@ -154,7 +154,6 @@ class SpriteMaker(QWidget):
           
     def closeOutLine(self):
          if self.outlineSet:
-            # QGuiApplication.restoreOverrideCursor()
             self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))     
             self.outlineSet = False 
             self.pathClosed = True
