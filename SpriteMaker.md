@@ -1,6 +1,8 @@
 ## Changes
-**July 2022:**		 
-**Qt-warnings** are gone - thanks to **Qt** for providing a one-line fix, setting a QGraphicsView attribute took care of it. **SpriteMaker** is now fully standalone-alone other than using the **demo sprites** and **txy folders.**  It's also now able to run in **PySide6.3.1** with some minor edits.  You will need to edit the path locations in **spriteWorks** if you plan to use **spriteMaker** outside of the **demo** directory. Both **numpy** and **cv2** are required. See the video: <https://youtu.be/NjMg-95ecgw>
+**July 2022:**	
+**Qt-warnings** are gone - thanks to **Qt** for providing a one-line fix.
+
+ **SpriteMaker** is now fully standalone-alone other than using the **demo sprites** and **txy folders.**  It's also now able to run with some minor edits in **PySide6.3.1**  and **PyQt5** as well.  You will need to edit the path locations in **spriteWorks** if you plan to use **spriteMaker** outside of the **demo** directory. Both **numpy** and **cv2** are required. See the video: <https://youtu.be/NjMg-95ecgw>
        
           
        
@@ -8,7 +10,7 @@
     1. In all **sprite*.py** files, change **PyQt6** to **PySide6**  
     2. in **spriteMaker.py** - change **e.pos()** to **e.position()**      
     3. In **spriteWorks.py** - change **pyqtSignal(s)** to **Signal** and comment out line **181**, look for **comment**    
-    4. In  **spriteLoupe.py**- change **pyqtSlot(s)** to **Slot**  
+    4. In  **spriteLoupe.py** - change **pyqtSlot(s)** to **Slot**  
     5. Make sure you're in the right directory
 
  **Edits for PyQt5.15:**     
