@@ -3,9 +3,8 @@ import os
 import cv2
 import numpy as np
 
-from PyQt6.QtCore       import QPointF, Qt , QRect, QPoint, QSize, pyqtSignal
-from PyQt6.QtGui        import QColor, QImage, QPixmap, QPainter, QPainterPath, \
-                               QPolygonF, QPen, QGuiApplication
+from PyQt6.QtCore       import QPointF, Qt , QRect, QPoint, QSize
+from PyQt6.QtGui        import QColor, QImage, QPixmap, QPainter, QPainterPath, QPolygonF, QPen
 from PyQt6.QtWidgets    import QGraphicsPixmapItem, QFileDialog, QWidget
                                
 from spritePoints       import MsgBox, Fixed
@@ -20,8 +19,6 @@ paths = {  ## only place it's used
 ### --------------------------------------------------------    
 class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
 ### --------------------------------------------------------
-    imgSignal = pyqtSignal([str])
-
     def __init__(self, parent):
         super().__init__()
         
@@ -40,9 +37,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
                       
         self.mode = 0  
         self.editingOn = False
-     
-        QGuiApplication.restoreOverrideCursor()
-                  
+                       
 ### --------------------------------------------------------         
     def addPixmap(self, file):  ## inital open - scene cleared each new image file                                          
         img = QImage(file)     
@@ -74,19 +69,17 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         if self.spriteMaker.pathClosed == False:
             return  
 
-        if self.mode > 2: self.mode = 0  ## only for this function  
+        if self.mode > 1: self.mode = 0  ## only for this function  
                
         img, w, h = self.makeSprite()
         self.addSprite(img) 
                
         p = QPixmap(w, h)  
             
-        if self.mode == 0:   
-            p.fill(QColor(230,230,230,128))  
-        elif self.mode == 1:
+        if self.mode == 0:
             p.fill(QColor(128,128,128,255))
-        elif self.mode == 2:
-            p.fill(QColor(Qt.GlobalColor.transparent))
+        elif self.mode == 1:
+            p.fill(QColor('transparent'))
  
         if self.bkg:
             self.scene.removeItem(self.bkg)                         
@@ -211,8 +204,8 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         ## replace the original with a same size copy 
         self.spriteMaker.pixmap = pixmap  
         self.scene.addItem(self.spriteMaker.pixmap)
-        self.imgCopy = self.pixGrab.toImage()
-        self.imgSignal[str].emit('')  ## let spriteLoupe know 
+        
+        self.imgCopy = self.pixGrab.toImage()  ## view.grab returns a pixmap
                                  
     def openCopy(self, file):  ## only if '-copy' in file name
         try:           
@@ -231,7 +224,6 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
             self.scene.addItem(self.spriteMaker.pixmap)
             
             self.imgCopy = img  
-            self.imgSignal[str].emit('')
             
             self.openTxy(file)                                             
         except IOError:

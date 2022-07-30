@@ -1,9 +1,10 @@
 ## Changes
-**July 2022**     
-**Good News!!!** No more **qt-warnings** - all that was required was having the right attribute set, fortunately someone at Qt came up with the fix.       
+**July 2022:**     
+See **SpriteMaker.md** for current changes as I'm breaking **spriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **spriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest videos:
+<https://youtu.be/bGYBj_bjEJU>
 
-See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of dots.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PySide6.3.1** with some minor edits. Latest video:
-<https://youtu.be/NjMg-95ecgw>
+
+**Good News!!!** No more **qt-warnings** - all that was required was having the right attribute set, fortunately someone at Qt came up with the fix.  Also, it seems to only effect Mac laptop users who don't use a mouse like me.  Video at: <https://youtu.be/NjMg-95ecgw>
 
 **June 2022:**  
 Some cosmetic changes to the right-click widgets. Also, I finally was able to file a bug report with Qt about the pointer.dispatch warnings. It's in their work queue.  Maybe by the next release it will have been taken care of. Remember, you can always use a mouse if the warnings bother you. They're not visible running dots from your desktop.

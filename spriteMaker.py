@@ -21,6 +21,7 @@ Width, Height = 860, 840
 ### ------------------- dotsSpriteMaker --------------------                                                                                                                                                                                                                                                                           
 class SpriteMaker(QWidget):  
 ### -------------------------------------------------------- 
+        
     def __init__(self, parent=None):
         super().__init__()
               
@@ -30,7 +31,7 @@ class SpriteMaker(QWidget):
                  
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         x = int(((ctr.x() * 2 ) - Width)/2)
-        self.setGeometry(x,75,Width,Height)
+        self.setGeometry(x,35,Width,Height)
         
         self.setFixedSize(Width,Height)     
         self.setWindowTitle("spriteMaker")
@@ -50,9 +51,7 @@ class SpriteMaker(QWidget):
        
         self.buttons = self.setButtons()
         self.sliders = self.setSliders()
-        
-        self.enableSliders()  ## off 
-                  
+                        
         hbox = QHBoxLayout()            
         hbox.addWidget(self.view) 
         hbox.addWidget(self.sliders) 
@@ -63,13 +62,14 @@ class SpriteMaker(QWidget):
                
         self.setLayout(vbox)
      
-        self.setMouseTracking(True)
         self.view.viewport().installEventFilter(self)  
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)   
          
+        self.enableSliders()  ## off 
         self.addBtn.setDisabled(True)   
         self.closeBtn.setDisabled(True)
         
+        self.setMouseTracking(True)
         self.grabKeyboard()  ## makes it easier to use arrow keys
      
         self.show()  
@@ -84,13 +84,13 @@ class SpriteMaker(QWidget):
         self.last = QPointF()
  
         self.outline = None 
-      
+        self.pixmap  = None
+          
         self.outlineSet = False 
         self.slidersSet = False
         self.pathClosed = False
        
         self.color  = "WHITE"                  
-        self.pixmap = None
         self.rotate = 0.0
         self.scale  = 1.0        
                       
@@ -115,8 +115,8 @@ class SpriteMaker(QWidget):
                         self.pts.append(pt)
                     self.updateOutline()
                                
-        elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.times2:
-            self.loupe.removeTimes()
+        elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.widget:
+            self.loupe.close()
                                
         return QWidget.eventFilter(self, source, e)
                                           
@@ -158,15 +158,18 @@ class SpriteMaker(QWidget):
             self.outlineSet = False 
             self.pathClosed = True
             self.updateOutline()  ## close it         
-            self.redrawPoints(True)  ## True - constrain XY
+            self.redrawPoints(True)  ## True - constrain XY at close
             self.works.editingOn = True     
             self.addBtn.setEnabled(False)
             self.closeBtn.setEnabled(False)
       
     def updateOutline(self):  ## make a path from pathMaker pts
         self.deleteOutline()
+        w = 1  
+        if self.outlineSet:
+            w = 2   
         self.outline = QGraphicsPathItem(self.setPaintPath(self.pathClosed))
-        self.outline.setPen(QPen(QColor(self.color), 3, Qt.PenStyle.SolidLine))
+        self.outline.setPen(QPen(QColor(self.color), w, Qt.PenStyle.SolidLine))
         self.outline.setZValue(100) 
         self.scene.addItem(self.outline)
             
@@ -178,11 +181,11 @@ class SpriteMaker(QWidget):
     def changePathColor(self):
         self.color = getColorStr()
         self.updateOutline()
-        if self.loupe.times2:
+        if self.loupe.widget:
             self.loupe.loupeIt(self.loupe.idx)
             self.removePointItems()
             self.works.editingOn = False
-        
+                 
     def setPaintPath(self, bool=False): 
         path = QPainterPath()
         for pt in self.pts: 
@@ -265,8 +268,8 @@ class SpriteMaker(QWidget):
         self.scene.clear()
         self.init() 
         self.works.init()
+        self.loupe.closeWidget()
         self.loupe.init()
-        self.loupe.img = None
           
 ### -------------------------------------------------------- 
     def setSliders(self):
@@ -341,8 +344,8 @@ class SpriteMaker(QWidget):
             "border: 1px solid rgb(125,125,125);\n"
             "}")
         
-        filesBtn = QPushButton("Files")      
-        filesBtn.clicked.connect(self.works.openFiles)
+        self.filesBtn = QPushButton("Files")      
+        self.filesBtn.clicked.connect(self.works.openFiles)
                 
         self.addBtn = QPushButton("Outline")
         self.addBtn.clicked.connect(self.addOutLine)
@@ -369,7 +372,7 @@ class SpriteMaker(QWidget):
         quitBtn.clicked.connect(self.aclose)
         
         hbox = QHBoxLayout(self)
-        hbox.addWidget(filesBtn)
+        hbox.addWidget(self.filesBtn)
         hbox.addWidget(self.addBtn)
         hbox.addWidget(self.closeBtn)
         hbox.addWidget(self.changeBtn)
@@ -391,9 +394,13 @@ class SpriteMaker(QWidget):
             self.setKey('del')
         elif e.key() == Qt.Key.Key_Alt:
             self.setKey('opt') 
-        elif e.key() == Qt.Key.Key_Control:
-            self.works.edit()      
-        elif self.loupe.times2:    
+        elif e.key() == Qt.Key.Key_Control:  ## apple command
+            self.works.edit()    
+        elif e.key() == Qt.Key.Key_Shift:
+            self.loupe.holdIt()    
+        elif e.key() == Qt.Key.Key_P:
+            self.works.background()       
+        elif self.loupe.widget:    
             if e.key() == Qt.Key.Key_Up:
                 self.loupe.nextPoint('up')
             elif e.key() == Qt.Key.Key_Down:
@@ -406,7 +413,8 @@ class SpriteMaker(QWidget):
         self.key = '' 
            
     def aclose(self):
-        QGuiApplication.restoreOverrideCursor()    
+        QGuiApplication.restoreOverrideCursor() 
+        self.loupe.close()   
         self.close()
         
 ### -------------------------------------------------------- 
@@ -416,6 +424,9 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ------------------- dotsSpriteMaker --------------------
+
+
+
 
 
 

@@ -8,7 +8,7 @@ ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)
 Ticks = (100,50,10)  ## how often to draw a line and size
 
-ctrWidth, ctrHeight = 600, 70
+VWidth, VHeight = 600, 70
 
 # from PyQt6.QtCore import QT_VERSION_STR
 # from PyQt6.QtCore import PYQT_VERSION_STR
@@ -17,16 +17,22 @@ ctrWidth, ctrHeight = 600, 70
 # print("PyQt version:", PYQT_VERSION_STR) 
 # print("Python version:", QT_VERSION_STR)
 
+### --------------------------------------------------------
+''' for pyqt5 change gobalPosition to globalPos and see setWindowFlags 
+    looks ok for pyside6 '''
 ### ------------------------- vhx --------------------------
 class VHX(QMainWindow):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------
     def __init__(self):
         super().__init__()
 
-        self.resize(ctrWidth, ctrHeight)
+        self.resize(VWidth, VHeight)
 
-        self.setWindowFlags(Qt.WindowType.Window.FramelessWindowHint)
+        # self.setWindowFlags(Qt.FramelessWindowHint)  -- qt5
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+
+        self.setWindowOpacity(.85)
 
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
@@ -54,7 +60,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
 ### --------------------------------------------------------
     def paintEvent(self, event):
         painter = QPainter(self)
-        painter.setBrush(QColor(128, 255, 0, 175)) 
+        painter.setBrush(QColor(128, 255, 0)) 
         painter.drawRect(0, 0, self.width(), self.height() )
         painter.setBrush(Qt.BrushStyle.NoBrush) 
         painter.setPen(QPen(Qt.GlobalColor.darkGray, .5)) 
@@ -75,11 +81,11 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
                 p = metrics.boundingRect(txt)
                 p = p.width()
                 if t > 10:
-                    painter.drawLine(i, 20, i, ctrHeight)
+                    painter.drawLine(i, 20, i, VHeight)
                     if i == w * t: p = p + 4
                     painter.drawText(i-p, 15, txt)
                 else:  ## just draw lines
-                    painter.drawLine(i, 35, i, ctrHeight)
+                    painter.drawLine(i, 35, i, VHeight)
 
     def drawVerticalLines(self, painter, metrics):  
         for t in Ticks:  
@@ -126,8 +132,8 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             y = constrain(y, self.height(), self.scrnHeight, 200)
         ## so it doesn't get lost and go off screen
         if self.horizontal:
-            if y >= self.scrnHeight - ctrHeight/2:
-                y = int(self.scrnHeight - ctrHeight/2)
+            if y >= self.scrnHeight - VHeight/2:
+                y = int(self.scrnHeight - VHeight/2)
         else:
             if x >= self.scrnWidth - self.width()/2:
                 x = int(self.scrnWidth - self.width()/2)
@@ -154,10 +160,10 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
     def center(self):
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         if self.horizontal:
-            x = int(((ctr.x() * 2 ) - ctrWidth)/2)
+            x = int(((ctr.x() * 2 ) - VWidth)/2)
             self.move(x, ctr.y()-100)
         else:
-            y = int((((ctr.y() * 2 ) - ctrWidth)/2))
+            y = int((((ctr.y() * 2 ) - VWidth)/2))
             x = int(ctr.x()-self.width()/2)
             self.move(x, y-50)
 

@@ -30,25 +30,16 @@ class PointItem(QGraphicsEllipseItem):
        
         self.pt  = pt
         self.idx = i          
-        self.setZValue(zval) ## 150+ for outline, 1000+ selection 
+        self.setZValue(zval) ## 150+ for outline
         
         self.dragCnt = 0
         self.type = 'pt'
     
         self.moving = False
     
-        self.V = 8.0
+        self.V = 5.0
         self.setBrush(QColor("white"))
         self.saveColor = None
-                   
-        ## only 900+, here and gone - very temporary
-        if self.zValue() > 901:  
-            self.V = 10.0
-            self.setBrush(QColor("cyan"))
-            if self.idx == self.loupe.idx:
-                self.setBrush(QColor('yellow'))        
-        else:
-            self.setBrush(QColor("white"))
             
         self.x = pt.x()-self.V*.5  ## -V*.5 so it's centered on the path 
         self.y = pt.y()-self.V*.5
@@ -75,7 +66,6 @@ class PointItem(QGraphicsEllipseItem):
                 self.loupe.deletePointItem(self.idx)
             elif self.zValue() < 900 and self.spriteMaker.key == 'opt': 
                 self.loupe.insertPointItem(self) 
-            self.spriteMaker.key = ''     
         e.accept() 
         
     def mouseMoveEvent(self, e):
