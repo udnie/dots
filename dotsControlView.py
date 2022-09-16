@@ -20,8 +20,7 @@ ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_
 ### --------------------------------------------------------
 class ControlView(QGraphicsView):
 ### --------------------------------------------------------
-    ## adds drag and drop to a QGraphicsView instance and 
-    ## keyboard capture 
+    ## adds drag and drop to a QGraphicsView instance and keyboard capture 
     keysSignal = pyqtSignal([str])
 
     def __init__(self, parent):
@@ -93,8 +92,8 @@ class ControlView(QGraphicsView):
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.canvas.mapper.toFront(0)
-            # self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
-            self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ### PyQt6 take position
+            ##self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
+            self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ### PyQt6 takes position
                 None, False)
    
 ### -------------------------------------------------------

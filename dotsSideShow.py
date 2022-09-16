@@ -6,8 +6,7 @@ import random
 import asyncio
 import time
 
-from PyQt6.QtCore    import QTimer, QAbstractAnimation, Qt
-from PyQt6.QtWidgets import QGraphicsDropShadowEffect
+from PyQt6.QtCore    import QTimer, QAbstractAnimation
 
 from dotsPixItem     import PixItem
 from dotsBkgItem     import *

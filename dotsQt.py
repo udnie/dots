@@ -3,7 +3,7 @@ import sys
 import platform
 import os
 
-from PyQt6.QtCore     import QTimer
+from PyQt6.QtCore     import QTimer, PYQT_VERSION_STR
 from PyQt6.QtWidgets  import QApplication, QStatusBar, QMainWindow
 
 from dotsShared       import common
@@ -40,12 +40,7 @@ class DotsQt(QMainWindow):
 
         self.show()
 
-        from PyQt6.QtCore import QT_VERSION_STR
-        from PyQt6.QtCore import PYQT_VERSION_STR
-
-        # print( PySide6.__version__ )
         # print("PyQt version:", PYQT_VERSION_STR) 
-        # print("Python version:", QT_VERSION_STR)
         # print(platform.python_version())
             
 ### --------------------------------------------------------

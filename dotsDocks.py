@@ -11,7 +11,7 @@ from datetime       import datetime
 ''' dotsDocks: dockwidgets and buttons groups '''
 ### --------------------------------------------------------
 def addScrollDock(self):
-    self.ldocked = QDockWidget(None, self)
+    self.ldocked = QDockWidget(self)
     self.dots.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.ldocked)
     self.dockedWidget = QWidget(self)
 
@@ -29,7 +29,7 @@ def addScrollDock(self):
 
 ### --------------------------------------------------------
 def addSliderDock(self):
-    self.rdocked = QDockWidget(None, self)
+    self.rdocked = QDockWidget(self)
     self.dots.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.rdocked)
     self.dockedWidget = QWidget(self)
 
@@ -47,7 +47,7 @@ def addSliderDock(self):
 
 ### --------------------------------------------------------  
 def addButtonDock(self):  
-    self.bdocked = QDockWidget(None, self)
+    self.bdocked = QDockWidget(self)
     self.dots.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bdocked)
     self.dockedWidget = QWidget(self)
 

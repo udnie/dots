@@ -1,11 +1,14 @@
 ## Changes
+**September 2022:**
+Minor edits to make it more compatible with PySide6.
+
 **July 2022 - part 2:**
 The enlargement is now **2.5** times the selected area and no longer jumps around trying to avoid the mouse. Once it appears you can move it using the loupe's border to anywhere that's convenient for you and it will stay there till you move or delete it. Look for **initial setting** in **spriteLoupe.py** to customize its location.  I've also dumped the gauze like background and set preview to toggle between gray and the image using the **'P'** key.  Most importantly the **Shift** key will now toggle the loupe magnifier to remain fixed making it much easier to do any edits. I've added the new **spriteMaker** keys to the **keys.pdf**.  Lastly, both **numpy** and **cv2** are **required**.  A new video: <https://youtu.be/bGYBj_bjEJU>
 
 **July 2022 - part 1:**
 **Qt-warnings** are gone - thanks to **Qt** for providing a one-line fix. Seems only to effect Mac laptop users who don't use a mouse.
 
- **SpriteMaker** is now fully standalone-alone other than using the **demo sprites** and **txy folders.**  It's also now able to run with some minor edits in **PySide6.3.1**  and **PyQt5** as well.  You will need to edit the path locations in **spriteWorks** if you plan to use **spriteMaker** outside of the **demo** directory. Both **numpy** and **cv2** are required. See the video: <https://youtu.be/NjMg-95ecgw>
+ **SpriteMaker** is now fully standalone-alone other than using the **demo sprites** and **txy folders.**  It's also now able to run with some minor edits in **PySide 6.3.1**  and **PyQt5** as well.  You will need to edit the path locations in **spriteWorks** if you plan to use **spriteMaker** outside of the **demo** directory. Both **numpy** and **cv2** are required. See the video: <https://youtu.be/NjMg-95ecgw>
               
 **Edits for PySide6:**     
     1. In all **sprite*.py** files, change **PyQt6** to **PySide6**  

@@ -18,14 +18,7 @@ PixFactor = .30  # beginnig size factor
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 
-PixSizes = {
-    'dorot': (300, 500),
-    'can_m': (300, 375),
-    'miche': (350, 375),
-    'bosch': (250, 375),
-    'lizar': (600, 225),
-    'pivot': (150, 150),
-    'mike_': (300, 500),
+PixSizes = {  ## match up on base filename
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -58,7 +51,7 @@ class PixItem(QGraphicsPixmapItem):
             newW, newH = self.setPixSizes( 
                 img.width() * PixFactor, 
                 img.height() * PixFactor)
-
+   
         ## don't change
         img = img.scaled(int(newW), int(newH),
             Qt.AspectRatioMode.KeepAspectRatio,
@@ -245,6 +238,7 @@ class PixItem(QGraphicsPixmapItem):
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
+            # horizontally=self.flopped, vertically=False)))  ## pyside6
             horizontal=self.flopped, vertical=False)))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
     
@@ -360,11 +354,12 @@ class PixItem(QGraphicsPixmapItem):
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                                     
     def setPixSizes(self, newW, newH):  
-        p = os.path.basename(self.fileName)[0:5]
-        if p in PixSizes:
-            p = PixSizes[p]
-            return p[0], p[1]
-        elif newW < 100 or newH < 100:
+        p = os.path.basename(self.fileName)     
+        for key in PixSizes:
+            if key in p:
+                val = PixSizes.get(key)
+                return val[0], val[1]
+        if newW < 100 or newH < 100:
             newW, newH = 200, 200 
         elif newW > 400 or newH > 400:
             newW, newH = 425, 425

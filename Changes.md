@@ -1,4 +1,10 @@
 ## Changes
+**September 2022:**  
+Edits to widgets and sliders, mostly for scaling. 
+
+A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPos(), plus of course, PyQt6 to PyQt5. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  **Dots doesn't run in PySide6.**
+
+
 **July 2022:**     
 See **SpriteMaker.md** for current changes as I'm breaking **spriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **spriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest videos:
 <https://youtu.be/bGYBj_bjEJU>

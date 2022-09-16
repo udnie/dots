@@ -25,7 +25,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         self.spriteMaker = parent
         self.scene       = parent.scene
         self.view        = parent.view
-        
+                   
         self.init()
          
 ### --------------------------------------------------------     
@@ -37,7 +37,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
                       
         self.mode = 0  
         self.editingOn = False
-                       
+                                                     
 ### --------------------------------------------------------         
     def addPixmap(self, file):  ## inital open - scene cleared each new image file                                          
         img = QImage(file)     
@@ -154,7 +154,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
          
         ## add a light-grey semi-transparent border to help with anti-aliasing
-        painter.setPen(QPen(QColor(100,100,100,50), 3, Qt.PenStyle.SolidLine))     
+        painter.setPen(QPen(QColor(100,100,100,50), 4, Qt.PenStyle.SolidLine))     
         painter.drawPolygon(poly)  
             
         painter.setClipPath(path)  

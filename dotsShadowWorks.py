@@ -3,8 +3,7 @@ import cv2
 import numpy as np
 
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QRectF
-from PyQt6.QtGui        import QColor, QPen, QPainterPath, QRegion, QTransform, \
-                               QPainter
+from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QGraphicsPixmapItem, \
                                QLabel, QSlider, QHBoxLayout,  QVBoxLayout, QPushButton, \
                                QGraphicsEllipseItem, QDial
@@ -162,16 +161,22 @@ class ShadowWidget(QWidget):
         self.rotaryDial.valueChanged.connect(self.Rotate)
     
         self.scaleValue = QLabel("1.00")
-        self.scaleSlider = QSlider(Qt.Orientation.Vertical,                   
-            minimum=50, maximum=200, singleStep=1, value=100)
+        self.scaleSlider = QSlider(Qt.Orientation.Vertical)   
+        self.scaleSlider.setMinimum(25)
+        self.scaleSlider.setMaximum(225)
+        self.scaleSlider.setSingleStep(1)
+        self.scaleSlider.setValue(100)
         self.scaleSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
         
         self.opacityValue = QLabel(".50")
-        self.opacitySlider = QSlider(Qt.Orientation.Vertical,                   
-            minimum=0, maximum=100, singleStep=1, value=50)
+        self.opacitySlider = QSlider(Qt.Orientation.Vertical)   
+        self.opacitySlider.setMinimum(0)
+        self.opacitySlider.setMaximum(100)
+        self.opacitySlider.setSingleStep(1)
+        self.opacitySlider.setValue(50) 
         self.opacitySlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.opacitySlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.opacitySlider.setTickInterval(16)  

@@ -1,7 +1,7 @@
 
 import math
 
-from PyQt6.QtCore       import QObject, QPointF, QTimer
+from PyQt6.QtCore       import QPointF, QTimer
 from PyQt6.QtGui        import QImage, QPixmap, QPolygonF
 from PyQt6.QtWidgets    import QGraphicsPolygonItem
                            

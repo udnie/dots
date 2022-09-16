@@ -39,10 +39,10 @@ class Node(QObject):
     def _setRotate(self, rotate):
         self.pix.setRotation(rotate)
 
-    pos = pyqtProperty(QPointF, fset=_setPos)
-    scale = pyqtProperty(float, fset=_setScale) 
-    rotate = pyqtProperty(int, fset=_setRotate) 
-    opacity = pyqtProperty(float, fset=_setOpacity)
+    pos =  pyqtProperty(QPointF, fset=_setPos)
+    scale =  pyqtProperty(float, fset=_setScale) 
+    rotate =  pyqtProperty(int, fset=_setRotate) 
+    opacity =  pyqtProperty(float, fset=_setOpacity)
 
 ### -------------------------------------------------------- 
 class Animation:
@@ -96,6 +96,7 @@ def vibrate(pix):
     node = Node(pix)
     pos  = node.pix.pos()
     node.pix.setOriginPt()
+    
 
     random.seed()
     sync = random.randint(130,205)

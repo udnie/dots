@@ -1,6 +1,5 @@
 
-from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot, \
-                               QPropertyAnimation
+from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot, QPropertyAnimation
 from PyQt6.QtGui        import QColor, QPen, QPixmap, QPainterPath
 from PyQt6.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonItem 
 

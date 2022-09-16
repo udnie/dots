@@ -61,7 +61,7 @@ class SpriteMaker(QWidget):
         vbox.addWidget(self.buttons, Qt.AlignmentFlag.AlignHCenter)
                
         self.setLayout(vbox)
-     
+          
         self.view.viewport().installEventFilter(self)  
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)   
          
@@ -70,7 +70,7 @@ class SpriteMaker(QWidget):
         self.closeBtn.setDisabled(True)
         
         self.setMouseTracking(True)
-        self.grabKeyboard()  ## makes it easier to use arrow keys
+        self.grabKeyboard() 
      
         self.show()  
          
@@ -95,31 +95,30 @@ class SpriteMaker(QWidget):
         self.scale  = 1.0        
                       
 ### --------------------- event filter ----------------------                
-    def eventFilter(self, source, e):      
-        if self.outlineSet:
+    def eventFilter(self, source, e):          
+        if self.outlineSet:  ## used to draw outline      
             if e.type() == QEvent.Type.MouseButtonPress and \
                 e.button() == Qt.MouseButton.LeftButton:
                     self.npts = 0  
                     self.addPoints(e.pos())
                     self.last = self.constrainXY(e.pos(), 1) 
-        
+                    
             elif e.type() == QEvent.Type.MouseMove and \
                 e.buttons() == Qt.MouseButton.LeftButton:
                     self.addPoints(e.pos())
-        
+                    
             elif e.type() == QEvent.Type.MouseButtonRelease and \
                 e.button() == Qt.MouseButton.LeftButton:
                     pt = self.constrainXY(e.pos(), 1) 
                     if self.last != pt:  ## else too many points
                         self.last = pt   
                         self.pts.append(pt)
-                    self.updateOutline()
-                               
+                    self.updateOutline()     
+                                       
         elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.widget:
-            self.loupe.close()
-                               
+            self.loupe.close()                       
         return QWidget.eventFilter(self, source, e)
-                                          
+                                                  
 ### --------------------------------------------------------
     def addPoints(self, pt): 
         if self.npts == 0:
@@ -128,7 +127,7 @@ class SpriteMaker(QWidget):
         if self.npts % 5 == 0: 
             self.pointCheck(pt)  ## look for overlaping points     
 
-    def pointCheck(self, pt):
+    def pointCheck(self, pt):  ## make sure points don't go off the screen
         pt = self.constrainXY(pt, 1)  
         if distance(pt.x(), self.last.x(), pt.y(), self.last.y()) > 15.0:
             self.last = pt     

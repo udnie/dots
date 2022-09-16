@@ -38,9 +38,9 @@ class SliderPanel(QWidget):
 ### --------------------------------------------------------
     def enableSliders(self, bool=False): 
         self.isEnabled = bool
-        self.rotateSldr.setValue(0)
-        self.scaleSldr.setValue(100)
-        self.opacitySldr.setValue(100)
+        self.rotateSlider.setValue(0)
+        self.scaleSlider.setValue(100)
+        self.opacitySlider.setValue(100)
         self.sliderGroup.setEnabled(bool)
 
     def toggleMenu(self):
@@ -118,27 +118,33 @@ class SliderPanel(QWidget):
         opacityLabel = QLabel("Opacity")
         self.opacityValue = QLabel("1.0")
         self.opacityValue.setAlignment(Qt.AlignmentFlag.AlignLeft)
-
-        self.rotateSldr = QSlider(Qt.Orientation.Vertical, 
-            minimum=-1, maximum=360,
-            singleStep=1, value=1, 
-            valueChanged=self.setRotate)  
-        self.rotateSldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.rotateSldr.setTickInterval(90)
+       
+        self.rotateSlider = QSlider(Qt.Orientation.Vertical)  
+        self.rotateSlider.setMinimum(1)
+        self.rotateSlider.setMaximum(360)
+        self.rotateSlider.setSingleStep(1)
+        self.rotateSlider.setValue(1) 
+        self.rotateSlider.valueChanged.connect(self.setRotate)      
+        self.rotateSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.rotateSlider.setTickInterval(90)
         
-        self.scaleSldr = QSlider(Qt.Orientation.Vertical, 
-            minimum=25, maximum=300,
-            singleStep=2, value=100, 
-            valueChanged=self.setScale)
-        self.scaleSldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.scaleSldr.setTickInterval(25)
+        self.scaleSlider = QSlider(Qt.Orientation.Vertical)  
+        self.scaleSlider.setMinimum(25)
+        self.scaleSlider.setMaximum(300)
+        self.scaleSlider.setSingleStep(2)
+        self.scaleSlider.setValue(100) 
+        self.scaleSlider.valueChanged.connect(self.setScale)      
+        self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.scaleSlider.setTickInterval(25)
 
-        self.opacitySldr = QSlider(Qt.Orientation.Vertical, 
-            minimum=-1, maximum=100,
-            singleStep=1, value=100, 
-            valueChanged=self.setOpacity)
-        self.opacitySldr.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.opacitySldr.setTickInterval(5)
+        self.opacitySlider = QSlider(Qt.Orientation.Vertical)
+        self.opacitySlider.setMinimum(1)
+        self.opacitySlider.setMaximum(100)
+        self.opacitySlider.setSingleStep(1)
+        self.opacitySlider.setValue(100) 
+        self.opacitySlider.valueChanged.connect(self.setOpacity)
+        self.opacitySlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.opacitySlider.setTickInterval(5)
         
         self.ctrBtn = QPushButton("Center")
         self.ctrBtn.clicked.connect(lambda: self.sliderSignal[str, int].emit("center", 0))
@@ -159,9 +165,9 @@ class SliderPanel(QWidget):
         vabox.addWidget(self.opacityValue)
 
         sbox = QHBoxLayout()    ## sliders      
-        sbox.addWidget(self.rotateSldr) 
-        sbox.addWidget(self.scaleSldr)                  
-        sbox.addWidget(self.opacitySldr) 
+        sbox.addWidget(self.rotateSlider) 
+        sbox.addWidget(self.scaleSlider)                  
+        sbox.addWidget(self.opacitySlider) 
 
         vbox = QVBoxLayout()  
         vbox.addLayout(lbox)
