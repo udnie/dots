@@ -133,9 +133,10 @@ class PixWidget(QWidget):
         return groupBox
 
     def buttonGroup(self):
-        groupBox = QGroupBox("Feeling Lucky?")
+        groupBox = QGroupBox("Pixitem Widget  ")
+        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
-        groupBox.setFixedWidth(100)
+        groupBox.setFixedWidth(103)
         groupBox.setStyleSheet("background: rgb(245, 245, 245)")
                      
         shadowBtn = QPushButton("Shadow")

@@ -28,7 +28,7 @@ common = {
     "runThis":  "demo.play",
 }
           
-CanvasStr = "L,R,P,S,C,K,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+CanvasStr = "L,R,P,S,C,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
 PathStr = "C,D,E,F,L,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
@@ -76,16 +76,19 @@ keyMenu = (                    ## pixitems and bkgitems
     ('K', 'Toggle KeyList'),
     ('L', 'Load Play'),
     ('M', 'Map Selected'),
+    ('O', 'Clear Outlines'),
     ('P', 'Toggle Paths'),
     ('R', 'Run Play/Demo'),
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
     ('U', 'UnSelect All'),
+    ('W'  'Clear Widgets'), 
+    ('Shift', '+H Hide Selected'), 
     ('Shift', '+L ToggleLocks'),
     ('Shift', '+R Locks All'),
     ('Shift', '+T TagSelected'),
     ('Shift', '+U Unlocks All'),
-    ('Shift', '+V Pixel Ruler'),    
+    ('Shift', '+V Pixel Ruler'),   
     ('Space', 'Show this Tag'),
     ('\'', 'Toggle this lock'),
     ('X, Q', 'Escape to Quit'),

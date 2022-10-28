@@ -20,11 +20,12 @@ class PathMaker(QWidget):
     def __init__(self, parent):  
         super().__init__()
 
-        self.canvas = parent  
-        self.scene  = parent.scene
-        self.view   = parent.view
-        self.slider = parent.slider
-        self.dots   = parent.dots
+        self.canvas  = parent  
+        self.scene   = self.canvas.scene
+        self.view    = self.canvas.view
+        self.slider  = self.canvas.slider
+        self.dots    = self.canvas.dots
+        self.sideCar = self.canvas.sideCar
 
         self.chooser = None  ## placeholder for doodles_popup_widget 
        
@@ -112,7 +113,7 @@ class PathMaker(QWidget):
             self.doFirst[key]()  ## run the function, value
 
         elif self.key == 'K':
-            self.slider.toggleMenu()  ## keys
+            self.sideCar.toggleMenu()  ## keys
                     
         elif self.key == 'E' and self.sideWays.tagCount() > 0:
             self.sideWays.removeWayPtTags()
@@ -188,7 +189,7 @@ class PathMaker(QWidget):
             self.canvas.pathMakerOn = True 
             self.initThis()
             if not self.slider.pathMenuSet:
-                self.slider.toggleMenu()
+                self.sideCar.toggleMenu()
             self.turnGreen()
             # QTimer.singleShot(200, self.pathChooser)  ## optional
 
@@ -216,7 +217,7 @@ class PathMaker(QWidget):
             self.canvas.initBkg.disableSetBkg() 
             self.slider.enableSliders(False)
             if self.slider.pathMenuSet:
-                self.slider.toggleMenu()
+                self.sideCar.toggleMenu()
             self.canvas.btnPathMaker.setStyleSheet(
                 "background-color: white")
 

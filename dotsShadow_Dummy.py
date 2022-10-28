@@ -34,7 +34,24 @@ class ShadowMaker:
     def hideAll(self):
         pass
     
+    def toggleOutline(self):
+        pass
     
+    def clearOutlines(self):
+        pass
+    
+    def deleteOutline(self):
+        pass
+    
+    def deletePoints(self):
+        pass
+    
+    def cleanUpShadow(self):
+        pass
+    
+    def init(self):
+        pass
+       
 ### --------------------------------------------------------
 class Shadow(): 
 ### --------------------------------------------------------

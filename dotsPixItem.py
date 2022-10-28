@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 
-#from dotsShadowMaker    import ShadowMaker  ## add shadows
+##from dotsShadowMaker    import ShadowMaker  ## add shadows
 from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsSideCar    as sideCar
@@ -18,7 +18,7 @@ PixFactor = .30  # beginnig size factor
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 
-PixSizes = {  ## match up on base filename
+PixSizes = {  ## match up on base filename  
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -30,9 +30,9 @@ class PixItem(QGraphicsPixmapItem):
         super().__init__()
 
         self.canvas = parent
-        self.scene  = parent.scene
-        self.mapper = parent.mapper
-
+        self.scene  = self.canvas.scene
+        self.mapper = self.canvas.mapper
+    
         self.fileName = imgFile
    
         self.id = int(id)  ## used by mapper
@@ -86,14 +86,12 @@ class PixItem(QGraphicsPixmapItem):
 
         self.setPos(self.x, self.y)
         self.setMirrored(mirror)
-
-        self.setFlags(False) if 'frame' in self.fileName else self.setFlags(True)
-  
-        self.setShapeMode(QGraphicsPixmapItem.ShapeMode.BoundingRectShape)
+        
         self.setAcceptHoverEvents(True)
-        
-        self.shadowMaker = ShadowMaker(self)
-        
+        self.setFlags(False) if 'frame' in self.fileName else self.setFlags(True)
+       
+        self.shadowMaker = ShadowMaker(self) 
+         
         self.WidgetW, self.WidgetH = 330.0, 210.0
       
 ### --------------------------------------------------------
@@ -136,10 +134,11 @@ class PixItem(QGraphicsPixmapItem):
     def mousePressEvent(self, e):    
         if self.canvas.control not in PlayKeys: 
             if e.button() == Qt.MouseButton.RightButton:
-                if 'pivot' in self.fileName or 'frame' in self.fileName:
-                    return
-                elif not self.scene.selectedItems():
-                    self.addWidget()
+                ## right mouse triggers animation menu if selected screen items
+                if 'pivot' in self.fileName or 'frame' in self.fileName or \
+                    self.scene.selectedItems():
+                    return      
+                self.addWidget()  ## nothing selected - ok to add
             elif self.key == 'space' and e.button() == Qt.LeftButton:
                 self.mapper.toggleTagItems(self.id)
             elif self.key in RotateKeys:
@@ -212,6 +211,13 @@ class PixItem(QGraphicsPixmapItem):
             e.accept()
             
 ### --------------------------------------------------------
+    def addShadow(self):  ## from pixwidget 
+        self.shadowMaker.cleanUpShadow()
+        self.shadowMaker.init()
+        self.shadowMaker.addShadow(self.width, self.height, common["ViewW"],common["ViewH"])
+        self.closeWidget()
+        self.shadow = self.shadowMaker.shadow
+
     def addWidget(self):
         self.closeWidget()
         self.widget = PixWidget(self)
@@ -229,12 +235,7 @@ class PixItem(QGraphicsPixmapItem):
         if self.widget != None:
             self.widget.close()
             self.widget = None
-            
-    def addShadow(self):
-        self.shadowMaker.addShadow(self.width, self.height, common["ViewW"],common["ViewH"])
-        self.closeWidget()
-        self.shadow = self.shadowMaker.shadow
-         
+                     
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(

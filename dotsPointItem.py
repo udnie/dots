@@ -17,7 +17,7 @@ class PointItem(QGraphicsEllipseItem):
         super().__init__()
 
         self.canvas = parent
-        self.scene  = parent.scene
+        self.scene  = self.canvas.scene
     
         self.drawing = drawing
         self.pathMaker = drawing.pathMaker

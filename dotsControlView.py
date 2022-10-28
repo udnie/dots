@@ -7,12 +7,14 @@ from dotsSideGig     import MsgBox
 from dotsShared      import singleKeys
 from dotsSideCar     import SideCar
 from dotsMapItem     import InitMap
+from dotsSliderPanel import SliderPanel
 
-DFTKeys   = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T)
+DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
-ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_W)
+ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, \
+                Qt.Key.Key_H)
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -26,11 +28,10 @@ class ControlView(QGraphicsView):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.canvas = parent         
-        self.canvas.mapper = InitMap(self.canvas)  ## carry mapper to sidecar
-        
-        self.sideCar = SideCar(self.canvas)
-
+        self.canvas         = parent         
+        self.canvas.mapper  = InitMap(self.canvas)  ## carry mapper to sidecar  
+        self.canvas.sideCar = SideCar(self.canvas)
+      
         self.setObjectName('ControlView')
         self.setScene(parent.scene)
       
@@ -60,11 +61,13 @@ class ControlView(QGraphicsView):
             Qt.Key.Key_H: self.canvas.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
             Qt.Key.Key_Z: self.canvas.ZDump,
+            Qt.Key.Key_O: self.canvas.sideCar.clearOutlines,   
         }
 
         self.toggleKeys = {
-            Qt.Key.Key_G: self.sideCar.toggleGrid,
+            Qt.Key.Key_G: self.canvas.sideCar.toggleGrid,
             Qt.Key.Key_M: self.canvas.mapper.toggleMap,
+            Qt.Key.Key_K: self.canvas.sideCar.toggleMenu,  
         }
 
 ### --------------------------------------------------------
@@ -102,7 +105,7 @@ class ControlView(QGraphicsView):
         key = e.key() 
         mod = e.modifiers()   
           
-        ## special keys - may differ in another OS
+        ## special keys - may differ in another OS - !, @, del
         if e.key() == 33 and self.canvas.pathMakerOn:
             self.setKey('!')
         elif e.key() == 64 and self.canvas.pathMakerOn:
@@ -110,7 +113,7 @@ class ControlView(QGraphicsView):
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
             
-        ## handle shift keys   
+        ## shift keys - D, P, T, V, H  
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in ShiftKeys:
             if key == Qt.Key.Key_D:   
                 self.setKey('delPts')  ## send to pathmaker
@@ -119,16 +122,18 @@ class ControlView(QGraphicsView):
                     self.canvas.mapper.toggleTagItems('paths')                
             elif key == Qt.Key.Key_T:         
                 self.canvas.mapper.toggleTagItems('select')     
-            elif key == Qt.Key.Key_V:
+            elif key == Qt.Key.Key_V:  ## VHX
                 self.startProcess()
-            elif key == Qt.Key.Key_W:
-                self.sideCar.shadowTime()
-                
-        ## shift key and lock keys
+            elif key == Qt.Key.Key_H:
+                self.canvas.sideCar.hideSelected()
+                self.canvas.sideCar.clearWidgets()
+                self.canvas.sideCar.toggleOutlines()
+             
+        ## shift keys used in locking screen items - L, R, U
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
             self.canvas.togglePixLocks(singleKeys[key])  
                      
-        elif key in DFTKeys:
+        elif key in DFTWKeys:  ## set key as well - used by pathMaker
             if key == Qt.Key.Key_D:  
                 self.setKey('D') 
                 self.canvas.deleteSelected()
@@ -140,15 +145,20 @@ class ControlView(QGraphicsView):
                     self.setKey('T')  ## run test
                 else:  
                     self.canvas.mapper.toggleTagItems('all')
+            elif key == Qt.Key.Key_W:
+                if not self.canvas.pathMakerOn:
+                    self.canvas.sideCar.clearWidgets()
+                else:
+                    self.setKey('W') 
                                    
         elif key in self.direct: 
-            self.direct[key]()  
+            self.direct[key]()  ## dictionary
             
         elif key in self.toggleKeys:
-            self.toggleKeys[key]()  
+            self.toggleKeys[key]()  ## dictionary
             
         elif key in singleKeys:  ## in dotsShared.py  
-            self.setKey(singleKeys[key]) 
+            self.setKey(singleKeys[key])
             
         elif e.key() in ExitKeys:
             self.canvas.exit() 

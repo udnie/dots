@@ -2,15 +2,16 @@
 import random
 import json
 
-from PyQt6.QtCore    import Qt, QPointF
-from PyQt6.QtGui     import QPixmap, QPen, QColor, QGuiApplication
-from PyQt6.QtWidgets import QGraphicsPixmapItem, QFileDialog, \
-                            QGraphicsItemGroup, QGraphicsLineItem, \
-                            QApplication
-                           
-from dotsShared      import common, paths
-from dotsPixItem     import PixItem
-from dotsSideGig     import MsgBox
+from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtGui        import QPixmap, QPen, QColor, QGuiApplication
+from PyQt6.QtWidgets    import QGraphicsPixmapItem, QFileDialog, \
+                                QGraphicsItemGroup, QGraphicsLineItem, \
+                                QApplication
+                  
+from dotsAnimation  import *   
+from dotsShared     import common, paths, keyMenu, pathMenu
+from dotsPixItem    import PixItem
+from dotsSideGig    import MsgBox
 
 ### ---------------------- dotsSideCar ---------------------
 ''' dotsSideCar: wings, pixTest, transFormPixitem, toggleGrid plus 
@@ -24,6 +25,8 @@ class SideCar:
         self.canvas = parent
         self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
+        
+        self.animation = Animation(self.canvas)
       
         self.gridZ   = common["gridZ"] 
         self.gridGroup = None
@@ -101,7 +104,7 @@ class SideCar:
         op = QPointF(pix.width/2, pix.height/2)
         pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         pix.setTransformOriginPoint(op)
-         
+              
         pix.rotation = rotation
         pix.scale    = scale 
         pix.alpha2   = alpha2
@@ -137,20 +140,47 @@ class SideCar:
                 rotation = random.randrange(-5, 5) * 5
                 scale = random.randrange(90, 110)/100.0
                 self.transFormPixItem(pix, rotation, scale, 1.0)
-                                    
-### --------------------------------------------------------                             
-    def shadowTime(self):
-        self.clearWidgets() 
-        for pix in self.scene.items(): 
-            if pix.type == 'pix' and pix.shadow != None:
-                if pix.shadowMaker.ishidden == False:
-                    pix.shadowMaker.hideAll()        
-                           
+                
+                ## set the animation tag and class variable
+                # pix.tag = 'Random'
+                # pix.anime = self.animation.setAnimation(          
+                #     pix.tag, 
+                #     pix)    
+                   
+   ### --------------------------------------------------------           
+    def toggleMenu(self):
+        if self.canvas.slider.pathMenuSet:
+            self.canvas.slider.setTableModel(keyMenu)
+            self.canvas.slider.pathMenuSet = False
+        else:
+            self.canvas.slider.setTableModel(pathMenu)
+            self.canvas.slider.pathMenuSet = True     
+                                                                                        
     def clearWidgets(self):                       
         for widget in QApplication.allWidgets():  ## note!!
-            if widget.accessibleName() == 'widget':  ## shadow menu/widget
-                widget.close()                     
-                                                                  
+            if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
+                widget.close()  
+                                                                                
+    def clearOutlines(self):  ## with shadows
+        for pix in self.scene.items():
+            if pix.type == 'pix' and pix.shadow:
+                pix.shadowMaker.deleteOutline()
+                pix.shadowMaker.deletePoints()
+                
+    def toggleOutlines(self):
+        for pix in self.scene.items():
+            if pix.type == 'pix' and pix.shadow:
+                pix.shadowMaker.toggleOutline()
+                                                                                                                                 
+    def hideSelected(self):  ## with shadows
+        for pix in self.scene.items():
+            if pix.type == 'pix' and pix.shadow: 
+                if pix.isSelected():
+                    pix.hide() 
+                elif not pix.isVisible():
+                    pix.show()       
+                    pix.setSelected(True)
+                                                                               
 ### --------------------------------------------------------
     def toggleGrid(self):
         if self.gridGroup is not None:

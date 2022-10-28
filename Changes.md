@@ -1,12 +1,20 @@
+
 ## Changes
+**October 2022:**        
+Dots updated to **PyQt 6.4** and **Python 3.11** - may need to re-install open-cv as well.
+
+Some additions and updates to Shadows. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run Shadows. Latest video:<https://youtu.be/CLOVUHtD-Ts>
+
+
+
 **September 2022:**  
-Edits to widgets and sliders, mostly for scaling. 
+Minor edits to widgets and sliders, mostly for scaling. 
 
 A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPos(), plus of course, PyQt6 to PyQt5. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  **Dots doesn't run in PySide6.**
 
 
 **July 2022:**     
-See **SpriteMaker.md** for current changes as I'm breaking **spriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **spriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest videos:
+See **SpriteMaker.md** for current changes as I'm breaking **spriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **spriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest video:
 <https://youtu.be/bGYBj_bjEJU>
 
 

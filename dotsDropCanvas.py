@@ -3,11 +3,10 @@ import random
 import os
 import gc
 
-from PyQt6.QtCore    import QAbstractAnimation, QTimer, QEvent, QPointF
+from PyQt6.QtCore    import QAbstractAnimation, QTimer, QEvent, QPointF, pyqtSlot
 from PyQt6.QtGui     import QTransform
-from PyQt6.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene, \
-                            QApplication
-                       
+from PyQt6.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene
+                                        
 from dotsShared      import common, CanvasStr, PathStr, MoveKeys, PlayKeys
 from dotsAnimation   import *
 from dotsSideGig     import getPathList
@@ -80,24 +79,28 @@ class DropCanvas(QWidget):
     @pyqtSlot(str)
     def setKeys(self, key):
         self.key = key
-        if self.pathMakerOn and self.key == 'C' and \
-            len(self.scene.items()) == 0:
-            self.clear()
-            return
-        if not self.pathMakerOn:  ## canvas
+        
+        if self.key == 'C':
+            if self.pathMakerOn:
+                if len(self.scene.items()) == 0:
+                   self.clear()   ## really does it and returns to canvas
+                else:
+                    self.pathMaker.pathKeys(self.key)  ## centers path
+            else:
+                self.clear()  ## canvas
+       
+        elif not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
                 if self.key in Loops:  ## canvas hotkeys
                     self.sideShow.keysInPlay(self.key)        
-                elif self.key == 'C':
-                    self.clear()
-                elif self.key == 'K':
-                    self.slider.toggleMenu()
                 else:
                     self.sendPixKeys()
+                    
         ## send move keys to selected pointItems 
         elif self.pathMaker.drawing.pointItemsSet() == True and \
-            self.pathMaker.selections and self.key in MoveKeys:
+            self.pathMaker.selections and self.key in MoveKeys:  ## from shared.py
                 self.sendPixKeys()
+                
         ## send the rest to pathMaker
         elif self.key in PathStr: 
             self.pathMaker.pathKeys(self.key)
@@ -114,7 +117,8 @@ class DropCanvas(QWidget):
                     self.unSelect()      
                 elif self.hasHiddenPix() or self.mapper.selections:
                     if self.control not in PlayKeys:
-                        self.mapper.updatePixItemPos()     
+                        self.mapper.updatePixItemPos()   
+                          
                 ## show play files on right mouse click if nothing at location       
                 elif e.button() == Qt.MouseButton.RightButton:
                     if len(self.scene.items()) == 0:
@@ -169,7 +173,7 @@ class DropCanvas(QWidget):
                     pix.alpha2)
                 return
         
-            elif 'frame' in pix.fileName:  ## pin it on dnd
+            elif 'frame' in pix.fileName:  ## pin it on drag and drop
                 pix.setPos(0,0)
                 pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
             
@@ -234,14 +238,12 @@ class DropCanvas(QWidget):
 
     def unSelect(self):
         self.mapper.clearMap()
-        for pix in self.scene.items():
-            if pix.type == 'pix':
-                pix.isHidden = False
-                pix.setSelected(False)
-            elif pix.type == 'pt':
-                pix.setSelected(False)   
-            elif pix.zValue() <= common["pathZ"]:
-                break
+        for itm in self.scene.items():
+            if itm.zValue() <= common["pathZ"]:
+                break     
+            itm.setSelected(False)  
+            if itm.type == 'pix':
+               itm.isHidden = False 
     
 ### --------------------------------------------------------
     def deleteSelected(self):  ## self.pathMakerOn equals false

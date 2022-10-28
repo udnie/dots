@@ -21,7 +21,9 @@ class PointItem(QGraphicsEllipseItem):
     def __init__(self, pt, ptStr, parent):
         super().__init__()
 
-        self.fab = parent
+        self.fab     = parent
+        self.pixitem = self.fab.pixitem
+        self.path    = self.fab.path
          
         self.type  = "point"
         self.ptStr = ptStr
@@ -31,8 +33,8 @@ class PointItem(QGraphicsEllipseItem):
         ## -V*.5 so it's centered on the path 
         self.x = pt.x()-V*.5
         self.y = pt.y()-V*.5
-        self.setZValue(50) 
         
+        self.setZValue(self.pixitem.zValue()-.1)      
         self.setRect(self.x, self.y, V, V)  
         
         self.setPen(QPen(QColor("gray"), 1))
@@ -63,22 +65,22 @@ class PointItem(QGraphicsEllipseItem):
         self.setRect(x-V*.5, y-V*.5, V,V)  ## set current point    
         if self.ptStr == "topLeft":  ## push right
             w, y1 = self.current(0,1)            
-            self.fab.path[0] = QPointF(x,y) 
-            self.fab.path[1] = QPointF(x+w,y1)
+            self.path[0] = QPointF(x,y) 
+            self.path[1] = QPointF(x+w,y1)
             self.fab.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)       
         elif self.ptStr == "botLeft":    
             w, y1 = self.current(3,2)            
-            self.fab.path[3] = QPointF(x,y) 
-            self.fab.path[2] = QPointF(x+w,y1)
+            self.path[3] = QPointF(x,y) 
+            self.path[2] = QPointF(x+w,y1)
             self.fab.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
         else:  
             i = PathStr.index(self.ptStr)  ## move only 
-            self.fab.path[i] = QPointF(x,y)                  
+            self.path[i] = QPointF(x,y)                  
         
     def current(self,a,b):
-        l = self.fab.path[a].x()
-        r = self.fab.path[b].x()
-        return r - l,  self.fab.path[b].y()
+        l = self.path[a].x()
+        r = self.path[b].x()
+        return r - l,  self.path[b].y()
 
 ### --------------------------------------------------------        
 class ShadowWidget(QWidget): 
@@ -87,6 +89,7 @@ class ShadowWidget(QWidget):
         super().__init__()
                                         
         self.fab = parent
+        self.pixitem = self.fab.pixitem
         
         self.type = 'widget'
         self.save = QPointF(0.0,0.0)
@@ -207,19 +210,22 @@ class ShadowWidget(QWidget):
         return groupBox
 
     def buttonGroup(self):
-        groupBox = QGroupBox("Feeling Lucky?")
+        groupBox = QGroupBox("Shadow Widget  ")
+        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
-        groupBox.setFixedWidth(100)
+        groupBox.setFixedWidth(103)
         groupBox.setStyleSheet("background: rgb(245, 245, 245)")
                      
         hideBtn = QPushButton("Hide")
         flipBtn  = QPushButton("Flip")
+        flopBtn  = QPushButton("Flop")
         newBtn  = QPushButton("New")
         delBtn  = QPushButton("Delete")
         quitBtn = QPushButton("Close")
     
         hideBtn.clicked.connect(self.fab.hideAll)
         flipBtn.clicked.connect(self.fab.flip)
+        flopBtn.clicked.connect(self.fab.flop)
         newBtn.clicked.connect(self.fab.newShadow)
         delBtn.clicked.connect(self.fab.deleteShadow)
         quitBtn.clicked.connect(self.fab.closeWidget)
@@ -227,6 +233,7 @@ class ShadowWidget(QWidget):
         hbox = QVBoxLayout(self)
         hbox.addWidget(hideBtn)
         hbox.addWidget(flipBtn)
+        hbox.addWidget(flopBtn)
         hbox.addWidget(newBtn)
         hbox.addWidget(delBtn)
         hbox.addWidget(quitBtn)
@@ -234,50 +241,50 @@ class ShadowWidget(QWidget):
         groupBox.setLayout(hbox)
         return groupBox
     
-    def Rotate(self, val):
+    def Rotate(self, val):  ## setting rotate in shadowMaker
         self.fab.rotateShadow(val)
         self.rotateValue.setText("{:3d}".format(val))
-        ## setting rotate in shadowMaker
-  
-    def Scale(self, val):
+             
+    def Scale(self, val):  ## setting rotate in shadowMaker
         op = (val/100)
         self.fab.scaleShadow(op)
         self.scaleValue.setText("{0:.2f}".format(op))
-        ## setting rotate in shadowMaker
-        
+           
     def Opacity(self, val):
         op = (val/100)
         self.fab.shadow.setOpacity(op)
         self.fab.alpha = op
         self.opacityValue.setText("{0:.2f}".format(op)) 
-                                                                                                                                                                              
+                                                        
 ### --------------------------------------------------------
-class Shadow(QGraphicsPixmapItem): 
+class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
        
-        self.fab = parent
+        self.fab     = parent
+        self.pixitem = self.fab.pixitem
+        self.path    = self.fab.path
        
         self.type = "shadow" 
         self.anime = None 
-        self.setZValue(self.fab.pixitem.zValue()-1) 
+        self.setZValue(self.pixitem.zValue()-.5) 
                                        
         self.dragCnt = 0
         self.save    = QPointF(0.0,0.0)
         self.skip    = False
                            
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True)
+        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True)
           
 ### --------------------------------------------------------
-    def paint(self, painter, option, widget=None):
-        super().paint(painter, option, widget)
-        if self.isSelected():
-            pen = QPen(QColor("lime"))
-            pen.setWidth(2)
-            painter.setPen(pen)
-            painter.drawRect(self.boundingRect())
+    # def paint(self, painter, option, widget=None):  ## turn off for now
+    #     super().paint(painter, option, widget)
+    #     if self.isSelected():
+    #         pen = QPen(QColor("lime"))
+    #         pen.setWidth(2)
+    #         painter.setPen(pen)
+    #         painter.drawRect(self.boundingRect())
 
     def mousePressEvent(self, e): 
         self.save = self.mapToScene(e.pos())    
@@ -290,46 +297,53 @@ class Shadow(QGraphicsPixmapItem):
     def mouseMoveEvent(self, e):
         self.dragCnt += 1
         if self.dragCnt % 5 == 0:                     
-            self.updatePath(self.mapToScene(e.pos()))  
+            self.fab.updatePath(self.mapToScene(e.pos()))  
             self.fab.updateOutline()
         e.accept()
                        
     def mouseReleaseEvent(self, e): 
-        self.updatePath(self.mapToScene(e.pos())) 
+        self.fab.updatePath(self.mapToScene(e.pos())) 
         if self.skip:
             self.skip = False  ## skip updating shadow as ran widget 
         else: 
             self.fab.updateOutline()
             self.fab.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving
         e.accept()
-                     
-    def updatePath(self, val):   
-        dif = val - self.save
-        self.setPos(self.pos()+dif)         
-        for i in range(4):  
-            self.fab.path[i] = self.fab.path[i] + dif
-            self.fab.updatePoints(i, self.fab.path[i].x(), self.fab.path[i].y())
-        self.save = val
-                       
-### --------------------------------------------------------      
-    def initPoints(self):  ## initial path and points setting       
-        self.fab.path = []
+ 
+ ### --------------------------------------------------------   
+    def initPoints(self):  ## initial path and points setting           
+        self.path = []
         self.fab.outline = None
+         
+        self.fab.setPath(self.boundingRect(), self.fab.shadow.pos())
         
-        b = self.boundingRect()  
-        p = self.pos() 
-        
-        self.fab.path.append(p)  
-        self.fab.path.append(QPointF(p.x() + b.width(), p.y()))  
-        self.fab.path.append(QPointF(p.x() + b.width(), p.y() + b.height()))         
-        self.fab.path.append(QPointF(p.x(), p.y() + b.height()))
+        self.fab.updateOutline()     
+        self.fab.addPoints() 
+    
+        if self.pixitem.scale == 1.0 and self.pixitem.rotation == 0:    
+            return
+                     
+        self.fab.hideAll()  ## pixitem rotated or scaled 
+           
+        self.fab.shadow.setRotation(self.pixitem.rotation)
+        self.fab.shadow.setScale(self.pixitem.scale)
+    
+        self.fab.setPath(self.pixitem.boundingRect(), self.pixitem.pos() + QPointF(-50,-15))
+     
+        if self.pixitem.rotation != 0:
+            self.fab.rotateShadow(self.pixitem.rotation)
+            self.fab.rotate = self.pixitem.rotation
+                    
+        if self.pixitem.scale != 1.0:   
+            self.fab.scaleShadow(self.pixitem.scale)      
+            self.fab.scalor = self.pixitem.scale
+   
+        self.fab.updateOutline()         
+        self.fab.addPoints()                
       
-        self.fab.updateOutline()  
-        self.fab.addPoints()                                                                                                                                                                                                                                         
-
-    def deleteShadow(self):
-        self.fab.deleteShadow()
-                                                                                 
+        self.fab.hideAll()  ## call again to unhide       
+        self.fab.shadow.show()
+                                                        
 ### --------------------------------------------------------        
 def initShadow(file, w, h, flop):  ## replace all colors with grey    
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)   
@@ -354,7 +368,7 @@ def initShadow(file, w, h, flop):  ## replace all colors with grey
 ### --------------------------------------------------------          
 def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on path xy's         
     p = []                      
-    for i in range(4):  ## make cv2 happy - get current location of points from path
+    for i in range(4):  ## get current location of points from path
         x,y = int(path[i].x()), int(path[i].y()) 
         p.append([x,y])
             
@@ -366,11 +380,8 @@ def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on
 
     height, width, ch = img.shape
     bytesPerLine = ch * width  ## 4 bits of information
-        
-    img = cv2.resize(img, (width, height), interpolation = cv2.INTER_CUBIC)  ## helps smooth out edges
-    img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT)    
     
-    return img, width, height, bytesPerLine    
-                                                                                                            
+    return img, width, height, bytesPerLine   
+                                                   
 ### ------------------- dotsShadowWorks --------------------
 

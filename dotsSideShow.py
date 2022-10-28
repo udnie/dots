@@ -11,7 +11,7 @@ from PyQt6.QtCore    import QTimer, QAbstractAnimation
 from dotsPixItem     import PixItem
 from dotsBkgItem     import *
 
-#from dotsShadowWorks    import Shadow  ## adds shadows
+##from dotsShadowWorks    import Shadow  ## adds shadows
 from dotsShadow_Dummy    import Shadow  ## turns off shadows
 
 from dotsShared      import common, paths
@@ -121,7 +121,7 @@ class SideShow:
                     tmp['z'] = lnn  ## lnn preserves front to back relationships
                     lnn -= 1 
                     ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
-                    if 'scalor' in tmp.keys() and pix.shadowMaker.addRestore == '': 
+                    if 'scalor' in tmp.keys() and pix.shadowMaker.addRestore == '':
                         ns += 1
                     self.addPixToScene(pix, tmp)  ## finish unpacking tmp  
                                 
@@ -144,7 +144,7 @@ class SideShow:
             self.dots.statusBar.showMessage("Number of Pixitems: {}".format(kix),5000)  
               
             if ns > 0:
-                QTimer.singleShot(200, self.addShadows)  
+                QTimer.singleShot(200, self.addShadows) 
                 MsgBox("Adding Shadows,  please wait...", int(1 + (ns * .3)))
             elif self.locks > 0:
                 MsgBox("Some screen items are locked", 5)  ## seconds
@@ -185,17 +185,20 @@ class SideShow:
                 "pathX":    tmp['pathX'],
                 "pathY":    tmp['pathY'],
                 "ishidden": tmp['ishidden'],     
-            }        
-     
+            }  
+            if 'flopped' not in tmp.keys():      
+                pix.shadow['flopped'] = None
+            else:
+                pix.shadow['flopped'] = tmp['flopped']
+             
         ## may require rotation or scaling - adds to scene items
         self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
    
 ### --------------------------------------------------------                      
-    def addShadows(self):         
+    def addShadows(self):  ## add shadows after adding pixitems     
         tasks = []         
         start = time.time()
-        loop  = asyncio.new_event_loop()
-        
+        loop  = asyncio.new_event_loop() 
         ## thanks to a dev community post - it took some work to 
         ## eventually find an example that illustrated how to process
         ## a group of class functions using asyncio
@@ -356,6 +359,7 @@ class SideShow:
                 "pathY":    [float("{0:.2f}".format(pix.shadowMaker.path[k].y()))
                                 for k in range(len(pix.shadowMaker.path))],
                 "ishidden": pix.shadowMaker.ishidden,
+                "flopped":   pix.shadowMaker.flopped,
             }
             tmp.update(shadow)
           

@@ -16,8 +16,8 @@ class DrawsPaths(QWidget):
         super().__init__()
 
         self.canvas = parent
-        self.scene  = parent.scene
-        self.view   = parent.view
+        self.scene  = self.canvas.scene
+        self.view   = self.canvas.view
         
         self.pathMaker = pathMaker  
         self.sideWays  = sideWays

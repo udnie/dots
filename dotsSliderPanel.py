@@ -20,7 +20,6 @@ class SliderPanel(QWidget):
         super().__init__()
         
         self.canvas = parent
-        self.view   = parent.view
     
         self.setFixedSize(SliderW, SliderH) 
 
@@ -42,14 +41,6 @@ class SliderPanel(QWidget):
         self.scaleSlider.setValue(100)
         self.opacitySlider.setValue(100)
         self.sliderGroup.setEnabled(bool)
-
-    def toggleMenu(self):
-        if self.pathMenuSet:
-            self.setTableModel(keyMenu)
-            self.pathMenuSet = False
-        else:
-            self.setTableModel(pathMenu)
-            self.pathMenuSet = True
 
 ### --------------------------------------------------------
     def addTableGroup(self):
@@ -74,11 +65,11 @@ class SliderPanel(QWidget):
 
 ### --------------------------------------------------------
     def setTableModel(self, list):
-        header = [' Keys ', 'Action']
+        header = [' Keys ', 'StoryBoard ']
         model = TableModel(list, header)
         self.tableView.setModel(model)
         if list != keyMenu:
-            header[1] = 'PathMaker'
+            header[1] = 'PathMaker '
             self.tableView.horizontalHeader().setStyleSheet(
                 "QHeaderView::section{\n"
                 "background-color: rgb(144,238,144);\n"
@@ -90,7 +81,7 @@ class SliderPanel(QWidget):
                 "font-size: 12px;\n"
                 "}")  
         else:
-            header[1] = 'Action'
+            header[1] = 'StoryBoard '
             self.tableView.horizontalHeader().setStyleSheet(
                 "QHeaderView::section{\n"
                 "background-color: rgb(220,220,220);\n"

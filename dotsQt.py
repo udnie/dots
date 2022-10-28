@@ -35,7 +35,7 @@ class DotsQt(QMainWindow):
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
         
-        ## just in case the sprite directory is missing
+        ## can't all happen at once
         QTimer.singleShot(200, self.canvas.loadSprites)
 
         self.show()
@@ -51,5 +51,7 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ------------------------- dotsQt -----------------------
+
+
 
 

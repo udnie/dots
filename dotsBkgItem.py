@@ -25,7 +25,7 @@ class BkgItem(QGraphicsPixmapItem):
         super().__init__()
 
         self.canvas = canvas
-        self.scene  = canvas.scene
+        self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
        
         self.ViewW = common["ViewW"]
