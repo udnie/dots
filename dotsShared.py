@@ -82,7 +82,7 @@ keyMenu = (                    ## pixitems and bkgitems
     ('S', 'Stop Play'),
     ('T', 'Toggle Tags'),
     ('U', 'UnSelect All'),
-    ('W'  'Clear Widgets'), 
+    ('W', 'Clear Widgets'), 
     ('Shift', '+H Hide Selected'), 
     ('Shift', '+L ToggleLocks'),
     ('Shift', '+R Locks All'),
