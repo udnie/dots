@@ -17,7 +17,7 @@ Btns = 820
 Width, Height = 860, 840
 
 ## --> see spriteWorks to set paths, currently set for dots demo directories <-- ##
-
+''' for pyqt5 change gobalPosition to globalPos '''
 ### ------------------- dotsSpriteMaker --------------------                                                                                                                                                                                                                                                                           
 class SpriteMaker(QWidget):  
 ### -------------------------------------------------------- 

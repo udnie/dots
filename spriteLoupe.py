@@ -25,7 +25,7 @@ class SpriteWidget(QWidget):  ## the display
         
         self.view.scale(2.5,2.5)
         self.view.setGeometry(0,0,350,350)
-        self.setStyleSheet("border: 5px solid lime;")
+        self.setStyleSheet("border: 12px solid lime;")
             
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
@@ -135,11 +135,11 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
             if not self.hold:
                 self.hold = True
                 self.rect.hide()  
-                self.widget.setStyleSheet("border: 6px solid orangered;")
+                self.widget.setStyleSheet("border: 12px solid orangered;")
             else:
                 self.hold = False
                 self.rect.show()
-                self.widget.setStyleSheet("border: 5px solid lime;")
+                self.widget.setStyleSheet("border: 12px solid lime;")
         
     def closeWidget(self):
         if self.widget:
