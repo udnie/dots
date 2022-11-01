@@ -1,20 +1,21 @@
 
 ## Changes
 **October 2022:**        
-Dots updated to **PyQt 6.4** and **Python 3.11** - may need to re-install open-cv as well.
+Dots updated to **PyQt 6.4**, **PyQt5.17** and **Python 3.11**. 
+Dots doesn't run in **PySide6** but **VHX** and **SpriteMaker** can.
 
-Some additions and updates to Shadows. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run Shadows. Latest video:<https://youtu.be/CLOVUHtD-Ts>
+Some additions and updates to Shadows. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run Shadows and SpriteMaker. Latest video:<https://youtu.be/CLOVUHtD-Ts>
 
 
 
 **September 2022:**  
 Minor edits to widgets and sliders, mostly for scaling. 
 
-A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPos(), plus of course, PyQt6 to PyQt5. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  **Dots doesn't run in PySide6.**
+A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPos(), plus of course, PyQt6 to PyQt5. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  
 
 
 **July 2022:**     
-See **SpriteMaker.md** for current changes as I'm breaking **spriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **spriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest video:
+See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest video:
 <https://youtu.be/bGYBj_bjEJU>
 
 
@@ -24,7 +25,7 @@ See **SpriteMaker.md** for current changes as I'm breaking **spriteMaker** out o
 Some cosmetic changes to the right-click widgets. Also, I finally was able to file a bug report with Qt about the pointer.dispatch warnings. It's in their work queue.  Maybe by the next release it will have been taken care of. Remember, you can always use a mouse if the warnings bother you. They're not visible running dots from your desktop.
 
 **May 2022:**  
-A few small dumb bug fixes, I'm sorry for any problems they may have caused. I've added a sprite-maker, **spriteMaker.py**, currently standalone as it requires **cv2** and **numpy**. I decided to leave it outside of dots for the present, however it does rely on dotsQt for some data, functions, and directories(folders), so it's not totally standalone. A good deal of its code is based on pathMaker, including being able to add or delete points so it may prove familiar.
+A few small dumb bug fixes, I'm sorry for any problems they may have caused. I've added a sprite-maker, **SpriteMaker.py**, currently standalone as it requires **cv2** and **numpy**. I decided to leave it outside of dots for the present, however it does rely on dotsQt for some data, functions, and directories(folders), so it's not totally standalone. A good deal of its code is based on pathMaker, including being able to add or delete points so it may prove familiar.
 See the demo: <https://youtu.be/sySmphW7bYA>
 
 As of April dots was updated to **PyQt6.3** and **Python 3.10.4**. If you're on a Mac laptop running either Big Sur or Monterey and you _*_**don't**_*_ use a mouse there's good change you'll see this warning
