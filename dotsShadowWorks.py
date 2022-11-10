@@ -34,7 +34,7 @@ class PointItem(QGraphicsEllipseItem):
         self.x = pt.x()-V*.5
         self.y = pt.y()-V*.5
         
-        self.setZValue(self.pixitem.zValue()-.1)      
+        self.setZValue(35)      
         self.setRect(self.x, self.y, V, V)  
         
         self.setPen(QPen(QColor("gray"), 1))
@@ -268,7 +268,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
        
         self.type = "shadow" 
         self.anime = None 
-        self.setZValue(self.pixitem.zValue()-.5) 
+        self.setZValue(50) 
                                        
         self.dragCnt = 0
         self.save    = QPointF(0.0,0.0)

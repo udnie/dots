@@ -1,12 +1,14 @@
 
 ## Changes
+**November 2022:**      
+Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMaker**. The **StoryBoard** change affects the file name while continuing to maintain the reference thru **.canvas**.  **BkgMaker** goes a little deeper with both file and reference changes - though not many. Last, to run Shadows only dotsPixItem.py that needs an edit.
+
+
 **October 2022:**        
-Dots updated to **PyQt 6.4**, **PyQt5.17** and **Python 3.11**. 
-Dots doesn't run in **PySide6** but **VHX** and **SpriteMaker** can.
+**Dots** updated to **PyQt 6.4**, **PyQt5.17** and **Python 3.11**. 
+**Dots** doesn't run in **PySide6** but **VHX** and **SpriteMaker** can with minor edits.
 
-Some additions and updates to Shadows. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run Shadows and SpriteMaker. Latest video:<https://youtu.be/CLOVUHtD-Ts>
-
-
+Some additions and updates to **Shadows**. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run **Shadows** and **SpriteMaker**. Latest video:<https://youtu.be/CLOVUHtD-Ts>
 
 **September 2022:**  
 Minor edits to widgets and sliders, mostly for scaling. 

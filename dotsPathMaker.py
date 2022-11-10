@@ -111,9 +111,6 @@ class PathMaker(QWidget):
         self.key = key
         if key in self.doFirst:
             self.doFirst[key]()  ## run the function, value
-
-        elif self.key == 'K':
-            self.sideCar.toggleMenu()  ## keys
                     
         elif self.key == 'E' and self.sideWays.tagCount() > 0:
             self.sideWays.removeWayPtTags()
@@ -214,7 +211,7 @@ class PathMaker(QWidget):
         if self.canvas.pathMakerOn:
             self.delete()   
             self.canvas.pathMakerOn = False
-            self.canvas.initBkg.disableSetBkg() 
+            self.canvas.bkgMaker.disableSetBkg() 
             self.slider.enableSliders(False)
             if self.slider.pathMenuSet:
                 self.sideCar.toggleMenu()

@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot
+from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot, QRectF
 from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
@@ -18,7 +18,7 @@ PixFactor = .30  # beginnig size factor
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 
-PixSizes = {  ## match up on base filename  
+PixSizes = {  ## match up on base filename   
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -73,7 +73,7 @@ class PixItem(QGraphicsPixmapItem):
            
         self.setZValue(self.id)  ## zValue may reset by loadPlay 
         
-        self.isHidden = False
+        self.isHidden = False  ## no reason to save it, acts as toggle
         self.tag = ''
         
         self.anime  = None   
@@ -90,7 +90,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setAcceptHoverEvents(True)
         self.setFlags(False) if 'frame' in self.fileName else self.setFlags(True)
        
-        self.shadowMaker = ShadowMaker(self) 
+        self.shadowMaker = ShadowMaker(self)  ## sets shadow_dummy True/False
          
         self.WidgetW, self.WidgetH = 330.0, 210.0
       
@@ -107,8 +107,8 @@ class PixItem(QGraphicsPixmapItem):
                 self.moveThis(MoveKeys[key])
  
 ### --------------------------------------------------------
-    def paint(self, painter, option, widget=None):
-        super().paint(painter, option, widget)
+    def paint(self, painter, option, widget=None):  ## this may be the source of a type error in pyside
+        super().paint(painter, option, widget)  ## why is this necessary??
         if self.isSelected():
             pen = QPen(QColor("lime"))
             pen.setWidth(2)
@@ -163,12 +163,12 @@ class PixItem(QGraphicsPixmapItem):
                 self.mapper.toggleTagItems(self.id)
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
-            e.accept()
+        e.accept()
 
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName or self.locked:
             return
-        if self.canvas.control not in PlayKeys:
+        elif self.canvas.control not in PlayKeys:
             if self.key in TagKeys or self.mapper.tagSet:
                 self.clearTag() 
             self.updateXY(self.mapToScene(e.pos()))
@@ -176,7 +176,7 @@ class PixItem(QGraphicsPixmapItem):
             self.dragCnt +=1
             if self.key == 'opt' and self.dragCnt % 5 == 0:  
                 self.cloneThis() 
-            e.accept()
+        e.accept()
             
     def mouseReleaseEvent(self, e):
         self.dragCnt = 0         
@@ -188,7 +188,7 @@ class PixItem(QGraphicsPixmapItem):
         if 'frame' in self.fileName or \
             self.key in TagKeys or self.locked:
             return 
-        if self.canvas.control not in PlayKeys:
+        elif self.canvas.control not in PlayKeys:
             if self.key == 'opt':  
                 self.cloneThis()
             elif self.canvas.key == 'noMap': 
@@ -202,21 +202,22 @@ class PixItem(QGraphicsPixmapItem):
                 ## selected as the others will become hidden 
                 self.setSelected(True) 
                 self.isHidden = False  
-            elif not self.canvas.key in ('opt','cmd','shift'):
+            elif self.canvas.key not in ('opt','cmd','shift'):
                 if self.isSelected() == False:
                     self.setSelected(True)  
                 elif self.isSelected():
                     self.setSelected(False)
                 self.isHidden = False 
-            e.accept()
+        e.accept()
             
 ### --------------------------------------------------------
     def addShadow(self):  ## from pixwidget 
-        self.shadowMaker.cleanUpShadow()
-        self.shadowMaker.init()
-        self.shadowMaker.addShadow(self.width, self.height, common["ViewW"],common["ViewH"])
-        self.closeWidget()
-        self.shadow = self.shadowMaker.shadow
+        if self.shadowMaker.isDummy == False:
+            self.shadowMaker.cleanUpShadow()
+            self.shadowMaker.init()
+            self.shadowMaker.addShadow(self.width, self.height, common["ViewW"],common["ViewH"])
+            self.closeWidget()
+            self.shadow = self.shadowMaker.shadow
 
     def addWidget(self):
         self.closeWidget()
@@ -239,7 +240,7 @@ class PixItem(QGraphicsPixmapItem):
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-            # horizontally=self.flopped, vertically=False)))  ## pyside6
+            ## horizontally=self.flopped, vertically=False)))  ## PyQt6
             horizontal=self.flopped, vertical=False)))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
     
@@ -290,7 +291,8 @@ class PixItem(QGraphicsPixmapItem):
         if 'frame' in self.fileName:
             self.removeThis()
         else:
-            self.shadowMaker.deleteShadow()
+            if self.shadowMaker.isDummy == False:
+                self.shadowMaker.deleteShadow()
             self.closeWidget()
             self.anime 
             self.anime = anima.fin(self)

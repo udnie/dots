@@ -153,7 +153,7 @@ def addBkgBtnGroup(self):
     layout.addWidget(self.btnSaveBkg) 
     layout.addWidget(self.btnBkgColor)
 
-    bkg = self.initBkg
+    bkg = self.bkgMaker
 
     self.btnAddBkg.clicked.connect(bkg.openBkgFiles)       
     self.btnSetBkg.clicked.connect(bkg.setBkg)
@@ -189,7 +189,7 @@ def addCanvasBtnGroup(self):
 
     self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
     btnClrCanvas.clicked.connect(canvas.clear)   
-    btnSnapShot.clicked.connect(canvas.initBkg.snapShot)
+    btnSnapShot.clicked.connect(canvas.bkgMaker.snapShot)
     btnPixTest.clicked.connect(canvas.sideCar.pixTest)
     btnExit.clicked.connect(canvas.exit)
 

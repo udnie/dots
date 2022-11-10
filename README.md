@@ -9,9 +9,9 @@ The files **StartHere.md** and  **dotsAnimation.py** provide a starting point fo
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible, it doesn't always work. Also I use camel case after many years of coding in snake.
 
-Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on dropCanvas.
+Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on StoryBoard. You can easily override it for specific sprites.
 
-The upper right hand panel is a **read only** scrolling list of the keys, key combinations and their actions. The panel will switch the key assignments as you switch from DropCanvas to PathMaker or by entering **'k'**. 
+The upper right hand panel is a **read only** scrolling list of the keys, key combinations and their actions. The panel will switch the key assignments as you switch from StoryBoard to PathMaker or by entering **'k'**. 
 
 The **background** image doesn't need to reside in the backgrounds folder unless you're planning to reload it. You can save a copy of it to the backgrounds folder using the save button in the background group. The copy will have the first 15 characters of the file name plus **'-bkg'** and will set itself as the background replacing the original image.
 
@@ -31,11 +31,17 @@ I use the graphicsitem **zValue()** as a means to order the graphic types which 
 | PointItem | pt | 200 from topmost item+ |
 | MapItem | map | 50 over top pixItem |
 | TagItem | tag|25 over top pixItem|
-| PixItem | pix  |  0 increasing by 1.0 | 
-| Paths| path| -25 as a group 
+| PixItem | pix  | **\*see below**
+| Shadow  |shadow| 50|
+| Points  |point | 35|
+| Outline |  none   | 30| 
+| Paths| path| -25 as a group |
 | LineItem  | grid   | -50 as a group |
-| BkgItem   | bkg | -99 decreasing by -1 |    
+| BkgItem   | bkg | -99 decreasing by -1 |  
+
   
+**\***   number of screen items + 100 decreasing by 1 per item
+
   
 
 ## Requirements

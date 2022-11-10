@@ -66,6 +66,7 @@ Star = ((100, 20), (112, 63), (158, 63), (122, 91),
         (136, 133), (100, 106), (63, 132), (77, 90), 
         (41, 63), (86, 63))
 
+
 keyMenu = (                    ## pixitems and bkgitems
     ('A', 'Select All'),   
     ('C', 'Clear Canvas'),     
@@ -106,7 +107,8 @@ keyMenu = (                    ## pixitems and bkgitems
     ('[/]', 'Rotate 45 deg'),
     ('</>', 'Toggle Size'),
     ('U/D', 'Arrow Keys'),
-    ('L/R', 'Arrow Keys'))
+    ('L/R', 'Arrow Keys'),
+)
 
 pathMenu = (
     ('C', 'Center Path'),
@@ -162,7 +164,8 @@ pathcolors = (
     "TOMATO",
     "ORANGERED", 
     "RED",    
-    "YELLOW")       
+    "YELLOW",
+    )       
 
 singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_Up: 'up',          

@@ -34,8 +34,9 @@ class ShadowMaker:
         self.path = [] 
         self.points = []  
    
-        self.flopped  = False
-        self.ishidden = False
+        self.flopped   = False
+        self.isHidden = False  ## just a toggle - not saved
+        self.isDummy  = False
 
         self.alpha  = .50
         self.scalor = 1.0
@@ -47,9 +48,6 @@ class ShadowMaker:
         self.outline = None  
         self.shadow  = None
         self.widget  = None
-        
-        ## blank to add/restore shadows, 'pass' in dotsShadows_Dummy.py to skip
-        self.addRestore = ""  
        
         self.imgSize = 0,0  ## last width and height of shadow
         
@@ -70,7 +68,7 @@ class ShadowMaker:
         image = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32)    
         pixmap = QPixmap.fromImage(image)
               
-        self.shadow = Shadow(self) 
+        self.shadow = Shadow(self)  ## from ShadowWorks *
         self.shadow.setPixmap(pixmap)
                       
         self.imgSize = width, height  ## save for later 
@@ -119,13 +117,12 @@ class ShadowMaker:
         self.alpha    = self.pixitem.shadow['alpha']
         self.scalor   = self.pixitem.shadow['scalor']
         self.rotate   = self.pixitem.shadow['rotate']
-        self.ishidden = self.pixitem.shadow['ishidden']
         self.flopped   = self.pixitem.shadow['flopped']
-                     
+                  
         self.addPoints() 
         self.updateShadow()
                 
-        self.shadow.setOpacity(self.alpha)                
+        self.shadow.setOpacity(self.alpha)             
                                                                                                                  
 ### --------------------------------------------------------
     def updateShadow(self):  ## if rotated, scaled or points moved      
@@ -185,7 +182,7 @@ class ShadowMaker:
                   
     def addPointsToScene(self):
         for p in self.points:    
-            if self.ishidden:
+            if self.isHidden:
                 p.hide()                              
             self.scene.addItem(p)
    
@@ -308,8 +305,8 @@ class ShadowMaker:
         self.deleteOutline()
         self.outline = QGraphicsPolygonItem(self.addOutline()) 
         self.outline.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
-        self.outline.setZValue(self.pixitem.zValue()-.2)  
-        if self.ishidden:
+        self.outline.setZValue(30)  
+        if self.isHidden:
             self.outline.hide()    
         self.scene.addItem(self.outline)
         
@@ -343,13 +340,13 @@ class ShadowMaker:
         return int(x), int(y), int((x1-x)), int((y1-y))
     
     def hideAll(self):
-        if self.ishidden == False:
-            self.ishidden = True
+        if self.isHidden == False:
+            self.isHidden = True
             if self.outline != None:
                 self.outline.hide()
             self.hidePoints()  
-        elif self.ishidden == True: 
-            self.ishidden = False    
+        elif self.isHidden == True: 
+            self.isHidden = False    
             self.updateOutline()
             self.hidePoints(False) 
                                                           

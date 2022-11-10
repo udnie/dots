@@ -9,10 +9,7 @@ import time
 from PyQt6.QtCore    import QTimer, QAbstractAnimation
 
 from dotsPixItem     import PixItem
-from dotsBkgItem     import *
-
-##from dotsShadowWorks    import Shadow  ## adds shadows
-from dotsShadow_Dummy    import Shadow  ## turns off shadows
+from dotsBkgMaker    import *
 
 from dotsShared      import common, paths
 from dotsSideGig     import MsgBox, getPathList
@@ -26,11 +23,12 @@ class SideShow:
     def __init__(self, parent):
         super().__init__()
  
-        self.canvas  = parent
-        self.scene   = self.canvas.scene
-        self.dots    = self.canvas.dots
-        self.mapper  = self.canvas.mapper
-        self.sideCar = SideCar(self.canvas)  ## additional extentions 
+        self.canvas   = parent
+        self.scene    = self.canvas.scene
+        self.dots     = self.canvas.dots
+        self.mapper   = self.canvas.mapper
+        self.bkgMaker = self.canvas.bkgMaker
+        self.sideCar  = SideCar(self.canvas)  ## additional extentions 
 
         self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
@@ -121,7 +119,7 @@ class SideShow:
                     tmp['z'] = lnn  ## lnn preserves front to back relationships
                     lnn -= 1 
                     ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
-                    if 'scalor' in tmp.keys() and pix.shadowMaker.addRestore == '':
+                    if 'scalor' in tmp.keys() and pix.shadowMaker.isDummy == False:
                         ns += 1
                     self.addPixToScene(pix, tmp)  ## finish unpacking tmp  
                                 
@@ -132,7 +130,7 @@ class SideShow:
                         bkz -= 1  ## could be more than one background or flat
                     tmp["z"] = bkz
                     if tmp['fname'] == 'flat':
-                        self.canvas.initBkg.setBkgColor(QColor(tmp['tag']), tmp["z"])
+                        self.canvas.bkgMaker.setBkgColor(QColor(tmp['tag']), tmp["z"])
                         continue 
                     else:
                         pix = BkgItem(paths["bkgPath"] + tmp['fname'], self.canvas, tmp["z"])
@@ -140,7 +138,7 @@ class SideShow:
                         self.addPixToScene(pix, tmp)  ## finish unpacking tmp 
  
             self.canvas.openPlayFile = file
-            self.canvas.initBkg.disableBkgBtns()
+            self.canvas.bkgMaker.disableBkgBtns()
             self.dots.statusBar.showMessage("Number of Pixitems: {}".format(kix),5000)  
               
             if ns > 0:
@@ -160,7 +158,9 @@ class SideShow:
         pix.setMirrored(tmp['mirror']),
         pix.rotation = tmp['rotation']
         pix.scale    = tmp['scale']
-      
+              
+        pix.setZValue(pix.zValue() + 100),  
+           
         if 'tag' not in tmp.keys():  ## seriously good to know
             tmp['tag'] = ''
         pix.tag = tmp['tag'] 
@@ -183,14 +183,13 @@ class SideShow:
                 "width":    tmp['width'],
                 "height":   tmp['height'],
                 "pathX":    tmp['pathX'],
-                "pathY":    tmp['pathY'],
-                "ishidden": tmp['ishidden'],     
+                "pathY":    tmp['pathY'],    
             }  
             if 'flopped' not in tmp.keys():      
                 pix.shadow['flopped'] = None
             else:
                 pix.shadow['flopped'] = tmp['flopped']
-             
+                                          
         ## may require rotation or scaling - adds to scene items
         self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
    
@@ -358,7 +357,6 @@ class SideShow:
                                 for k in range(len(pix.shadowMaker.path))],
                 "pathY":    [float("{0:.2f}".format(pix.shadowMaker.path[k].y()))
                                 for k in range(len(pix.shadowMaker.path))],
-                "ishidden": pix.shadowMaker.ishidden,
                 "flopped":   pix.shadowMaker.flopped,
             }
             tmp.update(shadow)

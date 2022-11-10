@@ -3,13 +3,13 @@ import sys
 import platform
 import os
 
-from PyQt6.QtCore     import QTimer, PYQT_VERSION_STR
+from PyQt6.QtCore     import QTimer
 from PyQt6.QtWidgets  import QApplication, QStatusBar, QMainWindow
 
 from dotsShared       import common
 from dotsDocks        import *
 
-import dotsDropCanvas as canvas
+import dotsStoryBoard as canvas
 
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widget panels, and
@@ -21,7 +21,7 @@ class DotsQt(QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
 
-        self.canvas = canvas.DropCanvas(self)
+        self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)    
 
         self.setWindowTitle("DotsQt - " + os.path.basename(os.getcwd()) + " ~ " + getDate())
@@ -30,7 +30,7 @@ class DotsQt(QMainWindow):
         self.setStyleSheet(open('./dotsStyle.css').read())
       
         self.setFixedSize(common['DotsW'], common['DotsH'])
-        self.canvas.initBkg.disableBkgBtns()  ## toggles bkg sliders off as well
+        self.canvas.bkgMaker.disableBkgBtns()  ## toggles bkg sliders off as well
 
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar)
@@ -40,7 +40,7 @@ class DotsQt(QMainWindow):
 
         self.show()
 
-        # print("PyQt version:", PYQT_VERSION_STR) 
+      
         # print(platform.python_version())
             
 ### --------------------------------------------------------

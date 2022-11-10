@@ -1,5 +1,7 @@
 import sys
 
+# import PySide6  ## required for pyside version
+
 from PyQt6.QtCore    import Qt, QPointF
 from PyQt6.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget
@@ -11,15 +13,17 @@ Ticks = (100,50,10)  ## how often to draw a line and size
 VWidth, VHeight = 600, 70
 
 # from PyQt6.QtCore import QT_VERSION_STR
-# from PyQt6.QtCore import PYQT_VERSION_STR
+# from PyQt6.QtCore import PYQT_VERSION_STR]
 
-# print( PyQt6.__version__ )
+# print( PySide.__version__ )
 # print("PyQt version:", PYQT_VERSION_STR) 
 # print("Python version:", QT_VERSION_STR)
 
+## this works for pyside - Qt6 to Side6... 
+# print("Qt: v", PyQt6.QtCore.__version__, "\tPyQt: v", PyQt6.__version__)
+
 ### --------------------------------------------------------
-''' for pyqt5 change gobalPosition to globalPos and see setWindowFlags 
-    looks ok for pyside6 '''
+''' for pyqt5 change gobalPos() to globalPosition() '''
 ### ------------------------- vhx --------------------------
 class VHX(QMainWindow):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------
@@ -28,7 +32,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
 
         self.resize(VWidth, VHeight)
 
-        # self.setWindowFlags(Qt.FramelessWindowHint)  -- qt5
+        # self.setWindowFlags(Qt.FramelessWindowHint)  -- qt5 ???
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
