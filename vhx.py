@@ -7,7 +7,7 @@ from PyQt6.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetric
 from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
-SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)
+SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)  ## '</>'
 Ticks = (100,50,10)  ## how often to draw a line and size
 
 VWidth, VHeight = 600, 70
@@ -155,10 +155,21 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             scale = 100
         else:
             scale = -100
+        p = self.pos()
+        x, y = p.x(), p.y()
         if self.horizontal and (self.width() + scale) > 100: 
             self.resize(self.width() + scale, self.height())
+            if scale == 100:
+                x -= 50         
+            else:
+                x += 50         
         elif self.height() + scale > 100:
             self.resize(self.width(), self.height() + scale)
+            if scale == 100:
+                y -= 50         
+            else:
+                y += 50  
+        self.move(x,y)
         self.update()
 
     def center(self):

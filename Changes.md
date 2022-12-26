@@ -1,8 +1,17 @@
 
 ## Changes
-**November 2022:**      
-Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMaker**. The **StoryBoard** change affects the file name while continuing to maintain the reference thru **.canvas**.  **BkgMaker** goes a little deeper with both file and reference changes - though not many. Last, to run Shadows only dotsPixItem.py that needs an edit.
+**December 2022:**      
+I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key used to toggle **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video:
 
+To run **Shadows** requires an easy edit to **dotsPixItem.py** by commenting on and off two lines near the top of the file. **Open-cv** and **numpy** are required to run both **Shadows** and **SpriteMaker**. 
+
+**VHX** now expands and contracts evenly end to end. 
+
+        
+Lastly,  there's sort of an easter egg, real easy to spot, in **dotsQt.py**.
+
+**November 2022:**      
+Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMaker**. The **StoryBoard** change affects the file name while continuing to maintain the reference thru **.canvas**.  **BkgMaker** goes a little deeper with both file and reference changes - though not many. 
 
 **October 2022:**        
 **Dots** updated to **PyQt 6.4**, **PyQt5.17** and **Python 3.11**. 

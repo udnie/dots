@@ -7,14 +7,12 @@ from dotsSideGig     import MsgBox
 from dotsShared      import singleKeys
 from dotsSideCar     import SideCar
 from dotsMapItem     import InitMap
-from dotsSliderPanel import SliderPanel
 
-DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
-ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, \
-                Qt.Key.Key_H)
+ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, Qt.Key.Key_W)
+DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -22,21 +20,20 @@ ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, \
 ### --------------------------------------------------------
 class ControlView(QGraphicsView):
 ### --------------------------------------------------------
-    ## adds drag and drop to a QGraphicsView instance and keyboard capture 
     keysSignal = pyqtSignal(str)
 
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.canvas         = parent         
-        self.canvas.mapper  = InitMap(self.canvas)  ## carry mapper to sidecar  
-        self.canvas.sideCar = SideCar(self.canvas)
-      
+        self.canvas  = parent         
+        self.mapper  = InitMap(self.canvas)  ## carry mapper to sidecar  
+        self.sideCar = SideCar(self.canvas)
+        
         self.setObjectName('ControlView')
-        self.setScene(parent.scene)
+        self.setScene(self.canvas.scene)
       
         self.dragOver = False
-        self.p = None
+        self.proc = None
     
         self.setRenderHints(
             QPainter.RenderHint.Antialiasing | 
@@ -61,13 +58,13 @@ class ControlView(QGraphicsView):
             Qt.Key.Key_H: self.canvas.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
             Qt.Key.Key_Z: self.canvas.ZDump,
-            Qt.Key.Key_O: self.canvas.sideCar.clearOutlines,   
+            Qt.Key.Key_O: self.sideCar.clearOutlines,   
         }
 
         self.toggleKeys = {
-            Qt.Key.Key_G: self.canvas.sideCar.toggleGrid,
-            Qt.Key.Key_M: self.canvas.mapper.toggleMap,
-            Qt.Key.Key_K: self.canvas.sideCar.toggleMenu,  
+            Qt.Key.Key_G: self.sideCar.toggleGrid,
+            Qt.Key.Key_M: self.mapper.toggleMap,
+            Qt.Key.Key_K: self.sideCar.toggleMenu,  ## storyboard and pathMaker keys
         }
 
 ### --------------------------------------------------------
@@ -94,7 +91,7 @@ class ControlView(QGraphicsView):
         if m.hasUrls():
             imgFile = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
-            self.canvas.pixCount = self.canvas.mapper.toFront(0)
+            self.canvas.pixCount = self.mapper.toFront(0)
             # self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
             self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ### PyQt6 takes position
                 None, False)
@@ -103,31 +100,34 @@ class ControlView(QGraphicsView):
     ## best location for reading keys - especially arrow keys
     def keyPressEvent(self, e):
         key = e.key() 
-        mod = e.modifiers()   
-          
+        mod = e.modifiers()
+            
         ## special keys - may differ in another OS - !, @, del
         if e.key() == 33 and self.canvas.pathMakerOn:
-            self.setKey('!')
+            self.setKey('!')  ## use by pathMaker
         elif e.key() == 64 and self.canvas.pathMakerOn:
             self.setKey('@')
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
             
         ## shift keys - D, P, T, V, H  
-        elif mod & Qt.KeyboardModifier.ShiftModifier and key in ShiftKeys:
+        elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:            
             if key == Qt.Key.Key_D:   
                 self.setKey('delPts')  ## send to pathmaker
             elif key == Qt.Key.Key_P:  ## show pix path tags
                 if not self.canvas.pathMakerOn:
-                    self.canvas.mapper.toggleTagItems('paths')                
+                    self.mapper.toggleTagItems('paths') 
+            elif key == Qt.Key.Key_W:  ## show waypts
+                if self.canvas.pathMakerOn:  
+                    self.canvas.pathMaker.sideWays.addWayPtTags()                     
             elif key == Qt.Key.Key_T:         
-                self.canvas.mapper.toggleTagItems('select')     
+                self.mapper.toggleTagItems('select')     
             elif key == Qt.Key.Key_V:  ## VHX
                 self.startProcess()
             elif key == Qt.Key.Key_H:
-                self.canvas.sideCar.hideSelected()
-                self.canvas.sideCar.clearWidgets()
-                self.canvas.sideCar.toggleOutlines()
+                self.sideCar.hideSelected()
+                self.sideCar.clearWidgets()
+                self.sideCar.toggleOutlines()
              
         ## shift keys used in locking screen items - L, R, U
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
@@ -144,13 +144,10 @@ class ControlView(QGraphicsView):
                 if self.canvas.pathMakerOn:
                     self.setKey('T')  ## run test
                 else:  
-                    self.canvas.mapper.toggleTagItems('all')
+                    self.mapper.toggleTagItems('all')
             elif key == Qt.Key.Key_W:
-                if not self.canvas.pathMakerOn:
-                    self.canvas.sideCar.clearWidgets()
-                else:
-                    self.setKey('W') 
-                                   
+                    self.sideCar.clearWidgets()
+                                    
         elif key in self.direct: 
             self.direct[key]()  ## dictionary
             
@@ -171,15 +168,15 @@ class ControlView(QGraphicsView):
         self.keysSignal[str].emit('')
 
     def startProcess(self):
-        if self.p is None:
-            self.p = QProcess()  ## thanks to Martin Fitzpatrick
-            self.p.finished.connect(self.processFinished)
-            self.p.start("python3", ["vhx.py"])  ## works in vscode
-            # self.p.start("/on a mac - full  path to /vhx.app")  ## using autotmator
+        if self.proc is None:
+            self.proc = QProcess()  ## thanks to Martin Fitzpatrick
+            self.proc.finished.connect(self.processFinished)
+            self.proc.start("python3", ["vhx.py"])  ## works in vscode
+            # self.proc.start("/on a mac - full  path to /vhx.app")  ## using autotmator
           
     def processFinished(self):
-        self.p.close()
-        self.p = None
+        self.proc.close()
+        self.proc = None
 
 ### ------------------ dotsControlView ---------------------
 

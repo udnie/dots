@@ -50,8 +50,6 @@ class ShadowMaker:
         self.widget  = None
        
         self.imgSize = 0,0  ## last width and height of shadow
-        
-        self.WidgetW, self.WidgetH = 330.0, 200.0
         self.viewW, self.viewH = 0,0
                                                                                                                                     
 ### --------------------------------------------------------
@@ -121,9 +119,13 @@ class ShadowMaker:
                   
         self.addPoints() 
         self.updateShadow()
-                
-        self.shadow.setOpacity(self.alpha)             
-                                                                                                                 
+        
+        self.shadow.setOpacity(self.alpha)
+        
+        if self.outline != None: 
+            self.outline.hide()
+            self.hidePoints()
+                                                                                                                                     
 ### --------------------------------------------------------
     def updateShadow(self):  ## if rotated, scaled or points moved      
         cpy = self.flopCpy if self.flopped else self.cpy 
@@ -265,7 +267,7 @@ class ShadowMaker:
         x, y = int(p.x()), int(p.y()+50)  ## safer here       
         if y > self.path[3].y():
             y = int(self.path[3].y())     
-        self.widget.setGeometry(x-20, y, int(self.WidgetW), int(self.WidgetH))
+        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
                    
 ### --------------------------------------------------------           
@@ -305,7 +307,7 @@ class ShadowMaker:
         self.deleteOutline()
         self.outline = QGraphicsPolygonItem(self.addOutline()) 
         self.outline.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
-        self.outline.setZValue(30)  
+        self.outline.setZValue(common["outline"])  
         if self.isHidden:
             self.outline.hide()    
         self.scene.addItem(self.outline)

@@ -101,7 +101,6 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
            
         if not self.hold:
             self.widget.view.centerOn(QPointF(self.x, self.y))
- 
             self.rect = self.addRect(self.x, self.y) 
             self.scene.addItem(self.rect)
             
@@ -109,8 +108,7 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
                                                   
 ### --------------------------------------------------------
     def addRect(self, x, y): 
-        if self.rect:
-            self.scene.removeItem(self.rect)
+        if self.rect: self.scene.removeItem(self.rect)
             
         if x-70 <= 0: x = 71      
         if y-70 <= 0: y = 71
@@ -119,7 +117,7 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
         if y+70 >= 720: y = 649
       
         rect = QGraphicsRectItem(x-70, y-70, 140, 140)
-        rect.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.SolidLine)) 
+        rect.setPen(QPen(QColor('lime'), 2.5, Qt.PenStyle.SolidLine)) 
         rect.setZValue(110)
         return rect
              
@@ -134,7 +132,7 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
         if self.widget:
             if not self.hold:
                 self.hold = True
-                self.rect.hide()  
+                # self.rect.hide()  
                 self.widget.setStyleSheet("border: 12px solid orangered;")
             else:
                 self.hold = False

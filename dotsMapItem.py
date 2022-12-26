@@ -12,7 +12,7 @@ All = -999
 
 ### ---------------------- dotsMapItem ---------------------
 ''' dotsMapItem: handles the mapItem, tags and paths display.
-    Classes: MapItem, InitMap - uses self.parent for parent '''
+    Classes: MapItem, InitMap - uses self.canvas for canvas '''
 ### --------------------------------------------------------
 class MapItem(QGraphicsItem):
 ### --------------------------------------------------------
@@ -52,12 +52,12 @@ class MapItem(QGraphicsItem):
 ### ---------------------- dotsMapItem ---------------------
 class InitMap:
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, canvas):
         super().__init__()
 
-        self.parent = parent
-        self.scene  = parent.scene
-        self.dots   = parent.dots
+        self.canvas = canvas
+        self.scene  = self.canvas.scene
+        self.dots   = self.canvas.dots
 
         self.tagZ = 0
         self.pathTagZ = 0  ## only by paths
@@ -77,7 +77,7 @@ class InitMap:
     def addSelectionsFromCanvas(self): ## uses rubberband to select items
         k = 0
         self.selections = []
-        rect = QRect(self.parent.rubberBand.geometry())
+        rect = QRect(self.canvas.rubberBand.geometry())
         for pix in self.scene.items():
             if pix.type == 'pix':
                 if 'frame' in pix.fileName: 
@@ -101,7 +101,7 @@ class InitMap:
     def addMapItem(self):
         self.removeMapItem()
         self.mapRect = self.mapBoundingRects()
-        self.parent.rubberBand.setGeometry(QRect(self.parent.origin, QSize()))
+        self.canvas.rubberBand.setGeometry(QRect(self.canvas.origin, QSize()))
         self.map = MapItem(self.mapRect, self)  
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
@@ -142,7 +142,7 @@ class InitMap:
             self.selections = []  ## not the same as in drawsPaths
             for pix in self.scene.selectedItems():  ## only items selected
                 self.selections.append(pix.id)
-            if self.scene.selectedItems() or self.parent.hasHiddenPix():
+            if self.scene.selectedItems() or self.canvas.hasHiddenPix():
                 self.addMapItem()
         else:
             self.removeMap()
@@ -175,7 +175,7 @@ class InitMap:
 
 ### ------------------- tags and paths ---------------------
     def toggleTagItems(self, pid):  
-        if self.parent.pathMakerOn:
+        if self.canvas.pathMakerOn:
             return
         if self.tagSet: 
             self.clearTagGroup()
@@ -219,7 +219,7 @@ class InitMap:
             self.clearTagGroup()
 
     def addTagGroup(self):
-        self.tagZ = self.toFront(20.0)   ## otherwise it can be hidden  
+        self.tagZ = self.toFront(25.0)   ## otherwise it can be hidden  
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
@@ -251,7 +251,7 @@ class InitMap:
         if token == 'paths':
             y = y - 20
         else:
-            token = self.parent.control
+            token = self.canvas.control
             
         if tag == 'UnLocked': color = 'orange'
 
@@ -263,7 +263,7 @@ class InitMap:
 
 ### -------------------- mostly paths ----------------------
     def togglePaths(self):
-        if self.parent.pathMakerOn:
+        if self.canvas.pathMakerOn:
             return
         if self.pathSet:
             self.clearPaths()
@@ -271,7 +271,7 @@ class InitMap:
         if self.scene.items():
             k = 0
             self.pathSet = False  ## force clearPaths if fails
-            QTimer.singleShot(200, self.clearTagGroup)  ## the other tags
+            QTimer.singleShot(200, self.clearTagGroup)  ## the other tags    
             self.addPathGroup()
             self.addPathTagGroup()
             for pix in self.scene.items():
@@ -308,7 +308,7 @@ class InitMap:
             for pix in self.scene.items():
                 if pix.type == 'pix' and not pix.tag.endswith('.path'):
                     if pix.anime and pix.anime.state() ==  QAbstractAnimation.State.Paused:
-                        if self.parent.control != 'resume':
+                        if self.canvas.control != 'resume':
                             pix.anime.resume()
                 elif pix.zValue() <= common["pathZ"]:
                     break
@@ -328,10 +328,10 @@ class InitMap:
 
     def addPainterPath(self, tag):
         color = getColorStr()
-        path = pathLoader(tag)  ## return painter path
+        path = pathLoader(tag)  ## return painter path     
         pathPt = path.pointAtPercent(0.0)  ## so its consistent
         ## use painter path
-        pathItem = QGraphicsPathItem(path)
+        pathItem = QGraphicsPathItem(path)        
         pathItem.setPen(QPen(QColor(color), 3, Qt.PenStyle.DashDotLine))
         pathItem.setFlag(QGraphicsPathItem.GraphicsItemFlag.ItemIsMovable, False)
         self.pathGroup.addToGroup(pathItem)
@@ -342,7 +342,7 @@ class InitMap:
         tag.setPos(pt)
         tag.setZValue(self.pathTagZ)   ## use pathTagZ instead of tagZ
         self.pathTagGroup.addToGroup(tag)
-
+        
     def lastZval(self, str):  ## finds the lowest pix or bkg zValue
         last = 100000.0
         for itm in self.scene.items():

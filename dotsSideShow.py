@@ -1,5 +1,9 @@
 
 import os
+import os.path
+
+from os import path
+
 import json
 import random
 
@@ -35,12 +39,7 @@ class SideShow:
         
         self.locks = 0
         
-### --------------------------------------------------------
-    def runThis(self, file):
-        if not self.scene.items():
-            self.openPlay(paths["playPath"] + file)
-            QTimer.singleShot(200, self.run)
-    
+### --------------------------------------------------------    
     def keysInPlay(self, key):
         if self.canvas.pathMakerOn == False:
             if key == 'L':
@@ -54,7 +53,7 @@ class SideShow:
                     self.run()
             elif key == 'S' and self.canvas.control != '':
                 self.stop()
-       
+                         
     def loadPlay(self):
         if self.canvas.pathMakerOn:  ## using load in pathMaker
             self.pathMaker.sideWays.openFiles()
@@ -67,7 +66,13 @@ class SideShow:
                 self.openPlay(file) 
             else:
                 return
-
+            
+    def runThis(self, file):
+        if not self.scene.items():
+            self.openPlay(paths["playPath"] + file)
+            QTimer.singleShot(200, self.run) 
+                  
+### -------------------------------------------------------- 
     def openPlay(self, file):
         dlist = []
         self.locks = 0
@@ -82,22 +87,21 @@ class SideShow:
             kix, bkz, ns = 0, 0, 0   ## number of pixitems, bkg zval, number of shadows
             lnn = len(dlist)
             lnn = lnn + self.mapper.toFront(0)  ## start at the top
-            self.canvas.pixCount = self.mapper.toFront(0) 
-             
+            self.canvas.pixCount = self.mapper.toFront(0)       
             # header = []  ## save for debugging purposes 
-                
-            for tmp in dlist:  
-              
-                ## I'm including this as it makes dumping the play file easier to read
-                ## just incase - up to 20 keys - current max size of the play dictionary
+         
+            for tmp in dlist:                   
+                '''I'm including this as it makes dumping the play file easier to read
+                just incase - up to 20 keys - current max size of the play dictionary 
+                The following three lines test to see if there's a 20 key header string 
                 # if header != list(tmp.keys())[:20]:  ## [8:20] you can also dump a range
                 #     header = list(tmp.keys())[:20]   ## includes shadow data 
-                #     print(','.join(header)) 
-                # vals = list(tmp.values())[:20]   
-                # print(','.join(str(v) for v in vals))  ## formatted for csv
-                # continue
-                
-                ## toss no shows - no msgs or log
+                #     print(','.join(header))  ## gets output first and once
+                # vals = list(tmp.values())[:20]  ## gather up the values for this line   
+                # print(','.join(str(v) for v in vals))  ## output formatted for csv
+                # continue '''
+             
+                ## toss no shows - no msgs or log - hasn't been a problem
                 if tmp['type'] == 'bkg' and tmp['fname'] != 'flat' and \
                     not path.exists(paths["bkgPath"] + tmp['fname']):       
                     continue 
@@ -116,34 +120,34 @@ class SideShow:
                     self.canvas.pixCount += 1  ## id used by mapper            
                     pathStr = paths["spritePath"] + tmp['fname']
                     pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas) 
-                    tmp['z'] = lnn  ## lnn preserves front to back relationships
-                    lnn -= 1 
+                    tmp['z'] = lnn  ## lnn preserves front to back relationships 
                     ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
                     if 'scalor' in tmp.keys() and pix.shadowMaker.isDummy == False:
                         ns += 1
-                    self.addPixToScene(pix, tmp)  ## finish unpacking tmp  
+                    self.addPixToScene(pix, tmp)  ## finish unpacking tmp                 
+                    lnn -= 1 
+                    ## print(lnn, tmp['fname'], tmp['x'], tmp['width']) 
                                 
-                elif tmp['type'] == 'bkg': 
+                elif tmp['type'] == 'bkg':  ## could be more than one background or flat
                     if bkz == 0:
                         bkz = common['bkgZ']  ## starts at -99.0
-                    else:
-                        bkz -= 1  ## could be more than one background or flat
-                    tmp["z"] = bkz
+                    tmp["z"] = bkz           
                     if tmp['fname'] == 'flat':
-                        self.canvas.bkgMaker.setBkgColor(QColor(tmp['tag']), tmp["z"])
-                        continue 
+                        self.canvas.bkgMaker.setBkgColor(QColor(tmp['tag']), bkz)
                     else:
-                        pix = BkgItem(paths["bkgPath"] + tmp['fname'], self.canvas, tmp["z"])
-                        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)     
+                        pix = BkgItem(paths["bkgPath"] + tmp['fname'], self.canvas, bkz)    
                         self.addPixToScene(pix, tmp)  ## finish unpacking tmp 
- 
+                        ## print(bkz, tmp['fname'], tmp['x'], tmp['width'])
+                    bkz -= 1    
+            ## end for loop
+
             self.canvas.openPlayFile = file
             self.canvas.bkgMaker.disableBkgBtns()
             self.dots.statusBar.showMessage("Number of Pixitems: {}".format(kix),5000)  
               
-            if ns > 0:
+            if ns > 0:  ## there must be shadows
                 QTimer.singleShot(200, self.addShadows) 
-                MsgBox("Adding Shadows,  please wait...", int(1 + (ns * .3)))
+                MsgBox("Adding Shadows,  please wait...", int(1 + (ns * .25)))
             elif self.locks > 0:
                 MsgBox("Some screen items are locked", 5)  ## seconds
                 self.canvas.mapper.toggleTagItems('all')
@@ -151,15 +155,16 @@ class SideShow:
  ### --------------------------------------------------------
     def addPixToScene(self, pix, tmp):
         pix.type = tmp['type']                 
-        pix.x    = float("{0:.2f}".format(tmp['x']))
-        pix.y    = float("{0:.2f}".format(tmp['y']))
+        pix.x = float("{0:.2f}".format(tmp['x']))
+        pix.y = float("{0:.2f}".format(tmp['y']))
         pix.setPos(pix.x,pix.y)
         pix.setZValue(tmp['z']),  ## use the new one
         pix.setMirrored(tmp['mirror']),
         pix.rotation = tmp['rotation']
         pix.scale    = tmp['scale']
               
-        pix.setZValue(pix.zValue() + 100),  
+        ## bump zVals up 100
+        if pix.type == 'pix': pix.setZValue(pix.zValue() + 100)  ## not for 'bkg'
            
         if 'tag' not in tmp.keys():  ## seriously good to know
             tmp['tag'] = ''
@@ -169,12 +174,16 @@ class SideShow:
             tmp['alpha2'] = 1.0
         pix.alpha2 = tmp['alpha2'] 
 
-        if pix.type == 'pix' and 'frame' not in pix.fileName:
+        if 'locked' not in tmp.keys(): 
+            tmp['locked'] = False
+        pix.locked = tmp['locked']
+
+        if pix.type in('pix') and 'frame' not in pix.fileName:
             pix.locked = tmp['locked']
             if pix.locked: self.locks += 1
             pix.part = tmp['part']
-            self.lookForStrays(pix)   
-                                
+            self.lookForStrays(pix)  
+                                                   
         if 'scalor' in tmp.keys():  ## save to pix.shadow      
             pix.shadow = {
                 "alpha":    tmp['alpha'],
@@ -189,7 +198,11 @@ class SideShow:
                 pix.shadow['flopped'] = None
             else:
                 pix.shadow['flopped'] = tmp['flopped']
-                                          
+                                           
+        if pix.type == 'bkg':  ## you can unlock them now
+            pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+            pix.locked = True
+                                                                                
         ## may require rotation or scaling - adds to scene items
         self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
    
@@ -210,8 +223,9 @@ class SideShow:
         
         str = "Number of Shadows: {0}  seconds:  {1:.2f}"  
         self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)        
-          
-    def run(self):  
+   
+### --------------------------------------------------------        
+    def run(self):  ## run only pixItems
         if self.canvas.control != '': 
             return 
         self.mapper.clearMap()
@@ -363,16 +377,22 @@ class SideShow:
           
         return tmp
     
-    def saveBkg(self, pix): 
+    def saveBkg(self, pix):
+        p = pix.boundingRect() 
+        pos = pix.pos()
         tmp = {
             "fname":    os.path.basename(pix.fileName),
             "type":    "bkg",
-            "x":        float("{0:.2f}".format(pix.x)),
-            "y":        float("{0:.2f}".format(pix.y)),
+            "x":        float("{0:.2f}".format(pos.x())),
+            "y":        float("{0:.2f}".format(pos.y())),
             "z":        pix.zValue(),
             "mirror":   pix.flopped,
+            "locked":   pix.locked,
             "rotation": pix.rotation,
             "scale":    float("{0:.2f}".format(pix.scale)),
+            "opacity":  float("{0:.2f}".format(pix.opacity)),
+            "width":    int(p.width()),
+            "height":   int(p.height()),
         }
         return tmp
 

@@ -1,13 +1,13 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations and create sprites.  **SpriteMaker** is now stand-alone and is easily converted to run in **PySide6** - see **SpiteMaker.md**.
 
-As of **October 2022** dots updated to **PyQt 6.4** and **Python 3.11**, runs in **PyQt 5.17** with minor edits.  Needed to re-install **open-cv** as well.
+As of **October 2022** dots updated to **PyQt 6.4** and **Python 3.11**, runs in **PyQt 5.17** with minor edits. You will need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.
 
 
 The files **StartHere.md** and  **dotsAnimation.py** provide a starting point for coding your own animations. See **Changes.md** and **keys.pdf** for further documentation and links to videos - best watched with closed captions - except for the last few.
 	  
 ## Stuff to know
-The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible, it doesn't always work. Also I use camel case after many years of coding in snake.
+The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. 400 lines now seems to the current average. I also use camel case after many years of coding in snake.
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %25-%35 of its original size when displaying it on StoryBoard. You can easily override it for specific sprites.
 
@@ -30,10 +30,10 @@ I use the graphicsitem **zValue()** as a means to order the graphic types which 
 |:------------- |:---------------:| -------------:|
 | PointItem | pt | 200 from topmost item+ |
 | MapItem | map | 50 over top pixItem |
-| TagItem | tag|25 over top pixItem|
+| TagItem | tag|20 over top pixItem|
 | PixItem | pix  | **\*see below**
 | Shadow  |shadow| 50|
-| Points  |point | 35|
+| Points  |point | 40|
 | Outline |  none   | 30| 
 | Paths| path| -25 as a group |
 | LineItem  | grid   | -50 as a group |
@@ -48,7 +48,7 @@ I use the graphicsitem **zValue()** as a means to order the graphic types which 
 * PyQt6
 * functools
 * cv2 and numpy for Sprites and Shadows
-* Any program that can create transparent pngs
+* Your favorite program for creating transparent pngs if you have one
 
 ## Lastly
 My background combines degrees in fine arts, photography and ceramics, work as a graphics artist, layout artist, photography teacher, and a 21 year career as a business application programmer. All procedural code and other than Fortran, languages you probably never heard of. 

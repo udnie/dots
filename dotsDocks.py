@@ -7,6 +7,14 @@ from PyQt6.QtWidgets    import QWidget, QDockWidget, QPushButton, \
 from dotsShared     import common
 from datetime       import datetime
 
+docks = {
+    "fixedHgt":     72, 
+    "scrollGrp":  375,  
+    "playGrp":    350,
+    "backGrp":    275,
+    "canvasGrp":  360,
+}
+
 ### ---------------------- dotsDocks -----------------------
 ''' dotsDocks: dockwidgets and buttons groups '''
 ### --------------------------------------------------------
@@ -23,7 +31,7 @@ def addScrollDock(self):
     self.dockedWidget.setLayout(layout)
 
     vbox = self.dockedWidget.layout() 
-    vbox.addWidget(self.scroll)
+    vbox.addWidget(self.scroll)  ## comes from storyboard
     
     return vbox
 
@@ -53,6 +61,7 @@ def addButtonDock(self):
 
     self.bdocked.setTitleBarWidget(QWidget(self))
     self.bdocked.setWidget(self.dockedWidget)
+    
     self.dockedWidget.setLayout(QHBoxLayout())
 
     hbox = self.dockedWidget.layout()          
@@ -64,11 +73,15 @@ def addButtonDock(self):
     hbox.addStretch(2) 
     hbox.addWidget(addCanvasBtnGroup(self))
 
+    self.dockedWidget.setFixedHeight(docks['fixedHgt'])
+    self.dockedWidget.setStyleSheet("border: 1px solid rgb(135,135,135)")
+    self.dockedWidget.setContentsMargins(0,0,0,0) 
+        
 ### --------------------------------------------------------
 def addScrollBtnGroup(self):  
     self.scrollGroup = QGroupBox("Scroll Panel")
 
-    self.scrollGroup.setFixedWidth(375)
+    self.scrollGroup.setFixedWidth(docks['scrollGrp'])
     ## this sets the position of the title
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
@@ -105,7 +118,7 @@ def addScrollBtnGroup(self):
 def addPlayBtnGroup(self):
     self.playGroup = QGroupBox("Play")
 
-    self.playGroup.setFixedWidth(350) 
+    self.playGroup.setFixedWidth(docks['playGrp']) 
     self.playGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     btnLoad  = QPushButton("Load")
@@ -138,7 +151,7 @@ def addPlayBtnGroup(self):
 def addBkgBtnGroup(self):
     bkgGroup = QGroupBox("Background")
 
-    bkgGroup.setFixedWidth(275)
+    bkgGroup.setFixedWidth(docks['backGrp'])
     bkgGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     self.btnAddBkg  = QPushButton(" Add ")
@@ -167,7 +180,7 @@ def addBkgBtnGroup(self):
 ### -----------------------------------------------------
 def addCanvasBtnGroup(self):
     canvasGroup = QGroupBox("Canvas")
-    canvasGroup.setFixedWidth(360) 
+    canvasGroup.setFixedWidth(docks["canvasGrp"]) 
     canvasGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     btnClrCanvas = QPushButton("Clear")
@@ -189,7 +202,7 @@ def addCanvasBtnGroup(self):
 
     self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
     btnClrCanvas.clicked.connect(canvas.clear)   
-    btnSnapShot.clicked.connect(canvas.bkgMaker.snapShot)
+    btnSnapShot.clicked.connect(canvas.sideCar.snapShot)
     btnPixTest.clicked.connect(canvas.sideCar.pixTest)
     btnExit.clicked.connect(canvas.exit)
 
@@ -205,6 +218,10 @@ def getDate():
 def getX():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()
     return int(((ctr.x() * 2 ) - common['DotsW'])/2)
+
+def getY():
+    ctr = QGuiApplication.primaryScreen().availableGeometry().center()  
+    return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.65)  
 
 ### -------------------- dotsDocks ----------------------
 

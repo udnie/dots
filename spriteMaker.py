@@ -1,10 +1,12 @@
 
 import sys
 
+# import PyQt6   ## required in pyside for version
+
 from PyQt6.QtCore       import Qt, QPointF, QEvent
 from PyQt6.QtGui        import QColor, QGuiApplication, QPen, QPainterPath, QCursor                             
 from PyQt6.QtWidgets    import QSlider, QWidget, QApplication, QGraphicsView, QGroupBox, \
-                               QGraphicsScene, QLabel, QGraphicsPathItem, \
+                               QGraphicsScene, QLabel, QGraphicsPathItem, QGraphicsEllipseItem, \
                                QSlider, QHBoxLayout,  QVBoxLayout, QPushButton 
                        
 from spriteWorks        import Works
@@ -16,8 +18,13 @@ DispWidth, DispHeight = 720, 720
 Btns = 820
 Width, Height = 860, 840
 
-## --> see spriteWorks to set paths, currently set for dots demo directories <-- ##
-''' for pyqt5 change gobalPosition to globalPos '''
+## change Qt6 to Side6  
+## print("Qt: v", PyQt6.QtCore.__version__, "\tPyQt: v", PyQt6.__version__)
+
+## --> <-- ##
+''' For pyqt5 change gobalPosition() to globalPosition().  
+    See spriteWorks to set paths, currently set for dots demo.
+    For pyside goto line 174 in spriteWorks and remark out '''
 ### ------------------- dotsSpriteMaker --------------------                                                                                                                                                                                                                                                                           
 class SpriteMaker(QWidget):  
 ### -------------------------------------------------------- 
@@ -83,6 +90,7 @@ class SpriteMaker(QWidget):
         self.npts = 0 
         self.last = QPointF()
  
+        self.big = None
         self.outline = None 
         self.pixmap  = None
           
@@ -90,7 +98,7 @@ class SpriteMaker(QWidget):
         self.slidersSet = False
         self.pathClosed = False
        
-        self.color  = "WHITE"                  
+        self.color  = "lime"                  
         self.rotate = 0.0
         self.scale  = 1.0        
                       
@@ -109,7 +117,7 @@ class SpriteMaker(QWidget):
                     
             elif e.type() == QEvent.Type.MouseButtonRelease and \
                 e.button() == Qt.MouseButton.LeftButton:
-                    pt = self.constrainXY(e.pos(), 1) 
+                    pt = self.constrainXY(e.pos(), 1)     
                     if self.last != pt:  ## else too many points
                         self.last = pt   
                         self.pts.append(pt)
@@ -124,6 +132,7 @@ class SpriteMaker(QWidget):
         if self.npts == 0:
             self.pts.append(pt)
         self.npts += 1
+        # self.setBigPtOff() if self.npts > 5 else self.setBigPt()
         if self.npts % 5 == 0: 
             self.pointCheck(pt)  ## look for overlaping points     
 
@@ -135,6 +144,15 @@ class SpriteMaker(QWidget):
             self.updateOutline()
         elif distance(pt.x(), self.last.x(), pt.y(), self.last.y()) < 2.5:
             return
+   
+    def setBigPt(self):
+        if self.big: self.scene.removeItem(big)
+        big = QGraphicsEllipseItem()
+        V = 15.0
+        big.setBrush(QColor(self.color))      
+        big.setRect(700, 700, V, V) 
+        big.setZValue(300)
+        self.scene.addItem(big)
                                                                                
     def addOutLine(self):
         if self.outlineSet:
@@ -142,6 +160,7 @@ class SpriteMaker(QWidget):
         if len(self.pts) == 0 and self.slidersSet == True:
             self.outlineSet = True
             self.setCursor(QCursor(Qt.CursorShape.CrossCursor))
+            self.setBigPt()
                      
     def finalizePixmap(self):  ## the set button in sliders
         if self.pixmap: 
@@ -162,29 +181,31 @@ class SpriteMaker(QWidget):
             self.addBtn.setEnabled(False)
             self.closeBtn.setEnabled(False)
       
-    def updateOutline(self):  ## make a path from pathMaker pts
-        self.deleteOutline()
-        w = 1  
-        if self.outlineSet:
-            w = 2   
-        self.outline = QGraphicsPathItem(self.setPaintPath(self.pathClosed))
-        self.outline.setPen(QPen(QColor(self.color), w, Qt.PenStyle.SolidLine))
-        self.outline.setZValue(100) 
-        self.scene.addItem(self.outline)
-            
-    def deleteOutline(self): 
-        if len(self.pts) > 0 and self.outline:
-            self.scene.removeItem(self.outline)
-            self.outline = None
-            
     def changePathColor(self):
         self.color = getColorStr()
+        self.setBigPt()
         self.updateOutline()
         if self.loupe.widget:
             self.loupe.loupeIt(self.loupe.idx)
             self.removePointItems()
             self.works.editingOn = False
-                 
+
+    def updateOutline(self):  ## make a path from pathMaker pts
+        self.deleteOutline()
+        w = 1.5  
+        if self.outlineSet:
+            w = 2.5   
+        self.outline = QGraphicsPathItem(self.setPaintPath(self.pathClosed))
+        self.outline.setPen(QPen(QColor(self.color), w, Qt.PenStyle.SolidLine))
+        self.outline.setZValue(100) 
+        self.scene.addItem(self.outline)
+        self.setBigPt()
+            
+    def deleteOutline(self): 
+        if len(self.pts) > 0 and self.outline:
+            self.scene.removeItem(self.outline)
+            self.outline = None
+                             
     def setPaintPath(self, bool=False): 
         path = QPainterPath()
         for pt in self.pts: 
@@ -390,9 +411,9 @@ class SpriteMaker(QWidget):
         if e.key() in ExitKeys:
             self.aclose()
         elif e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
-            self.setKey('del')
+            self.setKey('del')  ## delete a point
         elif e.key() == Qt.Key.Key_Alt:
-            self.setKey('opt') 
+            self.setKey('opt')  ## add a point
         elif e.key() == Qt.Key.Key_Control:  ## apple command
             self.works.edit()    
         elif e.key() == Qt.Key.Key_Shift:

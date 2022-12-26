@@ -154,7 +154,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
          
         ## add a light-grey semi-transparent border to help with anti-aliasing
-        painter.setPen(QPen(QColor(100,100,100,50), 4, Qt.PenStyle.SolidLine))     
+        painter.setPen(QPen(QColor(100,100,100,50), 5, Qt.PenStyle.SolidLine))     
         painter.drawPolygon(poly)  
             
         painter.setClipPath(path)  
@@ -171,7 +171,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         height = output.height()
                                                          
         bits = output.bits()  
-        bits.setsize(output.sizeInBytes())  ## comment out for pyside
+        bits.setsize(output.sizeInBytes())  ## comment out for pyside - 6.4 still
         
         img = np.array(bits).reshape(height, width, 4)                      
         kernel = np.array([  ## sharpen matrix below
@@ -181,7 +181,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
         ## try shapening overall - then blur edges
         img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
         img = cv2.GaussianBlur(img,(3,3),cv2.BORDER_DEFAULT)
-                       
+                    
         return img, width, height
                                       
     def redrawSprite(self):

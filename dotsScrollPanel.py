@@ -11,6 +11,16 @@ from dotsShared      import paths, Star, common
 from functools       import partial
 from dotsSideGig     import MsgBox
 
+scroll = {
+    "LabelW":   133,  ## the following is used by ScrollPanel
+    "LabelH":   112,  
+    "MaxW":     110,
+    "MaxH":      85,  
+    "Star":     .70,
+    "Type":     106,
+    "Margin":    13,    
+}
+
 ### ------------------- dotsScrollPanel --------------------
 ''' dotsScrollPanel: handles scrolling sprite selections.
     Includes ImgLabel and ScrollPanel classes. '''
@@ -41,28 +51,28 @@ class ImgLabel(QLabel):
         else:    
             img = QImage(self.imgFile)
                         
-            if img.width() > common['MaxW'] or img.height() > common['MaxH']:  ## size it to fit       
-                img = img.scaled(common['MaxW'], common['MaxH'],  ## keep it small
+            if img.width() > scroll['MaxW'] or img.height() > scroll['MaxH']:  ## size it to fit       
+                img = img.scaled(scroll['MaxW'], scroll['MaxH'],  ## keep it small
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation)
       
             newW, newH = img.width(), img.height()
           
-            posX = ((common['LabelW'] - newW) /2 )
-            posY = ((common['MaxH'] - newH) /2 ) + 9
+            posX = ((scroll['LabelW'] - newW) /2 )
+            posY = ((scroll['MaxH'] - newH) /2 ) + 9
             qp.drawImage(QPointF(posX, posY), img)
 
         pen = QPen(Qt.GlobalColor.darkGray)   
         pen.setWidth(2)
         qp.setPen(pen) 
-        qp.drawRect(0, 0, common['LabelW'], common['LabelH'])
+        qp.drawRect(0, 0, scroll['LabelW'], scroll['LabelH'])
 
         pen = QPen(Qt.GlobalColor.white) 
         pen.setWidth(3)
         pen.setJoinStyle(Qt.PenJoinStyle.BevelJoin)
         qp.setPen(pen) 
-        qp.drawLine(0, 2, 0, common['LabelH']) # left border
-        qp.drawLine(1, 1, common['LabelW'], 1) # top border
+        qp.drawLine(0, 2, 0, scroll['LabelH']) # left border
+        qp.drawLine(1, 1, scroll['LabelW'], 1) # top border
 
         font = QFont()
         pen = QPen(Qt.GlobalColor.black)
@@ -76,13 +86,13 @@ class ImgLabel(QLabel):
         metrics = QFontMetrics(font)    
         p = metrics.boundingRect(imgfile)
         p = p.width()
-        p = (common['LabelW'] - p)/2 
+        p = (scroll['LabelW'] - p)/2 
 
-        qp.drawText(int(p), common['Type'], imgfile)
+        qp.drawText(int(p), scroll['Type'], imgfile)
         qp.end()
 
     def minimumSizeHint(self):
-        return QSize(common['LabelW'], common['LabelH'])
+        return QSize(scroll['LabelW'], scroll['LabelH'])
 
     def sizeHint(self):
         return self.minimumSizeHint()
@@ -107,7 +117,7 @@ class ImgLabel(QLabel):
     def drawStar(self):
         poly = QPolygon()
         for s in Star:
-            poly.append(QPoint(s[0],s[1])*common['Star'])
+            poly.append(QPoint(s[0],s[1])*scroll['Star'])
         return poly
 
 ### --------------------------------------------------------
@@ -141,7 +151,7 @@ class ScrollPanel(QWidget):
         self.scroll.setWidget(widget)
        
         vBoxLayout = QVBoxLayout(self)
-        vBoxLayout.setContentsMargins(0, common['Margin'], 0, 0)  ## change for dotsDocks
+        vBoxLayout.setContentsMargins(0, scroll['Margin'], 0, 0)  ## change for dotsDocks
         vBoxLayout.addWidget(self.scroll)
          
         self.setLayout(vBoxLayout) 
@@ -163,7 +173,7 @@ class ScrollPanel(QWidget):
         p = self.scrollList.index(this.id)
         del self.scrollList[p]    
         self.layout.itemAt(p).widget().deleteLater()
-        p = (p-1) * common['LabelH']
+        p = (p-1) * scroll['LabelH']
         self.scroll.verticalScrollBar().setSliderPosition(p)
 
     def top(self):           

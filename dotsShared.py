@@ -4,32 +4,71 @@ from PyQt6.QtCore    import Qt
 ### --------------------- dotsShared.py --------------------
 ''' dotsShared: common data shared across classes and files '''
 ### --------------------------------------------------------
+
 common = {
-    "factor": 0.35,
-    "tagZ":   20.0,    
-    "gridZ": -50.0, 
-    "pathZ": -25.0,  
-    "bkgZ":  -99.0,
-    "DotsW":  1455,  # app width 
-    "DotsH":   825,  # app height
-    "ViewW":  1080,  # canvas width  30 X 36
-    "ViewH":   720,  # canvas height 30 X 24
-    "gridSize": 30,  # number of pixels per side
-    "ScrollW": 152,  # scrollbar stuff
-    "ScrollH": 685,  
-    "LabelW":  133,
-    "LabelH":  112,    
-    "MaxW":    110,
-    "MaxH":     85,  
-    "Star":    .70,
-    "Type":    106,
-    "Margin":   13,
-    "V":      12.0,
-    "runThis":  "demo.play",
+    "tagZ":     20.0,    
+    "pathZ":   -25.0, 
+    "gridZ":   -50.0, 
+    "bkgZ":    -99.0, 
+    "shadow":   50.0,
+    "points":   40.0,
+    "outline":  30.0,
+    "ScrollW":   150,  ## used by both 1080 and 1280X720 px
+    "SliderW":   188,    
+    "DocksH":     76,
+    "V":        12.0,  ## diameter of pointItems in shadows
+    "runThis":  "demo.play",  ## default run key
+} 
+      
+### ------------- 3:2 format - 1080X720 px -----------------
+ten80 = {             ## see dotQt for use 
+    "DotsW":   1458,  
+    "DotsH":    812,  
+    "ViewW":   1080,  
+    "ViewH":    720,
+    "gridSize":  30, 
+    "factor":  0.35,  ## amount to scaled pixitems by unless preset
+} 
+
+seven20 = {     ## used by both 1080 and 1280X720px
+    "ScrollH":  685,  
+    "SliderH":  710,  
+    "OffSet":     0,  ## sliderpanel width
+    "fix":        23,  ## sliderpanel height
+    "margin1":    0,  ## sliderpanel margins
+    "margin2":   10,      
 }
-          
+
+### ------------- 16:9 format - 1280X720 px ----------------
+twelve80 = {        
+    "DotsW":   1658, 
+    "DotsH":    818, 
+    "ViewW":   1280,  
+    "ViewH":    720,  
+    "gridSize":  40,  
+    "factor":  0.30, 
+}
+
+### --------------- 3:2 format - 1280X854 px ---------------
+eight54 = {
+    "DotsW":  1658,
+    "DotsH":   955, 
+    "ViewW":  1280,  
+    "ViewH":   854,     
+    "ScrollH": 798,
+    "SliderH": 794,          
+    "fix":       17,  ## used to reset margins
+    "OffSet":   20, 
+    "margin1":  17,
+    "margin2":   0,
+    "gridSize": 32.82,  ## good size
+    "factor":    0.38
+}
+
+### --------------------------------------------------------
+             
 CanvasStr = "L,R,P,S,C,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
-PathStr = "C,D,E,F,L,N,P,R,S,T,W,V,K,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 paths = {
@@ -53,7 +92,7 @@ MoveKeys = {
 
 PlayKeys = ('resume','pause')
 
-RotateKeys = {
+RotateKeys = {  ## works in reverse
     '+':  -1.0,
     '_':   1.0,
     '-':  15.0,   
@@ -65,85 +104,6 @@ RotateKeys = {
 Star = ((100, 20), (112, 63), (158, 63), (122, 91), 
         (136, 133), (100, 106), (63, 132), (77, 90), 
         (41, 63), (86, 63))
-
-
-keyMenu = (                    ## pixitems and bkgitems
-    ('A', 'Select All'),   
-    ('C', 'Clear Canvas'),     
-    ('D', 'Delete Selected'),
-    ('F', 'Flop Selected'),
-    ('G', 'Add/Hide Grid'),
-    ('H', 'Hide/UnHide'),
-    ('K', 'Toggle KeyList'),
-    ('L', 'Load Play'),
-    ('M', 'Map Selected'),
-    ('O', 'Clear Outlines'),
-    ('P', 'Toggle Paths'),
-    ('R', 'Run Play/Demo'),
-    ('S', 'Stop Play'),
-    ('T', 'Toggle Tags'),
-    ('U', 'UnSelect All'),
-    ('W', 'Clear Widgets'), 
-    ('Shift', '+H Hide Selected'), 
-    ('Shift', '+L ToggleLocks'),
-    ('Shift', '+R Locks All'),
-    ('Shift', '+T TagSelected'),
-    ('Shift', '+U Unlocks All'),
-    ('Shift', '+V Pixel Ruler'),   
-    ('Space', 'Show this Tag'),
-    ('\'', 'Toggle this lock'),
-    ('X, Q', 'Escape to Quit'),
-    ('Rtn', 'Enter to Front'),
-    ('/', 'Clk to Back'),
-    (',', 'Clk Back One Z'),
-    ('.', 'Clk Up One Z'),
-    ('Del', 'Clk to Delete'),
-    ('Shift', 'Clk to Flop'),  
-    ('Opt', 'DbClk to Clone'),
-    ('Opt', 'Drag Clones'), 
-    ('Cmd', 'Drag to Select'),
-    ('_/+', "Rotate 1 deg"),  
-    ('-/=', "Rotate 15 deg"),
-    ('[/]', 'Rotate 45 deg'),
-    ('</>', 'Toggle Size'),
-    ('U/D', 'Arrow Keys'),
-    ('L/R', 'Arrow Keys'),
-)
-
-pathMenu = (
-    ('C', 'Center Path'),
-    ("D", "Delete Screen"), 
-    ("E", "Edit Points"),
-    ("F", "Files"),
-    ("L", "Lasso"),
-    ("N", "New Path"),
-    ("P", "Path Chooser"),
-    ("R", "Reverse Path"),
-    ("S", "Save Path"),
-    ("T", "Test"),
-    ("W", "Way Points"),
-    ("V", "..View Points"),
-    ("Shift", "+D Delete Pts"),
-    ('Shift', '+V Pixel Ruler'),
-    ("cmd", "Closes Path"),
-    ("/", "Path Color"),
-    ('_/+', "Rotate 1 deg"),  
-    ('-/=', "Rotate 15 deg"),
-    ('[/]', 'Rotate 45 deg'),
-    ('</>', 'Toggle Size'),
-    ("} ", "Flop Path"),
-    ("{ ", "Flip Path"),  
-    (':/\"', "Scale X"),
-    (';/\'', 'Scale Y'),
-    ('U/D', 'Arrow Keys'),
-    ('L/R', 'Arrow Keys'),   
-    ("opt", "Add a Point"),
-    ("del", "Delete a Point"),
-    (">", "  Shift Pts +5%"),
-    ("<", "  Shift Pts -5%"),
-    ("! ","  Half Path Size"),
-    ("@ ","  Redistribute Pts"),
-)
 
 pathcolors = (
     "DODGERBLUE",    
@@ -177,7 +137,8 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_Control: 'cmd',
     Qt.Key.Key_Enter: 'enter',
     Qt.Key.Key_Return: 'return',
-    Qt.Key.Key_Space: 'space',             
+    Qt.Key.Key_Space: 'space',  
+    Qt.Key.Key_Backslash: 'front',           
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
     Qt.Key.Key_K: 'K',  
@@ -209,5 +170,6 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_BracketLeft: '[',
     Qt.Key.Key_BracketRight: ']', 
 }
+
 ### --------------------- dotsShared.py --------------------
 

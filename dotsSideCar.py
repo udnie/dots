@@ -1,17 +1,20 @@
 
+import os
+import os.path
 import random
 import json
 
-from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect
 from PyQt6.QtGui        import QPixmap, QPen, QColor, QGuiApplication
 from PyQt6.QtWidgets    import QGraphicsPixmapItem, QFileDialog, \
                                 QGraphicsItemGroup, QGraphicsLineItem, \
                                 QApplication
                   
-from dotsAnimation  import *   
-from dotsShared     import common, paths, keyMenu, pathMenu
-from dotsPixItem    import PixItem
-from dotsSideGig    import MsgBox
+from dotsAnimation   import *   
+from dotsShared      import common, paths
+from dotsPixItem     import PixItem
+from dotsSideGig     import MsgBox
+from dotsMapItem     import InitMap
 
 ### ---------------------- dotsSideCar ---------------------
 ''' dotsSideCar: wings, pixTest, transFormPixitem, toggleGrid plus 
@@ -24,8 +27,8 @@ class SideCar:
  
         self.canvas = parent
         self.scene  = self.canvas.scene
-        self.mapper = self.canvas.mapper
-        
+        self.mapper = InitMap(self.canvas) 
+  
         self.animation = Animation(self.canvas)
       
         self.gridZ   = common["gridZ"] 
@@ -36,7 +39,7 @@ class SideCar:
     Use the bat portion to move the bat - the pivot sprite and the wing 
     are in the images folder. Main thing to know, if you need to move 
     or change an animation - do so, save it, clear and reload.
-    They're brittle. And it works, even better now. '''
+    They're still brittle but it works, even better now. '''
 ### --------------------------------------------------------
     def wings(self, x, y, tag):
         self.canvas.pixCount += 1         
@@ -100,8 +103,8 @@ class SideCar:
         self.scene.addItem(pivot) 
 
 ### --------------------------------------------------------
-    def transFormPixItem(self, pix, rotation, scale, alpha2):
-        op = QPointF(pix.width/2, pix.height/2)
+    def transFormPixItem(self, pix, rotation, scale, alpha2):         
+        op = QPointF(pix.width/2, pix.height/2)  
         pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         pix.setTransformOriginPoint(op)
               
@@ -112,7 +115,7 @@ class SideCar:
         pix.setRotation(pix.rotation)         
         pix.setScale(pix.scale)     
         pix.setOpacity(pix.alpha2)
-                
+                                                      
         self.scene.addItem(pix)
             
 ### --------------------------------------------------------
@@ -141,33 +144,59 @@ class SideCar:
                 scale = random.randrange(90, 110)/100.0
                 self.transFormPixItem(pix, rotation, scale, 1.0)
                 
-                ## set the animation tag and class variable
-                # pix.tag = 'Random'
-                # pix.anime = self.animation.setAnimation(          
-                #     pix.tag, 
-                #     pix)    
-                   
-   ### --------------------------------------------------------           
+### --------------------------------------------------------      
+    def snapShot(self):
+        if self.hasBackGround() or self.scene.items():
+            self.canvas.unSelect()  ## turn off any select borders
+            if self.canvas.pathMakerOn == False:
+                if self.mapper.isMapSet():
+                    self.mapper.removeMap()
+            if self.canvas.openPlayFile == '':
+                snap = "dots_" + self.snapTag() + ".jpg"
+            else:
+                snap = os.path.basename(self.canvas.openPlayFile)
+                snap = snap[:-5] + ".jpg"
+            if snap[:4] != "dots":  ## always ask unless
+                Q = QFileDialog()
+                f = Q.getSaveFileName(self.canvas, paths["snapShot"],
+                    paths["snapShot"] + snap)
+                if not f[0]:
+                    return
+                elif not f[0].lower().endswith('.jpg'):
+                    MsgBox("Wrong file extention - use '.jpg'")
+                    return
+                snap = os.path.basename(f[0])
+            pix = self.canvas.view.grab(QRect(QPoint(0,0), QSize()))
+            pix.save(paths["snapShot"] + snap,
+                format='jpg',
+                quality=100)        
+            MsgBox("Saved as " + snap, 3)
+        
+    def hasBackGround(self):
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itm.type == 'bkg':
+                return True
+        return False
+    
+    def snapTag():
+        return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
+                             
+### --------------------------------------------------------           
     def toggleMenu(self):
-        if self.canvas.slider.pathMenuSet:
-            self.canvas.slider.setTableModel(keyMenu)
-            self.canvas.slider.pathMenuSet = False
-        else:
-            self.canvas.slider.setTableModel(pathMenu)
-            self.canvas.slider.pathMenuSet = True     
-                                                                                        
+        self.canvas.slider.toggleMenu()  ## no direct path from controlView
+                                                                                           
     def clearWidgets(self):                       
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
-                widget.close()  
-                                                                                
-    def clearOutlines(self):  ## with shadows
+                widget.close()
+                          
+    def clearOutlines(self):
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadow:
-                pix.shadowMaker.deleteOutline()
-                pix.shadowMaker.deletePoints()
-                
-    def toggleOutlines(self):
+                pix.shadowMaker.outline.hide()
+                pix.shadowMaker.hidePoints() 
+                                                                                                            
+    def toggleOutlines(self):  ## runs from shift-H
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadow:
                 pix.shadowMaker.toggleOutline()
@@ -183,7 +212,7 @@ class SideCar:
                                                                                
 ### --------------------------------------------------------
     def toggleGrid(self):
-        if self.gridGroup is not None:
+        if self.gridGroup:
             self.scene.removeItem(self.gridGroup)
             self.gridGroup = None
         else: 
@@ -276,8 +305,8 @@ def constrain(lastXY, objSize, panelSize, overlap):
     else:
         return lastXY
 
-def setCursor():
-    QGuiApplication.primaryScreen().availableGeometry().center()
+# def setCursor():
+#     QGuiApplication.primaryScreen().availableGeometry().center()
 
 ### ---------------------- dotsSideCar ---------------------
 

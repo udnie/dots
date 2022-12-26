@@ -18,6 +18,7 @@ class PixWidget(QWidget):
         self.save = QPoint(0,0)
                 
         self.setAccessibleName('widget')
+        self.WidgetW, self.WidgetH = 330.0, 200.0
                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
@@ -25,7 +26,7 @@ class PixWidget(QWidget):
         hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignBottom)
         self.setLayout(hbox)
         
-        self.setFixedHeight(int(self.pix.WidgetH))  
+        self.setFixedHeight(int(self.WidgetH))  
         self.setStyleSheet("background-color: rgba(0,0,0,0)")
         self.setContentsMargins(0,15,0,-15) 
         
@@ -40,7 +41,7 @@ class PixWidget(QWidget):
     def paintEvent(self, e): 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        
-        rect = QRectF(2, 2, self.pix.WidgetW-4, self.pix.WidgetH-4)
+        rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)
         painter.setPen(QPen(QColor(0,125,255), 5, Qt.PenStyle.SolidLine, 
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
         painter.setBrush(QColor(255,255,0,255))  ## yellow 
@@ -133,7 +134,7 @@ class PixWidget(QWidget):
         return groupBox
 
     def buttonGroup(self):
-        groupBox = QGroupBox("Pixitem Widget  ")
+        groupBox = QGroupBox("Pixitem ")
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)
@@ -155,10 +156,10 @@ class PixWidget(QWidget):
     
         vbox = QVBoxLayout(self)
         vbox.addWidget(shadowBtn)
+        vbox.addWidget(lockBtn)
         vbox.addWidget(flopBtn)
         vbox.addWidget(cloneBtn)
         vbox.addWidget(delBtn)
-        vbox.addWidget(lockBtn)
         vbox.addWidget(quitBtn)
                 
         groupBox.setLayout(vbox)

@@ -1,6 +1,6 @@
 
-import math
 import os
+import math
 
 from PyQt6.QtCore    import QPointF, QTimer
 from PyQt6.QtGui     import QColor
@@ -119,8 +119,11 @@ class SideWays():
             self.pathMaker.addPath()    
         self.drawing.redrawPoints(self.drawing.pointItemsSet())
         
-    def scaleRotate(self, key): 
-        p = self.pathMaker.path.sceneBoundingRect()
+    def scaleRotate(self, key):
+        if self.pathMaker.path == None: 
+            return 
+        else:
+            p = self.pathMaker.path.sceneBoundingRect()
         centerX = p.x() + p.width() /2
         centerY = p.y() + p.height() /2    
         ## for each pt compute distance from center

@@ -1,6 +1,5 @@
 
 import random
-import os
 import gc
 
 from PyQt6.QtCore    import QAbstractAnimation, QTimer, QEvent, QPointF, pyqtSlot
@@ -21,10 +20,10 @@ from dotsSliderPanel import SliderPanel
 from dotsScrollPanel import ScrollPanel
 from dotsDocks       import *
 
-Loops = ('L','R','P','S')
+Play = ('L','R','P','S')
 
-### -------------------- dotsDropCanvas --------------------
-''' dotsDropCanvas: program hub/canvas, includes context menu and 
+### -------------------- dotsStoryBoard --------------------
+''' dotsStoryBoard: program hub/canvas, includes context menu and 
     screen handling for selecting screen objects '''
 ### --------------------------------------------------------
 class StoryBoard(QWidget):
@@ -33,9 +32,12 @@ class StoryBoard(QWidget):
         super().__init__()
 
         self.dots  = parent 
-        self.scene = QGraphicsScene(self)
+        self.scene = QGraphicsScene(0, 0, common["ViewW"], common["ViewH"])
         self.view  = ControlView(self)
-
+        
+        self.view.setGeometry(QRect(0,0,common["ViewW"]+2, common["ViewH"]+2))
+        self.setFixedSize(common["ViewW"]+2, common["ViewH"]+2)
+     
         self.control = ''         ## shared
         self.pathMakerOn = False  ## shared
         self.openPlayFile = ''    ## shared 
@@ -56,20 +58,13 @@ class StoryBoard(QWidget):
         addSliderDock(self)
         addButtonDock(self)  
 
-        self.scene.setSceneRect(0, 0,
-            common["ViewW"],
-            common["ViewH"])
-
-        self.setFixedSize(common["ViewW"]+2,
-            common["ViewH"]+2)
-
         self.key = ''
-        self.pixCount = 0
-       
         self.origin = QPoint(0,0)
+        self.pixCount = 1
+        
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self)
-
         self.setMouseTracking(True)
+        
         self.view.viewport().installEventFilter(self)
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)  
     
@@ -91,7 +86,7 @@ class StoryBoard(QWidget):
        
         elif not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
-                if self.key in Loops:  ## canvas hotkeys
+                if self.key in Play:  ## canvas hotkeys
                     self.sideShow.keysInPlay(self.key)        
                 else:
                     self.sendPixKeys()
@@ -208,7 +203,7 @@ class StoryBoard(QWidget):
 
     def exit(self):
         self.clear()     
-        QTimer.singleShot(250, self.dots.close)
+        QTimer.singleShot(200, self.dots.close)
 
     def clear(self):  ## do this before exiting app
         self.pathMaker.pathMakerOff()
@@ -219,7 +214,7 @@ class StoryBoard(QWidget):
         self.dots.statusBar.clearMessage()
         self.mapper.clearMap()
         self.btnAddBkg.setEnabled(True)
-        self.pixCount = 0
+        self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.scene.clear()
@@ -298,10 +293,9 @@ class StoryBoard(QWidget):
 
     def ZDump(self):
         return
-        for pix in self.scene.items():
-            print(os.path.basename(pix.fileName), pix.id, pix.zValue())
-        print("bkg: " + str(self.bkgMaker.hasBackGround()))
-
+        # for pix in self.scene.items():
+        #     print(os.path.basename(pix.fileName), pix.id, pix.zValue())
+  
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():
@@ -347,6 +341,6 @@ class StoryBoard(QWidget):
         if self.mapper.isMapSet(): 
             self.mapper.removeMap()
 
-### -------------------- dotsDropCanvas --------------------
+### -------------------- dotsStoryBoard --------------------
 
 

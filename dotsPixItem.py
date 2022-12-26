@@ -8,17 +8,16 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 
-##from dotsShadowMaker    import ShadowMaker  ## add shadows
+##from dotsShadowMaker    import ShadowMaker  ## add shadows - only location
 from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsSideCar    as sideCar
 import dotsAnimation  as anima
 
-PixFactor = .30  # beginnig size factor 
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 
-PixSizes = {  ## match up on base filename   
+PixSizes = {  ## match up on base filename
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -37,8 +36,7 @@ class PixItem(QGraphicsPixmapItem):
    
         self.id = int(id)  ## used by mapper
         self.part = ""     ## used by wings
-        self.locked = False
-
+ 
         self.x = x
         self.y = y
 
@@ -49,8 +47,8 @@ class PixItem(QGraphicsPixmapItem):
             self.x, self.y = 0,0
         else:
             newW, newH = self.setPixSizes( 
-                img.width() * PixFactor, 
-                img.height() * PixFactor)
+                img.width() * common["factor"], 
+                img.height() * common["factor"])
    
         ## don't change
         img = img.scaled(int(newW), int(newH),
@@ -70,10 +68,11 @@ class PixItem(QGraphicsPixmapItem):
         self.alpha2 = 1.0  ## alpha was already being used and opacity can be a function
         self.scale  = 1.0
         self.rotation = 0
-           
-        self.setZValue(self.id)  ## zValue may reset by loadPlay 
-        
+             
+        self.setZValue(self.id+100) if self.id < 100 else self.setZValue(self.id)
+             
         self.isHidden = False  ## no reason to save it, acts as toggle
+        self.locked = False
         self.tag = ''
         
         self.anime  = None   
@@ -91,9 +90,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlags(False) if 'frame' in self.fileName else self.setFlags(True)
        
         self.shadowMaker = ShadowMaker(self)  ## sets shadow_dummy True/False
-         
-        self.WidgetW, self.WidgetH = 330.0, 210.0
-      
+               
 ### --------------------------------------------------------
     @pyqtSlot(str)
     def setPixKeys(self, key):
@@ -123,6 +120,8 @@ class PixItem(QGraphicsPixmapItem):
     def hoverLeaveEvent(self, e):
         if self.locked:
             self.mapper.clearTagGroup()
+        if self.key in TagKeys or self.mapper.tagSet: 
+            self.clearTag() 
         e.accept()
 
     def setFlags(self, bool):
@@ -138,10 +137,9 @@ class PixItem(QGraphicsPixmapItem):
                 if 'pivot' in self.fileName or 'frame' in self.fileName or \
                     self.scene.selectedItems():
                     return      
-                self.addWidget()  ## nothing selected - ok to add
-            elif self.key == 'space' and e.button() == Qt.LeftButton:
-                self.mapper.toggleTagItems(self.id)
-            elif self.key in RotateKeys:
+                else:
+                    self.addWidget()  ## nothing selected - ok to add
+            elif self.key in RotateKeys: 
                 self.rotateThis(self.key)
             elif self.key == '\'': 
                 self.togglelock()  ## single tag
@@ -160,7 +158,7 @@ class PixItem(QGraphicsPixmapItem):
                 elif self.key == '.':
                     p = self.zValue()+1  
                 self.setZValue(p)
-                self.mapper.toggleTagItems(self.id)
+                self.mapper.toggleTagItems(self.id) 
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
         e.accept()
@@ -178,8 +176,11 @@ class PixItem(QGraphicsPixmapItem):
                 self.cloneThis() 
         e.accept()
             
-    def mouseReleaseEvent(self, e):
-        self.dragCnt = 0         
+    def mouseReleaseEvent(self, e): 
+        if self.key in TagKeys or self.mapper.tagSet:
+            self.clearTag()
+        self.dragCnt = 0   
+        self.canvas.key = ""
         self.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)
         e.accept()
@@ -224,7 +225,7 @@ class PixItem(QGraphicsPixmapItem):
         self.widget = PixWidget(self)
         p = self.pos()
         x, y = int(p.x()), int(p.y())         
-        self.widget.setGeometry(x-20, y+50, int(self.WidgetW), int(self.WidgetH))
+        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
   
     def resetSliders(self):
@@ -362,6 +363,7 @@ class PixItem(QGraphicsPixmapItem):
             if key in p:
                 val = PixSizes.get(key)
                 return val[0], val[1]
+        # print(p, "{0:.2f}".format(newW), "{0:.2f}".format(newH))
         if newW < 100 or newH < 100:
             newW, newH = 200, 200 
         elif newW > 400 or newH > 400:

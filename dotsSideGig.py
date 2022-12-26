@@ -3,11 +3,9 @@ import random
 import os
 import math
 
-from PyQt6.QtCore    import Qt, QTimer, QPointF, QRectF,QSize, QEvent
-from PyQt6.QtGui     import QPainter, QBrush, QFontMetrics, \
-                            QPen, QPolygonF, QColor, QFont
-from PyQt6.QtWidgets import QWidget, QMessageBox, QGraphicsSimpleTextItem, \
-                            QLabel, QScrollArea, QGridLayout, QVBoxLayout
+from PyQt6.QtCore    import Qt, QTimer, QPointF, QRectF
+from PyQt6.QtGui     import QPainter, QBrush, QFontMetrics, QColor, QFont
+from PyQt6.QtWidgets import QMessageBox, QGraphicsSimpleTextItem
 
 from dotsShared      import paths, pathcolors, PlayKeys
 
@@ -113,93 +111,6 @@ class TagIt(QGraphicsSimpleTextItem):
         painter.setFont(self.font)
         painter.drawText(self.boundingRect(), 
             Qt.AlignmentFlag.AlignCenter, self.text)
- 
-### --------------------------------------------------------
-class DoodleMaker(QWidget): 
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
-
-        self.pathMaker = parent
-        self.resize(530,320)
-        self.setWindowFlags(Qt.WindowType.NoDropShadowWindowHint)
-        self.setStyleSheet("background-color: rgb(225,225,225)")
-
-        widget = QWidget()
-        gLayout = QGridLayout(widget)
-        gLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
-        gLayout.setHorizontalSpacing(5)
-        # gLayout.setOriginCorner(0)  ## not sure if this is being used anymore
-        gLayout.setContentsMargins(5, 5, 5, 5)
-
-        for file in getPathList():    
-            df = Doddle(parent, file)
-            gLayout.addWidget(df)
-
-        scroll = QScrollArea()
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        scroll.setWidgetResizable(False)
-        scroll.setWidget(widget)
-   
-        vLayout = QVBoxLayout(self)
-        vLayout.addWidget(scroll)
-                   
-### --------------------------------------------------------
-class Doddle(QLabel):  
-### --------------------------------------------------------
-    def __init__(self, parent, file):
-        super().__init__()
-
-        self.pathMaker = parent
-   
-        self.file = file
-        scalor = .10
-        self.W, self.H = 150, 100
-
-        self.font = QFont()
-        self.font.setFamily("Helvetica")
-        self.font.setPointSize(12)
-
-        self.pen = QPen(QColor(0,0,0))                     
-        self.pen.setWidth(1)                                       
-        self.brush = QBrush(QColor(255,255,255,255)) 
-        ## scale down screen drawing --  file, scalor, offset
-        self.df = getPts(self.file, scalor, 10)  
-  
-    def minimumSizeHint(self):
-        return QSize(self.W, self.H)
-
-    def sizeHint(self):
-        return self.minimumSizeHint()
-
-    def mousePressEvent(self, e): 
-        if e.type() == QEvent.Type.MouseButtonPress and \
-            e.button() == Qt.MouseButton.RightButton:
-            return
-        self.pathMaker.pts = getPts(self.file)
-        self.pathMaker.addPath()
-        self.pathMaker.openPathFile = os.path.basename(self.file)
-        self.pathMaker.pathChooserOff() 
-        e.accept()
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setBrush(self.brush) 
-        painter.setPen(QPen(QColor("DODGERBLUE"), 2, Qt.PenStyle.DashDotLine))
-        painter.drawPolygon(QPolygonF(self.df))
-        painter.setBrush(Qt.BrushStyle.NoBrush) 
-        painter.setPen(QPen(Qt.GlobalColor.darkGray, 2)) 
-        painter.drawRect(0, 0, self.W, self.H)
-        painter.setPen(QPen(Qt.GlobalColor.black, 2))
-
-        metrics = QFontMetrics(self.font)
-        txt = os.path.basename(self.file)
-        p = metrics.boundingRect(txt)
-        p = p.width()
-
-        p = int((self.W - p)/2 )
-        painter.drawText(p, self.H-10, txt)
 
 ### --------------------------------------------------------
 def getPathList(bool=False):  ## used by DoodleMaker & context menu

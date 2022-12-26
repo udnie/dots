@@ -34,7 +34,7 @@ class PointItem(QGraphicsEllipseItem):
         self.x = pt.x()-V*.5
         self.y = pt.y()-V*.5
         
-        self.setZValue(35)      
+        self.setZValue(common["points"])      
         self.setRect(self.x, self.y, V, V)  
         
         self.setPen(QPen(QColor("gray"), 1))
@@ -95,6 +95,7 @@ class ShadowWidget(QWidget):
         self.save = QPointF(0.0,0.0)
                 
         self.setAccessibleName('widget')
+        self.WidgetW, self.WidgetH = 330.0, 200.0
                 
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())
@@ -102,7 +103,7 @@ class ShadowWidget(QWidget):
         hbox.addWidget(self.buttonGroup())
         self.setLayout(hbox)
         
-        self.setFixedHeight(int(self.fab.WidgetH))
+        self.setFixedHeight(int(self.WidgetH))
         self.setStyleSheet("background-color: rgba(0,0,0,0)")
         self.setContentsMargins(0,15,0,-15)
              
@@ -110,14 +111,14 @@ class ShadowWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
-                                 
+                                         
         self.show()
                 
 ### --------------------------------------------------------                              
     def paintEvent(self, e):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
-        rect = QRectF(2, 2, self.fab.WidgetW-4, self.fab.WidgetH-4)                   
+        rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
         painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,            
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
         painter.setBrush(QColor(0,150,245,255))
@@ -210,7 +211,7 @@ class ShadowWidget(QWidget):
         return groupBox
 
     def buttonGroup(self):
-        groupBox = QGroupBox("Shadow Widget  ")
+        groupBox = QGroupBox(" Shadow")
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)
@@ -268,7 +269,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
        
         self.type = "shadow" 
         self.anime = None 
-        self.setZValue(50) 
+        self.setZValue(common["shadow"]) 
                                        
         self.dragCnt = 0
         self.save    = QPointF(0.0,0.0)

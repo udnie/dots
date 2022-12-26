@@ -1,11 +1,10 @@
 
 from PyQt6.QtCore    import Qt, QPointF, QEvent, QTimer
 from PyQt6.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
-from PyQt6.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsPolygonItem 
+from PyQt6.QtWidgets import QWidget, QGraphicsPolygonItem 
                             
 from dotsShared      import common
 from dotsPointItem   import PointItem
-from dotsSideGig     import distance
 
 ### ------------------- dotsDrawsPaths ---------------------
 ''' dotsDrawsPaths: newPath, lasso, pointitems '''
@@ -23,7 +22,6 @@ class DrawsPaths(QWidget):
         self.sideWays  = sideWays
           
         self.dragCnt = 0 
-        self.last = 0
         
         self.lassoSet = False
         self.polySet = False
@@ -31,7 +29,6 @@ class DrawsPaths(QWidget):
         self.poly = None
         self.lasso = []
         
-        # self.setMouseTracking(True)  ## not needed - probably set by canvas
         self.view.viewport().installEventFilter(self)
              
 ### --------------------- event filter ----------------------          
@@ -55,11 +52,13 @@ class DrawsPaths(QWidget):
         return QWidget.eventFilter(self, source, e)    
      
 ### ---------------------- new path ------------------------  
-    def toggleNewPath(self):
+    def toggleNewPath(self):  ## changed - use delete instead or 'N'
         if self.pathMaker.addingNewPath: 
-            self.deleteNewPath()  ## changed your mind
-            self.pathMaker.delete()
-        elif not self.pathMaker.pathSet and self.sideWays.tagCount() == 0:
+            if len(self.pathMaker.pts) == 0:
+                self.deleteNewPath()
+            else:
+                self.closeNewPath()  ## if there's not a path on display or waypt tags
+        elif not self.pathMaker.pathSet:
             self.addNewPath()
 
     def addNewPath(self):
@@ -69,45 +68,33 @@ class DrawsPaths(QWidget):
         self.pathMaker.newPath = None
         self.pathMaker.npts = 0
         self.pathMaker.pts = []
-
-    def addNewPathPts(self, pt):
-        if self.pathMaker.npts == 0:
-            self.pathMaker.pts.append(pt)
-        self.pathMaker.npts += 1
-        if self.pathMaker.npts % 5 == 0:    
-            if distance(pt.x(),self.last.x(), pt.y(), self.last.y()) > 15.0:
-                self.last = pt     
-                self.pathMaker.pts.append(pt)
-                self.updateNewPath()
+        self.editBtn("ClosePath")
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note
             self.removeNewPath()  
             self.pathMaker.turnGreen()
             self.pathMaker.addPath()  ## draws a polygon rather than painter path
-
+   
+    def removeNewPath(self):  ## keep self.pathMaker.pts for path
+        if self.pathMaker.addingNewPath:
+            if self.pathMaker.newPath:            
+                self.scene.removeItem(self.pathMaker.newPath)
+            self.pathMaker.addingNewPath = False
+            self.pathMaker.newPath = None
+            self.pathMaker.npts = 0
+                            
+    def editBtn(self, str):
+        if self.pathMaker.widget:
+            self.pathMaker.widget.newBtn.setText(str)
+                 
     def deleteNewPath(self):  ## changed your mind, doesn't save pts
         if self.pathMaker.addingNewPath:
             self.removeNewPath()
             self.pathMaker.turnGreen()
-            
-    def updateNewPath(self):
-        if self.pathMaker.addingNewPath:  ## list of points
-            self.removeNewPath()  ## clean up just in case
-            ## no polyline in pyqt - use open painter path instead 
-            self.pathMaker.newPath = QGraphicsPathItem(self.pathMaker.setPaintPath())
-            self.pathMaker.newPath.setPen(QPen(QColor(self.pathMaker.color), 3, Qt.PenStyle.DashDotLine))
-            self.pathMaker.newPath.setZValue(common['pathZ']) 
-            self.scene.addItem(self.pathMaker.newPath)  ## only one - no group needed
-            self.pathMaker.addingNewPath = True
-
-    def removeNewPath(self):  ## keep self.pathMaker.pts for path
-        if self.pathMaker.newPath:
-            self.scene.removeItem(self.pathMaker.newPath)
-            self.pathMaker.addingNewPath = False
-            self.pathMaker.newPath = None
-            self.pathMaker.npts = 0
-          
+            self.pathMaker.pts = []
+            self.pathMaker.pathSet = False
+                      
 ### ------------------------ lasso ------------------------- 
     def toggleLasso(self):
         if self.lassoSet:
@@ -317,10 +304,8 @@ class DrawsPaths(QWidget):
         # print("d-delete: ", self.pathMaker.selections, "\n")
                 
     def findTop(self):
-      
         ## save
-        #  self.setZValue(self.parent.scene.items()[0].zValue() + 1)
-           
+        #  self.setZValue(self.parent.scene.items()[0].zValue() + 1)    
         for itm in self.scene.items():
             return itm.zValue()
         return 0
