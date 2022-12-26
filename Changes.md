@@ -1,7 +1,7 @@
 
 ## Changes
 **December 2022:**      
-I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key used to toggle **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video:
+I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key used to toggle **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
 
 To run **Shadows** requires an easy edit to **dotsPixItem.py** by commenting on and off two lines near the top of the file. **Open-cv** and **numpy** are required to run both **Shadows** and **SpriteMaker**. 
 
