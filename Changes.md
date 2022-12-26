@@ -5,6 +5,12 @@ I've added a few more widgets.  One to **backGrounds** to replace the sliders or
 
 To run **Shadows** requires an easy edit to **dotsPixItem.py** by commenting on and off two lines near the top of the file. **Open-cv** and **numpy** are required to run both **Shadows** and **SpriteMaker**. 
 
+```
+# from dotsShadowMaker    import ShadowMaker  ## add shadows
+from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+
+```
+
 **VHX** now expands and contracts evenly end to end. 
 
         
