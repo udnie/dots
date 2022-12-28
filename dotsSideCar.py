@@ -178,7 +178,7 @@ class SideCar:
                 return True
         return False
     
-    def snapTag():
+    def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
                              
 ### --------------------------------------------------------           
