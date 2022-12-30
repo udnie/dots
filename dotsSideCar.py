@@ -189,7 +189,8 @@ class SideCar:
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
-                          
+        if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
+        
     def clearOutlines(self):
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadow:

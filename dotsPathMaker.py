@@ -91,6 +91,8 @@ class PathMaker(QWidget):
         self.npts = 0  ## used by addNewPathPts
         self.last = 0
         
+        
+        self.chooser = None
         self.newPath = None
         self.addingNewPath = False
 
