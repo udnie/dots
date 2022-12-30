@@ -285,6 +285,7 @@ class DoodleMaker(QWidget):
         scroll.setFixedSize(self.WidgetW-40, self.WidgetH-70)
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        scroll.setStyleSheet("background: rgb(220, 220, 220)")
         scroll.setWidget(widget)
         return scroll
           

@@ -262,11 +262,12 @@ class PathMaker(QWidget):
             self.pathChooserOff()
 
     def pathChooserOff(self):
+        if self.chooser: self.chooser.close()
         self.chooser = None
-        self.pathChooserSet = False
+        self.pathChooserSet = False 
         if self.openPathFile:  ## filename top left corner
             self.dots.statusBar.showMessage(self.openPathFile)
-        
+                    
 ### -------------------- path stuff ------------------------
     def addPath(self):
         self.removePath()  ## not for animation

@@ -114,7 +114,7 @@ class TagIt(QGraphicsSimpleTextItem):
 
 ### --------------------------------------------------------
 def getPathList(bool=False):  ## used by DoodleMaker & context menu
-    try:                      ## also by 
+    try:                        
         files = os.listdir(paths['paths'])
     except IOError:
         MsgBox("getPathList: No Path Directory Found!", 5)
