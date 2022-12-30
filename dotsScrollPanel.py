@@ -43,6 +43,7 @@ class ImgLabel(QLabel):
         qp = QPainter()
         qp.begin(self)
 
+        img = ""  ## otherwise it can crash
         if self.imgFile == 'Star':
             qp.setPen(QPen(Qt.GlobalColor.black, 1, Qt.PenStyle.SolidLine))
             qp.setBrush(QBrush(Qt.GlobalColor.red, Qt.BrushStyle.SolidPattern))
@@ -62,7 +63,7 @@ class ImgLabel(QLabel):
             posY = ((scroll['MaxH'] - newH) /2 ) + 9
             qp.drawImage(QPointF(posX, posY), img)
             
-        img = None
+        del img
 
         pen = QPen(Qt.GlobalColor.darkGray)   
         pen.setWidth(2)
