@@ -1,4 +1,11 @@
-## Changes
+## Changes      
+**December 2022:**      
+I've made some small changes -- the smaller green square no longer disappears when switching to the **loupe/magnifier** and a small color filled circle now appears once you begin to edit. It shows the current outline color which starts with **lime** rather than **white** as I find it easier to see, especially against a light color background.
+ 
+        
+So this is going to be strange but I now have an easier way to produce **transparent .pngs** rather than using **SpriteMaker**. **SpriteMaker** is now my fallback as **Apple IOS 16.2** will easily allow you to create a **transparent .png** in **Photos**, at least on my **IPhone 11Pro**.
+Not all the time - and some touch up may be required, but I found that most of the time it will produce a very usable image. I recommend scaling the resulting image to around **1MB** or less as **2MB** to **4MB** files can slow **Dots** down. 
+
 **September 2022:**
 Minor edits to make it more compatible with PySide6.
 

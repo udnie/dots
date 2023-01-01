@@ -1,9 +1,9 @@
 
 ## Changes
 **December 2022:**      
-I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key used to toggle **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
+I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key that toggled **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
 
-To run **Shadows** requires an easy edit to **dotsPixItem.py** by commenting on and off two lines near the top of the file. **Open-cv** and **numpy** are required to run both **Shadows** and **SpriteMaker**. 
+Repeating myself a bit, to run **Shadows** requires an easy edit to **dotsPixItem.py** by commenting on and off two lines near the top of the file. **Open-cv** and **numpy** are required to run both **Shadows** and **SpriteMaker**. 
 
 ```
 # from dotsShadowMaker    import ShadowMaker  ## add shadows
@@ -11,10 +11,9 @@ from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 ```
 
-**VHX** now expands and contracts evenly end to end. 
+**Other Stuff:** **VHX** now expands and contracts evenly end to end. Though I didn't demo it, you can now delete paths directly from **PathChooser** by holding down the delete key and clicking on the path. Also, see **SpriteMaker.md** for the latest news, especially if you own a later model **iPhone**.         
 
-        
-Lastly,  there's sort of an easter egg, real easy to spot, in **dotsQt.py**.
+**Lastly**, there's sort of an easter egg, real easy to spot, in **dotsQt.py**.
 
 **November 2022:**      
 Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMaker**. The **StoryBoard** change affects the file name while continuing to maintain the reference thru **.canvas**.  **BkgMaker** goes a little deeper with both file and reference changes - though not many. 
