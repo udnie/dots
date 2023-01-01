@@ -225,14 +225,16 @@ class BkgMaker(QWidget):
         return p.x() , p.y()
                                                      
     def lockBkg(self):
-        self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-        self.bkgItem.locked = True
-        if self.widget: self.widget.lockBtn.setText("Locked")
+        if self.bkgItem and self.bkgItem.fileName != 'flat':
+            self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+            self.bkgItem.locked = True
+            if self.widget: self.widget.lockBtn.setText("Locked")
                               
     def unlockBkg(self):
-        self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
-        self.bkgItem.locked = False
-        if self.widget: self.widget.lockBtn.setText("UnLocked")
+        if self.bkgItem and self.bkgItem.fileName != 'flat':
+            self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+            self.bkgItem.locked = False
+            if self.widget: self.widget.lockBtn.setText("UnLocked")
         
     def flopIt(self):  ## used by widget 
         if self.bkgItem and self.bkgItem.fileName != 'flat':

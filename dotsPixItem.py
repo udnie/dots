@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 
-##from dotsShadowMaker    import ShadowMaker  ## add shadows - only location
+##from dotsShadowMaker    import ShadowMaker  ## add shadows
 from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsSideCar    as sideCar
@@ -16,6 +16,7 @@ import dotsAnimation  as anima
 
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
+Pct = -0.50  ## percent allowable off screen
 
 PixSizes = {  ## match up on base filename
 }
@@ -25,14 +26,14 @@ PixSizes = {  ## match up on base filename
 ### --------------------------------------------------------
 class PixItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
-    def __init__(self, imgFile, id, x, y, parent, mirror=False):
+    def __init__(self, fileName, id, x, y, parent, mirror=False):
         super().__init__()
 
         self.canvas = parent
         self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
     
-        self.fileName = imgFile
+        self.fileName = fileName
    
         self.id = int(id)  ## used by mapper
         self.part = ""     ## used by wings
@@ -40,7 +41,7 @@ class PixItem(QGraphicsPixmapItem):
         self.x = x
         self.y = y
 
-        img = QImage(imgFile)
+        img = QImage(fileName)
 
         if 'frame' in self.fileName: 
             newW, newH = common["ViewW"],common["ViewH"]
@@ -58,6 +59,8 @@ class PixItem(QGraphicsPixmapItem):
         self.width   = img.width()
         self.height  = img.height()  
         self.imgFile = img
+
+        del img
 
         self.key = ""
         self.dragCnt = 0
@@ -258,12 +261,12 @@ class PixItem(QGraphicsPixmapItem):
             self.initX + dragX, 
             self.width, 
             common["ViewW"], 
-            self.width * -common["factor"]))
+            self.width * Pct))
         self.y = int(sideCar.constrain(
             self.initY + dragY,
             self.height, 
             common["ViewH"], 
-            self.height * -common["factor"]))
+            self.height * Pct))
      
     def reprise(self):  ## return pixitem to original position
         if self.tag == '':  ## you're done
@@ -310,12 +313,8 @@ class PixItem(QGraphicsPixmapItem):
         self.canvas.setKeys('') 
              
     def cloneThis(self):
-        self.canvas.addPixItem(
-            self.fileName, 
-            self.x+25, 
-            self.y+10,
-            (self.rotation, self.scale),
-            self.flopped)
+        self.canvas.addPixItem(self.fileName, self.x+25, self.y+10,\
+            (self.rotation, self.scale), self.flopped)
      
     def moveThis(self, key):
         self.setOriginPt()  ## updates width and height also
@@ -324,11 +323,11 @@ class PixItem(QGraphicsPixmapItem):
         self.x = int(sideCar.constrain(self.x, 
             self.width, 
             common["ViewW"], 
-            self.width * -common["factor"]))
+            self.width * Pct))
         self.y = int(sideCar.constrain(self.y, 
             self.height, 
             common["ViewH"], 
-            self.height * -common["factor"]))
+            self.height * Pct))
         self.setPos(self.x, self.y) 
   
     def rotateThis(self, key):

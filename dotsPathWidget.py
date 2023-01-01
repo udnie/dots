@@ -244,7 +244,7 @@ class DoodleMaker(QWidget):
         vbox = QVBoxLayout()
          
         vbox.addSpacing(0)
-        vbox.addWidget(self.addGrid(parent))
+        vbox.addWidget(self.addGrid())
         vbox.addSpacing(0)
         vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
         
@@ -270,33 +270,48 @@ class DoodleMaker(QWidget):
     def closeWidget(self):       
         self.pathMaker.pathChooserOff()
      
-    def addGrid(self, parent):           
+    def addGrid(self):           
         widget = QWidget()
-        gLayout = QGridLayout(widget)
-        gLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
-        gLayout.setHorizontalSpacing(5)
-        gLayout.setContentsMargins(5, 5, 5, 5)
+        self.gLayout = QGridLayout(widget)
+        self.gLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
+        self.gLayout.setHorizontalSpacing(5)
+        self.gLayout.setContentsMargins(5, 5, 5, 5)
 
-        for file in getPathList():    
-            df = Doddle(parent, file)
-            gLayout.addWidget(df)
+        self.updateGrid()
 
         scroll = QScrollArea()
         scroll.setFixedSize(self.WidgetW-40, self.WidgetH-70)
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
         scroll.setStyleSheet("background: rgb(220, 220, 220)")
+        scroll.verticalScrollBar().setStyleSheet("QScrollBar:vertical {\n" 
+            "background: rgb(245,245,245) }");  ## shows handle better
+            
         scroll.setWidget(widget)
         return scroll
-          
+    
+    def updateGrid(self):
+        for file in getPathList():    
+            df = Doddle(self, self.pathMaker, file)
+            self.gLayout.addWidget(df)
+            
+    def delete(self, this):
+        os.remove(this.file)
+        for i in reversed(range(self.gLayout.count())):
+            self.gLayout.removeItem(self.gLayout.itemAt(i))
+        self.updateGrid()
+        self.pathMaker.removePath()
+         
 ### --------------------------------------------------------
 class Doddle(QLabel):  
 ### --------------------------------------------------------
-    def __init__(self, parent, file):
+    def __init__(self, parent, path, file):
         super().__init__()
 
-        self.pathMaker = parent
-   
+        self.doodle = parent
+        self.pathMaker = path
+        
         self.file = file
         scalor = .10
         self.W, self.H = 150, 100
@@ -323,12 +338,15 @@ class Doddle(QLabel):
         if e.type() == QEvent.Type.MouseButtonPress and \
             e.button() == Qt.MouseButton.RightButton:
             return
+        elif self.pathMaker.key == 'del':
+            self.doodle.delete(self)
+            return
         self.pathMaker.pts = getPts(self.file)
         self.pathMaker.addPath()
         self.pathMaker.openPathFile = os.path.basename(self.file) 
         self.pathMaker.pathChooserOff() 
         e.accept()
-                
+                                   
     def paintEvent(self, event):  ## draw rthe path
         painter = QPainter(self)
         painter.setBrush(self.brush) 

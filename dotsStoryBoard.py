@@ -154,12 +154,12 @@ class StoryBoard(QWidget):
     
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
-    def addPixItem(self, imgFile, x, y, clone, mirror):  
-        if 'wings' in imgFile:  ## see dotsSideCar for wings
+    def addPixItem(self, fileName, x, y, clone, mirror):  
+        if 'wings' in fileName:  ## see dotsSideCar for wings
             self.sideCar.wings(x, y, '')        
         else:
             self.pixCount += 1  
-            pix = PixItem(imgFile, self.pixCount, x, y, self, mirror)
+            pix = PixItem(fileName, self.pixCount, x, y, self, mirror)
                 
             if clone != None:  ## clone it                    
                 self.sideCar.transFormPixItem(pix,

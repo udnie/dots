@@ -27,13 +27,13 @@ scroll = {
 ### --------------------------------------------------------
 class ImgLabel(QLabel):
 ### --------------------------------------------------------
-    def __init__(self, imgFile, count, parent):
+    def __init__(self, fileName, count, parent):
         super().__init__()
    
         self.scrollPanel = parent
         self.canvas = parent.canvas
 
-        self.imgFile = imgFile
+        self.fileName = fileName
         self.id = count 
 
         self.setFrameStyle(QFrame.Shape.Panel|QFrame.Shadow.Raised)
@@ -44,13 +44,13 @@ class ImgLabel(QLabel):
         qp.begin(self)
 
         img = ""  ## otherwise it can crash
-        if self.imgFile == 'Star':
+        if self.fileName == 'Star':
             qp.setPen(QPen(Qt.GlobalColor.black, 1, Qt.PenStyle.SolidLine))
             qp.setBrush(QBrush(Qt.GlobalColor.red, Qt.BrushStyle.SolidPattern))
             qp.drawPolygon(QPolygon(self.drawStar()))  
             qp.setBrush(Qt.BrushStyle.NoBrush) 
         else:    
-            img = QImage(self.imgFile)
+            img = QImage(self.fileName)
                         
             if img.width() > scroll['MaxW'] or img.height() > scroll['MaxH']:  ## size it to fit       
                 img = img.scaled(scroll['MaxW'], scroll['MaxH'],  ## keep it small
@@ -84,14 +84,14 @@ class ImgLabel(QLabel):
 
         qp.setPen(pen)  
         qp.setFont(font)
-        imgfile = os.path.basename(self.imgFile)
+        fileName = os.path.basename(self.fileName)
 
         metrics = QFontMetrics(font)    
-        p = metrics.boundingRect(imgfile)
+        p = metrics.boundingRect(fileName)
         p = p.width()
         p = (scroll['LabelW'] - p)/2 
 
-        qp.drawText(int(p), scroll['Type'], imgfile)
+        qp.drawText(int(p), scroll['Type'], fileName)
         qp.end()
 
     def minimumSizeHint(self):
@@ -112,7 +112,7 @@ class ImgLabel(QLabel):
         data = QMimeData()
         data.setText(None)
     
-        data.setUrls([QUrl.fromLocalFile(self.imgFile)])
+        data.setUrls([QUrl.fromLocalFile(self.fileName)])
         drag.setMimeData(data)
         drag.setPixmap(QPixmap(paths['imagePath'] + 'dnd2.png'))
         drag.exec()
@@ -149,6 +149,7 @@ class ScrollPanel(QWidget):
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     
+        self.scroll.setStyleSheet("background: rgb(235, 235, 235)")
         self.scroll.verticalScrollBar().setStyleSheet("QScrollBar:vertical {\n" 
             "background: rgb(245,245,245) }");  ## shows handle better
  
@@ -207,8 +208,8 @@ class ScrollPanel(QWidget):
             "Choose an image file to open", paths['snapShot'], 
             "Images Files(*.bmp *.jpg *.png)")
         if files:
-            for imgFile in files:
-                self.add(imgFile)
+            for fileName in files:
+                self.add(fileName)
         Q.done(0)
           
     def loadSprites(self):

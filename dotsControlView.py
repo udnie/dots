@@ -79,8 +79,8 @@ class ControlView(QGraphicsView):
         ext = FileTypes
         if e.mimeData().hasUrls():
             m = e.mimeData()
-            imgFile = m.urls()[0].toLocalFile()
-            if imgFile != 'star' and imgFile.lower().endswith(ext): 
+            fileName = m.urls()[0].toLocalFile()
+            if fileName != 'star' and fileName.lower().endswith(ext): 
                 e.setAccepted(True)
                 self.dragOver = True
             else:
@@ -89,11 +89,11 @@ class ControlView(QGraphicsView):
     def dropEvent(self, e):
         m = e.mimeData()
         if m.hasUrls():
-            imgFile = m.urls()[0].toLocalFile()
+            fileName = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.mapper.toFront(0)
-            # self.canvas.addPixItem(imgFile, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
-            self.canvas.addPixItem(imgFile, e.position().x(), e.position().y(),  ### PyQt6 takes position
+            # self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
+            self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### PyQt6 takes position
                 None, False)
    
 ### -------------------------------------------------------

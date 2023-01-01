@@ -27,7 +27,7 @@ ten80 = {             ## see dotQt for use
     "ViewW":   1080,  
     "ViewH":    720,
     "gridSize":  30, 
-    "factor":  0.35,  ## amount to scaled pixitems by unless preset
+    "factor":  0.30,  ## amount to scaled pixitems by unless preset
 } 
 
 seven20 = {     ## used by both 1080 and 1280X720px

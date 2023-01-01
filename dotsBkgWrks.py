@@ -5,14 +5,14 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QGraphicsPixmapItem ,QSlider, QHBoxLayout,  \
                                 QVBoxLayout, QPushButton
     
-from dotsShared         import common
+from dotsShared         import common, RotateKeys
                                              
 ### ---------------------- dotsBkgWrks ---------------------
 ''' classes: BkgItem, BkgWidget '''
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
-    def __init__(self, imgFile, canvas, z=common["bkgZ"], mirror=False):
+    def __init__(self, fileName, canvas, z=common["bkgZ"], mirror=False):
         super().__init__()
 
         self.canvas   = canvas
@@ -22,14 +22,16 @@ class BkgItem(QGraphicsPixmapItem):
         self.ViewW = common["ViewW"]
         self.ViewH = common["ViewH"]
         
-        self.fileName = imgFile
-        img = QImage(imgFile)
+        self.fileName = fileName
+        img = QImage(fileName)
   
         self.imgFile = img.scaled(  ## fill to width or height
             self.ViewW, 
             self.ViewH,
             Qt.AspectRatioMode.KeepAspectRatio, 
-            Qt.TransformationMode.SmoothTransformation)            
+            Qt.TransformationMode.SmoothTransformation)  
+        
+        del img          
                     
         self.key = ""
         self.id = 0  ## not used except for conisistency
