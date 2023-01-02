@@ -65,9 +65,13 @@ class ShadowMaker:
                          
         image = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32)    
         pixmap = QPixmap.fromImage(image)
-              
+                  
         self.shadow = Shadow(self)  ## from ShadowWorks *
         self.shadow.setPixmap(pixmap)
+        
+        del img
+        del image
+        del pixmap
                       
         self.imgSize = width, height  ## save for later 
         self.viewW, self.viewH = viewW, viewH
@@ -147,7 +151,10 @@ class ShadowMaker:
    
         self.shadow = Shadow(self)      
         self.shadow.setPixmap(pixmap)    
-      
+        
+        del img
+        del pixmap
+         
         self.shadow.setX(x)  
         self.shadow.setY(y)  
        

@@ -93,7 +93,8 @@ class BkgMaker(QWidget):
             "Images Files(*.bmp *.jpg *.png *.bkg)")
         if file:
             self.openBkgFile(file) if file.endswith('.bkg') else self.addBkg(file)
-            
+        Q.done(0)
+        
     def openBkgFile(self, file):  ## read from .bkg file
         try:
             with open(file, 'r') as fp:
@@ -160,11 +161,12 @@ class BkgMaker(QWidget):
                
 ### --------------------------------------------------------
     def saveBkg(self):  ## save it to the background file
-        if not self.bkgItem.locked:
-            MsgBox("Set to Background inorder to save", 3)
-            return
         if self.bkgItem.fileName == 'flat':
-            self.saveBkgColor()
+            self.saveBkgColor()  
+            return  
+        elif not self.bkgItem.locked:
+            MsgBox("Set/Lock Background inorder to save", 3)
+            return
         else:
             file = os.path.basename(self.bkgItem.fileName)
             file = file[0: file.index('.')]
@@ -189,7 +191,9 @@ class BkgMaker(QWidget):
     def saveBkgColor(self):  ## write to .bkg file
         Q = QFileDialog()
         f = Q.getSaveFileName(self.canvas, paths["bkgPath"],  
-            paths["bkgPath"] + 'tmp.bkg')    
+            paths["bkgPath"] + 'tmp.bkg')  
+        Q.accept()
+          
         if not f[0]: 
             return
         if not f[0].lower().endswith('.bkg'):

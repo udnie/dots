@@ -60,8 +60,9 @@ class SideShow:
         else:
             Q = QFileDialog()
             file, _ = Q.getOpenFileName(self.canvas, 
-                "Choose a file to open", paths["playPath"], "Files (*.play)",
-                None)
+                "Choose a file to open", paths["playPath"], "Files (*.play)", None)
+            Q.accept()
+            
             if file:
                 self.openPlay(file) 
             else:
@@ -141,6 +142,8 @@ class SideShow:
                     bkz -= 1    
             ## end for loop
 
+            del dlist
+
             self.canvas.openPlayFile = file
             self.canvas.bkgMaker.disableBkgBtns()
             self.dots.statusBar.showMessage("Number of Pixitems: {}".format(kix),5000)  
@@ -198,6 +201,8 @@ class SideShow:
                 pix.shadow['flopped'] = None
             else:
                 pix.shadow['flopped'] = tmp['flopped']
+                   
+        del tmp
                                            
         if pix.type == 'bkg':  ## you can unlock them now
             pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
