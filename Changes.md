@@ -24,7 +24,7 @@ followed by the the format key, ie., demo-1350.play, demo-1350.path. Entering **
      % python3 ./dotsQt.py 1350        
         
 **More stuff**: I've removed the **VHX** pixel ruler **Shift-V** start key as I was having some difficulty in getting it to run from my desktop **dotsQt app**. The simple solution was to add the **VHX** desktop app to the dock/taskbar.
-Also, just after I recorded the accompanying video I decided to try and shave off some pixels from the scrollPanel by cutting back on the width of the image tile and in the sliderPanel, reducing the font size.  The result is the two panels in the video are slightly wider and the tiles in scrollPanel less square from what you would see when running dots. Lastly, I'm running Python and friends in **Rosetta** and have no complaints, especially when it comes to launching dots, and particularly when it's importing numpy and open-cv.  New video: <https://youtu.be/-mpV2f8Qj6w>
+Also, just after I recorded the accompanying video I decided to try and shave off some pixels from the scrollPanel by cutting back on the width of the image tile and in the sliderPanel, reducing the font size.  The result is the two panels in the video are slightly wider and the tiles in scrollPanel less square from what you would see when running dots. Lastly, I'm running Python and friends in **Rosetta** and have no complaints, especially when it comes to launching dots, and particularly when it's importing numpy and open-cv.  New video at: <https://youtu.be/-mpV2f8Qj6w>
                           
 **January 2023:**       
 A few bug fixes and mostly trying to clarify my code by clearing some naming issues.
