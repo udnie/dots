@@ -5,21 +5,21 @@ from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF
 from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
-                            QFrame, QFileDialog, QLayout, QScrollBar
+                            QFrame, QFileDialog, QLayout
 
 from dotsShared      import paths, Star, common
 from functools       import partial
 from dotsSideGig     import MsgBox
 
-scroll = {
-    "LabelW":   133,  ## the following is used by ScrollPanel
+panel = {   ## the following is used by ScrollPanel
+    "LabelW":   120,  
     "LabelH":   112,  
-    "MaxW":     110,
+    "MaxW":     105,
     "MaxH":      85,  
     "Star":     .70,
     "Type":     106,
-    "Margin":    13,    
-}
+    "Margin":    15,    
+}  ## also a common['modLabel'] - scales down vertical for screen changes
 
 ### ------------------- dotsScrollPanel --------------------
 ''' dotsScrollPanel: handles scrolling sprite selections.
@@ -42,7 +42,7 @@ class ImgLabel(QLabel):
     def paintEvent(self, e):
         qp = QPainter()
         qp.begin(self)
-
+        
         img = ""  ## otherwise it can crash
         if self.fileName == 'Star':
             qp.setPen(QPen(Qt.GlobalColor.black, 1, Qt.PenStyle.SolidLine))
@@ -50,32 +50,29 @@ class ImgLabel(QLabel):
             qp.drawPolygon(QPolygon(self.drawStar()))  
             qp.setBrush(Qt.BrushStyle.NoBrush) 
         else:    
-            img = QImage(self.fileName)
-                        
-            if img.width() > scroll['MaxW'] or img.height() > scroll['MaxH']:  ## size it to fit       
-                img = img.scaled(scroll['MaxW'], scroll['MaxH'],  ## keep it small
+            img = QImage(self.fileName)     
+            r = common['modLabel']                   
+            if img.width() > (panel['MaxW']) or img.height() > (panel['MaxH']):  ## size it to fit       
+                img = img.scaled(int(panel['MaxW']), int(panel['MaxH']),  ## keep it small
                     Qt.AspectRatioMode.KeepAspectRatio,
-                    Qt.TransformationMode.SmoothTransformation)
-      
+                    Qt.TransformationMode.SmoothTransformation)                 
             newW, newH = img.width(), img.height()
-          
-            posX = ((scroll['LabelW'] - newW) /2 )
-            posY = ((scroll['MaxH'] - newH) /2 ) + 9
+            posX = ((panel['LabelW'] - newW) /2 )
+            posY = ((panel['MaxH'] - newH) /2 ) + 9
             qp.drawImage(QPointF(posX, posY), img)
-            
         del img
-
+        
         pen = QPen(Qt.GlobalColor.darkGray)   
         pen.setWidth(2)
         qp.setPen(pen) 
-        qp.drawRect(0, 0, scroll['LabelW'], scroll['LabelH'])
+        qp.drawRect(0, 0, panel['LabelW'], panel['LabelH'])
 
         pen = QPen(Qt.GlobalColor.white) 
         pen.setWidth(3)
         pen.setJoinStyle(Qt.PenJoinStyle.BevelJoin)
         qp.setPen(pen) 
-        qp.drawLine(0, 2, 0, scroll['LabelH']) # left border
-        qp.drawLine(1, 1, scroll['LabelW'], 1) # top border
+        qp.drawLine(0, 2, 0, panel['LabelH']) # left border
+        qp.drawLine(1, 1, panel['LabelW'], 1) # top border
 
         font = QFont()
         pen = QPen(Qt.GlobalColor.black)
@@ -89,17 +86,17 @@ class ImgLabel(QLabel):
         metrics = QFontMetrics(font)    
         p = metrics.boundingRect(fileName)
         p = p.width()
-        p = (scroll['LabelW'] - p)/2 
+        p = (panel['LabelW'] - p)/2 
 
-        qp.drawText(int(p), scroll['Type'], fileName)
+        qp.drawText(int(p), panel['Type'], fileName)
         qp.end()
 
-    def minimumSizeHint(self):
-        return QSize(scroll['LabelW'], scroll['LabelH'])
+    def minimumSizeHint(self):   
+        return QSize(panel['LabelW'], self.setNewHeight()) 
 
     def sizeHint(self):
         return self.minimumSizeHint()
-
+    
     def mousePressEvent(self, event):
         if self.canvas.key == 'del':
             self.scrollPanel.deleteImgLabel(self)
@@ -110,18 +107,22 @@ class ImgLabel(QLabel):
     def StartDrag(self):
         drag = QDrag(self)
         data = QMimeData()
+        
         data.setText(None)
-    
         data.setUrls([QUrl.fromLocalFile(self.fileName)])
         drag.setMimeData(data)
+        
         drag.setPixmap(QPixmap(paths['imagePath'] + 'dnd2.png'))
         drag.exec()
      
     def drawStar(self):
         poly = QPolygon()
         for s in Star:
-            poly.append(QPoint(s[0],s[1])*scroll['Star'])
+            poly.append(QPoint(s[0],s[1])*panel['Star'])
         return poly
+
+    def setNewHeight(self):
+        return int(self.scrollPanel.resetLabelH())
 
 ### --------------------------------------------------------
 class ScrollPanel(QWidget):
@@ -139,8 +140,8 @@ class ScrollPanel(QWidget):
         
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
         self.layout.setSpacing(0)
-        self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.layout.setContentsMargins(0,0,0,0)
      
         widget = QWidget()  
         widget.setLayout(self.layout)
@@ -150,17 +151,19 @@ class ScrollPanel(QWidget):
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     
         self.scroll.setStyleSheet("background: rgb(235, 235, 235)")
+        self.scroll.setStyleSheet("border: 1px solid rgb(160,160,160)")
         self.scroll.verticalScrollBar().setStyleSheet("QScrollBar:vertical {\n" 
             "background: rgb(245,245,245) }");  ## shows handle better
  
         self.scroll.setWidgetResizable(True)    # always
-        self.scroll.verticalScrollBar().setSingleStep(int(scroll['LabelH']/3))
+        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH']/4))
+        self.scroll.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         
         self.scroll.setWidget(widget)
        
         vBoxLayout = QVBoxLayout(self)
-        vBoxLayout.setContentsMargins(0, scroll['Margin'], 0, 0)  ## change for dotsDocks
-        vBoxLayout.addWidget(self.scroll)
+        vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
+        vBoxLayout.addWidget(self.scroll,Qt.AlignmentFlag.AlignVCenter)
          
         self.setLayout(vBoxLayout) 
 
@@ -170,19 +173,25 @@ class ScrollPanel(QWidget):
 ### --------------------------------------------------------
     def add(self, fname):   
         self.scrollCount += 1
-        self.scrollList.append(self.scrollCount) 
-        self.layout.addWidget(ImgLabel(fname, self.scrollCount, self))
+        self.scrollList.append(self.scrollCount)   
+        label = ImgLabel(fname, self.scrollCount, self)
+        label.setFixedHeight(int(self.resetLabelH()))      
+        self.layout.addWidget(label)
         self.bottom()
-
+        
     def Star(self):    
         self.add('Star')
+        
+    def resetLabelH(self):
+        pan, mod = panel['LabelH'], common['modLabel']
+        return pan * mod
         
     def deleteImgLabel(self, this):
         p = self.scrollList.index(this.id)
         del self.scrollList[p]    
         self.layout.itemAt(p).widget().deleteLater()
-        p = (p-1) * scroll['LabelH']
-        self.scroll.verticalScrollBar().setSliderPosition(p)
+        # p *= self.resetLabelH()
+        self.scroll.verticalScrollBar().setSliderPosition(int(p))
 
     def top(self):           
         if self.layout.count() > 0:
@@ -210,7 +219,7 @@ class ScrollPanel(QWidget):
         if files:
             for fileName in files:
                 self.add(fileName)
-        Q.done(0)
+        Q.accept()
           
     def loadSprites(self):
         sprites = sorted(self.spriteList())
@@ -235,6 +244,7 @@ class ScrollPanel(QWidget):
                 filenames.append(paths['spritePath'] + file.lower())       
         if not filenames:
             MsgBox("No Sprites Found!", 5)
+            return
         return filenames
 
 ### ------------------- dotsScrollPanel --------------------

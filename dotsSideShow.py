@@ -1,7 +1,4 @@
 
-import os
-import os.path
-
 from os import path
 
 import json
@@ -10,14 +7,15 @@ import random
 import asyncio
 import time
 
-from PyQt6.QtCore    import QTimer, QAbstractAnimation
+from PyQt6.QtCore    import QTimer, QAbstractAnimation, QPoint
 
 from dotsPixItem     import PixItem
 from dotsBkgMaker    import *
 
 from dotsShared      import common, paths
-from dotsSideGig     import MsgBox, getPathList
+from dotsSideGig     import MsgBox, getPathList, savePix, saveBkg, saveFlat, getCtr
 from dotsSideCar     import SideCar
+from dotsScreens     import MaxScreens
 
 ### ---------------------- dotsSideShow --------------------
 ''' dotsSideShow: functions to run, pause, stop, etc.. .play animations'''        
@@ -42,7 +40,7 @@ class SideShow:
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
         if self.canvas.pathMakerOn == False:
-            if key == 'L':
+            if key == 'L' and self.canvas.control == '':
                 self.loadPlay()
             elif key == 'P':  ## always
                 self.mapper.togglePaths()
@@ -61,20 +59,22 @@ class SideShow:
             Q = QFileDialog()
             file, _ = Q.getOpenFileName(self.canvas, 
                 "Choose a file to open", paths["playPath"], "Files (*.play)", None)
-            Q.accept()
-            
+            Q.accept()      
             if file:
                 self.openPlay(file) 
             else:
                 return
             
-    def runThis(self, file):
+    def runThis(self, file):  ## doesn't ask
         if not self.scene.items():
-            self.openPlay(paths["playPath"] + file)
+            self.openPlay(paths["playPath"] + file)  ## also adds pix to scene 
             QTimer.singleShot(200, self.run) 
-                  
+       
 ### -------------------------------------------------------- 
-    def openPlay(self, file):
+    def openPlay(self, file): 
+        if 'demo-' in file and str(common['ViewW']) not in file:
+            MsgBox("Demo file format does not match Screen Width", 7)
+            return
         dlist = []
         self.locks = 0
         try:
@@ -89,8 +89,7 @@ class SideShow:
             lnn = len(dlist)
             lnn = lnn + self.mapper.toFront(0)  ## start at the top
             self.canvas.pixCount = self.mapper.toFront(0)       
-            # header = []  ## save for debugging purposes 
-         
+            # header = []  ## save for debugging purposes       
             for tmp in dlist:                   
                 '''I'm including this as it makes dumping the play file easier to read
                 just incase - up to 20 keys - current max size of the play dictionary 
@@ -106,12 +105,10 @@ class SideShow:
                 if tmp['type'] == 'bkg' and tmp['fname'] != 'flat' and \
                     not path.exists(paths["bkgPath"] + tmp['fname']):       
                     continue 
-                
                 elif tmp['type'] == 'pix' and \
                     not path.exists(paths["spritePath"] + tmp['fname']) and \
                     not path.exists(paths["imagePath"] + tmp['fname']):
-                    continue  
-                
+                    continue      
                 elif 'bat' in tmp['fname']:       
                     self.sideCar.wings(tmp['x'], tmp['y'], tmp['tag'])
                     continue
@@ -139,11 +136,10 @@ class SideShow:
                         pix = BkgItem(paths["bkgPath"] + tmp['fname'], self.canvas, bkz)    
                         self.addPixToScene(pix, tmp)  ## finish unpacking tmp 
                         ## print(bkz, tmp['fname'], tmp['x'], tmp['width'])
-                    bkz -= 1    
+                    bkz -= 1   
+                del tmp 
             ## end for loop
-
             del dlist
-
             self.canvas.openPlayFile = file
             self.canvas.bkgMaker.disableBkgBtns()
             self.dots.statusBar.showMessage("Number of Pixitems: {}".format(kix),5000)  
@@ -202,12 +198,11 @@ class SideShow:
             else:
                 pix.shadow['flopped'] = tmp['flopped']
                    
-        del tmp
+        del tmp      
                                            
         if pix.type == 'bkg':  ## you can unlock them now
             pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            pix.locked = True
-                                                                                
+            pix.locked = True                                                                          
         ## may require rotation or scaling - adds to scene items
         self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
    
@@ -240,7 +235,7 @@ class SideShow:
             self.canvas.pathList = getPathList(True)       
         k, r = 0, 0  ## k counts all non r items (demo)
         scale = .65
-        for pix in self.scene.items():
+        for pix in self.scene.items():  ## set the animation and run it 
             if pix.type == 'pix' and pix.tag:
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
@@ -252,8 +247,9 @@ class SideShow:
                     pix.tag, 
                     pix)   
                 k += 1
-                ## set scale factor if demoPath and alien
-                if pix.tag.endswith('demo.path') and r >= 0:  
+                ## run the animation  - set scale factor if demoPath and alien
+                # if pix.tag.endswith('demo.path') and r >= 0:  
+                if 'demo' in pix.tag and r >= 0:  
                     if 'alien' in pix.fileName:  ## just to make sure you don't scale everything
                         pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
                     r += 1
@@ -310,7 +306,7 @@ class SideShow:
                 break
         self.sideCar.enablePlay() 
         self.canvas.btnPause.setText( "Pause" )
-        
+### --------------------------------------------------------
     def lookForStrays(self, pix):
         if pix.x < -25 or pix.x > common["ViewW"] -10:
             pix.setPos(float(random.randint(25, 100) * 2.5), pix.y)      
@@ -337,77 +333,16 @@ class SideShow:
             if pix.type == "pix":   
                 if pix.part in ('left','right'):  ## let pivot thru
                     continue          
-                dlist.append(self.savePix(pix))
+                dlist.append(savePix(pix))  ## in sideGig
             elif pix.type == "bkg":
                 if pix.fileName != 'flat': 
-                    dlist.append(self.saveBkg(pix))
+                    dlist.append(saveBkg(pix))  ## in sideGig
                 else:
-                    dlist.append(self.saveFlat(pix))
+                    dlist.append(saveFlat(pix))  ## ditto
         if dlist:
             self.sideCar.saveToJson(dlist)
         else:
-            MsgBox("savePlay: Error saving file")
- 
-    def savePix(self, pix): 
-        p = pix.pos() 
-        tmp = {
-            "fname":    os.path.basename(pix.fileName),
-            "type":    "pix",
-            "x":        float("{0:.2f}".format(p.x())),
-            "y":        float("{0:.2f}".format(p.y())),
-            "z":        pix.zValue(),
-            "mirror":   pix.flopped,
-            "rotation": pix.rotation,
-            "scale":    float("{0:.2f}".format(pix.scale)),
-            "tag":      pix.tag,
-            "alpha2":   float("{0:.2f}".format(pix.alpha2)), 
-            "locked":   pix.locked,
-            "part":     pix.part,
-        }               
-            
-        if pix.shadow != None:   
-            shadow = {
-                "alpha":    float("{0:.2f}".format(pix.shadowMaker.alpha)),
-                "scalor":   float("{0:.2f}".format(pix.shadowMaker.scalor)),
-                "rotate":   pix.shadowMaker.rotate,
-                "width":    pix.shadowMaker.imgSize[0],
-                "height":   pix.shadowMaker.imgSize[1],
-                "pathX":    [float("{0:.2f}".format(pix.shadowMaker.path[k].x()))
-                                for k in range(len(pix.shadowMaker.path))],
-                "pathY":    [float("{0:.2f}".format(pix.shadowMaker.path[k].y()))
-                                for k in range(len(pix.shadowMaker.path))],
-                "flopped":   pix.shadowMaker.flopped,
-            }
-            tmp.update(shadow)
-          
-        return tmp
-    
-    def saveBkg(self, pix):
-        p = pix.boundingRect() 
-        pos = pix.pos()
-        tmp = {
-            "fname":    os.path.basename(pix.fileName),
-            "type":    "bkg",
-            "x":        float("{0:.2f}".format(pos.x())),
-            "y":        float("{0:.2f}".format(pos.y())),
-            "z":        pix.zValue(),
-            "mirror":   pix.flopped,
-            "locked":   pix.locked,
-            "rotation": pix.rotation,
-            "scale":    float("{0:.2f}".format(pix.scale)),
-            "opacity":  float("{0:.2f}".format(pix.opacity)),
-            "width":    int(p.width()),
-            "height":   int(p.height()),
-        }
-        return tmp
-
-    def saveFlat(self, pix):
-        tmp = {
-            "fname": 'flat',
-            "type":  "bkg",
-            "z":      pix.zValue(),
-            "tag":    pix.color.name(),
-        }
-        return tmp
-                
+            MsgBox("savePlay: Error saving file", 5)         
+        del dlist
+  
 ### ---------------------- dotsSideShow --------------------

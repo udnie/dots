@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot, QRectF
+from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot
 from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
@@ -16,9 +16,11 @@ import dotsAnimation  as anima
 
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
-Pct = -0.50  ## percent allowable off screen
+Pct = -0.50  ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename
+    # "alien": (400, 400),
+    # "doral": (400, 400),            
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -256,18 +258,10 @@ class PixItem(QGraphicsPixmapItem):
         dragX = pos.x() - self.dragAnchor.x()
         dragY = pos.y() - self.dragAnchor.y()     
         b = self.boundingRect()
-        self.width, self.height = b.width(), b.height()
-        self.x = int(sideCar.constrain(
-            self.initX + dragX, 
-            self.width, 
-            common["ViewW"], 
-            self.width * Pct))
-        self.y = int(sideCar.constrain(
-            self.initY + dragY,
-            self.height, 
-            common["ViewH"], 
-            self.height * Pct))
-     
+        self.width, self.height = b.width(), b.height()   
+        self.x = self.constrainX(self.initX + dragX)
+        self.y = self.constrainY(self.initY + dragY)
+                 
     def reprise(self):  ## return pixitem to original position
         if self.tag == '':  ## you're done
             return
@@ -320,15 +314,15 @@ class PixItem(QGraphicsPixmapItem):
         self.setOriginPt()  ## updates width and height also
         self.x += key[0]
         self.y += key[1]
-        self.x = int(sideCar.constrain(self.x, 
-            self.width, 
-            common["ViewW"], 
-            self.width * Pct))
-        self.y = int(sideCar.constrain(self.y, 
-            self.height, 
-            common["ViewH"], 
-            self.height * Pct))
+        self.x = self.constrainX(self.x)
+        self.y = self.constrainY(self.y)
         self.setPos(self.x, self.y) 
+  
+    def constrainX(self, X):    
+        return int(sideCar.constrain(X, self.width, common["ViewW"], self.width * Pct))
+        
+    def constrainY(self, Y):
+        return int(sideCar.constrain(Y, self.height, common["ViewH"], self.height * Pct))
   
     def rotateThis(self, key):
         self.setOriginPt() 

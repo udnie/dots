@@ -374,8 +374,8 @@ class ShadowMaker:
         self.rotateScale(per, 0)
         self.scalor = val
             
-    def rotateScale(self, per, inc):
-        x, y, w, h = self.getCrop()    
+    def rotateScale(self, per, inc):  ## uses path rather than pts
+        x, y, w, h = self.getCrop()   ## uses getCrop 
         centerX, centerY = x + w/2, y + h/2
         
         self.shadow.setTransformOriginPoint(centerX, centerY)
@@ -400,7 +400,7 @@ class ShadowMaker:
             self.path[i] = QPointF(plotX, plotY)
             self.updatePoints(i, plotX, plotY)
     
-        self.updateShadow() 
+        self.updateShadow()  ## updates shadow 
                                                                   
 ### ------------------- dotsShadowMaker --------------------
                                                                                                                                                           

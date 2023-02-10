@@ -72,6 +72,7 @@ class BkgMaker(QWidget):
         super().__init__()
 
         self.canvas = parent
+        self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
@@ -79,10 +80,11 @@ class BkgMaker(QWidget):
         self.widget  = None
         self.bkgItem = None  
        
-        self.widgetX = 400
+        self.widgetX = 400  ## position widget
         self.widgetY = 300 
         
         self.save = QPoint(self.widgetX, self.widgetY)
+        
 ### --------------------------------------------------------
     def openBkgFiles(self):
         if self.canvas.control in PlayKeys:
@@ -93,14 +95,14 @@ class BkgMaker(QWidget):
             "Images Files(*.bmp *.jpg *.png *.bkg)")
         if file:
             self.openBkgFile(file) if file.endswith('.bkg') else self.addBkg(file)
-        Q.done(0)
+        Q.accept()
         
     def openBkgFile(self, file):  ## read from .bkg file
         try:
             with open(file, 'r') as fp:
                 self.setBkgColor(QColor(fp.readline()))
         except IOError:
-            MsgBox("openBkgFile: Error reading file")
+            MsgBox("openBkgFile: Error reading file", 5)
   
 ### --------------------------------------------------------              
     def addBkg(self, file, flopped=False):  ## also used by saveBkg 
@@ -131,7 +133,7 @@ class BkgMaker(QWidget):
         self.closeWidget()      
         self.bkgItem = item        
         self.lockBkg() if self.bkgItem.locked else self.unlockBkg()         
-        self.widget = BkgWidget(self.bkgItem, self)
+        self.widget  = BkgWidget(self.bkgItem, self)
         self.widgetX = int(self.save.x())  ## set to last position
         self.widgetY = int(self.save.y())          
         self.widget.setGeometry(self.widgetX, self.widgetY, int(self.widget.WidgetW), \
@@ -150,7 +152,7 @@ class BkgMaker(QWidget):
             self.disableSetBkg()  ## turn off setting it again 
             return
         else:
-            MsgBox("Already set to background")
+            MsgBox("Already set to background", 5)
             
     def deleteBkg(self, bkg):
         self.scene.removeItem(bkg)
@@ -184,7 +186,7 @@ class BkgMaker(QWidget):
                 self.canvas.clear()  ## replace current background with "-bkg.jpg" copy   
                 self.addBkg(self.bkgItem.fileName, flopped)
             else:
-                MsgBox("Already saved as background jpg")
+                MsgBox("Already saved as background jpg", 5)
         self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
   
@@ -197,14 +199,14 @@ class BkgMaker(QWidget):
         if not f[0]: 
             return
         if not f[0].lower().endswith('.bkg'):
-            MsgBox("Save Background Color: Wrong file extention - use '.bkg'")  
+            MsgBox("Save Background Color: Wrong file extention - use '.bkg'", 5)  
             return
         else:
             try:
                 with open(f[0], 'w') as fp:
                     fp.write(self.bkgItem.color.name())
             except IOError:
-                MsgBox("savePlay: Error saving file")
+                MsgBox("savePlay: Error saving file", 5)
                                                                        
     def bkgColor(self):  ## from button or widget   
         if self.canvas.control in PlayKeys:
@@ -220,7 +222,7 @@ class BkgMaker(QWidget):
     def settingBkgMsg(self): 
         if self.bkgItem.fileName != 'flat':
             txt = os.path.basename(self.bkgItem.fileName)
-            MsgBox(txt + " " +  "set to background") 
+            MsgBox(txt + " " +  "set to background", 4) 
    
 ### --------------------------------------------------------     
     def setXY(self, bkg):
@@ -271,15 +273,18 @@ class BkgMaker(QWidget):
                                 
 ### ------------------- background buttons -----------------
     def enableBkgBtns(self, bool):
-        self.canvas.btnSetBkg.setEnabled(bool)
-        self.canvas.btnSaveBkg.setEnabled(bool)
+        if not self.dots.Vertical:
+            self.canvas.btnSetBkg.setEnabled(bool)
+            self.canvas.btnSaveBkg.setEnabled(bool)
 
     def disableBkgBtns(self):
-        self.enableBkgBtns(False)
+        if not self.dots.Vertical:
+            self.enableBkgBtns(False)
 
     def disableSetBkg(self):
-        self.canvas.btnAddBkg.setEnabled(True)
-        self.canvas.btnSetBkg.setEnabled(False)
-        self.canvas.btnSaveBkg.setEnabled(True)
+        if not self.dots.Vertical:
+            self.canvas.btnAddBkg.setEnabled(True)
+            self.canvas.btnSetBkg.setEnabled(False)
+            self.canvas.btnSaveBkg.setEnabled(True)
 
 ### --------------------- dotsBkgMaker ---------------------

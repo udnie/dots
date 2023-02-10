@@ -175,7 +175,7 @@ class PathMaker(QWidget):
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
         if self.sideWays.pixCount() > 0 and not self.canvas.pathMakerOn:
-            MsgBox("Clear Scene First to run PathMaker")
+            MsgBox("Clear Scene First to run PathMaker", 5)
             return
         if self.canvas.pathMakerOn:
             self.pathMakerOff()
@@ -185,7 +185,7 @@ class PathMaker(QWidget):
             if not self.slider.pathMenuSet:
                 self.slider.toggleMenu()
             self.turnGreen()
-            # QTimer.singleShot(200, self.pathChooser)  ## optional
+            self.addWidget()  ## on start up 
 
     def turnGreen(self):
         self.canvas.btnPathMaker.setStyleSheet(

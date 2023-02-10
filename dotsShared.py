@@ -6,65 +6,20 @@ from PyQt6.QtCore    import Qt
 ### --------------------------------------------------------
 
 common = {
-    "tagZ":     20.0,    
-    "pathZ":   -25.0, 
-    "gridZ":   -50.0, 
-    "bkgZ":    -99.0, 
-    "shadow":   50.0,
-    "points":   40.0,
-    "outline":  30.0,
-    "ScrollW":   150,  ## used by both 1080 and 1280X720 px
-    "SliderW":   188,    
-    "DocksH":     76,
-    "V":        12.0,  ## diameter of pointItems in shadows
-    "runThis":  "demo.play",  ## default run key
+    "tagZ":      20.0,    
+    "pathZ":    -25.0, 
+    "gridZ":    -50.0, 
+    "bkgZ":     -99.0, 
+    "shadow":    50.0,
+    "points":    40.0,
+    "outline":   30.0,
+    "ScrollW":    138,  ## used by both 1080 and 1280X720 px
+    "SliderW":    170,    
+    "OffSet":       0,  ## sliderpanel width, used to set fixed size 
+    "fix":          23,  ## sliderpanel height, used to set fixed size 
+    "V":         12.0,  ## diameter of pointItems in shadows
 } 
       
-### ------------- 3:2 format - 1080X720 px -----------------
-ten80 = {             ## see dotQt for use 
-    "DotsW":   1458,  
-    "DotsH":    812,  
-    "ViewW":   1080,  
-    "ViewH":    720,
-    "gridSize":  30, 
-    "factor":  0.30,  ## amount to scaled pixitems by unless preset
-} 
-
-seven20 = {     ## used by both 1080 and 1280X720px
-    "ScrollH":  685,  
-    "SliderH":  710,  
-    "OffSet":     0,  ## sliderpanel width
-    "fix":        23,  ## sliderpanel height
-    "margin1":    0,  ## sliderpanel margins
-    "margin2":   10,      
-}
-
-### ------------- 16:9 format - 1280X720 px ----------------
-twelve80 = {        
-    "DotsW":   1658, 
-    "DotsH":    818, 
-    "ViewW":   1280,  
-    "ViewH":    720,  
-    "gridSize":  40,  
-    "factor":  0.30, 
-}
-
-### --------------- 3:2 format - 1280X854 px ---------------
-eight54 = {
-    "DotsW":  1658,
-    "DotsH":   955, 
-    "ViewW":  1280,  
-    "ViewH":   854,     
-    "ScrollH": 798,
-    "SliderH": 794,          
-    "fix":       17,  ## used to reset margins
-    "OffSet":   20, 
-    "margin1":  17,
-    "margin2":   0,
-    "gridSize": 32.82,  ## good size
-    "factor":    0.38
-}
-
 ### --------------------------------------------------------
              
 CanvasStr = "L,R,P,S,C,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   

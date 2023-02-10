@@ -185,37 +185,11 @@ class PathWidget(QWidget):
         self.rotateScale(per, 0)
         self.scale = val
     
-    ## yet another one - they're all just a little bit different
     def rotateScale(self, per, inc):  
         if len(self.pathMaker.pts) == 0: 
             return 
-        else:
-            p = self.pathMaker.path.sceneBoundingRect()
-    
-        centerX = p.x() + p.width() /2
-        centerY = p.y() + p.height() /2  
-                  
-        for i in range(0, len(self.pathMaker.pts)):  ## if you don't get 4 points...  
-            dist = distance(self.pathMaker.pts[i].x(), centerX, self.pathMaker.pts[i].y(), centerY) 
-              
-            xdist, ydist = dist, dist      
-            xdist = dist + (dist * per)              
-            ydist = xdist
-           
-            deltaX = self.pathMaker.pts[i].x() - centerX
-            deltaY = self.pathMaker.pts[i].y() - centerY
-
-            angle = math.degrees(math.atan2(deltaX, deltaY))
-            angle = angle + math.ceil( angle / 360) * 360
-
-            plotX = centerX + xdist * math.sin(math.radians(angle + inc))
-            plotY = centerY + ydist * math.cos(math.radians(angle + inc))
-           
-            self.pathMaker.pts[i] = QPointF(plotX, plotY)
-            
-        self.pathMaker.addPath()
-        self.sideWays.gofish()
-                                                                                             
+        self.sideWays.scaleRotate('A', per, inc)
+                                                                                           
 ### --------------------------------------------------------
 class DoodleMaker(QWidget): 
 ### --------------------------------------------------------
@@ -301,7 +275,7 @@ class DoodleMaker(QWidget):
         for i in reversed(range(self.gLayout.count())):
             self.gLayout.removeItem(self.gLayout.itemAt(i))
         self.updateGrid()
-        self.pathMaker.removePath()
+        self.pathMaker.removePath()  
          
 ### --------------------------------------------------------
 class Doddle(QLabel):  

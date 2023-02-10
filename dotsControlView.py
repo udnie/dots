@@ -1,5 +1,7 @@
 
-from PyQt6.QtCore    import Qt, pyqtSignal, QProcess
+import os
+
+from PyQt6.QtCore    import Qt, pyqtSignal
 from PyQt6.QtGui     import QPainter
 from PyQt6.QtWidgets import QGraphicsView
 
@@ -11,7 +13,8 @@ from dotsMapItem     import InitMap
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
-ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, Qt.Key.Key_W)
+ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
+            Qt.Key.Key_S, Qt.Key.Key_W)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
 ### ------------------ dotsControlView ---------------------
@@ -31,17 +34,14 @@ class ControlView(QGraphicsView):
         
         self.setObjectName('ControlView')
         self.setScene(self.canvas.scene)
-      
-        self.dragOver = False
-        self.proc = None
-    
+         
         self.setRenderHints(
             QPainter.RenderHint.Antialiasing | 
             QPainter.RenderHint.TextAntialiasing | 
             QPainter.RenderHint.SmoothPixmapTransform
         )
-
-        self.setStyleSheet("border: 1px solid rgb(100,100,100)")
+        
+        self.setStyleSheet("border: 1px solid rgb(160,160,160)")
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -74,7 +74,7 @@ class ControlView(QGraphicsView):
     def dragEnterEvent(self, e):
         if self.canvas.pathMakerOn:  ## added for pathmaker
             e.setAccepted(False)
-            MsgBox("Can't add sprites to PathMaker")
+            MsgBox("Can't add sprites to PathMaker", 5)
             return
         ext = FileTypes
         if e.mimeData().hasUrls():
@@ -92,7 +92,7 @@ class ControlView(QGraphicsView):
             fileName = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.mapper.toFront(0)
-            # self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
+            ## self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
             self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### PyQt6 takes position
                 None, False)
    
@@ -110,29 +110,6 @@ class ControlView(QGraphicsView):
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
             
-        ## shift keys - D, P, T, V, H  
-        elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:            
-            if key == Qt.Key.Key_D:   
-                self.setKey('delPts')  ## send to pathmaker
-            elif key == Qt.Key.Key_P:  ## show pix path tags
-                if not self.canvas.pathMakerOn:
-                    self.mapper.toggleTagItems('paths') 
-            elif key == Qt.Key.Key_W:  ## show waypts
-                if self.canvas.pathMakerOn:  
-                    self.canvas.pathMaker.sideWays.addWayPtTags()                     
-            elif key == Qt.Key.Key_T:         
-                self.mapper.toggleTagItems('select')     
-            elif key == Qt.Key.Key_V:  ## VHX
-                self.startProcess()
-            elif key == Qt.Key.Key_H:
-                self.sideCar.hideSelected()
-                self.sideCar.clearWidgets()
-                self.sideCar.toggleOutlines()
-             
-        ## shift keys used in locking screen items - L, R, U
-        elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
-            self.canvas.togglePixLocks(singleKeys[key])  
-                     
         elif key in DFTWKeys:  ## set key as well - used by pathMaker
             if key == Qt.Key.Key_D:  
                 self.setKey('D') 
@@ -146,8 +123,31 @@ class ControlView(QGraphicsView):
                 else:  
                     self.mapper.toggleTagItems('all')
             elif key == Qt.Key.Key_W:
-                    self.sideCar.clearWidgets()
-                                    
+                self.sideCar.clearWidgets()
+            
+        ## shift keys - D, P, T, V, H  
+        elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:            
+            if key == Qt.Key.Key_D:   
+                self.setKey('delPts')  ## send to pathmaker
+            elif key == Qt.Key.Key_P:  ## show pix path tags
+                if not self.canvas.pathMakerOn:
+                    self.mapper.toggleTagItems('paths') 
+            elif key == Qt.Key.Key_W:  ## show waypts
+                if self.canvas.pathMakerOn:  
+                    self.canvas.pathMaker.sideWays.addWayPtTags()                     
+            elif key == Qt.Key.Key_T:         
+                self.mapper.toggleTagItems('select')     
+            elif key == Qt.Key.Key_H:
+                self.sideCar.hideSelected()
+                self.sideCar.clearWidgets()
+                self.sideCar.toggleOutlines()
+            elif key == Qt.Key.Key_S:
+                self.sideCar.screenMenu()
+             
+        ## shift keys used in locking screen items - L, R, U
+        elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
+            self.canvas.togglePixLocks(singleKeys[key])  
+                                                         
         elif key in self.direct: 
             self.direct[key]()  ## dictionary
             
@@ -166,17 +166,6 @@ class ControlView(QGraphicsView):
 
     def keyReleaseEvent(self, e):   
         self.keysSignal[str].emit('')
-
-    def startProcess(self):
-        if self.proc is None:
-            self.proc = QProcess()  ## thanks to Martin Fitzpatrick
-            self.proc.finished.connect(self.processFinished)
-            self.proc.start("python3", ["vhx.py"])  ## works in vscode
-            # self.proc.start("/on a mac - full  path to /vhx.app")  ## using autotmator
-          
-    def processFinished(self):
-        self.proc.close()
-        self.proc = None
-
+        
 ### ------------------ dotsControlView ---------------------
 

@@ -155,6 +155,6 @@ def pathLoader(anime):
         path.closeSubpath()
         return path
     except IOError:
-        MsgBox("pathLoader: Error loading path file")
+        MsgBox("pathLoader: Error loading path file", 5)
 
 ### ---------------------- dotsSidePath --------------------

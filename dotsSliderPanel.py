@@ -1,5 +1,6 @@
 
-from PyQt6.QtCore       import Qt, QAbstractTableModel                    
+from PyQt6.QtCore       import Qt, QAbstractTableModel    
+from PyQt6.QtGui        import QFont               
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QTableView, QHeaderView, \
                                 QAbstractItemView, QFrame
                                 
@@ -15,20 +16,17 @@ class SliderPanel(QWidget):
         super().__init__()
         
         self.canvas = parent
-    
-        self.setFixedSize(common["SliderW"], common["SliderH"]) 
                                                         
         self.keyMenu     = storyBoard()
         self.pathMenu    = pathMaker()
         self.pathMenuSet = False
                         
-        layout = QVBoxLayout(self)        
-        layout.addWidget(self.addTableGroup())     
-        layout.addSpacing(0)  
-     
-        layout.setContentsMargins(10, common["margin1"],0, common["margin2"])
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.setFixedSize(common["SliderW"], common["SliderH"]) 
         
+        self.layout = QVBoxLayout(self)        
+        self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignCenter) 
+        self.layout.setContentsMargins(10, common['margin1'],0, common["margin2"]+3)
+    
 ### --------------------------------------------------------
     def toggleMenu(self):  ## called thru sideCar 'K' key
         if self.pathMenuSet:
@@ -45,7 +43,13 @@ class SliderPanel(QWidget):
         self.tableView.setFixedSize(common["SliderW"]-common["OffSet"], \
             common["SliderH"]-common["fix"])        
         self.tableView.setAlternatingRowColors(True) 
+        self.tableView.setStyleSheet("border: 1px solid rgb(130,130,130)")
          
+        font = QFont()
+        font.setFamily('Arial')
+        font.setPointSize(12)
+        self.tableView.setFont(font)
+                
         ## make it read-only
         self.tableView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableView.setSelectionMode(self.tableView.SelectionMode.NoSelection)
@@ -56,8 +60,8 @@ class SliderPanel(QWidget):
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        self.tableView.setColumnWidth(0, 48) 
-        self.tableView.setColumnWidth(1, 110)
+        self.tableView.setColumnWidth(0, 40) 
+        self.tableView.setColumnWidth(1, 105)
         
         return self.tableView
                                 
@@ -72,7 +76,7 @@ class SliderPanel(QWidget):
             self.tableView.horizontalHeader().setStyleSheet(
                 "QHeaderView::section{\n"
                 "background-color: rgb(144,238,144);\n"
-                "border: .5px solid lightgray;\n"
+                "border:  1px solid rgb(240,240,240); \n"
                 "font-size: 12px;\n"
                 "}")  
             self.tableView.setStyleSheet("QTableView {\n"
@@ -84,13 +88,14 @@ class SliderPanel(QWidget):
             self.tableView.horizontalHeader().setStyleSheet(
                 "QHeaderView::section{\n"
                 "background-color: rgb(220,220,220);\n"
-                "border: .5px solid lightgray;\n"
+                "border: 1px solid rgb(240,240,240);\n"
                 "font-size: 12px;\n"
                 "}") 
             self.tableView.setStyleSheet("QTableView {\n"
                 "alternate-background-color: rgb(220,220,220);\n"
                 "font-size: 12px;\n"
-                "}")  
+                "}") 
+        del list 
             
 ### --------------------------------------------------------    
 class TableModel(QAbstractTableModel):  
@@ -141,6 +146,7 @@ def storyBoard():
         ('Shift', '+H Hide Selected'), 
         ('Shift', '+L ToggleLocks'),
         ('Shift', '+R Locks All'),
+        ('Shift', '+S Screens'),
         ('Shift', '+T TagSelected'),
         ('Shift', '+U Unlocks All'),
         ('Shift', '+V Pixel Ruler'),   

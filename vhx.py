@@ -1,10 +1,11 @@
+
 import sys
 
 # import PySide6  ## required for pyside version
 
 from PyQt6.QtCore    import Qt, QPointF
 from PyQt6.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
-from PyQt6.QtWidgets import QMainWindow, QApplication, QWidget
+from PyQt6.QtWidgets import QApplication, QWidget
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)  ## '</>'
@@ -23,16 +24,15 @@ VWidth, VHeight = 600, 70
 # print("Qt: v", PyQt6.QtCore.__version__, "\tPyQt: v", PyQt6.__version__)
 
 ### --------------------------------------------------------
-''' for pyqt5 change gobalPos() to globalPosition() '''
+''' for PyQt6 change gobalPos() to globalPosition() '''
 ### ------------------------- vhx --------------------------
-class VHX(QMainWindow):  ## yet another screen pixel ruler 
+class VHX(QWidget):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------
     def __init__(self):
         super().__init__()
 
         self.resize(VWidth, VHeight)
 
-        # self.setWindowFlags(Qt.FramelessWindowHint)  -- qt5 ???
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
@@ -42,23 +42,23 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
 
-        self.widget = QWidget(self)
-        self.widget.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.widget.setFocus()
-       
-        self.setCentralWidget(self.widget);
-        self.initXY = self.pos()
+        self.type = 'widget'
+        self.setAccessibleName('widget')
 
+        self.widget = QWidget(self)
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setFocus()
+
+        self.initXY = self.pos()
         self.horizontal = True 
+        
         self.center()
         self.scrnWidth, self.scrnHeight = getScreenSize()
   
         self.font = QFont()
         self.font.setFamily("Helvetica")
         self.font.setPointSize(13)
-
-        self.grabMouse()
-
+                
         self.show()
 
 ### --------------------------------------------------------
@@ -120,7 +120,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
             self.scaleThis(key)
         elif key in ExitKeys:
             self.close()
-
+                
     def mousePressEvent(self, e):
         self.initXY = e.globalPosition()
         e.accept()
@@ -148,7 +148,7 @@ class VHX(QMainWindow):  ## yet another screen pixel ruler
         e.accept()
 
     def mouseDoubleClickEvent(self, e):
-        self.close()
+        self.close()  
     
     def scaleThis(self, key):
         if key == Qt.Key.Key_Greater:

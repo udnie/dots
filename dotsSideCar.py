@@ -4,21 +4,26 @@ import os.path
 import random
 import json
 
-from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect
+from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect, QTimer, QProcess
 from PyQt6.QtGui        import QPixmap, QPen, QColor, QGuiApplication
 from PyQt6.QtWidgets    import QGraphicsPixmapItem, QFileDialog, \
                                 QGraphicsItemGroup, QGraphicsLineItem, \
-                                QApplication
-                  
+                                QApplication, QMenu
+                                                 
 from dotsAnimation   import *   
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
-from dotsSideGig     import MsgBox
+from dotsSideGig     import MsgBox, getCtr
 from dotsMapItem     import InitMap
+from dotsScreens     import *
+
+from vhx             import VHX
+
+from functools       import partial
 
 ### ---------------------- dotsSideCar ---------------------
-''' dotsSideCar: wings, pixTest, transFormPixitem, toggleGrid plus 
-    some small functions '''  
+''' dotsSideCar: wings, pixTest, transFormPixitem, snapShot, 
+    toggleGrid, screenMenu, and assorted small functions '''  
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -26,13 +31,16 @@ class SideCar:
         super().__init__()
  
         self.canvas = parent
+        self.dots = self.canvas.dots
+        
         self.scene  = self.canvas.scene
         self.mapper = InitMap(self.canvas) 
   
         self.animation = Animation(self.canvas)
       
-        self.gridZ   = common["gridZ"] 
+        self.gridZ = common["gridZ"] 
         self.gridGroup = None
+        self.proc = None
 
 ### --------------------------------------------------------
     ''' Things to know about wings. They're brittle, don't pull on them.
@@ -59,7 +67,7 @@ class SideCar:
         try:
             ## another correction -5 for y
             # pivot.setPos(pivot.x - half, pivot.y - height - 5)
-            pivot.setScale(.55)
+            pivot.setScale(.57)
             pivot.setOriginPt() 
         except IOError:
             pass  
@@ -67,7 +75,7 @@ class SideCar:
         self.canvas.pixCount += 1
         rightWing = PixItem(paths["imagePath"] + 'bat-wings.png', 
             self.canvas.pixCount,
-            x -20, y, 
+            x-20, y-20, 
             self.canvas,
             False,
         )  ## flop it
@@ -93,7 +101,7 @@ class SideCar:
         leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
        
         ## center wings around pivot
-        rightWing.setPos(half+10, height+2)
+        rightWing.setPos(half+1, height-2)
         leftWing.setPos(-leftWing.width+(half+5), height)
 
         ''' if there's a better way to bind these I'd like to know '''
@@ -102,7 +110,7 @@ class SideCar:
 
         self.scene.addItem(pivot) 
 
-### --------------------------------------------------------
+### --------------------- end wings ------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
         pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
@@ -124,26 +132,63 @@ class SideCar:
             self.canvas.pixCount = self.mapper.toFront()
             for _ in range(10):
                 self.canvas.pixCount += 1
-                pix = PixItem(paths["spritePath"] + 'apple.png',
-                        self.canvas.pixCount,
-                        0, 0, 
+                pix = PixItem(paths["spritePath"] + 'apple.png', self.canvas.pixCount, 0, 0, 
                         self.canvas)
-                x = int(constrain(
-                        self.xy(common["ViewW"]),
-                        pix.width, 
-                        common["ViewW"], 
+                x = int(constrain(self.xy(common["ViewW"]), pix.width, common["ViewW"], 
                         pix.width * -common["factor"]))
-                y = int(constrain(
-                        self.xy(common["ViewH"]),
-                        pix.height, 
-                        common["ViewH"],
+                y = int(constrain(self.xy(common["ViewH"]), pix.height, common["ViewH"],
                         pix.height * -common["factor"]))
                 pix.x, pix.y = x, y
                 pix.setPos(x,y)
                 rotation = random.randrange(-5, 5) * 5
                 scale = random.randrange(90, 110)/100.0
                 self.transFormPixItem(pix, rotation, scale, 1.0)
-                
+                             
+### --------------------------------------------------------                       
+    def screenMenu(self):
+        menu = QMenu(self.canvas)    
+        menu.addAction(' Screen Formats')
+        menu.addSeparator()
+        for screen in screens.values():
+            action = menu.addAction(screen)
+            menu.addSeparator()
+            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
+        menu.move(getCtr(-125,-115)) 
+        menu.setFixedSize(150, 190)
+        menu.show()
+    
+    def clicked(self, screen):
+        for key, value in screens.items():
+            if value == screen:  ## singleshot needed for menu to clear
+                QTimer.singleShot(200, partial(self.displayChk, key))
+                break
+            
+    def displayChk(self, key):
+        p = QGuiApplication.primaryScreen().availableGeometry()
+        if key in MaxScreens and p.width() < MaxWidth:  ## current screen width < 1680
+            self.exceedsMsg() 
+            return               
+        self.canvas.clear()       
+        self.canvas.dots.switch(key)
+        
+    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
+        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
+ 
+### -------------------------------------------------------- 
+    def startProcess(self):
+        if self.proc is None:
+            pass
+            # self.proc = QProcess()  ## thanks to Martin Fitzpatrick
+            # self.proc.finished.connect(self.processFinished)
+            # self.proc.start("python3", ["vhx.py"])  ## works in vscode
+            ## doesn't work- easier to pin vhx.app to the Desktop dock
+            ## self.proc.start('python3', ['/full-path..../vhx.app']) 
+          
+    def processFinished(self):
+        pass
+        # self.proc.close()
+        # self.proc = None
+        
 ### --------------------------------------------------------      
     def snapShot(self):
         if self.hasBackGround() or self.scene.items():
@@ -156,14 +201,17 @@ class SideCar:
             else:
                 snap = os.path.basename(self.canvas.openPlayFile)
                 snap = snap[:-5] + ".jpg"
+                
             if snap[:4] != "dots":  ## always ask unless
                 Q = QFileDialog()
                 f = Q.getSaveFileName(self.canvas, paths["snapShot"],
                     paths["snapShot"] + snap)
+                Q.accept()
+        
                 if not f[0]:
                     return
                 elif not f[0].lower().endswith('.jpg'):
-                    MsgBox("Wrong file extention - use '.jpg'")
+                    MsgBox("Wrong file extention - use '.jpg'", 5)
                     return
                 snap = os.path.basename(f[0])
             pix = self.canvas.view.grab(QRect(QPoint(0,0), QSize()))
@@ -185,7 +233,7 @@ class SideCar:
     def toggleMenu(self):
         self.canvas.slider.toggleMenu()  ## no direct path from controlView
                                                                                            
-    def clearWidgets(self):                       
+    def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
@@ -235,7 +283,7 @@ class SideCar:
     def addLines(self, line, pen):
         line.type = 'grid'
         line.setPen(pen)
-        line.setOpacity(common["factor"])
+        line.setOpacity(.30)
         line.setZValue(common["gridZ"])
         line.setFlag(QGraphicsLineItem.GraphicsItemFlag.ItemIsMovable, False)
         self.gridGroup.addToGroup(line)
@@ -277,19 +325,20 @@ class SideCar:
         f = Q.getSaveFileName(self.canvas, 
             paths["playPath"],  
             self.canvas.openPlayFile)
+        Q.accept()
+        
         if not f[0]: 
             return
         if not f[0].lower().endswith('.play'):
-            MsgBox("saveToJson: Wrong file extention - use '.play'")  
+            MsgBox("saveToJson: Wrong file extention - use '.play'", 5)  
             return
         else:
             try:
                 with open(f[0], 'w') as fp:
                     json.dump(dlist, fp)
             except IOError:
-                MsgBox("saveToJson: Error saving file")
-            del dlist
-            return
+                MsgBox("saveToJson: Error saving file", 5)
+        del dlist
 
 ### --------------------------------------------------------
 def setMirror(self, mirror):

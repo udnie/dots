@@ -32,6 +32,7 @@ class StoryBoard(QWidget):
         super().__init__()
 
         self.dots  = parent 
+        
         self.scene = QGraphicsScene(0, 0, common["ViewW"], common["ViewH"])
         self.view  = ControlView(self)
         
@@ -68,13 +69,16 @@ class StoryBoard(QWidget):
         self.view.viewport().installEventFilter(self)
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)  
     
-        self.view.keysSignal[str].connect(self.setKeys)    
-
+        self.view.keysSignal[str].connect(self.setKeys)  
+        
+        if self.dots.msg != '':
+            QTimer.singleShot(100, self.sideCar.exceedsMsg)
+            self.dots.msg = ''
+        
 ### ---------------------- send keys -----------------------
     @pyqtSlot(str)
-    def setKeys(self, key):
-        self.key = key
-        
+    def setKeys(self, key):  ## managing storyboard and pathMaker
+        self.key = key 
         if self.key == 'C':
             if self.pathMakerOn:
                 if len(self.scene.items()) == 0:
@@ -83,19 +87,16 @@ class StoryBoard(QWidget):
                     self.pathMaker.pathKeys(self.key)  ## centers path
             else:
                 self.clear()  ## canvas
-       
         elif not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
                 if self.key in Play:  ## canvas hotkeys
                     self.sideShow.keysInPlay(self.key)        
                 else:
-                    self.sendPixKeys()
-                    
+                    self.sendPixKeys()               
         ## send move keys to selected pointItems 
         elif self.pathMaker.drawing.pointItemsSet() == True and \
             self.pathMaker.selections and self.key in MoveKeys:  ## from shared.py
-                self.sendPixKeys()
-                
+                self.sendPixKeys()          
         ## send the rest to pathMaker
         elif self.key in PathStr: 
             self.pathMaker.pathKeys(self.key)
@@ -103,7 +104,6 @@ class StoryBoard(QWidget):
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e):  ## used by mapper for selecting
         if not self.pathMakerOn:      
-
             if e.type() == QEvent.Type.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()  ## chks if set
@@ -112,13 +112,11 @@ class StoryBoard(QWidget):
                     self.unSelect()      
                 elif self.hasHiddenPix() or self.mapper.selections:
                     if self.control not in PlayKeys:
-                        self.mapper.updatePixItemPos()   
-                          
+                        self.mapper.updatePixItemPos()                    
                 ## show play files on right mouse click if nothing at location       
                 elif e.button() == Qt.MouseButton.RightButton:
                     if len(self.scene.items()) == 0:
                         self.sideShow.loadPlay()
-        
             elif e.type() == QEvent.Type.MouseMove:
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
@@ -129,7 +127,6 @@ class StoryBoard(QWidget):
                     self.mapper.removeMap()
                 elif self.control not in PlayKeys:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary 
-
             elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
@@ -139,7 +136,6 @@ class StoryBoard(QWidget):
                 if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                 self.mapper.updatePixItemPos()  
-
             elif e.type() == QEvent.Type.MouseButtonDblClick:
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
@@ -148,8 +144,7 @@ class StoryBoard(QWidget):
                 if p := self.scene.itemAt(QPointF(e.pos()), QTransform()):
                     if p != None and p.type != 'pix' and self.mapper.isMapSet():
                         self.mapper.removeMap()
-                        self.setKeys('noMap')    
-       
+                        self.setKeys('noMap')      
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
@@ -159,19 +154,16 @@ class StoryBoard(QWidget):
             self.sideCar.wings(x, y, '')        
         else:
             self.pixCount += 1  
-            pix = PixItem(fileName, self.pixCount, x, y, self, mirror)
-                
+            pix = PixItem(fileName, self.pixCount, x, y, self, mirror)        
             if clone != None:  ## clone it                    
                 self.sideCar.transFormPixItem(pix,
                     clone[0],
                     clone[1] * random.randrange(95, 105)/100.0,
                     pix.alpha2)
                 return
-        
             elif 'frame' in pix.fileName:  ## pin it on drag and drop
                 pix.setPos(0,0)
-                pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            
+                pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)   
             self.scene.addItem(pix)
         
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys
@@ -184,9 +176,14 @@ class StoryBoard(QWidget):
             self.mapper.updateMap()
 
     def togglePixLocks(self, key):
-        stub = ''
+        if self.control == '': 
+            return 
+        stub = '' 
         for pix in self.scene.items(): 
             if pix.type == 'pix':
+                if pix.anime != None and \
+                    pix.anime.state() == QAbstractAnimation.State.Running:
+                    return 
                 if key == 'R': 
                     pix.locked = True
                     stub = 'all'
@@ -200,20 +197,22 @@ class StoryBoard(QWidget):
                 break
         self.mapper.clearMap()
         self.mapper.toggleTagItems(stub)
-
+                  
     def exit(self):
-        self.clear()     
-        QTimer.singleShot(200, self.dots.close)
+        self.clear() 
+        self.dots.closeAll()
+        QTimer.singleShot(20, self.dots.close)   
 
     def clear(self):  ## do this before exiting app
         self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()
         self.sideCar.clearWidgets()
-        self.sideShow.stop('clear')
-        self.bkgMaker.disableBkgBtns()
+        self.sideShow.stop('clear')   
+        if not self.dots.Vertical:
+            self.bkgMaker.disableBkgBtns()        
+        self.btnAddBkg.setEnabled(True)                  
         self.dots.statusBar.clearMessage()
         self.mapper.clearMap()
-        self.btnAddBkg.setEnabled(True)
         self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
@@ -244,7 +243,8 @@ class StoryBoard(QWidget):
     def deleteSelected(self):  ## self.pathMakerOn equals false
         self.mapper.clearMap()
         self.mapper.clearTagGroup()
-        for pix in self.scene.selectedItems():       
+        k = 0
+        for pix in self.scene.selectedItems():      
             if pix.type == 'pix':  ## could be something else
                 if pix.anime != None and \
                     pix.anime.state() == QAbstractAnimation.State.Running:
@@ -252,7 +252,8 @@ class StoryBoard(QWidget):
                 pix.setSelected(False)
                 pix.deletePix()  ## deletes shadow as well 
                 del pix
-        self.sideCar.enablePlay()  ## stop it - otherwise it's hung
+                k += 1
+        if k > 0: self.sideCar.enablePlay()  ## stop it - otherwise it's hung
         gc.collect()
     
     def flopSelected(self):    
@@ -300,16 +301,17 @@ class StoryBoard(QWidget):
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():
             return
-        menu = QMenu(self)
-        menu.setStyleSheet("QMenu {\n"
-            "font-size: 14px;\n"
-            "border: 1px solid rgb(125,125,125);\n"
-            "}")
+        menu = QMenu(self)               
         alst = sorted(AnimeList)
+        
         ## basing pathlist on what's in the directory
         self.pathList = getPathList(True)  ## names only
-        rlst = sorted(self.pathList)    
-        alst.extend(["Random"])
+        rlst = sorted(self.pathList)     
+        alst.extend(["Random"])  
+              
+        menu.addAction('Animations and Paths')
+        menu.addSeparator()   
+        
         for anime in alst:
             action = menu.addAction(anime)
             action.triggered.connect(

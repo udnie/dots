@@ -1,5 +1,34 @@
 
-## Changes
+## Changes      
+**February 2023:**       
+I've added some new screen formats and sizes made accessible by entering **Shift-S** to bring up the **Screen Formats menu**. What happens next depends on your computers display. Worse case the selected size is wider than the number of pixels your computer can display and outside of the software limits to detect it. The result would have the app overflow the edges of your screen making **dots** possibly unusable. I make a point of this in the video by explaining how the position of the dock can effect whether the program interprets the screen size correctly. The dock knocks off around 50 pixels from the useable display width or height based on where it's positioned - that's on my Mac. Results will vary depending on your hardware, see the video for a further examples.  Worse case the larger screen sizes and formats won't be ones you can easily work with.
+        
+
+This table represents the **screens** dictionary in **dotsScreens.py** used to build the **Screen Formats menu** and everything else that affects the screen sizes and layouts.  The numbers in the **key** column are the widths associated with the format. 
+
+| key   | format |
+|:---- |:-----------:|
+| 1080 | 1080X720 - 3:2|
+| 1280 | 1280X720 - 16:9 |
+| 1350 | 1350X900 - 3:2 |
+| 1536 | 1536X864 - 16:9 |
+| 620  | 620X1102 - 9:16|
+
+If there's a particular format you rather have as the default other than 1080, you can easily write a simple shell script to manage that by adding a key value as in the example below. Mistakes or nothing added default to 1080. Additionally
+each screen format has it's own demo play and path file identified by 'demo-'
+followed by the the format key, ie., demo-1350.play, demo-1350.path. Entering **R** or clicking on the **Run** button will run it.
+
+
+ 
+
+     % python3 ./dotsQt.py 1350        
+        
+**More stuff**: I've removed the **VHX** pixel ruler **Shift-V** start key as I was having some difficulty in getting it to run from my desktop **dotsQt app**. The simple solution was to add the **VHX** desktop app to the dock/taskbar.
+Also, just after I recorded the accompanying video I decided to try and shave off some pixels from the scrollPanel by cutting back on the width of the image tile and in the sliderPanel, reducing the font size.  The result is the two panels in the video are slightly wider and the tiles in scrollPanel less square from what you would see when running dots. Lastly, I'm running Python and friends in **Rosetta** and have no complaints, especially when it comes to launching dots, and particularly when it's importing numpy and open-cv.  New video:
+                          
+**January 2023:**       
+A few bug fixes and mostly trying to clarify my code by clearing some naming issues.
+   
 **December 2022:**      
 I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key that toggled **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
 
@@ -19,7 +48,7 @@ from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMaker**. The **StoryBoard** change affects the file name while continuing to maintain the reference thru **.canvas**.  **BkgMaker** goes a little deeper with both file and reference changes - though not many. 
 
 **October 2022:**        
-**Dots** updated to **PyQt 6.4**, **PyQt5.17** and **Python 3.11**. 
+**Dots** updated to **PyQt 6.4**, **PyQt6.17** and **Python 3.11**. 
 **Dots** doesn't run in **PySide6** but **VHX** and **SpriteMaker** can with minor edits.
 
 Some additions and updates to **Shadows**. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run **Shadows** and **SpriteMaker**. Latest video:<https://youtu.be/CLOVUHtD-Ts>
@@ -27,11 +56,11 @@ Some additions and updates to **Shadows**. There's a new button added to the  sh
 **September 2022:**  
 Minor edits to widgets and sliders, mostly for scaling. 
 
-A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPos(), plus of course, PyQt6 to PyQt5. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  
+A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPosition(), plus of course, PyQt6 to PyQt6. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  
 
 
 **July 2022:**     
-See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PySide6.3.1** and **PyQt5** with some minor edits. Latest video:
+See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PySide6.3.1** and **PyQt6** with some minor edits. Latest video:
 <https://youtu.be/bGYBj_bjEJU>
 
 

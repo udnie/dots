@@ -16,6 +16,7 @@ class BkgItem(QGraphicsPixmapItem):
         super().__init__()
 
         self.canvas   = canvas
+        self.dots     = self.canvas.dots
         self.scene    = self.canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
      
@@ -25,12 +26,19 @@ class BkgItem(QGraphicsPixmapItem):
         self.fileName = fileName
         img = QImage(fileName)
   
-        self.imgFile = img.scaled(  ## fill to width or height
-            self.ViewW, 
-            self.ViewH,
-            Qt.AspectRatioMode.KeepAspectRatio, 
-            Qt.TransformationMode.SmoothTransformation)  
-        
+        if not self.dots.Vertical:
+            self.imgFile = img.scaled(  ## fill to width or height
+                self.ViewW, 
+                self.ViewH,
+                Qt.AspectRatioMode.KeepAspectRatio, 
+                Qt.TransformationMode.SmoothTransformation)
+        else:
+            self.imgFile = img.scaled(  
+                self.ViewW, 
+                self.ViewH,
+                Qt.AspectRatioMode.IgnoreAspectRatio, 
+                Qt.TransformationMode.SmoothTransformation)
+            
         del img          
                     
         self.key = ""

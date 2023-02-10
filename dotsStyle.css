@@ -71,4 +71,22 @@ QTableView {
   border: 1px solid rgb(125,125,125);
 } 
 
+QMainWindowTitle  {
+  background: rgb(195, 195, 195);
+  font-size: 33px;
+}
+           
+QMenu {
+    background-color: rgb(245,245,245); 
+    border: 3px solid dodgerblue;
+    font-size: 14px;
+}
+
+QMenu::item { 
+  background-color: transparent;
+}
+
+QMenu::item:selected { 
+    background-color: rgba(30,144,255,200);
+}
 

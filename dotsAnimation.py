@@ -80,7 +80,7 @@ class Animation:
             return sidePath.flapper(pix, anime, Node(pix)) 
         elif anime in Spins:
             return spin(pix, anime, Node(pix))
-        elif anime == 'demo.path':
+        elif 'demo' in anime:
             return sidePath.demo(pix, anime, Node(pix))
         elif anime in self.canvas.pathList:
             return sidePath.setPaths(pix, anime, Node(pix))
