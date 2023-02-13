@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, pyqtSlot
+from PyQt6.QtCore       import Qt, QTimer, QPoint, QPointF, QRectF, pyqtSlot
 from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
@@ -18,9 +18,9 @@ ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 Pct = -0.50  ## used by constrain - percent allowable off screen
 
-PixSizes = {  ## match up on base filename
-    # "alien": (400, 400),
-    # "doral": (400, 400),            
+PixSizes = {  ## match up on base filename, use these sizes
+    # "apple": (650, 450),
+    # 'doral': (300, 500),
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -66,7 +66,7 @@ class PixItem(QGraphicsPixmapItem):
 
         self.key = ""
         self.dragCnt = 0
-
+   
         self.type = 'pix'
         self.flopped = mirror
 
@@ -227,10 +227,12 @@ class PixItem(QGraphicsPixmapItem):
 
     def addWidget(self):
         self.closeWidget()
-        self.widget = PixWidget(self)
+        self.widget = PixWidget(self)    
         p = self.pos()
-        x, y = int(p.x()), int(p.y())         
-        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        x, y = int(p.x()), int(p.y())  
+        f = common['widget']  ## necessary, it drifts with changes in size
+        x1, y1 = int(f[0]), int(f[1])
+        self.widget.setGeometry(x+x1, y+y1, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
   
     def resetSliders(self):

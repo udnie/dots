@@ -270,11 +270,11 @@ class ShadowMaker:
     def addWidget(self):
         self.closeWidget()
         self.widget = ShadowWidget(self)
-        p = self.path[0]
-        x, y = int(p.x()), int(p.y()+50)  ## safer here       
-        if y > self.path[3].y():
-            y = int(self.path[3].y())     
-        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        p = self.shadow.pos()
+        x, y = int(p.x()), int(p.y())  
+        f = common['widget']  ## necessary, it drifts with changes in size
+        x1, y1 = int(f[0]), int(f[1])     
+        self.widget.setGeometry(x+x1, y+y1, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
                    
 ### --------------------------------------------------------           

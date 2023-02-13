@@ -5,7 +5,7 @@ from PyQt6.QtCore    import Qt
 ''' dotsShared: common data shared across classes and files '''
 ### --------------------------------------------------------
 
-common = {
+common = {  ## wherever it's needed
     "tagZ":      20.0,    
     "pathZ":    -25.0, 
     "gridZ":    -50.0, 

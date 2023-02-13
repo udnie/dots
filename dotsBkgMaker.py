@@ -10,7 +10,7 @@ from PyQt6.QtGui        import QColor, QPixmap
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
                                 QGraphicsPixmapItem
 
-from dotsSideGig        import MsgBox
+from dotsSideGig        import MsgBox, getCtr
 from dotsShared         import common, paths, PlayKeys
 from dotsBkgWrks        import BkgItem, BkgWidget
    
@@ -134,8 +134,10 @@ class BkgMaker(QWidget):
         self.bkgItem = item        
         self.lockBkg() if self.bkgItem.locked else self.unlockBkg()         
         self.widget  = BkgWidget(self.bkgItem, self)
-        self.widgetX = int(self.save.x())  ## set to last position
-        self.widgetY = int(self.save.y())          
+        b = common['bkgrnd']
+        p = getCtr(int(b[0]), int(b[1]))
+        self.widgetX = int(p.x())  ## set to last position
+        self.widgetY = int(p.y())        
         self.widget.setGeometry(self.widgetX, self.widgetY, int(self.widget.WidgetW), \
             int(self.widget.WidgetH)) 
             

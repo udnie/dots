@@ -35,6 +35,8 @@ class SideShow:
         self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
         
+        self.ifBats = False
+        
         self.locks = 0
         
 ### --------------------------------------------------------    
@@ -77,6 +79,7 @@ class SideShow:
             return
         dlist = []
         self.locks = 0
+        self.ifBats = False
         try:
             with open(file, 'r') as fp:  ## read a play file
                 dlist = json.load(fp)
@@ -109,7 +112,8 @@ class SideShow:
                     not path.exists(paths["spritePath"] + tmp['fname']) and \
                     not path.exists(paths["imagePath"] + tmp['fname']):
                     continue      
-                elif 'bat' in tmp['fname']:       
+                elif 'bat' in tmp['fname']:    
+                    self.ifBats = True   
                     self.sideCar.wings(tmp['x'], tmp['y'], tmp['tag'])
                     continue
                 
@@ -246,15 +250,18 @@ class SideShow:
                 pix.anime = self.animation.setAnimation(          
                     pix.tag, 
                     pix)   
-                k += 1
+                k += 1  ## k = number of pixitems
                 ## run the animation  - set scale factor if demoPath and alien
-                # if pix.tag.endswith('demo.path') and r >= 0:  
-                if 'demo' in pix.tag and r >= 0:  
+                # if pix.tag.endswith('demo-.path') and r >= 0:  
+                if 'demo-' in pix.tag and r >= 0:  
                     if 'alien' in pix.fileName:  ## just to make sure you don't scale everything
                         pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
                     r += 1
                     ## delay each demo pixitems start 
-                    QTimer.singleShot(100 + (r * 50), pix.anime.start)
+                    if pix.anime == None:
+                        break
+                    else:
+                        QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
                     if pix.anime: 
                         pix.anime.start()
@@ -263,7 +270,7 @@ class SideShow:
                 # pix.setGraphicsEffect(shadow)
             elif pix.zValue() <= common["pathZ"]:
                 break 
-        if k > 0:
+        if k > 0 or self.ifBats:
             self.sideCar.disablePlay()  
             self.canvas.control = 'pause'
             self.dots.statusBar.showMessage("Number of Pixitems:  {}".format(k),5000)

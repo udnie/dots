@@ -131,7 +131,7 @@ class SideWays():
         for i in range(0, len(self.pathMaker.pts)):    
             dist = distance(self.pathMaker.pts[i].x(), centerX, self.pathMaker.pts[i].y(), centerY)
               
-            if key == 'A':  ## it's from pathWidget
+            if key == 'A':  ## it's from pathWidget, scale or rotate
                 xdist, ydist = dist, dist      
                 xdist = dist + (dist * per)              
                 ydist = xdist

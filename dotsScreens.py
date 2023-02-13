@@ -6,6 +6,7 @@ from datetime       import datetime
 from dotsShared     import common
 
 MaxWidth = 1680  ##  position dock to screen bottom for max default display width
+                 ##  on my mac with dock on left side, not on bottom
 MaxScreens = ('1350','1536','620')  ## requires 1920X1280 display size
 
 ### -------------------- dotsScreens -----------------------
@@ -49,7 +50,11 @@ ten80 = {
     "DotsW":   1427,  
     "DotsH":    822,  
     "ViewW":   1080,  
-    "gridSize":  30.0,   ## gridline spacing - seems to work, consistant
+    "gridSize":  30.0,       ## gridline spacing - seems to work, consistant
+    "scaleX":     1.0,
+    "scaleY":     1.0,       ## same as 720
+    "widget":    (175,175),  ## position pix and shadow widgets using getCtr 
+    "bkgrnd":   (-525,-455),
     "runThis":  "demo-1080.play",  ## default run key
 } 
 
@@ -69,38 +74,50 @@ twelve80 = {
     "DotsH":    822, 
     "ViewW":   1280,  
     "gridSize":  26.66,  
+    "scaleX":     1.15,
+    "scaleY":     1.0,  ## same as 720
+    "widget":     (75,175),
+    "bkgrnd":   (-625,-455),
     "runThis":  "demo-1280.play",  ## default run key
 }
 
 ### ------------------ 1350X900 - 3:2 ----------------------
 thirteen50 = {         
-    "DotsW":  1697,
-    "DotsH":  1002, 
-    "ViewW":  1350,  
-    "ViewH":   900,     
-    "ScrollH": 806,
-    "SliderH": 800,    
-    "margin1":  20,
-    "margin2":   3,
-    "gridSize": 30, 
-    "factor":    0.38,  
-    "modLabel":  1.0,
+    "DotsW":   1697,
+    "DotsH":   1002, 
+    "ViewW":   1350,  
+    "ViewH":    900,     
+    "ScrollH":  806,
+    "SliderH":  800,    
+    "margin1":   20,
+    "margin2":    3,
+    "gridSize":  30, 
+    "factor":     0.34,  ## scales pixitems by format
+    "modLabel":   1.0,
+    "scaleX":     1.175,
+    "scaleY":     1.20, 
+    "widget":    (25,125),
+    "bkgrnd":  (-650,-500),
     "runThis":  "demo-1350.play",  ## default run key
 }
 
 ### ------------------ 1536X864 - 16:9 ---------------------
 fifteen36 = {       
-    "DotsW":  1885,
-    "DotsH":   966, 
-    "ViewW":  1536,  
-    "ViewH":   864,     
-    "ScrollH": 804,
-    "SliderH": 798,    
-    "margin1":  20,
-    "margin2":   0,
-    "gridSize": 32,  
-    "factor":    0.38,    
-    "modLabel":  1.0, 
+    "DotsW":   1885,
+    "DotsH":    966, 
+    "ViewW":   1536,  
+    "ViewH":    864,     
+    "ScrollH":  804,
+    "SliderH":  798,    
+    "margin1":   20,
+    "margin2":    0,
+    "gridSize":  32,  
+    "factor":     0.38,  ## scales pixitems by format 
+    "modLabel":   1.0, 
+    "scaleX":     1.375,
+    "scaleY":     1.20,
+    "widget":  (-50,150),
+    "bkgrnd": (-725,-500),
     "runThis":  "demo-1536.play",  ## default run key
 }
 
@@ -117,6 +134,10 @@ V620 = {             ## 620
     "gridSize":  34.43, 
     "factor":     0.33, 
     "modLabel":   1.0,
+    "scaleX":     0.5,
+    "scaleY":     1.40,  
+    "widget":  (400,75),
+    "bkgrnd": (-425,-500),
     "runThis":  "demo-620.play",  ## default run key
 }
 

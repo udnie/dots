@@ -5,7 +5,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonIte
                                 QGraphicsPathItem
 
 from dotsAnimation      import Node                           
-from dotsSideGig        import MsgBox, getColorStr, distance
+from dotsSideGig        import MsgBox, getColorStr, distance, getCtr
 from dotsShared         import common, paths, MoveKeys, ScaleRotateKeys
 
 from dotsSideWays       import SideWays
@@ -240,8 +240,10 @@ class PathMaker(QWidget):
 ### --------------------------------------------------------
     def addWidget(self):
         self.closeWidget()
-        self.widget = PathWidget(self)         
-        self.widget.setGeometry(350, 250, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        self.widget = PathWidget(self)    
+        b = common['bkgrnd']
+        p = getCtr(int(b[0]), int(b[1]))             
+        self.widget.setGeometry(int(p.x()), int(p.y()), int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
   
     def resetSliders(self):
@@ -256,8 +258,9 @@ class PathMaker(QWidget):
     def pathChooser(self): 
         if not self.pathChooserSet and not self.addingNewPath:
             if not self.editingPts:
-                self.chooser = DoodleMaker(self)  
-                self.chooser.move(600,200)
+                self.chooser = DoodleMaker(self) 
+                b = getCtr(-270,-265)      
+                self.chooser.move(int(b.x()), int(b.y()))
                 self.chooser.show()
                 self.pathChooserSet = True
         else:  

@@ -1,8 +1,7 @@
 
 ## Changes      
-**February 2023:**       
-I've added some new screen formats and sizes made accessible by entering **Shift-S** to bring up the **Screen Formats menu**. What happens next depends on your computers display. Worse case the selected size is wider than the number of pixels your computer can display and outside of the software limits to detect it. The result would have the app overflow the edges of your screen making **dots** possibly unusable. I make a point of this in the video by explaining how the position of the dock can effect whether the program interprets the screen size correctly. The dock knocks off around 50 pixels from the useable display width or height based on where it's positioned - that's on my Mac. Results will vary depending on your hardware, see the video for a further examples.  Worse case the larger screen sizes and formats won't be ones you can easily work with.
-        
+**February 2023:**   
+I've added some new screen formats and sizes made accessible by entering **Shift-S** to bring up the **Screen Formats menu**. What happens next depends on your computers display. Worse case the selected size is wider than the number of pixels your computer can display and outside of the software limits to detect it. The result would have the app overflow the edges of your screen making **dots** possibly unusable. I make a point of this in the video by explaining how the position of the dock can effect whether the program interprets the screen size correctly. The dock knocks off around 50 pixels from the useable display width or height based on where it's positioned - that's on my Mac. Results will vary depending on your hardware, see the video for a further examples.         
 
 This table represents the **screens** dictionary in **dotsScreens.py** used to build the **Screen Formats menu** and everything else that affects the screen sizes and layouts.  The numbers in the **key** column are the widths associated with the format. 
 
@@ -14,8 +13,8 @@ This table represents the **screens** dictionary in **dotsScreens.py** used to b
 | 1536 | 1536X864 - 16:9 |
 | 620  | 620X1102 - 9:16|
 
-If there's a particular format you rather have as the default other than 1080, you can easily write a simple shell script to manage that by adding a key value as in the example below. Mistakes or nothing added default to 1080. Additionally
-each screen format has it's own demo play and path file identified by 'demo-'
+If there's a particular format you rather have as the default other than 1080, you can easily write a simple shell script to manage that by adding a key value as in the example below. Mistakes or nothing added default to the 1080 format. Additionally
+each screen format has it's own demo play and path file identified by **'demo-'**
 followed by the the format key, ie., demo-1350.play, demo-1350.path. Entering **R** or clicking on the **Run** button will run it.
 
 
@@ -25,6 +24,10 @@ followed by the the format key, ie., demo-1350.play, demo-1350.path. Entering **
         
 **More stuff**: I've removed the **VHX** pixel ruler **Shift-V** start key as I was having some difficulty in getting it to run from my desktop **dotsQt app**. The simple solution was to add the **VHX** desktop app to the dock/taskbar.
 Also, just after I recorded the accompanying video I decided to try and shave off some pixels from the scrollPanel by cutting back on the width of the image tile and in the sliderPanel, reducing the font size.  The result is the two panels in the video are slightly wider and the tiles in scrollPanel less square from what you would see when running dots. Lastly, I'm running Python and friends in **Rosetta** and have no complaints, especially when it comes to launching dots, and particularly when it's importing numpy and open-cv.  New video at: <https://youtu.be/-mpV2f8Qj6w>
+
+**Even More**: Since I posted the changes for screen formats I've a made few more adjustments. The first being, what will happen if the demo path file is missing?  The result, the bats will be the only moving screen items and the **play** buttons should all work. You shouldn't be stuck. The second change has to do with dressing up the demos so the bats are covering more of the screen area, left to right, up and down, or any other item that's following a path. For that I added two more variables to each screen format, **'scaleX', 'scaleY'**, the defaults being 1.0, 1.0, essentially, do nothing, As the 1080 format is the original source of all of the paths except the demo paths you're able to modify their sizes on the fly by tweaking these variables for each format.  And finally, changes to keep the widgets closer to the screen item and shadow, and or appearing in a set location as the screen format changes, see the **'widget' and 'bkgrnd'** variables/keys.
+
+
                           
 **January 2023:**       
 A few bug fixes and mostly trying to clarify my code by clearing some naming issues.

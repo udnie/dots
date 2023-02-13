@@ -95,7 +95,10 @@ class ControlView(QGraphicsView):
             ## self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
             self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### PyQt6 takes position
                 None, False)
-   
+            
+    def dragLeaveEvent(self, e):
+        e.accept()
+
 ### -------------------------------------------------------
     ## best location for reading keys - especially arrow keys
     def keyPressEvent(self, e):

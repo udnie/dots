@@ -6,7 +6,7 @@ from PyQt6.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
                                QParallelAnimationGroup, QSequentialAnimationGroup     
 from PyQt6.QtGui        import QPainterPath
 
-from dotsShared         import paths
+from dotsShared         import paths, common
 from dotsSideGig        import MsgBox
 
 ### ---------------------- dotsSidePath --------------------
@@ -34,6 +34,7 @@ def demo(pix, anime, node):
     path.setDuration(int(sync))
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
+        # if i <= 10: print(i)
         path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
     path.setEndValue(waypts.pointAtPercent(1.0)-pt)  
     path.setLoopCount(-1) 
@@ -90,14 +91,17 @@ def demo(pix, anime, node):
     return seq
 
 ### --------------------------------------------------------
-def setPaths(pix, anime, node):           
+def setPaths(pix, anime, node):  ## called by setAnimation          
     sync = random.randint(73,173) * 100  ## very arbitrary
 
     path = QPropertyAnimation(node, b'pos')
     path.setDuration(int(sync))
 
     waypts = pathLoader(anime)
-    if not waypts: return
+    
+    if waypts == None: 
+        return None
+    
     ## offset for origin pt - setOrigin wasn't working
     pt = getOffSet(node.pix)
 
@@ -110,6 +114,30 @@ def setPaths(pix, anime, node):
 
     return path
 
+### --------------------------------------------------------
+def pathLoader(anime):
+    file = paths["paths"] + anime  ## includes '.path'
+    try:
+        scaleX, scaleY = 1.0, 1.0 
+        path = QPainterPath()
+        if 'demo-' not in file:  ## apply scaleX, scaleY from screens
+            scaleX = common['scaleX']
+            scaleY = common['scaleY']
+        with open(file, 'r') as fp:
+            for line in fp:
+                ln = line.rstrip()  
+                ln = list(map(float, ln.split(',')))
+                ln[0] = ln[0] * scaleX
+                ln[1] = ln[1] * scaleY
+                if not path.elementCount():
+                    path.moveTo(QPointF(ln[0], ln[1]))
+                path.lineTo(QPointF(ln[0], ln[1])) 
+        path.closeSubpath()
+        return path
+    except IOError:
+        MsgBox("pathLoader: Error loading path file", 5)
+        return None
+        
 ### --------------------------------------------------------
 def flapper(pix, anime, node):          
     baseName = os.path.basename(pix.fileName)
@@ -141,20 +169,7 @@ def getOffSet(pix):
     b = pix.boundingRect()
     return QPointF(b.width()*.5, b.height()*.5)
 
-def pathLoader(anime):
-    file = paths["paths"] + anime  ## includes '.path'
-    try:
-        path = QPainterPath()
-        with open(file, 'r') as fp:
-            for line in fp:
-                ln = line.rstrip()  
-                ln = list(map(float, ln.split(',')))
-                if not path.elementCount():
-                    path.moveTo(QPointF(ln[0], ln[1]))
-                path.lineTo(QPointF(ln[0], ln[1])) 
-        path.closeSubpath()
-        return path
-    except IOError:
-        MsgBox("pathLoader: Error loading path file", 5)
-
 ### ---------------------- dotsSidePath --------------------
+
+
+
