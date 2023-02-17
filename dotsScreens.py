@@ -97,7 +97,7 @@ thirteen50 = {
     "scaleX":     1.175,
     "scaleY":     1.20, 
     "widget":    (25,125),
-    "bkgrnd":  (-650,-500),
+    "bkgrnd":  (-660,-510),
     "runThis":  "demo-1350.play",  ## default run key
 }
 
@@ -117,7 +117,7 @@ fifteen36 = {
     "scaleX":     1.375,
     "scaleY":     1.20,
     "widget":  (-50,150),
-    "bkgrnd": (-725,-500),
+    "bkgrnd": (-750,-500),
     "runThis":  "demo-1536.play",  ## default run key
 }
 
