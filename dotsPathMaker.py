@@ -105,9 +105,9 @@ class PathMaker(QWidget):
           
         self.editingPts = False
         self.pathTestSet = False
-        
+                  
 ### ---------------------- key handler ---------------------
-    @pyqtSlot(str)
+    @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
     def pathKeys(self, key):
         self.key = key
         if key in self.doFirst:

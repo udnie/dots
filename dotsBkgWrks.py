@@ -150,10 +150,10 @@ class BkgWidget(QWidget):
             Qt.WindowType.WindowStaysOnTopHint)             
 
         self.resetSliders(self.bkgItem)
-                                   
+                                                     
         self.show()
                 
-### --------------------------------------------------------                      
+### --------------------------------------------------------                    
     def paintEvent(self, e): 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        

@@ -14,16 +14,7 @@ from dotsSideGig        import MsgBox
     demo, setPath, getOffSet and pathLoader '''
 ### --------------------------------------------------------
 def demo(pix, anime, node):           
-    pos  = node.pix.pos()
     sync = 10000
-        
-    ## needs a pause before it starts followed by a delayed
-    ## start, also see play(), to match the animation in java 
-
-    idle = QPropertyAnimation(node, b'pos')
-    idle.setDuration(13)
-    idle.setStartValue(pos)
-    idle.setEndValue(pos)
 
     waypts = pathLoader(anime)
     if not waypts: return
@@ -34,7 +25,6 @@ def demo(pix, anime, node):
     path.setDuration(int(sync))
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
-        # if i <= 10: print(i)
         path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
     path.setEndValue(waypts.pointAtPercent(1.0)-pt)  
     path.setLoopCount(-1) 
@@ -82,34 +72,30 @@ def demo(pix, anime, node):
     group.addAnimation(scale)
     group.addAnimation(opacity)
 
-    seq = QSequentialAnimationGroup()
-    seq.addAnimation(idle)
-    seq.addAnimation(group)
+    group.setLoopCount(-1)
 
-    seq.setLoopCount(-1)
-
-    return seq
+    return group
 
 ### --------------------------------------------------------
 def setPaths(pix, anime, node):  ## called by setAnimation          
     sync = random.randint(73,173) * 100  ## very arbitrary
-
-    path = QPropertyAnimation(node, b'pos')
-    path.setDuration(int(sync))
-
-    waypts = pathLoader(anime)
     
-    if waypts == None: 
-        return None
+    waypts = pathLoader(anime)    
+    if not waypts: return
+    
+    k = random.randint(73,173) % 3  ## just to make things interesting
+    if k == 0: waypts = waypts.toReversed()
     
     ## offset for origin pt - setOrigin wasn't working
     pt = getOffSet(node.pix)
-
+    path = QPropertyAnimation(node, b'pos')
+    
+    path.setDuration(int(sync))
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
         path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
     path.setEndValue(waypts.pointAtPercent(1.0)-pt)
-
+  
     path.setLoopCount(-1) 
 
     return path
@@ -120,9 +106,9 @@ def pathLoader(anime):
     try:
         scaleX, scaleY = 1.0, 1.0 
         path = QPainterPath()
-        if 'demo-' not in file:  ## apply scaleX, scaleY from screens
-            scaleX = common['scaleX']
-            scaleY = common['scaleY']
+        if 'demo-' not in file:         ## apply scaleX, scaleY from screens
+            scaleX = common['scaleX']  ## this does not actually scale but it's enough
+            scaleY = common['scaleY'] 
         with open(file, 'r') as fp:
             for line in fp:
                 ln = line.rstrip()  
@@ -135,7 +121,7 @@ def pathLoader(anime):
         path.closeSubpath()
         return path
     except IOError:
-        MsgBox("pathLoader: Error loading path file", 5)
+        MsgBox("pathLoader: Error loading path file, " + anime, 5)
         return None
         
 ### --------------------------------------------------------

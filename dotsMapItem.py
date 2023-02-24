@@ -66,13 +66,14 @@ class InitMap:
         self.pathSet = False
 
         self.mapRect = QRectF()
+        
+        self.paths = []
         self.selections = []
 
         self.pathGroup = None 
         self.tagGroup  = None
         self.pathTagGroup = None 
-        self.paths = []
-      
+            
 ### --------------------------------------------------------
     def addSelectionsFromCanvas(self): ## uses rubberband to select items
         k = 0
@@ -177,13 +178,14 @@ class InitMap:
     def toggleTagItems(self, pid):  
         if self.canvas.pathMakerOn:
             return
-        if self.tagSet: 
+        if self.tagCount() > 0:           
             self.clearTagGroup()
-            self.clearPaths()  
+            self.clearPaths() 
+            self.tagGroup = None
             return
         if self.isMapSet():
             self.clearMap()
-        if self.scene.items():
+        if self.scene.items():  ## tag them all
             if self.pathSet:
                 QTimer.singleShot(200, self.clearPaths)
             self.addTagGroup()
@@ -219,17 +221,25 @@ class InitMap:
             self.clearTagGroup()
 
     def addTagGroup(self):
-        self.tagZ = self.toFront(25.0)   ## otherwise it can be hidden  
+        self.tagZ = self.toFront(25.0)   ## otherwise it can be hidden 
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
-
+ 
     def clearTagGroup(self):
-        if self.tagSet:
-            self.scene.removeItem(self.tagGroup)
-            self.tagGroup = None
-            self.tagSet = False  
-
+        if self.tagGroup != None:
+            self.scene.removeItem(self.tagGroup) 
+        else: 
+            self.removeTags()
+        self.tagGroup = None
+        self.tagSet = False 
+            
+    def removeTags(self):
+        if self.tagCount() > 0:
+            for p in self.canvas.scene.items():
+                if p.type == 'tag':
+                    self.scene.removeItem(p)
+        
     def tagIt(self, token, pix, tf):  
         p = pix.sceneBoundingRect()
         x = p.x() + p.width()*.45
@@ -260,6 +270,12 @@ class InitMap:
         tag.setZValue(self.tagZ) 
         self.tagGroup.addToGroup(tag)
         self.tagSet = True
+
+    def tagCount(self):  
+        return sum(
+            pix.type == 'tag' 
+            for pix in self.scene.items()
+        )
 
 ### -------------------- mostly paths ----------------------
     def togglePaths(self):

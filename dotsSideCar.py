@@ -154,7 +154,7 @@ class SideCar:
             menu.addSeparator()
             action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
         menu.move(getCtr(-125,-115)) 
-        menu.setFixedSize(150, 190)
+        menu.setFixedSize(150, 252)
         menu.show()
     
     def clicked(self, screen):

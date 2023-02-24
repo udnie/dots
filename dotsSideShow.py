@@ -74,7 +74,7 @@ class SideShow:
        
 ### -------------------------------------------------------- 
     def openPlay(self, file): 
-        if 'demo-' in file and str(common['ViewW']) not in file:
+        if 'demo-' in file and common['Screen'] not in file:
             MsgBox("Demo file format does not match Screen Width", 7)
             return
         dlist = []
@@ -93,7 +93,7 @@ class SideShow:
             lnn = lnn + self.mapper.toFront(0)  ## start at the top
             self.canvas.pixCount = self.mapper.toFront(0)       
             # header = []  ## save for debugging purposes       
-            for tmp in dlist:                   
+            for tmp in dlist:              
                 '''I'm including this as it makes dumping the play file easier to read
                 just incase - up to 20 keys - current max size of the play dictionary 
                 The following three lines test to see if there's a 20 key header string 
@@ -232,9 +232,11 @@ class SideShow:
     def run(self):  ## run only pixItems
         if self.canvas.control != '': 
             return 
+        
         self.mapper.clearMap()
         self.clearPathsandTags()  
         self.canvas.unSelect()
+        
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = getPathList(True)       
         k, r = 0, 0  ## k counts all non r items (demo)
@@ -264,6 +266,7 @@ class SideShow:
                         QTimer.singleShot(100 + (r * 50), pix.anime.start)
                 else:
                     if pix.anime: 
+                        # QTimer.singleShot(100 + (k * 50), pix.anime.start)
                         pix.anime.start()
                 ### --->> optional drop shadow <<-- ###
                 # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)

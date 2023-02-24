@@ -18,7 +18,7 @@ ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
 Pct = -0.50  ## used by constrain - percent allowable off screen
 
-PixSizes = {  ## match up on base filename, use these sizes
+PixSizes = {  ## match up on base filename
     # "apple": (650, 450),
     # 'doral': (300, 500),
 }
@@ -227,14 +227,13 @@ class PixItem(QGraphicsPixmapItem):
 
     def addWidget(self):
         self.closeWidget()
-        self.widget = PixWidget(self)    
+        self.widget = PixWidget(self)  
         p = self.pos()
         x, y = int(p.x()), int(p.y())  
         f = common['widget']  ## necessary, it drifts with changes in size
-        x1, y1 = int(f[0]), int(f[1])
-        self.widget.setGeometry(x+x1, y+y1, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        self.widget.setGeometry(x+f[0], y+f[1], int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
-  
+
     def resetSliders(self):
         self.widget.opacitySlider.setValue(int(self.alpha2*100))
         self.widget.scaleSlider.setValue(int(self.scale*100))

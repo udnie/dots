@@ -111,10 +111,10 @@ class ShadowWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
-                                         
+                                
         self.show()
                 
-### --------------------------------------------------------                              
+### --------------------------------------------------------                                   
     def paintEvent(self, e):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   

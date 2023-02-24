@@ -46,10 +46,10 @@ class PathWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
-                                 
+                                         
         self.show()
                 
-### --------------------------------------------------------                              
+### -------------------------------------------------------- 
     def paintEvent(self, e):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
@@ -197,7 +197,7 @@ class DoodleMaker(QWidget):
         super().__init__()
 
         self.pathMaker = parent
-          
+                 
         self.type = 'widget'
         self.save = QPointF(0.0,0.0)
         
@@ -223,8 +223,8 @@ class DoodleMaker(QWidget):
         vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.setLayout(vbox)
-        
-  ### --------------------------------------------------------                                 
+                
+### --------------------------------------------------------                                          
     def paintEvent(self, e): 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        

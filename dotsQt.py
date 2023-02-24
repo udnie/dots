@@ -40,6 +40,7 @@ class DotsQt(QMainWindow):
         self.init()
         
     def init(self):  
+        self.dragCnt = 0
         self.setWindowTitle("DotsQt - " + os.path.basename(os.getcwd()) + \
             " ~ " + self.screen)  ## or getDate()
                     
@@ -51,15 +52,16 @@ class DotsQt(QMainWindow):
                   
         self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)  
-               
+        
         self.move(getX(), getY())  ## adjusted for app size and display
+   
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always
                  
         self.show()
-             
-### --------------------------------------------------------                 
+                     
+### --------------------------------------------------------       
     def closeAll(self):  ## close all app widgets
         self.canvas.close()   
         self.canvas.slider.close()

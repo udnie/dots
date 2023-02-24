@@ -8,7 +8,7 @@ from PyQt6.QtGui        import QPainter, QBrush, QFontMetrics, QColor, QFont, \
                                 QGuiApplication
 from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem
 
-from dotsShared         import paths, pathcolors, PlayKeys
+from dotsShared         import common, paths, pathcolors, PlayKeys
 
 ### ---------------------- dotsSideGig ---------------------
 ''' dotsSideGigs: MsgBox, TagIt, savePix, saveBkg, saveFlat...'''

@@ -1,28 +1,39 @@
 
 ## Changes      
-**February 2023:**   
-See **Even More** for updates to **paths** and **widgets** after the following **'New Screen Formats'** entry.
+**February 2023:**  
+**02/23/2023**      
+Added a **1440-16:9** and a **1440- 3:2** format plus some cosmetic code fixes. I think I'm done with any more big changes to formats - however I'll probably be making some small adjustments to the screens as I get further along, scaling for one.  See the revised **02/10/2023** entry for more about the **1440** formats. No video.
 
+
+**02/17/2023**      
+ See **Even More** for updates to **paths** and **widgets** after the following **'New Screen Formats'** entry.  There's a video.
+
+**02/10/2023**  
 I've added some **new screen formats** and sizes made accessible by entering **Shift-S** to bring up the **Screen Formats menu**. What happens next depends on your computers display. Worse case the selected size is wider than the number of pixels your computer can display and outside of the software limits to detect it. The result would have the app overflow the edges of your screen making **dots** possibly unusable. I make a point of this in the video by explaining how the position of the dock can effect whether the program interprets the screen size correctly. The dock knocks off around 50 pixels from the useable display width or height based on where it's positioned - that's on my Mac. Results will vary depending on your hardware, see the video for a further examples.         
 
-This table represents the **screens** dictionary in **dotsScreens.py** used to build the **Screen Formats menu** and everything else that affects the screen sizes and layouts.  The numbers in the **key** column are the widths associated with the format. 
+This table represents the **screens** dictionary in **dotsScreens.py** used to build the **Screen Formats menu** and everything else that affects the screen sizes and layouts.  The numbers in the **key** column are the widths associated with the format - there's one exception,
+the **1440X960** format, see below.
 
 | key   | format |
 |:---- |:-----------:|
 | 1080 | 1080X720 - 3:2|
 | 1280 | 1280X720 - 16:9 |
 | 1350 | 1350X900 - 3:2 |
+| 1440 | 1440X810 - 16:9 |
+| 1432 | 1440X960 - 3:2 |
 | 1536 | 1536X864 - 16:9 |
-| 620  | 620X1102 - 9:16|
+|  620 | 620X1102 - 9:16|
+
+There'a a reason the **1440X960** format access key is **1432**.  I needed a way to tell the two 1440 formats apart and replacing the **40** with **32** to mimic its ratio seemed like an easy decision.  You won't see this anywhere except in **dotsScreens.py**. It's something to remember if you wanted to change your default format to **1440X960** as it's necessary in order to add the correct reference to a shell script or to replace the current default format in **DotsQt.py**. 
 
 If there's a particular format you rather have as the default other than 1080, you can easily write a simple shell script to manage that by adding a key value as in the example below. Mistakes or nothing added default to the 1080 format. Additionally
 each screen format has it's own demo play and path file identified by **'demo-'**
-followed by the the format key, ie., demo-1350.play, demo-1350.path. Entering **R** or clicking on the **Run** button will run it.
+followed by the the format key, ie., demo-1432.play, demo-1432.path. Entering **R** or clicking on the **Run** button will run it.
 
 
  
 
-     % python3 ./dotsQt.py 1350        
+     % python3 ./dotsQt.py 1432        
         
 **More stuff**: I've removed the **VHX** pixel ruler **Shift-V** start key as I was having some difficulty in getting it to run from my desktop **dotsQt app**. The simple solution was to add the **VHX** desktop app to the dock/taskbar.
 Also, just after I recorded the accompanying video I decided to try and shave off some pixels from the scrollPanel by cutting back on the width of the image tile and in the sliderPanel, reducing the font size.  The result is the two panels in the video are slightly wider and the tiles in scrollPanel less square from what you would see when running dots. Lastly, I'm running Python and friends in **Rosetta** and have no complaints, especially when it comes to launching dots, and particularly when it's importing numpy and open-cv.  New video at: <https://youtu.be/-mpV2f8Qj6w>
