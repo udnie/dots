@@ -39,7 +39,7 @@ class PathWidget(QWidget):
         self.setLayout(hbox)
         
         self.setFixedHeight(int(self.WidgetH))
-        self.setStyleSheet("background-color: rgba(0,0,0,0)")
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
         self.setContentsMargins(0,15,0,-15)
              
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -82,13 +82,13 @@ class PathWidget(QWidget):
         
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox("Rotate        Scale ")
+        groupBox = QGroupBox('Rotate        Scale ')
         
         groupBox.setFixedWidth(140)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
    
-        self.rotateValue = QLabel("0", alignment=Qt.AlignmentFlag.AlignCenter)
+        self.rotateValue = QLabel('0', alignment=Qt.AlignmentFlag.AlignCenter)
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
@@ -99,7 +99,7 @@ class PathWidget(QWidget):
         self.rotaryDial.setNotchTarget(15.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
     
-        self.scaleValue = QLabel("1.00", alignment=Qt.AlignmentFlag.AlignCenter)
+        self.scaleValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignCenter)
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)   
         self.scaleSlider.setMinimum(25)
         self.scaleSlider.setMaximum(225)
@@ -132,19 +132,19 @@ class PathWidget(QWidget):
 
 ### -------------------------------------------------------- 
     def buttonGroup(self):
-        groupBox = QGroupBox("PathMaker ")
+        groupBox = QGroupBox('PathMaker ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
-        waysBtn = QPushButton("WayPts")                 
-        saveBtn = QPushButton("Save")
-        editBtn = QPushButton("Edit")
-        self.newBtn  = QPushButton("New")
-        filesBtn = QPushButton("Files")     
-        delBtn  = QPushButton("Delete")
-        quitBtn = QPushButton("Close")
+        waysBtn = QPushButton('WayPts')                 
+        saveBtn = QPushButton('Save')
+        editBtn = QPushButton('Edit')
+        self.newBtn  = QPushButton('New')
+        filesBtn = QPushButton('Files')     
+        delBtn  = QPushButton('Delete')
+        quitBtn = QPushButton('Close')
     
         waysBtn.clicked.connect(self.sideWays.addWayPtTags)
         saveBtn.clicked.connect(self.sideWays.savePath)
@@ -168,12 +168,12 @@ class PathWidget(QWidget):
 
     def Rotate(self, val):  ## setting rotate in shadowMaker
         self.rotatePath(val)
-        self.rotateValue.setText("{:3d}".format(val))
+        self.rotateValue.setText('{:3d}'.format(val))
              
     def Scale(self, val):  ## setting rotate in shadowMaker
         op = (val/100)
         self.scalePath(op)
-        self.scaleValue.setText("{0:.2f}".format(op))
+        self.scaleValue.setText('{0:.2f}'.format(op))
                 
     def rotatePath(self, val): 
         inc = (val - self.rotate)
@@ -208,7 +208,7 @@ class DoodleMaker(QWidget):
         self.WidgetW, self.WidgetH = 530, 400
         
         self.setFixedSize(self.WidgetW, self.WidgetH)
-        self.setStyleSheet("background-color: rgba(0,0,0,0)")
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
     
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
@@ -235,9 +235,9 @@ class DoodleMaker(QWidget):
         painter.drawRoundedRect(rect, 15, 15)
         
     def addClose(self): 
-        quitBtn = QPushButton("Close")
+        quitBtn = QPushButton('Close')
         quitBtn.clicked.connect(self.closeWidget)
-        quitBtn.setStyleSheet("background: rgb(245, 245, 245)")
+        quitBtn.setStyleSheet('background: rgb(245, 245, 245)')
         quitBtn.setFixedWidth(100) 
         return quitBtn 
            
@@ -258,9 +258,9 @@ class DoodleMaker(QWidget):
         scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
-        scroll.setStyleSheet("background: rgb(220, 220, 220)")
-        scroll.verticalScrollBar().setStyleSheet("QScrollBar:vertical {\n" 
-            "background: rgb(245,245,245) }");  ## shows handle better
+        scroll.setStyleSheet('background: rgb(220, 220, 220)')
+        scroll.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
+            'background: rgb(245,245,245) }');  ## shows handle better
             
         scroll.setWidget(widget)
         return scroll
@@ -290,10 +290,10 @@ class Doddle(QLabel):
         scalor = .10
         self.W, self.H = 150, 100
     
-        self.setStyleSheet("background: rgb(235, 235, 235)")
+        self.setStyleSheet('background: rgb(235, 235, 235)')
         
         self.font = QFont()
-        self.font.setFamily("Helvetica")
+        self.font.setFamily('Helvetica')
         self.font.setPointSize(12)
 
         self.pen = QPen(QColor(0,0,0))                     
@@ -324,7 +324,7 @@ class Doddle(QLabel):
     def paintEvent(self, event):  ## draw rthe path
         painter = QPainter(self)
         painter.setBrush(self.brush) 
-        painter.setPen(QPen(QColor("DODGERBLUE"), 2, Qt.PenStyle.DashDotLine))
+        painter.setPen(QPen(QColor('DODGERBLUE'), 2, Qt.PenStyle.DashDotLine))
         painter.drawPolygon(QPolygonF(self.df))
         painter.setBrush(Qt.BrushStyle.NoBrush) 
         painter.setPen(QPen(Qt.GlobalColor.darkGray, 2)) 

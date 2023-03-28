@@ -21,11 +21,11 @@ class SliderPanel(QWidget):
         self.pathMenu    = pathMaker()
         self.pathMenuSet = False
                         
-        self.setFixedSize(common["SliderW"], common["SliderH"]) 
+        self.setFixedSize(common['SliderW'], common['SliderH']) 
         
         self.layout = QVBoxLayout(self)        
         self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignCenter) 
-        self.layout.setContentsMargins(10, common['margin1'],0, common["margin2"]+3)
+        self.layout.setContentsMargins(10, common['margin1'],0, common['margin2']+3)
     
 ### --------------------------------------------------------
     def toggleMenu(self):  ## called thru sideCar 'K' key
@@ -40,10 +40,10 @@ class SliderPanel(QWidget):
         self.tableView = QTableView()
         self.setTableModel(self.keyMenu)  ## initial menu
          
-        self.tableView.setFixedSize(common["SliderW"]-common["OffSet"], \
-            common["SliderH"]-common["fix"])        
+        self.tableView.setFixedSize(common['SliderW']-common['OffSet'], \
+            common['SliderH']-common['fix'])        
         self.tableView.setAlternatingRowColors(True) 
-        self.tableView.setStyleSheet("border: 1px solid rgb(130,130,130)")
+        self.tableView.setStyleSheet('border: 1px solid rgb(130,130,130)')
          
         font = QFont()
         font.setFamily('Arial')
@@ -60,7 +60,7 @@ class SliderPanel(QWidget):
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        self.tableView.setColumnWidth(0, 40) 
+        self.tableView.setColumnWidth(0, 46) 
         self.tableView.setColumnWidth(1, 105)
         
         return self.tableView
@@ -74,27 +74,27 @@ class SliderPanel(QWidget):
         if list != self.keyMenu:
             header[1] = 'PathMaker '
             self.tableView.horizontalHeader().setStyleSheet(
-                "QHeaderView::section{\n"
-                "background-color: rgb(144,238,144);\n"
-                "border:  1px solid rgb(240,240,240); \n"
-                "font-size: 12px;\n"
-                "}")  
-            self.tableView.setStyleSheet("QTableView {\n"
-                "alternate-background-color: rgb(144,238,144);\n"
-                "font-size: 12px;\n"
-                "}")  
+                'QHeaderView::section{\n'
+                'background-color: rgb(144,238,144);\n'
+                'border:  1px solid rgb(240,240,240); \n'
+                'font-size: 12px;\n'
+                '}')  
+            self.tableView.setStyleSheet('QTableView {\n'
+                'alternate-background-color: rgb(144,238,144);\n'
+                'font-size: 12px;\n'
+                '}')  
         else:
             header[1] = 'StoryBoard '
             self.tableView.horizontalHeader().setStyleSheet(
-                "QHeaderView::section{\n"
-                "background-color: rgb(220,220,220);\n"
-                "border: 1px solid rgb(240,240,240);\n"
-                "font-size: 12px;\n"
-                "}") 
-            self.tableView.setStyleSheet("QTableView {\n"
-                "alternate-background-color: rgb(220,220,220);\n"
-                "font-size: 12px;\n"
-                "}") 
+                'QHeaderView::section{\n'
+                'background-color: rgb(220,220,220);\n'
+                'border: 1px solid rgb(240,240,240);\n'
+                'font-size: 12px;\n'
+                '}') 
+            self.tableView.setStyleSheet('QTableView {\n'
+                'alternate-background-color: rgb(220,220,220);\n'
+                'font-size: 12px;\n'
+                '}') 
         del list 
             
 ### --------------------------------------------------------    
@@ -143,13 +143,13 @@ def storyBoard():
         ('T', 'Toggle Tags'),
         ('U', 'UnSelect All'),
         ('W', 'Clear Widgets'), 
+        ('Opt', '+R Runs Snakes'),
         ('Shift', '+H Hide Selected'), 
         ('Shift', '+L ToggleLocks'),
         ('Shift', '+R Locks All'),
         ('Shift', '+S Screens'),
         ('Shift', '+T TagSelected'),
-        ('Shift', '+U Unlocks All'),
-        ('Shift', '+V Pixel Ruler'),   
+        ('Shift', '+U Unlocks All'),   
         ('Space', 'Show this Tag'),
         ('\'', 'Toggle this lock'),
         ('X, Q', 'Escape to Quit'),
@@ -162,8 +162,8 @@ def storyBoard():
         ('Opt', 'DbClk to Clone'),
         ('Opt', 'Drag Clones'), 
         ('Cmd', 'Drag to Select'),
-        ('_/+', "Rotate 1 deg"),  
-        ('-/=', "Rotate 15 deg"),
+        ('_/+', 'Rotate 1 deg'),  
+        ('-/=', 'Rotate 15 deg'),
         ('[/]', 'Rotate 45 deg'),
         ('</>', 'Toggle Size'),
         ('U/D', 'Arrow Keys'),
@@ -174,37 +174,36 @@ def storyBoard():
 def pathMaker():
     menu = (
         ('C', 'Center Path'),
-        ("D", "Delete Screen"), 
-        ("E", "Edit Points"),
-        ("F", "Files"),
-        ("L", "Lasso"),
-        ("N", "New Path"),
-        ("P", "Path Chooser"),
-        ("R", "Reverse Path"),
-        ("S", "Save Path"),
-        ("T", "Test"),
-        ("V", "..View Points"),
-        ("Shift", "+D Delete Pts"),
-        ('Shift', '+V Pixel Ruler'),
-        ("Shift", "+W Way Pts"),
-        ("cmd", "Closes Path"),
-        ("/", "Path Color"),
-        ('_/+', "Rotate 1 deg"),  
-        ('-/=', "Rotate 15 deg"),
-        ('[/]', 'Rotate 45 deg'),
-        ('</>', 'Toggle Size'),
-        ("} ", "Flop Path"),
-        ("{ ", "Flip Path"),  
-        (':/\"', "Scale X"),
+        ('D', 'Delete Screen'), 
+        ('E', 'Edit Points'),
+        ('F', 'Files'),
+        ('L', 'Lasso'),
+        ('N', 'New Path'),
+        ('P', 'Path Chooser'),
+        ('R', 'Reverse Path'),
+        ('S', 'Save Path'),
+        ('T', 'Test'),
+        ('V', '..View Points'),
+        ('Shift', '+D Delete Pts'),
+        ('Shift', '+W Way Pts'),
+        ('cmd', 'Closes Path'),
+        ('/', 'Path Color'),
+        ('_/+',  'Rotate 1 deg'),  
+        ('-/=',  'Rotate 15 deg'),
+        ('[/]',  'Rotate 45 deg'),
+        ('</>',  'Toggle Size'),
+        ('} ',   'Flop Path'),
+        ('{ ',   'Flip Path'),  
+        (':/\'', 'Scale X'),
         (';/\'', 'Scale Y'),
-        ('U/D', 'Arrow Keys'),
-        ('L/R', 'Arrow Keys'),   
-        ("opt", "Add a Point"),
-        ("del", "Delete a Point"),
-        (">", "  Shift Pts +5%"),
-        ("<", "  Shift Pts -5%"),
-        ("! ","  Half Path Size"),
-        ("@ ","  Redistribute Pts"),
+        ('U/D',  'Arrow Keys'),
+        ('L/R',  'Arrow Keys'),   
+        ('opt',  'Add a Point'),
+        ('del',  'Delete a Point'),
+        ('>',    'Shift Pts +5%'),
+        ('<',    'Shift Pts -5%'),
+        ('! ',   'Half Path Size'),
+        ('@ ',   'Redistribute Pts'),
     )
     return menu
       

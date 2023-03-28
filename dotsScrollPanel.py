@@ -12,13 +12,13 @@ from functools       import partial
 from dotsSideGig     import MsgBox
 
 panel = {   ## the following is used by ScrollPanel
-    "LabelW":   120,  
-    "LabelH":   112,  
-    "MaxW":     105,
-    "MaxH":      85,  
-    "Star":     .70,
-    "Type":     106,
-    "Margin":    15,    
+    'LabelW':   120,  
+    'LabelH':   112,  
+    'MaxW':     105,
+    'MaxH':      85,  
+    'Star':     .70,
+    'Type':     106,
+    'Margin':    15,    
 }  ## also a common['modLabel'] - scales down vertical for screen changes
 
 ### ------------------- dotsScrollPanel --------------------
@@ -43,7 +43,7 @@ class ImgLabel(QLabel):
         qp = QPainter()
         qp.begin(self)
         
-        img = ""  ## otherwise it can crash
+        img = ''  ## otherwise it can crash
         if self.fileName == 'Star':
             qp.setPen(QPen(Qt.GlobalColor.black, 1, Qt.PenStyle.SolidLine))
             qp.setBrush(QBrush(Qt.GlobalColor.red, Qt.BrushStyle.SolidPattern))
@@ -135,7 +135,7 @@ class ScrollPanel(QWidget):
         self.dots   = self.canvas.dots
 
         self.setFixedSize(common['ScrollW'],common['ScrollH'])
-   
+           
         self.layout = QVBoxLayout(self)
         
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
@@ -150,13 +150,13 @@ class ScrollPanel(QWidget):
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
     
-        self.scroll.setStyleSheet("background: rgb(235, 235, 235)")
-        self.scroll.setStyleSheet("border: 1px solid rgb(160,160,160)")
-        self.scroll.verticalScrollBar().setStyleSheet("QScrollBar:vertical {\n" 
-            "background: rgb(245,245,245) }");  ## shows handle better
+        self.scroll.setStyleSheet('background: rgb(235, 235, 235)')
+        self.scroll.setStyleSheet('border: 1px solid rgb(160,160,160)')
+        self.scroll.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
+            'background: rgb(245,245,245) }');  ## shows handle better
  
         self.scroll.setWidgetResizable(True)    # always
-        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH']/4))
+        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH']/5))
         self.scroll.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         
         self.scroll.setWidget(widget)
@@ -168,8 +168,8 @@ class ScrollPanel(QWidget):
         self.setLayout(vBoxLayout) 
 
         self.scrollCount = 0
-        self.scrollList = []
-
+        self.scrollList  = []
+        
 ### --------------------------------------------------------
     def add(self, fname):   
         self.scrollCount += 1
@@ -182,7 +182,7 @@ class ScrollPanel(QWidget):
     def Star(self):    
         self.add('Star')
         
-    def resetLabelH(self):
+    def resetLabelH(self):  ## reset label height
         pan, mod = panel['LabelH'], common['modLabel']
         return pan * mod
         
@@ -204,7 +204,7 @@ class ScrollPanel(QWidget):
             lastItem = self.layout.itemAt(self.layout.count()-1).widget()
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
                 lastItem))
-
+   
     def clear(self):
         for i in reversed(range(self.layout.count())): 
             self.layout.itemAt(i).widget().deleteLater()
@@ -214,8 +214,8 @@ class ScrollPanel(QWidget):
     def scrollFiles(self):
         Q = QFileDialog()
         files, _ = Q.getOpenFileNames(self,
-            "Choose an image file to open", paths['snapShot'], 
-            "Images Files(*.bmp *.jpg *.png)")
+            'Choose an image file to open', paths['snapShot'], 
+            'Images Files(*.bmp *.jpg *.png)')
         if files:
             for fileName in files:
                 self.add(fileName)
@@ -227,7 +227,7 @@ class ScrollPanel(QWidget):
             for s in sprites:
                 self.add(s)
             self.top()   
-        self.dots.statusBar.showMessage("Number of Sprites:  {}".format(self.scrollCount),15000) 
+        self.dots.statusBar.showMessage('Number of Sprites:  {}'.format(self.scrollCount),15000) 
         ## ------ your choice -------------
         # firstwidget = self.layout.itemAt(0).widget()
         # QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, firstwidget))
@@ -236,14 +236,14 @@ class ScrollPanel(QWidget):
         try:
             files = os.listdir(paths['spritePath'])
         except IOError:
-            MsgBox("No Sprite Directory Found!", 5)
+            MsgBox('No Sprite Directory Found!', 5)
             return None  
         filenames = []
         for file in files:
             if file.lower().endswith('png'): 
                 filenames.append(paths['spritePath'] + file.lower())       
         if not filenames:
-            MsgBox("No Sprites Found!", 5)
+            MsgBox('No Sprites Found!', 5)
             return
         return filenames
 

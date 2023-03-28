@@ -63,12 +63,12 @@ class DrawsPaths(QWidget):
 
     def addNewPath(self):
         self.canvas.btnPathMaker.setStyleSheet(
-            "background-color: rgb(215,165,255)")
+            'background-color: rgb(215,165,255)')
         self.pathMaker.addingNewPath = True
         self.pathMaker.newPath = None
         self.pathMaker.npts = 0
         self.pathMaker.pts = []
-        self.editBtn("ClosePath")
+        self.editBtn('ClosePath')
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note
@@ -101,11 +101,13 @@ class DrawsPaths(QWidget):
             self.deleteLasso()
         else:
             self.newLasso()
-            QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
-
-    def newLasso(self):  
-        self.lasso = []   
-        self.lassoSet = True
+  
+    def newLasso(self): 
+        self.lassoSet = True 
+        self.lasso = []  
+        if self.pathMaker.widget != None:
+            self.pathMaker.widget.close()
+        QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
  
     def deleteLasso(self):
         self.lassoSet = False
@@ -127,7 +129,7 @@ class DrawsPaths(QWidget):
             self.scene.removeItem(self.poly)    
         self.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
         self.poly.setBrush(QBrush(QColor(125,125,125,50)))
-        self.poly.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
+        self.poly.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
         self.poly.setZValue(common['pathZ']) 
         self.scene.addItem(self.poly)
         self.polySet = True
@@ -221,18 +223,18 @@ class DrawsPaths(QWidget):
             if poly.containsPoint(p, Qt.FillRule.WindingFill):  ## match 
                 if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
                     idx = self.pathMaker.selections.index(i)
-                    # print("a ", i, idx, self.pathMaker.selections)
+                    # print('a ', i, idx, self.pathMaker.selections)
                     self.pathMaker.selections.pop(idx)
                 else:
                     self.pathMaker.selections.append(i)  ## save pts index 
-                    # print("b ", i, self.pathMaker.selections)
+                    # print('b ', i, self.pathMaker.selections)
         self.deleteLasso()
         self.removePoly()
         if self.pathMaker.selections:
             self.pathMaker.selections.sort()
         QTimer.singleShot(200, self.updatePath)  ## it works better this way
                       
-    def deleteSections(self):
+    def deleteSections(self):  ## selected with lasso
         if self.pathMaker.selections: 
             self.pathMaker.selections.sort()  ## works better this way
             sel = self.pathMaker.selections[::-1]  ## reverse list 
@@ -255,24 +257,24 @@ class DrawsPaths(QWidget):
             
     def insertIntoSelection(self, idx):      
         if idx in self.pathMaker.selections:      
-            # print("j-insert: ", idx, self.pathMaker.selections)
+            # print('j-insert: ', idx, self.pathMaker.selections)
             j = self.pathMaker.selections.index(idx) + 1  ## use the index        
             for k in range(j, len(self.pathMaker.selections)):
                 self.pathMaker.selections[k] += 1         
         else:
             for i in range(0, len(self.pathMaker.selections)): 
                 if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
-                    # print("k-insert: ", idx, self.pathMaker.selections[i])
+                    # print('k-insert: ', idx, self.pathMaker.selections[i])
                     for k in range(i+1, len(self.pathMaker.selections)):
                         self.pathMaker.selections[k] += 1  
                     self.pathMaker.selections[i] == idx  
                     break
-        # print("n-insert", self.pathMaker.selections, "\n")
+        # print('n-insert', self.pathMaker.selections, '\n')
    
     def removeSelection(self, idx):  ## used only by pointItems          
         if self.pathMaker.selections:
             self.pathMaker.selections.sort() 
-            # print("a-delete: ", idx, self.pathMaker.selections)  
+            # print('a-delete: ', idx, self.pathMaker.selections)  
             if idx <= self.pathMaker.selections[0]:  ## test for first
                 if idx == self.pathMaker.selections[0]: 
                     self.pathMaker.selections.pop(0)  
@@ -288,20 +290,20 @@ class DrawsPaths(QWidget):
                                 
     def removeFromSelections(self, idx):            
         if idx in self.pathMaker.selections:  ## remove and renumber
-            # print("b-delete: ", idx, self.pathMaker.selections)  
+            # print('b-delete: ', idx, self.pathMaker.selections)  
             idx = self.pathMaker.selections.index(idx)  ## use the index        
             self.pathMaker.selections.pop(idx)  
             for i in range(idx, len(self.pathMaker.selections)):  ## only returns index
                 self.pathMaker.selections[i] += -1  ## from this point on  
         else:             
             for i in range(0, len(self.pathMaker.selections)):  ## just renumber
-                # print("c-delete: ", idx, self.pathMaker.selections[i])              
+                # print('c-delete: ', idx, self.pathMaker.selections[i])              
                 if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
                     for k in range(i+1, len(self.pathMaker.selections)):
-                        # print("c-renum: ", k, idx, self.pathMaker.selections[k]) 
+                        # print('c-renum: ', k, idx, self.pathMaker.selections[k]) 
                         self.pathMaker.selections[k] += -1       
                     break
-        # print("d-delete: ", self.pathMaker.selections, "\n")
+        # print('d-delete: ', self.pathMaker.selections, '\n')
                 
     def findTop(self):
         ## save
@@ -312,7 +314,7 @@ class DrawsPaths(QWidget):
     
     def turnBlue(self):
         self.canvas.btnPathMaker.setStyleSheet(
-        "background-color: rgb(118,214,255)")
+        'background-color: rgb(118,214,255)')
        
 ### ------------------- dotsDrawsPaths ---------------------
 

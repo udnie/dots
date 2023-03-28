@@ -8,9 +8,9 @@ from PyQt6.QtWidgets    import QGraphicsPolygonItem
                            
 from dotsShadowWorks    import *
 from dotsShared         import common
-from dotsSideGig        import distance
+from dotsSideGig        import distance, getCrop
 
-V = common["V"]  ## the diameter of a pointItem, same as in ShadowWorks
+V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
        
 ### ------------------- dotsShadowMaker --------------------
 ''' a.k.a. fab - handles shadow, menu, and points classes '''                                                                                                                    
@@ -104,8 +104,8 @@ class ShadowMaker:
             y = self.pixitem.shadow['pathY'][k]
             self.path.append(QPointF(x,y))
                   
-        self.viewW, self.viewH = common["ViewW"],common["ViewH"] 
-            
+        self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
+                    
         file, w, h = self.pixWidthHeight()  
         flop = self.pixitem.flopped 
                     
@@ -143,7 +143,7 @@ class ShadowMaker:
          
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32) 
         
-        x, y, w, h = self.getCrop()   
+        x, y, w, h = getCrop(self.path)   
         img = img.copy(x, y, w, h)
           
         pixmap = QPixmap.fromImage(img)     
@@ -167,10 +167,10 @@ class ShadowMaker:
     def addPoints(self): 
         self.deletePoints() 
           
-        self.topLeft  = PointItem(self.path[0], "topLeft", self)
-        self.topRight = PointItem(self.path[1], "topRight", self)
-        self.botRight = PointItem(self.path[2], "botRight", self)
-        self.botLeft  = PointItem(self.path[3], "botLeft", self)
+        self.topLeft  = PointItem(self.path[0], 'topLeft', self)
+        self.topRight = PointItem(self.path[1], 'topRight', self)
+        self.botRight = PointItem(self.path[2], 'botRight', self)
+        self.botLeft  = PointItem(self.path[3], 'botLeft', self)
               
         self.points.append(self.topLeft)  
         self.points.append(self.topRight)  
@@ -313,8 +313,8 @@ class ShadowMaker:
     def updateOutline(self): 
         self.deleteOutline()
         self.outline = QGraphicsPolygonItem(self.addOutline()) 
-        self.outline.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.DotLine))
-        self.outline.setZValue(common["outline"])  
+        self.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
+        self.outline.setZValue(common['outline'])  
         if self.isHidden:
             self.outline.hide()    
         self.scene.addItem(self.outline)
@@ -334,20 +334,7 @@ class ShadowMaker:
             outline.append(QPointF(p))
         return outline 
       
-### --------------------------------------------------------                   
-    def getCrop(self):  ## from path - bounding size and position
-        x, y, x1, y1 = common["ViewW"], common["ViewH"], 0.0, 0.0
-        for p in self.path:
-            if p.x() < x:
-                x = p.x()
-            if p.x() > x1:
-                x1 = p.x()           
-            if p.y() < y:
-                y = p.y()
-            if p.y() > y1:
-                y1 = p.y()  
-        return int(x), int(y), int((x1-x)), int((y1-y))
-    
+### --------------------------------------------------------    
     def hideAll(self):
         if self.isHidden == False:
             self.isHidden = True
@@ -375,7 +362,7 @@ class ShadowMaker:
         self.scalor = val
             
     def rotateScale(self, per, inc):  ## uses path rather than pts
-        x, y, w, h = self.getCrop()   ## uses getCrop 
+        x, y, w, h = getCrop(self.path)   ## uses getCrop 
         centerX, centerY = x + w/2, y + h/2
         
         self.shadow.setTransformOriginPoint(centerX, centerY)

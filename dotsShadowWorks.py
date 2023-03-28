@@ -10,8 +10,8 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QGraphicsPixmapItem,
                                
 from dotsShared         import common
 
-PathStr = ["topLeft","topRight","botRight","botLeft"]
-V = common["V"]  ## the diameter of a pointItem, same as in ShadowWorks
+PathStr = ['topLeft','topRight','botRight','botLeft']
+V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
 
 ### ------------------- dotsShadowWorks --------------------
 ''' classes: pointItem, shadowWidget, shadow, and cv2 functions '''
@@ -25,7 +25,7 @@ class PointItem(QGraphicsEllipseItem):
         self.pixitem = self.fab.pixitem
         self.path    = self.fab.path
          
-        self.type  = "point"
+        self.type  = 'point'
         self.ptStr = ptStr
         
         self.dragCnt = 0
@@ -34,14 +34,14 @@ class PointItem(QGraphicsEllipseItem):
         self.x = pt.x()-V*.5
         self.y = pt.y()-V*.5
         
-        self.setZValue(common["points"])      
+        self.setZValue(common['points'])      
         self.setRect(self.x, self.y, V, V)  
         
-        self.setPen(QPen(QColor("gray"), 1))
-        if self.ptStr in ("topLeft","topRight"):
-            self.setBrush(QColor("yellow"))
+        self.setPen(QPen(QColor('gray'), 1))
+        if self.ptStr in ('topLeft','topRight'):
+            self.setBrush(QColor('yellow'))
         else:
-            self.setBrush(QColor("lime"))
+            self.setBrush(QColor('lime'))
                         
  ### --------------------------------------------------------
     def mousePressEvent(self, e):  
@@ -63,12 +63,12 @@ class PointItem(QGraphicsEllipseItem):
         pos = self.mapToScene(e)
         x, y = pos.x(), pos.y()
         self.setRect(x-V*.5, y-V*.5, V,V)  ## set current point    
-        if self.ptStr == "topLeft":  ## push right
+        if self.ptStr == 'topLeft':  ## push right
             w, y1 = self.current(0,1)            
             self.path[0] = QPointF(x,y) 
             self.path[1] = QPointF(x+w,y1)
             self.fab.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)       
-        elif self.ptStr == "botLeft":    
+        elif self.ptStr == 'botLeft':    
             w, y1 = self.current(3,2)            
             self.path[3] = QPointF(x,y) 
             self.path[2] = QPointF(x+w,y1)
@@ -104,7 +104,7 @@ class ShadowWidget(QWidget):
         self.setLayout(hbox)
         
         self.setFixedHeight(int(self.WidgetH))
-        self.setStyleSheet("background-color: rgba(0,0,0,0)")
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
         self.setContentsMargins(0,15,0,-15)
              
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -147,13 +147,13 @@ class ShadowWidget(QWidget):
         
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox("Rotate     Scale   Opacity   ")
+        groupBox = QGroupBox('Rotate     Scale   Opacity   ')
         
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
    
-        self.rotateValue = QLabel("0", alignment=Qt.AlignmentFlag.AlignCenter)
+        self.rotateValue = QLabel('0', alignment=Qt.AlignmentFlag.AlignCenter)
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
@@ -164,7 +164,7 @@ class ShadowWidget(QWidget):
         self.rotaryDial.setNotchTarget(15.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
     
-        self.scaleValue = QLabel("1.00")
+        self.scaleValue = QLabel('1.00')
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)   
         self.scaleSlider.setMinimum(25)
         self.scaleSlider.setMaximum(225)
@@ -175,7 +175,7 @@ class ShadowWidget(QWidget):
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
         
-        self.opacityValue = QLabel(".50")
+        self.opacityValue = QLabel('.50')
         self.opacitySlider = QSlider(Qt.Orientation.Vertical)   
         self.opacitySlider.setMinimum(0)
         self.opacitySlider.setMaximum(100)
@@ -211,18 +211,18 @@ class ShadowWidget(QWidget):
         return groupBox
 
     def buttonGroup(self):
-        groupBox = QGroupBox(" Shadow")
+        groupBox = QGroupBox(' Shadow')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
-        hideBtn = QPushButton("Hide")
-        flipBtn  = QPushButton("Flip")
-        flopBtn  = QPushButton("Flop")
-        newBtn  = QPushButton("New")
-        delBtn  = QPushButton("Delete")
-        quitBtn = QPushButton("Close")
+        hideBtn = QPushButton('Hide')
+        flipBtn  = QPushButton('Flip')
+        flopBtn  = QPushButton('Flop')
+        newBtn  = QPushButton('New')
+        delBtn  = QPushButton('Delete')
+        quitBtn = QPushButton('Close')
     
         hideBtn.clicked.connect(self.fab.hideAll)
         flipBtn.clicked.connect(self.fab.flip)
@@ -244,18 +244,18 @@ class ShadowWidget(QWidget):
     
     def Rotate(self, val):  ## setting rotate in shadowMaker
         self.fab.rotateShadow(val)
-        self.rotateValue.setText("{:3d}".format(val))
+        self.rotateValue.setText('{:3d}'.format(val))
              
     def Scale(self, val):  ## setting rotate in shadowMaker
         op = (val/100)
         self.fab.scaleShadow(op)
-        self.scaleValue.setText("{0:.2f}".format(op))
+        self.scaleValue.setText('{0:.2f}'.format(op))
            
     def Opacity(self, val):
         op = (val/100)
         self.fab.shadow.setOpacity(op)
         self.fab.alpha = op
-        self.opacityValue.setText("{0:.2f}".format(op)) 
+        self.opacityValue.setText('{0:.2f}'.format(op)) 
                                                         
 ### --------------------------------------------------------
 class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
@@ -267,9 +267,9 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.pixitem = self.fab.pixitem
         self.path    = self.fab.path
        
-        self.type = "shadow" 
+        self.type = 'shadow' 
         self.anime = None 
-        self.setZValue(common["shadow"]) 
+        self.setZValue(common['shadow']) 
                                        
         self.dragCnt = 0
         self.save    = QPointF(0.0,0.0)
@@ -282,7 +282,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
     # def paint(self, painter, option, widget=None):  ## turn off for now
     #     super().paint(painter, option, widget)
     #     if self.isSelected():
-    #         pen = QPen(QColor("lime"))
+    #         pen = QPen(QColor('lime'))
     #         pen.setWidth(2)
     #         painter.setPen(pen)
     #         painter.drawRect(self.boundingRect())
@@ -351,14 +351,14 @@ def initShadow(file, w, h, flop):  ## replace all colors with grey
     if flop: img = cv2.flip(img, 1)  ## works after the read   
     rows, cols, _ = img.shape
 
-    wuf = img.copy()  
+    tmp = img.copy()  
     for i in range(rows):
         for j in range(cols):
             pixel = img[i,j]
             if pixel[-1] != 0:  ## not transparent      
-                wuf[i,j] = (20,20,20,255)
+                tmp[i,j] = (20,20,20,255)
                                            
-    img = cv2.resize(np.array(wuf), (int(w), int(h)), interpolation = cv2.INTER_CUBIC)
+    img = cv2.resize(np.array(tmp), (int(w), int(h)), interpolation = cv2.INTER_CUBIC)
     img = cv2.GaussianBlur(img,(5,5),cv2.BORDER_DEFAULT)
                                 
     height, width, ch = img.shape

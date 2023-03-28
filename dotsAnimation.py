@@ -83,7 +83,7 @@ class Animation:
         elif 'demo' in anime:
             return sidePath.demo(pix, anime, Node(pix))
         elif anime in self.canvas.pathList:
-            return sidePath.setPaths(pix, anime, Node(pix))
+            return sidePath.setPaths(anime, Node(pix))
 
 ### --------------------------------------------------------
     def _random(self):  
@@ -214,7 +214,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     reprise.setStartValue(node.pix.pos())
     reprise.setEndValue(QPointF(pix.x, pix.y))
 
-    if pix.part == "pivot":
+    if pix.type == 'pix' and pix.part == "pivot":
         return reprise
 
     spin = QPropertyAnimation(node, b'rotate')

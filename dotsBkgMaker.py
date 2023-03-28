@@ -20,7 +20,7 @@ from dotsBkgWrks        import BkgItem, BkgWidget
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):
 ### --------------------------------------------------------   
-    def __init__(self, color, canvas, z=common["bkgZ"]):
+    def __init__(self, color, canvas, z=common['bkgZ']):
         super().__init__()
 
         self.canvas   = canvas
@@ -33,10 +33,10 @@ class Flat(QGraphicsPixmapItem):
         self.fileName = 'flat'
         self.locked = False
         
-        self.key = ""
+        self.key = ''
         self.id = 0   
 
-        p = QPixmap(common["ViewW"],common["ViewH"])
+        p = QPixmap(common['ViewW'],common['ViewH'])
         p.fill(self.color)
         
         self.setPixmap(p)
@@ -91,8 +91,8 @@ class BkgMaker(QWidget):
             return
         Q = QFileDialog()
         file, _ = Q.getOpenFileName(self.canvas,
-            "Choose an image file to open", paths["bkgPath"],
-            "Images Files(*.bmp *.jpg *.png *.bkg)")
+            'Choose an image file to open', paths['bkgPath'],
+            'Images Files(*.bmp *.jpg *.png *.bkg)')
         if file:
             self.openBkgFile(file) if file.endswith('.bkg') else self.addBkg(file)
         Q.accept()
@@ -102,7 +102,7 @@ class BkgMaker(QWidget):
             with open(file, 'r') as fp:
                 self.setBkgColor(QColor(fp.readline()))
         except IOError:
-            MsgBox("openBkgFile: Error reading file", 5)
+            MsgBox('openBkgFile: Error reading file', 5)
   
 ### --------------------------------------------------------              
     def addBkg(self, file, flopped=False):  ## also used by saveBkg 
@@ -111,7 +111,7 @@ class BkgMaker(QWidget):
                 self.mapper.removeMap()
                 
         self.bkgItem = BkgItem(file, self.canvas)
-        self.bkgItem.setZValue(common["bkgZ"])  ## always on top             
+        self.bkgItem.setZValue(common['bkgZ'])  ## always on top             
         self.scene.addItem(self.bkgItem)   
         self.updateZvals(self.bkgItem)  ## update other bkg zvalues
         self.x, self.y = self.setXY(self.bkgItem)
@@ -154,7 +154,7 @@ class BkgMaker(QWidget):
             self.disableSetBkg()  ## turn off setting it again 
             return
         else:
-            MsgBox("Already set to background", 5)
+            MsgBox('Already set to background', 5)
             
     def deleteBkg(self, bkg):
         self.scene.removeItem(bkg)
@@ -169,33 +169,33 @@ class BkgMaker(QWidget):
             self.saveBkgColor()  
             return  
         elif not self.bkgItem.locked:
-            MsgBox("Set/Lock Background inorder to save", 3)
+            MsgBox('Set/Lock Background inorder to save', 3)
             return
         else:
             file = os.path.basename(self.bkgItem.fileName)
             file = file[0: file.index('.')]
-            file = file[:15] + "-bkg.jpg"
+            file = file[:15] + '-bkg.jpg'
             ## if it's not already a bkg file and the new file doesn't exist
-            if not self.bkgItem.fileName.lower().endswith("-bkg.jpg") and not \
-                path.exists(paths["bkgPath"]+ file):
-                self.bkgItem.fileName = paths["bkgPath"] + file
+            if not self.bkgItem.fileName.lower().endswith('-bkg.jpg') and not \
+                path.exists(paths['bkgPath']+ file):
+                self.bkgItem.fileName = paths['bkgPath'] + file
                 flopped = self.bkgItem.flopped
                 pix = self.canvas.view.grab(QRect(QPoint(1,1), QSize()))
-                pix.save(paths["bkgPath"] + file,
-                    format='jpg',
+                pix.save(paths['bkgPath'] + file, format='jpg',
                     quality=100)
-                MsgBox("Saved as " + file, 3)
-                self.canvas.clear()  ## replace current background with "-bkg.jpg" copy   
+                MsgBox('Saved as ' + file, 3)
+                self.canvas.clear()  ## replace current background with '-bkg.jpg' copy   
                 self.addBkg(self.bkgItem.fileName, flopped)
             else:
-                MsgBox("Already saved as background jpg", 5)
+                MsgBox('Already saved as background jpg', 5)
         self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
   
     def saveBkgColor(self):  ## write to .bkg file
         Q = QFileDialog()
-        f = Q.getSaveFileName(self.canvas, paths["bkgPath"],  
-            paths["bkgPath"] + 'tmp.bkg')  
+        Q.setDirectory(paths['bkgPath'])
+        f = Q.getSaveFileName(self.canvas, paths['bkgPath'],  
+            paths['bkgPath'] + 'tmp.bkg')  
         Q.accept()
           
         if not f[0]: 
@@ -208,14 +208,14 @@ class BkgMaker(QWidget):
                 with open(f[0], 'w') as fp:
                     fp.write(self.bkgItem.color.name())
             except IOError:
-                MsgBox("savePlay: Error saving file", 5)
+                MsgBox('savePlay: Error saving file', 5)
                                                                        
     def bkgColor(self):  ## from button or widget   
         if self.canvas.control in PlayKeys:
             return
         self.setBkgColor(QColorDialog.getColor())
 
-    def setBkgColor(self, color, bkz=common["bkgZ"]):  ## add a flat color to canvas
+    def setBkgColor(self, color, bkz=common['bkgZ']):  ## add a flat color to canvas
         if color.isValid():
             self.bkgItem = Flat(color, self.canvas, bkz)    
             self.scene.addItem(self.bkgItem)
@@ -224,7 +224,7 @@ class BkgMaker(QWidget):
     def settingBkgMsg(self): 
         if self.bkgItem.fileName != 'flat':
             txt = os.path.basename(self.bkgItem.fileName)
-            MsgBox(txt + " " +  "set to background", 4) 
+            MsgBox(txt + ' ' +  'set to background', 4) 
    
 ### --------------------------------------------------------     
     def setXY(self, bkg):
@@ -236,13 +236,13 @@ class BkgMaker(QWidget):
         if self.bkgItem and self.bkgItem.fileName != 'flat':
             self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
             self.bkgItem.locked = True
-            if self.widget: self.widget.lockBtn.setText("Locked")
+            if self.widget: self.widget.lockBtn.setText('Locked')
                               
     def unlockBkg(self):
         if self.bkgItem and self.bkgItem.fileName != 'flat':
             self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
             self.bkgItem.locked = False
-            if self.widget: self.widget.lockBtn.setText("UnLocked")
+            if self.widget: self.widget.lockBtn.setText('UnLocked')
         
     def flopIt(self):  ## used by widget 
         if self.bkgItem and self.bkgItem.fileName != 'flat':
@@ -250,7 +250,7 @@ class BkgMaker(QWidget):
                 else self.bkgItem.setMirrored(True)
                                                                              
     def front(self, bkg):
-        bkg.setZValue(common["bkgZ"])
+        bkg.setZValue(common['bkgZ'])
         self.updateZvals(bkg)
         self.lockBkg()   
         self.closeWidget() 

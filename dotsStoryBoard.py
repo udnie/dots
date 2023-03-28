@@ -16,9 +16,11 @@ from dotsMapItem     import InitMap
 from dotsBkgMaker    import *
 from dotsSideShow    import SideShow
 from dotsPathMaker   import PathMaker
+from dotsSnakes      import Snakes
 from dotsSliderPanel import SliderPanel
 from dotsScrollPanel import ScrollPanel
 from dotsDocks       import *
+from dotsSidePath    import Wings
 
 Play = ('L','R','P','S')
 
@@ -52,7 +54,10 @@ class StoryBoard(QWidget):
         self.bkgMaker  = BkgMaker(self)
      
         self.animation = Animation(self)    
-        self.sideShow  = SideShow(self)  ## additional extentions 
+        self.snakes    = Snakes(self)
+        self.wings     = Wings(self)
+        
+        self.sideShow  = SideShow(self)  ## additional extentions    
         self.sideCar   = SideCar(self) 
          
         addScrollDock(self)  ## add button groups from dotsDocks
@@ -79,7 +84,8 @@ class StoryBoard(QWidget):
     @pyqtSlot(str)
     def setKeys(self, key):  ## managing storyboard and pathMaker
         self.key = key 
-        if self.key == 'C':
+        
+        if self.key == 'C':  ## clear canvas
             if self.pathMakerOn:
                 if len(self.scene.items()) == 0:
                    self.clear()   ## really does it and returns to canvas
@@ -87,23 +93,27 @@ class StoryBoard(QWidget):
                     self.pathMaker.pathKeys(self.key)  ## centers path
             else:
                 self.clear()  ## canvas
+                
         elif not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
                 if self.key in Play:  ## canvas hotkeys
                     self.sideShow.keysInPlay(self.key)        
                 else:
-                    self.sendPixKeys()               
+                    self.sendPixKeys()      
+                             
         ## send move keys to selected pointItems 
         elif self.pathMaker.drawing.pointItemsSet() == True and \
             self.pathMaker.selections and self.key in MoveKeys:  ## from shared.py
-                self.sendPixKeys()          
+                self.sendPixKeys()
+                          
         ## send the rest to pathMaker
         elif self.key in PathStr: 
             self.pathMaker.pathKeys(self.key)
 
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e):  ## used by mapper for selecting
-        if not self.pathMakerOn:      
+        if not self.pathMakerOn:     
+             
             if e.type() == QEvent.Type.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()  ## chks if set
@@ -112,11 +122,13 @@ class StoryBoard(QWidget):
                     self.unSelect()      
                 elif self.hasHiddenPix() or self.mapper.selections:
                     if self.control not in PlayKeys:
-                        self.mapper.updatePixItemPos()                    
+                        self.mapper.updatePixItemPos()  
+                                          
                 ## show play files on right mouse click if nothing at location       
                 elif e.button() == Qt.MouseButton.RightButton:
                     if len(self.scene.items()) == 0:
                         self.sideShow.loadPlay()
+                        
             elif e.type() == QEvent.Type.MouseMove:
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
@@ -127,6 +139,7 @@ class StoryBoard(QWidget):
                     self.mapper.removeMap()
                 elif self.control not in PlayKeys:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary 
+                    
             elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
@@ -136,6 +149,7 @@ class StoryBoard(QWidget):
                 if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                 self.mapper.updatePixItemPos()  
+                
             elif e.type() == QEvent.Type.MouseButtonDblClick:
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
@@ -151,16 +165,16 @@ class StoryBoard(QWidget):
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, fileName, x, y, clone, mirror):  
         if 'wings' in fileName:  ## see dotsSideCar for wings
-            self.sideCar.wings(x, y, '')        
+            self.wings.bats(x, y, '')        
         else:
             self.pixCount += 1  
-            pix = PixItem(fileName, self.pixCount, x, y, self, mirror)        
+            pix = PixItem(fileName, self.pixCount, x, y, self, mirror)            
             if clone != None:  ## clone it                    
                 self.sideCar.transFormPixItem(pix,
                     clone[0],
                     clone[1] * random.randrange(95, 105)/100.0,
                     pix.alpha2)
-                return
+                return   
             elif 'frame' in pix.fileName:  ## pin it on drag and drop
                 pix.setPos(0,0)
                 pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)   
@@ -203,7 +217,7 @@ class StoryBoard(QWidget):
         self.dots.closeAll()
         QTimer.singleShot(20, self.dots.close)   
 
-    def clear(self):  ## do this before exiting app
+    def clear(self):  ## do this before exiting app        
         self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()
         self.sideCar.clearWidgets()
@@ -291,12 +305,14 @@ class StoryBoard(QWidget):
                     pix.isHidden = False
             elif pix.zValue() <= common["pathZ"]:
                 break
-
-    def ZDump(self):
-        return
-        # for pix in self.scene.items():
-        #     print(os.path.basename(pix.fileName), pix.id, pix.zValue())
-  
+        
+    def runSnakes(self):  ## can be run using 'r' after initial alt/opt-r
+        if self.openPlayFile != 'snake' and len(self.scene.items()) > 0: 
+            MsgBox('The Screen Needs to be Clear inorder to Run Snakes', 7, getCtr(-225,-175))
+            return 
+        else:
+            QTimer.singleShot(100, self.snakes.setSnakePaths) 
+                 
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():

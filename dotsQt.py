@@ -12,8 +12,8 @@ from dotsShared         import common
 import dotsStoryBoard   as canvas
 
 ### ----------------------- dotsQt -------------------------
-''' dotsQt: parent container for the major widgets.
-    See dotsShared.py for common shared variables and path
+''' dotsQt: parent container for the //major widgets.
+    See dotsShared.py for common shared variabxxxxles and path
     dictionaries shared across classes and files''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
@@ -41,8 +41,8 @@ class DotsQt(QMainWindow):
         
     def init(self):  
         self.dragCnt = 0
-        self.setWindowTitle("DotsQt - " + os.path.basename(os.getcwd()) + \
-            " ~ " + self.screen)  ## or getDate()
+        self.setWindowTitle('DotsQt - ' + os.path.basename(os.getcwd()) + \
+            ' ~ ' + self.screen)  ## or getDate()
                     
         self.setStyleSheet(open('./dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
@@ -91,8 +91,6 @@ if __name__ == '__main__':
     sys.exit(app.exec())    
       
 ### ------------------------- dotsQt -----------------------
-
-
 
 
 

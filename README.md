@@ -30,12 +30,12 @@ I use the graphicsitem **zValue()** as a means to order the dots graphic types w
 |:------------- |:---------------:| -------------:|
 | PointItem | pt | 200 from topmost item+ |
 | MapItem | map | 50 over top pixItem |
-| TagItem | tag|20 over top pixItem|
+| TagItem | tag|45 over top pixItem|
+| Paths| path| 35 over top pixItem
 | PixItem | pix  | **\*see below**
 | Shadow  |shadow| 50|
 | Points  |point | 40|
 | Outline |  none   | 30| 
-| Paths| path| -25 as a group |
 | LineItem  | grid   | -50 as a group |
 | BkgItem   | bkg | -99 decreasing by -1 |  
 

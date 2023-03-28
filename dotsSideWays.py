@@ -17,14 +17,15 @@ ScaleDnKeys = ('<',':',';')
 ''' dotsSideWays: extends pathMaker. Includes path and wayPoints
     functions - scaleRotate, flopPath, reversePath, etc..'''
 ### --------------------------------------------------------
-class SideWays():
+class SideWays:
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  
         self.pathMaker = parent
+        self.canvas    = self.pathMaker.canvas
         self.scene     = self.pathMaker.scene
-        self.drawing   = DrawsPaths(self.pathMaker, self, self.pathMaker.canvas) 
+        self.drawing   = DrawsPaths(self.pathMaker, self, self.canvas) 
         
         self.tagGroup = None  
     
@@ -32,8 +33,8 @@ class SideWays():
     def centerPath(self):
         if self.pathMaker.pathSet:
             p = self.pathMaker.path.sceneBoundingRect()
-            w = (common["ViewW"] - p.width()) /2
-            h = (common["ViewH"] - p.height()) / 2
+            w = (common['ViewW'] - p.width()) /2
+            h = (common['ViewH'] - p.height()) / 2
             x = w - p.x()
             y = h - p.y()
             self.pathMaker.path.setPos(
@@ -175,15 +176,16 @@ class SideWays():
 ### ----------------- load and save paths ------------------
     def openFiles(self):
         if self.pathMaker.pts:
-            MsgBox("openFiles: Clear Scene First", 5)
+            MsgBox('openFiles: Clear Scene First', 5)
             return
         Q = QFileDialog()
-        file, _ = Q.getOpenFileName(self.pathMaker.canvas,
-            "Choose a path file to open", paths["paths"],
-            "Files(*.path)")
+        Q.setDirectory(paths['paths'])
+        file, _ = Q.getOpenFileName(self.canvas,
+            'Choose a path file to open', paths['paths'],
+            'Files(*.path)')
         Q.accept()
         if file:
-            self.pathMaker.pts = getPts(file)  ## read the file
+            self.pathMaker.pts = getPts(file)  ## in sideGig  
             self.pathMaker.openPathFile = os.path.basename(file)
             self.pathMaker.addPath()
        
@@ -191,32 +193,37 @@ class SideWays():
         if self.pathMaker.pts:
             if self.pathMaker.addingNewPath != False: 
                 MsgBox("savePath: Close the new path using 'cmd'", 5)  
-                return
-            Q = QFileDialog()
+                return  
+            
             if self.pathMaker.openPathFile == '':
-                self.pathMaker.openPathFile = paths["paths"] + 'tmp.path'
-            f = Q.getSaveFileName(self.pathMaker.canvas,
-                paths["paths"],
-                self.pathMaker.openPathFile)
-            Q.accept()        
+                self.pathMaker.openPathFile = paths['paths'] + 'tmp.path' 
+                     
+            ##  self.pathMaker.openPathFile has no path attached to it            
+            Q = QFileDialog()
+            Q.setDirectory(paths['paths'])
+            f = Q.getSaveFileName(self.canvas, paths['paths'],
+                paths['paths'] + self.pathMaker.openPathFile)  ## note
+            Q.accept()  
+                  
             if not f[0]: 
                 return
             elif not f[0].lower().endswith('.path'):
-                MsgBox("savePath: Wrong file extention - use '.path'", 5)    
+                MsgBox("savePath: Wrong file extention - use '.path'", 5)   
+                return 
             else:
                 try:
                     with open(f[0], 'w') as fp:
                         for i in range(0, len(self.pathMaker.pts)):
                             p = self.pathMaker.pts[i]
-                            x = "{0:.2f}".format(p.x())
-                            y = "{0:.2f}".format(p.y())
-                            fp.write(x + ", " + y + "\n")
+                            x = '{0:.2f}'.format(p.x())
+                            y = '{0:.2f}'.format(p.y())
+                            fp.write(x + ', ' + y + '\n')
                         fp.close()
                 except IOError:
-                    MsgBox("savePath: Error saving file", 5)
+                    MsgBox('savePath: Error saving file', 5)
                     return
         else:
-            MsgBox("savePath: Nothing saved", 5)
+            MsgBox('savePath: Nothing saved', 5)
 
 ### ---------------------- waypoints ----------------------- 
     def shiftWayPtsLeft(self):  
@@ -269,14 +276,14 @@ class SideWays():
         del list
                        
     def addWayPtTag(self, tag, pt):
-        self.tag = TagIt('pathMaker', tag, QColor("TOMATO"))   
+        self.tag = TagIt('pathMaker', tag, QColor('TOMATO'))   
         self.tag.setPos(QPointF(pt))
-        self.tag.setZValue(common["tagZ"]+5) 
+        self.tag.setZValue(common['tagZ']+5) 
         self.tagGroup.addToGroup(self.tag)
            
     def addWayPtTagsGroup(self):
         self.tagGroup = QGraphicsItemGroup()
-        self.tagGroup.setZValue(common["tagZ"]+5)
+        self.tagGroup.setZValue(common['tagZ']+5)
         self.scene.addItem(self.tagGroup)
          
     def removeWayPtTags(self):   
@@ -285,23 +292,19 @@ class SideWays():
             self.tagGroup = None
                    
     def makePtsTag(self, pt, idx, pct):  ## used by pointItem as well
-        s = "(" + "{:2d}".format(int(pt.x()))
-        s = s + ", " + "{:2d}".format(int(pt.y())) + ")"
-        s = s + "  " + "{0:.2f}%".format(pct)
-        s = s + "  " + "{0:2d}".format(idx)
+        s = '(' + '{:2d}'.format(int(pt.x()))
+        s = s + ', ' + '{:2d}'.format(int(pt.y())) + ')'
+        s = s + '  ' + '{0:.2f}%'.format(pct)
+        s = s + '  ' + '{0:2d}'.format(idx)
         return s
         
     def pixCount(self):  
-        return sum(
-            pix.type == 'pix' 
-            for pix in self.scene.items()
-        )
+        return sum(pix.type == 'pix' 
+            for pix in self.scene.items())
         
     def tagCount(self):  
-        return sum(
-            pix.type == 'tag' 
-            for pix in self.scene.items()
-        )
+        return sum(pix.type == 'tag' 
+            for pix in self.scene.items())
                 
 ### --------------------- dotsSideWays ---------------------
 

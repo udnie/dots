@@ -7,12 +7,13 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
+from dotsSideGig        import constrain
 
 ##from dotsShadowMaker    import ShadowMaker  ## add shadows
-from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+from dotsShadow_Dummy   import ShadowMaker  ## turns off shadows
 
-import dotsSideCar    as sideCar
-import dotsAnimation  as anima
+import dotsSideCar      as sideCar
+import dotsAnimation    as anima
 
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
@@ -20,7 +21,7 @@ Pct = -0.50  ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename
     # "apple": (650, 450),
-    # 'doral': (300, 500),
+    # 'doral': (300, 500),         
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -320,10 +321,10 @@ class PixItem(QGraphicsPixmapItem):
         self.setPos(self.x, self.y) 
   
     def constrainX(self, X):    
-        return int(sideCar.constrain(X, self.width, common["ViewW"], self.width * Pct))
+        return int(constrain(X, self.width, common["ViewW"], self.width * Pct))
         
     def constrainY(self, Y):
-        return int(sideCar.constrain(Y, self.height, common["ViewH"], self.height * Pct))
+        return int(constrain(Y, self.height, common["ViewH"], self.height * Pct))
   
     def rotateThis(self, key):
         self.setOriginPt() 

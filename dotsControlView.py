@@ -41,7 +41,7 @@ class ControlView(QGraphicsView):
             QPainter.RenderHint.SmoothPixmapTransform
         )
         
-        self.setStyleSheet("border: 1px solid rgb(160,160,160)")
+        self.setStyleSheet('border: 1px solid rgb(160,160,160)')
 
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -57,7 +57,6 @@ class ControlView(QGraphicsView):
             Qt.Key.Key_A: self.canvas.selectAll,
             Qt.Key.Key_H: self.canvas.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
-            Qt.Key.Key_Z: self.canvas.ZDump,
             Qt.Key.Key_O: self.sideCar.clearOutlines,   
         }
 
@@ -92,7 +91,7 @@ class ControlView(QGraphicsView):
             fileName = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.mapper.toFront(0)
-            ## self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
+            # self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
             self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### PyQt6 takes position
                 None, False)
             
@@ -104,7 +103,7 @@ class ControlView(QGraphicsView):
     def keyPressEvent(self, e):
         key = e.key() 
         mod = e.modifiers()
-            
+                 
         ## special keys - may differ in another OS - !, @, del
         if e.key() == 33 and self.canvas.pathMakerOn:
             self.setKey('!')  ## use by pathMaker
@@ -112,26 +111,12 @@ class ControlView(QGraphicsView):
             self.setKey('@')
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
-            
-        elif key in DFTWKeys:  ## set key as well - used by pathMaker
-            if key == Qt.Key.Key_D:  
-                self.setKey('D') 
-                self.canvas.deleteSelected()
-            elif key == Qt.Key.Key_F:
-                self.setKey('F') 
-                self.canvas.flopSelected()  
-            elif key == Qt.Key.Key_T:
-                if self.canvas.pathMakerOn:
-                    self.setKey('T')  ## run test
-                else:  
-                    self.mapper.toggleTagItems('all')
-            elif key == Qt.Key.Key_W:
-                self.sideCar.clearWidgets()
-            
+                        
         ## shift keys - D, P, T, V, H  
         elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:            
             if key == Qt.Key.Key_D:   
-                self.setKey('delPts')  ## send to pathmaker
+                if self.canvas.pathMakerOn:
+                    self.setKey('delPts')  ## send to pathmaker
             elif key == Qt.Key.Key_P:  ## show pix path tags
                 if not self.canvas.pathMakerOn:
                     self.mapper.toggleTagItems('paths') 
@@ -146,11 +131,30 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleOutlines()
             elif key == Qt.Key.Key_S:
                 self.sideCar.screenMenu()
-             
-        ## shift keys used in locking screen items - L, R, U
+        
+        elif key == Qt.Key.Key_R and mod & Qt.KeyboardModifier.AltModifier: 
+            if self.canvas.pathMakerOn == False:  
+                self.canvas.runSnakes()
+           
+        # shift keys used in locking screen items - L, R, U
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
-            self.canvas.togglePixLocks(singleKeys[key])  
-                                                         
+            self.canvas.togglePixLocks(singleKeys[key]) 
+                                               
+        elif key in DFTWKeys:  ## set key as well - used by pathMaker
+            if key == Qt.Key.Key_D:  
+                self.setKey('D') 
+                self.canvas.deleteSelected()
+            elif key == Qt.Key.Key_F:
+                self.setKey('F') 
+                self.canvas.flopSelected()  
+            elif key == Qt.Key.Key_T:
+                if self.canvas.pathMakerOn:
+                    self.setKey('T')  ## run test
+                else:  
+                    self.mapper.toggleTagItems('all')
+            elif key == Qt.Key.Key_W:
+                self.sideCar.clearWidgets()        
+                                                            
         elif key in self.direct: 
             self.direct[key]()  ## dictionary
             

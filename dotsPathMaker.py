@@ -175,7 +175,7 @@ class PathMaker(QWidget):
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
         if self.sideWays.pixCount() > 0 and not self.canvas.pathMakerOn:
-            MsgBox("Clear Scene First to run PathMaker", 5)
+            MsgBox('Clear Scene First to run PathMaker', 5)
             return
         if self.canvas.pathMakerOn:
             self.pathMakerOff()

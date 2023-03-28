@@ -1,5 +1,5 @@
 
-from PyQt6.QtCore    import QPointF, pyqtSlot
+from PyQt6.QtCore    import QPointF, pyqtSlot, QPoint
 from PyQt6.QtGui     import QColor
 from PyQt6.QtWidgets import QGraphicsEllipseItem
    
@@ -9,7 +9,7 @@ from dotsSideGig     import TagIt
 V = 7.5     ## the diameter of a pointItem
 
 ### ------------------- dotsPointItem ----------------------
-''' dotsPointItems class, everyelse in dotsDrawsPaths '''
+''' dotsPointItems class, used in dotsDrawsPaths '''
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
@@ -38,9 +38,9 @@ class PointItem(QGraphicsEllipseItem):
         self.setRect(self.x, self.y, V, V)  
         
         if self.selections and idx in self.selections:
-            self.setBrush(QColor("lime"))
+            self.setBrush(QColor('lime'))
         else:
-            self.setBrush(QColor("white"))   
+            self.setBrush(QColor('white'))   
                
         self.maptos = (0.0,0.0)
         self.dragCnt = 0
@@ -60,8 +60,8 @@ class PointItem(QGraphicsEllipseItem):
         if self.pathMaker.pathSet:  
             pct = (self.idx/len(self.pathMaker.pts))*100
             tag = self.pathMaker.sideWays.makePtsTag(self.pt, self.idx, pct)
-            self.pointTag = TagIt('points', tag, QColor("YELLOW"))   
-            self.pointTag.setPos(self.pt+QPointF(0,-20))
+            self.pointTag = TagIt('points', tag, QColor('YELLOW')) 
+            self.pointTag.setPos(QPointF(self.pt)+QPointF(0.0,-20.0))
             self.pointTag.setZValue(self.drawing.findTop()+5)
             self.scene.addItem(self.pointTag)
         e.accept()

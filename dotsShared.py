@@ -6,43 +6,43 @@ from PyQt6.QtCore    import Qt
 ### --------------------------------------------------------
 
 common = {  ## wherever it's needed
-    "tagZ":      20.0,    
-    "pathZ":    -25.0, 
-    "gridZ":    -50.0, 
-    "bkgZ":     -99.0, 
-    "shadow":    50.0,
-    "points":    40.0,
-    "outline":   30.0,
-    "ScrollW":    138,  ## used by both 1080 and 1280X720 px
-    "SliderW":    170,    
-    "OffSet":       0,  ## sliderpanel width, used to set fixed size 
-    "fix":          23,  ## sliderpanel height, used to set fixed size 
-    "V":         12.0,  ## diameter of pointItems in shadows
+    'tagZ':      20.0,    
+    'pathZ':    -25.0, 
+    'gridZ':    -50.0, 
+    'bkgZ':     -99.0, 
+    'shadow':    50.0,
+    'points':    40.0,
+    'outline':   30.0,
+    'ScrollW':    138,  ## used by both 1080 and 1280X720 px
+    'SliderW':    170,    
+    'OffSet':       0,  ## sliderpanel width, used to set fixed size 
+    'fix':          23,  ## sliderpanel height, used to set fixed size 
+    'V':         12.0,  ## diameter of pointItems in shadows
 } 
-      
+        
 ### --------------------------------------------------------
              
-CanvasStr = "L,R,P,S,C,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+CanvasStr = "L,R,P,S,C,T,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
 PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 paths = {
-    "snapShot":   "./",
-    "bkgPath":    "./backgrounds/",
-    "imagePath":  "./images/",
-    "playPath":   "./plays/",
-    "paths":      "./paths/",
-    "spritePath": "./sprites/",
-    "txy":        "./txy/",
+    'snapShot':   './',
+    'bkgPath':    './backgrounds/',
+    'imagePath':  './images/',
+    'playPath':   './plays/',
+    'paths':      './paths/',
+    'spritePath': './sprites/',
+    'txy':        './txy/',
 }
 
 Tick = 2.0
 
 MoveKeys = {
-    "right": (Tick, 0.0),
-    "left":  (-Tick, 0.0),
-    "up":    (0.0, -Tick),
-    "down":  (0.0, Tick),
+    'right': (Tick, 0.0),
+    'left':  (-Tick, 0.0),
+    'up':    (0.0, -Tick),
+    'down':  (0.0, Tick),
 }
 
 PlayKeys = ('resume','pause')
@@ -61,25 +61,25 @@ Star = ((100, 20), (112, 63), (158, 63), (122, 91),
         (41, 63), (86, 63))
 
 pathcolors = (
-    "DODGERBLUE",    
-    "AQUAMARINE", 
-    "CORAL",         
-    "CYAN",        
-    "DEEPSKYBLUE",   
-    "LAWNGREEN", 
-    "GREEN",    
-    "HOTPINK",  
-    "WHITESMOKE",
-    "LIGHTCORAL", 
-    "LIGHTGREEN",    
-    "LIGHTSALMON", 
-    "LIGHTSKYBLUE",
-    "LIGHTSEAGREEN", 
-    "MAGENTA",     
-    "TOMATO",
-    "ORANGERED", 
-    "RED",    
-    "YELLOW",
+    'DODGERBLUE',    
+    'AQUAMARINE', 
+    'CORAL',         
+    'CYAN',        
+    'DEEPSKYBLUE',   
+    'LAWNGREEN', 
+    'GREEN',    
+    'HOTPINK',  
+    'WHITESMOKE',
+    'LIGHTCORAL', 
+    'LIGHTGREEN',    
+    'LIGHTSALMON', 
+    'LIGHTSKYBLUE',
+    'LIGHTSEAGREEN', 
+    'MAGENTA',     
+    'TOMATO',
+    'ORANGERED', 
+    'RED',    
+    'YELLOW',
     )       
 
 singleKeys = {  ## wish I had done this earlier
