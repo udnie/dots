@@ -14,7 +14,7 @@ I've updated two of the **3:2** screens so their height now matches the height o
 | 620  | 620X1102 - 9:16|
 
 Also, there's a new demo of sorts which I call **'Snakes'** - though they're more of a cross between a woolly-bear and something like an aquatic snake.  It's accessed by entering an **option/alt R**. The **pause, resume,** and **stop** play keys work and you can re-run it by entering **'R'** once it's stopped.  There's no **play** file to save as it's all code except for the three cactus images.
-I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below.
+I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below.  A new video: <https://youtu.be/hFfXc0H2oZM>
 
 
 **February - 02/17/2023 and 02/23/2023**      
