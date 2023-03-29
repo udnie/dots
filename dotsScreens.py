@@ -150,7 +150,7 @@ eight64 = {
     'scaleY':      1.15,
     'modLabel':    1.0,
     'factor':      0.36,  ## scales pixitems by format
-    'steps':       9, 
+    'steps':       7, 
 }
 
 ### ------------------ 1264X864 - 3:2 ----------------------
@@ -195,6 +195,7 @@ V620 = {             ## 620 - must be a string not a number
     'scaleY':     1.40,  
     'widget':  (405,75),
     'bkgrnd': (-305,-590),
+    'steps':       9, 
     'runThis':  'demo-620.play',  ## default run key
 }
 
