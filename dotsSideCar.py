@@ -163,6 +163,9 @@ class SideCar:
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
+    
+    def pageDown(self, key):
+        self.canvas.scroll.pageDown(key)
      
 ### --------------------------------------------------------    
     def clearOutlines(self):

@@ -3,6 +3,8 @@
 **March:**   
 I've updated two of the **3:2** screens so their height now matches the height of two of the **16:9** screens, eliminating the 1350 and 1432,  which makes maintaining the **3:2** much easier. Sorry for the confusion again, but this is what happens when you don't have a clear plan. I've also revised some of the changes from **February** to reflect the current screens sizes - many of the earlier changes still hold.
 
+  
+
 | key   | format |
 |:---- |:-----------:|
 | 1080 | 1080X720 - 3:2|
@@ -13,8 +15,8 @@ I've updated two of the **3:2** screens so their height now matches the height o
 | 1536 | 1536X864 - 16:9 |
 | 620  | 620X1102 - 9:16|
 
-Also, there's a new demo of sorts which I call **'Snakes'** - though they're more of a cross between a woolly-bear and something like an aquatic snake.  It's accessed by entering an **option/alt R**. The **pause, resume,** and **stop** play keys work and you can re-run it by entering **'R'** once it's stopped.  There's no **play** file to save as it's all code except for the three cactus images.
-I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below.  A new video: <https://youtu.be/hFfXc0H2oZM>
+Also, there's a new demo of sorts which I call **'Snakes'** - though they're more of a cross between a woolly-bear and something like an aquatic snake.  It's accessed by entering an **Option/Alt R**. The **pause, resume,** and **stop** play keys work and you can re-run it by entering **'R'** once it's stopped.  There's no **play** file to save as it's all code except for the three cactus images.
+I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below.  A new video: <https://youtu.be/hFfXc0H2oZM>. This months **bonus**, **page up** and **page down** keys on the scrolling sprite panel - **Option/Alt**  plus the **up/down** keys.
 
 
 **February - 02/17/2023 and 02/23/2023**      

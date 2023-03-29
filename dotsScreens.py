@@ -66,25 +66,26 @@ screens = {  ## the keys arn't shown
  
 ### --------------- 1080X720 - 3:2 format ------------------
 seven20 = {    
-    'DotsH':    822, 
-    'ViewH':    720,               
-    'ScrollH':  687,  
-    'SliderH':  679,  
-    'margin1':   15,     ## sliderpanel margins top
-    'margin2':   10,     ## right
-    'factor':     0.30,  ## amount to scale pixitems unless preset    
-    'modLabel':   1.0,   ## amount to scale scroll label height 
-    'scaleY':      1.0,  ## same as 720
+    'DotsH':     822, 
+    'ViewH':     720,               
+    'ScrollH':   687,  
+    'SliderH':   679,  
+    'margin1':    15,  ## sliderpanel margins top
+    'margin2':    10,  ## right
+    'factor':   0.30,  ## amount to scale pixitems unless preset    
+    'modLabel':  1.0,  ## amount to scale scroll label height 
+    'scaleY':    1.0,  ## same as 720
+    'steps':       6,  ## number of visible scroll widgets
 }
 
 ten80 = {            
-    'Screen': '1080',        ## used by both 1080 and 1280X720px 
-    'DotsW':    1427,  
-    'ViewW':    1080,  
+    'Screen':   '1080',        ## used by both 1080 and 1280X720px 
+    'DotsW':      1427,  
+    'ViewW':      1080,  
     'gridSize':   30.0,       ## gridline spacing - seems to work, consistant
     'scaleX':      1.0,
-    'widget':     (175,175),  ## position pix and shadow widgets using getCtr 
-    'bkgrnd':    (-525,-455),
+    'widget':   (175,175),  ## position pix and shadow widgets using getCtr 
+    'bkgrnd': (-525,-455),
     'runThis':  'demo-1080.play',  ## default run key
 }
 
@@ -111,6 +112,7 @@ eight10 = {
     'scaleY':      1.15, 
     'modLabel':    0.962,
     'factor':      0.36,  ## scales pixitems by format
+    'steps':       7, 
 }
 
 ### --------------- 1215X810 - 3:2 format -------------------
@@ -148,6 +150,7 @@ eight64 = {
     'scaleY':      1.15,
     'modLabel':    1.0,
     'factor':      0.36,  ## scales pixitems by format
+    'steps':       9, 
 }
 
 ### ------------------ 1264X864 - 3:2 ----------------------

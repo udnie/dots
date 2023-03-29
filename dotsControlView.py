@@ -131,6 +131,10 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleOutlines()
             elif key == Qt.Key.Key_S:
                 self.sideCar.screenMenu()
+           
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and mod & Qt.KeyboardModifier.AltModifier: 
+            self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
+                self.sideCar.pageDown('up') 
         
         elif key == Qt.Key.Key_R and mod & Qt.KeyboardModifier.AltModifier: 
             if self.canvas.pathMakerOn == False:  
@@ -148,9 +152,7 @@ class ControlView(QGraphicsView):
                 self.setKey('F') 
                 self.canvas.flopSelected()  
             elif key == Qt.Key.Key_T:
-                if self.canvas.pathMakerOn:
-                    self.setKey('T')  ## run test
-                else:  
+                self.setKey('T') if self.canvas.pathMakerOn else \
                     self.mapper.toggleTagItems('all')
             elif key == Qt.Key.Key_W:
                 self.sideCar.clearWidgets()        

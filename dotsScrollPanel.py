@@ -143,8 +143,8 @@ class ScrollPanel(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.layout.setContentsMargins(0,0,0,0)
      
-        widget = QWidget()  
-        widget.setLayout(self.layout)
+        self.widget = QWidget()  
+        self.widget.setLayout(self.layout)
 
         self.scroll = QScrollArea()
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
@@ -159,7 +159,8 @@ class ScrollPanel(QWidget):
         self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH']/5))
         self.scroll.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         
-        self.scroll.setWidget(widget)
+        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH'] * common['modLabel']))  
+        self.scroll.setWidget(self.widget)
        
         vBoxLayout = QVBoxLayout(self)
         vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
@@ -169,8 +170,16 @@ class ScrollPanel(QWidget):
 
         self.scrollCount = 0
         self.scrollList  = []
-        
+
 ### --------------------------------------------------------
+    def pageDown(self, key):
+        scrollBar = self.scroll.verticalScrollBar()
+        if key == 'down': 
+            steps = common['steps']
+        else:
+            steps = common['steps'] * -1
+        scrollBar.setValue(scrollBar.value() + scrollBar.singleStep() * steps)
+                
     def add(self, fname):   
         self.scrollCount += 1
         self.scrollList.append(self.scrollCount)   
