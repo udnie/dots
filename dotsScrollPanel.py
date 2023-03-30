@@ -176,8 +176,12 @@ class ScrollPanel(QWidget):
         scrollBar = self.scroll.verticalScrollBar()
         if key == 'down': 
             steps = common['steps']
-        else:
+        elif key == 'up':
             steps = common['steps'] * -1
+        elif key == '1':
+            steps = 1
+        else:
+            steps = -1      
         scrollBar.setValue(scrollBar.value() + scrollBar.singleStep() * steps)
                 
     def add(self, fname):   

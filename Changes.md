@@ -1,6 +1,9 @@
 
 ## Changes
 **March:**   
+This months **bonus**; **page up** and **page down** keys on the scrolling sprite panel by entering **Option/Alt**  plus the **Up/Down Arrow** keys. Also, **one tile Up** and **one tile down** with the Apple Command key/Windows Control key plus the **Up/Down Arrow** keys.
+
+
 I've updated two of the **3:2** screens so their height now matches the height of two of the **16:9** screens, eliminating the 1350 and 1432,  which makes maintaining the **3:2** much easier. Sorry for the confusion again, but this is what happens when you don't have a clear plan. I've also revised some of the changes from **February** to reflect the current screens sizes - many of the earlier changes still hold.
 
   
@@ -16,8 +19,8 @@ I've updated two of the **3:2** screens so their height now matches the height o
 | 620  | 620X1102 - 9:16|
 
 Also, there's a new demo of sorts which I call **'Snakes'** - though they're more of a cross between a woolly-bear and something like an aquatic snake.  It's accessed by entering an **Option/Alt R**. The **pause, resume,** and **stop** play keys work and you can re-run it by entering **'R'** once it's stopped.  There's no **play** file to save as it's all code except for the three cactus images.
-I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below.  A new video: <https://youtu.be/hFfXc0H2oZM>. This months **bonus**, **page up** and **page down** keys on the scrolling sprite panel - **Option/Alt**  plus the **up/down** keys.
-
+I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below. 
+A new video: <https://youtu.be/hFfXc0H2oZM>.
 
 **February - 02/17/2023 and 02/23/2023**      
 Added a **1440-16:9** format plus some cosmetic code fixes.  See the revised **02/10/2023** entry for more about screen formats. See **Even More** for updates to **paths** and **widgets** after the following **'New Screen Formats'** entry.  There are also two videos.

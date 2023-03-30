@@ -132,10 +132,14 @@ class ControlView(QGraphicsView):
             elif key == Qt.Key.Key_S:
                 self.sideCar.screenMenu()
            
-        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and mod & Qt.KeyboardModifier.AltModifier: 
-            self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                self.sideCar.pageDown('up') 
-        
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up):
+            if mod & Qt.KeyboardModifier.AltModifier: 
+                self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
+                    self.sideCar.pageDown('up')             
+            elif mod & Qt.KeyboardModifier.ControlModifier: 
+                self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
+                    self.sideCar.pageDown('-1') 
+                    
         elif key == Qt.Key.Key_R and mod & Qt.KeyboardModifier.AltModifier: 
             if self.canvas.pathMakerOn == False:  
                 self.canvas.runSnakes()
