@@ -162,6 +162,8 @@ class ScrollPanel(QWidget):
         self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH'] * common['modLabel']))  
         self.scroll.setWidget(self.widget)
        
+        self.scroll.verticalScrollBar().sliderReleased.connect(self.reposition)
+
         vBoxLayout = QVBoxLayout(self)
         vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
         vBoxLayout.addWidget(self.scroll,Qt.AlignmentFlag.AlignVCenter)
@@ -172,6 +174,11 @@ class ScrollPanel(QWidget):
         self.scrollList  = []
 
 ### --------------------------------------------------------
+    def reposition(self):  ## topmost partial tile down so all are evenly distributed 
+        v = self.scroll.verticalScrollBar().value()
+        p = int(v/self.scroll.verticalScrollBar().singleStep())
+        self.scroll.verticalScrollBar().setValue(p * self.scroll.verticalScrollBar().singleStep())
+        
     def pageDown(self, key):
         scrollBar = self.scroll.verticalScrollBar()
         if key == 'down': 
