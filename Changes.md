@@ -1,7 +1,8 @@
 
 ## Changes
 **March:**   
-This months **bonus**; **page up** and **page down** keys on the scrolling sprite panel by entering **Option/Alt**  plus the **Up/Down Arrow** keys. Also, **one tile Up** and **one tile down** with the Apple Command key/Windows Control key plus the **Up/Down Arrow** keys.
+This months **bonus**; **page up** and **page down** keys on the scrolling sprite panel by entering **Option/Alt**  plus the **Up/Down Arrow** keys. Also, **one tile Up** and **one tile down** with the Apple Command key/Windows Control key plus the **Up/Down Arrow** keys. Also, with enough sprites, if a partial tile is showing it will scroll down till it's fully visible.
+
 
 
 I've updated two of the **3:2** screens so their height now matches the height of two of the **16:9** screens, eliminating the 1350 and 1432,  which makes maintaining the **3:2** much easier. Sorry for the confusion again, but this is what happens when you don't have a clear plan. I've also revised some of the changes from **February** to reflect the current screens sizes - many of the earlier changes still hold.
