@@ -1,8 +1,8 @@
 
 import os
 
-from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF
-from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, \
+from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF, QEvent
+from PyQt6.QtGui     import QPainter, QImage, QPen, QFont,  \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
                             QFrame, QFileDialog, QLayout
@@ -101,9 +101,9 @@ class ImgLabel(QLabel):
         if self.canvas.key == 'del':
             self.scrollPanel.deleteImgLabel(self)
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event):     
         self.StartDrag()
- 
+   
     def StartDrag(self):
         drag = QDrag(self)
         data = QMimeData()
@@ -134,8 +134,7 @@ class ScrollPanel(QWidget):
         self.view   = self.canvas.view  
         self.dots   = self.canvas.dots
 
-        self.setFixedSize(common['ScrollW'],common['ScrollH'])
-           
+        self.setFixedSize(common['ScrollW'],common['ScrollH'])     
         self.layout = QVBoxLayout(self)
         
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
@@ -154,16 +153,15 @@ class ScrollPanel(QWidget):
         self.scroll.setStyleSheet('border: 1px solid rgb(160,160,160)')
         self.scroll.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
             'background: rgb(245,245,245) }');  ## shows handle better
- 
+        
         self.scroll.setWidgetResizable(True)    # always
-        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH']/5))
         self.scroll.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         
         self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH'] * common['modLabel']))  
         self.scroll.setWidget(self.widget)
-       
+           
         self.scroll.verticalScrollBar().sliderReleased.connect(self.reposition)
-
+    
         vBoxLayout = QVBoxLayout(self)
         vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
         vBoxLayout.addWidget(self.scroll,Qt.AlignmentFlag.AlignVCenter)
@@ -172,13 +170,14 @@ class ScrollPanel(QWidget):
 
         self.scrollCount = 0
         self.scrollList  = []
-
-### --------------------------------------------------------
+              
+### --------------------------------------------------------                      
     def reposition(self):  ## topmost partial tile down so all are evenly distributed 
         v = self.scroll.verticalScrollBar().value()
         p = int(v/self.scroll.verticalScrollBar().singleStep())
-        self.scroll.verticalScrollBar().setValue(p * self.scroll.verticalScrollBar().singleStep())
-        
+        if v % self.scroll.verticalScrollBar().singleStep() != 0:  ## only if needed
+            self.scroll.verticalScrollBar().setValue(p * self.scroll.verticalScrollBar().singleStep())                 
+                                  
     def pageDown(self, key):
         scrollBar = self.scroll.verticalScrollBar()
         if key == 'down': 
