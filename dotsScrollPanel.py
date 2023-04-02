@@ -1,8 +1,9 @@
 
 import os
 
-from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF, QEvent
-from PyQt6.QtGui     import QPainter, QImage, QPen, QFont,  \
+from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF, \
+                            QEvent
+from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, QWheelEvent, \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
                             QFrame, QFileDialog, QLayout
@@ -19,7 +20,7 @@ panel = {   ## the following is used by ScrollPanel
     'Star':     .70,
     'Type':     106,
     'Margin':    15,    
-}  ## also a common['modLabel'] - scales down vertical for screen changes
+}  ## also, common['modLabel'], scales down the tile's vertical for screen changes
 
 ### ------------------- dotsScrollPanel --------------------
 ''' dotsScrollPanel: handles scrolling sprite selections.
@@ -103,7 +104,7 @@ class ImgLabel(QLabel):
 
     def mouseMoveEvent(self, event):     
         self.StartDrag()
-   
+           
     def StartDrag(self):
         drag = QDrag(self)
         data = QMimeData()
@@ -135,16 +136,38 @@ class ScrollPanel(QWidget):
         self.dots   = self.canvas.dots
 
         self.setFixedSize(common['ScrollW'],common['ScrollH'])     
-        self.layout = QVBoxLayout(self)
-        
+        self.layout = QVBoxLayout(self)    
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
+
+        self.widget = QWidget()  
+        self.widget.setLayout(self.layout)   
+        self.addScrollArea()
+
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.layout.setContentsMargins(0,0,0,0)
-     
-        self.widget = QWidget()  
-        self.widget.setLayout(self.layout)
-
+             
+        self.scrollCount = 0
+        self.scrollList  = []
+        
+        self.last = 0        
+        self.widget.installEventFilter(self)
+        
+### --------------------------------------------------------
+    def eventFilter(self, obj, e): 
+        if e.type() == QEvent.Type.Wheel: 
+            if e.phase() == Qt.ScrollPhase.ScrollEnd:        
+                QTimer.singleShot(100, self.reposition) 
+        return QWidget.eventFilter(self, obj, e)      
+                                            
+    def reposition(self):  ## topmost partial tile down so all are evenly distributed 
+        step = self.scroll.verticalScrollBar().singleStep()
+        v = self.scroll.verticalScrollBar().value()
+        p = int(v/step)
+        if v % step != 0:  ## only if needed
+            self.scroll.verticalScrollBar().setValue(p * step)  
+   
+    def addScrollArea(self):
         self.scroll = QScrollArea()
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -164,20 +187,10 @@ class ScrollPanel(QWidget):
     
         vBoxLayout = QVBoxLayout(self)
         vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
-        vBoxLayout.addWidget(self.scroll,Qt.AlignmentFlag.AlignVCenter)
+        vBoxLayout.addWidget(self.scroll, Qt.AlignmentFlag.AlignVCenter)
          
-        self.setLayout(vBoxLayout) 
-
-        self.scrollCount = 0
-        self.scrollList  = []
-              
-### --------------------------------------------------------                      
-    def reposition(self):  ## topmost partial tile down so all are evenly distributed 
-        v = self.scroll.verticalScrollBar().value()
-        p = int(v/self.scroll.verticalScrollBar().singleStep())
-        if v % self.scroll.verticalScrollBar().singleStep() != 0:  ## only if needed
-            self.scroll.verticalScrollBar().setValue(p * self.scroll.verticalScrollBar().singleStep())                 
-                                  
+        self.setLayout(vBoxLayout)
+                                                
     def pageDown(self, key):
         scrollBar = self.scroll.verticalScrollBar()
         if key == 'down': 
@@ -189,7 +202,8 @@ class ScrollPanel(QWidget):
         else:
             steps = -1      
         scrollBar.setValue(scrollBar.value() + scrollBar.singleStep() * steps)
-                
+        
+ ### --------------------------------------------------------               
     def add(self, fname):   
         self.scrollCount += 1
         self.scrollList.append(self.scrollCount)   
