@@ -3,7 +3,7 @@ import os
 
 from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF, \
                             QEvent
-from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, QWheelEvent, \
+from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
                             QFrame, QFileDialog, QLayout
@@ -12,13 +12,13 @@ from dotsShared      import paths, Star, common
 from functools       import partial
 from dotsSideGig     import MsgBox
 
-panel = {   ## the following is used by ScrollPanel
+panel = {   ## used throughout
     'LabelW':   120,  
     'LabelH':   112,  
     'MaxW':     105,
     'MaxH':      85,  
     'Star':     .70,
-    'Type':     106,
+    'Type':     105,
     'Margin':    15,    
 }  ## also, common['modLabel'], scales down the tile's vertical for screen changes
 
@@ -52,15 +52,15 @@ class ImgLabel(QLabel):
             qp.setBrush(Qt.BrushStyle.NoBrush) 
         else:    
             img = QImage(self.fileName)     
-            r = common['modLabel']                   
+            skale = common['modLabel']            
             if img.width() > (panel['MaxW']) or img.height() > (panel['MaxH']):  ## size it to fit       
-                img = img.scaled(int(panel['MaxW']), int(panel['MaxH']),  ## keep it small
+                img = img.scaled(int(panel['MaxW'] * skale), int(panel['MaxH'] * skale),  ## keep it small
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation)                 
             newW, newH = img.width(), img.height()
             posX = ((panel['LabelW'] - newW) /2 )
-            posY = ((panel['MaxH'] - newH) /2 ) + 9
-            qp.drawImage(QPointF(posX, posY), img)
+            posY = ((panel['MaxH'] - newH) /2 )
+            qp.drawImage(QPointF(posX, posY + 6), img)  ## magic number
         del img
         
         pen = QPen(Qt.GlobalColor.darkGray)   
@@ -84,12 +84,13 @@ class ImgLabel(QLabel):
         qp.setFont(font)
         fileName = os.path.basename(self.fileName)
 
-        metrics = QFontMetrics(font)    
+        metrics = QFontMetrics(font) 
         p = metrics.boundingRect(fileName)
         p = p.width()
         p = (panel['LabelW'] - p)/2 
 
-        qp.drawText(int(p), panel['Type'], fileName)
+        hght = int(panel['Type'] * common['modLabel'])  ## text x.position
+        qp.drawText(int(p), hght, fileName) 
         qp.end()
 
     def minimumSizeHint(self):   
@@ -139,33 +140,44 @@ class ScrollPanel(QWidget):
         self.layout = QVBoxLayout(self)    
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
 
-        self.widget = QWidget()  
-        self.widget.setLayout(self.layout)   
-        self.addScrollArea()
-
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.layout.setContentsMargins(0,0,0,0)
-             
+
+        self.widget = QWidget()  
+        self.widget.setLayout(self.layout) 
+          
+        self.setLayout(self.addScrollArea())
+      
         self.scrollCount = 0
         self.scrollList  = []
-        
-        self.last = 0        
+            
         self.widget.installEventFilter(self)
         
 ### --------------------------------------------------------
-    def eventFilter(self, obj, e): 
-        if e.type() == QEvent.Type.Wheel: 
-            if e.phase() == Qt.ScrollPhase.ScrollEnd:        
-                QTimer.singleShot(100, self.reposition) 
+    def eventFilter(self, obj, e):  ## detect the end of a two finger scroll
+        if e.type() == QEvent.Type.Wheel and e.phase() == Qt.ScrollPhase.ScrollEnd:        
+            QTimer.singleShot(100, self.reposition) 
         return QWidget.eventFilter(self, obj, e)      
                                             
-    def reposition(self):  ## topmost partial tile down so all are evenly distributed 
+    def reposition(self):  ## move partial showing top tile down
         step = self.scroll.verticalScrollBar().singleStep()
         v = self.scroll.verticalScrollBar().value()
         p = int(v/step)
-        if v % step != 0:  ## only if needed
+        if v % step != 0:  ## scroll it down to match top of scrollarea 
             self.scroll.verticalScrollBar().setValue(p * step)  
+            
+    def pageDown(self, key):
+        scrollBar = self.scroll.verticalScrollBar()
+        if key == 'down': 
+            steps = common['steps']
+        elif key == 'up':
+            steps = common['steps'] * -1
+        elif key == '1':
+            steps = 1
+        else:
+            steps = -1      
+        scrollBar.setValue(scrollBar.value() + scrollBar.singleStep() * steps)
    
     def addScrollArea(self):
         self.scroll = QScrollArea()
@@ -189,20 +201,8 @@ class ScrollPanel(QWidget):
         vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
         vBoxLayout.addWidget(self.scroll, Qt.AlignmentFlag.AlignVCenter)
          
-        self.setLayout(vBoxLayout)
-                                                
-    def pageDown(self, key):
-        scrollBar = self.scroll.verticalScrollBar()
-        if key == 'down': 
-            steps = common['steps']
-        elif key == 'up':
-            steps = common['steps'] * -1
-        elif key == '1':
-            steps = 1
-        else:
-            steps = -1      
-        scrollBar.setValue(scrollBar.value() + scrollBar.singleStep() * steps)
-        
+        return vBoxLayout
+                                                        
  ### --------------------------------------------------------               
     def add(self, fname):   
         self.scrollCount += 1
@@ -223,7 +223,6 @@ class ScrollPanel(QWidget):
         p = self.scrollList.index(this.id)
         del self.scrollList[p]    
         self.layout.itemAt(p).widget().deleteLater()
-        # p *= self.resetLabelH()
         self.scroll.verticalScrollBar().setSliderPosition(int(p))
 
     def top(self):           
@@ -261,9 +260,6 @@ class ScrollPanel(QWidget):
                 self.add(s)
             self.top()   
         self.dots.statusBar.showMessage('Number of Sprites:  {}'.format(self.scrollCount),15000) 
-        ## ------ your choice -------------
-        # firstwidget = self.layout.itemAt(0).widget()
-        # QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, firstwidget))
 
     def spriteList(self):
         try:
