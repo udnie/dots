@@ -243,7 +243,8 @@ class PathMaker(QWidget):
         self.widget = PathWidget(self)    
         b = common['bkgrnd']
         p = getCtr(int(b[0]), int(b[1]))             
-        self.widget.setGeometry(int(p.x()), int(p.y()), int(self.widget.WidgetW), int(self.widget.WidgetH))
+        self.widget.setGeometry(int(p.x()), int(p.y()), \
+            int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
   
     def resetSliders(self):
@@ -270,8 +271,9 @@ class PathMaker(QWidget):
         if self.chooser: self.chooser.close()
         self.chooser = None
         self.pathChooserSet = False 
-        if self.openPathFile:  ## filename top left corner
-            self.dots.statusBar.showMessage(self.openPathFile)
+        if self.openPathFile:  ## statusBar
+            self.dots.statusBar.showMessage(self.openPathFile + \
+                " - Number of Points " + str(len(self.pts)))
                     
 ### -------------------- path stuff ------------------------
     def addPath(self):

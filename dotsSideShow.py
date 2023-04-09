@@ -3,7 +3,6 @@ from os import path
 
 import json
 import random
-import gc
 
 import asyncio
 import time
@@ -147,8 +146,10 @@ class SideShow:
         del dlist
         self.canvas.openPlayFile = file
         self.canvas.bkgMaker.disableBkgBtns()
-        self.dots.statusBar.showMessage('Number of Pixitems: {}'.format(kix),5000)  
-              
+        
+        file = os.path.basename(self.canvas.openPlayFile)
+        self.dots.statusBar.showMessage(file + " - " + 'Number of Pixitems: {}'.format(kix)) 
+                
         if ns > 0:  ## there must be shadows
             QTimer.singleShot(200, self.addShadows) 
             MsgBox('Adding Shadows,  please wait...', int(1 + (ns * .25)))
@@ -283,7 +284,8 @@ class SideShow:
         if k > 0 or self.ifBats:
             self.sideCar.disablePlay()  
             self.canvas.control = 'pause'
-            self.dots.statusBar.showMessage('Number of Pixitems:  {}'.format(k),5000)
+            file = os.path.basename(self.canvas.openPlayFile)
+            self.dots.statusBar.showMessage(file + " - " + 'Number of Pixitems: {}'.format(k))  
                                    
     def pause(self):
         self.clearPathsandTags()  

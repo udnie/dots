@@ -148,6 +148,7 @@ class ScrollPanel(QWidget):
         self.widget.setLayout(self.layout) 
           
         self.setLayout(self.addScrollArea())
+        self.scroll.verticalScrollBar().sliderReleased.connect(self.reposition)
       
         self.scrollCount = 0
         self.scrollList  = []
@@ -195,8 +196,6 @@ class ScrollPanel(QWidget):
         self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH'] * common['modLabel']))  
         self.scroll.setWidget(self.widget)
            
-        self.scroll.verticalScrollBar().sliderReleased.connect(self.reposition)
-    
         vBoxLayout = QVBoxLayout(self)
         vBoxLayout.setContentsMargins(0, common['margin1'],0,0)  ## change for dotsDocks??
         vBoxLayout.addWidget(self.scroll, Qt.AlignmentFlag.AlignVCenter)
@@ -259,7 +258,7 @@ class ScrollPanel(QWidget):
             for s in sprites:
                 self.add(s)
             self.top()   
-        self.dots.statusBar.showMessage('Number of Sprites:  {}'.format(self.scrollCount),15000) 
+        self.dots.statusBar.showMessage('Number of Sprites:  {}'.format(self.scrollCount)) 
 
     def spriteList(self):
         try:
