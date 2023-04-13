@@ -12,7 +12,7 @@ from dotsShared         import common, RotateKeys
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
-    def __init__(self, fileName, canvas, z=common["bkgZ"], mirror=False):
+    def __init__(self, fileName, canvas, z=common['bkgZ'], mirror=False):
         super().__init__()
 
         self.canvas   = canvas
@@ -20,8 +20,8 @@ class BkgItem(QGraphicsPixmapItem):
         self.scene    = self.canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
      
-        self.ViewW = common["ViewW"]
-        self.ViewH = common["ViewH"]
+        self.ViewW = common['ViewW']
+        self.ViewH = common['ViewH']
         
         self.fileName = fileName
         img = QImage(fileName)
@@ -41,7 +41,7 @@ class BkgItem(QGraphicsPixmapItem):
             
         del img          
                     
-        self.key = ""
+        self.key = ''
         self.id = 0  ## not used except for conisistency
  
         self.type = 'bkg'
@@ -64,6 +64,8 @@ class BkgItem(QGraphicsPixmapItem):
         self.initX = 0
         self.initY = 0
                 
+        self.anime = None
+                
         self.setPixmap(QPixmap.fromImage(self.imgFile))
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
     
@@ -82,7 +84,7 @@ class BkgItem(QGraphicsPixmapItem):
             elif self.canvas.key in ('enter','return'):  
                 self.bkgMaker.front(self)          
         e.accept()
-       
+           
     def mouseReleaseEvent(self, e):
         if not self.canvas.pathMakerOn: 
             self.canvas.key = ''
@@ -95,6 +97,7 @@ class BkgItem(QGraphicsPixmapItem):
     def setMirrored(self, bool):
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
+            # horizontally=self.flopped, vertically=False)))  ## pyside6
             horizontal=self.flopped, vertical=False)))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
             
@@ -141,7 +144,7 @@ class BkgWidget(QWidget):
         self.setLayout(hbox)
         
         self.setFixedHeight(int(self.WidgetH))  
-        self.setStyleSheet("background-color: rgba(0,0,0,0)")
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
         self.setContentsMargins(0,15,0,-15) 
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -194,9 +197,9 @@ class BkgWidget(QWidget):
             
     def setLocks(self):
         if self.bkgItem.locked == False:
-            self.lockBtn.setText("UnLocked")
+            self.lockBtn.setText('UnLocked')
         else:
-            self.lockBtn.setText("Locked")
+            self.lockBtn.setText('Locked')
             
     def toggleLock(self):
         if self.bkgItem:
@@ -211,7 +214,7 @@ class BkgWidget(QWidget):
             if val< 0: val = 0
             self.bkgItem.rotation = val   
             self.bkgItem.setRotation(self.bkgItem.rotation)
-            self.rotateValue.setText("{:3d}".format(val))
+            self.rotateValue.setText('{:3d}'.format(val))
             
     def setBkgScale(self, val):
         if self.bkgItem and self.bkgItem.locked == False and self.bkgItem.fileName != 'flat':
@@ -219,14 +222,14 @@ class BkgWidget(QWidget):
             op = (val/100)
             self.bkgItem.scale = op
             self.bkgItem.setScale(self.bkgItem.scale)
-            self.scaleValue.setText("{0:.2f}".format(op))
+            self.scaleValue.setText('{0:.2f}'.format(op))
    
     def setBkgOpacity(self, val):
         if self.bkgItem and self.bkgItem.locked == False: 
             op = (val/100)
             self.bkgItem.opacity = op    
             self.bkgItem.setOpacity(self.bkgItem.opacity)
-            self.opacityValue.setText("{0:.2f}".format(op))
+            self.opacityValue.setText('{0:.2f}'.format(op))
             
     def centerBkg(self):
         if self.bkgItem and self.bkgItem.fileName != 'flat':  
@@ -238,13 +241,13 @@ class BkgWidget(QWidget):
                                 
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox("Rotate     Scale   Opacity   ")
+        groupBox = QGroupBox('Rotate     Scale   Opacity   ')
         
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
    
-        self.rotateValue = QLabel("0", alignment=Qt.AlignmentFlag.AlignCenter)
+        self.rotateValue = QLabel('0', alignment=Qt.AlignmentFlag.AlignCenter)
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
@@ -256,7 +259,7 @@ class BkgWidget(QWidget):
         self.rotaryDial.setSingleStep(1)
         self.rotaryDial.valueChanged.connect(self.setBkgRotate)
      
-        self.scaleValue = QLabel("1.00")
+        self.scaleValue = QLabel('1.00')
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)
         self.scaleSlider.setMinimum(25)
         self.scaleSlider.setMaximum(225)
@@ -267,7 +270,7 @@ class BkgWidget(QWidget):
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.setBkgScale)   
         
-        self.opacityValue = QLabel("1.00")
+        self.opacityValue = QLabel('1.00')
         self.opacitySlider = QSlider(Qt.Orientation.Vertical)
         self.opacitySlider.setMinimum(0)
         self.opacitySlider.setMaximum(100)
@@ -304,20 +307,20 @@ class BkgWidget(QWidget):
     
 ### -------------------------------------------------------- 
     def buttonGroup(self):
-        groupBox = QGroupBox("BackGrounds  ")
+        groupBox = QGroupBox('BackGrounds  ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
       
-        saveBtn   = QPushButton("Save")               
-        setBtn    = QPushButton("Set")
-        self.lockBtn = QPushButton("Locked")
-        colorBtn  = QPushButton("Color")
-        flopBtn    = QPushButton("Flop")
-        deleteBtn = QPushButton("Delete")
-        centerBtn = QPushButton("Center")
-        quitBtn   = QPushButton("Close")
+        saveBtn   = QPushButton('Save')               
+        setBtn    = QPushButton('Set')
+        self.lockBtn = QPushButton('Locked')
+        colorBtn  = QPushButton('Color')
+        flopBtn    = QPushButton('Flop')
+        deleteBtn = QPushButton('Delete')
+        centerBtn = QPushButton('Center')
+        quitBtn   = QPushButton('Close')
         
         saveBtn.clicked.connect(self.bkgMaker.saveBkg)
         setBtn.clicked.connect(self.bkgMaker.setBkg)     

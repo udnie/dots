@@ -1,7 +1,7 @@
 
 import sys
 
-# import PySide6  ## required for pyside version
+# import PyQt6  ## required for pyside version
 
 from PyQt6.QtCore    import Qt, QPointF
 from PyQt6.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont

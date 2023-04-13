@@ -7,10 +7,9 @@ from PyQt6.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
 from PyQt6.QtGui        import QPainterPath
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-from dotsSideCar        import SideCar  ## it's needed to take care of a circular reference
 from dotsShared         import paths, common
+from dotsSideCar        import PixItem 
 from dotsSideGig        import *
-from dotsPixItem        import PixItem
 
 ### ---------------------- dotsSidePath --------------------
 ''' dotsPaths is used by storyboard, sideshow, animations, 

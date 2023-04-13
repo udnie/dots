@@ -36,6 +36,7 @@ paths = {
     'txy':        './txy/',
 }
 
+
 Tick = 2.0
 
 MoveKeys = {
@@ -83,16 +84,16 @@ pathcolors = (
     )       
 
 singleKeys = {  ## wish I had done this earlier
-    Qt.Key.Key_Up: 'up',          
-    Qt.Key.Key_Down: 'down',
-    Qt.Key.Key_Left: 'left',      
-    Qt.Key.Key_Right:'right',
-    Qt.Key.Key_Alt: 'opt',    
-    Qt.Key.Key_Shift: 'shift',
-    Qt.Key.Key_Control: 'cmd',
-    Qt.Key.Key_Enter: 'enter',
-    Qt.Key.Key_Return: 'return',
-    Qt.Key.Key_Space: 'space',  
+    Qt.Key.Key_Up:        'up',          
+    Qt.Key.Key_Down:    'down',
+    Qt.Key.Key_Left:    'left',      
+    Qt.Key.Key_Right:  'right',
+    Qt.Key.Key_Alt:      'opt',    
+    Qt.Key.Key_Shift:     'shift',
+    Qt.Key.Key_Control:     'cmd',
+    Qt.Key.Key_Enter:     'enter',
+    Qt.Key.Key_Return:   'return',
+    Qt.Key.Key_Space:     'space',  
     Qt.Key.Key_Backslash: 'front',           
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
@@ -117,7 +118,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_Colon: ':',   
     Qt.Key.Key_Semicolon: ';',  
     Qt.Key.Key_Apostrophe: '\'',      
-    Qt.Key.Key_QuoteDbl: '"', 
+    Qt.Key.Key_QuoteDbl: '\"', 
     Qt.Key.Key_Slash: '/',
     Qt.Key.Key_Underscore: '_', 
     Qt.Key.Key_BraceLeft: '{',

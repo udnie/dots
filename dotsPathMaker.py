@@ -82,16 +82,15 @@ class PathMaker(QWidget):
         self.pts = []  ## after adding a new path or from a file
         self.selections = []  ## needs to here, strongest reference
   
-        self.color = "DODGERBLUE"
+        self.color = 'DODGERBLUE'
         
-        self.key = ""
+        self.key = ''
         self.openPathFile = '' 
         self.tag = ''
  
         self.npts = 0  ## used by addNewPathPts
         self.last = 0
-        
-        
+         
         self.chooser = None
         self.newPath = None
         self.addingNewPath = False
@@ -189,8 +188,8 @@ class PathMaker(QWidget):
 
     def turnGreen(self):
         self.canvas.btnPathMaker.setStyleSheet(
-            "background-color: LIGHTGREEN")
-        if self.widget: self.widget.newBtn.setText("NewPath")  ## just to be sure
+            'background-color: LIGHTGREEN')
+        if self.widget: self.widget.newBtn.setText('NewPath')  ## just to be sure
          
     def delete(self):
         self.stopPathTest()
@@ -214,7 +213,7 @@ class PathMaker(QWidget):
             if self.slider.pathMenuSet:
                 self.slider.toggleMenu()
             self.canvas.btnPathMaker.setStyleSheet(
-                "background-color: white")
+                'background-color: white')
          
     def addNewPathPts(self, pt):
         if self.npts == 0:
@@ -246,6 +245,8 @@ class PathMaker(QWidget):
         self.widget.setGeometry(int(p.x()), int(p.y()), \
             int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
+        if self.addingNewPath:
+            self.drawing.editBtn('ClosePath')
   
     def resetSliders(self):
         self.widget.rotaryDial.setValue(0)
@@ -273,7 +274,7 @@ class PathMaker(QWidget):
         self.pathChooserSet = False 
         if self.openPathFile:  ## statusBar
             self.dots.statusBar.showMessage(self.openPathFile + \
-                " - Number of Points " + str(len(self.pts)))
+                ' - Number of Points ' + str(len(self.pts)))
                     
 ### -------------------- path stuff ------------------------
     def addPath(self):

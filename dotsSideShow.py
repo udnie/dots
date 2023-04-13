@@ -148,7 +148,7 @@ class SideShow:
         self.canvas.bkgMaker.disableBkgBtns()
         
         file = os.path.basename(self.canvas.openPlayFile)
-        self.dots.statusBar.showMessage(file + " - " + 'Number of Pixitems: {}'.format(kix)) 
+        self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(kix)) 
                 
         if ns > 0:  ## there must be shadows
             QTimer.singleShot(200, self.addShadows) 
@@ -285,7 +285,7 @@ class SideShow:
             self.sideCar.disablePlay()  
             self.canvas.control = 'pause'
             file = os.path.basename(self.canvas.openPlayFile)
-            self.dots.statusBar.showMessage(file + " - " + 'Number of Pixitems: {}'.format(k))  
+            self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(k))  
                                    
     def pause(self):
         self.clearPathsandTags()  

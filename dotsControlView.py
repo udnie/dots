@@ -132,8 +132,8 @@ class ControlView(QGraphicsView):
             elif key == Qt.Key.Key_S:
                 self.sideCar.screenMenu()
            
-        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up):
-            if mod & Qt.KeyboardModifier.AltModifier: 
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and self.canvas.pathMakerOn == False:
+            if mod & Qt.KeyboardModifier.AltModifier:  ## used by scrollpanel to scroll sprites 
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('up')             
             elif mod & Qt.KeyboardModifier.ControlModifier: 

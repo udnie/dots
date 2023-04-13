@@ -27,7 +27,7 @@ class PixWidget(QWidget):
         self.setLayout(hbox)
         
         self.setFixedHeight(int(self.WidgetH))  
-        self.setStyleSheet("background-color: rgba(0,0,0,0)")
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
         self.setContentsMargins(0,15,0,-15) 
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -70,13 +70,13 @@ class PixWidget(QWidget):
                         
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox("Rotate     Scale   Opacity   ")
+        groupBox = QGroupBox('Rotate     Scale   Opacity   ')
         
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
    
-        self.rotateValue = QLabel("0", alignment=Qt.AlignmentFlag.AlignCenter)
+        self.rotateValue = QLabel('0', alignment=Qt.AlignmentFlag.AlignCenter)
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
@@ -87,7 +87,7 @@ class PixWidget(QWidget):
         self.rotaryDial.setNotchTarget(15.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
      
-        self.scaleValue = QLabel("1.00")
+        self.scaleValue = QLabel('1.00')
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)
         self.scaleSlider.setMinimum(25)
         self.scaleSlider.setMaximum(225)
@@ -98,7 +98,7 @@ class PixWidget(QWidget):
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
         
-        self.opacityValue = QLabel("1.00")
+        self.opacityValue = QLabel('1.00')
         self.opacitySlider = QSlider(Qt.Orientation.Vertical)
         self.opacitySlider.setMinimum(0)
         self.opacitySlider.setMaximum(100)
@@ -134,18 +134,18 @@ class PixWidget(QWidget):
         return groupBox
 
     def buttonGroup(self):
-        groupBox = QGroupBox("Pixitem ")
+        groupBox = QGroupBox('Pixitem ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)
-        groupBox.setStyleSheet("background: rgb(245, 245, 245)")
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
-        shadowBtn = QPushButton("Shadow")
-        flopBtn    = QPushButton("Flop")
-        cloneBtn  = QPushButton("Clone")
-        delBtn    = QPushButton("Delete")
-        lockBtn   = QPushButton("Un/Lock")
-        quitBtn   = QPushButton("Close")
+        shadowBtn = QPushButton('Shadow')
+        flopBtn    = QPushButton('Flop')
+        cloneBtn  = QPushButton('Clone')
+        delBtn    = QPushButton('Delete')
+        lockBtn   = QPushButton('Un/Lock')
+        quitBtn   = QPushButton('Close')
     
         shadowBtn.clicked.connect(self.pix.addShadow)
         flopBtn.clicked.connect(self.pix.flopIt)
@@ -169,20 +169,20 @@ class PixWidget(QWidget):
         self.pix.setOriginPt() 
         self.pix.setRotation(val) 
         self.pix.rotation = val    
-        self.rotateValue.setText("{:3d}".format(val))
+        self.rotateValue.setText('{:3d}'.format(val))
     
     def Opacity(self, val):
         op = (val/100)
         self.pix.setOpacity(op)
         self.pix.alpha2 = op
-        self.opacityValue.setText("{0:.2f}".format(op)) 
+        self.opacityValue.setText('{0:.2f}'.format(op)) 
         
     def Scale(self,val):
         self.pix.setOriginPt() 
         op = (val/100)
         self.pix.setScale(op)
         self.pix.scale = op
-        self.scaleValue.setText("{0:.2f}".format(op))
+        self.scaleValue.setText('{0:.2f}'.format(op))
                                                                                    
 ### -------------------- dotsPixWidget ---------------------
 

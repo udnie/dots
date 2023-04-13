@@ -13,7 +13,7 @@ class ShadowMaker:
         self.isDummy  = True
   
 ### --------------------------------------------------------
-class Shadow(): 
+class Shadow: 
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()

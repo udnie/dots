@@ -20,7 +20,8 @@ from functools       import partial
 
 ### ---------------------- dotsSideCar ---------------------
 ''' dotsSideCar: pixTest, transFormPixitem, snapShot, 
-    toggleGrid, screenMenu, and assorted small functions '''  
+    toggleGrid, screenMenu, and assorted small functions 
+    related to storyboard activity '''  
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------

@@ -8,7 +8,7 @@ from PyQt6.QtGui        import QColor, QPen, QPainter, QPen, QPolygonF, QFontMet
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, QHBoxLayout,  \
                                QVBoxLayout, QPushButton,QScrollArea, QGridLayout, QVBoxLayout
 
-from dotsSideGig        import getPathList, getPts, distance
+from dotsSideGig        import getPathList, getPts
 
 ScaleRotate = ('<', '>', '+', '-') 
 
@@ -141,7 +141,8 @@ class PathWidget(QWidget):
         waysBtn = QPushButton('WayPts')                 
         saveBtn = QPushButton('Save')
         editBtn = QPushButton('Edit')
-        self.newBtn  = QPushButton('New')
+        centerBtn = QPushButton('Center')
+        self.newBtn = QPushButton('New')
         filesBtn = QPushButton('Files')     
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
@@ -149,6 +150,7 @@ class PathWidget(QWidget):
         waysBtn.clicked.connect(self.sideWays.addWayPtTags)
         saveBtn.clicked.connect(self.sideWays.savePath)
         editBtn.clicked.connect(self.drawing.editPoints)
+        centerBtn.clicked.connect(self.sideWays.centerPath)
         self.newBtn.clicked.connect(self.drawing.toggleNewPath)
         filesBtn.clicked.connect(self.pathMaker.pathChooser)
         delBtn.clicked.connect(self.pathMaker.delete)
@@ -158,6 +160,7 @@ class PathWidget(QWidget):
         hbox.addWidget(saveBtn)    
         hbox.addWidget(waysBtn)
         hbox.addWidget(editBtn)
+        hbox.addWidget(centerBtn)
         hbox.addWidget(self.newBtn)
         hbox.addWidget(filesBtn)      
         hbox.addWidget(delBtn)
@@ -299,7 +302,7 @@ class Doddle(QLabel):
         self.pen = QPen(QColor(0,0,0))                     
         self.pen.setWidth(1)                                       
         self.brush = QBrush(QColor(255,255,255,255)) 
-        ## scale down screen drawing --  file, scalor, offset
+        ## scale down screen drawing --  file, scalor, offset        
         self.df = getPts(self.file, scalor, 10)  
   
     def minimumSizeHint(self):
@@ -315,7 +318,7 @@ class Doddle(QLabel):
         elif self.pathMaker.key == 'del':
             self.doodle.delete(self)
             return
-        self.pathMaker.pts = getPts(self.file)
+        self.pathMaker.pts = getPts(self.file)  ## from sideGig
         self.pathMaker.addPath()
         self.pathMaker.openPathFile = os.path.basename(self.file) 
         self.pathMaker.pathChooserOff() 

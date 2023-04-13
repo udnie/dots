@@ -92,7 +92,7 @@ class InitMap:
                     if pix.locked:
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
                     k += 1
-            elif pix.zValue() <= common["pathZ"]: 
+            elif pix.zValue() <= common['pathZ']: 
                 break
         if k == 0:
             self.clearMap()
@@ -107,10 +107,10 @@ class InitMap:
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
         k = len(self.selections)
-        self.dots.statusBar.showMessage("Number Selected:  {}".format(k),2500)
+        self.dots.statusBar.showMessage('Number Selected:  {}'.format(k),2500)
 
     def mapBoundingRects(self):
-        tx, ty = common["ViewW"], common["ViewH"]
+        tx, ty = common['ViewW'], common['ViewH']
         bx, by = 0, 0
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.isSelected():
@@ -124,7 +124,7 @@ class InitMap:
                     bx = x + w
                 if y + h > by:
                     by = y + h
-            elif pix.zValue() <= common["pathZ"]:
+            elif pix.zValue() <= common['pathZ']:
                 break
         return QRectF(tx, ty, bx-tx, by-ty)
       
@@ -163,7 +163,7 @@ class InitMap:
                     p = pix.pos()
                     pix.x = p.x()
                     pix.y = p.y()
-                elif pix.zValue() <= common["pathZ"]:
+                elif pix.zValue() <= common['pathZ']:
                     break
 
     def removeMapItem(self):
@@ -219,7 +219,7 @@ class InitMap:
                     break
         if k > 0: 
             self.tagSet = True
-            self.dots.statusBar.showMessage("Number Tagged:  {}".format(k),2500)
+            self.dots.statusBar.showMessage('Number Tagged:  {}'.format(k),2500)
         else:
             self.clearTagGroup()
 
@@ -252,11 +252,11 @@ class InitMap:
         color = ''
 
         if 'frame' in pix.fileName: 
-            x, y = common["ViewW"]*.47, common["ViewH"]-35
-            pix.tag = ""
+            x, y = common['ViewW']*.47, common['ViewH']-35
+            pix.tag = ''
 
         if pix.type == 'pix' and pix.locked == True:
-            tag = "Locked " + tag 
+            tag = 'Locked ' + tag 
 
         if pix.zValue() == tf: 
             color = 'yellow'
@@ -298,7 +298,7 @@ class InitMap:
                         k += self.displayPath(pix)  ## anything displayed?
                     elif pix.anime and pix.anime.state() == QAbstractAnimation.State.Running:
                         pix.anime.pause()
-                elif pix.zValue() <= common["pathZ"]:
+                elif pix.zValue() <= common['pathZ']:
                     break
             if k > 0: 
                 self.pathSet = True
@@ -328,7 +328,7 @@ class InitMap:
                     if pix.anime and pix.anime.state() ==  QAbstractAnimation.State.Paused:
                         if self.canvas.control != 'resume':
                             pix.anime.resume()
-                elif pix.zValue() <= common["pathZ"]:
+                elif pix.zValue() <= common['pathZ']:
                     break
         self.pathSet = False
         self.paths = []
@@ -374,7 +374,7 @@ class InitMap:
             if pix.type in ('pix', 'snake'): 
                 first = pix.zValue()
                 break
-            elif pix.zValue() <= common["pathZ"]:
+            elif pix.zValue() <= common['pathZ']:
                 break
         return inc + first
     
