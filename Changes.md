@@ -39,7 +39,7 @@ There's no handy scrolling widget but it's easy to set the direction by first ho
 
 New video at: <https://youtu.be/E-1Mzau2KBw>
 
-<h2/span></h2>
+
 
 **March:**   
 This months **bonus**; **page up** and **page down** keys on the scrolling sprite panel by entering **Option/Alt**  plus the **Up/Down Arrow** keys. Also, **one tile Up** and **one tile down** with the Apple Command key/Windows Control key plus the **Up/Down Arrow** keys. Also, with enough sprites, if a partial tile is showing it will scroll down till it's fully visible.
@@ -60,12 +60,12 @@ Also, there's a new demo of sorts which I call **'Snakes'** - though they're mor
 I also fixed the sometime problem of saving path files to the wrong directory. Dots still runs in 5.17, look for the necessary edits below. 
 A new video: <https://youtu.be/hFfXc0H2oZM>.
 
-<h2/span></h2>
+
 
 **February - 02/17/2023 and 02/23/2023**      
 Added a **1440-16:9** format plus some cosmetic code fixes.  See the revised **02/10/2023** entry for more about screen formats. See **Even More** for updates to **paths** and **widgets** after the following **'New Screen Formats'** entry.  There are also two videos.
 
-<h2/span></h2>
+
 
 **February - 02/10/2023**  
 I've added some **New Screen Formats** and sizes made accessible by entering **Shift-S** to bring up the **Screen Formats menu**. What happens next depends on your computers display. Worse case the selected size is wider than the number of pixels your computer can display and outside of the software limits to detect it. The result would have the app overflow the edges of your screen making **dots** possibly unusable. I make a point of this in the video by explaining how the position of the dock can effect whether the program interprets the screen size correctly. The dock knocks off around 50 pixels from the useable display width or height based on where it's positioned - that's on my Mac. Results will vary depending on your hardware, see the video for a further examples.         
@@ -86,12 +86,12 @@ Also, just after I recorded the accompanying video I decided to try and shave of
 **February - 02/10/2023 -- Even More**  
 Since I posted the changes for **'new screen formats'** I've a made few more adjustments. The first being, addressing what would happen if the **'demo-' path** file was missing?  The result, the bats will be the only moving screen items, dots wouldn't crash. The second change has to do  with ensuring the bats or any other screen item following a path can cover the canvas width and height as the 1080 format is currently the source of all of the **'non-demo paths'.** For that I added two more variables , **'scaleX', 'scaleY'** to scale up or down paths based on the 1080 screen format, its' **scale..** settings defaulting to **1.0, 1.0**, essentially, do nothing, unlike the other screen formats. Paths beginning  with **'demo-'** aren't effected. The third and last change, keeping the **pixItem** and **shadow widgets** closer to their source even if the screen format shifts together with changes to the **background** and **pathMaker widgets** so they appear in a fixed starting location regardless of the format or screen size. See the **'widget' and 'bkgrnd'** variables/keys and the following video. <https://youtu.be/2iqnlGBLCso>
 
-<h2/span></h2>
+
                           
 **January 2023:**       
 A few bug fixes and mostly trying to clarify my code by clearing some naming issues.
 
-<h2/span></h2>
+
    
 **December 2022:**      
 I've added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key that toggled **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
@@ -108,12 +108,12 @@ from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 **Lastly**, there's sort of an easter egg, real easy to spot, in **dotsQt.py**.
 
-<h2/span></h2>
+
 
 **November 2022:**      
 Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMaker**. The **StoryBoard** change affects the file name while continuing to maintain the reference thru **.canvas**.  **BkgMaker** goes a little deeper with both file and reference changes - though not many. 
 
-<h2/span></h2>
+
 
 **October 2022:**        
 **Dots** updated to **PyQt 6.4**, **PyQt6.17** and **Python 3.11**. 
@@ -121,14 +121,14 @@ Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMa
 
 Some additions and updates to **Shadows**. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run **Shadows** and **SpriteMaker**. Latest video:<https://youtu.be/CLOVUHtD-Ts>
 
-<h2/span></h2>
+
 
 **September 2022:**  
 Minor edits to widgets and sliders, mostly for scaling. 
 
 A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPosition(), plus of course, PyQt6 to PyQt6. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  
 
-<h2/span></h2>
+
 
 **July 2022:**     
 See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PyQt6.3.1** and **PyQt6** with some minor edits. Latest video:
@@ -137,12 +137,12 @@ See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out o
 
 **Good News!!!** No more **qt-warnings** - all that was required was having the right attribute set, fortunately someone at Qt came up with the fix.  Also, it seems to only effect Mac laptop users who don't use a mouse like me.  Video at: <https://youtu.be/NjMg-95ecgw>
 
-<h2/span></h2>
+
 
 **June 2022:**  
 Some cosmetic changes to the right-click widgets. Also, I finally was able to file a bug report with Qt about the pointer.dispatch warnings. It's in their work queue.  Maybe by the next release it will have been taken care of. Remember, you can always use a mouse if the warnings bother you. They're not visible running dots from your desktop.
 
-<h2/span></h2>
+
 
 
 **May 2022:**  
@@ -158,7 +158,7 @@ many times.
 
 The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another Mac user has it as well.  You might want to let Qt know if you experience it. I'm going to that as soon as I finish posting the latest to GitHub. The warning also appears running PyQt6.
 
-<h2/span></h2>
+
 
 **April 2022:**  
 DotsQt has been updated to **PyQt6.3** and **Python 3.10.4**.
@@ -185,12 +185,12 @@ To create a shadow right-mouse click on a screen item and click on the top butto
 
 I added a few lines to dotsSideShow.py that can output the keys and values of a play file as it's loaded and format it for csv.  There's a shadowdemo.csv in the play folder of the output to view in your default spreadsheet app, makes it more readable. Also added a mouse-over tag to alert you if a pixItem is locked. Beats wondering why you can't move it. Lastly, the bat-wing has been replaced with the actual screen bat. Yet another video: <https://youtu.be/rbFCvU9_IUs>
 
-<h2/span></h2>
+
 
 **March 2022:**  
 I'm pretty sure **castShadow4.py**, is the last of the shadow apps. It requires both **numpy** and **cv2.** I didn't bother to demo **castShadow3.py** as it was more of an interim process. These two files and the other **'shadow'** files starting with **shadow.py** have been moved to their own folder, **dots/shadows**.  Thanks to Stack Over Flow for rounded corners and borders.  Latest video: <https://youtu.be/yqCDZHhBBww>
 
-<h2/span></h2>
+
 
 **February 27-28, 2022:**  
 Replaced **PIL** with **cv2**.  Still runs slow from a dead start but one less library to load.  Changes to insure only .pngs get loaded with the **Files** button.
@@ -203,12 +203,12 @@ Video at: <https://youtu.be/eAsH9412Bww>
 One more stand-alone app, **cast_shadow.py**, a cast shadow emulator.
 Requires, PIL, cv2, and numpy - consequently it takes a while to start when first run but it's worth it. My opinion. Another new video: <https://youtu.be/1VWjhypf0xk>
 
-<h2/span></h2>
+
 
 **January 2022:**      	
 Yet another stand-alone app, **outline.py**. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
   
- <h2/span></h2>
+ 
    
 **December 2021:**    
 I've added another stand-alone app, **shadow.py**, a PyQt dropshadow visualizer. It's either run from the command line or thru an editor. It's written to work with transparent .png and .jpg files while also as a template for future such apps. Another new video. <https://youtu.be/V-kkzuURsjg>
@@ -218,17 +218,17 @@ I've added two new functions/keys to editing a path in pathMaker.
 
 Additionally, some key reassignments in dropCanvas. I replaced **{/}** for rotating a sprite 45 degrees with **[/]** to match the same command in pathMaker. I also reassigned the keys that increment or decrement a sprite's **ZValue** back to front position. A **comma** sets a sprite back one **ZValue** and **period** up one value.  The four keys that are used to change a sprites **ZValue** are much closer together now. Big Win.
 
-<h2/span></h2>
+
 
 **November 2021:**  
 Added a right-mouse click to dropCanvas to trigger the **play** load dialog and to pathMaker to trigger **path chooser**.  Added a path edit function to pathMaker. Entering **E** after choosing a path allows you move, delete, or add a point and also re-distribute or half the number of points that make up the path. Some of these functions are also in wayPoints but not the ability to move individual points. Entering **W** from **edit** will put you into wayPoints and conversely **E** in **wayPoints** drops you into edit.  More work on bat-wings. They're now easier to select and move by clicking anywhere on the bats body but not the wings. Added **Shift U** to unlock all screen items in dropCanvas.
 
-<h2/span></h2>
+
 
 **October 2021:**   
 I've done some more work on wings and have some observations concerning the tendency for them to drift when stopped. The only differences I can see is using or not using the file chooser somehow affects the reprise animation for the wings screen objects.  
 
-<h2/span></h2>
+
 
 **September 2021:**			
 **Bonus...**  I've added a screen pixel ruler, **vhx.py** to the mix.  It runs both in Dots and on my Mac as a desktop widget - **vhx.app**, created using the MacOS Automator, the same utility that lets me run Dots as a desktop app. **Note:** Also on my Mac, **vhx.py** only runs in Dots when in VSCode, otherwise you can run it from the command line. This finally replaces my JavaFx version. See **keys.pdf** for updates. New video:  <https://youtu.be/98m-fNB16-w> 
@@ -239,38 +239,38 @@ I wanted to see what it would take to set up a VM, a virtual machine, and run do
 See **keys.pdf** for the current key assignments and hopefully some clarity. I added a **45 degree** toggle to pathMaker and changed the **half path** function to evenly distribute the new points. It looks better that way, uses less data though it may alter the path slightly. In dropCanvas, selecting screen objects will now be outlined by an actually visible lime green boundingRect. Lastly, I posted a remake of the last video I created in DotsJavaFx, **Tableau 2018**, recreated now in DotsQt as **Tableau 2021**, which was sort of the idea and why I spent the last two years writing in PyQt. I've included the code for wings 
 in DotsSideCar. Two videos follow, **Tableau 2021** <https://youtu.be/h70MO0V7CNw> and **DotsQt Wings** <https://youtu.be/HtOaDZfeCzg>
 
-<h2/span></h2>
+
 
 **August 2021:**  
 The annoyance is no more. It's taken a while and the fix was easier to apply once I had isolated pathMaker from the rest of dots. The solution bothers me some - otherwise an interesting programming challenge.  Moving on, more key changes and additions.  I've moved the **-/= scale Y** keys to **;** and **'** to line up with **scale X :/"**.  The old **-/= scale Y** keys are now rotate **-/+15** degrees.  Also, the highest positioned pixItem by zValue is now tagged in yellow if you show tags by pressing **T**. The latest video. <https://youtu.be/cBvLJh02LgQ>
 
-<h2/span></h2>
+
    
 **July 2021:**		
 Changed, holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** locked or unlocked. The second method, **shift-R**, locks **all pixItems**. The last method, **apostrophe** and a **mouse-click** toggles individual pixItems. You will need to save the changes for them to take effect. There's a new file, as of August, **dotsDrawsPaths**, that isolates the code that draws the path and displays pointItems. The annoyance still persists. Still working on it.
 
-<h2/span></h2>
+
 
 **June 2021:**  
 Decided to change things around again and reassigned some keys from February changes. In dropCanvas **'R'**, for run, replaces **'P'** for play. Typing **'R'** on a blank screen will run the demo or any play file you've set in dotsShared under 'runThis'. **'P'** will toggle paths replacing **'O'** - from February again. In pathMaker **'P'**, under wayPoint to show pointItems, has been replaced with **'V'** to view pointItems. Changed status-bar color. No video. The annoyance still persists.  Still working on it.
 
-<h2/span></h2>
+
 
 **April 2021:**  
  Changed the single zValue keys to **'['** and **']'** as the **option-click** key was conflicting with the **option-double click**.  Added a display for a single **ztag** when right-mouse clicking over a pixItem. Changed the **single-click** to **enter/return** to eliminate any accidental or unnecessary movement back to front. Reduced the screen width of dots and added one more sprite selection to the scrollPanel. Blocked any mouse actions to a pixItem while running an animation - this will prevent any screen items from getting lost. The **'C-key** can quit pathMaker if the screen is empty and no longer requires a click on the pathMaker button to do so. See dotsDropCanvas.py starting at line 96 for a fuller explanation of what I call an annoyance.
 Video at: <https://youtu.be/AI1E8hszBbk>
 
-<h2/span></h2>
+
 
 **March 2021:**  
 Added the **Color** button to launch a color picker *widget. A color can be saved to the backgrounds directory as a named file that ends in **'.bkg'**, this allows it to be recalled and added to a play file as a regular background object. The expected color token is a hex string - **#FFFFFF**, there is no saved image file. Also added the pixItems zValue to tags and keys to send a pixItem back one zValue using **option-click** or forward one zValue using **command-click**. Frames are now a special case sprite rather than a background item.  DropCanvas now 1080X720 pixels.  See Video: <https://youtu.be/yUzqY7p9X3I>
 
-<h2/span></h2>
+
 
 **February 2021:**	
 Added the **'O'** key to the main window to toggle the paths prior to running animations as the **'P'** is now the **play** hot-key. Both keys can toggle the paths display once the animations are running. Also updated the parent window from a QGroupBox widget to QMainWindow adding QDockWidgets, a CentralWidget and a statusBar.  Currently running in Python 3.9.2 and PyQt 5.15.3 on a Mac, OSX  10.14.6.  QFileDialog in native mode no longer lets the user delete files. 
 
-<h2/span></h2>
+
 
 **December 2020:**	
 Added the **'L','P','S'** keys to dropCanvas to Load, Play, and Stop animations, same as the buttons - also reinstated **'C'** to clear the screen in dropCanvas. Clicking on the clear button will close pathMaker and as well as clicking on the pathMaker button if it's green. The **'C'** key is also used in pathMaker to center a path.
@@ -279,26 +279,26 @@ The **'P'** key still toggles paths but only after play begins. It's either that
 
 The method used to calculate percents has changed. The old method was based on a fixed percentage which returned a point value position along the path but not necessarily an actual point, especially if the total number of points wasn't evenly divisible by 10. There's a fix for that if you desire an actual 10% correspondence. Mouse over a point to display the tag, hold down the delete key and click to **delete** the point or option click on it to **add** a new point midway from the point you're on to the next point down the path. Either approach will update the path and the percents.
 
-<h2/span></h2>
+
 
 **November 2020:**  
 Added **'P'** key to toggle paths if found in a play file or if assigned when running and the **'K'** key to toggle the help keyList from dropCanvas to pathMaker.  Added a new **button** for pathMaker functions.  Reassigned some dropKeys to match up with similar functions in pathMaker and pixItems. Added **'R'** key to run the animation path demo. It's looks a little odd when it starts but the end result matches the original. It required a few work arounds to get the effect I was after.   
   
 Use the **'!'** key in **pathMaker** to reduce the path points size. I found that around 200 points should be sufficient in most cases. Also, you can use the snapshot button to record the waypoint tags and paths, plus any background. See video: <https://youtu.be/kalDltrQkWs>
 
-<h2/span></h2>
+
 
 **September 2020:**   
 Added the play, pause/resume and stop buttons to run animations. Added **paths** to animations.  Added a right-click **context menu** for adding animations to screen selections.  
 
 Added **tags** to show a screen items current animation. After selecting an animation you can type 'T' to toggle the tags on and off. Tags will be orange initially if there are no animations running.  Once running and if set to Random, tags will appear green and display the animation that was randomly assigned. The **context menu** only works if something is selected, even to clear **tags**. A video showing some basic animations and how to add them to a screen object - pixitem. <https://youtu.be/SHDmcySukGg>
 
-<h2/span></h2>
+
 
 **August 2020:**  
 Added two new buttons. The save button maps the canvas items, pixItems and background to a Json file written to the ./plays directory as a .play file.  The load button reconstructs the saved canvas layout from the named .play file. Changed delete from the shift key to the actual delete key. Seems it shows up as a backspace key on some installs which is why I may not have used it earlier. Video to illustrate the save and load functions. <https://youtu.be/RPwEjgAcITk> 
 
-<h2/span></h2>
+
  
 **June 2020:**  
 Initial posting followed by minor bug fixes and fussy changes. The original video that illustrates some of the features of this app. <https://youtu.be/rd4LtR88UjE> 
