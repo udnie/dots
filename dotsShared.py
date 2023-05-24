@@ -26,7 +26,7 @@ CanvasStr = "L,R,P,S,C,T,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right
 PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
-pathsX = {
+paths = {
     'snapShot':   './',
     'bkgPath':    './backgrounds/',
     'imagePath':  './images/',
@@ -34,16 +34,6 @@ pathsX = {
     'paths':      './paths/',
     'spritePath': './sprites/',
     'txy':        './txy/',
-}
-
-paths = {
-    'snapShot':     '/users/mel.tearle/Desktop/',  
-    'bkgPath':      '../wrks/backgrounds/',
-    'imagePath':    '../wrks/images/',
-    'playPath':     '../wrks/plays/',
-    'spritePath':   '../wrks/sprites/',
-    'paths':        '../wrks/paths/',
-    'txy':          '../wrks/txy/',
 }
 
 Tick = 2.0

@@ -9,8 +9,8 @@ from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import constrain
 
-from dotsShadowMaker    import ShadowMaker  ## add shadows
-##from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+##from dotsShadowMaker    import ShadowMaker  ## add shadows
+from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
 import dotsAnimation  as anima
 
