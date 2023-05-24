@@ -8,8 +8,8 @@ from PyQt6.QtGui        import QPainterPath
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import paths, common
-from dotsSideCar        import PixItem 
-from dotsSideGig        import *
+from dotsPixItem        import PixItem
+from dotsSideGig        import getOffSet, MsgBox
 
 ### ---------------------- dotsSidePath --------------------
 ''' dotsPaths is used by storyboard, sideshow, animations, 
@@ -124,7 +124,7 @@ def flapper(pix, anime, node):  ## used by demo bat wings
 def demo(pix, anime, node):  ## sets the demo path         
     sync = 11000
 
-    waypts = pathLoader(anime)
+    waypts = pathLoader(anime)  ## demo-path file name
     if not waypts: return
     ## offset for origin pt - setOrigin wasn't working
     pt = getOffSet(node.pix)

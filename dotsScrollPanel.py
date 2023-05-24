@@ -244,6 +244,7 @@ class ScrollPanel(QWidget):
  
     def scrollFiles(self):
         Q = QFileDialog()
+        Q.Option.DontUseNativeDialog
         files, _ = Q.getOpenFileNames(self,
             'Choose an image file to open', paths['snapShot'], 
             'Images Files(*.bmp *.jpg *.png)')

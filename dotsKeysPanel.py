@@ -2,15 +2,15 @@
 from PyQt6.QtCore       import Qt, QAbstractTableModel    
 from PyQt6.QtGui        import QFont               
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QTableView, QHeaderView, \
-                                QAbstractItemView, QFrame
+                                QAbstractItemView
                                 
 from dotsShared         import common                           
 
-### --------------------- dotssliderPanel ------------------
-''' dotssliderPanel contains TableGroup and TableModel class 
+### ---------------------- dotskeysPanel -------------------
+''' dotskeysPanel contains TableGroup and TableModel class 
     used by the TableView '''       
 ### --------------------------------------------------------
-class SliderPanel(QWidget):
+class KeysPanel(QWidget):
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -26,7 +26,7 @@ class SliderPanel(QWidget):
         self.layout = QVBoxLayout(self)        
         self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignCenter) 
         self.layout.setContentsMargins(10, common['margin1'],0, common['margin2']+3)
-    
+            
 ### --------------------------------------------------------
     def toggleMenu(self):  ## called thru sideCar 'K' key
         if self.pathMenuSet:
@@ -61,7 +61,7 @@ class SliderPanel(QWidget):
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.tableView.setColumnWidth(0, 46) 
-        self.tableView.setColumnWidth(1, 105)
+        self.tableView.setColumnWidth(1, 108)
         
         return self.tableView
                                 
@@ -138,8 +138,8 @@ def storyBoard():
         ('M', 'Map Selected'),
         ('O', 'Clear Outlines'),
         ('P', 'Toggle Paths'),
-        ('R', 'Run Play/Demo'),
-        ('S', 'Stop Play'),
+        ('R', 'Run/DemoMenu'),
+        ('S', 'Stop/SceenMenu'),
         ('T', 'Toggle Tags'),
         ('U', 'UnSelect All'),
         ('W', 'Clear Widgets'), 
@@ -206,6 +206,7 @@ def pathMaker():
         ('@ ',   'Redistribute Pts'),
     )
     return menu
-      
-### -------------------- dotsSliderPanel -------------------
+
+### --------------------- dotsKeysPanel --------------------
+
 

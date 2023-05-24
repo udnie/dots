@@ -28,16 +28,28 @@ class Node(QObject):
         self.pix = pix
 
     def _setPos(self, pos):
-        self.pix.setPos(pos)
+        try:
+            self.pix.setPos(pos)
+        except RuntimeError:
+            return None
 
     def _setOpacity(self, opacity):
-        self.pix.setOpacity(opacity)
+        try:
+            self.pix.setOpacity(opacity)
+        except RuntimeError:
+            return None
 
     def _setScale(self, scale):
-        self.pix.setScale(scale)
+        try:     
+            self.pix.setScale(scale)
+        except RuntimeError:
+            return None
 
     def _setRotate(self, rotate):
-        self.pix.setRotation(rotate)
+        try:
+            self.pix.setRotation(rotate)
+        except RuntimeError:
+            return None
 
     pos =  pyqtProperty(QPointF, fset=_setPos)
     scale =  pyqtProperty(float, fset=_setScale) 

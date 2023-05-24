@@ -10,10 +10,9 @@ from dotsPixWidget      import PixWidget
 from dotsSideGig        import constrain
 
 ##from dotsShadowMaker    import ShadowMaker  ## add shadows
-from dotsShadow_Dummy   import ShadowMaker  ## turns off shadows
+from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
-import dotsSideCar      as sideCar
-import dotsAnimation    as anima
+import dotsAnimation  as anima
 
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
@@ -21,7 +20,7 @@ Pct = -0.50  ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename
     # "apple": (650, 450),
-    # 'doral': (300, 500),         
+    # 'doral': (300, 500),         ,
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -248,7 +247,7 @@ class PixItem(QGraphicsPixmapItem):
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-            ## horizontally=self.flopped, vertically=False)))  ## PyQt6
+            # horizontally=self.flopped, vertically=False)))  ## pyside6
             horizontal=self.flopped, vertical=False)))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
     

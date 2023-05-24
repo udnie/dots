@@ -1,87 +1,58 @@
 
 import os 
 import os.path
- 
-from os                 import path
+import gc
+
 from functools          import partial
        
-from PyQt6.QtCore       import Qt, QPoint, QSize, QRect, QTimer
-from PyQt6.QtGui        import QColor, QPixmap
-from PyQt6.QtWidgets    import QWidget, QFileDialog, QColorDialog, QGraphicsItem, \
-                                QGraphicsPixmapItem
+from PyQt6.QtCore       import Qt, QPoint, QRect, QTimer, QSize
+from PyQt6.QtGui        import QColor
+from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
+                                QColorDialog, QMenu
 
 from dotsSideGig        import MsgBox, getCtr
 from dotsShared         import common, paths, PlayKeys
-from dotsBkgWrks        import BkgItem, BkgWidget
-   
-### ---------------------- dotsBkgMaker ---------------------
-''' dotsBkgMaker: handles adding, setting, copying and saving background 
-    items.  Includes Flat and BkgMaker classes. '''
-### --------------------------------------------------------
-class Flat(QGraphicsPixmapItem):
-### --------------------------------------------------------   
-    def __init__(self, color, canvas, z=common['bkgZ']):
-        super().__init__()
+from dotsBkgWidget      import BkgWidget, Flat
+from dotsBkgItem        import BkgItem
+from dotsScreens        import *
+from dotsSnakes         import Snakes
 
-        self.canvas   = canvas
-        self.scene    = canvas.scene
-        self.bkgMaker = self.canvas.bkgMaker
-        
-        self.type = 'bkg'
-        self.color = color
-        
-        self.fileName = 'flat'
-        self.locked = False
-        
-        self.key = ''
-        self.id = 0   
+demos = {  ## used by demo menu
+    '1':  'Original Batwings',
+    '2':  'Snakes Blue Background',
+    '3':  'Right to Left Scrolling',  
+    '4':  'Left to Right Scrolling',  
+    '5':  'Snakes Scrolling Background',    
+    '6':  'Snakes Vertical Scrolling',  
+}
 
-        p = QPixmap(common['ViewW'],common['ViewH'])
-        p.fill(self.color)
-        
-        self.setPixmap(p)
-        self.setZValue(z)
-   
-        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
-        
-### --------------------------------------------------------
-    def mousePressEvent(self, e):      
-        if not self.canvas.pathMakerOn:
-            if e.button() == Qt.MouseButton.RightButton:    
-                self.bkgMaker.addWidget(self)        
-            elif self.canvas.key == 'del':     
-                self.delete()
-            elif self.canvas.key == '/':  ## to back
-                self.bkgMaker.back(self)
-            elif self.canvas.key in ('enter','return'):  
-                self.bkgMaker.front(self)                             
-        e.accept()
-      
-    def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
-            self.canvas.key = ''       
-        e.accept()
-     
-    def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
-      
-### --------------------------------------------------------
-class BkgMaker(QWidget):
+### --------------------- dotsBkgMaker ---------------------                   
+''' Both pop menus, screens and demos, are here because of visiblity
+    to scene and view - otherwise screens wouldn't clear '''
+### --------------------------------------------------------     
+class BkgMaker(QWidget):  
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
-
         self.canvas = parent
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
-        
+        self.snakes = Snakes(self.canvas)
+                       
         self.widget  = None
         self.bkgItem = None  
        
         self.widgetX = 400  ## position widget
         self.widgetY = 300 
+        
+        self.last = ''
+        self.key = ''
+        self.num  = 0
+        
+        self.demoMenu = None
+        self.screenMenu = None
         
         self.save = QPoint(self.widgetX, self.widgetY)
         
@@ -90,6 +61,7 @@ class BkgMaker(QWidget):
         if self.canvas.control in PlayKeys:
             return
         Q = QFileDialog()
+        Q.Option.DontUseNativeDialog
         file, _ = Q.getOpenFileName(self.canvas,
             'Choose an image file to open', paths['bkgPath'],
             'Images Files(*.bmp *.jpg *.png *.bkg)')
@@ -111,11 +83,12 @@ class BkgMaker(QWidget):
                 self.mapper.removeMap()
                 
         self.bkgItem = BkgItem(file, self.canvas)
-        self.bkgItem.setZValue(common['bkgZ'])  ## always on top             
-        self.scene.addItem(self.bkgItem)   
+        self.bkgItem.setZValue(common['bkgZ'])  ## always on top
+                 
+        self.scene.addItem(self.bkgItem)      
         self.updateZvals(self.bkgItem)  ## update other bkg zvalues
         self.x, self.y = self.setXY(self.bkgItem)
-                  
+        
         ## take care of a file previously saved
         if file.endswith('-bkg.jpg'):
             self.bkgItem.setScale(1.003)  ## for white space???
@@ -126,44 +99,9 @@ class BkgMaker(QWidget):
         else:
             self.canvas.btnAddBkg.setEnabled(False)
             self.enableBkgBtns(True)  ## hasn't been set 
-            
-        if self.widget: QTimer.singleShot(0, partial(self.widget.resetSliders, self.bkgItem))
  
-    def addWidget(self, item):
-        self.closeWidget()      
-        self.bkgItem = item        
-        self.lockBkg() if self.bkgItem.locked else self.unlockBkg()         
-        self.widget  = BkgWidget(self.bkgItem, self)
-        b = common['bkgrnd']
-        p = getCtr(int(b[0]), int(b[1]))
-        self.widgetX = int(p.x())  ## set to last position
-        self.widgetY = int(p.y())        
-        self.widget.setGeometry(self.widgetX, self.widgetY, int(self.widget.WidgetW), \
-            int(self.widget.WidgetH)) 
-            
-    def closeWidget(self):
-        if self.widget and self.widget != None:
-            self.save = self.widget.pos()
-            self.widget.close()
-            self.widget = None
-                    
-    def setBkg(self):  ## from widget or button   
-        if self.bkgItem:          
-            self.lockBkg()
-            self.settingBkgMsg()
-            self.disableSetBkg()  ## turn off setting it again 
-            return
-        else:
-            MsgBox('Already set to background', 5)
-            
-    def deleteBkg(self, bkg):
-        self.scene.removeItem(bkg)
-        self.bkgItem = None
-        self.closeWidget()  
-        self.disableBkgBtns()
-        self.canvas.btnAddBkg.setEnabled(True)
-               
-### --------------------------------------------------------
+        if self.widget: QTimer.singleShot(0, partial(self.widget.resetSliders, self.bkgItem))
+
     def saveBkg(self):  ## save it to the background file
         if self.bkgItem.fileName == 'flat':
             self.saveBkgColor()  
@@ -174,10 +112,10 @@ class BkgMaker(QWidget):
         else:
             file = os.path.basename(self.bkgItem.fileName)
             file = file[0: file.index('.')]
-            file = file[:15] + '-bkg.jpg'
+            file = file[:15] + '-bkg.jpg'       
             ## if it's not already a bkg file and the new file doesn't exist
             if not self.bkgItem.fileName.lower().endswith('-bkg.jpg') and not \
-                path.exists(paths['bkgPath']+ file):
+                os.path.exists(paths['bkgPath']+ file):
                 self.bkgItem.fileName = paths['bkgPath'] + file
                 flopped = self.bkgItem.flopped
                 pix = self.canvas.view.grab(QRect(QPoint(1,1), QSize()))
@@ -190,14 +128,14 @@ class BkgMaker(QWidget):
                 MsgBox('Already saved as background jpg', 5)
         self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
-  
+ 
     def saveBkgColor(self):  ## write to .bkg file
         Q = QFileDialog()
+        Q.Option.DontUseNativeDialog
         Q.setDirectory(paths['bkgPath'])
         f = Q.getSaveFileName(self.canvas, paths['bkgPath'],  
             paths['bkgPath'] + 'tmp.bkg')  
-        Q.accept()
-          
+        Q.accept()       
         if not f[0]: 
             return
         if not f[0].lower().endswith('.bkg'):
@@ -220,12 +158,147 @@ class BkgMaker(QWidget):
             self.bkgItem = Flat(color, self.canvas, bkz)    
             self.scene.addItem(self.bkgItem)
             self.updateZvals(self.bkgItem)
-                                                                                                          
-    def settingBkgMsg(self): 
-        if self.bkgItem.fileName != 'flat':
-            txt = os.path.basename(self.bkgItem.fileName)
-            MsgBox(txt + ' ' +  'set to background', 4) 
-   
+         
+### --------------------------------------------------------                       
+    def setDemoMenu(self):
+        self.demoMenu = QMenu(self.canvas) 
+        self.demoMenu.addAction('Demos'.rjust(20,' '))
+        self.demoMenu.addSeparator()
+        for demo in demos.values():
+            action = self.demoMenu.addAction(demo)
+            self.demoMenu.addSeparator()
+            action.triggered.connect(lambda chk, demo=demo: self.dclicked(demo))            
+        self.demoMenu.setFixedSize(220, 220)
+        self.demoMenu.move(getCtr(-120,-225))    
+        self.demoMenu.show()
+
+    def dclicked(self, demo):
+        for key, value in demos.items():
+            if value == demo:  ## singleshot needed for menu to clear
+                QTimer.singleShot(200, partial(self.run, key))
+                break
+        self.closeDemoMenu()
+        
+    def closeDemoMenu(self):
+        if self.demoMenu:
+            self.demoMenu.close()           
+        self.demoMenu = None
+           
+    def run(self, key):                  
+        if key == '1':
+            self.canvas.sideShow.runThis(common['runThis']) 
+        elif key == '2':
+            self.runSnakes('blue', key)     
+        elif key in ('3', '4', '5') and not self.dots.Vertical:         
+            if key == '3':
+                self.canvas.sideShow.runThis('abstract_left.play')  
+            elif key == '4':
+                self.canvas.sideShow.runThis('abstract_right.play')            
+            elif key == '5':
+                self.runSnakes('left', key)         
+        elif key == '6' and self.dots.Vertical:   
+            self.runSnakes('vertical', key)      
+                 
+    def runSnakes(self, what, key): 
+        if key in ('2', '5', '6'): self.delSnakes()    
+        self.key = key
+        if what != '':
+            QTimer.singleShot(100, partial(self.snakes.setSnakePaths, what))           
+        elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
+            MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 7, getCtr(-225,-175))
+            return 
+        
+    def delScroller(self, pix):
+        self.scene.removeItem(pix)
+        del pix
+        self.num += 1
+        if self.num % 3 == 0: gc
+           
+    def delSnakes(self):
+        if len(self.canvas.scene.items()) > 0:
+            for pix in self.canvas.scene.items():      
+                if pix.type == 'snake':
+                    self.canvas.scene.removeItem(pix)
+                    del pix
+                                    
+### --------------------------------------------------------                       
+    def setScreenMenu(self):
+        self.screenMenu = QMenu(self.canvas)    
+        self.screenMenu.addAction(' Screen Formats')
+        self.screenMenu.addSeparator()
+        for screen in screens.values():
+            action = self.screenMenu.addAction(screen)
+            self.screenMenu.addSeparator()
+            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
+        self.screenMenu.move(getCtr(-85,-225)) 
+        self.screenMenu.setFixedSize(150, 252)
+        self.screenMenu.show()
+    
+    def clicked(self, screen):
+        for key, value in screens.items():
+            if value == screen:  ## singleshot needed for menu to clear
+                QTimer.singleShot(200, partial(self.displayChk, self.switchKey(key)))
+                break      
+        self.closeScreenMenu()  
+                    
+    def closeScreenMenu(self):   
+        if self.screenMenu:
+            self.screenMenu.close()
+        self.screenMenu = None
+              
+    def switchKey(self, key):                 
+        if self.displayChk(key) == True:
+            self.canvas.clear()       
+            self.canvas.dots.switch(key) 
+        else:
+            return
+    
+    def displayChk(self, key):  ## switch screen format
+        p = QGuiApplication.primaryScreen().availableGeometry()
+        if key in MaxScreens and p.width() < MaxWidth:  ## current screen width < 1680
+            self.exceedsMsg() 
+            return False
+        else:
+            return True            
+        
+    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
+        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
+        
+### -------------------------------------------------------- 
+    def addWidget(self, item):  ## background widget
+        self.closeWidget()      
+        self.bkgItem = item        
+        self.lockBkg() if self.bkgItem.locked else self.unlockBkg()         
+        self.widget  = BkgWidget(self.bkgItem, self)
+        b = common['bkgrnd']
+        p = getCtr(int(b[0]), int(b[1]))
+        self.widgetX = int(p.x())  ## set to last position
+        self.widgetY = int(p.y())        
+        self.widget.setGeometry(self.widgetX, self.widgetY, int(self.widget.WidgetW), \
+            int(self.widget.WidgetH)) 
+                                
+    def closeWidget(self):
+        if self.widget and self.widget != None:
+            self.save = self.widget.pos()
+            self.widget.close()
+            self.widget = None
+                                       
+    def setBkg(self):  ## from widget or button   
+        if self.bkgItem:          
+            self.lockBkg()
+            self.settingBkgMsg()
+            self.disableSetBkg()  ## turn off setting it again 
+            return
+        else:
+            MsgBox('Already set to background', 5)
+            
+    def deleteBkg(self, bkg):
+        self.scene.removeItem(bkg)
+        self.bkgItem = None
+        self.closeWidget()  
+        self.disableBkgBtns()
+        self.canvas.btnAddBkg.setEnabled(True)
+               
 ### --------------------------------------------------------     
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()
@@ -273,6 +346,11 @@ class BkgMaker(QWidget):
             if itm.type == 'bkg':
                 print(itm.zValue())
                                 
+    def settingBkgMsg(self):
+        if self.bkgItem.fileName != 'flat':
+            txt = os.path.basename(self.bkgItem.fileName)
+            MsgBox(txt + ' ' +  'set to background', 4) 
+            
 ### ------------------- background buttons -----------------
     def enableBkgBtns(self, bool):
         if not self.dots.Vertical:
@@ -288,5 +366,7 @@ class BkgMaker(QWidget):
             self.canvas.btnAddBkg.setEnabled(True)
             self.canvas.btnSetBkg.setEnabled(False)
             self.canvas.btnSaveBkg.setEnabled(True)
-
+        
 ### --------------------- dotsBkgMaker ---------------------
+                                    
+                                    

@@ -12,7 +12,18 @@ MaxScreens = ('1440','1536', '620')  ## requires 1920X1280 display size
 ### -------------------- dotsScreens -----------------------
 ''' dotsScreens: various screen formats and functions used
     in the title bar '''
-### --------------------------------------------------------
+### -------------------------------------------------------- 
+screens = {  ## the keys aren't shown
+    '1080': '1080X720 -  3:2',
+    '1280': '1280X720 - 16:9',
+    '1215': '1215X810 -  3:2',
+    '1440': '1440X810 - 16:9',
+    '1296': '1296X864 -  3:2',
+    '1536': '1536X864 - 16:9',
+     '620': '620X1102 -  9:16',
+}
+
+### -------------------------------------------------------- 
 def setCommon(format=''):
     if format == '1080':      ## 1080X720 - 3:2 same as default
         common.update(ten80)  
@@ -52,25 +63,14 @@ def setCommon(format=''):
         common.update(ten80)  ## 1080X720 - 3:2 - default
         common.update(seven20) 
         return '1080X720 - 3:2' 
-  
-### -------------------------------------------------------- 
-screens = {  ## the keys arn't shown
-    '1080': '1080X720 -  3:2',
-    '1280': '1280X720 - 16:9',
-    '1215': '1215X810 -  3:2',
-    '1440': '1440X810 - 16:9',
-    '1296': '1296X864 -  3:2',
-    '1536': '1536X864 - 16:9',
-     '620': '620X1102 -  9:16',
-}
- 
+   
 ### --------------- 1080X720 - 3:2 format ------------------
 seven20 = {    
     'DotsH':     822, 
     'ViewH':     720,               
     'ScrollH':   687,  
     'SliderH':   679,  
-    'margin1':    15,  ## sliderpanel margins top
+    'margin1':    15,  ## keysMenu margins top
     'margin2':    10,  ## right
     'factor':   0.30,  ## amount to scale pixitems unless preset    
     'modLabel':  1.0,  ## amount to scale scroll label height 
@@ -80,11 +80,11 @@ seven20 = {
 
 ten80 = {            
     'Screen':   '1080',        ## used by both 1080 and 1280X720px 
-    'DotsW':      1427,  
+    'DotsW':      1431,  
     'ViewW':      1080,  
     'gridSize':   30.0,       ## gridline spacing - seems to work, consistant
     'scaleX':      1.0,
-    'widget':   (175,175),  ## position pix and shadow widgets using getCtr 
+    'widget':   (175,175),    ## position pix and shadow widgets using getCtr 
     'bkgrnd': (-525,-455),
     'runThis':  'demo-1080.play',  ## default run key
 }
@@ -92,7 +92,7 @@ ten80 = {
 ### ------------------ 1280X720 - 16:9 ---------------------
 twelve80 = {  
     'Screen': '1280',        
-    'DotsW':    1628, 
+    'DotsW':    1631, 
     'ViewW':    1280,  
     'gridSize':   26.66,  
     'scaleX':      1.15,
@@ -118,7 +118,7 @@ eight10 = {
 ### --------------- 1215X810 - 3:2 format -------------------
 twelve15 = {
     'Screen': '1215',  
-    'DotsW':    1563,   
+    'DotsW':    1567,   
     'ViewW':    1215,    
     'gridSize':   28.925, 
     'scaleX':      1.05,
@@ -130,7 +130,7 @@ twelve15 = {
 ### ------------------ 1440X810 - 16:9 ----------------------
 fourteen40 = {  
     'Screen': '1440',         
-    'DotsW':    1787,
+    'DotsW':    1791,
     'ViewW':    1440,
     'gridSize':   30, 
     'scaleX':      1.30,
@@ -156,7 +156,7 @@ eight64 = {
 ### ------------------ 1264X864 - 3:2 ----------------------
 twelve96 = {  
     'Screen':  '1296',  
-    'DotsW':    1643,
+    'DotsW':    1647,
     'ViewW':    1296,  
     'gridSize':   30, 
     'scaleX':      1.123,
@@ -168,7 +168,7 @@ twelve96 = {
 ### ------------------ 1536X864 - 16:9 ---------------------
 fifteen36 = {      
     'Screen': '1536',   
-    'DotsW':    1885, 
+    'DotsW':    1889, 
     'ViewW':    1536,      
     'gridSize':   32,  
     'scaleX':      1.40,
@@ -180,7 +180,7 @@ fifteen36 = {
 ### -------------------- 620X1102 - 9:16 --------------------
 V620 = {             ## 620 - must be a string not a number
     'Screen': '620',  
-    'DotsW':    968,
+    'DotsW':    971,
     'DotsH':   1204, 
     'ViewW':    620,  
     'ViewH':   1102,     

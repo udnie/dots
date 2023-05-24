@@ -1,127 +1,62 @@
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF
-from PyQt6.QtGui        import QColor, QPen, QPainter,  QImage, QPixmap
+from PyQt6.QtGui        import QColor, QPen, QPainter, QPixmap
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QGraphicsPixmapItem ,QSlider, QHBoxLayout,  \
-                                QVBoxLayout, QPushButton
+                                QVBoxLayout, QPushButton, QGraphicsItem
     
-from dotsShared         import common, RotateKeys
-                                             
+from dotsShared         import common
+                    
 ### ---------------------- dotsBkgWrks ---------------------
-''' classes: BkgItem, BkgWidget '''
+''' classes:  Flat, BkgWidget '''                                                                                                              
 ### --------------------------------------------------------
-class BkgItem(QGraphicsPixmapItem):
-### --------------------------------------------------------
-    def __init__(self, fileName, canvas, z=common['bkgZ'], mirror=False):
+class Flat(QGraphicsPixmapItem):
+### --------------------------------------------------------   
+    def __init__(self, color, canvas, z=common['bkgZ']):
         super().__init__()
 
         self.canvas   = canvas
-        self.dots     = self.canvas.dots
-        self.scene    = self.canvas.scene
+        self.scene    = canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
-     
-        self.ViewW = common['ViewW']
-        self.ViewH = common['ViewH']
         
-        self.fileName = fileName
-        img = QImage(fileName)
-  
-        if not self.dots.Vertical:
-            self.imgFile = img.scaled(  ## fill to width or height
-                self.ViewW, 
-                self.ViewH,
-                Qt.AspectRatioMode.KeepAspectRatio, 
-                Qt.TransformationMode.SmoothTransformation)
-        else:
-            self.imgFile = img.scaled(  
-                self.ViewW, 
-                self.ViewH,
-                Qt.AspectRatioMode.IgnoreAspectRatio, 
-                Qt.TransformationMode.SmoothTransformation)
-            
-        del img          
-                    
-        self.key = ''
-        self.id = 0  ## not used except for conisistency
- 
         self.type = 'bkg'
-        self.flopped = False
+        self.color = color
+        
+        self.fileName = 'flat'
         self.locked = False
         
-        self.setZValue(z)
-        self.setMirrored(mirror)
-        
-        self.width = self.imgFile.width()
-        self.height = self.imgFile.height() 
-        
-        self.opacity = 100
-        self.rotation = 0
-        self.scale = 1
+        self.tag = ''
+        self.id = 0   
 
-        self.x, self.y = 0.0, 0.0
+        p = QPixmap(common['ViewW'],common['ViewH'])
+        p.fill(self.color)
         
-        self.dragAnchor = QPoint(0,0)
-        self.initX = 0
-        self.initY = 0
-                
-        self.anime = None
-                
-        self.setPixmap(QPixmap.fromImage(self.imgFile))
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
-    
+        self.setPixmap(p)
+        self.setZValue(z)
+   
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
+        
 ### --------------------------------------------------------
-    def mousePressEvent(self, e):
-        if not self.canvas.pathMakerOn:   
-            if e.button() == Qt.MouseButton.RightButton:
-                self.bkgMaker.addWidget(self)             
-            elif self.canvas.key == 'del':    
-                self.delete()      
+    def mousePressEvent(self, e):      
+        if not self.canvas.pathMakerOn:
+            if e.button() == Qt.MouseButton.RightButton:    
+                self.bkgMaker.addWidget(self)        
+            elif self.canvas.key == 'del':     
+                self.delete()
             elif self.canvas.key == '/':  ## to back
                 self.bkgMaker.back(self)
-            elif self.canvas.key == 'shift':
-                self.flopped = not self.flopped 
-                self.setMirrored(self.flopped)
             elif self.canvas.key in ('enter','return'):  
-                self.bkgMaker.front(self)          
+                self.bkgMaker.front(self)                             
         e.accept()
-           
+      
     def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn: 
-            self.canvas.key = ''
+        if not self.canvas.pathMakerOn:
+            self.canvas.key = ''       
         e.accept()
-          
-### --------------------------------------------------------                                                                  
+     
     def delete(self):  ## also called by widget
         self.bkgMaker.deleteBkg(self)
-   
-    def setMirrored(self, bool):
-        self.flopped = bool
-        self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-            # horizontally=self.flopped, vertically=False)))  ## pyside6
-            horizontal=self.flopped, vertical=False)))
-        self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-            
-    def setRotate(self, key):
-        self.setOrigin()
-        p = int(RotateKeys[key])
-        p = int(self.rotation - p) 
-        if p > 360:            
-            p = p - 360
-        elif p < 0:
-            p = p + 360  
-        if self.bkgMaker.widget: self.bkgMaker.widget.setBkgRotate(p)       
-            
-    def setOrigin(self):  
-        b = self.boundingRect()
-        op = QPointF(b.width()/2, b.height()/2)
-        self.setTransformOriginPoint(op)
-                                           
-    def updateXY(self, pos):
-        dragX = pos.x() - self.dragAnchor.x()
-        dragY = pos.y() - self.dragAnchor.y()     
-        self.x = int(self.initX + dragX)        
-        self.y = int(self.initY + dragY)  
-
+      
 ### --------------------------------------------------------        
 class BkgWidget(QWidget):  
 ### -------------------------------------------------------- 
@@ -151,8 +86,6 @@ class BkgWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)             
-
-        self.resetSliders(self.bkgItem)
                                                      
         self.show()
                 
@@ -343,7 +276,7 @@ class BkgWidget(QWidget):
                 
         groupBox.setLayout(vbox)
         return groupBox
+                            
+### ---------------------- dotsBkgWrks ---------------------
+
   
-### ---------------------- dotsBkgWrks ---------------------                                                                                         
-
-

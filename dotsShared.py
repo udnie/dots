@@ -5,7 +5,7 @@ from PyQt6.QtCore    import Qt
 ''' dotsShared: common data shared across classes and files '''
 ### --------------------------------------------------------
 
-common = {  ## wherever it's needed
+common = {  ## wherever it's needed * updated by screens
     'tagZ':      20.0,    
     'pathZ':    -25.0, 
     'gridZ':    -50.0, 
@@ -14,9 +14,9 @@ common = {  ## wherever it's needed
     'points':    40.0,
     'outline':   30.0,
     'ScrollW':    138,  ## used by both 1080 and 1280X720 px
-    'SliderW':    170,    
-    'OffSet':       0,  ## sliderpanel width, used to set fixed size 
-    'fix':          23,  ## sliderpanel height, used to set fixed size 
+    'SliderW':    175,    
+    'OffSet':       0,  ## keysPanel width, used to set fixed size 
+    'fix':          23,  ## keysPanel height, used to set fixed size 
     'V':         12.0,  ## diameter of pointItems in shadows
 } 
         
@@ -35,7 +35,6 @@ paths = {
     'spritePath': './sprites/',
     'txy':        './txy/',
 }
-
 
 Tick = 2.0
 
@@ -108,14 +107,14 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_U: 'U',
     Qt.Key.Key_V: 'V', 
     Qt.Key.Key_W: 'W',  
-    Qt.Key.Key_Comma: ',', 
+    Qt.Key.Key_Comma:  ',', 
     Qt.Key.Key_Period: '.',     
-    Qt.Key.Key_Plus: '+',         
+    Qt.Key.Key_Plus:  '+',         
     Qt.Key.Key_Equal: '=',    
     Qt.Key.Key_Minus: '-',  
-    Qt.Key.Key_Less: '<',     
+    Qt.Key.Key_Less:  '<',     
     Qt.Key.Key_Greater: '>',
-    Qt.Key.Key_Colon: ':',   
+    Qt.Key.Key_Colon:   ':',   
     Qt.Key.Key_Semicolon: ';',  
     Qt.Key.Key_Apostrophe: '\'',      
     Qt.Key.Key_QuoteDbl: '\"', 

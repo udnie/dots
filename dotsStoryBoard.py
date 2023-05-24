@@ -16,8 +16,7 @@ from dotsMapItem     import InitMap
 from dotsBkgMaker    import *
 from dotsSideShow    import SideShow
 from dotsPathMaker   import PathMaker
-from dotsSnakes      import Snakes
-from dotsSliderPanel import SliderPanel
+from dotsKeysPanel   import KeysPanel
 from dotsScrollPanel import ScrollPanel
 from dotsDocks       import *
 from dotsSidePath    import Wings
@@ -35,18 +34,18 @@ class StoryBoard(QWidget):
 
         self.dots  = parent 
         
-        self.scene = QGraphicsScene(0, 0, common["ViewW"], common["ViewH"])
+        self.scene = QGraphicsScene(0, 0, common['ViewW'], common['ViewH'])
         self.view  = ControlView(self)
         
-        self.view.setGeometry(QRect(0,0,common["ViewW"]+2, common["ViewH"]+2))
-        self.setFixedSize(common["ViewW"]+2, common["ViewH"]+2)
+        self.view.setGeometry(QRect(0,0,common['ViewW']+2, common['ViewH']+2))
+        self.setFixedSize(common['ViewW']+2, common['ViewH']+2)
      
         self.control = ''         ## shared
         self.pathMakerOn = False  ## shared
         self.openPlayFile = ''    ## shared 
         self.pathList = []        ## used by animations, updated here
     
-        self.slider    = SliderPanel(self)
+        self.keysPanel = KeysPanel(self)
         self.scroll    = ScrollPanel(self)
         self.pathMaker = PathMaker(self)
 
@@ -54,14 +53,13 @@ class StoryBoard(QWidget):
         self.bkgMaker  = BkgMaker(self)
      
         self.animation = Animation(self)    
-        self.snakes    = Snakes(self)
         self.wings     = Wings(self)
         
         self.sideShow  = SideShow(self)  ## additional extentions    
         self.sideCar   = SideCar(self) 
          
         addScrollDock(self)  ## add button groups from dotsDocks
-        addSliderDock(self)
+        addKeysDock(self)
         addButtonDock(self)  
 
         self.key = ''
@@ -77,14 +75,13 @@ class StoryBoard(QWidget):
         self.view.keysSignal[str].connect(self.setKeys)  
         
         if self.dots.msg != '':
-            QTimer.singleShot(100, self.sideCar.exceedsMsg)
+            QTimer.singleShot(100, self.bkgMaker.exceedsMsg)
             self.dots.msg = ''
-        
+                
 ### ---------------------- send keys -----------------------
     @pyqtSlot(str)
     def setKeys(self, key):  ## managing storyboard and pathMaker
-        self.key = key 
-        
+        self.key = key  
         if self.key == 'C':  ## clear canvas
             if self.pathMakerOn:
                 if len(self.scene.items()) == 0:
@@ -184,7 +181,7 @@ class StoryBoard(QWidget):
         for itm in self.scene.items(): 
             if itm.type in ('pt','pix'): 
                 itm.setPixKeys(self.key)
-            elif itm.zValue() <= common["pathZ"]:
+            elif itm.zValue() <= common['pathZ']:
                 break
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
@@ -207,7 +204,7 @@ class StoryBoard(QWidget):
                 elif key == 'L' and pix.isSelected():
                     pix.togglelock()  ## wait to toggleTagItems
                     stub = 'select'
-            elif pix.zValue() <= common["pathZ"]:
+            elif pix.zValue() <= common['pathZ']:
                 break
         self.mapper.clearMap()
         self.mapper.toggleTagItems(stub)
@@ -216,22 +213,31 @@ class StoryBoard(QWidget):
         self.clear() 
         self.dots.closeAll()
         QTimer.singleShot(20, self.dots.close)   
-
-    def clear(self):  ## do this before exiting app        
+                    
+    def clear(self):  ## do this before exiting app  
+        if self.control != '':
+            self.sideShow.stop('clear')
+        self.bkgMaker.delSnakes() 
+        self.mapper.clearMap() 
+                      
+        self.sideCar.clearWidgets()             
+        self.bkgMaker.closeDemoMenu() 
+        self.bkgMaker.closeScreenMenu()
+               
         self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()
-        self.sideCar.clearWidgets()
-        self.sideShow.stop('clear')   
+  
         if not self.dots.Vertical:
-            self.bkgMaker.disableBkgBtns()        
+            self.bkgMaker.disableBkgBtns()   
+      
         self.btnAddBkg.setEnabled(True)                  
         self.dots.statusBar.clearMessage()
-        self.mapper.clearMap()
         self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.scene.clear()
-      
+        gc
+           
     def loadSprites(self):
         self.sideCar.enablePlay()
         self.scroll.loadSprites()
@@ -241,13 +247,13 @@ class StoryBoard(QWidget):
             if pix.type in ('pix', 'shadow'):
                 pix.setSelected(True)
                 pix.isHidden = False
-            elif pix.zValue() <= common["pathZ"]:
+            elif pix.zValue() <= common['pathZ']:
                 break
 
     def unSelect(self):
         self.mapper.clearMap()
         for itm in self.scene.items():
-            if itm.zValue() <= common["pathZ"]:
+            if itm.zValue() <= common['pathZ']:
                 break     
             itm.setSelected(False)  
             if itm.type == 'pix':
@@ -279,7 +285,7 @@ class StoryBoard(QWidget):
                             pix.setMirrored(False)
                         else:
                             pix.setMirrored(True)
-                elif pix.zValue() <= common["pathZ"]:
+                elif pix.zValue() <= common['pathZ']:
                     break
 
     def hasHiddenPix(self):
@@ -287,7 +293,7 @@ class StoryBoard(QWidget):
             if pix.type == 'pix':
                 if pix.isHidden: 
                     return True  ## found one
-            elif pix.zValue() <= common["pathZ"]:
+            elif pix.zValue() <= common['pathZ']:
                 break
         return False
 
@@ -303,16 +309,9 @@ class StoryBoard(QWidget):
                 elif pix.isHidden:
                     pix.setSelected(True)
                     pix.isHidden = False
-            elif pix.zValue() <= common["pathZ"]:
+            elif pix.zValue() <= common['pathZ']:
                 break
-        
-    def runSnakes(self):  ## can be run using 'r' after initial alt/opt-r
-        if self.openPlayFile != 'snake' and len(self.scene.items()) > 0: 
-            MsgBox('The Screen Needs to be Clear inorder to Run Snakes', 7, getCtr(-225,-175))
-            return 
-        else:
-            QTimer.singleShot(100, self.snakes.setSnakePaths) 
-                 
+                       
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():
@@ -323,7 +322,7 @@ class StoryBoard(QWidget):
         ## basing pathlist on what's in the directory
         self.pathList = getPathList(True)  ## names only
         rlst = sorted(self.pathList)     
-        alst.extend(["Random"])  
+        alst.extend(['Random'])  
               
         menu.addAction('Animations and Paths')
         menu.addSeparator()   
@@ -338,19 +337,19 @@ class StoryBoard(QWidget):
             action.triggered.connect(
                 lambda chk, anime=anime: self.setAnimationTag(anime))
         menu.addSeparator()
-        anime = "Clear Tags"
+        anime = 'Clear Tags'
         action = menu.addAction(anime)
         action.triggered.connect(
             lambda chk, anime=anime: self.setAnimationTag(anime))
         menu.exec(e.globalPos())  ## except for pyside
     
     def setAnimationTag(self, tag):
-        if self.mapper.tagSet and tag == "Clear Tags":
+        if self.mapper.tagSet and tag == 'Clear Tags':
             self.mapper.clearTagGroup()
         for pix in self.scene.selectedItems(): 
             if pix.type != 'pix':
                 continue
-            if tag == "Clear Tags":
+            if tag == 'Clear Tags':
                 pix.tag = ''
             else:
                 pix.tag = tag

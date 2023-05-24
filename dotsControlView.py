@@ -14,7 +14,7 @@ ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
 ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
-            Qt.Key.Key_S, Qt.Key.Key_W)
+            Qt.Key.Key_W)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
 ### ------------------ dotsControlView ---------------------
@@ -129,21 +129,16 @@ class ControlView(QGraphicsView):
                 self.sideCar.hideSelected()
                 self.sideCar.clearWidgets()
                 self.sideCar.toggleOutlines()
-            elif key == Qt.Key.Key_S:
-                self.sideCar.screenMenu()
            
         elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and self.canvas.pathMakerOn == False:
             if mod & Qt.KeyboardModifier.AltModifier:  ## used by scrollpanel to scroll sprites 
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('up')             
+                    self.sideCar.pageDown('up')    
+                             
             elif mod & Qt.KeyboardModifier.ControlModifier: 
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('-1') 
-                    
-        elif key == Qt.Key.Key_R and mod & Qt.KeyboardModifier.AltModifier: 
-            if self.canvas.pathMakerOn == False:  
-                self.canvas.runSnakes()
-           
+                            
         # shift keys used in locking screen items - L, R, U
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
             self.canvas.togglePixLocks(singleKeys[key]) 

@@ -21,12 +21,15 @@ class PointItem(QGraphicsEllipseItem):
     def __init__(self, pt, ptStr, parent):
         super().__init__()
 
-        self.fab     = parent
-        self.pixitem = self.fab.pixitem
-        self.path    = self.fab.path
+        self.maker   = parent
+        self.pixitem = self.maker.pixitem
+        self.path    = self.maker.path
          
-        self.type  = 'point'
         self.ptStr = ptStr
+        
+        self.type  = 'point'
+        self.fileName = 'point'
+        self.tag = 'point'
         
         self.dragCnt = 0
           
@@ -51,12 +54,12 @@ class PointItem(QGraphicsEllipseItem):
         self.dragCnt += 1
         if self.dragCnt % 5 == 0:            
             self.moveIt(e.pos()) 
-            self.fab.updateShadow()                  
+            self.maker.updateShadow()                  
         e.accept()
                        
     def mouseReleaseEvent(self, e):
         self.moveIt(e.pos())
-        self.fab.updateShadow()
+        self.maker.updateShadow()
         e.accept()
                                         
     def moveIt(self, e):     
@@ -67,12 +70,12 @@ class PointItem(QGraphicsEllipseItem):
             w, y1 = self.current(0,1)            
             self.path[0] = QPointF(x,y) 
             self.path[1] = QPointF(x+w,y1)
-            self.fab.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)       
+            self.maker.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)       
         elif self.ptStr == 'botLeft':    
             w, y1 = self.current(3,2)            
             self.path[3] = QPointF(x,y) 
             self.path[2] = QPointF(x+w,y1)
-            self.fab.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
+            self.maker.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
         else:  
             i = PathStr.index(self.ptStr)  ## move only 
             self.path[i] = QPointF(x,y)                  
@@ -88,8 +91,8 @@ class ShadowWidget(QWidget):
     def __init__(self, parent):
         super().__init__()
                                         
-        self.fab = parent
-        self.pixitem = self.fab.pixitem
+        self.maker = parent
+        self.pixitem = self.maker.pixitem
         
         self.type = 'widget'
         self.save = QPointF(0.0,0.0)
@@ -142,7 +145,7 @@ class ShadowWidget(QWidget):
         self.save = e.globalPosition()
         
     def mouseDoubleClickEvent(self, e):
-        self.fab.closeWidget()
+        self.maker.closeWidget()
         e.accept()
         
 ### -------------------------------------------------------- 
@@ -224,12 +227,12 @@ class ShadowWidget(QWidget):
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
     
-        hideBtn.clicked.connect(self.fab.hideAll)
-        flipBtn.clicked.connect(self.fab.flip)
-        flopBtn.clicked.connect(self.fab.flop)
-        newBtn.clicked.connect(self.fab.newShadow)
-        delBtn.clicked.connect(self.fab.deleteShadow)
-        quitBtn.clicked.connect(self.fab.closeWidget)
+        hideBtn.clicked.connect(self.maker.hideAll)
+        flipBtn.clicked.connect(self.maker.flip)
+        flopBtn.clicked.connect(self.maker.flop)
+        newBtn.clicked.connect(self.maker.newShadow)
+        delBtn.clicked.connect(self.maker.deleteShadow)
+        quitBtn.clicked.connect(self.maker.closeWidget)
     
         hbox = QVBoxLayout(self)
         hbox.addWidget(hideBtn)
@@ -243,18 +246,18 @@ class ShadowWidget(QWidget):
         return groupBox
     
     def Rotate(self, val):  ## setting rotate in shadowMaker
-        self.fab.rotateShadow(val)
+        self.maker.rotateShadow(val)
         self.rotateValue.setText('{:3d}'.format(val))
              
     def Scale(self, val):  ## setting rotate in shadowMaker
         op = (val/100)
-        self.fab.scaleShadow(op)
+        self.maker.scaleShadow(op)
         self.scaleValue.setText('{0:.2f}'.format(op))
            
     def Opacity(self, val):
         op = (val/100)
-        self.fab.shadow.setOpacity(op)
-        self.fab.alpha = op
+        self.maker.shadow.setOpacity(op)
+        self.maker.alpha = op
         self.opacityValue.setText('{0:.2f}'.format(op)) 
                                                         
 ### --------------------------------------------------------
@@ -263,13 +266,16 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
     def __init__(self, parent):
         super().__init__()
        
-        self.fab     = parent
-        self.pixitem = self.fab.pixitem
-        self.path    = self.fab.path
+        self.maker   = parent
+        self.pixitem = self.maker.pixitem
+        self.path    = self.maker.path
        
-        self.type = 'shadow' 
         self.anime = None 
         self.setZValue(common['shadow']) 
+        
+        self.tag = ''
+        self.type = 'shadow' 
+        self.fileName = 'shadow'
                                        
         self.dragCnt = 0
         self.save    = QPointF(0.0,0.0)
@@ -289,61 +295,61 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
 
     def mousePressEvent(self, e): 
         self.save = self.mapToScene(e.pos())    
-        self.fab.addPoints()  
+        self.maker.addPoints()  
         if e.button() == Qt.MouseButton.RightButton:
             self.skip = True      
-            self.fab.addWidget()
+            self.maker.addWidget()
         e.accept() 
         
     def mouseMoveEvent(self, e):
         self.dragCnt += 1
         if self.dragCnt % 5 == 0:                     
-            self.fab.updatePath(self.mapToScene(e.pos()))  
-            self.fab.updateOutline()
+            self.maker.updatePath(self.mapToScene(e.pos()))  
+            self.maker.updateOutline()
         e.accept()
                        
     def mouseReleaseEvent(self, e): 
-        self.fab.updatePath(self.mapToScene(e.pos())) 
+        self.maker.updatePath(self.mapToScene(e.pos())) 
         if self.skip:
             self.skip = False  ## skip updating shadow as ran widget 
         else: 
-            self.fab.updateOutline()
-            self.fab.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving
+            self.maker.updateOutline()
+            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving
         e.accept()
  
  ### --------------------------------------------------------   
     def initPoints(self):  ## initial path and points setting           
         self.path = []
-        self.fab.outline = None
+        self.maker.outline = None
          
-        self.fab.setPath(self.boundingRect(), self.fab.shadow.pos())
+        self.maker.setPath(self.boundingRect(), self.maker.shadow.pos())
         
-        self.fab.updateOutline()     
-        self.fab.addPoints() 
+        self.maker.updateOutline()     
+        self.maker.addPoints() 
     
         if self.pixitem.scale == 1.0 and self.pixitem.rotation == 0:    
             return
                      
-        self.fab.hideAll()  ## pixitem rotated or scaled 
+        self.maker.hideAll()  ## pixitem rotated or scaled 
            
-        self.fab.shadow.setRotation(self.pixitem.rotation)
-        self.fab.shadow.setScale(self.pixitem.scale)
+        self.maker.shadow.setRotation(self.pixitem.rotation)
+        self.maker.shadow.setScale(self.pixitem.scale)
     
-        self.fab.setPath(self.pixitem.boundingRect(), self.pixitem.pos() + QPointF(-50,-15))
+        self.maker.setPath(self.pixitem.boundingRect(), self.pixitem.pos() + QPointF(-50,-15))
      
         if self.pixitem.rotation != 0:
-            self.fab.rotateShadow(self.pixitem.rotation)
-            self.fab.rotate = self.pixitem.rotation
+            self.maker.rotateShadow(self.pixitem.rotation)
+            self.maker.rotate = self.pixitem.rotation
                     
         if self.pixitem.scale != 1.0:   
-            self.fab.scaleShadow(self.pixitem.scale)      
-            self.fab.scalor = self.pixitem.scale
+            self.maker.scaleShadow(self.pixitem.scale)      
+            self.maker.scalor = self.pixitem.scale
    
-        self.fab.updateOutline()         
-        self.fab.addPoints()                
+        self.maker.updateOutline()         
+        self.maker.addPoints()                
       
-        self.fab.hideAll()  ## call again to unhide       
-        self.fab.shadow.show()
+        self.maker.hideAll()  ## call again to unhide       
+        self.maker.shadow.show()
                                                         
 ### --------------------------------------------------------        
 def initShadow(file, w, h, flop):  ## replace all colors with grey    

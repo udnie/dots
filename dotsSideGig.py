@@ -3,9 +3,9 @@ import random
 import os
 import math
 
-from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint
+from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint, QSize
 from PyQt6.QtGui        import QPainter, QBrush, QFontMetrics, QColor, QFont, \
-                                QGuiApplication
+                                QGuiApplication, QImage, QPixmap
 from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem
 
 from dotsShared         import common, paths, pathcolors, PlayKeys
@@ -17,7 +17,12 @@ class MsgBox(QMessageBox):  ## always use getCtr for setting point
 ### --------------------------------------------------------
     def __init__(self, text, pause=3, pt=None):
         super().__init__()
-
+                 
+        img = QImage(paths['spritePath'] + "doral.png")
+        pixmap = QPixmap(img)   
+        self.setIconPixmap(pixmap)
+        self.setText('\n' + text)
+        
         if isinstance(pause, int):
             self.timeOut = pause
         elif isinstance(pause, QPoint):
@@ -28,10 +33,7 @@ class MsgBox(QMessageBox):  ## always use getCtr for setting point
             return
         else:
             self.timeOut = 3
-             
-        self.setText('\n' + text)
-        self.setStandardButtons(QMessageBox.StandardButton.NoButton)
-            
+                   
         self.timer = QTimer(self)
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.changeContent)
@@ -203,6 +205,8 @@ def getCrop(path):  ## from path - bounding size and position
     return int(x), int(y), int((x1-x)), int((y1-y))
 
 ### --------------------------------------------------------
+### from sideshow
+### --------------------------------------------------------
 def savePix(pix): 
     p = pix.pos() 
     tmp = {
@@ -239,12 +243,11 @@ def savePix(pix):
 
 def saveBkg(pix):
     p = pix.boundingRect() 
-    pos = pix.pos()
     tmp = {
         'fname':    os.path.basename(pix.fileName),
         'type':    'bkg',
-        'x':        float('{0:.2f}'.format(pos.x())),
-        'y':        float('{0:.2f}'.format(pos.y())),
+        'x':        float('{0:.2f}'.format(pix.x)),
+        'y':        float('{0:.2f}'.format(pix.y)),
         'z':        pix.zValue(),
         'mirror':   pix.flopped,
         'locked':   pix.locked,
@@ -253,6 +256,9 @@ def saveBkg(pix):
         'opacity':  float('{0:.2f}'.format(pix.opacity)),
         'width':    int(p.width()),
         'height':   int(p.height()),
+        'tag':      pix.tag,
+        'scrollable':   pix.scrollable,
+        'direction':    pix.direction,
     }
     return tmp
 
@@ -262,6 +268,7 @@ def saveFlat(pix):
         'type':  'bkg',
         'z':      pix.zValue(),
         'tag':    pix.color.name(),
+        'color':  pix.color.name(),
     }
     return tmp
 

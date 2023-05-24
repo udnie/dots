@@ -68,22 +68,22 @@ def addScrollDock(self):
     return scrollDock
 
 ### --------------------------------------------------------
-def addSliderDock(self):
-    self.sliderDock = QDockWidget(self)
-    self.dots.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.sliderDock)
+def addKeysDock(self):
+    self.keysDock = QDockWidget(self)
+    self.dots.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.keysDock)
     self.dockedWidget = QWidget(self)
 
-    self.sliderDock.setTitleBarWidget(QWidget(self))
-    self.sliderDock.setWidget(self.dockedWidget)  
+    self.keysDock.setTitleBarWidget(QWidget(self))
+    self.keysDock.setWidget(self.dockedWidget)  
 
     layout = QVBoxLayout()      
     layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size - stopped movement
     self.dockedWidget.setLayout(layout)
 
-    sliderDock = self.dockedWidget.layout() 
-    sliderDock.addWidget(self.slider)
+    keysDock = self.dockedWidget.layout() 
+    keysDock.addWidget(self.keysPanel)
     
-    return sliderDock
+    return keysDock
 
 ### --------------------------------------------------------  
 def addScrollBtnGroup(self):  
@@ -184,7 +184,7 @@ def addBkgBtnGroup(self):
     layout.addWidget(self.btnSaveBkg) 
     layout.addWidget(self.btnBkgColor)
 
-    bkg = self.bkgMaker
+    bkg  = self.bkgMaker
 
     self.btnAddBkg.clicked.connect(bkg.openBkgFiles)       
     self.btnSetBkg.clicked.connect(bkg.setBkg)

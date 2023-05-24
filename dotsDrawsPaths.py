@@ -69,6 +69,7 @@ class DrawsPaths(QWidget):
         self.pathMaker.npts = 0
         self.pathMaker.pts = []
         self.editBtn('ClosePath')
+        self.pathMaker.closeWidget()
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note

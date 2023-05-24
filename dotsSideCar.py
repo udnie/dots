@@ -9,13 +9,10 @@ from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect, QTimer
 from PyQt6.QtGui        import QPen, QColor, QGuiApplication
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
                                 QApplication, QMenu
-                                                 
-import dotsAnimation    as Animation
-   
+                                                    
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
-from dotsSideGig     import MsgBox, getCtr, constrain
-from dotsScreens     import *
+from dotsSideGig     import MsgBox, constrain
 from functools       import partial
 
 ### ---------------------- dotsSideCar ---------------------
@@ -31,13 +28,10 @@ class SideCar:
         self.canvas = parent
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
-        self.animation = Animation.Animation(self.canvas)
       
-        self.gridZ = common['gridZ'] 
-        
+        self.gridZ = common['gridZ']    
         self.gridGroup = None   
-        self.scrnMenu  = None
-    
+     
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
@@ -74,46 +68,7 @@ class SideCar:
                              
     def xy(self, max):
         return random.randrange(-40, max+40)
-    
-### --------------------------------------------------------                       
-    def screenMenu(self):
-        self.scrnMenu = QMenu(self.canvas)    
-        self.scrnMenu.addAction(' Screen Formats')
-        self.scrnMenu.addSeparator()
-        for screen in screens.values():
-            action = self.scrnMenu.addAction(screen)
-            self.scrnMenu.addSeparator()
-            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
-        self.scrnMenu.move(getCtr(-100,-225)) 
-        self.scrnMenu.setFixedSize(150, 252)
-        self.scrnMenu.show()
-    
-    def clicked(self, screen):
-        for key, value in screens.items():
-            if value == screen:  ## singleshot needed for menu to clear
-                QTimer.singleShot(200, partial(self.displayChk, self.switchKey(key)))
-                break
-        self.scrnMenu == None
-        self.scrnMenu.close()
-                     
-    def switchKey(self, key):                 
-        if self.displayChk(key) == True:
-            self.canvas.clear()       
-            self.canvas.dots.switch(key) 
-        else:
-            return
-    
-    def displayChk(self, key):  ## switch screen format
-        p = QGuiApplication.primaryScreen().availableGeometry()
-        if key in MaxScreens and p.width() < MaxWidth:  ## current screen width < 1680
-            self.exceedsMsg() 
-            return False
-        else:
-            return True            
-        
-    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
-        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
-                                   
+                                    
 ### --------------------------------------------------------      
     def snapShot(self):  ## screen capture
         if self.hasBackGround() or self.scene.items():
@@ -130,6 +85,7 @@ class SideCar:
                 
             if snap[:4] != 'dots':  ## always ask unless                      
                 Q = QFileDialog()
+                Q.Option.DontUseNativeDialog
                 Q.setDirectory(paths['snapShot'])
                 f = Q.getSaveFileName(self.canvas, paths['snapShot'],
                     paths['snapShot'] + snap)
@@ -157,7 +113,7 @@ class SideCar:
                              
 ### --------------------------------------------------------           
     def toggleMenu(self):
-        self.canvas.slider.toggleMenu()  ## no direct path from controlView
+        self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
                                                                                            
     def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
@@ -248,12 +204,13 @@ class SideCar:
     def saveToJson(self, dlist):     
         if self.canvas.openPlayFile == '':
             self.canvas.openPlayFile = paths['playPath'] + 'tmp.play'       
-        Q = QFileDialog()            
+        Q = QFileDialog()        
+        Q.Option.DontUseNativeDialog    
         Q.setDirectory(paths['playPath'])
         f = Q.getSaveFileName(self.canvas, paths['playPath'],  
             self.canvas.openPlayFile)
         Q.accept()
-        
+
         if not f[0]: 
             return
         if not f[0].lower().endswith('.play'):

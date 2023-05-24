@@ -179,6 +179,7 @@ class SideWays:
             MsgBox('openFiles: Clear Scene First', 5)
             return
         Q = QFileDialog()
+        Q.Option.DontUseNativeDialog
         Q.setDirectory(paths['paths'])
         file, _ = Q.getOpenFileName(self.canvas,
             'Choose a path file to open', paths['paths'],
@@ -200,6 +201,7 @@ class SideWays:
                      
             ##  self.pathMaker.openPathFile has no path attached to it            
             Q = QFileDialog()
+            Q.Option.DontUseNativeDialog
             Q.setDirectory(paths['paths'])
             f = Q.getSaveFileName(self.canvas, paths['paths'],
                 paths['paths'] + self.pathMaker.openPathFile)  ## note

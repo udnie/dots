@@ -12,8 +12,8 @@ from dotsShared         import common
 import dotsStoryBoard   as canvas
 
 ### ----------------------- dotsQt -------------------------
-''' dotsQt: parent container for the //major widgets.
-    See dotsShared.py for common shared variabxxxxles and path
+''' dotsQt: parent container for the major widgets.
+    See dotsShared.py for common shared variables and path
     dictionaries shared across classes and files''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
@@ -49,7 +49,7 @@ class DotsQt(QMainWindow):
                                
         self.statusBar = QStatusBar()
         self.setStatusBar(self.statusBar) 
-                  
+                
         self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)  
         
@@ -58,15 +58,15 @@ class DotsQt(QMainWindow):
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always
-                 
+                         
         self.show()
                      
 ### --------------------------------------------------------       
     def closeAll(self):  ## close all app widgets
         self.canvas.close()   
-        self.canvas.slider.close()
+        self.canvas.keysPanel.close()
         self.canvas.scroll.close()
-        self.canvas.sliderDock.close()
+        self.canvas.keysDock.close()
         self.canvas.scrollDock.close()
         self.canvas.buttonDock.close()    
                    

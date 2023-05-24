@@ -13,7 +13,7 @@ from dotsSideGig        import distance, getCrop
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
        
 ### ------------------- dotsShadowMaker --------------------
-''' a.k.a. fab - handles shadow, menu, and points classes '''                                                                                                                    
+''' a.k.a. maker - handles shadow, menu, and points classes '''                                                                                                                    
 ### -------------------------------------------------------- 
 class ShadowMaker:  
 ### --------------------------------------------------------    
@@ -86,7 +86,7 @@ class ShadowMaker:
         
         if self.pixitem.scale != 1.0 or self.pixitem.rotation != 0:
             self.shadow.hide()
-                             
+                                        
         self.scene.addItem(self.shadow)      
         QTimer.singleShot(100, self.shadow.initPoints)
         
@@ -120,6 +120,10 @@ class ShadowMaker:
         self.scalor   = self.pixitem.shadow['scalor']
         self.rotate   = self.pixitem.shadow['rotate']
         self.flopped   = self.pixitem.shadow['flopped']
+        
+        self.tag = ''
+        self.type = 'shadow'
+        self.fileName = 'shadow'
                   
         self.addPoints() 
         self.updateShadow()

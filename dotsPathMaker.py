@@ -22,11 +22,11 @@ class PathMaker(QWidget):
     def __init__(self, parent):  
         super().__init__()
 
-        self.canvas  = parent  
-        self.scene   = self.canvas.scene
-        self.view    = self.canvas.view
-        self.slider  = self.canvas.slider
-        self.dots    = self.canvas.dots
+        self.canvas    = parent  
+        self.scene     = self.canvas.scene
+        self.view      = self.canvas.view
+        self.keysPanel = self.canvas.keysPanel
+        self.dots      = self.canvas.dots
  
         self.widget = None  ## main pathMaker widget 
        
@@ -181,8 +181,8 @@ class PathMaker(QWidget):
         else:
             self.canvas.pathMakerOn = True 
             self.initThis()
-            if not self.slider.pathMenuSet:
-                self.slider.toggleMenu()
+            if not self.keysPanel.pathMenuSet:
+                self.keysPanel.toggleMenu()
             self.turnGreen()
             self.addWidget()  ## on start up 
 
@@ -210,8 +210,8 @@ class PathMaker(QWidget):
             self.canvas.pathMakerOn = False
             self.canvas.bkgMaker.disableSetBkg() 
             self.canvas.sideCar.clearWidgets()
-            if self.slider.pathMenuSet:
-                self.slider.toggleMenu()
+            if self.keysPanel.pathMenuSet:
+                self.keysPanel.toggleMenu()
             self.canvas.btnPathMaker.setStyleSheet(
                 'background-color: white')
          

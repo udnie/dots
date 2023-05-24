@@ -14,7 +14,7 @@ Ticks = (100,50,10)  ## how often to draw a line and size
 VWidth, VHeight = 600, 70
 
 # from PyQt6.QtCore import QT_VERSION_STR
-# from PyQt6.QtCore import PYQT_VERSION_STR]
+# from PyQt6.QtCore import PYQT_VERSION_STR
 
 # print( PySide.__version__ )
 # print("PyQt version:", PYQT_VERSION_STR) 
