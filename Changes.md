@@ -37,7 +37,7 @@ The first column values are all 10.0. **Ten** times the screen width or height t
 
 There's no handy scrolling widget but it's easy to set the direction by first holding down either the left or right arrow key and clicking on a background.  if the background image's ratio is **2:1** or  greater you'll get a message confirming the direction you've chosen, otherwise it won't work.  The next step is to save it with the **play** save button and not the **background** save button. Animations can only be run from a **play** file which is why I chose to write the scrolling routine as I did so it would play nice with the other animations in being able to **run**, **pause, resume**, and **stop** using the app play buttons.
 
-New video at: <https://youtu.be/-mpV2f8Qj6w>
+New video at: <https://youtu.be/E-1Mzau2KBw>
 
 <h2/span></h2>
 
