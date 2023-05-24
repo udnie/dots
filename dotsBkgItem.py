@@ -230,9 +230,6 @@ class BkgItem(QGraphicsPixmapItem):
         MsgBox('Direction set to ' +  self.canvas.key + '...', 6) 
        
     def left(self, path, pix, rate, which):  
-
-        print(rate)
-
         if which == 1:
             path.setDuration(int(common['ViewW'] * rate[0]))  ## rate time equals time to clear   
             path.setStartValue(QPoint(0,0)) 
