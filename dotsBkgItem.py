@@ -24,7 +24,7 @@ abstract = {  ## used by abstract.jpg and snakes.jpg - based on 1280X640 2:1 - u
     '1080':  (10.0,  17.62,  17.55),  ## first, next, next-right
     '1280':  (10.0,  18.97, 19.0),
     '1215':  (10.0,  17.4,  17.4),  
-    '1440':  (10.0,  18.85, 18.95),
+    '1440':  (10.0,  18.95, 18.95),
     '1296':  (10.0,  17.45, 17.55),  
     '1536':  (10.0,  18.95, 18.95),
     '620':   (10.0,  20.9,   0.0),
@@ -34,7 +34,7 @@ pano = {  ## no right scroll - used 1600X400 4:1 - one 1MB or less
     '1080':  (10.0,   15.0,  0.0),
     '1280':  (10.0,   15.9,  15.6,),
     '1215':  (10.0,   15.6,  0.0,),
-    '1440':  (10.0,   15.95,  0.0,),
+    '1440':  (10.0,   16.95, 0.0,),
     '1296':  (10.0,   15.6,  0.0,),
     '1536':  (10.0,   14.4,  0.0,),
 }
@@ -229,7 +229,10 @@ class BkgItem(QGraphicsPixmapItem):
         self.anime = self.setScrollerPath(self, 1)             
         MsgBox('Direction set to ' +  self.canvas.key + '...', 6) 
        
-    def left(self, path, pix, rate, which):       
+    def left(self, path, pix, rate, which):  
+
+        print(rate)
+
         if which == 1:
             path.setDuration(int(common['ViewW'] * rate[0]))  ## rate time equals time to clear   
             path.setStartValue(QPoint(0,0)) 
