@@ -8,7 +8,7 @@ import json
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect, QTimer
 from PyQt6.QtGui        import QPen, QColor, QGuiApplication
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
-                                QApplication, QMenu
+                                QApplication
                                                     
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
