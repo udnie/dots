@@ -1,5 +1,8 @@
 ## Changes
-**May:**        
+**May:**                
+Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
+
+
 I've upgraded both PyQt5 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
 
     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
