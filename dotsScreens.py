@@ -1,17 +1,21 @@
 
-from PyQt6.QtCore   import QPoint
-from PyQt6.QtGui    import QGuiApplication
+from functools          import partial
+
+from PyQt6.QtCore       import QTimer
+from PyQt6.QtGui        import QGuiApplication
+from PyQt6.QtWidgets    import QMenu
 
 from datetime       import datetime
 from dotsShared     import common
+from dotsSideGig    import MsgBox, getCtr
 
 MaxWidth = 1680  ##  position dock to screen bottom for max default display width
                  ##  on my mac with dock on left side, not on bottom
 MaxScreens = ('1440','1536', '620')  ## requires 1920X1280 display size
 
 ### -------------------- dotsScreens -----------------------
-''' dotsScreens: various screen formats and functions used
-    in the title bar '''
+''' classes: ScreenMenu and various screen formats and functions 
+    used in the title bar '''
 ### -------------------------------------------------------- 
 screens = {  ## the keys aren't shown
     '1080': '1080X720 -  3:2',
@@ -23,6 +27,62 @@ screens = {  ## the keys aren't shown
      '620': '620X1102 -  9:16',
 }
 
+### --------------------------------------------------------     
+class ScreenMenu:  
+### -------------------------------------------------------- 
+    def __init__(self, parent):
+        super().__init__()  
+   
+        self.canvas = parent
+        self.dots   = self.canvas.dots
+        self.scene  = self.canvas.scene
+        self.view   = self.canvas.view  
+        
+        self.screenMenu = None
+                     
+    def openScreenMenu(self):
+        self.closeScreenMenu()
+        self.screenMenu = QMenu(self.canvas)    
+        self.screenMenu.addAction(' Screen Formats')
+        self.screenMenu.addSeparator()
+        for screen in screens.values():
+            action = self.screenMenu.addAction(screen)
+            self.screenMenu.addSeparator()
+            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
+        self.screenMenu.move(getCtr(-85,-225)) 
+        self.screenMenu.setFixedSize(150, 252)
+        self.screenMenu.show()
+    
+    def clicked(self, screen):
+        for key, value in screens.items():
+            if value == screen:  ## singleshot needed for menu to clear
+                QTimer.singleShot(200, partial(self.displayChk, self.switchKey(key)))
+                break      
+        self.closeScreenMenu()  
+                    
+    def closeScreenMenu(self):   
+        if self.screenMenu:
+            self.screenMenu.close()
+        self.screenMenu = None
+              
+    def switchKey(self, key):                 
+        if self.displayChk(key) == True:
+            self.canvas.clear()       
+            self.canvas.dots.switch(key) 
+        else:
+            return
+    
+    def displayChk(self, key):  ## switch screen format
+        p = QGuiApplication.primaryScreen().availableGeometry()
+        if key in MaxScreens and p.width() < MaxWidth:  ## current screen width < 1680
+            self.exceedsMsg() 
+            return False
+        else:
+            return True            
+        
+    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
+        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
+     
 ### -------------------------------------------------------- 
 def setCommon(format=''):
     if format == '1080':      ## 1080X720 - 3:2 same as default

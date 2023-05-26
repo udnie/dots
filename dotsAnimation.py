@@ -1,13 +1,13 @@
 
 import random
 
-from PyQt6.QtCore    import QPointF, pyqtProperty, QPropertyAnimation, \
-                            QParallelAnimationGroup, QSequentialAnimationGroup, \
-                            QEasingCurve, QObject
+from PyQt6.QtCore   import QPointF, pyqtProperty, QPropertyAnimation, \
+                        QParallelAnimationGroup, QSequentialAnimationGroup, \
+                        QEasingCurve, QObject
 
-from dotsShared      import common
+from dotsShared     import common
 
-import dotsSidePath  as sidePath
+import dotsSidePath as sidePath
 
 AnimeList = ['Vibrate', 'Pulse','Bobble','Idle']
 OneOffs   = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
@@ -17,8 +17,7 @@ Spins     = ('Spin Left', 'Spin Right')
 AnimeList += OneOffs
 
 ### -------------------- dotsAnimation ---------------------
-''' dotsAnimation: contains many basic animations and the  
-    Node class - just like in java. Moved paths to dotsPaths '''
+''' classes: Node, Animation. Many basic animations '''
 ### --------------------------------------------------------
 class Node(QObject):
 ### --------------------------------------------------------

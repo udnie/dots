@@ -24,7 +24,7 @@ from dotsSidePath    import Wings
 Play = ('L','R','P','S')
 
 ### -------------------- dotsStoryBoard --------------------
-''' dotsStoryBoard: program hub/canvas, includes context menu and 
+''' class StoryBoard: program hub/canvas, includes context menu and 
     screen handling for selecting screen objects '''
 ### --------------------------------------------------------
 class StoryBoard(QWidget):
@@ -221,8 +221,8 @@ class StoryBoard(QWidget):
         self.mapper.clearMap() 
                       
         self.sideCar.clearWidgets()             
-        self.bkgMaker.closeDemoMenu() 
-        self.bkgMaker.closeScreenMenu()
+        self.sideShow.demoMenu.closeDemoMenu() 
+        self.sideShow.screenMenu.closeScreenMenu()
                
         self.pathMaker.pathMakerOff()
         self.pathMaker.pathChooserOff()

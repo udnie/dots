@@ -8,19 +8,22 @@ import gc
 import asyncio
 import time
 
-from PyQt6.QtCore    import QTimer, QAbstractAnimation
-from PyQt6.QtWidgets import QGraphicsPolygonItem
+from PyQt6.QtCore       import QTimer, QAbstractAnimation
+from PyQt6.QtWidgets    import QGraphicsPolygonItem
 
-from dotsShared      import common, paths
-from dotsPixItem     import PixItem
-from dotsBkgMaker    import *
+from dotsShared         import common, paths
+from dotsPixItem        import PixItem
+from dotsBkgMaker       import *
 
-from dotsSideGig     import *
-from dotsSideCar     import SideCar
-from dotsSidePath    import Wings
+from dotsSideGig        import *
+from dotsSideCar        import SideCar
+from dotsSidePath       import Wings
+
+from dotsSnakes         import DemoMenu
+from dotsScreens        import ScreenMenu
 
 ### ---------------------- dotsSideShow --------------------
-''' dotsSideShow: functions to run, pause, stop, etc.. .play animations'''        
+''' class: SideShow: functions to run, pause, stop, etc.. .play animations'''        
 ### --------------------------------------------------------
 class SideShow:
 ### --------------------------------------------------------
@@ -38,40 +41,42 @@ class SideShow:
         self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
         self.bkgMaker  = self.canvas.bkgMaker
+        
+        self.demoMenu   = DemoMenu(self.canvas)
+        self.screenMenu = ScreenMenu(self.canvas)
  
         self.ifBats = False
-        
-        self.screenMenu = None
         self.locks = 0
         
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
-        if self.canvas.pathMakerOn == False:
-            
+        if self.canvas.pathMakerOn == False:      
             if key == 'L' and self.canvas.control == '':
                 self.loadPlay()
+                
             elif key == 'P':  ## always
                 self.mapper.togglePaths()
                 
-            elif key == 'R':         
-                if len(self.scene.items()) == 0:    
-                    self.bkgMaker.closeScreenMenu()
-                    self.bkgMaker.setDemoMenu()     
-                    
-                elif self.canvas.openPlayFile == 'snakes' and self.bkgMaker.key != '':
-                    self.bkgMaker.delSnakes()
-                    self.bkgMaker.run(self.bkgMaker.key)   
-                    
-                elif self.canvas.openPlayFile != '':
-                    self.run()   
-                                
-            elif key == 'S':
-                if self.canvas.control != '':
-                    self.stop()
-                else:
-                    self.bkgMaker.closeDemoMenu()
-                    self.bkgMaker.setScreenMenu()
-                         
+            elif len(self.scene.items()) > 0:       
+                if key == 'R':                  
+                    if self.canvas.openPlayFile == 'snakes' and self.bkgMaker.key != '':
+                        self.bkgMaker.delSnakes()
+                        self.demoMenu.run(self.bkgMaker.key)                    
+                    elif self.canvas.openPlayFile != '':
+                        self.run()                                      
+                elif key == 'S':
+                    if self.canvas.control != '':
+                        self.stop()
+                        
+            else:  ## easier to add more single keys  
+                if key == 'R':
+                    self.screenMenu.closeScreenMenu()
+                    self.demoMenu.openDemoMenu()  
+                elif key == 'S':   
+                    self.demoMenu.closeDemoMenu()
+                    self.screenMenu.openScreenMenu()
+        
+### --------------------------------------------------------                            
     def loadPlay(self):   
         if self.canvas.pathMakerOn:  ## using load in pathMaker
             self.pathMaker.sideWays.openFiles()

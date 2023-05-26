@@ -11,17 +11,19 @@ from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem
 from dotsShared         import common, paths, pathcolors, PlayKeys
 
 ### ---------------------- dotsSideGig ---------------------
-''' dotsSideGigs: MsgBox, TagIt, savePix, saveBkg, saveFlat...'''
+''' classes: MsgBox, TagIt - plus savePix, saveBkg, saveFlat...'''
 ### --------------------------------------------------------
-class MsgBox(QMessageBox):  ## always use getCtr for setting point
+class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------
     def __init__(self, text, pause=3, pt=None):
         super().__init__()
                  
+        self.msg = QMessageBox()
+                        
         img = QImage(paths['spritePath'] + "doral.png")
         pixmap = QPixmap(img)   
-        self.setIconPixmap(pixmap)
-        self.setText('\n' + text)
+        self.msg.setIconPixmap(pixmap)
+        self.msg.setText('\n' + text)
         
         if isinstance(pause, int):
             self.timeOut = pause
@@ -29,28 +31,28 @@ class MsgBox(QMessageBox):  ## always use getCtr for setting point
             pt = pause
             self.timeOut = 3
         elif not isinstance(pt, QPoint):
-            MsgBox('Use a QPoint(n,n) to set message position', 6)
+            self.msg('Use a QPoint(n,n) to set message position', 6)
             return
         else:
             self.timeOut = 3
                    
-        self.timer = QTimer(self)
+        self.timer = QTimer(self.msg)
         self.timer.setInterval(1000)
         self.timer.timeout.connect(self.changeContent)
         self.timer.start()
 
         if isinstance(pt, QPoint) and pt.x() > 0 and pt.y() > 0: 
-            self.move(pt)
+            self.msg.move(pt)
                
-        self.exec()
+        self.msg.exec()
                            
     def enterEvent(self, e):  
-        self.close()
+        self.msg.close()
 
     def changeContent(self):
         self.timeOut -= 1
         if self.timeOut <= 0:
-            self.close()
+            self.msg.close()
 
     def closeEvent(self, e):
         self.timer.stop()

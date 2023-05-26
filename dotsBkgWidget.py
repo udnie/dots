@@ -7,7 +7,7 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
     
 from dotsShared         import common
                     
-### ---------------------- dotsBkgWrks ---------------------
+### ------------------- dotsDotsWidget ---------------------
 ''' classes:  Flat, BkgWidget '''                                                                                                              
 ### --------------------------------------------------------
 class Flat(QGraphicsPixmapItem):
@@ -276,7 +276,7 @@ class BkgWidget(QWidget):
                 
         groupBox.setLayout(vbox)
         return groupBox
-                            
-### ---------------------- dotsBkgWrks ---------------------
-
+                         
+### ------------------- dotsDotsWidget ---------------------
   
+

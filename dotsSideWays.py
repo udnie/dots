@@ -14,7 +14,7 @@ ScaleUpKeys = ('>','\"','\'')
 ScaleDnKeys = ('<',':',';')
                 
 ### --------------------- dotsSideWays ---------------------
-''' dotsSideWays: extends pathMaker. Includes path and wayPoints
+''' class SideWays: extends pathMaker. Includes path and wayPoints
     functions - scaleRotate, flopPath, reversePath, etc..'''
 ### --------------------------------------------------------
 class SideWays:

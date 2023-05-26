@@ -5,20 +5,18 @@ import random
 import json
 
 
-from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect, QTimer
-from PyQt6.QtGui        import QPen, QColor, QGuiApplication
+from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect
+from PyQt6.QtGui        import QPen, QColor
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
                                 QApplication
                                                     
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
 from dotsSideGig     import MsgBox, constrain
-from functools       import partial
 
 ### ---------------------- dotsSideCar ---------------------
-''' dotsSideCar: pixTest, transFormPixitem, snapShot, 
-    toggleGrid, screenMenu, and assorted small functions 
-    related to storyboard activity '''  
+''' no class: pixTest, transFormPixitem, snapShot, toggleGrid, 
+    and assorted small functions, related to storyboard activity '''  
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------

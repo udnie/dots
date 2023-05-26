@@ -4,7 +4,7 @@ import random
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtGui        import QColor, QImage, QPixmap
-from PyQt6.QtWidgets    import QGraphicsPixmapItem
+from PyQt6.QtWidgets    import QGraphicsPixmapItem, QMenu
 
 import dotsAnimation    as Anime
 
@@ -15,10 +15,88 @@ from dotsSideGig        import *
 from functools          import partial
 from dotsBkgMaker       import BkgItem
 
-### ---------------------- dotsSidePath --------------------
-''' dotsPaths is used by animations and pathmaker and contains 
-    demo, setPath, getOffSet and pathLoader '''
-    
+demos = {  ## used by demo menu
+    '1':  'Original Batwings',
+    '2':  'Snakes Blue Background',
+    '3':  'Right to Left Scrolling',  
+    '4':  'Left to Right Scrolling',  
+    '5':  'Snakes Scrolling Background',    
+    '6':  'Snakes Vertical Scrolling',  
+}
+
+### --------------------- dotsSnakes ----------------------- 
+''' classes: DemoMenu, Snake, Snakes '''
+### --------------------------------------------------------     
+class DemoMenu:  
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()  
+   
+        self.canvas = parent
+        self.dots   = self.canvas.dots
+        self.scene  = self.canvas.scene
+        self.view   = self.canvas.view 
+     
+        self.snakes = Snakes(self.canvas)    
+        self.bkgMaker = self.canvas.bkgMaker
+       
+        self.demoMenu = None
+                       
+    def openDemoMenu(self):
+        self.closeDemoMenu()
+        self.demoMenu = QMenu(self.canvas) 
+        self.demoMenu.addAction('Demos Menu'.rjust(20,' '))
+        self.demoMenu.addSeparator()
+        for demo in demos.values():
+            action = self.demoMenu.addAction(demo)
+            self.demoMenu.addSeparator()
+            action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))            
+        self.demoMenu.setFixedSize(220, 220)
+        self.demoMenu.move(getCtr(-120, -225))   
+        self.demoMenu.show()
+
+    def clicked(self, demo):
+        for key, value in demos.items():
+            if value == demo:  ## singleshot needed for menu to clear
+                QTimer.singleShot(200, partial(self.run, key))
+                break
+        self.closeDemoMenu()
+        
+    def closeDemoMenu(self):
+        if self.demoMenu:
+            self.demoMenu.close()           
+        self.demoMenu = None
+           
+    def run(self, key):                  
+        if key == '1':
+            self.canvas.sideShow.runThis(common['runThis']) 
+        elif key == '2':
+            self.runSnakes('blue', key)         
+        elif key == '6':
+            if self.dots.Vertical:   
+                self.runSnakes('vertical', key)  
+            else:
+                MsgBox("The Vertical screen format is required")          
+        elif key in ('3', '4', '5'):
+            if self.dots.Vertical: 
+                MsgBox("Not implemented for vertical screen format")
+            else:      
+                if key == '3':
+                    self.canvas.sideShow.runThis('abstract_left.play')  
+                elif key == '4':
+                    self.canvas.sideShow.runThis('abstract_right.play')            
+                elif key == '5':
+                    self.runSnakes('left', key)   
+            
+    def runSnakes(self, what, key): 
+        if key in ('2', '5', '6'): self.bkgMaker.delSnakes()    
+        self.key = key
+        if what != '':
+            QTimer.singleShot(100, partial(self.snakes.setSnakePaths, what))           
+        elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
+            MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 6, getCtr(-225,-175))
+            return 
+                    
 ### --------------------------------------------------------
 class Snake(QGraphicsPixmapItem):
 ### --------------------------------------------------------
@@ -79,9 +157,9 @@ class Snakes:
     def __init__(self, parent):
         super().__init__()
  
-        self.canvas  = parent
-        self.scene   = self.canvas.scene
-        self.mapper   = self.canvas.mapper
+        self.canvas = parent
+        self.scene  = self.canvas.scene
+        self.mapper = self.canvas.mapper
                                     
         self.sideCar = SideCar(self.canvas)
         self.PathsToClear = []
@@ -221,8 +299,7 @@ class Snakes:
         for p in self.PathsToClear:
             p.clear()
         self.PathsToClear = []
-        
-  ### --------------------------------------------------------      
-        
-        
-        
+           
+### ---------------------- dotsSnakes ----------------------     
+
+

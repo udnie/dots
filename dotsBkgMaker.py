@@ -8,39 +8,26 @@ from functools          import partial
 from PyQt6.QtCore       import Qt, QPoint, QRect, QTimer, QSize
 from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
-                                QColorDialog, QMenu
+                                QColorDialog
 
 from dotsSideGig        import MsgBox, getCtr
 from dotsShared         import common, paths, PlayKeys
 from dotsBkgWidget      import BkgWidget, Flat
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
-from dotsSnakes         import Snakes
 
-demos = {  ## used by demo menu
-    '1':  'Original Batwings',
-    '2':  'Snakes Blue Background',
-    '3':  'Right to Left Scrolling',  
-    '4':  'Left to Right Scrolling',  
-    '5':  'Snakes Scrolling Background',    
-    '6':  'Snakes Vertical Scrolling',  
-}
-
-### --------------------- dotsBkgMaker ---------------------                   
-''' Both pop menus, screens and demos, are here because of visiblity
-    to scene and view - otherwise screens wouldn't clear '''
-### --------------------------------------------------------     
+### --------------------- dotsBkgMaker ---------------------              
 class BkgMaker(QWidget):  
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
+        
         self.canvas = parent
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
-        self.snakes = Snakes(self.canvas)
-                       
+   
         self.widget  = None
         self.bkgItem = None  
        
@@ -50,10 +37,7 @@ class BkgMaker(QWidget):
         self.last = ''
         self.key = ''
         self.num  = 0
-        
-        self.demoMenu = None
-        self.screenMenu = None
-        
+                
         self.save = QPoint(self.widgetX, self.widgetY)
         
 ### --------------------------------------------------------
@@ -158,112 +142,21 @@ class BkgMaker(QWidget):
             self.bkgItem = Flat(color, self.canvas, bkz)    
             self.scene.addItem(self.bkgItem)
             self.updateZvals(self.bkgItem)
-         
-### --------------------------------------------------------                       
-    def setDemoMenu(self):
-        self.demoMenu = QMenu(self.canvas) 
-        self.demoMenu.addAction('Demos'.rjust(20,' '))
-        self.demoMenu.addSeparator()
-        for demo in demos.values():
-            action = self.demoMenu.addAction(demo)
-            self.demoMenu.addSeparator()
-            action.triggered.connect(lambda chk, demo=demo: self.dclicked(demo))            
-        self.demoMenu.setFixedSize(220, 220)
-        self.demoMenu.move(getCtr(-120,-225))    
-        self.demoMenu.show()
 
-    def dclicked(self, demo):
-        for key, value in demos.items():
-            if value == demo:  ## singleshot needed for menu to clear
-                QTimer.singleShot(200, partial(self.run, key))
-                break
-        self.closeDemoMenu()
-        
-    def closeDemoMenu(self):
-        if self.demoMenu:
-            self.demoMenu.close()           
-        self.demoMenu = None
-           
-    def run(self, key):                  
-        if key == '1':
-            self.canvas.sideShow.runThis(common['runThis']) 
-        elif key == '2':
-            self.runSnakes('blue', key)     
-        elif key in ('3', '4', '5') and not self.dots.Vertical:         
-            if key == '3':
-                self.canvas.sideShow.runThis('abstract_left.play')  
-            elif key == '4':
-                self.canvas.sideShow.runThis('abstract_right.play')            
-            elif key == '5':
-                self.runSnakes('left', key)         
-        elif key == '6' and self.dots.Vertical:   
-            self.runSnakes('vertical', key)      
-                 
-    def runSnakes(self, what, key): 
-        if key in ('2', '5', '6'): self.delSnakes()    
-        self.key = key
-        if what != '':
-            QTimer.singleShot(100, partial(self.snakes.setSnakePaths, what))           
-        elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
-            MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 7, getCtr(-225,-175))
-            return 
-        
+### --------------------------------------------------------     
     def delScroller(self, pix):
         self.scene.removeItem(pix)
         del pix
         self.num += 1
         if self.num % 3 == 0: gc
-           
+        
     def delSnakes(self):
         if len(self.canvas.scene.items()) > 0:
             for pix in self.canvas.scene.items():      
                 if pix.type == 'snake':
                     self.canvas.scene.removeItem(pix)
                     del pix
-                                    
-### --------------------------------------------------------                       
-    def setScreenMenu(self):
-        self.screenMenu = QMenu(self.canvas)    
-        self.screenMenu.addAction(' Screen Formats')
-        self.screenMenu.addSeparator()
-        for screen in screens.values():
-            action = self.screenMenu.addAction(screen)
-            self.screenMenu.addSeparator()
-            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
-        self.screenMenu.move(getCtr(-85,-225)) 
-        self.screenMenu.setFixedSize(150, 252)
-        self.screenMenu.show()
-    
-    def clicked(self, screen):
-        for key, value in screens.items():
-            if value == screen:  ## singleshot needed for menu to clear
-                QTimer.singleShot(200, partial(self.displayChk, self.switchKey(key)))
-                break      
-        self.closeScreenMenu()  
-                    
-    def closeScreenMenu(self):   
-        if self.screenMenu:
-            self.screenMenu.close()
-        self.screenMenu = None
-              
-    def switchKey(self, key):                 
-        if self.displayChk(key) == True:
-            self.canvas.clear()       
-            self.canvas.dots.switch(key) 
-        else:
-            return
-    
-    def displayChk(self, key):  ## switch screen format
-        p = QGuiApplication.primaryScreen().availableGeometry()
-        if key in MaxScreens and p.width() < MaxWidth:  ## current screen width < 1680
-            self.exceedsMsg() 
-            return False
-        else:
-            return True            
-        
-    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
-        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
-        
+                                               
 ### -------------------------------------------------------- 
     def addWidget(self, item):  ## background widget
         self.closeWidget()      
