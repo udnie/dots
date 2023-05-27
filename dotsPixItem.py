@@ -20,27 +20,7 @@ Pct = -0.50  ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename
     # "apple": (650, 450),
-    # 'doral': (300, 500),         
-    "actor": (650, 450),
-    'dorot': (300, 500),
-    'can_m': (300, 400),
-    'miche': (350, 375),
-    'bosch': (250, 375),
-    'lizar': (600, 225),
-    'pivot': (150, 150),
-    'mike_': (300, 500),
-    'squid': (375, 375),
-    'boids': (400, 500),
-    "joker": (335, 455),
-    "jocke": (335, 555),
-    "parad": (300, 300),
-    "dot":   (375, 400),
-    "bug":   (350, 350),
-    "manti": (350, 350), 
-    "img_":  (650, 450), 
-    "orang": (195, 195), 
-    "trunk": (150, 600),
-    "tag_":  (550, 250),
+    # 'doral': (300, 500),          
 }
 
 ### --------------------- dotsPixItem ----------------------
