@@ -5,10 +5,10 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 ---
 
 
-**May 26**        
+**May 26 2023**        
 I've moved the Screen Formats Menu to dotsScreens.py and the Demos Menu to dotsSnakes.py. I've also added the appropriate messages to fill-in what I left out earlier.
 
-**May 26**      
+**May 26 2023**      
 I've upgraded both PyQt5 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
 
     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
@@ -77,12 +77,11 @@ A new video: <https://youtu.be/hFfXc0H2oZM>.
 
 ---
 
-**February - 02/17/2023 and 02/23/2023**      
+**February 23 2023**      
 Added a **1440-16:9** format plus some cosmetic code fixes.  See the revised **02/10/2023** entry for more about screen formats. See **Even More** for updates to **paths** and **widgets** after the following **'New Screen Formats'** entry.  There are also two videos.
 
 
-
-**February - 02/10/2023**  
+**February 10 2023**  
 I've added some **New Screen Formats** and sizes made accessible by entering **Shift-S** to bring up the **Screen Formats menu**. What happens next depends on your computers display. Worse case the selected size is wider than the number of pixels your computer can display and outside of the software limits to detect it. The result would have the app overflow the edges of your screen making **dots** possibly unusable. I make a point of this in the video by explaining how the position of the dock can effect whether the program interprets the screen size correctly. The dock knocks off around 50 pixels from the useable display width or height based on where it's positioned - that's on my Mac. Results will vary depending on your hardware, see the video for a further examples.         
 
 This table represents the **screens** dictionary in **dotsScreens.py** used to build the **Screen Formats menu** and everything else that affects the screen sizes and layouts.  The numbers in the **key** column are the widths associated with the format.
@@ -93,12 +92,12 @@ followed by the the format key, ie., demo-1440.play, demo-1440.path. Entering **
 
      % python3 ./dotsQt.py 1440       
      
-**February - 02/10/2023, continued**  
+**February10 2023 - continued**  
 I've removed the **VHX** pixel ruler **Shift-V** start key as I was having some difficulty in getting it to run from my desktop **dotsQt app**. The simple solution was to add the **VHX** desktop app to the dock/taskbar.
 Also, just after I recorded the accompanying video I decided to try and shave off some pixels from the scrollPanel by cutting back on the width of the image tile and in the sliderPanel, reducing the font size.  The result is the two panels in the video are slightly wider and the tiles in scrollPanel less square from what you would see when running dots. Lastly, I'm running Python and friends in **Rosetta** and have no complaints, especially when it comes to launching dots, and particularly when it's importing numpy and open-cv.  New video at: <https://youtu.be/-mpV2f8Qj6w>
 
 
-**February - 02/10/2023 -- Even More**  
+**February 10 2023 - Even More**  
 Since I posted the changes for **'new screen formats'** I've a made few more adjustments. The first being, addressing what would happen if the **'demo-' path** file was missing?  The result, the bats will be the only moving screen items, dots wouldn't crash. The second change has to do  with ensuring the bats or any other screen item following a path can cover the canvas width and height as the 1080 format is currently the source of all of the **'non-demo paths'.** For that I added two more variables , **'scaleX', 'scaleY'** to scale up or down paths based on the 1080 screen format, its' **scale..** settings defaulting to **1.0, 1.0**, essentially, do nothing, unlike the other screen formats. Paths beginning  with **'demo-'** aren't effected. The third and last change, keeping the **pixItem** and **shadow widgets** closer to their source even if the screen format shifts together with changes to the **background** and **pathMaker widgets** so they appear in a fixed starting location regardless of the format or screen size. See the **'widget' and 'bkgrnd'** variables/keys and the following video. <https://youtu.be/2iqnlGBLCso>
 
 ---
@@ -207,20 +206,20 @@ I'm pretty sure **castShadow4.py**, is the last of the shadow apps. It requires 
 
 ---
 
-**February 27-28, 2022**  
+**February 28 2022**  
 Replaced **PIL** with **cv2**.  Still runs slow from a dead start but one less library to load.  Changes to insure only .pngs get loaded with the **Files** button.
 
-**February 22, 2022**   
+**February 22 2022**   
  **cast_shadow2.py**, another cast shadow emulator. This one uses points rather than pixels to create a shadow - as a result I updated **outline.py** to display a larger image, I also set the point limit up to 350. It didn't help the shadow look any better, too edgy, but a good learning experience, more to share. It works best with apple.png - cv2 and numpy required.
 Video at: <https://youtu.be/eAsH9412Bww>
 
-**February 14, 2022**  
+**February 14 2022**  
 One more stand-alone app, **cast_shadow.py**, a cast shadow emulator.
 Requires, PIL, cv2, and numpy - consequently it takes a while to start when first run but it's worth it. My opinion. Another new video: <https://youtu.be/1VWjhypf0xk>
 
 ---
 
-**January 2022**      	
+**January 2022**             	
 Yet another stand-alone app, **outline.py**. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
   
 --- 
@@ -245,7 +244,7 @@ I've done some more work on wings and have some observations concerning the tend
 
 ---
 
-**September 2021**			
+**September 2021**      			
 **Bonus...**  I've added a screen pixel ruler, **vhx.py** to the mix.  It runs both in Dots and on my Mac as a desktop widget - **vhx.app**, created using the MacOS Automator, the same utility that lets me run Dots as a desktop app. **Note:** Also on my Mac, **vhx.py** only runs in Dots when in VSCode, otherwise you can run it from the command line. This finally replaces my JavaFx version. See **keys.pdf** for updates. New video:  <https://youtu.be/98m-fNB16-w> 
 
 **Runs on Linux.**
@@ -261,7 +260,7 @@ The annoyance is no more. It's taken a while and the fix was easier to apply onc
 
 ---
    
-**July 2021**		
+**July 2021**	      	
 Changed, holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** locked or unlocked. The second method, **shift-R**, locks **all pixItems**. The last method, **apostrophe** and a **mouse-click** toggles individual pixItems. You will need to save the changes for them to take effect. There's a new file, as of August, **dotsDrawsPaths**, that isolates the code that draws the path and displays pointItems. The annoyance still persists. Still working on it.
 
 ---
@@ -282,12 +281,12 @@ Added the **Color** button to launch a color picker *widget. A color can be save
 
 ---
 
-**February 2021**	
+**February 2021**       	
 Added the **'O'** key to the main window to toggle the paths prior to running animations as the **'P'** is now the **play** hot-key. Both keys can toggle the paths display once the animations are running. Also updated the parent window from a QGroupBox widget to QMainWindow adding QDockWidgets, a CentralWidget and a statusBar.  Currently running in Python 3.9.2 and PyQt 5.15.3 on a Mac, OSX  10.14.6.  QFileDialog in native mode no longer lets the user delete files. 
 
 ---
 
-**December 2020**	
+**December 2020**       
 Added the **'L','P','S'** keys to dropCanvas to Load, Play, and Stop animations, same as the buttons - also reinstated **'C'** to clear the screen in dropCanvas. Clicking on the clear button will close pathMaker and as well as clicking on the pathMaker button if it's green. The **'C'** key is also used in pathMaker to center a path.
 
 The **'P'** key still toggles paths but only after play begins. It's either that or start play and immediately show the paths. In wayPoints, under pathMaker, I've added another **'P'**  key that toggles the points used to draw the path. If you mouse over a point a yellow tag with the points x,y value, percent, and index will appear - mouse away to clear it. 	
