@@ -3,12 +3,13 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-
+**May 27 2023**     
+Renamed dotsDrawsPaths.py to dotsPathEdits.py.  What was I thinking.  
 
 **May 26 2023**        
 I've moved the Screen Formats Menu to dotsScreens.py and the Demos Menu to dotsSnakes.py. I've also added the appropriate messages to fill-in what I left out earlier.
 
-**May 26 2023**      
+**May 23 2023**      
 I've upgraded both PyQt5 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
 
     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
@@ -261,7 +262,7 @@ The annoyance is no more. It's taken a while and the fix was easier to apply onc
 ---
    
 **July 2021**	      
-Changed, holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** locked or unlocked. The second method, **shift-R**, locks **all pixItems**. The last method, **apostrophe** and a **mouse-click** toggles individual pixItems. You will need to save the changes for them to take effect. There's a new file, as of August, **dotsDrawsPaths**, that isolates the code that draws the path and displays pointItems. The annoyance still persists. Still working on it.
+Changed, holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** locked or unlocked. The second method, **shift-R**, locks **all pixItems**. The last method, **apostrophe** and a **mouse-click** toggles individual pixItems. You will need to save the changes for them to take effect. There's a new file, as of August, **dotsPathEdits**, that isolates the code that draws the path and displays pointItems. The annoyance still persists. Still working on it.
 
 ---
 
