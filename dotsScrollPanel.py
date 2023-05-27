@@ -23,8 +23,7 @@ panel = {   ## used throughout
 }  ## also, common['modLabel'], scales down the tile's vertical for screen changes
 
 ### ------------------- dotsScrollPanel --------------------
-''' dotsScrollPanel: handles scrolling sprite selections.
-    Includes ImgLabel and ScrollPanel classes. '''
+''' classes: ImgLabel, ScrollPanel: handles scrolling sprite selections '''
 ### --------------------------------------------------------
 class ImgLabel(QLabel):
 ### --------------------------------------------------------

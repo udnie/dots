@@ -13,7 +13,7 @@ from dotsSideGig        import distance, getCrop
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
        
 ### ------------------- dotsShadowMaker --------------------
-''' a.k.a. maker - handles shadow, menu, and points classes '''                                                                                                                    
+''' class: ShadowMaker - handles shadow, menu, and points'''                                                                                                                    
 ### -------------------------------------------------------- 
 class ShadowMaker:  
 ### --------------------------------------------------------    

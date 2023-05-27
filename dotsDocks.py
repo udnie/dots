@@ -19,7 +19,7 @@ newWidths = {     ## if vertical
 }
 
 ### ---------------------- dotsDocks -----------------------
-''' dotsDocks: dockwidgets and buttons groups '''
+''' no classes: dockwidgets and buttons groups '''
 ### -------------------------------------------------------- 
 def addButtonDock(self):  
     self.buttonDock = QDockWidget(self)

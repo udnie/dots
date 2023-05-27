@@ -7,7 +7,7 @@ from dotsShared      import common
 from dotsPointItem   import PointItem
 
 ### ------------------- dotsDrawsPaths ---------------------
-''' dotsDrawsPaths: newPath, lasso, pointitems '''
+''' class: DrawsPaths, functions; newPath, lasso '''
 ### --------------------------------------------------------
 class DrawsPaths(QWidget):
 ### --------------------------------------------------------

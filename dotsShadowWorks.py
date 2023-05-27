@@ -14,7 +14,7 @@ PathStr = ['topLeft','topRight','botRight','botLeft']
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
 
 ### ------------------- dotsShadowWorks --------------------
-''' classes: pointItem, shadowWidget, shadow, and cv2 functions '''
+''' classes: PointItem, ShadowWidget, Shadow, and cv2 functions '''
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------

@@ -34,13 +34,13 @@ pano = {  ## no right scroll - used 1600X400 4:1 - one 1MB or less
     '1080':  (10.0,   15.0,  0.0),
     '1280':  (10.0,   15.9,  15.6,),
     '1215':  (10.0,   15.6,  0.0,),
-    '1440':  (10.0,   16.95, 0.0,),  ## trying 3:1 as well
+    '1440':  (10.0,   16.0,  0.0,),  ## trying 3:1 as well
     '1296':  (10.0,   15.6,  0.0,),
     '1536':  (10.0,   14.4,  0.0,),
 }
 
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
-    'snakes': 10,  ## same for vertical scrolling
+    'snakes': 11,  ## same for vertical scrolling
     'left':    4,
     'right':  15,
     'pano':    4,  ## 3:1   ## ->  12,  ## 4:1
