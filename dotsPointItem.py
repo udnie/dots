@@ -9,7 +9,7 @@ from dotsSideGig     import TagIt
 V = 7.5     ## the diameter of a pointItem
 
 ### ------------------- dotsPointItem ----------------------
-''' dotsPointItems class, used in dotsDrawsPaths '''
+''' dotsPointItems class, used in dotsPathEdits '''
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------

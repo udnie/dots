@@ -6,10 +6,10 @@ from PyQt6.QtWidgets import QWidget, QGraphicsPolygonItem
 from dotsShared      import common
 from dotsPointItem   import PointItem
 
-### ------------------- dotsDrawsPaths ---------------------
-''' class: DrawsPaths, functions; newPath, lasso '''
+### ------------------- dotsPathEdits ---------------------
+''' class: PathEdits, functions; newPath, lasso '''
 ### --------------------------------------------------------
-class DrawsPaths(QWidget):
+class PathEdits(QWidget):
 ### --------------------------------------------------------
     def __init__(self, pathMaker, sideWays, parent):  
         super().__init__()
@@ -317,6 +317,6 @@ class DrawsPaths(QWidget):
         self.canvas.btnPathMaker.setStyleSheet(
         'background-color: rgb(118,214,255)')
        
-### ------------------- dotsDrawsPaths ---------------------
+### ------------------- dotsPathEdits ---------------------
 
 

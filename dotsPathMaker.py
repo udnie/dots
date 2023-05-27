@@ -9,7 +9,7 @@ from dotsSideGig        import MsgBox, getColorStr, distance, getCtr
 from dotsShared         import common, paths, MoveKeys, ScaleRotateKeys
 
 from dotsSideWays       import SideWays
-from dotsDrawsPaths     import DrawsPaths
+from dotsPathEdits      import PathEdits
 from dotsPathWidget     import PathWidget, DoodleMaker
 
 ### -------------------- dotsPathMaker ---------------------
@@ -33,7 +33,7 @@ class PathMaker(QWidget):
         self.initThis()
            
         self.sideWays = SideWays(self)  ## extends pathMaker
-        self.drawing  = DrawsPaths(self, self.sideWays, parent) 
+        self.drawing  = PathEdits(self, self.sideWays, parent) 
                   
         self.doFirst = {
             'D':   self.delete,

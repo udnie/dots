@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QFileDialog,  QGraphicsItemGroup
 
 from dotsShared      import common, paths, RotateKeys
 from dotsSideGig     import MsgBox, getPts, TagIt, distance
-from dotsDrawsPaths  import DrawsPaths
+from dotsPathEdits   import PathEdits
  
 ScaleUpKeys = ('>','\"','\'')
 ScaleDnKeys = ('<',':',';')
@@ -25,7 +25,7 @@ class SideWays:
         self.pathMaker = parent
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.pathMaker.scene
-        self.drawing   = DrawsPaths(self.pathMaker, self, self.canvas) 
+        self.drawing   = PathEdits(self.pathMaker, self, self.canvas) 
         
         self.tagGroup = None  
     
