@@ -219,7 +219,7 @@ Requires, PIL, cv2, and numpy - consequently it takes a while to start when firs
 
 ---
 
-**January 2022**             	
+**January 2022**        
 Yet another stand-alone app, **outline.py**. Combines Pygame **(required)** and PyQt as a way to outline a transparent .png and save the result as a SVG file.  This is a rewrite of the my pygame original of 3-4 years ago. It also features a SVG viewer. New video: <https://youtu.be/leTFR89YxA4>
   
 --- 
@@ -244,7 +244,7 @@ I've done some more work on wings and have some observations concerning the tend
 
 ---
 
-**September 2021**      			
+**September 2021**      
 **Bonus...**  I've added a screen pixel ruler, **vhx.py** to the mix.  It runs both in Dots and on my Mac as a desktop widget - **vhx.app**, created using the MacOS Automator, the same utility that lets me run Dots as a desktop app. **Note:** Also on my Mac, **vhx.py** only runs in Dots when in VSCode, otherwise you can run it from the command line. This finally replaces my JavaFx version. See **keys.pdf** for updates. New video:  <https://youtu.be/98m-fNB16-w> 
 
 **Runs on Linux.**
@@ -260,7 +260,7 @@ The annoyance is no more. It's taken a while and the fix was easier to apply onc
 
 ---
    
-**July 2021**	      	
+**July 2021**	      
 Changed, holding down the **space-bar** and a **left-mouse click** will show the pixItem tag.  **T** still displays all the tags and a **shift-T** will display the tags of everything that's been **selected**.  I've also added three methods to lock and unlock pixItem screen positions. The first, **shift-L** works to toggle **selected pixItems** locked or unlocked. The second method, **shift-R**, locks **all pixItems**. The last method, **apostrophe** and a **mouse-click** toggles individual pixItems. You will need to save the changes for them to take effect. There's a new file, as of August, **dotsDrawsPaths**, that isolates the code that draws the path and displays pointItems. The annoyance still persists. Still working on it.
 
 ---
@@ -281,7 +281,7 @@ Added the **Color** button to launch a color picker *widget. A color can be save
 
 ---
 
-**February 2021**       	
+**February 2021**       
 Added the **'O'** key to the main window to toggle the paths prior to running animations as the **'P'** is now the **play** hot-key. Both keys can toggle the paths display once the animations are running. Also updated the parent window from a QGroupBox widget to QMainWindow adding QDockWidgets, a CentralWidget and a statusBar.  Currently running in Python 3.9.2 and PyQt 5.15.3 on a Mac, OSX  10.14.6.  QFileDialog in native mode no longer lets the user delete files. 
 
 ---
