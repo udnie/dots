@@ -3,14 +3,17 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**May 29 2023**     
+I needed to change the path indicators in dotsShared,py inorder to locate the other directories and in dotsQt.py as well.  It all seemed to working the other day but there may have been some issues with a corrupted .zprofile which caused the problem. Hopefully it's resolved.  
+ 
 **May 28 2023**     
-Moved dots*.py to src. I think my GitHub landing page was getting overcrowded as I have a few more files I'm planning to add.
-
+Moved dots*.py to src. I think my GitHub landing page was getting overcrowded and I have a few more files to eventually add.
+ 
 **May 27 2023**     
 Renamed dotsDrawsPaths.py to dotsPathEdits.py.  What was I thinking.  
 
 **May 26 2023**        
-Moved the Screen Formats Menu to dotsScreens.py and the Demos Menu to dotsSnakes.py. Also added the appropriate messages to fill-in what I left out earlier.
+Moved the Screen Formats Menu to dotsScreens.py and the Demos Menu to dotsSnakes.py. I've also added the appropriate messages to fill-in what I left out earlier.
 
 **May 23 2023**      
 Upgraded both PyQt5 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
@@ -63,7 +66,7 @@ to 1500X500 pixels, res'd it down to just over 250KB and saved it as a .jpg.
 **March**   
 This months **bonus**; **page up** and **page down** keys on the scrolling sprite panel by entering **Option/Alt**  plus the **Up/Down Arrow** keys. Also, **one tile Up** and **one tile down** with the Apple Command key/Windows Control key plus the **Up/Down Arrow** keys. Also, with enough sprites, if a partial tile is showing it will scroll down till it's fully visible.
 
-Updated two of the **3:2** screens so their height now matches the height of two of the **16:9** screens, eliminating the 1350 and 1432,  which makes maintaining the **3:2** much easier. Sorry for the confusion again, but this is what happens when you don't have a clear plan. I've also revised some of the changes from **February** to reflect the current screens sizes - many of the earlier changes still hold.
+I've updated two of the **3:2** screens so their height now matches the height of two of the **16:9** screens, eliminating the 1350 and 1432,  which makes maintaining the **3:2** much easier. Sorry for the confusion again, but this is what happens when you don't have a clear plan. I've also revised some of the changes from **February** to reflect the current screens sizes - many of the earlier changes still hold.
   
 | key   | format |
 |:---- |:-----------:|
@@ -112,7 +115,7 @@ A few bug fixes and mostly trying to clarify my code by clearing some naming iss
 
 ---   
 **December 2022**      
-Added a few more widgets.  One to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key that toggled **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
+Added a few more widgets, one to **backGrounds** to replace the sliders originally located on the right hand panel - the space now extends the **keys menu/list**.  I've also added a widget to **pathMaker** to give easy access to the major path functions, files, edit, delete, new path, and waypoints. Also in pathMaker the **W** key that toggled **wayPoints** on and off has been replaced by the **shift-W** combination as to not interfere with the **W** key now used to clear widgets. Video: <https://youtu.be/9i8w6DsY1Ys>
 
 Repeating myself a bit, to run **Shadows** requires an easy edit to **dotsPixItem.py** by commenting on and off two lines near the top of the file. **Open-cv** and **numpy** are required to run both **Shadows** and **SpriteMaker**. 
 
@@ -134,7 +137,7 @@ Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMa
 ---
 
 **October 2022**        
-Updated **Dots**  to **PyQt 6.4**, **PyQt6.17** and **Python 3.11**. 
+**Dots** updated to **PyQt 6.4**, **PyQt6.17** and **Python 3.11**. 
 **Dots** doesn't run in **PyQt6** but **VHX** and **SpriteMaker** can with minor edits.
 
 Some additions and updates to **Shadows**. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run **Shadows** and **SpriteMaker**. Latest video:<https://youtu.be/CLOVUHtD-Ts>
@@ -183,7 +186,7 @@ DotsQt has been updated to **PyQt6.3** and **Python 3.10.4**.
 
 I also made some additions that aren't in the video, mainly to do with editing in pathMaker and centering backgrounds.  The big new stuff follows.
   
-Added shadow emulation to the mix but have it turned off as some folks may not share my interests in shadows and having it on adds 10-12 seconds to dots' startup time which may not be a great first-time user experience.  The two examples below give you the file names and snapshots of what code needs to tweaked inorder to have shadows working.  Comment one line off, uncomment the other line on. Save the files and restart dots. Next load shadowdemo.play and you should have 8 screen items and 8 shadows appearing as in the video. The time can vary but on my 6 year old Mac it's taking around 4 seconds for the shadows to appear once the screen items are up.  I'm using asyncio to restore shadows which has help to make the process 2 to 3 times faster then my first attempts. **cv2 and numpy are required** in order to add shadows.
+I've added shadow emulation to the mix but have it turned off as some folks may not share my interests in shadows and having it on adds 10-12 seconds to dots' startup time which may not be a great first-time user experience.  The two examples below give you the file names and snapshots of what code needs to tweaked inorder to have shadows working.  Comment one line off, uncomment the other line on. Save the files and restart dots. Next load shadowdemo.play and you should have 8 screen items and 8 shadows appearing as in the video. The time can vary but on my 6 year old Mac it's taking around 4 seconds for the shadows to appear once the screen items are up.  I'm using asyncio to restore shadows which has help to make the process 2 to 3 times faster then my first attempts. **cv2 and numpy are required** in order to add shadows.
 
 #### dotsPixItem.py
 
@@ -201,7 +204,7 @@ from dotsShadow_Dummy    import Shadow  ## turns off shadows
 ```
 To create a shadow right-mouse click on a screen item and click on the top button labeled 'Shadow' which appears on the pixItem widget. This will work if there are no screen items selected.  See the keys.pdf for more on right-mouse click usage. If you right-mouse click on the shadow it's widget will appear.  I've colored the widgets yellow for pixItems and blue for the shadows to more easily tell them apart. There's only shadow per pixItem and deleting a pixItem deletes it's shadow.  You can't add shadows to frames or bats and you can't add animations to shadows. **Shift-W** will clear all widgets rather than closing them one at a time.  
 
-Aadded a few lines to dotsSideShow.py that can output the keys and values of a play file as it's loaded and format it for csv.  There's a shadowdemo.csv in the play folder of the output to view in your default spreadsheet app, makes it more readable. Also added a mouse-over tag to alert you if a pixItem is locked. Beats wondering why you can't move it. Lastly, the bat-wing has been replaced with the actual screen bat. Yet another video: <https://youtu.be/rbFCvU9_IUs>
+I added a few lines to dotsSideShow.py that can output the keys and values of a play file as it's loaded and format it for csv.  There's a shadowdemo.csv in the play folder of the output to view in your default spreadsheet app, makes it more readable. Also added a mouse-over tag to alert you if a pixItem is locked. Beats wondering why you can't move it. Lastly, the bat-wing has been replaced with the actual screen bat. Yet another video: <https://youtu.be/rbFCvU9_IUs>
 
 ---
 
@@ -249,7 +252,7 @@ I've done some more work on wings and have some observations concerning the tend
 ---
 
 **September 2021**      
-**Bonus...**  Added a screen pixel ruler, **vhx.py** to the mix.  It runs both in Dots and on my Mac as a desktop widget - **vhx.app**, created using the MacOS Automator, the same utility that lets me run Dots as a desktop app. **Note:** Also on my Mac, **vhx.py** only runs in Dots when in VSCode, otherwise you can run it from the command line. This finally replaces my JavaFx version. See **keys.pdf** for updates. New video:  <https://youtu.be/98m-fNB16-w> 
+**Bonus...**  I've added a screen pixel ruler, **vhx.py** to the mix.  It runs both in Dots and on my Mac as a desktop widget - **vhx.app**, created using the MacOS Automator, the same utility that lets me run Dots as a desktop app. **Note:** Also on my Mac, **vhx.py** only runs in Dots when in VSCode, otherwise you can run it from the command line. This finally replaces my JavaFx version. See **keys.pdf** for updates. New video:  <https://youtu.be/98m-fNB16-w> 
 
 **Runs on Linux.**
 I wanted to see what it would take to set up a VM, a virtual machine, and run dots in Ubuntu 20.4 Linux. So I used VirtualBox, as recommended by Martin Fitzpatrick, as the VM of choice. After downloading and installing Ubuntu I gradually came to realize that no matter how many more times I downloaded and installed PyQt it was going to land in the python3.8 directory.  So I ran Dots in python3.8 with no problems other than not having dots displayed full size and having to use the control key in place of the Mac command key. I probably spent half my time with this project in the VM trying to find the menu bar which had disappeared - not an uncommon problem. I was finally able to resize the linux window to pretty much my Mac view and by setting the scaled setting to 200% dots opened up to the same size as I run it in MacOS though it could use a few small 10-15 pixels tweaks to reposition the inner side panels.  **Done.**
