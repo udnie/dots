@@ -2,7 +2,7 @@
 from PyQt6.QtCore    import Qt
 
 ### --------------------- dotsShared.py --------------------
-''' dotsShared: common data shared across classes and files '''
+''' no class: common data shared across classes and files '''
 ### --------------------------------------------------------
 
 common = {  ## wherever it's needed
@@ -26,14 +26,14 @@ CanvasStr = "L,R,P,S,C,T,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right
 PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
-paths = {
-    'snapShot':   './',
-    'bkgPath':    './backgrounds/',
-    'imagePath':  './images/',
-    'playPath':   './plays/',
-    'paths':      './paths/',
-    'spritePath': './sprites/',
-    'txy':        './txy/',
+paths= {
+    'snapShot':   './../',
+    'bkgPath':    './../backgrounds/',
+    'imagePath':  './../images/',
+    'playPath':   './../plays/',
+    'paths':      './../paths/',
+    'spritePath': './../sprites/',
+    'txy':        './../txy/',
 }
 
 Tick = 2.0
