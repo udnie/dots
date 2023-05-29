@@ -5,13 +5,6 @@
 ---
 
 
-
-
-
-    **cd ''/users/ml/python/qt5/dots'
-     /usr/local/bin/python3 ./dotsQt.py  **
-
-
 Animations come in two basic flavors, either ones that are programmatic or 
 ones that are path driven, and a third possibility would be a combination of the two.  An animation can be added to a screen object, pixItem, once it's been selected by right-mouse clicking on it and then clicking on an animation or path from the pop-up menu that appears. The selection, either a **.play** or **.path** file is applied to the **tag** property of the pixItem which later is used to run the animation it references.
  
