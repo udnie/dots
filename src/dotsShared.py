@@ -27,13 +27,13 @@ PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,le
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 paths= {
-    'snapShot':   './../',
-    'bkgPath':    './../backgrounds/',
-    'imagePath':  './../images/',
-    'playPath':   './../plays/',
-    'paths':      './../paths/',
-    'spritePath': './../sprites/',
-    'txy':        './../txy/',
+    'snapShot':   './',
+    'bkgPath':    './backgrounds/',
+    'imagePath':  './images/',
+    'playPath':   './plays/',
+    'paths':      './paths/',
+    'spritePath': './sprites/',
+    'txy':        './txy/',
 }
 
 Tick = 2.0

@@ -44,7 +44,7 @@ class DotsQt(QMainWindow):
         self.setWindowTitle('DotsQt - ' + os.path.basename(os.getcwd()) + \
             ' ~ ' + self.screen)  ## or getDate()
                     
-        self.setStyleSheet(open('./dotsStyle.css').read())   
+        self.setStyleSheet(open('./src/dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
                                
         self.statusBar = QStatusBar()
