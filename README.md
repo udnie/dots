@@ -1,10 +1,10 @@
 ## DotsQt  
-**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations and create sprites.  **SpriteMaker** is now stand-alone and is easily converted to run in **PySide6** - see **SpiteMaker.md**.
+**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations and create sprites.  **SpriteMaker** is now stand-alone and is easily converted to run in **PyQt6** - see **SpiteMaker.md**.
 
-As of **October 2022** dots was updated to **PyQt 6.4** and **Python 3.11**.  DotsQt can still run in **PyQt 5.17** with minor edits. You will need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.  Dots doesn't currently run in **PySide6**.
+As of **May 2023** dots was updated to **PyQt 6.5**, **Python 3.11.3** and **Ventura 13.4**.  DotsQt can still run in **PyQt 5.17** with minor edits. You will need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.  Dots doesn't currently run in **PySide6**.
 
 
-The files **StartHere.md** and  **dotsAnimation.py** provide a starting point for coding your own animations. See **Changes.md** and **keys.pdf** for further documentation and links to videos - best watched with closed captions - except for the last few. I was very intimated by having to speak into a very visible microphone. 
+**StartHere.md** is next in line for an update so I'd ignore it for now. See **Changes.md** and **keys.pdf** for further documentation and links to videos - earlier ones best watched with closed captions as I was very intimated by having to speak into a very visible microphone. 
 	  
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. 400 lines now seems to the current average. I also use camel case after many years of coding in snake.
@@ -39,10 +39,9 @@ I use the graphicsitem **zValue()** as a means to order the dots graphic types w
 | LineItem  | grid   | -50 as a group |
 | BkgItem   | bkg | -99 decreasing by -1 |  
 
-  
+ 
 **\***   number of screen items + 100 decreasing by 1 per item
 
-  
 
 ## Requirements
 * PyQt6
