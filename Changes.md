@@ -6,8 +6,10 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 **May 29 2023**     
 I needed to edit the paths in dotsShared,py and dotsQt.py once I relocated the *.py files to the /src directory in order to locate the other directories. A problem soon developed and I think it's been resolved.  The following script is how Mac's Automator launches Dots on my Mac. It's probably a good guide as it works for the development script as well.
 
-        cd '/users/ml/python/qt5/05-22'
+        cd '/users/ml/python/qt5/dots'
         /usr/local/bin/python3 ./src/dotsQt.py  
+        
+A retraction: I said in the last video you needed to save a background in a .play file in order to run it, you don't. I was wrong - I had shut off that feature by accident it's now restored.
         
 **May 28 2023**     
 Moved dots*.py to src. I think my GitHub landing page was getting overcrowded and I have a few more files to eventually add.
