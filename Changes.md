@@ -4,8 +4,11 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **May 29 2023**     
-I needed to change the path indicators in dotsShared,py in order for it to locate the other directories and in dotsQt.py as well.  It all seemed to be working the other day. The problem is where I chose to start dotsQt from.  If you start it from src it will be different if started from dots/src/ - that was the problem. You need to make sure your paths and scripts are set correctly.  I'm getting use to this as well.
- 
+I needed to edit the paths in dotsShared,py and dotsQt.py once I relocated the *.py files to the /src directory in order to locate the other directories. A problem soon developed and I think it's been resolved.  The following script is how Mac's Automator launches Dots on my Mac. It's probably a good guide as it works for the development script as well.
+
+        cd '/users/ml/python/qt5/05-22'
+        /usr/local/bin/python3 ./src/dotsQt.py  
+        
 **May 28 2023**     
 Moved dots*.py to src. I think my GitHub landing page was getting overcrowded and I have a few more files to eventually add.
  
