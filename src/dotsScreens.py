@@ -33,7 +33,7 @@ class ScreenMenu:
     def __init__(self, parent):
         super().__init__()  
    
-        self.canvas = parent
+        self.canvas = parent  ## all these are necessary to clear the screen
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
@@ -127,7 +127,7 @@ def setCommon(format=''):
 ### --------------- 1080X720 - 3:2 format ------------------
 seven20 = {    
     'DotsH':     822, 
-    'ViewH':     720,               
+    'ViewH':     720,  ## used by both 1080X720 and 1280X720px           
     'ScrollH':   687,  
     'SliderH':   679,  
     'margin1':    15,  ## keysMenu margins top
@@ -139,7 +139,7 @@ seven20 = {
 }
 
 ten80 = {            
-    'Screen':   '1080',        ## used by both 1080 and 1280X720px 
+    'Screen':   '1080',     
     'DotsW':      1431,  
     'ViewW':      1080,  
     'gridSize':   30.0,       ## gridline spacing - seems to work, consistant
@@ -164,7 +164,7 @@ twelve80 = {
 ### --------------- 810 - 16:9/3:2 format ------------------
 eight10 = {
     'DotsH':     912, 
-    'ViewH':     810,     
+    'ViewH':     810,   ## used by both 1215X810 and 140X810px   
     'ScrollH':   772,
     'SliderH':   770,    
     'margin1':    20,
@@ -202,7 +202,7 @@ fourteen40 = {
 ### --------------- 864 - 16:9/3:2 format ------------------
 eight64 = {
     'DotsH':     966,     
-    'ViewH':     864,  
+    'ViewH':     864,   ## used by both 1296X864 and 1536X864px   
     'ScrollH':   804,
     'SliderH':   798,    
     'margin1':    20,
@@ -227,13 +227,13 @@ twelve96 = {
 
 ### ------------------ 1536X864 - 16:9 ---------------------
 fifteen36 = {      
-    'Screen': '1536',   
+    'Screen': '1536',   ## think about 1560X878 in 1920X1080
     'DotsW':    1889, 
     'ViewW':    1536,      
     'gridSize':   32,  
     'scaleX':      1.40,
     'widget':   (-50,150),
-    'bkgrnd':  (-750,-500),
+    'bkgrnd':  (-750,-450),
     'runThis':  'demo-1536.play',  ## default run key
 }
 
