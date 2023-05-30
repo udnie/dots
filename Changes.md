@@ -4,7 +4,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **May 29 2023**     
-I needed to change the path indicators in dotsShared,py inorder to locate the other directories and in dotsQt.py as well.  It all seemed to working the other day but there may have been some issues with a corrupted .zprofile which caused the problem. Hopefully it's resolved.  
+I needed to change the path indicators in dotsShared,py in order for it to locate the other directories and in dotsQt.py as well.  It all seemed to be working the other day. The problem is where I chose to start dotsQt from.  If you start it from src it will be different if started from dots/src/ - that was the problem. You need to make sure your paths and scripts are set correctly.  I'm getting use to this as well.
  
 **May 28 2023**     
 Moved dots*.py to src. I think my GitHub landing page was getting overcrowded and I have a few more files to eventually add.
