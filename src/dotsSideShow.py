@@ -62,8 +62,8 @@ class SideShow:
                     if self.canvas.openPlayFile == 'snakes' and self.bkgMaker.key != '':
                         self.bkgMaker.delSnakes()
                         self.demoMenu.run(self.bkgMaker.key)                    
-                    elif self.canvas.openPlayFile != '':
-                        self.run()                                      
+                    else:
+                        self.run()  ## run what's there                                   
                 elif key == 'S':
                     if self.canvas.control != '':
                         self.stop()
