@@ -3,11 +3,20 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**May 29 2023**     
-I needed to edit the paths in dotsShared,py and dotsQt.py once I relocated the *.py files to the /src directory in order to locate the other directories. A problem soon developed and I think it's been resolved.  The following script is how Mac's Automator launches Dots on my Mac. It's probably a good guide as it works for the development script as well.
+**May 31 2023** 
+Trying again.  I came to realize why I had to change directory settings and such.  VSCode needed to start in the src directory and it kept putting me in the old directory. Finally I saw the light and reset the workspace to put me into the correct source directory. Sorry for the confusion - I'm not sure how I set it up in the first place but that was over two years ago. DotsShared,py and DotsQt.py are back to the way they were and so are the automator scripts.
 
-        cd '/users/ml/python/qt5/dots'
-        /usr/local/bin/python3 ./src/dotsQt.py  
+
+        cd '/users/ml/python/qt5/dots/src'
+        /usr/local/bin/python3 ./dotsQt.py
+        
+
+
+**May 29 2023**     
+~~I needed to edit the paths in dotsShared,py and dotsQt.py once I relocated the *.py files to the /src directory in order to locate the other directories. A problem soon developed and I think it's been resolved.  The following script is how Mac's Automator launches Dots on my Mac. It's probably a good guide as it works for the development script as well.~~
+
+        ~~cd '/users/ml/python/qt5/dots'
+        /usr/local/bin/python3 ./src/dotsQt.py~~  
         
 A retraction: I said in the last video you needed to save a background in a .play file in order to run it, you don't. I was wrong - I had shut off that feature by accident it's now restored.
         
@@ -21,7 +30,7 @@ Renamed dotsDrawsPaths.py to dotsPathEdits.py.  What was I thinking.
 Moved the Screen Formats Menu to dotsScreens.py and the Demos Menu to dotsSnakes.py. I've also added the appropriate messages to fill-in what I left out earlier.
 
 **May 23 2023**      
-Upgraded both PyQt5 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
+Upgraded both PyQt6 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
 
     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
        

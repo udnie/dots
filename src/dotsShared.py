@@ -22,18 +22,19 @@ common = {  ## wherever it's needed
         
 ### --------------------------------------------------------
              
-CanvasStr = "L,R,P,S,C,T,W,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+CanvasStr = "L,R,P,S,C,T,W,M,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
 PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
-paths= {
-    'snapShot':   './',
-    'bkgPath':    './backgrounds/',
-    'imagePath':  './images/',
-    'playPath':   './plays/',
-    'paths':      './paths/',
-    'spritePath': './sprites/',
-    'txy':        './txy/',
+## use this and make sure your editor points to the right directory
+paths = {        
+    'snapShot':     ',/../',  
+    'bkgPath':      './../backgrounds/',
+    'imagePath':    './../images/',
+    'playPath':     './../plays/',
+    'spritePath':   './../sprites/',
+    'paths':        './../paths/',
+    'txy':          './../txy/',
 }
 
 Tick = 2.0
@@ -97,7 +98,8 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
     Qt.Key.Key_K: 'K',  
-    Qt.Key.Key_L: 'L',   
+    Qt.Key.Key_L: 'L',  
+    Qt.Key.Key_M: 'M', 
     Qt.Key.Key_N: 'N', 
     Qt.Key.Key_O: 'O',  
     Qt.Key.Key_P: 'P',

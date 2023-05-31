@@ -139,8 +139,8 @@ class InitMap:
         self.mapRect = QRectF()
 
     def toggleMap(self):  ## not based on rubberband geometry
-        if self.isMapSet() == False:
-            self.selections = []  ## not the same as in PathEdits
+        if self.isMapSet() == False:  ## runs directly from controlview
+            self.selections = []      ## not the same as in PathEdits
             for pix in self.scene.selectedItems():  ## only items selected
                 self.selections.append(pix.id)
             if self.scene.selectedItems() or self.canvas.hasHiddenPix():

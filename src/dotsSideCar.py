@@ -208,7 +208,6 @@ class SideCar:
         f = Q.getSaveFileName(self.canvas, paths['playPath'],  
             self.canvas.openPlayFile)
         Q.accept()
-        
         if not f[0]: 
             return
         if not f[0].lower().endswith('.play'):
