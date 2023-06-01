@@ -3,7 +3,7 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**May 31 2023** 
+**May 31 2023**                  
 Trying again.  I came to realize why I had to change directory settings and such.  VSCode needed to start in the src directory and it kept putting me in the old directory. Finally I saw the light and reset the workspace to put me into the correct source directory. Sorry for the confusion - I'm not sure how I set it up in the first place but that was over two years ago. DotsShared,py and DotsQt.py are back to the way they were and so are the automator scripts.
 
 
@@ -15,8 +15,8 @@ Trying again.  I came to realize why I had to change directory settings and such
 **May 29 2023**     
 ~~I needed to edit the paths in dotsShared,py and dotsQt.py once I relocated the *.py files to the /src directory in order to locate the other directories. A problem soon developed and I think it's been resolved.  The following script is how Mac's Automator launches Dots on my Mac. It's probably a good guide as it works for the development script as well.~~
 
-        ~~cd '/users/ml/python/qt5/dots'~~
-        ~~/usr/local/bin/python3 ./src/dotsQt.py~~  
+   ~~cd '/users/ml/python/qt5/dots'~~                  
+   ~~/usr/local/bin/python3 ./src/dotsQt.py~~  
         
 A retraction: I said in the last video you needed to save a background in a .play file in order to run it, you don't. I was wrong - I had shut off that feature by accident it's now restored.
         
