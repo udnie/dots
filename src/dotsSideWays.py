@@ -25,7 +25,7 @@ class SideWays:
         self.pathMaker = parent
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.pathMaker.scene
-        self.drawing   = PathEdits(self.pathMaker, self, self.canvas) 
+        self.drawing   = PathEdits(self.pathMaker, self) 
         
         self.tagGroup = None  
     
@@ -203,27 +203,29 @@ class SideWays:
             Q = QFileDialog()
             Q.Option.DontUseNativeDialog
             Q.setDirectory(paths['paths'])
+       
             f = Q.getSaveFileName(self.canvas, paths['paths'],
-                paths['paths'] + self.pathMaker.openPathFile)  ## note
+                paths['paths'] + self.pathMaker.openPathFile,  
+                'Files(*.path)')  ## <--- note
             Q.accept()  
-                  
+                                   
             if not f[0]: 
                 return
-            elif not f[0].lower().endswith('.path'):
-                MsgBox("savePath: Wrong file extention - use '.path'", 5)   
+            if not f[0].lower().endswith('.path'):
+                MsgBox("savePath: Missing or Wrong file extention - use '.path'", 5)   
                 return 
-            else:
-                try:
-                    with open(f[0], 'w') as fp:
-                        for i in range(0, len(self.pathMaker.pts)):
-                            p = self.pathMaker.pts[i]
-                            x = '{0:.2f}'.format(p.x())
-                            y = '{0:.2f}'.format(p.y())
-                            fp.write(x + ', ' + y + '\n')
-                        fp.close()
-                except IOError:
-                    MsgBox('savePath: Error saving file', 5)
-                    return
+            
+            try:
+                with open(f[0], 'w') as fp:
+                    for i in range(0, len(self.pathMaker.pts)):
+                        p = self.pathMaker.pts[i]
+                        x = '{0:.2f}'.format(p.x())
+                        y = '{0:.2f}'.format(p.y())
+                        fp.write(x + ', ' + y + '\n')
+                    fp.close()
+            except IOError:
+                MsgBox('savePath: Error saving file', 5)
+                return
         else:
             MsgBox('savePath: Nothing saved', 5)
 

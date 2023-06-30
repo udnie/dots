@@ -3,8 +3,19 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**May 31 2023** 
-Trying again.  I came to realize why I had to change directory settings and such.  VSCode needed to start in the src directory and it kept putting me in the old directory. Finally I saw the light and reset the workspace to put me into the correct source directory. Sorry for the confusion - I'm not sure how I set it up in the first place but that was over two years ago. DotsShared,py and DotsQt.py are back to the way they were and so are the automator scripts.
+**June 2023**       
+Just repeating myself. I said in the last video you needed to save a background in a **.play** file in order to run it, **you don't**, programming error. Some small changes to the **demoMenu** and the **sprite scrollPanel**. I was able to add another sprite, clean up some code and remove a few no longer needed screen variables by reducing the size of the **scrollPanel** tiles. 
+
+The **demo .paths** and **Snake photo assets** are now in a separate **demo** directory so as not to clutter things up.  All the **demo .play** files have been replaced by **dotsAbstractBats.py** which also houses a rewrite of **Wings**. That helped to fix the primary issue of being able to pull the wings off as well as another issue - the wings going invisible if the bat did.
+
+Last is the addition of what might be thought of as a digital **Matte** to better show off your efforts. It currently features light grey as the default border color, black and also a photo/image for the matte.  The border sizes run from 5-12-25 pixels and up by 25 pixel increments.  It's also possible to change the a mattes overall ratio to better accommodate wider screen formats.      
+
+I guess I'll be adding some more keys to **Keys.pdf** to cover it. All you need to do to add a matte is hold down the **'opt/alt'** key or it's replacement and click on the background. A 25 pixel border pops up so you can start an animation without interfering with the matte.  Use **'opt/alt' or 'X'** to leave. The **Matte widget** grabs the keyboard and can act as if you had a piece of glass floating over the screen.  My humble opinion.  Other keys, **'C'** changes the matte color from light grey to black and back. '**P'** will display a photo image in the matte border and **'R'** will reformat the matte to a wider format.  Feel free to experiment.
+A new Video:  <https://youtu.be/XHc5NGJ86NE>
+
+___
+**May 31 2023**      
+Trying again.  I came to realize why I had to change directory settings and such.  VSCode needed to start in the src directory and it kept putting me in the old directory. Finally I saw the light and reset the workspace to put me into the correct source directory. Sorry for the confusion - I'm not sure how I set it up in the first place but that was over two years ago. DotsShared,py and DotsQt.py are back to the way they were and so are the automator scripts with the /src addition.
 
 
         cd '/users/ml/python/qt5/dots/src'
@@ -15,8 +26,8 @@ Trying again.  I came to realize why I had to change directory settings and such
 **May 29 2023**     
 ~~I needed to edit the paths in dotsShared,py and dotsQt.py once I relocated the *.py files to the /src directory in order to locate the other directories. A problem soon developed and I think it's been resolved.  The following script is how Mac's Automator launches Dots on my Mac. It's probably a good guide as it works for the development script as well.~~
 
-        ~~cd '/users/ml/python/qt5/dots'~~
-        ~~/usr/local/bin/python3 ./src/dotsQt.py~~  
+~~cd '/users/ml/python/qt5/dots'~~      
+ ~~/usr/local/bin/python3 ./src/dotsQt.py~~  
         
 A retraction: I said in the last video you needed to save a background in a .play file in order to run it, you don't. I was wrong - I had shut off that feature by accident it's now restored.
         

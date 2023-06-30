@@ -143,7 +143,7 @@ class PathWidget(QWidget):
         editBtn = QPushButton('Edit')
         centerBtn = QPushButton('Center')
         self.newBtn = QPushButton('New')
-        filesBtn = QPushButton('Files')     
+        filesBtn = QPushButton('Path Files')     
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
     

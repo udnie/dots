@@ -14,14 +14,14 @@ from dotsShared         import paths, common
 from dotsSideGig        import *
 from functools          import partial
 from dotsBkgMaker       import BkgItem
+from dotsAbstractBats   import getPath
 
 demos = {  ## used by demo menu
-    '1':  'Original Batwings',
-    '2':  'Snakes Blue Background',
-    '3':  'Right to Left Scrolling',  
-    '4':  'Left to Right Scrolling',  
-    '5':  'Snakes Scrolling Background',    
-    '6':  'Snakes Vertical Scrolling',  
+    'bats':   'Original Batwings',
+    'blue':   'Snakes Blue Background',
+    'left':   'Right to Left Scrolling',  
+    'right':  'Left to Right Scrolling',  
+    'snakes': 'Snakes Scrolling Background',    
 }
 
 ### --------------------- dotsSnakes ----------------------- 
@@ -29,16 +29,19 @@ demos = {  ## used by demo menu
 ### --------------------------------------------------------     
 class DemoMenu:  
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, sideShow):
         super().__init__()  
    
         self.canvas = parent
+        self.sideShow = sideShow
+        
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view 
      
-        self.snakes = Snakes(self.canvas)    
-        self.bkgMaker = self.canvas.bkgMaker
+        self.snakes   = self.sideShow.snakes   
+        self.bats     = self.sideShow.bats
+        self.abstract = self.sideShow.abstract
        
         self.demoMenu = None
                        
@@ -51,8 +54,8 @@ class DemoMenu:
             action = self.demoMenu.addAction(demo)
             self.demoMenu.addSeparator()
             action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))            
-        self.demoMenu.setFixedSize(220, 220)
-        self.demoMenu.move(getCtr(-120, -225))   
+        self.demoMenu.setFixedSize(220, 190)
+        self.demoMenu.move(getCtr(-130, -225))   
         self.demoMenu.show()
 
     def clicked(self, demo):
@@ -67,43 +70,44 @@ class DemoMenu:
             self.demoMenu.close()           
         self.demoMenu = None
            
-    def run(self, key):                  
-        if key == '1':
-            self.canvas.sideShow.runThis(common['runThis']) 
-        elif key == '2':
-            self.runSnakes('blue', key)         
-        elif key == '6':
-            if self.dots.Vertical:   
-                self.runSnakes('vertical', key)  
-            else:
-                MsgBox("The Vertical screen format is required")          
-        elif key in ('3', '4', '5'):
-            if self.dots.Vertical: 
-                MsgBox("Not implemented for vertical screen format")
-            else:      
-                if key == '3':
-                    self.canvas.sideShow.runThis('abstract_left.play')  
-                elif key == '4':
-                    self.canvas.sideShow.runThis('abstract_right.play')            
-                elif key == '5':
-                    self.runSnakes('left', key)   
+    def run(self, key):                         
+        if key == 'bats':
+            self.bats.makeBats()
+        elif key == 'blue':
+            self.runSnakes('blue') 
             
-    def runSnakes(self, what, key): 
-        if key in ('2', '5', '6'): self.bkgMaker.delSnakes()    
-        self.key = key
+        elif key in ('left', 'right'):
+            if not self.dots.Vertical:         
+                if key == 'left':  ## direction of travel
+                    self.abstract.makeAbstracts('left')  ## right to left 
+                elif key == 'right':
+                    self.abstract.makeAbstracts('right') ## left to right   
+            else:
+                 MsgBox('Not Implemented for Vertical')
+                 return
+                     
+        elif key == 'snakes':
+            if self.dots.Vertical:   
+                self.runSnakes('vertical') 
+            else:
+                self.runSnakes('left')  
+      
+    def runSnakes(self, what): 
+        if what in ('blue', 'snakes'): 
+            self.snakes.delSnakes()    
         if what != '':
-            QTimer.singleShot(100, partial(self.snakes.setSnakePaths, what))           
+            QTimer.singleShot(100, partial(self.snakes.makeSnakes, what))           
         elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
             MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 6, getCtr(-225,-175))
             return 
                     
 ### --------------------------------------------------------
-class Snake(QGraphicsPixmapItem):
+class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
 ### --------------------------------------------------------
     def __init__(self, fileName, id, x, y, parent):
         super().__init__()
 
-        self.canvas  = parent       
+        self.canvas = parent               
         self.fileName = fileName
           
         self.id = int(id) 
@@ -139,12 +143,12 @@ class Snake(QGraphicsPixmapItem):
     
         self.anime = None  
            
-    def setOriginPt(self):    
+    def setOriginPt(self): 
         b = self.boundingRect()
         op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
      
-    def reprise(self):  ## return pixitem to original position
+    def reprise(self):  
         self.anime = None
         self.anime = Anime.reprise(self)
         self.anime.start()
@@ -152,24 +156,24 @@ class Snake(QGraphicsPixmapItem):
         self.clearFocus()
     
 ### --------------------------------------------------------
-class Snakes:
+class Snakes:    
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  
-        self.canvas = parent
-        self.scene  = self.canvas.scene
-        self.mapper = self.canvas.mapper
-                                    
-        self.sideCar = SideCar(self.canvas)
-        self.PathsToClear = []
-                                              
+        self.canvas   = parent
+        self.scene    = self.canvas.scene
+        self.mapper   = self.canvas.mapper
+        self.bkgMaker = self.canvas.bkgMaker              
+        self.sideCar  = SideCar(self.canvas)
+        
+        self.what = ''
+                                                      
 ### -------------------------------------------------------- 
-    def setSnakePaths(self, what):            
-        apaths = getPathList()               
-        random.shuffle(apaths) 
-           
-        self.waypts  = None     
+    def makeSnakes(self, what):                                   
+        self.what = what  
+        self.waypts = None 
+            
         self.canvas.openPlayFile = 'snakes'
         
         pic = {
@@ -179,10 +183,11 @@ class Snakes:
         }
       
         scroll = None  
-        snakes = 3  ## make these many and quit   
+        snakes = 3  ## if scrolling  
         
         if what not in ('blue', 'left', 'vertical'):
             MsgBox('Something wrong with Snakes')
+            return
                
         if what == 'blue':
             snakes = 4  ## make these many and quit
@@ -190,17 +195,16 @@ class Snakes:
             self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99 
             
         elif what == 'left':
-            scroll = BkgItem(paths['imagePath'] + 'snakes.jpg', self.canvas)
+            scroll = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
             scroll.direction = 'left' 
             scroll.tag = 'scroller'
-            scroll.anime = scroll.setScrollerPath(scroll, 1)   
+            scroll.anime = scroll.setScrollerPath(scroll, 'first')  ## the first background 
             
         elif what == 'vertical':
-            scroll = BkgItem(paths['imagePath'] + 'snakes_vertical.jpg', self.canvas) 
+            scroll = BkgItem(paths['demo'] + 'snakes_vertical.jpg', self.canvas) 
             scroll.direction = 'vertical'   
             scroll.tag = 'scroller'
-            scroll.anime = scroll.setScrollerPath(scroll, 1)
-       
+            scroll.anime = scroll.setScrollerPath(scroll, 'first')  ## it's always the first - it sets the 2nd
             scroll.runway = int(common['ViewH'] - scroll.height) + scroll.showtime  
             scroll.setPos(QPointF(0, scroll.runway))
             
@@ -211,23 +215,21 @@ class Snakes:
                          
         MsgBox('Processing...' + '  ', 2, getCtr(-100,-175))
  
+### -------------------------------------------------------- 
         k = 0  ## outside counter - number of paths - quit at 3
-        plist  = ['twigs.path', 'demo-', 'black-forest']  ## reject
         self.canvas.pixCount = 400  ## nothing else on the screen except background
-      
-        for p in apaths:                 
-            if any(ele in p for ele in plist):  ## if any <-------
-                 continue
-            
-            fileName = os.path.basename(p)    
-            waypts = pathLoader(fileName)
-            
+        apaths = getPathList()   
+                                   
+        while k <= snakes:
+            path = getPath(apaths) 
+            waypts = pathLoader(path)  
+                
             if not waypts: 
+                MsgBox(path + ' Not found')
                 return
                   
-            idx    = 0  ## snake counter
-            steps  = 0  ## a counter used in scaling down snake body
-            
+            idx    = 0  ## segment counter
+            steps  = 0  ## a counter used in scaling down snake body   
             length = (random.randint(22,27)*2) -1  ## number of segments
             sync   = random.randint(11,16) * 1000  ## duration
             scale  = (random.randint(18,25) * 4.0) / 100.0  ## body size  
@@ -235,48 +237,48 @@ class Snakes:
             if (random.randint(1,3)) == 3:  ## just to make things interesting
                 waypts = waypts.toReversed()
                                                
-            a = pic[random.randint(1,len(pic))]  ## choose a pic             
-            b = pic[random.randint(1,len(pic))] 
-                                                                                                                                                               
-            for _ in range(length): 
-                                     
-                if idx % 3 != 0:
-                    pix = Snake(paths['imagePath'] + a, self.canvas.pixCount, 0, 0, self.canvas)
-                else:
-                    pix = Snake(paths['imagePath'] + b, self.canvas.pixCount, 0, 0, self.canvas)
-                          
-                pix.x = int(constrain(xy(common['ViewW']), pix.width, common['ViewW'], 
-                        pix.width * -common['factor']))
-                pix.y = int(constrain(xy(common['ViewH']), pix.height, common['ViewH'],
-                        pix.height * -common['factor']))
-                      
-                pix.setPos(pix.x, pix.y) 
-                 
-                idx += 1    
-                skale = scale  ## sounds the same and avoids a possible conflict
+            for _ in range(length):  ## make the segments   
+                self.a = pic[random.randint(1,len(pic))]  ## choose a pic             
+                self.b = pic[random.randint(1,len(pic))]  
+                                  
+                skale = scale  ## sounds the same and avoids a possible conflict 
                 
                 if idx >= int(length * .65) - 1:  ## slim it down a tiny bit
                     steps += 1
                     skale = scale - ((steps * .75)/100.0)
-                                                               
-                rotation = (random.randint(-8, 8) * 3)    
-                pix.setRotation(rotation)
-   
-                node = Anime.Node(pix)  ## get pix pos property    
-                pix.tag = fileName        
-                pix.anime = pathWorks(node, sync, waypts)  ## set path animation
-                
+                    
+                pix = self.addSnakes(idx, path, waypts, sync)    
+                rotation = (random.randint(-8, 8) * 3)  
+                    
                 self.sideCar.transFormPixItem(pix, rotation, skale, 1.0)  ## adds it to screen 
-                self.canvas.pixCount -= 1  ## start at the highest zvalue, runs from front to back
-      
-            k += 1
-            QTimer.singleShot(k * 600, partial(self.run, fileName))
+                self.canvas.pixCount -= 1  ## start at the highest zvalue, runs from front to back  
+                idx += 1   
+                     
+            k += 1    
+            QTimer.singleShot(k * 300, partial(self.run, path))  ## leave some time between snakes
+            
             if k == snakes:        
-                self.sideCar.disablePlay()  
+                self.sideCar.disablePlay()  ## turns on pause/resume/stop
                 if what in ('vertical', 'left'): 
-                    if scroll.anime: QTimer.singleShot(200, scroll.anime.start)                  
+                    if scroll.anime: QTimer.singleShot(200, scroll.anime.start)                                      
                 break
-          
+    
+### --------------------------------------------------------      
+    def addSnakes(self, idx, fileName, waypts, sync):                                                                                  
+        if idx % 3 != 0:  ## vary the segments
+            pix = Snake(paths['demo'] + self.a, self.canvas.pixCount, 0, 0, self.canvas)
+        else:
+            pix = Snake(paths['demo'] + self.b, self.canvas.pixCount, 0, 0, self.canvas)             
+        pix.x = int(constrain(xy(common['ViewW']), pix.width, common['ViewW'], 
+                pix.width * -common['factor']))
+        pix.y = int(constrain(xy(common['ViewH']), pix.height, common['ViewH'],
+                pix.height * -common['factor']))      
+        pix.setPos(pix.x, pix.y)                                                   
+        node = Anime.Node(pix)  ## get pix pos property    
+        pix.tag = fileName        
+        pix.anime = pathWorks(node, sync, waypts)  ## set path animation      
+        return pix
+        
     def run(self, p):
         n = 0  ## counter * wait time 
         t = (random.randint(13, 18) * 2) - 1  ## 25 to 35.ms
@@ -286,20 +288,19 @@ class Snakes:
                 pix.tag = pix.tag
                 QTimer.singleShot(100 + (n * t), pix.anime.start)
                                  
-    def rerun(self):         
-        self.clearPaths()
-        self.bkgMaker.delSnakes()
-        QTimer.singleShot(200, self.setSnakePaths)
-       
-    def clearPaths(self):  
+    def rerun(self, what): 
         self.mapper.clearTagGroup()
-        self.mapper.clearPaths()    
-        for pix in self.scene.items():
-            if pix.type == 'snake': self.scene.removeItem(pix)
-        for p in self.PathsToClear:
-            p.clear()
-        self.PathsToClear = []
-           
+        self.mapper.clearPaths()
+        self.delSnakes()
+        self.makeSnakes(what)
+              
+    def delSnakes(self):
+        if len(self.canvas.scene.items()) > 0:
+            for pix in self.canvas.scene.items():      
+                if pix.type == 'snake':
+                    self.canvas.scene.removeItem(pix)
+                    del pix
+                                                                                                                   
 ### ---------------------- dotsSnakes ----------------------     
 
 

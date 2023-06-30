@@ -21,6 +21,7 @@ class ShadowMaker:
         super().__init__()
                   
         self.pixitem = parent
+        self.canvas  = parent.canvas
         self.scene   = parent.scene
         
         self.init()
@@ -273,12 +274,16 @@ class ShadowMaker:
 ### --------------------------------------------------------    
     def addWidget(self):
         self.closeWidget()
-        self.widget = ShadowWidget(self)
-        p = self.shadow.pos()
-        x, y = int(p.x()), int(p.y())  
-        f = common['widget']  ## necessary, it drifts with changes in size
-        x1, y1 = int(f[0]), int(f[1])     
-        self.widget.setGeometry(x+x1, y+y1, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        self.widget = ShadowWidget(self)  
+        
+        p = self.shadow.pos()  
+        p = self.canvas.mapToGlobal(QPoint(int(p.x()), int(p.y())  )) 
+          
+        x, y = int(p.x()), int(p.y())      
+        x = int(x - int(self.widget.WidgetW)-10)
+        y = int(y - int(self.widget.WidgetH)/6)    
+        
+        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
                    
 ### --------------------------------------------------------           

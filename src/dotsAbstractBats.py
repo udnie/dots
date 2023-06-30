@@ -1,0 +1,316 @@
+
+import os
+import random
+
+from PyQt6.QtCore       import QTimer
+from PyQt6.QtWidgets    import QGraphicsPixmapItem
+
+import dotsAnimation    as Anime
+
+from dotsSideCar        import SideCar
+from dotsSidePath       import pathLoader, pathWorks
+from dotsShared         import paths, common
+from dotsSideGig        import *
+from dotsBkgMaker       import BkgItem
+from dotsPixItem        import PixItem
+
+backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directory
+    '1080':  'montreaux.jpg', 
+    '1280':  'montreaux-1280.jpg',
+    '1215':  'montreaux.jpg',  
+    '1440':  'montreaux-1280.jpg',
+    '1296':  'montreaux.jpg',    
+    '1536':  'montreaux-1280.jpg',
+     '620':  'bats_vertical.jpg',
+}
+    
+### ------------------- dotsAbstractBats -------------------
+class Wings:
+### --------------------------------------------------------    
+    ''' Wings no longer come off, only the bat can move, wings still flap '''   
+### --------------------------------------------------------
+    def __init__(self, parent, x, y, tag):
+        super().__init__()
+ 
+        self.canvas = parent    
+        self.scene  = self.canvas.scene
+     
+        self.pivot     = self.pivot(paths['imagePath'] + 'bat-pivot.png',x, y, tag)
+        self.rightWing = self.right(paths['imagePath'] + 'bat-wings.png', x, y)
+        self.leftWing  = self.left(paths['imagePath'] + 'bat-wings.png', x, y)
+                                             
+        self.half   = self.pivot.width/2   
+        self.height = self.pivot.height/5    
+
+        if common['Screen'] in ('1215', '1440'):
+            self.height = self.pivot.height/7  ## drops too low otherwise
+        elif common['Screen'] in ('1536', '1296'):
+            self.height = self.pivot.height/9  
+          
+        try:
+            self.pivot.setPos(self.pivot.x - self.half, self.pivot.y - self.height - 5)
+            self.pivot.setScale(.60)
+            self.pivot.setOriginPt() 
+        except IOError:
+            pass    
+       
+        ## center wings around pivot - some magic numbers
+        self.rightWing.setPos(self.half+1, self.height-2)
+        self.leftWing.setPos(-self.leftWing.width+(self.half+5), self.height-5)
+
+        self.rightWing.setParentItem(self.pivot)  
+        self.leftWing.setParentItem(self.pivot)
+                   
+### --------------------------------------------------------
+    def pivot(self, file, x, y, tag):  ## was wings
+        self.canvas.pixCount += 1         
+        pivot = PixItem(file, 
+            self.canvas.pixCount,
+            x, y,  
+            self.canvas
+        ) 
+        pivot.part = 'pivot' 
+        pivot.tag  = tag  ## path to follow - random select
+      
+        pivot.setZValue(pivot.zValue() + 200)
+        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True)  
+        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
+        
+        self.scene.addItem(pivot)
+                            
+        return pivot
+   
+# ### --------------------------------------------------------  
+    def right(self, file, x, y):            
+        self.canvas.pixCount += 1
+        pix = PixItem(file, self.canvas.pixCount, x-20, y, 
+            self.canvas,
+            False,
+        )  ## don't flop it 
+        return self.setWing(pix, 'right')  
+            
+### --------------------------------------------------------          
+    def left(self, file, x, y):         
+        self.canvas.pixCount += 1
+        pix = PixItem(file, self.canvas.pixCount, x + self.rightWing.width, y,  ## offset to left
+            self.canvas,
+            True
+        )  ## flop it
+        return self.setWing(pix, 'left') 
+   
+   ### --------------------------------------------------------              
+    def setWing(self, pix, wing):   
+        pix.part = wing  ## part could be other than a wing   
+        pix.tag  = 'Flapper'  ## applies this animation when run
+        pix.setZValue(pix.zValue() + 200)  ## reset wing zvals
+        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
+        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
+        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIgnoresParentOpacity, True)  ## won't disappear
+        pix.setAcceptedMouseButtons(Qt.MouseButton.NoButton)  ## mouse ignored - wings can't be move
+        self.scene.addItem(pix)      
+        return pix 
+                            
+### --------------------------------------------------------
+class Bats:        
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+ 
+        self.canvas = parent
+        self.scene  = self.canvas.scene
+        self.dots   = self.canvas.dots
+        self.mapper = self.canvas.mapper
+                                            
+        self.sideCar  = SideCar(self.canvas)
+        self.animation = self.canvas.animation
+                                                   
+### -------------------------------------------------------- 
+    def makeBats(self):  ## makes aliens and bats                 
+        self.canvas.openPlayFile = 'bats'
+
+        if 'montreaux' in backGrounds[common['Screen']]:
+            bkg = BkgItem(paths['bkgPath'] + backGrounds[common['Screen']], self.canvas)
+        else:  
+            bkg = BkgItem(paths['demo'] + backGrounds[common['Screen']], self.canvas) 
+         
+        bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        self.scene.addItem(bkg)
+     
+        self.batWings()       
+        self.greys()
+        self.run()
+        self.sideCar.disablePlay()
+                      
+### --------------------------------------------------------
+    def batWings(self):  ## these go to screen and wait to be run
+        k = 0   
+        bats = 3 
+        apaths = getPathList()
+        while k < bats:      
+            x = random.randrange(200, common['ViewW']-300)
+            y = random.randrange(200, common['ViewH']-300) 
+            path = getPath(apaths)                               
+            Wings(self.canvas, x, y, path)   
+            k += 1       
+     
+    def runBat(self, pix, n, t):  ## run by run
+        if pix.part == 'pivot':   ## adds path to follow
+            node = Anime.Node(pix)  ## gets pix pos property 
+            sync = random.randint(11,16) * 1000  ## sets duration 
+            waypts = pathLoader(pix.tag)  ## get the path        
+            pix.anime = pathWorks(node, sync, waypts)  ## sets a path to follow     
+            QTimer.singleShot(100 + (n * t), pix.anime.start)  
+        elif pix.part in ('left','right'): 
+            pix.anime = self.animation.setAnimation(pix.tag, pix)  ## Flapper in Wings   
+            QTimer.singleShot(100 + (n * t), pix.anime.start)
+                   
+### --------------------------------------------------------                 
+    def greys(self):  ## these go to screen and wait to be run
+        greys = 23  
+        pathStr = paths['spritePath'] + 'alien.png'     
+        for i in range(0, greys):
+            pix = self.oneGrey(pathStr)
+            self.scene.addItem(pix)
+            
+    def oneGrey(self, pathStr):
+        pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas)        
+        pix.x = random.randrange(200, common['ViewW']-300)
+        pix.y = random.randrange(200, common['ViewH']-300)
+        pix.setPos(pix.x, pix.y)     
+        pix.setScale(.65)    
+        pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory             
+        return pix
+                                       
+    def runGrey(self, pix, k, scale):
+        pix.setOriginPt()
+        pix.scale = scale * (67-(k*3))/100.0  ## 3 * 22 screen items 
+        pix.setScale(pix.scale)  
+        pix.part = ''  ## follows a demo path
+        pix.anime = self.animation.setAnimation(pix.tag, pix) 
+        QTimer.singleShot(100 + (k * 60), pix.anime.start)
+            
+### --------------------------------------------------------        
+    def run(self):  
+        k , n = 0, 0 
+        scale = .65 
+        for pix in self.scene.items():
+            if pix.type =='pix': 
+                if 'alien' in pix.fileName:
+                    self.runGrey(pix, k,  scale)
+                    k += 1
+                elif pix.part in pix.part in ('pivot','left','right'):
+                    t = (random.randint(13, 18) * 2) - 1  ## 25 to 35.ms            
+                    self.runBat(pix, n, t)
+                    n +=1 
+                    
+ ### --------------------------------------------------------  
+    def rerun(self):  ## no reason to delete     
+        clearPaths(self)
+        self.run()
+        self.sideCar.disablePlay()
+     
+    def delBats(self):
+        if len(self.scene.items()) > 0:
+            for pix in self.scene.items():      
+                if pix.type == 'pix':  ## deleting pivot deletes the wings
+                    if pix.part in ('pivot') or 'alien' in pix.fileName:   
+                        self.scene.removeItem(pix)
+                        del pix
+                                       
+### --------------------------------------------------------
+class Abstract:
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+ 
+        self.canvas = parent    
+        self.scene  = self.canvas.scene
+        self.mapper = self.canvas.mapper
+        
+        self.sideCar  = SideCar(self.canvas)
+        self.animation = self.canvas.animation
+        
+        self.direction = ''
+        
+### --------------------------------------------------------      
+    def makeAbstracts(self, direction):
+        self.direction = direction
+        self.canvas.openPlayFile = 'abstract'
+          
+        self.bkg = BkgItem(paths['bkgPath'] + 'abstract.jpg', self.canvas)   
+        self.bkg.tag = 'scroller'
+        self.bkg.direction = direction
+        self.bkg.anime = self.bkg.setScrollerPath(self.bkg, 'first')
+            
+        if direction == 'right':
+            self.bkg.setPos(QPointF(self.bkg.runway, 0))  ## offset to right  
+       
+        self.bkg.addedScroller == False   
+        self.bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
+          
+        self.scene.addItem(self.bkg)
+        
+        hats = 8   
+        apaths = getPathList()  ## from sideGig  
+           
+        for i in range(0, hats):  
+            path = getPath(apaths)                                           
+            self.makeHats(path)
+            
+        QTimer.singleShot(200, self.bkg.anime.start)  
+        self.run()  
+        self.sideCar.disablePlay()
+
+### --------------------------------------------------------            
+    def makeHats(self, path): 
+        pathStr = paths['spritePath'] + 'doral'
+        pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas)        
+        pix.x = random.randrange(200, common['ViewW']-300)
+        pix.y = random.randrange(200, common['ViewH']-300)
+        pix.setPos(pix.x, pix.y)      
+        pix.tag = path            
+        self.scene.addItem(pix)
+                      
+    def run(self):   
+        k = 0
+        for pix in self.scene.items():
+            if pix.type =='pix' and 'doral' in pix.fileName:
+                node = Anime.Node(pix)  ## get pix pos property 
+                sync   = random.randint(11,16) * 1000  ## duration   
+                waypts = pathLoader(pix.tag)
+                pix.anime = pathWorks(node, sync, waypts)  ## set path animation 
+                QTimer.singleShot(100 + (k * 60), pix.anime.start)
+                k += 1
+       
+### --------------------------------------------------------                                                
+    def rerun(self, direction):         
+        clearPaths(self)
+        self.delHats() 
+        self.makeAbstracts(direction) 
+      
+    def delHats(self):
+        if len(self.scene.items()) > 0:
+            for pix in self.scene.items():      
+                if pix.type == 'pix' and 'doral' in pix.fileName:
+                    self.scene.removeItem(pix)
+                    del pix
+                elif pix.type == 'bkg':
+                    self.scene.removeItem(pix)
+                    del pix
+                    
+### -------------------------------------------------------- 
+def clearPaths(self):  
+    self.mapper.clearTagGroup()
+    self.mapper.clearPaths()    
+  
+def getPath(apaths):
+    plist  = ['twigs.path', 'demo-', 'black-forest']  ## reject these paths
+    random.shuffle(apaths) 
+    for p in apaths:                 
+        if any(ele in p for ele in plist): 
+            continue   
+        return os.path.basename(p)
+         
+### ------------------- dotsAbstractBats -------------------
+
+

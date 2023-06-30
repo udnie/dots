@@ -5,97 +5,16 @@ import random
 from PyQt6.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
                                 QParallelAnimationGroup
 from PyQt6.QtGui        import QPainterPath
-from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import paths, common
-from dotsPixItem        import PixItem
-from dotsSideGig        import getOffSet, MsgBox
+from dotsSideGig        import getOffSet, MsgBox, DemoAvailable
 
 ### ---------------------- dotsSidePath --------------------
-''' dotsPaths is used by storyboard, sideshow, animations, 
-    pathmaker and contains Wings, demo, setPath, pathLoader.
-    Mostly all of the original demo is here
+''' dotsPath is used by storyboard, sideshow, animations, 
+    pathmaker and contains demo, setPath, pathLoader.
+    Mostly all of the original demo is here '''
 ### --------------------------------------------------------
-    Things to know about wings. They're brittle, don't pull on them.
-    Use the bat portion to move the bat - the pivot sprite and the wing 
-    are in the images folder. Main thing to know, if you need to move 
-    or change an animation - do so, save it, clear and reload.
-    They're still brittle but it works, even better now. '''
-### --------------------------------------------------------
-class Wings:
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
- 
-        self.canvas = parent    
-        self.scene  = self.canvas.scene
-        
-### --------------------------------------------------------
-    def bats(self, x, y, tag):  ## was wings 
-        self.canvas.pixCount += 1         
-        pivot = PixItem(paths['imagePath'] + 'bat-pivot.png', 
-            self.canvas.pixCount,
-            x, y,  
-            self.canvas
-        ) 
-        pivot.part = 'pivot' 
-        pivot.tag  = tag
-        pivot.setZValue(pivot.zValue() + 200)
-        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True) 
-        ''' magic numbers warning - results will vary - seems
-            to be working for bat wings if loaded using file chooser''' 
-                      
-        half = pivot.width/2     ## looking better
-        height = pivot.height/5  ## good guess, close
-        
-        try:
-            ## another correction -5 for y
-            # pivot.setPos(pivot.x - half, pivot.y - height - 5)
-            pivot.setScale(.57)
-            pivot.setOriginPt() 
-        except IOError:
-            pass  
-          
-        self.canvas.pixCount += 1
-        rightWing = PixItem(paths['imagePath'] + 'bat-wings.png', 
-            self.canvas.pixCount,
-            x-20, y-20, 
-            self.canvas,
-            False,
-        )  ## flop it
- 
-        rightWing.part = 'right'
-        rightWing.tag  = 'Flapper'  ## applies this animation when run
-        rightWing.setZValue(rightWing.zValue() + 200)  ## reset wing zvals
-        rightWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
-        rightWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
-              
-        self.canvas.pixCount += 1
-        leftWing = PixItem(paths['imagePath'] + 'bat-wings.png', 
-            self.canvas.pixCount,
-            x + rightWing.width, y, 
-            self.canvas,
-            True
-        )  ## flop it
-
-        leftWing.part = 'left'
-        leftWing.tag  = 'Flapper'
-        leftWing.setZValue(leftWing.zValue() + 200)
-        leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False) 
-        leftWing.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
-       
-        ## center wings around pivot
-        rightWing.setPos(half+1, height-2)
-        leftWing.setPos(-leftWing.width+(half+5), height)
-
-        ''' if there's a better way to bind these I'd like to know '''
-        rightWing.setParentItem(pivot)  
-        leftWing.setParentItem(pivot)
-
-        self.scene.addItem(pivot) 
-        
-### --------------------------------------------------------
-def flapper(pix, anime, node):  ## used by demo bat wings        
+def flapper(pix, anime, node):  ## used by demo bat wings  
     baseName = os.path.basename(pix.fileName)
 
     if pix.part == 'right':
@@ -121,10 +40,13 @@ def flapper(pix, anime, node):  ## used by demo bat wings
     return rotate
     
 ### --------------------------------------------------------  
-def demo(pix, anime, node):  ## sets the demo path         
+def demo(pix, anime, node):  ## sets the demo path  
+    if not DemoAvailable():  ## <--- shouldn't happen
+        return
+    
     sync = 11000
 
-    waypts = pathLoader(anime)  ## demo-path file name
+    waypts = pathLoader(anime)  ## demo-path file name from the demo directory
     if not waypts: return
     ## offset for origin pt - setOrigin wasn't working
     pt = getOffSet(node.pix)
@@ -210,12 +132,16 @@ def pathWorks(node, sync, wpts):
     return path 
       
 ### --------------------------------------------------------
-def pathLoader(path):  ## also by MapItem
-    file = paths['paths'] + path 
+def pathLoader(path):  ## used by MapItem, Snakes. Abstract, Bats
+    file = paths['paths'] + path  ## paths directory
+    isDemo = False    
+    if 'demo' in path:
+        file = paths['demo'] + path 
+        isDemo = True
     try:
         scaleX, scaleY = 1.0, 1.0 
         path = QPainterPath()
-        if 'demo-' not in file:         ## apply scaleX, scaleY from screens
+        if not isDemo:  ## apply scaleX, scaleY from screens except for bats demo
             scaleX = common['scaleX']  ## this does not actually scale but it's enough
             scaleY = common['scaleY'] 
         with open(file, 'r') as fp:

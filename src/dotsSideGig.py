@@ -139,6 +139,12 @@ def constrain(lastXY, objSize, panelSize, overlap):
     else:
         return lastXY
 
+def DemoAvailable():
+    if os.path.exists(paths['demo']):  ## note
+        return True
+    else:
+        return False
+
 def getOffSet(pix):
     b = pix.boundingRect()
     return QPointF(b.width()*.5, b.height()*.5)
@@ -205,74 +211,6 @@ def getCrop(path):  ## from path - bounding size and position
         if p.y() > y1:
             y1 = p.y()  
     return int(x), int(y), int((x1-x)), int((y1-y))
-
-### --------------------------------------------------------
-### from sideshow
-### --------------------------------------------------------
-def savePix(pix): 
-    p = pix.pos() 
-    tmp = {
-        'fname':    os.path.basename(pix.fileName),
-        'type':    'pix',
-        'x':        float('{0:.2f}'.format(p.x())),
-        'y':        float('{0:.2f}'.format(p.y())),
-        'z':        pix.zValue(),
-        'mirror':   pix.flopped,
-        'rotation': pix.rotation,
-        'scale':    float('{0:.2f}'.format(pix.scale)),
-        'tag':      pix.tag,
-        'alpha2':   float('{0:.2f}'.format(pix.alpha2)), 
-        'locked':   pix.locked,
-        'part':     pix.part,
-    }  
-    
-    if pix.shadow != None:   
-        shadow = {
-            'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
-            'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
-            'rotate':   pix.shadowMaker.rotate,
-            'width':    pix.shadowMaker.imgSize[0],
-            'height':   pix.shadowMaker.imgSize[1],
-            'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
-                            for k in range(len(pix.shadowMaker.path))],
-            'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
-                            for k in range(len(pix.shadowMaker.path))],
-            'flopped':   pix.shadowMaker.flopped,
-        }
-        tmp.update(shadow)
-          
-    return tmp 
-
-def saveBkg(pix):
-    p = pix.boundingRect() 
-    tmp = {
-        'fname':    os.path.basename(pix.fileName),
-        'type':    'bkg',
-        'x':        float('{0:.2f}'.format(pix.x)),
-        'y':        float('{0:.2f}'.format(pix.y)),
-        'z':        pix.zValue(),
-        'mirror':   pix.flopped,
-        'locked':   pix.locked,
-        'rotation': pix.rotation,
-        'scale':    float('{0:.2f}'.format(pix.scale)),
-        'opacity':  float('{0:.2f}'.format(pix.opacity)),
-        'width':    int(p.width()),
-        'height':   int(p.height()),
-        'tag':      pix.tag,
-        'scrollable':   pix.scrollable,
-        'direction':    pix.direction,
-    }
-    return tmp
-
-def saveFlat(pix):
-    tmp = {
-        'fname': 'flat',
-        'type':  'bkg',
-        'z':      pix.zValue(),
-        'tag':    pix.color.name(),
-        'color':  pix.color.name(),
-    }
-    return tmp
 
 ### --------------------- dotsSideGig ----------------------
   

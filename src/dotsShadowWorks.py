@@ -16,7 +16,7 @@ V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
 ### ------------------- dotsShadowWorks --------------------
 ''' classes: PointItem, ShadowWidget, Shadow, and cv2 functions '''
 ### --------------------------------------------------------
-class PointItem(QGraphicsEllipseItem):
+class PointItem(QGraphicsEllipseItem):  ## not to be confused with pathMaker's PointItem
 ### --------------------------------------------------------
     def __init__(self, pt, ptStr, parent):
         super().__init__()

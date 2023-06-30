@@ -6,24 +6,27 @@ from PyQt6.QtCore    import Qt
 ### --------------------------------------------------------
 
 common = {  ## wherever it's needed
-    'tagZ':      20.0,    
+    'tagZ':      20.0,    ## Zvalues settings 
     'pathZ':    -25.0, 
     'gridZ':    -50.0, 
     'bkgZ':     -99.0, 
-    'shadow':    50.0,
-    'points':    40.0,
-    'outline':   30.0,
-    'ScrollW':    138,  ## used by both 1080 and 1280X720 px
-    'SliderW':    175,    
-    'OffSet':       0,  ## keysPanel width, used to set fixed size 
-    'fix':          23,  ## keysPanel height, used to set fixed size 
-    'V':         12.0,  ## diameter of pointItems in shadows
+    
+    'shadow':    50.0,    ## Zvalue for points in shadows
+    'points':    40.0,    ## Zvalue for points in shadows
+    'outline':   30.0,    ## Zvalue for outline in shadows
+    
+    'ScrollW':      118,  ## used by both 1080 and 1280X720 px
+    'SliderW':      175,  ## used by both 1080 and 1280X720 px
+    'OffSet':         0,  ## keysPanel width, used to set fixed size 
+    'fix':            23,  ## keysPanel height, used to set fixed size 
+    'V':           12.0,  ## diameter of pointItems in shadows
+    'widgetXY': (25,25),  ## position pathWidget and BkgWidget 
 } 
         
 ### --------------------------------------------------------
              
-CanvasStr = "L,R,P,S,C,T,W,M,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
-PathStr = "C,D,E,F,L,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+CanvasStr = "A,L,R,P,S,C,T,W,M,\",\',<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter"   
+PathStr = "C,D,E,F,L,M,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 ## use this and make sure your editor points to the right directory
@@ -35,6 +38,7 @@ paths = {
     'spritePath':   './../sprites/',
     'paths':        './../paths/',
     'txy':          './../txy/',
+    'demo':         './../demo/',
 }
 
 Tick = 2.0
@@ -84,17 +88,18 @@ pathcolors = (
     )       
 
 singleKeys = {  ## wish I had done this earlier
-    Qt.Key.Key_Up:        'up',          
-    Qt.Key.Key_Down:    'down',
-    Qt.Key.Key_Left:    'left',      
-    Qt.Key.Key_Right:  'right',
-    Qt.Key.Key_Alt:      'opt',    
+    Qt.Key.Key_Up:           'up',          
+    Qt.Key.Key_Down:       'down',
+    Qt.Key.Key_Left:       'left',      
+    Qt.Key.Key_Right:     'right',
+    Qt.Key.Key_Alt:         'opt',    
     Qt.Key.Key_Shift:     'shift',
     Qt.Key.Key_Control:     'cmd',
     Qt.Key.Key_Enter:     'enter',
     Qt.Key.Key_Return:   'return',
     Qt.Key.Key_Space:     'space',  
-    Qt.Key.Key_Backslash: 'front',           
+    Qt.Key.Key_Backslash: 'front',   
+    Qt.Key.Key_A: 'A',        
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
     Qt.Key.Key_K: 'K',  
@@ -109,22 +114,22 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_U: 'U',
     Qt.Key.Key_V: 'V', 
     Qt.Key.Key_W: 'W',  
-    Qt.Key.Key_Comma: ',', 
+    Qt.Key.Key_Comma:  ',', 
     Qt.Key.Key_Period: '.',     
-    Qt.Key.Key_Plus: '+',         
-    Qt.Key.Key_Equal: '=',    
-    Qt.Key.Key_Minus: '-',  
-    Qt.Key.Key_Less: '<',     
-    Qt.Key.Key_Greater: '>',
-    Qt.Key.Key_Colon: ':',   
-    Qt.Key.Key_Semicolon: ';',  
-    Qt.Key.Key_Apostrophe: '\'',      
-    Qt.Key.Key_QuoteDbl: '\"', 
-    Qt.Key.Key_Slash: '/',
-    Qt.Key.Key_Underscore: '_', 
-    Qt.Key.Key_BraceLeft: '{',
-    Qt.Key.Key_BraceRight: '}',   
-    Qt.Key.Key_BracketLeft: '[',
+    Qt.Key.Key_Plus:   '+',         
+    Qt.Key.Key_Equal:  '=',    
+    Qt.Key.Key_Minus:  '-',  
+    Qt.Key.Key_Less:   '<',     
+    Qt.Key.Key_Greater:      '>',
+    Qt.Key.Key_Colon:        ':',   
+    Qt.Key.Key_Semicolon:    ';',  
+    Qt.Key.Key_Apostrophe:  '\'',      
+    Qt.Key.Key_QuoteDbl:    '\"', 
+    Qt.Key.Key_Slash:        '/',
+    Qt.Key.Key_Underscore:   '_', 
+    Qt.Key.Key_BraceLeft:    '{',
+    Qt.Key.Key_BraceRight:   '}',   
+    Qt.Key.Key_BracketLeft:  '[',
     Qt.Key.Key_BracketRight: ']', 
 }
 

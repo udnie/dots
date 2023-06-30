@@ -11,31 +11,25 @@ from dotsPointItem   import PointItem
 ### --------------------------------------------------------
 class PathEdits(QWidget):
 ### --------------------------------------------------------
-    def __init__(self, pathMaker, sideWays, parent):  
+    def __init__(self, parent, sideWays):  
         super().__init__()
-
-        self.canvas = parent
-        self.scene  = self.canvas.scene
-        self.view   = self.canvas.view
         
-        self.pathMaker = pathMaker  
+        self.pathMaker = parent
+        self.canvas    = self.pathMaker.canvas
+        self.scene     = self.canvas.scene
+        self.view      = self.canvas.view
         self.sideWays  = sideWays
-          
-        self.dragCnt = 0 
-        
-        self.lassoSet = False
-        self.polySet = False
-        
-        self.poly = None
-        self.lasso = []
-        
+
+        self.lasso = None           
+        self.dragCnt = 0    
+           
         self.view.viewport().installEventFilter(self)
              
 ### --------------------- event filter ----------------------          
     def eventFilter(self, source, e):  ## used by lasso    
         if self.canvas.pathMakerOn:
     
-            if self.pathMaker.editingPts and self.lassoSet:
+            if self.pathMaker.editingPts and self.lasso != None:
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.addLassoPts(e.pos()) 
@@ -98,52 +92,62 @@ class PathEdits(QWidget):
                       
 ### ------------------------ lasso ------------------------- 
     def toggleLasso(self):
-        if self.lassoSet:
-            self.deleteLasso()
-        else:
+        if self.lasso != None:
+            self.deleteLasso()   
+        elif self.lasso == None:
             self.newLasso()
-  
+        
     def newLasso(self): 
-        self.lassoSet = True 
         self.lasso = []  
         if self.pathMaker.widget != None:
             self.pathMaker.widget.close()
         QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
- 
-    def deleteLasso(self):
-        self.lassoSet = False
-        self.lasso = []
-        QGuiApplication.restoreOverrideCursor()
-               
+                
     def addLassoPts(self, p):
         self.lasso.append(QPointF(p))
         self.drawLasso()
-                  
+                        
     def drawPoly(self, pts):  ## returns polygon used by qgraphicspolygonitem
         poly = QPolygonF()    ## not used by newPath or for animation
-        for p in pts:   ## pts can either be from lasso or pathMaker
+        for p in pts:         ## pts can either be from lasso or pathMaker
             poly.append(QPointF(p))
         return poly               
                                 
-    def drawLasso(self): 
-        if self.polySet:
-            self.scene.removeItem(self.poly)    
-        self.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
-        self.poly.setBrush(QBrush(QColor(125,125,125,50)))
-        self.poly.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
-        self.poly.setZValue(common['pathZ']) 
-        self.scene.addItem(self.poly)
-        self.polySet = True
- 
-    def removePoly(self): 
-        if self.polySet:
-            self.scene.removeItem(self.poly)  
-            self.polySet = False
-            self.poly = None
-                                      
+    def drawLasso(self):
+        self.pathMaker.removePoly()    
+        self.pathMaker.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
+        self.pathMaker.poly.setBrush(QBrush(QColor(160,160,160,50)))
+        self.pathMaker.poly.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
+        self.pathMaker.poly.setZValue(common['pathZ']) 
+        self.pathMaker.scene.addItem(self.pathMaker.poly)
+    
+    def deleteLasso(self):  
+        self.pathMaker.removePoly()
+        self.lasso = None
+        QGuiApplication.restoreOverrideCursor()
+                
+    def finalizeSelections(self, pt): 
+        self.lasso.append(QPointF(pt))
+        poly = self.drawPoly(self.lasso)  ## return a polygon
+        for i in range(0, len(self.pathMaker.pts)):  
+            p = QPointF(self.pathMaker.pts[i])
+            if poly.containsPoint(p, Qt.FillRule.WindingFill):  ## match 
+                if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
+                    idx = self.pathMaker.selections.index(i)
+                    # print('a ', i, idx, self.pathMaker.selections)
+                    self.pathMaker.selections.pop(idx)
+                else:
+                    self.pathMaker.selections.append(i)  ## save pts index 
+                    # print('b ', i, self.pathMaker.selections)            
+        del poly
+        self.deleteLasso()
+        if self.pathMaker.selections:
+            self.pathMaker.selections.sort()
+        QTimer.singleShot(200, self.updatePath)  ## it works better this way   
+                                         
 ### -------------------- pointItems ------------------------    
-    def togglePointItems(self):
-        if self.lassoSet: 
+    def togglePointItems(self):  ## the letter 'V'
+        if self.lasso != None:
             self.deleteLasso()
         if self.pointItemsSet():
             self.removePointItems()
@@ -180,6 +184,11 @@ class PathEdits(QWidget):
                 self.scene.removeItem(ptr)
                 del ptr
 
+    def updatePath(self):  ## pointItem responding to mouse events
+        self.removePointItems()      
+        self.pathMaker.addPath() 
+        self.addPointItems()  
+        
     def pointItemsSet(self):
         for itm in self.scene.items():
             if itm.type == 'pt':
@@ -210,31 +219,8 @@ class PathEdits(QWidget):
         else:
             self.pathMaker.addPath()
         if bool: self.addPointItems()
-
-    def updatePath(self):  ## pointItem responding to mouse events
-        self.removePointItems()      
-        self.pathMaker.addPath() 
-        self.addPointItems()   
-   
-    def finalizeSelections(self, pt): 
-        self.lasso.append(QPointF(pt))
-        poly = self.drawPoly(self.lasso)  ## return a polygon
-        for i in range(0, len(self.pathMaker.pts)):  
-            p = QPointF(self.pathMaker.pts[i])
-            if poly.containsPoint(p, Qt.FillRule.WindingFill):  ## match 
-                if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
-                    idx = self.pathMaker.selections.index(i)
-                    # print('a ', i, idx, self.pathMaker.selections)
-                    self.pathMaker.selections.pop(idx)
-                else:
-                    self.pathMaker.selections.append(i)  ## save pts index 
-                    # print('b ', i, self.pathMaker.selections)
-        self.deleteLasso()
-        self.removePoly()
-        if self.pathMaker.selections:
-            self.pathMaker.selections.sort()
-        QTimer.singleShot(200, self.updatePath)  ## it works better this way
-                      
+        
+### -------------------- selections ------------------------                
     def deleteSections(self):  ## selected with lasso
         if self.pathMaker.selections: 
             self.pathMaker.selections.sort()  ## works better this way

@@ -1,16 +1,17 @@
 
-from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot, QPropertyAnimation
+from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot,QTimer, QPropertyAnimation
 from PyQt6.QtGui        import QColor, QPen, QPixmap, QPainterPath
 from PyQt6.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonItem, \
                                 QGraphicsPathItem
 
-from dotsAnimation      import Node                           
+from dotsAnimation      import *                          
 from dotsSideGig        import MsgBox, getColorStr, distance, getCtr
 from dotsShared         import common, paths, MoveKeys, ScaleRotateKeys
-
+from dotsSideCar        import SideCar
 from dotsSideWays       import SideWays
 from dotsPathEdits      import PathEdits
 from dotsPathWidget     import PathWidget, DoodleMaker
+from dotsAbstractBats   import Bats
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,
@@ -26,14 +27,17 @@ class PathMaker(QWidget):
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
         self.keysPanel = self.canvas.keysPanel
-        self.dots      = self.canvas.dots
- 
+        self.dots      = self.canvas.dots  
+         
+        self.animation = Animation(self.canvas) 
+        self.sideCar   = SideCar(self.canvas) 
+        
         self.widget = None  ## main pathMaker widget 
        
         self.initThis()
            
         self.sideWays = SideWays(self)  ## extends pathMaker
-        self.drawing  = PathEdits(self, self.sideWays, parent) 
+        self.drawing  = PathEdits(self, self.sideWays) 
                   
         self.doFirst = {
             'D':   self.delete,
@@ -91,20 +95,21 @@ class PathMaker(QWidget):
         self.npts = 0  ## used by addNewPathPts
         self.last = 0
          
-        self.chooser = None
-        self.newPath = None
         self.addingNewPath = False
-
         self.pathSet = False
         self.pathChooserSet = False
-       
-        self.ball = None
-        self.path = None                 
-        self.pathTestNode = None
-          
+        
         self.editingPts = False
         self.pathTestSet = False
-                  
+         
+        self.ball = None
+        self.path = None                 
+        self.poly = None
+        
+        self.chooser = None
+        self.newPath = None 
+        self.pathTestNode = None
+                     
 ### ---------------------- key handler ---------------------
     @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
     def pathKeys(self, key):
@@ -202,6 +207,7 @@ class PathMaker(QWidget):
         self.pathChooserOff() 
         self.scene.clear()
         self.initThis()
+        self.canvas.bkgMaker.disableSetBkg() 
         self.dots.statusBar.showMessage(self.openPathFile)  ## it's empty, clears status bar
             
     def pathMakerOff(self):
@@ -235,14 +241,19 @@ class PathMaker(QWidget):
             self.newPath.setZValue(common['pathZ']) 
             self.scene.addItem(self.newPath)  ## only one - no group needed
             self.addingNewPath = True
-                     
+   
+    def removePoly(self):
+        if self.poly != None:
+            self.scene.removeItem(self.poly)
+        self.poly = None
+                    
 ### --------------------------------------------------------
     def addWidget(self):
         self.closeWidget()
-        self.widget = PathWidget(self)    
-        b = common['bkgrnd']
-        p = getCtr(int(b[0]), int(b[1]))             
-        self.widget.setGeometry(int(p.x()), int(p.y()), \
+        self.widget = PathWidget(self)       
+        p = common['widgetXY']
+        p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))                          
+        self.widget.setGeometry(p.x(), p.y(), \
             int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
         if self.addingNewPath:
@@ -313,7 +324,7 @@ class PathMaker(QWidget):
             path.lineTo(QPointF(pt)) 
         if bool: path.closeSubpath()
         return path
-
+    
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
         if self.pts and self.pathSet:
@@ -358,6 +369,5 @@ class PathMaker(QWidget):
             self.drawing.redrawPoints(self.drawing.pointItemsSet())
 
 ### -------------------- dotsPathMaker ---------------------
-
 
 

@@ -124,139 +124,111 @@ def setCommon(format=''):
         common.update(seven20) 
         return '1080X720 - 3:2' 
    
-### --------------- 1080X720 - 3:2 format ------------------
-seven20 = {    
+##  -------------- 1080X720 - 3:2 and 1280X720 - 16:9 ----------------
+seven20 = {     ## used by both 1080X720 and 1280X720px     
     'DotsH':     822, 
-    'ViewH':     720,  ## used by both 1080X720 and 1280X720px           
-    'ScrollH':   687,  
+    'ViewH':     720,       
+    'ScrollH':   682,  
     'SliderH':   679,  
     'margin1':    15,  ## keysMenu margins top
     'margin2':    10,  ## right
     'factor':   0.30,  ## amount to scale pixitems unless preset    
-    'modLabel':  1.0,  ## amount to scale scroll label height 
     'scaleY':    1.0,  ## same as 720
-    'steps':       6,  ## number of visible scroll widgets
+    'steps':       7,  ## number of visible scroll widgets
 }
 
-ten80 = {            
+ten80 = {   ## 1080X720 - 3:2        
     'Screen':   '1080',     
-    'DotsW':      1431,  
+    'DotsW':      1415,  
     'ViewW':      1080,  
     'gridSize':   30.0,       ## gridline spacing - seems to work, consistant
     'scaleX':      1.0,
-    'widget':   (175,175),    ## position pix and shadow widgets using getCtr 
-    'bkgrnd': (-525,-455),
-    'runThis':  'demo-1080.play',  ## default run key
 }
 
-### ------------------ 1280X720 - 16:9 ---------------------
-twelve80 = {  
-    'Screen': '1280',        
-    'DotsW':    1631, 
-    'ViewW':    1280,  
-    'gridSize':   26.66,  
-    'scaleX':      1.15,
-    'widget':    (75,175),
-    'bkgrnd':  (-625,-455),
-    'runThis':  'demo-1280.play',  ## default run key
+twelve80 = {    ## 1280X720 - 16:9
+    'Screen':   '1280',        
+    'DotsW':      1615, 
+    'ViewW':      1280,  
+    'gridSize':  26.66,  
+    'scaleX':     1.15,
 }
 
-### --------------- 810 - 16:9/3:2 format ------------------
-eight10 = {
+## -------------- 1215X810 - 3:2 and 1440X810 - 16:9 ----------------
+eight10 = {  ## used by both 1215X810 and 140X810px
     'DotsH':     912, 
-    'ViewH':     810,   ## used by both 1215X810 and 140X810px   
-    'ScrollH':   772,
+    'ViewH':     810,     
+    'ScrollH':   775,  ## scroll panel height
     'SliderH':   770,    
-    'margin1':    20,
+    'margin1':    13,  ## scroll panel top margin
     'margin2':     3,
-    'scaleY':      1.15, 
-    'modLabel':    0.962,
-    'factor':      0.36,  ## scales pixitems by format
-    'steps':       7, 
+    'scaleY':   1.15, 
+    'facto':    0.36,  ## scales pixitems by format
+    'steps':       8, 
 }
 
-### --------------- 1215X810 - 3:2 format -------------------
-twelve15 = {
-    'Screen': '1215',  
-    'DotsW':    1567,   
-    'ViewW':    1215,    
-    'gridSize':   28.925, 
-    'scaleX':      1.05,
-    'widget':   (100,160),
-    'bkgrnd':  (-595,-485),
-    'runThis':  'demo-1215.play',  ## default run key
+twelve15 = {    ## 1215X810 - 3:2 format
+    'Screen':   '1215',  
+    'DotsW':      1550,   
+    'ViewW':      1215,    
+    'gridSize': 28.925, 
+    'scaleX':     1.05,
 }
     
-### ------------------ 1440X810 - 16:9 ----------------------
-fourteen40 = {  
-    'Screen': '1440',         
-    'DotsW':    1791,
-    'ViewW':    1440,
-    'gridSize':   30, 
-    'scaleX':      1.30,
-    'widget':     (0,150),
-    'bkgrnd':  (-705,-485),
-    'runThis':  'demo-1440.play',  ## default run key
+fourteen40 = {  ## 1440X810 - 16:9 
+    'Screen':  '1440',         
+    'DotsW':     1775,
+    'ViewW':     1440,
+    'gridSize':    30, 
+    'scaleX':    1.30,
 }
 
-### --------------- 864 - 16:9/3:2 format ------------------
-eight64 = {
+## ----------- 1264X864 - 3:2 and 1536X864 16:9  -----------
+eight64 = {  ## used by both 1296X864 and 1536X864px  
     'DotsH':     966,     
-    'ViewH':     864,   ## used by both 1296X864 and 1536X864px   
-    'ScrollH':   804,
-    'SliderH':   798,    
-    'margin1':    20,
+    'ViewH':     864,    
+    'ScrollH':   787,  ## scroll panel height
+    'SliderH':   803,    
+    'margin1':    23,  ## scroll panel top margin
     'margin2':     0,
-    'scaleY':      1.15,
-    'modLabel':    1.0,
-    'factor':      0.36,  ## scales pixitems by format
-    'steps':       7, 
+    'scaleY':   1.15,
+    'factor':   0.36,  ## scales pixitems by format
+    'steps':       8, 
 }
 
 ### ------------------ 1264X864 - 3:2 ----------------------
 twelve96 = {  
-    'Screen':  '1296',  
-    'DotsW':    1647,
-    'ViewW':    1296,  
-    'gridSize':   30, 
-    'scaleX':      1.123,
-    'widget':    (-5,100),
-    'bkgrnd':  (-705,-530),
-    'runThis':  'demo-1296.play',  ## default run key
+    'Screen':   '1296',  
+    'DotsW':     1629,
+    'ViewW':     1296,  
+    'gridSize':    30, 
+    'scaleX':   1.123,
 }
 
 ### ------------------ 1536X864 - 16:9 ---------------------
 fifteen36 = {      
-    'Screen': '1536',   ## think about 1560X878 in 1920X1080
-    'DotsW':    1889, 
-    'ViewW':    1536,      
-    'gridSize':   32,  
-    'scaleX':      1.40,
-    'widget':   (-50,150),
-    'bkgrnd':  (-750,-450),
-    'runThis':  'demo-1536.play',  ## default run key
+    'Screen':  '1536',   ## think about 1560X878 in 1920X1080
+    'DotsW':     1869, 
+    'ViewW':     1536,      
+    'gridSize':    32,  
+    'scaleX':    1.40,
 }
 
 ### -------------------- 620X1102 - 9:16 --------------------
 V620 = {             ## 620 - must be a string not a number
-    'Screen': '620',  
-    'DotsW':    971,
-    'DotsH':   1204, 
-    'ViewW':    620,  
-    'ViewH':   1102,     
-    'ScrollH': 1022,
-    'SliderH':  977,    
-    'margin1':   15,
-    'margin2':    0,
-    'gridSize':  34.43, 
-    'factor':     0.33, 
-    'modLabel':   1.0,
+    'Screen':   '620',  
+    'DotsW':      952,
+    'DotsH':     1204, 
+    'ViewW':      620,  
+    'ViewH':     1102,     
+    'ScrollH':    977,
+    'SliderH':    977,    
+    'margin1':     22,
+    'margin2':     -5,
+    'gridSize': 34.43, 
+    'factor':    0.33, 
     'scaleX':     0.5,
-    'scaleY':     1.40,  
-    'widget':  (405,75),
-    'bkgrnd': (-305,-590),
-    'steps':       9, 
-    'runThis':  'demo-620.play',  ## default run key
+    'scaleY':    1.40,  
+    'steps':       10, 
 }
 
 ### -----------------------------------------------------        

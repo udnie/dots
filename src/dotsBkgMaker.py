@@ -5,18 +5,68 @@ import gc
 
 from functools          import partial
        
-from PyQt6.QtCore       import Qt, QPoint, QRect, QTimer, QSize
-from PyQt6.QtGui        import QColor
+from PyQt6.QtCore       import Qt, QPoint, QPointF, QRect, QRectF, QTimer, QSize
+from PyQt6.QtGui        import QColor, QPainter, QPen, QPixmap
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
-                                QColorDialog
+                                QColorDialog, QLabel, QHBoxLayout,  QGraphicsItem
 
-from dotsSideGig        import MsgBox, getCtr
+from dotsSideGig        import MsgBox
 from dotsShared         import common, paths, PlayKeys
-from dotsBkgWidget      import BkgWidget, Flat
+from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
 
-### --------------------- dotsBkgMaker ---------------------              
+### --------------------- dotsBkgMaker ---------------------
+''' classes:  Flat, BkgMaker '''        
+### --------------------------------------------------------
+class Flat(QGraphicsPixmapItem):
+### --------------------------------------------------------   
+    def __init__(self, color, canvas, z=common['bkgZ']):
+        super().__init__()
+
+        self.canvas   = canvas
+        self.scene    = canvas.scene
+        self.bkgMaker = self.canvas.bkgMaker
+        
+        self.type = 'bkg'
+        self.color = color
+        
+        self.fileName = 'flat'
+        self.locked = False
+        
+        self.tag = ''
+        self.id = 0   
+
+        p = QPixmap(common['ViewW'],common['ViewH'])
+        p.fill(self.color)
+        
+        self.setPixmap(p)
+        self.setZValue(z)
+   
+        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
+        
+### --------------------------------------------------------
+    def mousePressEvent(self, e):      
+        if not self.canvas.pathMakerOn:
+            if e.button() == Qt.MouseButton.RightButton:    
+                self.bkgMaker.addWidget(self)        
+            elif self.canvas.key == 'del':     
+                self.delete()
+            elif self.canvas.key == '/':  ## to back
+                self.bkgMaker.back(self)
+            elif self.canvas.key in ('enter','return'):  
+                self.bkgMaker.front(self)                             
+        e.accept()
+      
+    def mouseReleaseEvent(self, e):
+        if not self.canvas.pathMakerOn:
+            self.canvas.key = ''       
+        e.accept()
+     
+    def delete(self):  ## also called by widget
+        self.bkgMaker.deleteBkg(self)
+    
+### --------------------------------------------------------
 class BkgMaker(QWidget):  
 ### --------------------------------------------------------
     def __init__(self, parent):
@@ -29,17 +79,12 @@ class BkgMaker(QWidget):
         self.mapper = self.canvas.mapper
    
         self.widget  = None
-        self.bkgItem = None  
-       
-        self.widgetX = 400  ## position widget
-        self.widgetY = 300 
-        
+        self.bkgItem = None 
+        self.matte   = None 
+
         self.last = ''
-        self.key = ''
         self.num  = 0
-                
-        self.save = QPoint(self.widgetX, self.widgetY)
-        
+                               
 ### --------------------------------------------------------
     def openBkgFiles(self):
         if self.canvas.control in PlayKeys:
@@ -72,7 +117,7 @@ class BkgMaker(QWidget):
         self.scene.addItem(self.bkgItem)      
         self.updateZvals(self.bkgItem)  ## update other bkg zvalues
         self.x, self.y = self.setXY(self.bkgItem)
-        
+          
         ## take care of a file previously saved
         if file.endswith('-bkg.jpg'):
             self.bkgItem.setScale(1.003)  ## for white space???
@@ -84,6 +129,9 @@ class BkgMaker(QWidget):
             self.canvas.btnAddBkg.setEnabled(False)
             self.enableBkgBtns(True)  ## hasn't been set 
  
+        if self.canvas.pathMakerOn:
+            self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+            
         if self.widget: QTimer.singleShot(0, partial(self.widget.resetSliders, self.bkgItem))
 
     def saveBkg(self):  ## save it to the background file
@@ -142,42 +190,33 @@ class BkgMaker(QWidget):
             self.bkgItem = Flat(color, self.canvas, bkz)    
             self.scene.addItem(self.bkgItem)
             self.updateZvals(self.bkgItem)
-
-### --------------------------------------------------------     
+    
     def delScroller(self, pix):
         self.scene.removeItem(pix)
         del pix
         self.num += 1
         if self.num % 3 == 0: gc
-        
-    def delSnakes(self):
-        if len(self.canvas.scene.items()) > 0:
-            for pix in self.canvas.scene.items():      
-                if pix.type == 'snake':
-                    self.canvas.scene.removeItem(pix)
-                    del pix
-                                               
+ 
 ### -------------------------------------------------------- 
     def addWidget(self, item):  ## background widget
         self.closeWidget()      
         self.bkgItem = item        
         self.lockBkg() if self.bkgItem.locked else self.unlockBkg()         
-        self.widget  = BkgWidget(self.bkgItem, self)
-        b = common['bkgrnd']
-        p = getCtr(int(b[0]), int(b[1]))
-        self.widgetX = int(p.x())  ## set to last position
-        self.widgetY = int(p.y())        
+        self.widget = BkgWidget(self.bkgItem, self) 
+        p = common['widgetXY']
+        p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))     
+        self.widgetX = p.x()  ## set 25, 25
+        self.widgetY = p.y()        
         self.widget.setGeometry(self.widgetX, self.widgetY, int(self.widget.WidgetW), \
             int(self.widget.WidgetH)) 
                                 
     def closeWidget(self):
-        if self.widget and self.widget != None:
-            self.save = self.widget.pos()
+        if self.widget != None:
             self.widget.close()
             self.widget = None
                                        
     def setBkg(self):  ## from widget or button   
-        if self.bkgItem:          
+        if self.bkgItem != None:       
             self.lockBkg()
             self.settingBkgMsg()
             self.disableSetBkg()  ## turn off setting it again 
@@ -191,7 +230,7 @@ class BkgMaker(QWidget):
         self.closeWidget()  
         self.disableBkgBtns()
         self.canvas.btnAddBkg.setEnabled(True)
-               
+                     
 ### --------------------------------------------------------     
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()

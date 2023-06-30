@@ -295,8 +295,7 @@ def stage(pix, which):
     return stage
 
 ### --------------------------------------------------------
-def stageLeft(node, pos, left, right):
-    
+def stageLeft(node, pos, left, right):    
     stage1 = QPropertyAnimation(node, b'pos')
     stage1.setDuration(random.randint(16, 23) * 110)
     val = (random.randint(7, 13) * 5) / 125
@@ -314,8 +313,7 @@ def stageLeft(node, pos, left, right):
     return stage1, stage2
 
 ### --------------------------------------------------------
-def stageRight(node, pos, left, right):
-    
+def stageRight(node, pos, left, right):   
     stage1 = QPropertyAnimation(node, b'pos')
     stage1.setDuration(random.randint(14, 23) * 75)
     val = (random.randint(7, 13) * 5) / 100

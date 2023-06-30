@@ -54,7 +54,7 @@ class ControlView(QGraphicsView):
         self.grabKeyboard()  ## happy days
       
         self.direct = {
-            Qt.Key.Key_A: self.canvas.selectAll,
+            # Qt.Key.Key_A: self.canvas.selectAll,  << moved to storyBoard
             Qt.Key.Key_H: self.canvas.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
             Qt.Key.Key_O: self.sideCar.clearOutlines,   
@@ -103,7 +103,7 @@ class ControlView(QGraphicsView):
     def keyPressEvent(self, e):
         key = e.key() 
         mod = e.modifiers()
-                 
+     
         ## special keys - may differ in another OS - !, @, del
         if e.key() == 33 and self.canvas.pathMakerOn:
             self.setKey('!')  ## use by pathMaker

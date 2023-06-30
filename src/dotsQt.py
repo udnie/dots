@@ -23,22 +23,23 @@ class DotsQt(QMainWindow):
     
         self.msg = ''  ## just in case there's something to add 
         self.Vertical = False
-             
+                                                            
         p = QGuiApplication.primaryScreen().availableGeometry()
 
+        ## make sure it can be displayed
         if len(sys.argv) > 1 and sys.argv[1] in MaxScreens and p.width() < MaxWidth:  
             sys.argv[1] = '1080'
             self.msg = sys.argv[1]  ## default to 1080, too wide for display
                              
-        self.saveCommon = common.copy()  ## all new stuff
+        self.saveCommon = common.copy()  ## refreshes common - see switch
                   
         if len(sys.argv) > 1:  ## if there's no match it defaults to 1080
-            self.screen = setCommon(sys.argv[1])
+            self.screen = setCommon(sys.argv[1])  ## setCommon in screens
         else:
             self.screen = setCommon()  ## default - 1080X720 
-             
+                                   
         self.init()
-        
+    
     def init(self):  
         self.dragCnt = 0
         dir = os.path.basename(os.path.dirname(os.getcwd()))
@@ -71,7 +72,7 @@ class DotsQt(QMainWindow):
         self.canvas.scrollDock.close()
         self.canvas.buttonDock.close()    
                    
-    def switch(self, key): 
+    def switch(self, key):  ## from screenMenu in screens
         QApplication.setQuitOnLastWindowClosed(False)
         self.closeAll()
         if key == '620': 
@@ -81,7 +82,7 @@ class DotsQt(QMainWindow):
         common = self.saveCommon.copy()  ## copy it back
         self.screen = setCommon(key)     ## see dotsScreens
         self.init()
-                                                                               
+                                                                                      
         # print(platform.python_version())
          
 ### --------------------------------------------------------
@@ -92,6 +93,9 @@ if __name__ == '__main__':
     sys.exit(app.exec())    
       
 ### ------------------------- dotsQt -----------------------
+
+
+
 
 
 

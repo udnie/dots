@@ -13,14 +13,14 @@ from functools       import partial
 from dotsSideGig     import MsgBox
 
 panel = {   ## used throughout
-    'LabelW':   120,  
-    'LabelH':   112,  
-    'MaxW':     105,
-    'MaxH':      85,  
-    'Star':     .70,
-    'Type':     105,
-    'Margin':    15,    
-}  ## also, common['modLabel'], scales down the tile's vertical for screen changes
+    'LabelW':   100,  
+    'LabelH':    95,  
+    'MaxW':      70,
+    'MaxH':      70,  
+    'Star':     .50,
+    'Type':      90,
+    'Margin':     0,    
+} 
 
 ### ------------------- dotsScrollPanel --------------------
 ''' classes: ImgLabel, ScrollPanel: handles scrolling sprite selections '''
@@ -50,10 +50,9 @@ class ImgLabel(QLabel):
             qp.drawPolygon(QPolygon(self.drawStar()))  
             qp.setBrush(Qt.BrushStyle.NoBrush) 
         else:    
-            img = QImage(self.fileName)     
-            skale = common['modLabel']            
+            img = QImage(self.fileName)               
             if img.width() > (panel['MaxW']) or img.height() > (panel['MaxH']):  ## size it to fit       
-                img = img.scaled(int(panel['MaxW'] * skale), int(panel['MaxH'] * skale),  ## keep it small
+                img = img.scaled(int(panel['MaxW']), int(panel['MaxH']),  ## keep it small
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation)                 
             newW, newH = img.width(), img.height()
@@ -88,12 +87,12 @@ class ImgLabel(QLabel):
         p = p.width()
         p = (panel['LabelW'] - p)/2 
 
-        hght = int(panel['Type'] * common['modLabel'])  ## text x.position
+        hght = int(panel['Type'])  ## text x.position
         qp.drawText(int(p), hght, fileName) 
         qp.end()
 
     def minimumSizeHint(self):   
-        return QSize(panel['LabelW'], self.setNewHeight()) 
+        return QSize(panel['LabelW'], panel['LabelH']) 
 
     def sizeHint(self):
         return self.minimumSizeHint()
@@ -121,9 +120,6 @@ class ImgLabel(QLabel):
         for s in Star:
             poly.append(QPoint(s[0],s[1])*panel['Star'])
         return poly
-
-    def setNewHeight(self):
-        return int(self.scrollPanel.resetLabelH())
 
 ### --------------------------------------------------------
 class ScrollPanel(QWidget):
@@ -192,7 +188,7 @@ class ScrollPanel(QWidget):
         self.scroll.setWidgetResizable(True)    # always
         self.scroll.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         
-        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH'] * common['modLabel']))  
+        self.scroll.verticalScrollBar().setSingleStep(int(panel['LabelH']))  
         self.scroll.setWidget(self.widget)
            
         vBoxLayout = QVBoxLayout(self)
@@ -206,17 +202,13 @@ class ScrollPanel(QWidget):
         self.scrollCount += 1
         self.scrollList.append(self.scrollCount)   
         label = ImgLabel(fname, self.scrollCount, self)
-        label.setFixedHeight(int(self.resetLabelH()))      
+        label.setFixedHeight(panel['LabelH'])      
         self.layout.addWidget(label)
         self.bottom()
         
     def Star(self):    
         self.add('Star')
-        
-    def resetLabelH(self):  ## reset label height
-        pan, mod = panel['LabelH'], common['modLabel']
-        return pan * mod
-        
+             
     def deleteImgLabel(self, this):
         p = self.scrollList.index(this.id)
         del self.scrollList[p]    

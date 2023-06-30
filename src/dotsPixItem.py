@@ -9,10 +9,10 @@ from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import constrain
 
-##from dotsShadowMaker    import ShadowMaker  ## add shadows
+## from dotsShadowMaker    import ShadowMaker  ## add shadows
 from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
 
-import dotsAnimation  as anima
+import dotsAnimation  as Anime
 
 ScaleKeys  = ("<",">")
 TagKeys = (',','.','/','enter','return')  ## changed
@@ -20,7 +20,27 @@ Pct = -0.50  ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename
     # "apple": (650, 450),
-    # 'doral': (300, 500),          
+    # 'doral': (300, 500),         
+    "actor": (650, 450),
+    'dorot': (300, 500),
+    'can_m': (300, 400),
+    'miche': (350, 375),
+    'bosch': (250, 375),
+    'lizar': (600, 225),
+    'pivot': (150, 150),
+    'mike_': (300, 500),
+    'squid': (375, 375),
+    'boids': (400, 500),
+    "joker": (335, 455),
+    "jocke": (335, 555),
+    "parad": (300, 300),
+    "dot":   (375, 400),
+    "bug":   (350, 350),
+    "manti": (350, 350), 
+    "img_":  (650, 450), 
+    "orang": (195, 195), 
+    "trunk": (150, 600),
+    "tag_":  (550, 250),
 }
 
 ### --------------------- dotsPixItem ----------------------
@@ -138,9 +158,9 @@ class PixItem(QGraphicsPixmapItem):
     def mousePressEvent(self, e):    
         if self.canvas.control not in PlayKeys: 
             if e.button() == Qt.MouseButton.RightButton:
-                ## right mouse triggers animation menu if selected screen items
-                if 'pivot' in self.fileName or 'frame' in self.fileName or \
-                    self.scene.selectedItems():
+                ## right mouse triggers Animation menu if selected screen items
+                ## if 'pivot' in self.fileName or 'frame' in self.fileName or \                
+                if 'frame' in self.fileName or self.scene.selectedItems():
                     return      
                 else:
                     self.addWidget()  ## nothing selected - ok to add
@@ -228,10 +248,15 @@ class PixItem(QGraphicsPixmapItem):
     def addWidget(self):
         self.closeWidget()
         self.widget = PixWidget(self)  
+        
         p = self.pos()
-        x, y = int(p.x()), int(p.y())  
-        f = common['widget']  ## necessary, it drifts with changes in size
-        self.widget.setGeometry(x+f[0], y+f[1], int(self.widget.WidgetW), int(self.widget.WidgetH))
+        p = self.canvas.mapToGlobal(QPoint(int(self.x), int(self.y))  )
+        
+        x, y = int(p.x()), int(p.y())      
+        x = int(x - int(self.widget.WidgetW)-10)
+        y = int(y - int(self.widget.WidgetH)/6)
+        
+        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.resetSliders()
 
     def resetSliders(self):
@@ -267,7 +292,7 @@ class PixItem(QGraphicsPixmapItem):
         if self.tag == '':  ## you're done
             return
         self.anime = None
-        self.anime = anima.reprise(self)
+        self.anime = Anime.reprise(self)
         self.anime.start()
         self.anime.finished.connect(self.anime.stop)
         self.clearFocus()
@@ -294,7 +319,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.shadowMaker.deleteShadow()
             self.closeWidget()
             self.anime 
-            self.anime = anima.fin(self)
+            self.anime = Anime.fin(self)
             self.anime.start()
             self.anime.finished.connect(self.removeThis)
 

@@ -3,27 +3,29 @@ from os import path
 
 import json
 import random
-import gc
 
 import asyncio
 import time
 
-from PyQt6.QtCore       import QTimer, QAbstractAnimation
-from PyQt6.QtWidgets    import QGraphicsPolygonItem
+from PyQt6.QtCore       import QTimer
 
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
 from dotsBkgMaker       import *
 
+from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar
-from dotsSidePath       import Wings
 
 from dotsSnakes         import DemoMenu
 from dotsScreens        import ScreenMenu
 
+from dotsAbstractBats   import Abstract, Bats, Wings 
+from dotsSnakes         import Snakes
+
+
 ### ---------------------- dotsSideShow --------------------
-''' class: SideShow: functions to run, pause, stop, etc.. .play animations'''        
+''' class: SideShow: functions to load and add items to scene/canvas '''        
 ### --------------------------------------------------------
 class SideShow:
 ### --------------------------------------------------------
@@ -34,18 +36,22 @@ class SideShow:
         self.scene    = self.canvas.scene
         self.dots     = self.canvas.dots
         self.mapper   = self.canvas.mapper
+        self.sideCar  = SideCar(self.canvas) 
         
-        self.sideCar  = SideCar(self.canvas)  ## additional extentions
-        self.wings    = Wings(self.canvas)   
-
-        self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
         self.bkgMaker  = self.canvas.bkgMaker
-        
-        self.demoMenu   = DemoMenu(self.canvas)
-        self.screenMenu = ScreenMenu(self.canvas)
+       
+        self.demoAvailable = DemoAvailable()
+       
+        if self.demoAvailable:
+            self.bats      = Bats(self.canvas)     
+            self.snakes    = Snakes(self.canvas)     
+            self.abstract  = Abstract(self.canvas) 
+            self.demoMenu  = DemoMenu(self.canvas, self)
  
-        self.ifBats = False
+        self.showTime   = ShowTime(self.canvas)
+        self.screenMenu = ScreenMenu(self.canvas)  ## in screens
+ 
         self.locks = 0
         
 ### --------------------------------------------------------    
@@ -53,29 +59,41 @@ class SideShow:
         if self.canvas.pathMakerOn == False:      
             if key == 'L' and self.canvas.control == '':
                 self.loadPlay()
-                
-            elif key == 'P':  ## always
-                self.mapper.togglePaths()
-                
-            elif len(self.scene.items()) > 0:       
-                if key == 'R':                  
-                    if self.canvas.openPlayFile == 'snakes' and self.bkgMaker.key != '':
-                        self.bkgMaker.delSnakes()
-                        self.demoMenu.run(self.bkgMaker.key)                    
+                       
+            elif len(self.scene.items()) > 0:  ## stuff on screen
+                if key == 'P':  ## always
+                    self.mapper.togglePaths() 
+                                           
+                elif key == 'R':    
+                    if self.canvas.control != '':
+                        return
+                             
+                    if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'abstract'):
+                        if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
+                            self.snakes.rerun(self.snakes.what)  
+                        elif self.canvas.openPlayFile == 'abstract' and self.abstract.direction != '':
+                            self.abstract.rerun(self.abstract.direction)  
+                        elif self.canvas.openPlayFile == 'bats':
+                            self.bats.rerun()
                     else:
-                        self.run()  ## run what's there                                   
+                      self.showTime.run()   
+                                                                   
                 elif key == 'S':
                     if self.canvas.control != '':
-                        self.stop()
+                        self.showTime.stop()
                         
-            else:  ## easier to add more single keys  
-                if key == 'R':
+            else:  ## nothing on screen - easier to add more single keys  
+                if key == 'R':   
                     self.screenMenu.closeScreenMenu()
-                    self.demoMenu.openDemoMenu()  
+                    if self.demoAvailable: 
+                        self.demoMenu.openDemoMenu()  
                 elif key == 'S':   
-                    self.demoMenu.closeDemoMenu()
+                    if self.demoAvailable:  
+                        self.demoMenu.closeDemoMenu()
                     self.screenMenu.openScreenMenu()
-        
+                elif key == 'A':
+                    self.bkgMaker.openBkgFiles()
+                    
 ### --------------------------------------------------------                            
     def loadPlay(self):   
         if self.canvas.pathMakerOn:  ## using load in pathMaker
@@ -93,19 +111,16 @@ class SideShow:
             else:
                 return
             
-    def runThis(self, file):  ## doesn't ask
+    def runThis(self, file):  ## doesn't ask - called by demo menu - runs abstracts
         if not self.scene.items():
             self.openPlay(paths['playPath'] + file)  ## also adds pix to scene
-            self.canvas.openPlayFile = file
-            QTimer.singleShot(200, self.run) 
+            self.canvas.openPlayFile = file  ## give it time to load
+            QTimer.singleShot(200, self.showTime.run) 
        
 ### -------------------------------------------------------- 
-    def openPlay(self, file):  ## adds play file contents to screen
-        if 'demo-' in file and common['Screen'] not in file:
-            MsgBox('Demo file format does not match Screen Width', 7)
-            return    
+    def openPlay(self, file):  ## adds play file contents to screen    
+        dlist = []  
         try:
-            dlist = []  
             with open(file, 'r') as fp:  ## read a play file
                 dlist = json.load(fp)
         except IOError:
@@ -114,10 +129,10 @@ class SideShow:
            
         self.mapper.clearMap()  ## just clear it  
         self.locks = 0
-        self.ifBats = False 
         self.canvas.pixCount = self.mapper.toFront(0) 
          
-        ## number of pixitems, bkg zval, number of shadows, scrollers       
+        ## number of pixitems, bkg zval, number of shadows, scrollers 
+              
         kix, bkz, ns, scr, f = 0, 0, 0, 0, '' 
         lnn = len(dlist)
         lnn = lnn + self.mapper.toFront(0)  ## start at the top
@@ -132,15 +147,14 @@ class SideShow:
                 
             elif tmp['type'] == 'pix' and \
                 not path.exists(paths['spritePath'] + tmp['fname']) and \
-                not path.exists(paths['imagePath'] + tmp['fname']):
+                not path.exists(paths['imagePath']  + tmp['fname']):
                 MsgBox('openPlay: Error loading ' + paths['imagePath'] + tmp['fname'], 5)     
                 continue      
-            
-            elif 'bat' in tmp['fname']:    
-                self.ifBats = True   
-                self.wings.bats(tmp['x'], tmp['y'], tmp['tag'])  ## make a bat
+                 
+            elif 'bat' in tmp['fname']:  ## make a bat - not from demoMenu 
+                Wings(self.canvas, tmp['x'], tmp['y'], tmp['tag'])  ## added self to scene
                 continue
-            
+               
             elif tmp['type'] == 'pix':
                 kix += 1  ## counts pixitems
                 self.canvas.pixCount += 1  ## id used by mapper            
@@ -273,204 +287,6 @@ class SideShow:
         str = 'Number of Shadows: {0}  seconds:  {1:.2f}'  
         self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)        
    
-### --------------------------------------------------------        
-    def run(self):  ## runs whatever is in scene that can be animated
-        if self.canvas.openPlayFile == 'snakes': 
-            self.bkgMaker.delSnakes()
-            self.bkgMaker.snakes.rerun()
-            return
-        elif self.canvas.control != '':
-            return   
-        self.mapper.clearMap()
-        self.clearPathsandTags()  
-        self.canvas.unSelect()
-        
-        if not self.canvas.pathList:  ## should already exist - moved from animations
-            self.canvas.pathList = getPathList(True)  
-                        
-        k, r = 0, 0  ## k counts all non r items (demo)
-        scale = .65    
-        for pix in self.scene.items():  ## sets the animation and run it <<----
-            
-            if type(pix) == 'dotsShadowWorks.PointItem':  ## goes with shadows for now
-                continue
-            if isinstance(pix, QGraphicsPolygonItem):
-                continue
-        
-            if pix.type in ('pix', 'bkg') and pix.tag:    
-                ## if random, slice to length, display actual anime if paused 
-                if 'Random' in pix.tag:
-                    pix.tag = pix.tag[0:len('Random')]
-                if 'frame' in pix.fileName:
-                    pix.tag = 'idle' 
-                         
-                ## set the animation using the tag
-                if pix.type == 'pix':
-                    pix.anime = self.animation.setAnimation(          
-                        pix.tag, 
-                        pix)        
-                elif pix.type == 'bkg' and pix.tag == 'scroller':
-                    pix.anime = pix.setScrollerPath(pix, 1)  ## from sidePath
-                    pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True) 
-                    
-                k += 1  ## k = number of pixitems
-                if pix.anime == None:  ## not animated
-                    continue
-                
-                ## run the animation  - set scale factor if demoPath and alien
-                # if pix.tag.endswith('demo-.path') and r >= 0:  
-                if 'demo-' in pix.tag and r >= 0:  
-                    if 'alien' in pix.fileName:  ## just to make sure you don't scale everything
-                        pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
-                    r += 1
-                    ## delay each demo pixitems start 
-                    if pix.anime == None:
-                        break
-                    else:
-                        QTimer.singleShot(100 + (r * 50), pix.anime.start)  ## demo only
-                else:            
-                    pix.anime.start()  ## everyone else
-                    
-                ### --->> optional drop shadow <<-- ###
-                # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)
-                # pix.setGraphicsEffect(shadow)
-
-        if k > 0 or self.ifBats:
-            self.sideCar.disablePlay()  
-            self.canvas.control = 'pause'
-            file = os.path.basename(self.canvas.openPlayFile)
-            if "play" in file:
-                self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(k))  
-                
-### --------------------------------------------------------                                 
-    def pause(self):
-        self.clearPathsandTags()  
-        if self.canvas.control == 'resume':
-           self.resume()
-        else:          
-            for pix in self.scene.items():          
-                if type(pix) == 'dotsShadowWorks.PointItem':
-                    continue
-                if isinstance(pix, QGraphicsPolygonItem):
-                    continue         
-                if pix.fileName in ('frame','flat'):
-                    continue               
-                if pix.type in ('pix', 'snake', 'bkg'):
-                    if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Running:  ## running
-                        pix.anime.pause() 
-            self.sideCar.setPauseKey()
-
-    def resume(self):   
-        for pix in self.scene.items():   
-            if type(pix) == 'dotsShadowWorks.PointItem':
-                continue
-            if isinstance(pix, QGraphicsPolygonItem):
-                continue 
-            if pix.fileName in ('frame','flat'):
-                continue       
-            if pix.type in ('pix', 'snake', 'bkg'):
-                if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Paused:
-                    pix.anime.resume()                   
-        self.sideCar.setPauseKey()
-        
-### --------------------------------------------------------
-    def stop(self, action=''):  ## action used by clear 
-        self.clearPathsandTags()     
-        scrolling = []
-        for pix in self.scene.items():                      
-            if type(pix) == 'dotsShadowWorks.PointItem':  ## shadows
-                continue     
-            if isinstance(pix, QGraphicsPolygonItem):  ## shadows
-                continue      
-            try:
-                if pix.fileName in ('frame','flat'):
-                    continue       
-            except:
-                continue
-            
-            if pix.type in ('pix', 'snake', 'bkg'):                   
-                if pix.anime != None and pix.anime.state() != QAbstractAnimation.State.Stopped:       
-                    pix.anime.stop()
-                    if pix.tag == 'scroller':  ## can be more than one
-                        pix.anime = None
-                        scrolling.append(pix)
-                               
-                if pix.type in ('pix', 'snake'):
-                    if pix.part in ('left','right'):  
-                        continue  ## these stop when pivot stops  
-                          
-                    if action != 'clear':    
-                        pix.reprise() 
-
-        self.cleanUpScrollers(scrolling) 
-        self.sideCar.enablePlay() 
-        self.canvas.btnPause.setText( 'Pause' )
-        gc
-        
-### --------------------------------------------------------        
-    def cleanUpScrollers(self, scrolling):  
-        if len(scrolling) == 0:
-            return       
-        f, d, s = None, '', None 
-        for p in scrolling:  ## could be one on the way
-            if f == None:    ## save first
-                f = p.fileName
-                d = p.direction
-                s = p  ## save it
-            else:
-                self.scene.removeItem(p)
-                del p       
-        del scrolling 
-                                   
-        if f != None: 
-            self.scene.removeItem(s)
-            p = BkgItem(f, self.canvas)
-            p.tag = 'scroller'
-            p.direction = d
-            if 'abstract' in p.fileName and d == 'right':
-                p.setPos(QPointF(p.runway, 0))  ## offset to right         
-            self.scene.addItem(p)    
-            
-### --------------------------------------------------------
-    def savePlay(self):
-        if self.canvas.openPlayFile == 'snakes':
-            MsgBox("Can't Save Snakes as a Play File", 6)  ## seconds
-            return        
-        if self.canvas.pathMakerOn:  ## using load in pathMaker
-            self.pathMaker.sideWays.savePath()
-            return        
-        elif len(self.scene.items()) == 0:
-            return   
-              
-        dlist = [] 
-        for pix in self.scene.items(): 
-                      
-            if pix.type in ('pix','bkg'): 
-                if pix.fileName != 'flat' and \
-                    not path.exists(pix.fileName):  ## note
-                    continue   
-            
-            if pix.type == 'pix':   
-                if pix.part in ('left','right'):  ## let pivot thru
-                    continue                  
-                dlist.append(savePix(pix))  ## in sideGig   
-                  
-            elif pix.type == 'bkg':
-                if pix.fileName != 'flat':      
-                    dlist.append(saveBkg(pix))  ## in sideGig
-                else:
-                    dlist.append(saveFlat(pix))  ## in sideGig            
-        if dlist:
-            try:
-                self.sideCar.saveToJson(dlist)
-            except FileNotFoundError:
-                MsgBox('savePlay: Error saving file', 5)         
-        del dlist
-        
-    def clearPathsandTags(self):
-        self.mapper.clearTagGroup()
-        self.mapper.clearPaths()  ## clears tags as well
-
 ### --------------------------------------------------------
 def lookForStrays(pix):
     if pix.x < -25 or pix.x > common['ViewW'] -10:

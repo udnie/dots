@@ -2,26 +2,27 @@
 import random
 import gc
 
-from PyQt6.QtCore    import QAbstractAnimation, QTimer, QEvent, QPointF, pyqtSlot
-from PyQt6.QtGui     import QTransform
-from PyQt6.QtWidgets import QWidget, QMenu, QRubberBand, QGraphicsScene
+from PyQt6.QtCore       import QAbstractAnimation, QTimer, QEvent, QPointF, pyqtSlot
+from PyQt6.QtGui        import QTransform
+from PyQt6.QtWidgets    import QWidget, QMenu, QRubberBand, QGraphicsScene
                                         
-from dotsShared      import common, CanvasStr, PathStr, MoveKeys, PlayKeys
-from dotsAnimation   import *
-from dotsSideGig     import getPathList
-from dotsSideCar     import SideCar
-from dotsControlView import ControlView
-from dotsPixItem     import PixItem
-from dotsMapItem     import InitMap
-from dotsBkgMaker    import *
-from dotsSideShow    import SideShow
-from dotsPathMaker   import PathMaker
-from dotsKeysPanel   import KeysPanel
-from dotsScrollPanel import ScrollPanel
-from dotsDocks       import *
-from dotsSidePath    import Wings
+from dotsShared         import common, CanvasStr, PathStr, MoveKeys, PlayKeys
+from dotsAnimation      import *
+from dotsSideGig        import getPathList
+from dotsSideCar        import SideCar
+from dotsControlView    import ControlView
+from dotsPixItem        import PixItem
+from dotsMapItem        import InitMap
+from dotsBkgMaker       import *
+from dotsSideShow       import SideShow
+from dotsShowTime       import ShowTime
+from dotsPathMaker      import PathMaker
+from dotsKeysPanel      import KeysPanel
+from dotsScrollPanel    import ScrollPanel
+from dotsDocks          import *
+from dotsAbstractBats   import Wings 
 
-Play = ('L','R','P','S')
+Play = ('L','R','P','S','A')
 
 ### -------------------- dotsStoryBoard --------------------
 ''' class StoryBoard: program hub/canvas, includes context menu and 
@@ -45,6 +46,7 @@ class StoryBoard(QWidget):
         self.openPlayFile = ''    ## shared 
         self.pathList = []        ## used by animations, updated here
     
+        self.canvas    = self
         self.keysPanel = KeysPanel(self)
         self.scroll    = ScrollPanel(self)
         self.pathMaker = PathMaker(self)
@@ -53,11 +55,11 @@ class StoryBoard(QWidget):
         self.bkgMaker  = BkgMaker(self)
      
         self.animation = Animation(self)    
-        self.wings     = Wings(self)
-        
-        self.sideShow  = SideShow(self)  ## additional extentions    
-        self.sideCar   = SideCar(self) 
-         
+                 
+        self.sideShow  = SideShow(self)  ## reads .play files    
+        self.showTime  = ShowTime(self)  ## runs anything tagged as an animation 
+        self.sideCar   = SideCar(self)
+           
         addScrollDock(self)  ## add button groups from dotsDocks
         addKeysDock(self)
         addButtonDock(self)  
@@ -82,6 +84,7 @@ class StoryBoard(QWidget):
     @pyqtSlot(str)
     def setKeys(self, key):  ## managing storyboard and pathMaker
         self.key = key  
+        
         if self.key == 'C':  ## clear canvas
             if self.pathMakerOn:
                 if len(self.scene.items()) == 0:
@@ -93,15 +96,18 @@ class StoryBoard(QWidget):
                 
         elif not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
-                if self.key in Play:  ## canvas hotkeys
-                    self.sideShow.keysInPlay(self.key)        
+                if self.key in Play:  ## clear screen canvas hotkeys 
+                    if self.key == 'A' and len(self.scene.items()) > 0:
+                        self.canvas.selectAll()
+                    else:
+                        self.sideShow.keysInPlay(self.key)    
                 else:
                     self.sendPixKeys()      
                              
-        ## send move keys to selected pointItems 
+        ## send MoveKeys to PointItem selections in PathEdits
         elif self.pathMaker.drawing.pointItemsSet() == True and \
-            self.pathMaker.selections and self.key in MoveKeys:  ## from shared.py
-                self.sendPixKeys()
+            self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
+                self.sendPixKeys()  ## pointItems get messaged
                           
         ## send the rest to pathMaker
         elif self.key in PathStr: 
@@ -162,7 +168,7 @@ class StoryBoard(QWidget):
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, fileName, x, y, clone, mirror):  
         if 'wings' in fileName:  ## see dotsSideCar for wings
-            self.wings.bats(x, y, '')        
+            Wings(self, x, y, '')       
         else:
             self.pixCount += 1  
             pix = PixItem(fileName, self.pixCount, x, y, self, mirror)            
@@ -178,9 +184,13 @@ class StoryBoard(QWidget):
             self.scene.addItem(pix)
         
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys
-        for itm in self.scene.items(): 
-            if itm.type in ('pt','pix'): 
-                itm.setPixKeys(self.key)
+        for itm in self.scene.items():  ## used with lasso to move selections
+            if itm.type in ('pt','pix', 'bkg'):    
+                if itm.type == 'pt' or itm.type == 'pix' and \
+                    itm.part not in ('pivot','left','right'):  ## 06-23-23
+                    itm.setPixKeys(self.key)
+                elif itm.type == 'bkg':  
+                    itm.setPixKeys(self.key)
             elif itm.zValue() <= common['pathZ']:
                 break
         if self.mapper.isMapSet(): 
@@ -216,12 +226,15 @@ class StoryBoard(QWidget):
                     
     def clear(self):  ## do this before exiting app  
         if self.control != '':
-            self.sideShow.stop('clear')
-        self.bkgMaker.delSnakes() 
-        self.mapper.clearMap() 
-                      
-        self.sideCar.clearWidgets()             
-        self.sideShow.demoMenu.closeDemoMenu() 
+            self.showTime.stop('clear')
+            
+        self.mapper.clearMap()               
+        self.sideCar.clearWidgets()
+         
+        if self.sideShow.demoAvailable:   
+            self.sideShow.snakes.delSnakes()                     
+            self.sideShow.demoMenu.closeDemoMenu() 
+            
         self.sideShow.screenMenu.closeScreenMenu()
                
         self.pathMaker.pathMakerOff()
@@ -290,7 +303,7 @@ class StoryBoard(QWidget):
 
     def hasHiddenPix(self):
         for pix in self.scene.items():
-            if pix.type == 'pix':
+            if pix.type == 'pix'and pix.part not in ('pivot', 'left','right'):
                 if pix.isHidden: 
                     return True  ## found one
             elif pix.zValue() <= common['pathZ']:
@@ -302,7 +315,7 @@ class StoryBoard(QWidget):
         ## if self.mapper.mapSet and self.hasHiddenPix():  
         self.mapper.removeMap()  ## also updates pix.pos()
         for pix in self.scene.items():
-            if pix.type == 'pix':
+            if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
                 if pix.isSelected():
                     pix.setSelected(False)
                     pix.isHidden = True
