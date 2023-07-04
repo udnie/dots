@@ -54,3 +54,4 @@ plays/demo-1350.play
 *.png
 dotsBkgWrks.py
 dotsSliderPanel.py
+src/dotsShadowWorks.py
