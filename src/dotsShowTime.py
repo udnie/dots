@@ -45,7 +45,7 @@ class ShowTime:
             
             
             
-            if type(pix) == 'dotsShadowWorks.PointItem':  ## goes with shadows for now
+            if type(pix) == 'dotsShadowWidget.PointItem':  ## goes with shadows for now
                 continue
             if isinstance(pix, QGraphicsPolygonItem):
                 continue
@@ -89,7 +89,7 @@ class ShowTime:
            self.resume()
         else:          
             for pix in self.scene.items():          
-                if type(pix) == 'dotsShadowWorks.PointItem':
+                if type(pix) == 'dotsShadowWidget.PointItem':
                     continue
                 if isinstance(pix, QGraphicsPolygonItem):
                     continue         
@@ -102,7 +102,7 @@ class ShowTime:
 
     def resume(self):   
         for pix in self.scene.items():   
-            if type(pix) == 'dotsShadowWorks.PointItem':
+            if type(pix) == 'dotsShadowWidget.PointItem':
                 continue
             if isinstance(pix, QGraphicsPolygonItem):
                 continue 
@@ -118,7 +118,7 @@ class ShowTime:
         self.clearPathsandTags()     
         scrolling = []  ## None doesn't work on lists - use len()
         for pix in self.scene.items():                      
-            if type(pix) == 'dotsShadowWorks.PointItem':  ## shadows
+            if type(pix) == 'dotsShadowWidget.PointItem':  ## shadows
                 continue     
             if isinstance(pix, QGraphicsPolygonItem):  ## shadows
                 continue      

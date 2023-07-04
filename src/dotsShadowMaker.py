@@ -6,11 +6,11 @@ from PyQt6.QtCore       import QPointF, QTimer
 from PyQt6.QtGui        import QImage, QPixmap, QPolygonF
 from PyQt6.QtWidgets    import QGraphicsPolygonItem
                            
-from dotsShadowWorks    import *
+from dotsShadowWidget   import *
 from dotsShared         import common
 from dotsSideGig        import distance, getCrop
 
-V = common['V']  ## the diameter of a pointItem, same as in ShadowWorks
+V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
        
 ### ------------------- dotsShadowMaker --------------------
 ''' class: ShadowMaker - handles shadow, menu, and points'''                                                                                                                    
@@ -67,7 +67,7 @@ class ShadowMaker:
         image = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32)    
         pixmap = QPixmap.fromImage(image)
                   
-        self.shadow = Shadow(self)  ## from ShadowWorks *
+        self.shadow = Shadow(self)  ## from ShadowWidget *
         self.shadow.setPixmap(pixmap)
         
         del img

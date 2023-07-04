@@ -189,7 +189,7 @@ class StoryBoard(QWidget):
                 if itm.type == 'pt' or itm.type == 'pix' and \
                     itm.part not in ('pivot','left','right'):  ## 06-23-23
                     itm.setPixKeys(self.key)
-                elif itm.type == 'bkg':  
+                elif itm.type == 'bkg' and itm.fileName != 'flat':  
                     itm.setPixKeys(self.key)
             elif itm.zValue() <= common['pathZ']:
                 break
