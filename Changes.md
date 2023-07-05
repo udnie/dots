@@ -7,7 +7,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 **July 2023**   
 Renamed dotsShadowWorks.py to dotsShadowWidget.py. Bug fix on Flats.  Updated **Start Here**.
 
---
+---
 
 
 **June 2023**       
