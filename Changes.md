@@ -1,13 +1,14 @@
 ## Changes
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
-##
---
+
+---
+
 **July 2023**   
 Renamed dotsShadowWorks.py to dotsShadowWidget.py. Bug fix on Flats.  Updated **Start Here**.
 
-##
 --
+
 
 **June 2023**       
 Just repeating myself. I said in the last video you needed to save a background in a **.play** file in order to run it, **you don't**, programming error. Some small changes to the **demoMenu** and the **sprite scrollPanel**. I was able to add another sprite, clean up some code and remove a few no longer needed screen variables by reducing the size of the **scrollPanel** tiles. 
@@ -20,8 +21,8 @@ I guess I'll be adding some more keys to **Keys.pdf** to cover it. All you need 
 
 **New video at:** <https://youtu.be/XHc5NGJ86NE>
 
-##
---
+---
+
 
 **May 31 2023**      
 Trying again.  I came to realize why I had to change directory settings and such.  VSCode needed to start in the src directory and it kept putting me in the old directory. Finally I saw the light and reset the workspace to put me into the correct source directory. Sorry for the confusion - I'm not sure how I set it up in the first place but that was over two years ago. DotsShared,py and DotsQt.py are back to the way they were and so are the automator scripts with the /src addition.
