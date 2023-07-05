@@ -1,9 +1,108 @@
 
+####Last Update: 07/05/2023
+--
+       
+**Starting from zero**  
+Here are two directories that you should be aware of - **sprites** and **backgrounds**.  That's where your stuff needs to go if you want to do something other than play with the sprites and backgrounds already there. What I call a **sprite** needs to be **'transparent.png'** file and should be no larger than around 600 pixels square. For **backgrounds** I'd recommend keeping the files under **500MB** in size.
 
-**Last Update: 05/30/202**
+Besides the **sprites** and **backgrounds** directories you've two others, **plays** and **paths**, you'll visit from time to time. A **.play** file holds the sprite and background information used to restore the last saved canvas.  The **.path** file is a collection of screen point locations used in animating a screen object along a path.  There's a video for that.
+
+I suggest looking at a few videos in **Changes.md** starting from the most recent to get an idea of how **dots** works.  These videos will cover the most recent changes while touching on the basics along the way. 
 
 ---
 
+If you're in **Windows** you'll probably need to edit the **paths** dictionary in **dotsShared.py**.   
+
+    paths = {        
+        'snapShot':     ',/../',  
+        'bkgPath':      './../backgrounds/',
+        'imagePath':    './../images/',
+        'playPath':     './../plays/',
+        'spritePath':   './../sprites/',
+        'paths':        './../paths/',
+        'txy':          './../txy/',
+        'demo':         './../demo/',
+    }
+    
+I've recently changed the directory layout for **dots** by moving the **dots\*.py** files to **dots/src**. The following script is working for me using Mac's Automator.  It also required some setting of permissions as I had added an additional login.
+
+    cd '/users/your directory/python/qt5/dots/src'; /usr/local/bin/python3 ./dotsQt.py      
+
+---
+
+**From a blank canvas screen** you can choose to enter one of the following keys: 
+
+ 
+    'L' to run the file dialog used to load a .play file   
+    'S' to display the Screen Menu to change the canvas size and format     
+    'R' to display the Demo Menu   
+    'A' to add a background  
+    'C' clears the canvas
+     The 'PathMaker' button to draw a path used to animate a sprite
+    
+
+**Sprites** are added by drag and dropping them onto the screen/canvas, **backgrounds** are loaded by either entering **'A'** if the canvas is blank or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat**.     
+
+A **right mouse-click** on a **sprite, background** or **flat** will pop up a widget that provides access to the most often used functions such as scaling or rotation. There's also a widget for a **shadow** if it's enabled and a widget that pops up when entering **pathMaker**.  
+
+Besides widgets you've a number of **keyboard** controls that either match functions of the widget of add additional functions to sprites and backgrounds. Many of these controls will work on a multiple selection of sprites as well. There are two sets of keys, one for the start screen, the **canvas**, the other for **pathMaker**.  They don't interact but you can access **background** once **pathMaker** is active.
+
+---
+
+There are three **\*.py** files besides **dotsShared.py** you should be aware of if you want to change how **dots** behaves. If you wish to try out **shadows**, besides downloading and installing **numpy** and **opencv**, you'll need to make a small edit in **dotsPixItem.py** to comment out an import and uncomment another.
+
+    from dotsShadowMaker    import ShadowMaker  ## add shadows
+    ##from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
+    
+For **scrolling backgrounds** it gets more interesting.
+
+    abstract = {  ## used by abstract.jpg and snakes.jpg - based on 1280X640 2:1 - under 1MB
+        '1080':  (10.0,  17.62, 17.55),  ## first, next, next-right
+        '1280':  (10.0,  18.97,  19.0),
+        '1215':  (10.0,   17.4,  17.4),  
+        '1440':  (10.0,  18.95, 18.95),
+        '1296':  (10.0,  17.45, 17.55),  
+        '1536':  (10.0,  18.95, 18.95),
+        '620':   (10.0,   20.9,   0.0),
+    }
+    
+ 
+This dictionary is located in **dotsBkgItem.py**, the **background class** file. It's very likely the values I used in the video on scrolling backgrounds won't work for you without some attention. Pick one screen format to work with and get it scrolling without gaps or overlapping. If you look at the numbers, excluding the **'620' vertical**, you'll see there are two groups of values not very far apart. One being the **3:2** and the other **16:9**.  It's a good guess the other screen values you would need will be very close but there's no reason to update them unless you plan to try out all the formats.
+
+The last file you might want to investigate is **dotsBkgWidget.py** for making changes to the **Matte** class.  There are four class variables to consider, two that hold the matte colors, one for the photo and one that modifies the height in order to resize and reformat. You would need to edit the file inorder to change any one of these variables. 
+
+---
+
+This is in **ReadMe** but it fits better here:
+
+I use the **QGraphicsitem** zValue() as a means to order the dots graphic types which share 
+the scene items list. There are two functions, toFront() and lastZval() that help to make sure 
+the different types I've created are good neighbors.
+
+#### types and zValue range		
+| scene.item  | type  | zValue |
+|:------------- |:---------------:| -------------:|
+| PointItem | pt | 200 from topmost item+ |
+| MapItem | map | 50 over top pixItem |
+| TagItem | tag|45 over top pixItem|
+| Paths| path| 35 over top pixItem
+| PixItem | pix  | **\*see below**
+| Shadow  |shadow| 50|
+| Points  |point | 40|
+| Outline |  none   | 30| 
+| LineItem  | grid   | -50 as a group |
+| BkgItem   | big | -99 decreasing by -1 |  
+
+  
+**\***number of screen items + 100 decreasing by 1 per item
+
+---
+
+####A Brief History of Animation
+
+**It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
+
+**PixItems** and **BkgItems** are the only ones currently that are animated, that includes **Wings**.
 
 Animations come in two basic flavors, either ones that are programmatic or 
 ones that are path driven, and a third possibility would be a combination of the two.  An animation can be added to a screen object, pixItem, once it's been selected by right-mouse clicking on it and then clicking on an animation or path from the pop-up menu that appears. The selection, either a **.play** or **.path** file is applied to the **tag** property of the pixItem which later is used to run the animation it references.
@@ -21,19 +120,26 @@ Next of interest is the **Node** class.  This class   provides the code used to 
 
 	class Node(QObject):
 	### --------------------------------------------------------
-    def __init__(self, pix):
-        super().__init__()
-        self.pix = pix
-
-    def _setPos(self, pos):
-        self.pix.setPos(pos)
-
-    def _setOpacity(self, opacity):
-        self.pix.setOpacity(opacity)
-    ...
-
-    pos = pyqtProperty(QPointF, fset=_setPos)
-    opacity = pyqtProperty(float, fset=_setOpacity)
+        def __init__(self, pix):
+            super().__init__()
+            self.pix = pix
+    
+    
+        def _setPos(self, pos):
+            try:
+                self.pix.setPos(pos)
+            except RuntimeError:
+                return None
+    
+        def _setOpacity(self, opacity):
+            try:
+                self.pix.setOpacity(opacity)
+            except RuntimeError:
+                return None
+        ...
+    
+        pos = pyqtProperty(QPointF, fset=_setPos)
+        opacity = pyqtProperty(float, fset=_setOpacity)
 
 
 Next is the **Animation** class.  First up, a short dictionary of animations already referenced at the start followed by the **setAnimation** and **_random** functions. You may need to edit this class or **setAnimation** if you add a new animation, to do so follow the examples and read the published docs.  
