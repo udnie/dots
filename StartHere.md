@@ -1,6 +1,6 @@
 
-####Last Update: 07/05/2023
---
+###Last Update: 07/05/2023
+---
        
 **Starting from zero**  
 Here are two directories that you should be aware of - **sprites** and **backgrounds**.  That's where your stuff needs to go if you want to do something other than play with the sprites and backgrounds already there. What I call a **sprite** needs to be **'transparent.png'** file and should be no larger than around 600 pixels square. For **backgrounds** I'd recommend keeping the files under **500MB** in size.
