@@ -1,14 +1,20 @@
 
-### Last Update: 07/05/2023
+### Last Update: 07/07/2023
        
 ---
        
 **Starting from zero**  
-Here are two directories that you should be aware of - **sprites** and **backgrounds**.  That's where your stuff needs to go if you want to do something other than play with the sprites and backgrounds already there. What I call a **sprite** needs to be **'transparent.png'** file and should be no larger than around 600 pixels square. For **backgrounds** I'd recommend keeping the files under **500MB** in size.
+Here are two directories that you should be aware of - **sprites** and **backgrounds**.  That's where your stuff needs to go if you want to do something other than play with the **sprites** and **backgrounds** already there. What I call a **sprite** needs to be **'transparent.png'** file and should be no larger than around **600 pixels square**. For **backgrounds** I'd recommend keeping the files under **500MB** in size.
 
-Besides the **sprites** and **backgrounds** directories you've two others, **plays** and **paths**, you'll visit from time to time. A **.play** file holds the sprite and background information used to restore the last saved canvas.  The **.path** file is a collection of screen point locations used in animating a screen object along a path.  There's a video for that.
+If you have a current model iPhone, iPad, or Mac you can generate a sprite using **Remove BackGround** in Preview, selecting it in Photos or you can look into **SpriteMaker**. There's a write-up and a video for it.
 
-I suggest looking at a few videos in **Changes.md** starting from the most recent to get an idea of how **dots** works.  These videos will cover the most recent changes while touching on the basics along the way. 
+Besides the **sprites** and **backgrounds** directories you've two others, **plays** and **paths**, you'll visit from time to time. A **.play** file holds the **sprites** and **backgrounds** information used to restore the last saved canvas.  The **.path** file is a collection of screen point locations used in animating a screen object to move along a path.  
+
+A **.play** file can also be used to display a **photo collage** without any animation attached.
+
+Besides these four directories there are the **demo, images, shadows, spriteMaker, src**, and **txy** directories.  The **demo** and **images** directories hold photo assets and the demo **path** files used by **dots** to keep the **sprites** and **backgrounds** directories free of clutter.
+
+The **shadows, spriteMaker**, and **txy** directories are extras and I would look at **Changes** for a description of what they do. I'd also suggest looking at the videos in **Changes** starting with the latest entry and working backwards to get an idea of how **dots** works. These videos cover the most recent additions while touching on the basics along the way. 
 
 ---
 
@@ -25,6 +31,8 @@ If you're in **Windows** you'll probably need to edit the **paths** dictionary i
         'demo':         './../demo/',
     }
     
+There are two other files I'd suggest looking at are **dotsControlView.py** and **dotsScreens.py**. **ControlView** handles **drag** and **drop** and all the key stroke entries - except where it doesn't as in **Matte**.  **Screens** is the file that contains all or most of the code and data used in reformatting and sizing **dots** as well as the **Screen Menu** class.
+
 I've recently changed the directory layout for **dots** by moving the **dots\*.py** files to **dots/src**. The following script is working for me using Mac's Automator.  It also required some setting of permissions as I had added an additional login.
 
     cd '/users/your directory/python/qt5/dots/src'; /usr/local/bin/python3 ./dotsQt.py      
@@ -42,11 +50,13 @@ I've recently changed the directory layout for **dots** by moving the **dots\*.p
      The 'PathMaker' button to draw a path used to animate a sprite
     
 
-**Sprites** are added by drag and dropping them onto the screen/canvas, **backgrounds** are loaded by either entering **'A'** if the canvas is blank or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat**.     
+**Sprites** are added by drag and dropping them onto the screen/canvas, **backgrounds** are loaded by either entering **'A'** if the canvas is blank or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. 
 
-A **right mouse-click** on a **sprite, background** or **flat** will pop up a widget that provides access to the most often used functions such as scaling or rotation. There's also a widget for a **shadow** if it's enabled and a widget that pops up when entering **pathMaker**.  
+A **right-mouse-click** on a **sprite, background** or **flat** will pop up a widget that provides access to the most often used functions such as scaling or rotation. There' a widget for a **shadow** if shadows are enabled and a widget that pops up when entering **pathMaker** - both of these also work with a **right-mouse-click**. 
 
-Besides widgets you've a number of **keyboard** controls that either match functions of the widget of add additional functions to sprites and backgrounds. Many of these controls will work on a multiple selection of sprites as well. There are two sets of keys, one for the start screen, the **canvas**, the other for **pathMaker**.  They don't interact but you can access **background** once **pathMaker** is active.
+Besides widgets you've a number of **keyboard** controls that either match the functions provided by the **sprite** and **background widgets** or add additional functions, especially if one or more **sprites** has been selected.
+
+ The right hand panel displays a set of allowable keys and their function, one set for the start screen, the **canvas**, the other for **pathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active.
 
 ---
 
@@ -68,7 +78,7 @@ For **scrolling backgrounds** it gets more interesting.
     }
     
  
-This dictionary is located in **dotsBkgItem.py**, the **background class** file. It's very likely the values I used in the video on scrolling backgrounds won't work for you without some attention. Pick one screen format to work with and get it scrolling without gaps or overlapping. If you look at the numbers, excluding the **'620' vertical**, you'll see there are two groups of values not very far apart. One being the **3:2** and the other **16:9**.  It's a good guess the other screen values you would need will be very close but there's no reason to update them unless you plan to try out all the formats.
+This dictionary is located in **dotsBkgItem.py**, the **background class** file. It's very likely the values I used in the video on **scrolling backgrounds** won't work for you without some attention. Pick one screen format to work with and get it scrolling without gaps or overlapping. If you look at the numbers, excluding the **'620' vertical**, you'll see there are two groups of values not very far apart. One being the **3:2** and the other **16:9**.  It's a good guess the other screen values you would need will be very close but there's no reason to update them unless you plan to try out all the formats.
 
 The last file you might want to investigate is **dotsBkgWidget.py** for making changes to the **Matte** class.  There are four class variables to consider, two that hold the matte colors, one for the photo and one that modifies the height in order to resize and reformat. You would need to edit the file inorder to change any one of these variables. 
 
@@ -95,36 +105,47 @@ the different types I've created are good neighbors.
 | BkgItem   | big | -99 decreasing by -1 |  
 
   
-**\***number of screen items + 100 decreasing by 1 per item
+**\** number of screen items + 100 decreasing by 1 per item
 
 ---
 
-####A Brief History of Animation
+### A Brief History of Animation
 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
-**PixItems** and **BkgItems** are the only ones currently that are animated, that includes **Wings**.
+**PixItems** and **BkgItems** are the only ones currently that are animated. **Wings** is also included as it's a collection of **PixItems**. **BkgItems** have their methods for scrolling a background and will **play, pause, resume and stop** along with any **sprites**.
 
-Animations come in two basic flavors, either ones that are programmatic or 
-ones that are path driven, and a third possibility would be a combination of the two.  An animation can be added to a screen object, pixItem, once it's been selected by right-mouse clicking on it and then clicking on an animation or path from the pop-up menu that appears. The selection, either a **.play** or **.path** file is applied to the **tag** property of the pixItem which later is used to run the animation it references.
+Animations come in two basic flavors, either ones that are programmatic, you wrote some code, or ones that are path driven. **Paths** are created in **Path Maker** and are a means of moving a character around the screen. The ability to draw is not required. 
+
+A third possibility would be a combination of the two such as **demo** in **dotsSidePaths**. An animation can be added to a screen object, a **PixItem**, once it's been selected by right-mouse clicking on it and choosing an animation or path from the **Animations and Paths** pop-up menu. The selection is applied to the **tag** property of the **PixItem** which later is used to run the animation it references.
+
+The file **dotsSideShow.py** **loads** and **displays** the contents of a **.play** file and also is the source for launching the **Demo Menu** while **dotsShowTime.py** can both **run** and **save** an animation to a file. Originally these two were one file.
  
-The majority of the animation code is in the **dotsAnimation.py** file.  The first thing of interest in reading thru this file are the four variables, **AmnimeList, OneOffs, Stage, Spins**. The first two are lists which I'll later combine into one. These items reference the animations that are selectable and runnable from a pop-up context-menu. 
+In **dotsSidePath.py** you'll find the **demo animation** path code, the function **setPaths** that creates paths from **.path** files plus the functions to **load** the path file and set the **node origin**. The code for the actual demos is divided between **dotsAbstractBats.py** and **dotsSnakes.py** which also contains the **Demo Menu** class.
+ 
+The majority of the animation code is in the **dotsAnimation.py** file.  You can probabably skip what follows and save it for a later date as there's nothing here you'll need to deal with until you're ready to animate something. 
+
+
+---
+
+
+The first thing of interest in reading thru this file are the four variables, **AmnimeList, OneOffs, Stage, Spins**. The first two are lists which later are combined into one. These items reference the animations that are selectable and runnable from a pop-up context-menu. 
 
 	AnimeList = ['Vibrate', 'Pulse','Bobble','Idle']
 	OneOffs   = ['Rain','Spin Left','Spin Right','Stage Left','Stage Right']
 	Stages    = ('Stage Left', 'Stage Right')
 	Spins     = ('Spin Left', 'Spin Right')
 	
-Here's where you add your animation so it appears in the pop-up menu.
+You can add your animation to one of these lists so it appears in the pop-up menu.  Some of these animations take more than input variable.
 
-Next of interest is the **Node** class.  This class   provides the code used to control one of the four properties you might want to animate, **position, scale, rotation, or opacity**. They can also be combined, run in parallel or run sequentially.  No code changes needed here.  *Edited for brevity.*
+The **Node** class provides the code used to control a **PixItem** property you might want to animate; **position, scale, rotation, or opacity**. They can also be combined to run in parallel or run sequentially as illustrated in some of the animations in this file.  No code changes needed here.  *Edited for brevity.*
 
 	class Node(QObject):
 	### --------------------------------------------------------
         def __init__(self, pix):
             super().__init__()
+      
             self.pix = pix
-    
     
         def _setPos(self, pos):
             try:
@@ -143,20 +164,21 @@ Next of interest is the **Node** class.  This class   provides the code used to 
         opacity = pyqtProperty(float, fset=_setOpacity)
 
 
-Next is the **Animation** class.  First up, a short dictionary of animations already referenced at the start followed by the **setAnimation** and **_random** functions. You may need to edit this class or **setAnimation** if you add a new animation, to do so follow the examples and read the published docs.  
+Next is the **Animation** class.  First up, a short dictionary of animations 
+already referenced at the start followed by the **setAnimation** and **_random** 
+functions. You may need to edit this class or **setAnimation** if you add a new animation that matches this type.
 
 	class Animation:
-	### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
-        self.canvas = parent 
-    
-        self.singleFunctions = {  ## values are objects 
-            'Vibrate': vibrate,  
-            'Pulse': pulse,
-            'Bobble': bobble,
-            'Idle': idle,
-        }
+        def __init__(self, parent):
+            super().__init__()
+            self.canvas = parent 
+        
+            self.singleFunctions = {  ## values are objects 
+                'Vibrate': vibrate,  
+                'Pulse': pulse,
+                'Bobble': bobble,
+                'Idle': idle,
+            }
 
 The **setAnimation** function is the main driver for selecting which 
 animation to run. *Edited for brevity*.
@@ -181,9 +203,9 @@ animation to run. *Edited for brevity*.
         elif anime == 'Flapper':
 		...
 
-###Animation code follows...
 
-You'll see these three lines in many of the animations that follow.  I mentioned the **Node** class earlier, here I'm creating a reference, **pos**, to the pix screen items current position, I'm also setting the **node's** point of origin based on the pixItem.  *Note* **->** An animation function may require more that one argument which will need to be accounted for prior to using it.
+
+You'll see these three lines in many of the animations that follow.  I mentioned the **Node** class earlier and here I'm creating a reference, **pos**, to the pix screen items current position, I'm also setting the **node's** point of origin based on the **PixItem**.  An animation function may **require** more that one **argument** which will need to be accounted for prior to using it.
 
 	def vibrate(pix):  
 	    node = Node(pix)
@@ -205,62 +227,13 @@ And just below that how the **pos** variable is used.
 	
 	    vibrate.setLoopCount(-1)  ## let it run forever...
 
-There is one other file that extends what I'm calling code driven animation and that is  **dotsSidePath.py**. Here you'll find the **demo animation** path code, the function **setPaths** that creates paths from **.path** files plus the functions to load the path file and set the node origin.
+---
 
-That's a brief rundown on code driven animations in dots and their locations.
+A note about **Wings** - it's been rewritten and is now a class rather than a function. It's made up of three 
+**PixItems** each defined by their **part** tag. The bat portion **part** is named **pivot** and the wings **left** and **right**. The animation is applied to the **pivot** while the wings have their own **flapper** animations.  
 
-**dotsSideShow.py** is the file which **loads, displays, runs,** and **saves** your animations in the form of **.play** files. Here you'll find some of my not so pythonic code if you search for **demo** or **wings**.  
-
-This is all the code in **sideShow** for running the **demo** other then a few variables initialized earlier and it being part of a larger enclosing for-loop. It's based on having 22 aliens on the screen whose tags are set to **demo.path**. I'm scaling them down as I process them while also setting a delayed start to get the effect I want. This *Code fragment* is found in sideShow's **run** function. This is the only bit of code you might want to tweak in sideShow.
-	
-		## set scale factor if demoPath and alien
-		if pix.tag.endswith('demo.path') and r >= 0:  
-		    if 'alien' in pix.fileName:  ## just to make sure you don't scale everything
-		        pix.scale = scale * (67-(r*3))/100.0  ## 3 * 22 screen items
-		        r += 1
-		        ## delay each demo pixitems start 
-		        QTimer.singleShot(100 + (r * 50), pix.anime.start)
-		        
-		        
- 
-
-In the function **addPixToScene** I end with a line of code that passes a reference of the pixItem to **dotsSideCar.py** where you'll find the function **transFormPixItem**. This function after applying any tranforms either adds the pixItem to the screen or passes it on to the **wings** function if **'wings'** appears in it's filename. The **wings** function also in sideCar.  
-
-        ## may require rotation or scaling - adds to scene items
-        ## and where wings are created using the 'right' wing pix
-        self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale)
-
-The **wings** function is the only other bit of code that you may want to explore, particularly if you want to use something other the supplied bat wings and body.  *Code fragment* 
-
-    def wings(self, pix):
-        rightWing = pix
-        pathTag = pix.tag
-  
-        rightWing.part = 'right'
-        rightWing.tag  = 'Flapper'  ## applies this animation when run
-		...
-		...
-		
-Back to **dotsSideCar.py** for a look at the function **savePivots** which as the comment states, saves a pivots path, it's tag setting and xy position in the pixItem rightWing reference for later retrieval.  See the **wings** function for how that works. Kinda of cheesy but simple as I only save the one wing to rebuild the bat or winged object.
-
-    def savePivots(self):
-        ## save a pivots path and xy in rightWing for later
-        for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type == "pix":      
-                if pix.part == 'pivot':  ## pivot comes up first
-                    t = pix.tag
-                    p = pix.sceneBoundingRect()
-                if pix.part == 'right':  ## update the next 'right'
-                    pix.tag = t
-                    pix.x = p.x() + p.width()/2
-                    pix.y = p.y()
-
-There are two other animations worth mentioning, **fin** and **reprise**, two of my little amusements. When you delete a pixItem, except for frames, I run **fin** which the scales the pixItem down in size, while rotating it and lowering its opacity before deleting it. When stopping an animation I run **reprise** to reposition screen objects back to their starting positions.  Carry overs from my original java program. 
-
-Lastly, **Path** animations are accessed from the **Path Maker** button and are a non-programming means of moving a character around the screen. The ability to draw is not required. The paths that appear in context-menu are drawn from the files in the paths folder. Play.  
+Two other animations worth mentioning, **fin** and **reprise**, two of my little amusements. When you delete a **PixItem**, except for frames, I run **fin** which the scales the **PixItem** down in size, while rotating it and lowering its opacity before deleting it. When stopping an animation I run **reprise** to reposition screen objects back to their starting positions.  Carry overs from my original java program. 
 
 
-
-
-
+Have fun
 
