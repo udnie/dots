@@ -25,7 +25,7 @@ panel = {   ## used throughout
 ### ------------------- dotsScrollPanel --------------------
 ''' classes: ImgLabel, ScrollPanel: handles scrolling sprite selections '''
 ### --------------------------------------------------------
-class ImgLabel(QLabel):
+class ImgLabel(QLabel):  ## makes sprite tiles (labels)
 ### --------------------------------------------------------
     def __init__(self, fileName, count, parent):
         super().__init__()

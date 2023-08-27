@@ -213,8 +213,7 @@ class SideWays:
                 return
             if not f[0].lower().endswith('.path'):
                 MsgBox("savePath: Missing or Wrong file extention - use '.path'", 5)   
-                return 
-            
+                return  
             try:
                 with open(f[0], 'w') as fp:
                     for i in range(0, len(self.pathMaker.pts)):

@@ -2,12 +2,14 @@
 import os
 import random
 
+import asyncio
+import time
+
 from PyQt6.QtCore       import QTimer
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 import dotsAnimation    as Anime
 
-from dotsSideCar        import SideCar
 from dotsSidePath       import pathLoader, pathWorks
 from dotsShared         import paths, common
 from dotsSideGig        import *
@@ -25,7 +27,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
 }
     
 ### ------------------- dotsAbstractBats -------------------
-class Wings:
+class Wings: 
 ### --------------------------------------------------------    
     ''' Wings no longer come off, only the bat can move, wings still flap '''   
 ### --------------------------------------------------------
@@ -80,7 +82,7 @@ class Wings:
                             
         return pivot
    
-# ### --------------------------------------------------------  
+### --------------------------------------------------------  
     def right(self, file, x, y):            
         self.canvas.pixCount += 1
         pix = PixItem(file, self.canvas.pixCount, x-20, y, 
@@ -98,7 +100,7 @@ class Wings:
         )  ## flop it
         return self.setWing(pix, 'left') 
    
-   ### --------------------------------------------------------              
+### --------------------------------------------------------              
     def setWing(self, pix, wing):   
         pix.part = wing  ## part could be other than a wing   
         pix.tag  = 'Flapper'  ## applies this animation when run
@@ -109,9 +111,9 @@ class Wings:
         pix.setAcceptedMouseButtons(Qt.MouseButton.NoButton)  ## mouse ignored - wings can't be move
         self.scene.addItem(pix)      
         return pix 
-                            
+           
 ### --------------------------------------------------------
-class Bats:        
+class Bats:     
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -119,9 +121,9 @@ class Bats:
         self.canvas = parent
         self.scene  = self.canvas.scene
         self.dots   = self.canvas.dots
-        self.mapper = self.canvas.mapper
-                                            
-        self.sideCar  = SideCar(self.canvas)
+        self.mapper = self.canvas.mapper  
+                                         
+        self.sideCar   = self.canvas.sideCar
         self.animation = self.canvas.animation
                                                    
 ### -------------------------------------------------------- 
@@ -218,61 +220,96 @@ class Bats:
                         del pix
                                        
 ### --------------------------------------------------------
-class Abstract:
+class Abstract:  ## hats
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  
         self.canvas = parent    
         self.scene  = self.canvas.scene
+        self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper
         
-        self.sideCar  = SideCar(self.canvas)
+        self.sideCar   = self.canvas.sideCar                                          
         self.animation = self.canvas.animation
-        
+   
+        self.hats = 7
+        self.shadows = False
         self.direction = ''
+        self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
         
 ### --------------------------------------------------------      
     def makeAbstracts(self, direction):
         self.direction = direction
-        self.canvas.openPlayFile = 'abstract'
-          
-        self.bkg = BkgItem(paths['bkgPath'] + 'abstract.jpg', self.canvas)   
-        self.bkg.tag = 'scroller'
-        self.bkg.direction = direction
-        self.bkg.anime = self.bkg.setScrollerPath(self.bkg, 'first')
-            
-        if direction == 'right':
-            self.bkg.setPos(QPointF(self.bkg.runway, 0))  ## offset to right  
-       
-        self.bkg.addedScroller == False   
-        self.bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
-          
-        self.scene.addItem(self.bkg)
+        self.canvas.openPlayFile = 'abstract'     
+               
+        self.setBackGround()
+        self.setHats()        
         
-        hats = 8   
-        apaths = getPathList()  ## from sideGig  
-           
-        for i in range(0, hats):  
-            path = getPath(apaths)                                           
-            self.makeHats(path)
-            
-        QTimer.singleShot(200, self.bkg.anime.start)  
+        if self.shadows:
+            MsgBox('Adding Shadows,  please wait...', int(1 + (self.hats * .25)))
+            self.addShadows()
+                   
+        QTimer.singleShot(200, self.bkg.anime.start)  ## run scrolling background  
         self.run()  
         self.sideCar.disablePlay()
 
 ### --------------------------------------------------------            
+    def setBackGround(self):
+        self.bkg = BkgItem(paths['bkgPath'] + 'abstract.jpg', self.canvas)   
+        self.bkg.tag = 'scroller'
+        self.bkg.direction = self.direction
+        self.bkg.anime = self.bkg.setScrollerPath(self.bkg, 'first')       
+        if self.direction == 'right':
+            self.bkg.setPos(QPointF(self.bkg.runway, 0))  ## offset to right     
+        self.bkg.addedScroller == False   
+        self.bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
+        self.scene.addItem(self.bkg)  
+  
+    def setHats(self): 
+        apaths = getPathList()  ## from sideGig  
+        for i in range(0, self.hats):  
+            path = getPath(apaths)                                           
+            self.makeHats(path)
+  
     def makeHats(self, path): 
-        pathStr = paths['spritePath'] + 'doral'
+        pathStr = paths['spritePath'] + 'doral.png'
         pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas)        
         pix.x = random.randrange(200, common['ViewW']-300)
         pix.y = random.randrange(200, common['ViewH']-300)
-        pix.setPos(pix.x, pix.y)      
-        pix.tag = path            
+        pix.setPos(pix.x, pix.y)  
+        pix.setScale(1.0)   
+        pix.tag = path    
+        if pix.shadowMaker.isActive == True:
+            self.shadows = True
+            pix.setOpacity(0.001) 
         self.scene.addItem(pix)
-                      
-    def run(self):   
-        k = 0
+           
+### --------------------------------------------------------             
+    def addShadows(self):  ## add shadows after adding pixitems     
+        tasks = []        
+        start = time.time()
+        loop  = asyncio.new_event_loop() 
+        for pix in self.scene.items():
+            if pix.type == 'pix' and pix.shadowMaker.isActive == True: 
+                tasks.append(loop.create_task(self.newShadow(pix))) 
+        if len(tasks) > 0:
+            loop.run_until_complete(asyncio.wait(tasks))
+        loop.close()  
+        str = 'Number of Shadows: {0}  seconds:  {1:.2f}'  
+        self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)                            
+ 
+    async def newShadow(self, pix): 
+        pix.addShadow() 
+        pix.shadowMaker.shadow.setPos(self.setXY(), self.setXY())
+        pix.shadowMaker.shadow.setParentItem(pix) 
+              
+    def setXY(self):
+        return random.randint(-7,7)*5
+           
+ ## --------------------------------------------------------         
+    def run(self): 
+        k = 0  
         for pix in self.scene.items():
             if pix.type =='pix' and 'doral' in pix.fileName:
                 node = Anime.Node(pix)  ## get pix pos property 

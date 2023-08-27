@@ -5,12 +5,26 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**August 2023**  
+A few more key changes; **'O'** now toggles shadow outlines on and off rather than just off -
+**'Shift-O'** now hides shadow outlines. Some bug fixes and a **link** added to shadows that allows the shadow to follow a pixItem when the pixItem is either moved or animated. This works as expected as long as the pixItem hasn't been rotated or scaled.  
+  
+    PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
+        # "apple": (650, 450),  ## see setPixSizes below if you need more to add more chars
+        # 'doral': (300, 500),
+        'ariel':   (300,300),            
+    }
+    
+Scaling up or down can be handled without triggering any issues by editing the **PixSizes** dictionary in **dotsPixWidget.py** and setting the size there rather than using the slider in the pixItem widget as scaling is applied to the pixItem before it hits the canvas.  See the video for the rotation work-around. Also added a button to the pixItem widget to launch the **Animation Menu** and a slider to the pathMaker widget to change the number of seconds it takes Mr.Ball to complete a circuit around a path. The default is 10 seconds.
+
+Of note: I tried running dots in PyQt5 and ran into a problem with QMessageBox taking up an excessive amount of screen space and no longer being very usable - at least on my Mac.  Too many moving parts to know where to begin.
+  
+---
 
 **July 2023**   
 Renamed dotsShadowWorks.py to dotsShadowWidget.py. Bug fix on Flats.  Updated **Start Here**.
 
 ---
-
 
 **June 2023**       
 Just repeating myself. I said in the last video you needed to save a background in a **.play** file in order to run it, **you don't**, programming error. Some small changes to the **demoMenu** and the **sprite scrollPanel**. I was able to add another sprite, clean up some code and remove a few no longer needed screen variables by reducing the size of the **scrollPanel** tiles. 

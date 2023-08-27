@@ -10,7 +10,7 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, QHBox
 
 from dotsSideGig        import getPathList, getPts
 
-ScaleRotate = ('<', '>', '+', '-') 
+ScaleRotate = ('<', '>', '+', '-')  ## sent from keyboard
 
 ### --------------------------------------------------------        
 class PathWidget(QWidget): 
@@ -46,6 +46,8 @@ class PathWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
+        
+        self.resetSliders()
                                          
         self.show()
                 
@@ -79,12 +81,15 @@ class PathWidget(QWidget):
     def mouseDoubleClickEvent(self, e):
         self.pathMaker.closeWidget()
         e.accept()
-        
+   
+    def resetSliders(self):
+        self.secondsSlider.setValue(self.pathMaker.seconds)
+   
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox('Rotate        Scale ')
+        groupBox = QGroupBox('Rotate  Scale  Seconds' )
         
-        groupBox.setFixedWidth(140)
+        groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
    
@@ -109,18 +114,33 @@ class PathWidget(QWidget):
         self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
-                          
+     
+        self.secondsValue = QLabel(str(self.pathMaker.seconds), alignment=Qt.AlignmentFlag.AlignCenter)
+        self.secondsSlider = QSlider(Qt.Orientation.Vertical)
+        self.secondsSlider.setMinimum(10)
+        self.secondsSlider.setMaximum(60)
+        self.secondsSlider.setSingleStep(1)
+        self.secondsSlider.setValue(self.pathMaker.seconds)
+        self.secondsSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.secondsSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.secondsSlider.setTickInterval(10)  
+        self.secondsSlider.valueChanged.connect(self.Seconds) 
+                         
         sbox = QHBoxLayout()  ## sliders  
         sbox.addSpacing(-10)    
         sbox.addWidget(self.rotaryDial)  
         sbox.addSpacing(10)       
-        sbox.addWidget(self.scaleSlider) 
+        sbox.addWidget(self.scaleSlider)
+        sbox.addSpacing(10)                
+        sbox.addWidget(self.secondsSlider)  
         
         vabox = QHBoxLayout()  ## values
         vabox.addSpacing(0) 
         vabox.addWidget(self.rotateValue)        
         vabox.addSpacing(0) 
-        vabox.addWidget(self.scaleValue)     
+        vabox.addWidget(self.scaleValue)  
+        vabox.addSpacing(10) 
+        vabox.addWidget(self.secondsValue)      
         vabox.setAlignment(Qt.AlignmentFlag.AlignBottom)
          
         vbox = QVBoxLayout()  
@@ -169,6 +189,7 @@ class PathWidget(QWidget):
         groupBox.setLayout(hbox)
         return groupBox
 
+### -------------------------------------------------------- 
     def Rotate(self, val):  ## setting rotate in shadowMaker
         self.rotatePath(val)
         self.rotateValue.setText('{:3d}'.format(val))
@@ -177,24 +198,28 @@ class PathWidget(QWidget):
         op = (val/100)
         self.scalePath(op)
         self.scaleValue.setText('{0:.2f}'.format(op))
-                
+                        
+    def Seconds(self, val):  
+        self.pathMaker.seconds = val    
+        self.secondsValue.setText('{:2d}'.format(val))
+        
     def rotatePath(self, val): 
         inc = (val - self.rotate)
         self.rotateScale(0, -inc)
         self.rotate = val
-      
+          
     def scalePath(self, val): 
         per = (val - self.scale) / self.scale    
         self.rotateScale(per, 0)
         self.scale = val
     
-    def rotateScale(self, per, inc):  
+    def rotateScale(self, per, inc):  ## handles both rotation and scaling 
         if len(self.pathMaker.pts) == 0: 
             return 
-        self.sideWays.scaleRotate('A', per, inc)
+        self.sideWays.scaleRotate('A', per, inc)  ## used by other classes as well
                                                                                            
 ### --------------------------------------------------------
-class DoodleMaker(QWidget): 
+class DoodleMaker(QWidget): ## my file display of path files
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -281,7 +306,7 @@ class DoodleMaker(QWidget):
         self.pathMaker.removePath()  
          
 ### --------------------------------------------------------
-class Doddle(QLabel):  
+class Doddle(QLabel):  ## small drawing of path file content with filename
 ### --------------------------------------------------------
     def __init__(self, parent, path, file):
         super().__init__()
@@ -324,7 +349,7 @@ class Doddle(QLabel):
         self.pathMaker.pathChooserOff() 
         e.accept()
                                    
-    def paintEvent(self, event):  ## draw rthe path
+    def paintEvent(self, event):  ## draw the paths
         painter = QPainter(self)
         painter.setBrush(self.brush) 
         painter.setPen(QPen(QColor('DODGERBLUE'), 2, Qt.PenStyle.DashDotLine))

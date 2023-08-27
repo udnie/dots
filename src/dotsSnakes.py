@@ -41,7 +41,7 @@ class DemoMenu:
      
         self.snakes   = self.sideShow.snakes   
         self.bats     = self.sideShow.bats
-        self.abstract = self.sideShow.abstract
+        self.abstract = self.sideShow.abstract  ## hats and bats
        
         self.demoMenu = None
                        
@@ -75,23 +75,20 @@ class DemoMenu:
             self.bats.makeBats()
         elif key == 'blue':
             self.runSnakes('blue') 
-            
-        elif key in ('left', 'right'):
-            if not self.dots.Vertical:         
-                if key == 'left':  ## direction of travel
-                    self.abstract.makeAbstracts('left')  ## right to left 
-                elif key == 'right':
-                    self.abstract.makeAbstracts('right') ## left to right   
-            else:
-                 MsgBox('Not Implemented for Vertical')
-                 return
-                     
         elif key == 'snakes':
             if self.dots.Vertical:   
                 self.runSnakes('vertical') 
             else:
-                self.runSnakes('left')  
-      
+                self.runSnakes('left')              
+        elif key in ('left', 'right'):
+            if self.dots.Vertical:     
+                MsgBox('Not Implemented for Vertical Format')
+                return             
+            if key == 'left':  ## direction of travel
+                self.abstract.makeAbstracts('left')  ## right to left 
+            else: 
+                self.abstract.makeAbstracts('right') ## left to right   
+
     def runSnakes(self, what): 
         if what in ('blue', 'snakes'): 
             self.snakes.delSnakes()    
@@ -268,11 +265,13 @@ class Snakes:
         if idx % 3 != 0:  ## vary the segments
             pix = Snake(paths['demo'] + self.a, self.canvas.pixCount, 0, 0, self.canvas)
         else:
-            pix = Snake(paths['demo'] + self.b, self.canvas.pixCount, 0, 0, self.canvas)             
+            pix = Snake(paths['demo'] + self.b, self.canvas.pixCount, 0, 0, self.canvas) 
+                        
         pix.x = int(constrain(xy(common['ViewW']), pix.width, common['ViewW'], 
                 pix.width * -common['factor']))
         pix.y = int(constrain(xy(common['ViewH']), pix.height, common['ViewH'],
-                pix.height * -common['factor']))      
+                pix.height * -common['factor'])) 
+             
         pix.setPos(pix.x, pix.y)                                                   
         node = Anime.Node(pix)  ## get pix pos property    
         pix.tag = fileName        

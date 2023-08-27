@@ -94,6 +94,8 @@ class PathMaker(QWidget):
  
         self.npts = 0  ## used by addNewPathPts
         self.last = 0
+        
+        self.seconds = 10  ## set how long it takes mr.ball to complete a path
          
         self.addingNewPath = False
         self.pathSet = False
@@ -255,14 +257,9 @@ class PathMaker(QWidget):
         p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))                          
         self.widget.setGeometry(p.x(), p.y(), \
             int(self.widget.WidgetW), int(self.widget.WidgetH))
-        self.resetSliders()
         if self.addingNewPath:
             self.drawing.editBtn('ClosePath')
   
-    def resetSliders(self):
-        self.widget.rotaryDial.setValue(0)
-        self.widget.scaleSlider.setValue(100)
-
     def closeWidget(self):
         if self.widget != None:
             self.widget.close()
@@ -335,7 +332,7 @@ class PathMaker(QWidget):
                 self.ball.setZValue(self.drawing.findTop()+10)
        
                 self.pathTestNode = QPropertyAnimation(node, b'pos')
-                self.pathTestNode.setDuration(10000)  ## 10 seconds
+                self.pathTestNode.setDuration(self.seconds * 1000)
 
                 path = self.setPaintPath(True)  ## close subpath, uses    
                 b = self.ball.boundingRect() 

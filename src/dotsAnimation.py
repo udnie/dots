@@ -91,7 +91,7 @@ class Animation:
             return sidePath.flapper(pix, anime, Node(pix)) 
         elif anime in Spins:
             return spin(pix, anime, Node(pix))
-        elif 'demo' in anime:
+        elif 'demo' in anime:  ## from AbstractBats
             return sidePath.demo(pix, anime, Node(pix))
         elif anime in self.canvas.pathList:
             return sidePath.setPaths(anime, Node(pix))
@@ -108,7 +108,6 @@ def vibrate(pix):
     pos  = node.pix.pos()
     node.pix.setOriginPt()
     
-
     random.seed()
     sync = random.randint(130,205)
     ran  = random.randint(3,7)*2
@@ -132,6 +131,7 @@ def vibrate(pix):
 def pulse(pix):   
     node = Node(pix)
     node.pix.setOriginPt()
+    
     random.seed()
     sync = random.gauss(450, 50)
 
@@ -238,13 +238,22 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     scale.setDuration(int(sync))
                   
     scale.setStartValue(node.pix.scale)
-    scale.setEndValue(pix.scale)
+    if pix.canvas.openPlayFile == 'abstract' and \
+        pix.shadowMaker.isActive == True:
+        scale.setEndValue(1.0)   
+    else:    
+        scale.setEndValue(pix.scale)
 
     opacity = QPropertyAnimation(node, b'opacity')
     opacity.setDuration(int(sync))
     opacity.setStartValue(node.pix.opacity())  ## reset to 1.0
-    opacity.setEndValue(1)
-
+    
+    if pix.canvas.openPlayFile == 'abstract' and \
+        pix.shadowMaker.isActive == True:
+        opacity.setEndValue(.001)
+    else:
+        opacity.setEndValue(1)
+        
     group = QParallelAnimationGroup()
 
     group.addAnimation(reprise)

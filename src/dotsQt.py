@@ -20,7 +20,7 @@ class DotsQt(QMainWindow):
 ### --------------------------------------------------------
     def __init__(self, parent=None):
         super().__init__()
-    
+
         self.msg = ''  ## just in case there's something to add 
         self.Vertical = False
                                                             
@@ -32,7 +32,7 @@ class DotsQt(QMainWindow):
             self.msg = sys.argv[1]  ## default to 1080, too wide for display
                              
         self.saveCommon = common.copy()  ## refreshes common - see switch
-                  
+                   
         if len(sys.argv) > 1:  ## if there's no match it defaults to 1080
             self.screen = setCommon(sys.argv[1])  ## setCommon in screens
         else:
@@ -93,10 +93,5 @@ if __name__ == '__main__':
     sys.exit(app.exec())    
       
 ### ------------------------- dotsQt -----------------------
-
-
-
-
-
 
 

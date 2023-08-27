@@ -1,24 +1,97 @@
 
-from PyQt6.QtCore       import Qt, QPoint, QRectF
+import os
+
+from PyQt6.QtCore       import Qt, QPoint, QRectF, QPointF
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, \
                                QLabel, QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
-                                                 
+ 
+from dotsShared         import common               
+from dotsSideGig        import constrain
+
+Pct = -0.50   ## used by constrain - percent allowable off screen
+PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
+    # "apple": (650, 450),  ## see setPixSizes below
+    'doral': (215, 215),
+    #'ariel':  (300, 300),            
+}
+                                                                               
 ### -------------------- dotsPixWidget ---------------------
-''' classes: pixWidget '''
+''' class: PixWidget, works '''
+### --------------------------------------------------------
+class works:  ## small functions that were in Pixitem
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+ 
+        self.pix   = parent
+        self.scene = self.pix.scene
+
+### --------------------------------------------------------
+    def closeWidget(self):
+        if self.pix.widget != None:
+            self.pix.widget.close()
+            self.pix.widget = None
+                    
+    def resetSliders(self):
+        self.pix.widget.opacitySlider.setValue(int(self.pix.alpha2*100))
+        self.pix.widget.scaleSlider.setValue(int(self.pix.scale*100))
+        self.pix.widget.rotaryDial.setValue(int(self.pix.rotation))
+          
+    def removeThis(self):
+        self.pix.clearFocus() 
+        self.pix.setEnabled(False)
+        self.scene.removeItem(self.pix)
+        
+    def clearTag(self):  ## reset canvas key to '' 
+        self.pix.mapper.clearTagGroup()
+        self.pix.canvas.setKeys('') 
+        
+    def constrainX(self, X):    
+        return int(constrain(X, self.pix.width, common["ViewW"], self.pix.width * Pct))
+        
+    def constrainY(self, Y):
+        return int(constrain(Y, self.pix.height, common["ViewH"], self.pix.height * Pct))
+                                
+    def setPixSizes(self, newW, newH):  
+        p = os.path.basename(self.pix.fileName)     
+        for key in PixSizes:
+            if key in p:
+                val = PixSizes.get(key)
+                return val[0], val[1]
+        # print(p, "{0:.2f}".format(newW), "{0:.2f}".format(newH))
+        if newW < 100 or newH < 100:
+            newW, newH = 200, 200 
+        elif newW > 400 or newH > 400:
+            newW, newH = 425, 425
+        return newW, newH
+             
+    def scaleThis(self, key):
+        self.pix.setOriginPt()
+        if key == '>':
+            scale = .03
+        elif key == '<':
+            scale = -.03
+        self.pix.scale += scale
+        self.pix.setScale(self.pix.scale)
+                              
+    def flopIt(self):
+        self.pix.setMirrored(False) if self.pix.flopped else self.pix.setMirrored(True)
+                                                          
 ### --------------------------------------------------------        
 class PixWidget(QWidget):  
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
                                         
-        self.pix = parent
+        self.pix  = parent
+        self.works = self.pix.works
         
         self.type = 'widget'
         self.save = QPoint(0,0)
                 
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 200.0
+        self.WidgetW, self.WidgetH = 340.0, 230.0
                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
@@ -34,7 +107,7 @@ class PixWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
-                                             
+                                                     
         self.show()
                 
 ### --------------------------------------------------------              
@@ -65,9 +138,9 @@ class PixWidget(QWidget):
         self.save = e.globalPosition()
             
     def mouseDoubleClickEvent(self, e):
-        self.pix.closeWidget()
+        self.works.closeWidget()
         e.accept()
-                        
+                             
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')
@@ -80,11 +153,12 @@ class PixWidget(QWidget):
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
+        self.rotaryDial.setSingleStep(1)
         self.rotaryDial.setValue(0)
         self.rotaryDial.setFixedWidth(60)
         self.rotaryDial.setWrapping(False)
         self.rotaryDial.setNotchesVisible(True)
-        self.rotaryDial.setNotchTarget(15.0)
+        self.rotaryDial.setNotchTarget(45.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
      
         self.scaleValue = QLabel('1.00')
@@ -132,57 +206,64 @@ class PixWidget(QWidget):
                 
         groupBox.setLayout(vbox)
         return groupBox
-
+    
+### -------------------------------------------------------- 
     def buttonGroup(self):
         groupBox = QGroupBox('Pixitem ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
-        groupBox.setFixedWidth(103)
+        groupBox.setFixedWidth(110)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
         shadowBtn = QPushButton('Shadow')
         flopBtn    = QPushButton('Flop')
         cloneBtn  = QPushButton('Clone')
+        animeBtn  = QPushButton('Animations')
         delBtn    = QPushButton('Delete')
         lockBtn   = QPushButton('Un/Lock')
         quitBtn   = QPushButton('Close')
     
         shadowBtn.clicked.connect(self.pix.addShadow)
-        flopBtn.clicked.connect(self.pix.flopIt)
+        flopBtn.clicked.connect(self.works.flopIt)
         cloneBtn.clicked.connect(self.pix.cloneThis)
+        animeBtn.clicked.connect(self.pix.animeMenu)
         delBtn.clicked.connect(self.pix.deletePix)
         lockBtn.clicked.connect(self.pix.togglelock)
-        quitBtn.clicked.connect(self.pix.closeWidget)
+        quitBtn.clicked.connect(self.works.closeWidget)
     
         vbox = QVBoxLayout(self)
         vbox.addWidget(shadowBtn)
         vbox.addWidget(lockBtn)
         vbox.addWidget(flopBtn)
+        vbox.addWidget(animeBtn)
         vbox.addWidget(cloneBtn)
         vbox.addWidget(delBtn)
         vbox.addWidget(quitBtn)
                 
         groupBox.setLayout(vbox)
         return groupBox
-
+    
+### -------------------------------------------------------- 
     def Rotate(self, val): 
         self.pix.setOriginPt() 
         self.pix.setRotation(val) 
         self.pix.rotation = val    
         self.rotateValue.setText('{:3d}'.format(val))
-    
-    def Opacity(self, val):
-        op = (val/100)
-        self.pix.setOpacity(op)
-        self.pix.alpha2 = op
-        self.opacityValue.setText('{0:.2f}'.format(op)) 
-        
+ 
     def Scale(self,val):
         self.pix.setOriginPt() 
         op = (val/100)
         self.pix.setScale(op)
         self.pix.scale = op
         self.scaleValue.setText('{0:.2f}'.format(op))
-                                                                                   
+  
+    def Opacity(self, val):
+        op = (val/100)
+        if op <= 0.001:  ## necessary to animate shadows          
+            op = 0.001
+        self.pix.setOpacity(op)
+        self.pix.alpha2 = op
+        self.opacityValue.setText('{0:.2f}'.format(op)) 
+                                                                                                         
 ### -------------------- dotsPixWidget ---------------------
 

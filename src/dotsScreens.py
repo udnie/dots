@@ -162,7 +162,7 @@ eight10 = {  ## used by both 1215X810 and 140X810px
     'margin1':    13,  ## scroll panel top margin
     'margin2':     3,
     'scaleY':   1.15, 
-    'facto':    0.36,  ## scales pixitems by format
+    'factor':   0.35,  ## scales pixitems by format
     'steps':       8, 
 }
 
@@ -191,7 +191,7 @@ eight64 = {  ## used by both 1296X864 and 1536X864px
     'margin1':    23,  ## scroll panel top margin
     'margin2':     0,
     'scaleY':   1.15,
-    'factor':   0.36,  ## scales pixitems by format
+    'factor':   0.38,  ## scales pixitems by format
     'steps':       8, 
 }
 

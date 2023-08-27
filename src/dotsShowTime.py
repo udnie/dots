@@ -10,6 +10,8 @@ from dotsBkgMaker       import *
 from dotsSideGig        import *
 from dotsSideCar        import SideCar
 
+Demos = ['snakes', 'bats', 'abstract']
+
 ### ---------------------- dotsShowTime --------------------
 ''' class: ShowTime: functions to run, pause, stop, etc.. .play animations'''        
 ### --------------------------------------------------------
@@ -36,15 +38,14 @@ class ShowTime:
         self.mapper.clearMap()
         self.clearPathsandTags()  
         self.canvas.unSelect()
-               
+        self.sideCar.hideOutlines()
+                       
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = getPathList(True)  
                         
         k = 0  ## counts pixitems
         for pix in self.scene.items():  ## sets the animation and run it <<----
-            
-            
-            
+                 
             if type(pix) == 'dotsShadowWidget.PointItem':  ## goes with shadows for now
                 continue
             if isinstance(pix, QGraphicsPolygonItem):
@@ -62,9 +63,12 @@ class ShowTime:
                     pix.anime = self.animation.setAnimation(          
                         pix.tag, 
                         pix)        
-                elif pix.type == 'bkg' and pix.tag == 'scroller':
-                    pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem
-                    pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True) 
+                elif pix.type == 'bkg': 
+                    if pix.tag == 'scroller':
+                        pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem
+                        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)
+                    elif pix.locked:
+                        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable,False) 
                     
                 k += 1  ## k = number of pixitems - bats count as three
                 if pix.anime == None:  ## not animated
@@ -93,7 +97,7 @@ class ShowTime:
                     continue
                 if isinstance(pix, QGraphicsPolygonItem):
                     continue         
-                if pix.fileName in ('frame','flat'):
+                if pix.type in ('bkg', 'pix') and pix.fileName in ('frame','flat'):
                     continue               
                 if pix.type in ('pix', 'snake', 'bkg'):
                     if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Running:  ## running
@@ -118,7 +122,7 @@ class ShowTime:
         self.clearPathsandTags()     
         scrolling = []  ## None doesn't work on lists - use len()
         for pix in self.scene.items():                      
-            if type(pix) == 'dotsShadowWidget.PointItem':  ## shadows
+            if type(pix) == 'point':  ## shadows pointItem
                 continue     
             if isinstance(pix, QGraphicsPolygonItem):  ## shadows
                 continue      
@@ -135,10 +139,11 @@ class ShowTime:
                         pix.anime = None
                         scrolling.append(pix)
                                                 
-                if pix.type == 'pix' and pix.part == 'pivot':  
-                    if pix.opacity() < .2:  ## just in case              
-                        pix.setOpacity(1.0)                     
-                                                                                
+                if pix.type == 'pix' and pix.opacity() < .2:  ## just in case  
+                    if self.canvas.openPlayFile != 'abstract':            
+                        pix.setOpacity(1.0) 
+                        pix.alpha2 = pix.opacity()  ## opacity can't be a varibale name 
+                                                                                               
                 if pix.type in ('pix', 'snake'):
                     if pix.part in ('left','right'):  
                         continue  ## these stop when pivot stops  
@@ -179,25 +184,15 @@ class ShowTime:
             
 ### --------------------------------------------------------
     def savePlay(self):   
-        if self.canvas.openPlayFile in ('snakes', 'bats', 'abstract'):
+        if self.canvas.openPlayFile in Demos:
             self.sideCar.enablePlay()
-        
-        if self.canvas.openPlayFile == 'snakes':
-            MsgBox("Can't Save Snakes as a Play File", 6)  ## seconds
+            demo = self.canvas.openPlayFile 
+            MsgBox("Can't Save " + demo.capitalize() + " as a Play File", 6)  ## seconds
             return  
-        
-        elif self.canvas.openPlayFile == 'bats':
-            MsgBox("Can't Save Bats as a Play File", 6)  ## seconds
-            return  
-        
-        elif self.canvas.openPlayFile == 'abstract':
-            MsgBox("Can't Save Abstract as a Play File", 6)  ## seconds
-            return 
-              
+                   
         if self.canvas.pathMakerOn:  ## using load in pathMaker
             self.pathMaker.sideWays.savePath()
-            return  
-              
+            return          
         elif len(self.scene.items()) == 0:
             return   
               
@@ -222,8 +217,8 @@ class ShowTime:
         if dlist:
             try:
                 self.sideCar.saveToJson(dlist)
-            except FileNotFoundError:
-                MsgBox('savePlay: Error saving file', 5)         
+            except Exception:
+                MsgBox('Error saving file...', 5)         
         del dlist
         
     def clearPathsandTags(self):
@@ -256,10 +251,11 @@ def savePix(pix):
             'width':    pix.shadowMaker.imgSize[0],
             'height':   pix.shadowMaker.imgSize[1],
             'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
-                            for k in range(len(pix.shadowMaker.path))],
+                            for k in range(4)],
             'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
-                            for k in range(len(pix.shadowMaker.path))],
+                            for k in range(4)],
             'flopped':   pix.shadowMaker.flopped,
+            'linked':   pix.shadowMaker.linked,
         }
         tmp.update(shadow)
           

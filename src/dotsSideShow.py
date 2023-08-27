@@ -15,14 +15,11 @@ from dotsBkgMaker       import *
 
 from dotsShowTime       import ShowTime
 from dotsSideGig        import *
-from dotsSideCar        import SideCar
+from dotsSideCar        import SideCar 
 
-from dotsSnakes         import DemoMenu
+from dotsSnakes         import DemoMenu, Snakes
 from dotsScreens        import ScreenMenu
-
-from dotsAbstractBats   import Abstract, Bats, Wings 
-from dotsSnakes         import Snakes
-
+from dotsAbstractBats   import Abstract, Bats, Wings
 
 ### ---------------------- dotsSideShow --------------------
 ''' class: SideShow: functions to load and add items to scene/canvas '''        
@@ -58,42 +55,45 @@ class SideShow:
     def keysInPlay(self, key):
         if self.canvas.pathMakerOn == False:      
             if key == 'L' and self.canvas.control == '':
-                self.loadPlay()
-                       
+                self.loadPlay()                
             elif len(self.scene.items()) > 0:  ## stuff on screen
                 if key == 'P':  ## always
-                    self.mapper.togglePaths() 
-                                           
+                    self.mapper.togglePaths()                                
                 elif key == 'R':    
                     if self.canvas.control != '':
                         return
-                             
-                    if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'abstract'):
-                        if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
-                            self.snakes.rerun(self.snakes.what)  
-                        elif self.canvas.openPlayFile == 'abstract' and self.abstract.direction != '':
-                            self.abstract.rerun(self.abstract.direction)  
-                        elif self.canvas.openPlayFile == 'bats':
-                            self.bats.rerun()
                     else:
-                      self.showTime.run()   
-                                                                   
+                        self.runThese()                                        
                 elif key == 'S':
                     if self.canvas.control != '':
-                        self.showTime.stop()
-                        
-            else:  ## nothing on screen - easier to add more single keys  
-                if key == 'R':   
-                    self.screenMenu.closeScreenMenu()
-                    if self.demoAvailable: 
-                        self.demoMenu.openDemoMenu()  
-                elif key == 'S':   
-                    if self.demoAvailable:  
-                        self.demoMenu.closeDemoMenu()
-                    self.screenMenu.openScreenMenu()
-                elif key == 'A':
-                    self.bkgMaker.openBkgFiles()
-                    
+                        self.showTime.stop()        
+            elif key in ('R', 'S', 'A'):  ## single key command - no sceneItems
+                self.RSA(key)
+                
+### --------------------------------------------------------            
+    def runThese(self):      
+        if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'abstract'):
+            if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
+                self.snakes.rerun(self.snakes.what)  
+            elif self.canvas.openPlayFile == 'abstract' and self.abstract.direction != '':
+                self.abstract.rerun(self.abstract.direction)  
+            elif self.canvas.openPlayFile == 'bats':
+                self.bats.rerun()
+        else:
+            self.showTime.run()
+               
+    def RSA(self, key):
+        if key == 'R':   
+            self.screenMenu.closeScreenMenu()
+            if self.demoAvailable: 
+                self.demoMenu.openDemoMenu()  
+        elif key == 'S':   
+            if self.demoAvailable:  
+                self.demoMenu.closeDemoMenu()
+                self.screenMenu.openScreenMenu()
+        elif key == 'A':
+            self.bkgMaker.openBkgFiles()          
+                                   
 ### --------------------------------------------------------                            
     def loadPlay(self):   
         if self.canvas.pathMakerOn:  ## using load in pathMaker
@@ -106,8 +106,11 @@ class SideShow:
                 'Choose a file to open', paths['playPath'], 'Files (*.play)', None)
             Q.accept()      
             if file:
-                self.openPlay(file) 
-                self.canvas.openPlayFile = file
+                try:
+                    self.openPlay(file) 
+                    self.canvas.openPlayFile = file
+                except IOError:
+                    MsgBox(file + 'Not Found')
             else:
                 return
             
@@ -125,31 +128,29 @@ class SideShow:
                 dlist = json.load(fp)
         except IOError:
             MsgBox('openPlay: Error loading ' + file, 5)
-            return
-           
+            return       
         self.mapper.clearMap()  ## just clear it  
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
          
-        ## number of pixitems, bkg zval, number of shadows, scrollers 
-              
+        ## number of pixitems, bkg zval, number of shadows, scrollers            
         kix, bkz, ns, scr, f = 0, 0, 0, 0, '' 
         lnn = len(dlist)
         lnn = lnn + self.mapper.toFront(0)  ## start at the top
         plist  = ['abstract', 'snakes']  ## demo pic are in images
                             
         for tmp in dlist:                  
-            if tmp['type'] == 'bkg' and tmp['fname'] != 'flat' and \
-                not path.exists(paths['bkgPath'] + tmp['fname']) and\
+            if tmp['type'] == 'bkg:' and tmp['fname'] != 'flat' and \
+                not path.exists(paths['bkgPath']   + tmp['fname']) and\
                 not path.exists(paths['imagePath'] + tmp['fname']):    
-                MsgBox('openPlay: Error loading ' + paths['bkgPath'] + tmp['fname'], 5)  
-                continue 
+                MsgBox('openPlay: Error loading '  + paths['bkgPath'] + tmp['fname'], 5)  
+                return 
                 
             elif tmp['type'] == 'pix' and \
                 not path.exists(paths['spritePath'] + tmp['fname']) and \
                 not path.exists(paths['imagePath']  + tmp['fname']):
-                MsgBox('openPlay: Error loading ' + paths['imagePath'] + tmp['fname'], 5)     
-                continue      
+                MsgBox('openPlay: Error loading '   + paths['imagePath'] + tmp['fname'], 5)     
+                return      
                  
             elif 'bat' in tmp['fname']:  ## make a bat - not from demoMenu 
                 Wings(self.canvas, tmp['x'], tmp['y'], tmp['tag'])  ## added self to scene
@@ -162,7 +163,7 @@ class SideShow:
                 pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas) 
                 tmp['z'] = lnn  ## lnn preserves front to back relationships 
                 ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
-                if 'scalor' in tmp.keys() and pix.shadowMaker.isDummy == False:
+                if 'scalor' in tmp.keys() and pix.shadowMaker.isActive == True:
                     ns += 1
                 self.addPixToScene(pix, tmp)  ## finish unpacking tmp                 
                 lnn -= 1 
@@ -173,103 +174,41 @@ class SideShow:
                 tmp['z'] = bkz                
                 if tmp['fname'] == 'flat': 
                     self.bkgMaker.setBkgColor(QColor(tmp['tag']), bkz)           
-                else:              
+                else:          
                     if any(thing in tmp['fname'] for thing in plist):  ## demos are in images dir
-                        pix = BkgItem(paths['imagePath'] + tmp['fname'], self.canvas, bkz)  
+                        if not os.path.exists(paths['bkgPath'] + tmp['fname']):
+                            MsgBox(paths['bkgPath'] + tmp['fname'] + ' Not Found', 5)
+                            return
+                        else:
+                            pix = BkgItem(paths['imagePath'] + tmp['fname'], self.canvas, bkz)  
                     else:
-                        pix = BkgItem(paths['bkgPath'] + tmp['fname'], self.canvas, bkz)  
+                        if not os.path.exists(paths['bkgPath'] + tmp['fname']):
+                            MsgBox( paths['bkgPath'] + tmp['fname'] + ' Not Found', 5)
+                            return
+                        else:
+                            pix = BkgItem(paths['bkgPath'] + tmp['fname'], self.canvas, bkz)  
                     self.addPixToScene(pix, tmp)  ## finish unpacking tmp 
                 bkz -= 1   
             del tmp 
         ## end for loop
         
         del dlist
-        self.bkgMaker.disableBkgBtns()
         
+        self.bkgMaker.disableBkgBtns()
         file = os.path.basename(self.canvas.openPlayFile)
-        if 'play' in file:
+        
+        if 'play' in file and ns == 0 and self.locks == 0:
             self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(kix)) 
                 
-        if ns > 0:  ## there must be shadows
-            QTimer.singleShot(200, self.addShadows) 
+        elif ns > 0:  ## there must be shadows
+            QTimer.singleShot(200, self.addShadows)
             MsgBox('Adding Shadows,  please wait...', int(1 + (ns * .25)))
+            
         elif self.locks > 0:
             MsgBox('Some screen items are locked', 5)  ## seconds
             self.canvas.mapper.toggleTagItems('all')
-        
- ### --------------------------------------------------------
-    def addPixToScene(self, pix, tmp):
-        pix.type = tmp['type']                 
-        pix.x = float('{0:.2f}'.format(tmp['x']))
-        pix.y = float('{0:.2f}'.format(tmp['y']))
-        pix.setZValue(tmp['z']),  ## use the new one
-        pix.setMirrored(tmp['mirror']),
-        pix.rotation = tmp['rotation']
-        pix.scale    = tmp['scale']
-                            
-        ## bump zVals up 100
-        if pix.type == 'pix': 
-            pix.setZValue(pix.zValue() + 100)  ## not for 'bkg'
-            pix.setPos(pix.x, pix.y)
-           
-        if 'tag' not in tmp.keys():  ## seriously good to know
-            tmp['tag'] = ''
-        pix.tag = tmp['tag'] 
-
-        if 'alpha2' not in tmp.keys():  ## for shadows
-            tmp['alpha2'] = 1.0
-        pix.alpha2 = tmp['alpha2'] 
-
-        if 'locked' not in tmp.keys(): 
-            tmp['locked'] = False
-        pix.locked = tmp['locked']
-
-        if pix.type in('pix') and 'frame' not in pix.fileName:
-            pix.locked = tmp['locked']
-            if pix.locked: self.locks += 1
-            pix.part = tmp['part']
-            pix = lookForStrays(pix)  
-                                                   
-        if 'scalor' in tmp.keys():  ## save to pix.shadow      
-            pix.shadow = {
-                'alpha':    tmp['alpha'],
-                'scalor':   tmp['scalor'],  ## unique to shadow
-                'rotate':   tmp['rotate'],
-                'width':    tmp['width'],
-                'height':   tmp['height'],
-                'pathX':    tmp['pathX'],
-                'pathY':    tmp['pathY'],  
-            }  
-            if 'flopped' not in tmp.keys():      
-                pix.shadow['flopped'] = None
-            else:
-                pix.shadow['flopped'] = tmp['flopped']
-            if 'fileName' not in tmp.keys(): 
-                pix.shadow['fileName'] = 'shadow' 
-                                                          
-        if pix.type == 'bkg':  ## you can unlock them now
-              
-            if 'scrollable' not in tmp.keys(): 
-                tmp['scrollable'] = False
-            pix.scrollable = tmp['scrollable']
-             
-            if 'direction' not in tmp.keys(): 
-                tmp['direction'] = 'left'
-            pix.direction = tmp['direction']
-            
-            if 'anime' not in tmp.keys(): 
-                tmp['anime'] = None
-            pix.anime = tmp['anime']
-                                  
-        del tmp 
-
-        if pix.type == 'bkg' and pix.direction == '':
-            pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-                                                                                           
-        ## may require rotation or scaling - adds to scene items
-        self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
-   
-### --------------------------------------------------------                      
+    
+### --------------------------------------------------------             
     def addShadows(self):  ## add shadows after adding pixitems     
         tasks = []         
         start = time.time()
@@ -279,14 +218,99 @@ class SideShow:
         ## a group of class functions using asyncio
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadow != None:
-                tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))  
+                tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
-        loop.close() 
-        
+        loop.close()        
+        self.sideCar.hideOutlines()  ## turns them off               
         str = 'Number of Shadows: {0}  seconds:  {1:.2f}'  
         self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)        
+                       
+ ### --------------------------------------------------------
+    def addPixToScene(self, pix, tmp):  ## treats pix, bkg, shadow as a pix 
+        pix = self.setAll(pix, tmp)                    
+        if pix.type == 'pix': 
+            pix = self.setPixitem(pix, tmp)
+
+        if 'tag' not in tmp.keys():     ## pix and bkg
+            tmp['tag'] = ''
+        if 'alpha2' not in tmp.keys():  ## for shadows
+            tmp['alpha2'] = 1.0     
+        if 'locked' not in tmp.keys():  ## pix and bkg
+            tmp['locked'] = False     
+                    
+        pix.tag    = tmp['tag'] 
+        pix.alpha2 = tmp['alpha2']
+        pix.locked = tmp['locked']  
+                    
+        if 'scalor' in tmp.keys():   
+            pix = self.setShadow(pix, tmp)     
+        elif pix.type == 'bkg':
+            pix = self.setBackGround(pix, tmp)                                                                         
+        del tmp 
+
+        if pix.type == 'bkg' and pix.locked:
+            pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)   
+                                                                                               
+        ## adds pix to the scene and performs any transforms
+        self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
    
+### --------------------------------------------------------
+    def setAll(self, pix, tmp):
+        pix.type = tmp['type']                 
+        pix.x    = float('{0:.2f}'.format(tmp['x']))
+        pix.y    = float('{0:.2f}'.format(tmp['y']))   
+        pix.setZValue(tmp['z']),  ## use the new one
+        pix.setMirrored(tmp['mirror']),
+        pix.rotation = tmp['rotation']
+        pix.scale    = tmp['scale']
+        return pix
+
+    def setPixitem(self, pix, tmp):
+        pix.setZValue(pix.zValue() + 100)  ## not for 'bkg'
+        pix.setPos(pix.x, pix.y)     
+        if 'frame' not in pix.fileName:
+            pix.locked = tmp['locked']
+            if pix.locked: self.locks += 1
+            pix.part = tmp['part']
+            pix = lookForStrays(pix)
+        return pix        
+
+    def setBackGround(self, pix, tmp):
+        if 'scrollable' not in tmp.keys(): 
+            tmp['scrollable'] = False
+        if 'direction' not in tmp.keys(): 
+            tmp['direction'] = 'left'    
+        if 'anime' not in tmp.keys(): 
+            tmp['anime'] = None            
+        pix.scrollable = tmp['scrollable']
+        pix.direction  = tmp['direction']
+        pix.anime      = tmp['anime']
+        pix.locked     = tmp['locked']
+        return pix          
+ 
+    def setShadow(self, pix, tmp):
+        pix.shadow = {
+            'alpha':    tmp['alpha'],
+            'scalor':   tmp['scalor'],  ## unique to shadow
+            'rotate':   tmp['rotate'],
+            'width':    tmp['width'],
+            'height':   tmp['height'],
+            'pathX':    tmp['pathX'],
+            'pathY':    tmp['pathY'],  
+        }                   
+        if 'flopped' not in tmp.keys():      
+            pix.shadow['flopped'] = None
+        else:
+            pix.shadow['flopped'] = tmp['flopped']
+        if 'fileName' not in tmp.keys(): 
+            pix.shadow['fileName'] = 'shadow' 
+        if 'linked' not in tmp.keys(): 
+            pix.shadow['linked'] = False
+        else:
+            pix.shadow['linked'] = tmp['linked']
+        return pix
+                      
 ### --------------------------------------------------------
 def lookForStrays(pix):
     if pix.x < -25 or pix.x > common['ViewW'] -10:

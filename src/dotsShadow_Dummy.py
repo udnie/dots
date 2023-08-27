@@ -9,8 +9,8 @@ class ShadowMaker:
     def __init__(self, parent):
         super().__init__()
 
-        self.shadow   = None
-        self.isDummy  = True
+        self.shadow  = None
+        self.isActive = False
   
 ### --------------------------------------------------------
 class Shadow: 

@@ -14,7 +14,7 @@ ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
 ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
-            Qt.Key.Key_W)
+            Qt.Key.Key_W,  Qt.Key.Key_O)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
 ### ------------------ dotsControlView ---------------------
@@ -57,7 +57,7 @@ class ControlView(QGraphicsView):
             # Qt.Key.Key_A: self.canvas.selectAll,  << moved to storyBoard
             Qt.Key.Key_H: self.canvas.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
-            Qt.Key.Key_O: self.sideCar.clearOutlines,   
+            Qt.Key.Key_O: self.sideCar.toggleOutlines,   
         }
 
         self.toggleKeys = {
@@ -112,7 +112,7 @@ class ControlView(QGraphicsView):
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
                         
-        ## shift keys - D, P, T, V, H  
+        ## shift keys - D, P, T, V, H , O 
         elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:            
             if key == Qt.Key.Key_D:   
                 if self.canvas.pathMakerOn:
@@ -122,11 +122,13 @@ class ControlView(QGraphicsView):
                     self.mapper.toggleTagItems('paths') 
             elif key == Qt.Key.Key_W:  ## show waypts
                 if self.canvas.pathMakerOn:  
-                    self.canvas.pathMaker.sideWays.addWayPtTags()                     
+                    self.canvas.pathMaker.sideWays.addWayPtTags()  
+            elif key == Qt.Key.Key_O:         
+                 self.sideCar.hideOutlines()                 
             elif key == Qt.Key.Key_T:         
                 self.mapper.toggleTagItems('select')     
             elif key == Qt.Key.Key_H:
-                self.sideCar.hideSelected()
+                self.sideCar.hideSelectedShadows()
                 self.sideCar.clearWidgets()
                 self.sideCar.toggleOutlines()
            

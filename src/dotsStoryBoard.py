@@ -4,11 +4,10 @@ import gc
 
 from PyQt6.QtCore       import QAbstractAnimation, QTimer, QEvent, QPointF, pyqtSlot
 from PyQt6.QtGui        import QTransform
-from PyQt6.QtWidgets    import QWidget, QMenu, QRubberBand, QGraphicsScene
+from PyQt6.QtWidgets    import QWidget, QRubberBand, QGraphicsScene
                                         
 from dotsShared         import common, CanvasStr, PathStr, MoveKeys, PlayKeys
 from dotsAnimation      import *
-from dotsSideGig        import getPathList
 from dotsSideCar        import SideCar
 from dotsControlView    import ControlView
 from dotsPixItem        import PixItem
@@ -20,7 +19,7 @@ from dotsPathMaker      import PathMaker
 from dotsKeysPanel      import KeysPanel
 from dotsScrollPanel    import ScrollPanel
 from dotsDocks          import *
-from dotsAbstractBats   import Wings 
+from dotsAbstractBats   import Wings
 
 Play = ('L','R','P','S','A')
 
@@ -47,6 +46,8 @@ class StoryBoard(QWidget):
         self.pathList = []        ## used by animations, updated here
     
         self.canvas    = self
+        self.sideCar   = SideCar(self)   
+        
         self.keysPanel = KeysPanel(self)
         self.scroll    = ScrollPanel(self)
         self.pathMaker = PathMaker(self)
@@ -58,7 +59,7 @@ class StoryBoard(QWidget):
                  
         self.sideShow  = SideShow(self)  ## reads .play files    
         self.showTime  = ShowTime(self)  ## runs anything tagged as an animation 
-        self.sideCar   = SideCar(self)
+     
            
         addScrollDock(self)  ## add button groups from dotsDocks
         addKeysDock(self)
@@ -167,7 +168,7 @@ class StoryBoard(QWidget):
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, fileName, x, y, clone, mirror):  
-        if 'wings' in fileName:  ## see dotsSideCar for wings
+        if 'wings' in fileName:  ## see AbstractBats for wings
             Wings(self, x, y, '')       
         else:
             self.pixCount += 1  
@@ -329,48 +330,8 @@ class StoryBoard(QWidget):
     def contextMenuEvent(self, e):
         if not self.scene.selectedItems():
             return
-        menu = QMenu(self)               
-        alst = sorted(AnimeList)
+        self.sideCar.animeMenu(e.globalPos())
         
-        ## basing pathlist on what's in the directory
-        self.pathList = getPathList(True)  ## names only
-        rlst = sorted(self.pathList)     
-        alst.extend(['Random'])  
-              
-        menu.addAction('Animations and Paths')
-        menu.addSeparator()   
-        
-        for anime in alst:
-            action = menu.addAction(anime)
-            action.triggered.connect(
-                lambda chk, anime=anime: self.setAnimationTag(anime))
-        menu.addSeparator()
-        for anime in rlst:
-            action = menu.addAction(anime)
-            action.triggered.connect(
-                lambda chk, anime=anime: self.setAnimationTag(anime))
-        menu.addSeparator()
-        anime = 'Clear Tags'
-        action = menu.addAction(anime)
-        action.triggered.connect(
-            lambda chk, anime=anime: self.setAnimationTag(anime))
-        menu.exec(e.globalPos())  ## except for pyside
-    
-    def setAnimationTag(self, tag):
-        if self.mapper.tagSet and tag == 'Clear Tags':
-            self.mapper.clearTagGroup()
-        for pix in self.scene.selectedItems(): 
-            if pix.type != 'pix':
-                continue
-            if tag == 'Clear Tags':
-                pix.tag = ''
-            else:
-                pix.tag = tag
-            pix.anime = None        ## set by play
-            pix.setSelected(False)  ## when tagged 
-        if self.mapper.isMapSet(): 
-            self.mapper.removeMap()
-
 ### -------------------- dotsStoryBoard --------------------
 
 

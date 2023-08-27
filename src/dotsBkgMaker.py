@@ -104,6 +104,7 @@ class BkgMaker(QWidget):
                 self.setBkgColor(QColor(fp.readline()))
         except IOError:
             MsgBox('openBkgFile: Error reading file', 5)
+            return
   
 ### --------------------------------------------------------              
     def addBkg(self, file, flopped=False):  ## also used by saveBkg 
@@ -148,18 +149,21 @@ class BkgMaker(QWidget):
             ## if it's not already a bkg file and the new file doesn't exist
             if not self.bkgItem.fileName.lower().endswith('-bkg.jpg') and not \
                 os.path.exists(paths['bkgPath']+ file):
-                self.bkgItem.fileName = paths['bkgPath'] + file
-                flopped = self.bkgItem.flopped
-                pix = self.canvas.view.grab(QRect(QPoint(1,1), QSize()))
-                pix.save(paths['bkgPath'] + file, format='jpg',
-                    quality=100)
-                MsgBox('Saved as ' + file, 3)
-                self.canvas.clear()  ## replace current background with '-bkg.jpg' copy   
-                self.addBkg(self.bkgItem.fileName, flopped)
+                self.makeBkg(file)
             else:
                 MsgBox('Already saved as background jpg', 5)
         self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
+ 
+    def makeBkg(self, file):
+        self.bkgItem.fileName = paths['bkgPath'] + file
+        flopped = self.bkgItem.flopped
+        pix = self.canvas.view.grab(QRect(QPoint(1,1), QSize()))
+        pix.save(paths['bkgPath'] + file, format='jpg',
+            quality=100)
+        MsgBox('Saved as ' + file, 3)
+        self.canvas.clear()  ## replace current background with '-bkg.jpg' copy   
+        self.addBkg(self.bkgItem.fileName, flopped)
  
     def saveBkgColor(self):  ## write to .bkg file
         Q = QFileDialog()
@@ -178,7 +182,7 @@ class BkgMaker(QWidget):
                 with open(f[0], 'w') as fp:
                     fp.write(self.bkgItem.color.name())
             except IOError:
-                MsgBox('savePlay: Error saving file', 5)
+                MsgBox('saveBkgColor: Error saving file', 5)
                                                                        
     def bkgColor(self):  ## from button or widget   
         if self.canvas.control in PlayKeys:

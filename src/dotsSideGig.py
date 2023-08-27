@@ -199,6 +199,14 @@ def distance(x1, x2, y1, y2):
     dy = y1 - y2
     return math.sqrt((dx * dx ) + (dy * dy)) 
 
+def point(pt, st=''):  ## you never know when you'll need this
+    s = '(' + '{0:2d}'.format(int(pt.x()))
+    s = s + ',' + '{0:2d}'.format(int(pt.y())) + ')' 
+    if st != '':
+        return st +'; ' + s
+    else:
+        return s
+    
 def getCrop(path):  ## from path - bounding size and position
     x, y, x1, y1 = common['ViewW'], common['ViewH'], 0.0, 0.0
     for p in path:

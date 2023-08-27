@@ -4,19 +4,20 @@ import os.path
 import random
 import json
 
-
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect
 from PyQt6.QtGui        import QPen, QColor
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
-                                QApplication
+                                QApplication, QMenu
                                                     
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
-from dotsSideGig     import MsgBox, constrain
+from dotsSideGig     import MsgBox, constrain, getPathList
+from dotsMapItem     import InitMap
+from dotsAnimation   import *
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem, snapShot, toggleGrid, 
-    and assorted small functions, related to storyboard activity '''  
+    and assorted small functions, related to storyboard activity '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -26,9 +27,11 @@ class SideCar:
         self.canvas = parent
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
+        self.mapper = InitMap(self.canvas)
       
-        self.gridZ = common['gridZ']    
-        self.gridGroup = None   
+        self.gridZ     = common['gridZ']    
+        self.gridGroup = None  
+        self.menu      = None 
      
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
@@ -108,7 +111,7 @@ class SideCar:
     
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
-                             
+             
 ### --------------------------------------------------------           
     def toggleMenu(self):
         self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
@@ -122,27 +125,86 @@ class SideCar:
     def pageDown(self, key):
         self.canvas.scroll.pageDown(key)
      
-### --------------------------------------------------------    
-    def clearOutlines(self):
+### --------------------------------------------------------                                                                                                                
+    def toggleOutlines(self):  ## runs from O
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadow:
-                pix.shadowMaker.outline.hide()
-                pix.shadowMaker.hidePoints() 
-                                                                                                           
-    def toggleOutlines(self):  ## runs from shift-H
+            if pix.type == 'pix' and pix.shadowMaker.isActive == True:
+                pix.shadowMaker.works.toggleOutline()
+                                                                                                          
+    def hideOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadow:
-                pix.shadowMaker.toggleOutline()
-                                                                                                                                 
-    def hideSelected(self):  ## with shadows
+            if pix.type == 'pix'and pix.shadowMaker.isActive == True:
+                pix.shadowMaker.works.hideOutline()
+                                                                                                                                                                                                       
+    def hideSelectedShadows(self):  ## runs from shift-H
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadow: 
+            if pix.type == 'pix' and pix.shadowMaker.isActive == True:
                 if pix.isSelected():
                     pix.hide() 
-                elif not pix.isVisible():
+                elif pix.isVisible() == False:
                     pix.show()       
                     pix.setSelected(True)
-                                                                               
+ 
+### --------------------------------------------------------                               
+    def animeMenu(self, pos, where=''):  ## shared with canvas thru context menu
+        self.closeMenu()       ## and with pixitem thru pixwidget
+         
+        self.menu = QMenu(self.canvas)                   
+        alst = sorted(AnimeList)
+        
+        ## basing pathlist on what's in the directory
+        self.canvas.pathList = getPathList(True)  ## names only
+        
+        rlst = sorted(self.canvas.pathList)     
+        alst.extend(['Random']) ## add random to lst
+        
+        self.menu.addAction('Animations and Paths')
+        self.menu.addSeparator()   
+        
+        for anime in alst:
+            action = self.menu.addAction(anime)
+            action.triggered.connect(
+                lambda chk, anime=anime: self.setAnimationTag(anime))
+            
+        self.menu.addSeparator()
+        for anime in rlst:
+            action = self.menu.addAction(anime)
+            action.triggered.connect(
+                lambda chk, anime=anime: self.setAnimationTag(anime))    
+         
+        self.menu.addSeparator()
+        anime = 'Clear Tags'
+        action = self.menu.addAction(anime)
+        action.triggered.connect(
+            lambda chk, anime=anime: self.setAnimationTag(anime))
+        
+        if where == 'pix':
+            self.menu.move(pos) 
+            self.menu.show()
+        else:
+            self.menu.exec(pos)
+         
+    def closeMenu(self):   
+        if self.menu:
+            self.menu.close()
+        self.menu = None    
+    
+    def setAnimationTag(self, tag):
+        self.closeMenu()
+        if self.mapper.tagSet and tag == 'Clear Tags':
+            self.mapper.clearTagGroup()
+        for pix in self.scene.selectedItems(): 
+            if pix.type != 'pix':
+                continue
+            if tag == 'Clear Tags':
+                pix.tag = ''
+            else:
+                pix.tag = tag
+            pix.anime = None        ## set by play
+            pix.setSelected(False)  ## when tagged 
+        if self.mapper.isMapSet(): 
+            self.mapper.removeMap()               
+                
 ### --------------------------------------------------------
     def toggleGrid(self):
         if self.gridGroup:
@@ -151,15 +213,12 @@ class SideCar:
         else: 
             self.gridGroup = QGraphicsItemGroup()  
             self.gridGroup.setZValue(common['gridZ'])
-            self.scene.addItem(self.gridGroup)
-           
+            self.scene.addItem(self.gridGroup)         
             gs = common['gridSize']
-            pen = QPen(QColor(0,0,255))
-         
+            pen = QPen(QColor(0,0,255))       
             for y in range(1, int(common['ViewH']/gs)):
                 self.addLines(QGraphicsLineItem(0.0, gs*y,
                     float(common['ViewW']), gs*y), pen)
-  
             for x in range(1, int(common['ViewW']/gs)):
                 self.addLines(QGraphicsLineItem(gs*x, 0.0,
                     gs*x, float(common['ViewH'])), pen)
@@ -220,7 +279,7 @@ class SideCar:
             except IOError:
                 MsgBox('saveToJson: Error saving file', 5)
         del dlist
-       
+                
 ### ---------------------- dotsSideCar ---------------------
 
 

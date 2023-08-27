@@ -32,14 +32,12 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         super().__init__()
 
         self.resize(VWidth, VHeight)
-
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
-        self.setWindowOpacity(.85)
+        self.setWindowOpacity(.80)
 
         self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.FramelessWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
 
         self.type = 'widget'
@@ -48,7 +46,7 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         self.widget = QWidget(self)
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setFocus()
-
+        
         self.initXY = self.pos()
         self.horizontal = True 
         
@@ -64,6 +62,10 @@ class VHX(QWidget):  ## yet another screen pixel ruler
 ### --------------------------------------------------------
     def paintEvent(self, event):
         painter = QPainter(self)
+        if self.horizontal:  ## need to keep one component constant
+            self.resize(self.width(), VHeight)  ## fixes a small bug 
+        else:                
+            self.resize(VHeight, self.height() )
         painter.setBrush(QColor(128, 255, 0)) 
         painter.drawRect(0, 0, self.width(), self.height() )
         painter.setBrush(Qt.BrushStyle.NoBrush) 
