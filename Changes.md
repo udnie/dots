@@ -17,6 +17,8 @@ A few more key changes; **'O'** now toggles shadow outlines on and off rather th
     
 Scaling up or down can be handled without triggering any issues by editing the **PixSizes** dictionary in **dotsPixWidget.py** and setting the size there rather than using the slider in the pixItem widget as scaling is applied to the pixItem before it hits the canvas.  See the video for the rotation work-around. Also added a button to the pixItem widget to launch the **Animation Menu** and a slider to the pathMaker widget to change the number of seconds it takes Mr.Ball to complete a circuit around a path. The default is 10 seconds.
 
+New video: <<https://youtu.be/FFn2sq3R3nU>>
+
 Of note: I tried running dots in PyQt5 and ran into a problem with QMessageBox taking up an excessive amount of screen space and no longer being very usable - at least on my Mac.  Too many moving parts to know where to begin.
   
 ---
