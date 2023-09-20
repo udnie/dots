@@ -11,11 +11,13 @@ About two hours after I posted my last effort to GitHub and YouTube I had a mome
 
 You'll need to **unlink** the shadow before making any **additional** changes for scaling or rotation but not for opacity. I've made this easier by **not closing** the widget when you click on **'UnLink'** - big win.  The shadow is no longer linked, the widget hasn't gone away, the shadow outline now appears and the unlink button now reads **'Link'**.  Make your changes, **Relink** the shadow and you should be good to go.  
 
-There's more.  Added two buttons to the **BackGround** widget, one to set the **background scrolling** left to right, the other right to left, plus a button to open the **Matte** widget. That adds three more keys to the mix, **shift-R** to run anything runnable, **shift-P** to pause and resume it, and **shift-S** to stop - but only if the **Matte** is displayed which requires a background.
+There's more.  Added two buttons to the **BackGround** widget, one to set the **background scrolling** left to right, the other right to left, plus a button to open the **Matte** widget. That adds three more keys to the mix, **shift-R** to run anything runnable, **shift-P** to pause and resume it, and **shift-S** to stop - but only if the **Matte** is displayed which requires there's a background present.
 
 Lastly, changes to the **scrolling background** making it possible to have two running at the same time in the same or opposite in directions.
 
-New video:
+There are two problems I've encountered recently. The first was with **QMessageBox** not displaying correctly in PyQt5 and this known Apple/Python bug [:] **+[CATransaction synchronize] called within transaction**, can cause dots to end abruptly, at least on my M1 Mac running Ventura. 
+
+New video: <https://youtu.be/FZTsYaU3Eiw>
 
 ---
 
