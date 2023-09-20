@@ -1,141 +1,10 @@
 
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QRectF
-from PyQt6.QtGui        import QColor, QPen, QPainter, QPolygonF
-from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox,   QDial, QGraphicsPolygonItem, \
-                               QLabel, QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
-    
-from dotsShared         import common    
-from dotsSideGig        import point
-    
-V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget       
-                                            
-### ------------------- dotsShadowWidget -------------------
-''' class: ShadowWidget, Works '''
-### --------------------------------------------------------
-class Works:  ## small functions that were in ShadowMaker
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
- 
-        self.maker = parent
-        self.scene = self.maker.scene
-        
-### --------------------------------------------------------
-    def resetSliders(self): 
-        self.maker.widget.opacitySlider.setValue(int(self.maker.alpha*100))
-        self.maker.widget.opacityValue.setText('{0:.2f}'.format((self.maker.alpha)))
-        self.maker.widget.scaleSlider.setValue(int(self.maker.scalor*100))
-        self.maker.widget.scaleValue.setText('{0:.2f}'.format(int(self.maker.scalor*100)))
-        self.maker.widget.rotaryDial.setValue(int(self.maker.rotate))
-        self.maker.widget.rotateValue.setText('{:3d}'.format(int(self.maker.rotate)))
-         
-    def closeWidget(self):
-        if self.maker.widget != None:
-            self.maker.widget.close()          
-            if self.maker.shadow != None and self.maker.linked:
-                self.maker.pixitem.key = 'return'  ## trying to fake-out the tag showing      
-        self.maker.widget = None  
-                                                     
-    def cleanUpShadow(self):  
-        self.closeWidget()
-        self.deletePoints()  
-        self.deleteOutline()
-        self.removeShadow()
-   
-    def deleteShadow(self): 
-        if self.maker.shadow != None:
-            self.cleanUpShadow()
-        self.maker.shadow = None
- 
-    def removeShadow(self):
-        if self.maker.shadow != None:
-            self.scene.removeItem(self.maker.shadow)
-        self.maker.shadow = None 
- 
-    def hideAll(self):
-        if self.maker.isHidden == False:
-            self.maker.isHidden = True
-            if self.maker.outline != None and \
-                self.maker.outline.isVisible() == True:
-                self.hideOutline()
-        elif self.maker.isHidden == True: 
-            self.maker.isHidden = False   
-            self.showOutline() 
-    
-    def addPointsToScene(self):
-        for p in self.maker.points:   
-            if self.maker.isHidden:
-                p.hide()                              
-            self.scene.addItem(p)
-                             
-    def deletePoints(self):  ## the path stays
-        for p in self.maker.points:  
-            self.scene.removeItem(p) 
-            del p
-        self.maker.points = [] 
- 
-    def updateOutline(self): 
-        self.deleteOutline()
-        self.maker.outline = QGraphicsPolygonItem(self.makeOutline()) 
-        self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
-        self.maker.outline.setZValue(common['outline'])       
-        if self.maker.linked: ## used throughout shadow and updateShadow
-            self.hideOutline()      
-        self.addOutline()
-                                                                         
-    def addOutline(self):
-        self.scene.addItem(self.maker.outline)
-
-    def deleteOutline(self): 
-        if self.maker.outline != None:
-            self.scene.removeItem(self.maker.outline)
-        self.maker.outline = None
-                      
-    def makeOutline(self):  
-        outline = QPolygonF()   
-        for p in self.maker.path:  
-            outline.append(QPointF(p))
-        return outline 
-                              
-    def hidePoints(self, hide=True): 
-        for p in self.maker.points:       
-            p.hide() if hide == True else p.show()  
-                              
-    def hideOutline(self):
-        if self.maker.outline != None:
-            self.maker.outline.hide()
-            self.hidePoints()  ## default True       
-            
-    def showOutline(self):
-        if self.maker.outline != None:
-            self.maker.outline.setVisible(True)
-            self.maker.updatePath(self.maker.shadow.save) 
-            self.updateOutline()
-            self.maker.outline.show()
-            self.hidePoints(False)      
-   
-    def toggleOutline(self):
-        if self.maker.outline != None:
-            if self.maker.outline.isVisible() == True:
-                self.hideOutline()  
-            elif self.maker.outline.isVisible() == False:
-                self.showOutline()            
-                                                                   
-    def rotateShadow(self, val): 
-        inc = (val - self.maker.rotate)
-        self.maker.rotateScale(0, -inc)
-        self.maker.rotate = val
-      
-    def scaleShadow(self, val): 
-        per = (val - self.maker.scalor) / self.maker.scalor    
-        self.maker.rotateScale(per, 0)
-        self.maker.scalor = val
-                                                                                                             
-    def pixWidthHeight(self):
-        b = self.maker.pixitem.boundingRect()
-        return self.maker.pixitem.fileName, b.width(), b.height() 
-                                                                                                                                                        
-### --------------------------------------------------------        
+from PyQt6.QtGui        import QColor, QPen, QPainter
+from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QLabel, QDial, \
+                               QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
+                                                   
+### ------------------- dotsShadowWidget -------------------                                                                                                                                                        
 class ShadowWidget(QWidget): 
 ### -------------------------------------------------------- 
     def __init__(self, parent):
@@ -143,9 +12,10 @@ class ShadowWidget(QWidget):
                                         
         self.maker = parent                          
         self.works = self.maker.works
+        self.pix   = self.maker.pixitem
         
         self.type = 'widget'
-        self.save = QPointF(0.0,0.0)
+        self.save = QPointF()
                 
         self.setAccessibleName('widget')
         self.WidgetW, self.WidgetH = 330.0, 225.0
@@ -198,6 +68,26 @@ class ShadowWidget(QWidget):
         self.works.closeWidget()
         e.accept()
         
+### --------------------------------------------------------
+    def Rotate(self, val): 
+        if self.maker.linked == False:
+            self.maker.shadow.setOriginPt()
+            self.works.rotateShadow(val)
+            self.rotateValue.setText('{:3d}'.format(val))
+             
+    def Scale(self, val):  
+        if self.maker.linked == False:
+            self.maker.shadow.setOriginPt()
+            op = (val/100)
+            self.works.scaleShadow(op) 
+            self.scaleValue.setText('{0:.2f}'.format(op))
+                    
+    def Opacity(self, val):
+        op = (val/100)
+        self.maker.shadow.setOpacity(op)
+        self.maker.alpha = op
+        self.opacityValue.setText('{0:.2f}'.format(op))        
+              
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')
@@ -271,7 +161,7 @@ class ShadowWidget(QWidget):
         groupBox.setFixedWidth(103)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
-        hideBtn = QPushButton('Hide')
+        hideBtn = QPushButton('Outline')
         flipBtn  = QPushButton('Flip')
         flopBtn  = QPushButton('Flop')
         self.linkBtn = QPushButton('Link')
@@ -279,8 +169,8 @@ class ShadowWidget(QWidget):
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
     
-        hideBtn.clicked.connect(self.works.hideOutline)  ## that's it, no toggle
-        flipBtn.clicked.connect(self.maker.flip)
+        hideBtn.clicked.connect(self.works.toggleOutline)  
+        flipBtn.clicked.connect(self.works.flip)
         flopBtn.clicked.connect(self.maker.flop)
         self.linkBtn.clicked.connect(self.maker.toggleLink)
         newBtn.clicked.connect(self.maker.newShadow)
@@ -298,25 +188,7 @@ class ShadowWidget(QWidget):
                 
         groupBox.setLayout(hbox)
         return groupBox
-    
- ### --------------------------------------------------------
-    def Rotate(self, val): 
-        if self.maker.linked == False:
-            self.works.rotateShadow(val)
-            self.rotateValue.setText('{:3d}'.format(val))
-             
-    def Scale(self, val):  
-        if self.maker.linked == False:
-            op = (val/100)
-            self.works.scaleShadow(op) 
-            self.scaleValue.setText('{0:.2f}'.format(op))
-                    
-    def Opacity(self, val):
-        if self.maker.linked == False:
-            op = (val/100)
-            self.maker.shadow.setOpacity(op)
-            self.maker.alpha = op
-            self.opacityValue.setText('{0:.2f}'.format(op)) 
-                                                                                                                                                                                                               
+                                                                                                                                                                                                                   
 ### ------------------- dotsShadowWidget -------------------
+
 

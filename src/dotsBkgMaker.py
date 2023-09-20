@@ -5,67 +5,20 @@ import gc
 
 from functools          import partial
        
-from PyQt6.QtCore       import Qt, QPoint, QPointF, QRect, QRectF, QTimer, QSize
-from PyQt6.QtGui        import QColor, QPainter, QPen, QPixmap
+from PyQt6.QtCore       import Qt, QPoint, QRect, QTimer, QSize
+from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
-                                QColorDialog, QLabel, QHBoxLayout,  QGraphicsItem
+                                QColorDialog
 
 from dotsSideGig        import MsgBox
 from dotsShared         import common, paths, PlayKeys
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
+from dotsBkgMatte       import Flat
 
 ### --------------------- dotsBkgMaker ---------------------
-''' classes:  Flat, BkgMaker '''        
-### --------------------------------------------------------
-class Flat(QGraphicsPixmapItem):
-### --------------------------------------------------------   
-    def __init__(self, color, canvas, z=common['bkgZ']):
-        super().__init__()
-
-        self.canvas   = canvas
-        self.scene    = canvas.scene
-        self.bkgMaker = self.canvas.bkgMaker
-        
-        self.type = 'bkg'
-        self.color = color
-        
-        self.fileName = 'flat'
-        self.locked = False
-        
-        self.tag = ''
-        self.id = 0   
-
-        p = QPixmap(common['ViewW'],common['ViewH'])
-        p.fill(self.color)
-        
-        self.setPixmap(p)
-        self.setZValue(z)
-   
-        self.setFlag(QGraphicsItem.GraphicsItemFlag.ItemIsMovable, False)
-        
-### --------------------------------------------------------
-    def mousePressEvent(self, e):      
-        if not self.canvas.pathMakerOn:
-            if e.button() == Qt.MouseButton.RightButton:    
-                self.bkgMaker.addWidget(self)        
-            elif self.canvas.key == 'del':     
-                self.delete()
-            elif self.canvas.key == '/':  ## to back
-                self.bkgMaker.back(self)
-            elif self.canvas.key in ('enter','return'):  
-                self.bkgMaker.front(self)                             
-        e.accept()
-      
-    def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
-            self.canvas.key = ''       
-        e.accept()
-     
-    def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
-    
+''' classes: BkgMaker - creates and supports BkgItem '''         
 ### --------------------------------------------------------
 class BkgMaker(QWidget):  
 ### --------------------------------------------------------
@@ -152,6 +105,7 @@ class BkgMaker(QWidget):
                 self.makeBkg(file)
             else:
                 MsgBox('Already saved as background jpg', 5)
+                return
         self.canvas.btnAddBkg.setEnabled(True)
         self.disableBkgBtns()
  
@@ -198,8 +152,8 @@ class BkgMaker(QWidget):
     def delScroller(self, pix):
         self.scene.removeItem(pix)
         del pix
-        self.num += 1
-        if self.num % 3 == 0: gc
+        # self.num += 1  ## tesing may not need it
+        # if self.num % 3 == 0: gc
  
 ### -------------------------------------------------------- 
     def addWidget(self, item):  ## background widget

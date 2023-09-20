@@ -97,7 +97,7 @@ class SideShow:
 ### --------------------------------------------------------                            
     def loadPlay(self):   
         if self.canvas.pathMakerOn:  ## using load in pathMaker
-            self.pathMaker.sideWays.openFiles()
+            self.pathMaker.pathWays.openFiles()
             return
         else: 
             Q = QFileDialog()

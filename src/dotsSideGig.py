@@ -5,13 +5,14 @@ import math
 
 from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint, QSize
 from PyQt6.QtGui        import QPainter, QBrush, QFontMetrics, QColor, QFont, \
-                                QGuiApplication, QImage, QPixmap
-from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem
+                                QGuiApplication, QImage, QPixmap, QPen
+from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem, QPushButton, \
+                                QWidget, QVBoxLayout, QDialog, QHBoxLayout,QLabel
 
 from dotsShared         import common, paths, pathcolors, PlayKeys
 
 ### ---------------------- dotsSideGig ---------------------
-''' classes: MsgBox, TagIt - plus savePix, saveBkg, saveFlat...'''
+''' classes: MsgBox, TagIt - plus savePix ...'''
 ### --------------------------------------------------------
 class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------

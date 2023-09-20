@@ -122,7 +122,7 @@ class ControlView(QGraphicsView):
                     self.mapper.toggleTagItems('paths') 
             elif key == Qt.Key.Key_W:  ## show waypts
                 if self.canvas.pathMakerOn:  
-                    self.canvas.pathMaker.sideWays.addWayPtTags()  
+                    self.canvas.pathMaker.pathWays.addWayPtTags()  
             elif key == Qt.Key.Key_O:         
                  self.sideCar.hideOutlines()                 
             elif key == Qt.Key.Key_T:         
@@ -131,15 +131,15 @@ class ControlView(QGraphicsView):
                 self.sideCar.hideSelectedShadows()
                 self.sideCar.clearWidgets()
                 self.sideCar.toggleOutlines()
-           
-        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and self.canvas.pathMakerOn == False:
-            if mod & Qt.KeyboardModifier.AltModifier:  ## used by scrollpanel to scroll sprites 
-                self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('up')    
+          
+        ## used by scrollpanel to scroll sprites  
+        elif mod & Qt.KeyboardModifier.AltModifier and self.canvas.pathMakerOn == False:
+            self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
+                self.sideCar.pageDown('up')    
                              
-            elif mod & Qt.KeyboardModifier.ControlModifier: 
-                self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('-1') 
+        elif mod & Qt.KeyboardModifier.ControlModifier and self.canvas.pathMakerOn == False:
+            self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
+                self.sideCar.pageDown('-1') 
                             
         # shift keys used in locking screen items - L, R, U
         elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:

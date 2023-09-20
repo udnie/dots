@@ -4,7 +4,7 @@
 As of **May 2023** dots was updated to **PyQt 6.5**, **Python 3.11.3** and **Ventura 13.4**. You need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.  Dots doesn't currently run in **PySide6** and
 **PyQt 5.17** now has issues with QMessageBox on my current setup.
 
-**StartHere.md** is next in line for an update so I'd ignore it for now. See **Changes.md** and **keys.pdf** for further documentation and links to videos - the earlier ones best watched with closed captions as I was very intimated by having to speak into a very visible microphone.
+**StartHere.md** has been updated as well as **Changes.md** and **keys.pdf** .  See **Changes** for the latest documentation and links to videos - the earlier ones best watched with closed captions as I was very intimated by having to speak into a very visible microphone.
 	  
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. 400 lines now seems to the current average. I also use camel case after many years of coding in snake.
@@ -25,14 +25,12 @@ The **star** in scrollPanel isn't currently designed to be dragged to the canvas
 
 
 ## Requirements
-* PyQt6 though you can still run using PyQt5 with some edits
-* functools
+* PyQt6 though you can probably still run PyQt5 with some edits 
+* functools, though I'm sure it's built-in
 * cv2 and numpy for Sprites and Shadows
-* Your favorite program for creating transparent pngs if you have one or try **ShadowMaker**, it works.
+* Your favorite program for creating transparent pngs if you have one or try **ShadowMaker**, it works and requires cv2 and numpy.
 
 ## Lastly
 My background combines degrees in fine arts, photography and ceramics, work as a graphics artist, layout artist, photography teacher, and a 21 year career as a business application programmer. All procedural code and other than Fortran, languages you probably never heard of. 
-
-This is my first PyQt app and it wouldn't have been possible without Stack OverFlow and Google Search.
 
 Special thanks to Martin Fitzpatrick of <https://www.learnpyqt.com> for taking a look at the last update and for his recommendations and code contributions.  Thanks again, Martin

@@ -17,7 +17,7 @@ from dotsAnimation   import *
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem, snapShot, toggleGrid, 
-    and assorted small functions, related to storyboard activity '''   
+    animationMenu, assorted small functions and a few from sideShow '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -122,11 +122,11 @@ class SideCar:
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
     
-    def pageDown(self, key):
+    def pageDown(self, key):  ## for sprite scrollPanel
         self.canvas.scroll.pageDown(key)
      
 ### --------------------------------------------------------                                                                                                                
-    def toggleOutlines(self):  ## runs from O
+    def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker.isActive == True:
                 pix.shadowMaker.works.toggleOutline()
@@ -146,8 +146,8 @@ class SideCar:
                     pix.setSelected(True)
  
 ### --------------------------------------------------------                               
-    def animeMenu(self, pos, where=''):  ## shared with canvas thru context menu
-        self.closeMenu()       ## and with pixitem thru pixwidget
+    def animeMenu(self, pos, where=''): ## shared with canvas thru context menu
+        self.closeMenu()                ## and with pixitem thru pixwidget
          
         self.menu = QMenu(self.canvas)                   
         alst = sorted(AnimeList)
@@ -258,7 +258,7 @@ class SideCar:
         self.canvas.btnStop.setEnabled(True)  
         self.canvas.btnSave.setEnabled(False)  
 
-    def saveToJson(self, dlist):     
+    def saveToPlays(self, dlist):     
         if self.canvas.openPlayFile == '':
             self.canvas.openPlayFile = paths['playPath'] + 'tmp.play'       
         Q = QFileDialog()        
@@ -270,14 +270,14 @@ class SideCar:
         if not f[0]: 
             return
         if not f[0].lower().endswith('.play'):
-            MsgBox("saveToJson: Wrong file extention - use '.play'", 5)  
+            MsgBox("saveToPlays: Wrong file extention - use '.play'", 5)  
             return
         else:
             try:
                 with open(f[0], 'w') as fp:
                     json.dump(dlist, fp)
             except IOError:
-                MsgBox('saveToJson: Error saving file', 5)
+                MsgBox('saveToPlays: Error saving file', 5)
         del dlist
                 
 ### ---------------------- dotsSideCar ---------------------

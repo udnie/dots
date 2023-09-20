@@ -1,16 +1,15 @@
 
-### Last Update: 08/22/2023
+### Last Update: 09/19/2023
        
 ---
        
 **Files and Directories**   
-There are two directories that you should be aware of - **sprites** and **backgrounds**.  That's where your stuff needs to go if you want to do something other than play with the **sprites** and **backgrounds** already there. What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend keeping the file under **500MB** in size especially if you plan on scrolling it.
+There are four directories that you should be aware of - **sprites** and **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to do something other than play with the **sprites** and **backgrounds** already there. What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend using a .jpg file and keeping it under or around **500MB** in size.   Format it to **1280X640** pixels if you plan on scrolling it.
 
 If you have a current model iPhone, iPad, or Mac you may be able to generate a sprite using **Remove BackGround** as found in Preview Tools or in Photos on IOS devices by using your fingers or mouse to save a selection with the background removed. You also can look into using **SpriteMaker**. There's a write-up and a video for it.
 
-Besides the **sprites** and **backgrounds** directories there are two others, **plays** and **paths**, that you should become acquainted with. A **.play** file is a **.json** file which holds the **sprite** and **background** information used to restore the last saved canvas while a **.path** file is a collection of screen point locations used in animating a path for sprites to follow.
+The **plays** directory is made up of **.json** formatted **.play** files used to store **animated scenes** or **collage** data required to restore the last saved scene/canvas while the **paths** directory is made up of **.path** files, a list of screen point locations, used in building animated paths for sprites to follow.
 
-A **.play** file can also be used in creating a **photo collage** without any animations.
 
 Along with these four directories there are the **demo, images, shadows, spriteMaker, src**, and **txy** directories.  The **demo** and **images** directories contain some photo assets and demo path files and are primarily used in keeping the **sprites** and **backgrounds** directories free of unnecessary clutter. 
 
@@ -44,7 +43,7 @@ ___
 There are three files I'd suggest looking at - **dotsControlView.py**, **dotsShared**, and **dotsScreens.py**. **ControlView** handles **drag** and **drop** and most of the key stroke entries - except where it doesn't such as in **Matte**.  **Shared** is made up of lists and dictionaries that are shared throughout dots and **Screens** contains all or most of the code and data used in reformatting and sizing **dots**.
 
 **Menus and Their Locations**   
-The menu for choosing **Animations and Paths** is located in **dotsSideCare.py**, the **Screen Menu** is in **dotsScreens.py** and the **Demo Menu** is in **dotsSnakes.py** as many of the demos have to do with what I call snakes.   
+The menu for choosing **Animations and Paths** is located in **dotsSideCar.py**, the **Screen Menu** is in **dotsScreens.py** and the **Demo Menu** is in **dotsSnakes.py** as many of the demos have to do with what I call snakes.   
 
 
 ---
@@ -94,7 +93,7 @@ For **scrolling backgrounds** it gets more interesting.
  
 This dictionary is located in **dotsBkgItem.py**, the **background class** file. It's very likely the values I used in the video on **scrolling backgrounds** won't work for you without some attention. Pick one screen format to work with and get it scrolling without gaps or overlapping. If you look at the numbers, excluding the **'620' vertical**, you'll see there are two groups of values not very far apart. One being the **3:2** and the other **16:9**.  It's a good guess the other screen values you would need will be very close but there's no reason to update them unless you plan to try out all the formats.
 
-The another file you might want to investigate is **dotsBkgWidget.py** for making changes to the **Matte** class.  There are four class variables to consider, two that hold the matte colors, one for the photo and one that modifies the height in order to resize and reformat. You would need to edit the file inorder to change any one of these variables. 
+The another file you might want to investigate is **dotsBkgMatte.py** for making changes to the **Matte** class.  There are four class variables to consider, two that hold the matte colors, one for the photo and one that modifies the height in order to resize and reformat. You would need to edit the file inorder to change any one of these variables. 
 
 ---
 

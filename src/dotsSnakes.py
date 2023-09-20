@@ -211,7 +211,7 @@ class Snakes:
             self.scene.addItem(scroll)
                          
         MsgBox('Processing...' + '  ', 2, getCtr(-100,-175))
- 
+     
 ### -------------------------------------------------------- 
         k = 0  ## outside counter - number of paths - quit at 3
         self.canvas.pixCount = 400  ## nothing else on the screen except background

@@ -59,8 +59,7 @@ class StoryBoard(QWidget):
                  
         self.sideShow  = SideShow(self)  ## reads .play files    
         self.showTime  = ShowTime(self)  ## runs anything tagged as an animation 
-     
-           
+         
         addScrollDock(self)  ## add button groups from dotsDocks
         addKeysDock(self)
         addButtonDock(self)  
@@ -85,7 +84,6 @@ class StoryBoard(QWidget):
     @pyqtSlot(str)
     def setKeys(self, key):  ## managing storyboard and pathMaker
         self.key = key  
-        
         if self.key == 'C':  ## clear canvas
             if self.pathMakerOn:
                 if len(self.scene.items()) == 0:
@@ -100,12 +98,12 @@ class StoryBoard(QWidget):
                 if self.key in Play:  ## clear screen canvas hotkeys 
                     if self.key == 'A' and len(self.scene.items()) > 0:
                         self.canvas.selectAll()
-                    else:
-                        self.sideShow.keysInPlay(self.key)    
+                    else:  ## need to slow it down after changing screen format
+                        QTimer.singleShot(100, partial(self.sideShow.keysInPlay, self.key))  
                 else:
                     self.sendPixKeys()      
                              
-        ## send MoveKeys to PointItem selections in PathEdits
+        ## send MoveKeys to PathItem selections in PathEdits
         elif self.pathMaker.drawing.pointItemsSet() == True and \
             self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
                 self.sendPixKeys()  ## pointItems get messaged

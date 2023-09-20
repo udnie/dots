@@ -10,7 +10,7 @@ from dotsShared         import paths, common
 from dotsSideGig        import getOffSet, MsgBox, DemoAvailable
 
 ### ---------------------- dotsSidePath --------------------
-''' dotsPath is used by storyboard, sideshow, animations, 
+''' dotsSidePath is used by storyboard, sideshow, animations, 
     pathmaker and contains demo, setPath, pathLoader.
     Mostly all of the original demo is here '''
 ### --------------------------------------------------------

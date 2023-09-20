@@ -1,22 +1,23 @@
 
-from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot,QTimer, QPropertyAnimation
-from PyQt6.QtGui        import QColor, QPen, QPixmap, QPainterPath
-from PyQt6.QtWidgets    import QGraphicsPixmapItem, QWidget, QGraphicsPolygonItem, \
+from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot
+from PyQt6.QtGui        import QColor, QPen, QPainterPath
+from PyQt6.QtWidgets    import QWidget, QGraphicsPolygonItem, \
                                 QGraphicsPathItem
 
 from dotsAnimation      import *                          
 from dotsSideGig        import MsgBox, getColorStr, distance, getCtr
-from dotsShared         import common, paths, MoveKeys, ScaleRotateKeys
+from dotsShared         import common, MoveKeys, ScaleRotateKeys
 from dotsSideCar        import SideCar
-from dotsSideWays       import SideWays
+from dotsPathWays       import PathWays
 from dotsPathEdits      import PathEdits
-from dotsPathWidget     import PathWidget, DoodleMaker
-from dotsAbstractBats   import Bats
+from dotsPathItem       import DoodleMaker
+from dotsPathWorks      import PathWorks
+from dotsPathWidget     import PathWidget
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,
     pathlist, and path modifier functions...'''
-''' moved all scene references from sideWays to pathMaker '''
+''' moved all scene references from pathWays to pathMaker '''
 ### --------------------------------------------------------
 class PathMaker(QWidget):
 ### --------------------------------------------------------
@@ -31,14 +32,16 @@ class PathMaker(QWidget):
          
         self.animation = Animation(self.canvas) 
         self.sideCar   = SideCar(self.canvas) 
-        
-        self.widget = None  ## main pathMaker widget 
        
+        self.widget    = None  ## main pathMaker widget 
+        self.seconds   = 10  ## set how long it takes mr.ball to complete a path
+     
+        self.pathWorks = PathWorks(self)          
+        self.pathWays  = PathWays(self)  ## extends pathMaker
+        self.drawing   = PathEdits(self, self.pathWays) 
+               
         self.initThis()
-           
-        self.sideWays = SideWays(self)  ## extends pathMaker
-        self.drawing  = PathEdits(self, self.sideWays) 
-                  
+             
         self.doFirst = {
             'D':   self.delete,
             '/':   self.changePathColor,
@@ -46,37 +49,37 @@ class PathMaker(QWidget):
         }
 
         self.direct = {
-            'F': self.sideWays.openFiles,
+            'F': self.pathWays.openFiles,
             'P': self.pathChooser,
             'E': self.drawing.editPoints,
-            '{': self.sideWays.flipPath,
-            '}': self.sideWays.flopPath,
+            '{': self.pathWays.flipPath,
+            '}': self.pathWays.flopPath,
         }
 
         self.editKeys = {
             'E': self.drawing.editPoints,
-            'R': self.sideWays.reversePath,
-            'S': self.sideWays.savePath,
-            'T': self.pathTest,   
-            '!': self.sideWays.halfPath,
-            '@': self.sideWays.fullPath,
+            'R': self.pathWays.reversePath,
+            'S': self.pathWays.savePath,
+            'T': self.pathWorks.pathTest,   
+            '!': self.pathWays.halfPath,
+            '@': self.pathWays.fullPath,
        'delPts': self.drawing.deleteSections,
         }
 
         self.noPathKeysSet = {
-            'T': self.pathTest,
-            'C': self.sideWays.centerPath,    
-            'R': self.sideWays.reversePath,
-            'S': self.sideWays.savePath,     
+            'T': self.pathWorks.pathTest,
+            'C': self.pathWays.centerPath,    
+            'R': self.pathWays.reversePath,
+            'S': self.pathWays.savePath,     
             'N': self.drawing.toggleNewPath,
         }
 
         self.WayPtsKeys = {
-            '!': self.sideWays.halfPath,
-            '@': self.sideWays.fullPath,
-            'V': self.drawing.togglePointItems,
-            '<': self.sideWays.shiftWayPtsLeft,
-            '>': self.sideWays.shiftWayPtsRight,
+            '!': self.pathWays.halfPath,
+            '@': self.pathWays.fullPath,
+            'V': self.drawing.togglePathItems,
+            '<': self.pathWays.shiftWayPtsLeft,
+            '>': self.pathWays.shiftWayPtsRight,
         }
 
         self.view.viewport().installEventFilter(self)
@@ -87,16 +90,14 @@ class PathMaker(QWidget):
         self.selections = []  ## needs to here, strongest reference
   
         self.color = 'DODGERBLUE'
-        
+           
         self.key = ''
         self.openPathFile = '' 
         self.tag = ''
  
         self.npts = 0  ## used by addNewPathPts
         self.last = 0
-        
-        self.seconds = 10  ## set how long it takes mr.ball to complete a path
-         
+             
         self.addingNewPath = False
         self.pathSet = False
         self.pathChooserSet = False
@@ -119,8 +120,8 @@ class PathMaker(QWidget):
         if key in self.doFirst:
             self.doFirst[key]()  ## run the function, value
                     
-        elif self.key == 'E' and self.sideWays.tagCount() > 0:
-            self.sideWays.removeWayPtTags()
+        elif self.key == 'E' and self.pathWays.tagCount() > 0:
+            self.pathWays.removeWayPtTags()
             if self.selections:
                 self.editingPts = True
                 self.drawing.updatePath()
@@ -140,17 +141,17 @@ class PathMaker(QWidget):
             if self.selections:
                 self.drawing.updatePath()
 
-        elif self.sideWays.tagCount() == 0 and self.addingNewPath == False:
+        elif self.pathWays.tagCount() == 0 and self.addingNewPath == False:
             if self.key in self.direct: 
                 self.direct[self.key]() 
 
             elif len(self.pts) > 0:  ## works with edit - no points selected
                 if self.key in MoveKeys and self.selections == []:
-                    self.sideWays.movePath(MoveKeys[self.key])
+                    self.pathWays.movePath(MoveKeys[self.key])
                 elif self.key in ScaleRotateKeys:
-                    self.sideWays.scaleRotate(self.key)
+                    self.pathWorks.scaleRotate(self.key)
 
-        elif self.sideWays.tagCount() > 0 and self.key in self.WayPtsKeys:
+        elif self.pathWays.tagCount() > 0 and self.key in self.WayPtsKeys:
             self.WayPtsKeys[self.key]() 
 
 ### --------------------- event filter ----------------------   
@@ -180,7 +181,7 @@ class PathMaker(QWidget):
 
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
-        if self.sideWays.pixCount() > 0 and not self.canvas.pathMakerOn:
+        if self.pathWays.pixCount() > 0 and not self.canvas.pathMakerOn:
             MsgBox('Clear Scene First to run PathMaker', 5)
             return
         if self.canvas.pathMakerOn:
@@ -192,19 +193,29 @@ class PathMaker(QWidget):
                 self.keysPanel.toggleMenu()
             self.turnGreen()
             self.addWidget()  ## on start up 
-
+                    
+    def addWidget(self):
+        self.pathWorks.closeWidget()
+        self.widget = PathWidget(self)       
+        p = common['widgetXY']
+        p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))                          
+        self.widget.setGeometry(p.x(), p.y(), \
+            int(self.widget.WidgetW), int(self.widget.WidgetH))
+        if self.addingNewPath:
+            self.drawing.editBtn('ClosePath')
+            
     def turnGreen(self):
         self.canvas.btnPathMaker.setStyleSheet(
             'background-color: LIGHTGREEN')
         if self.widget: self.widget.newBtn.setText('NewPath')  ## just to be sure
          
     def delete(self):
-        self.stopPathTest()
+        self.pathWorks.stopPathTest()
         self.drawing.deleteLasso()    ## reset cursor
         self.drawing.deleteNewPath()  ## turns green if nothing else
         self.drawing.removeNewPath()
         self.drawing.editPointsOff()
-        self.sideWays.removeWayPtTags()
+        self.pathWays.removeWayPtTags()
         self.removePath()
         self.pathChooserOff() 
         self.scene.clear()
@@ -250,21 +261,6 @@ class PathMaker(QWidget):
         self.poly = None
                     
 ### --------------------------------------------------------
-    def addWidget(self):
-        self.closeWidget()
-        self.widget = PathWidget(self)       
-        p = common['widgetXY']
-        p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))                          
-        self.widget.setGeometry(p.x(), p.y(), \
-            int(self.widget.WidgetW), int(self.widget.WidgetH))
-        if self.addingNewPath:
-            self.drawing.editBtn('ClosePath')
-  
-    def closeWidget(self):
-        if self.widget != None:
-            self.widget.close()
-            self.widget = None
-
     def pathChooser(self): 
         if not self.pathChooserSet and not self.addingNewPath:
             if not self.editingPts:
@@ -295,16 +291,16 @@ class PathMaker(QWidget):
   
     def removePath(self):       
         if self.pathSet:
-            self.sideWays.removeWayPtTags()  
+            self.pathWays.removeWayPtTags()  
             self.scene.removeItem(self.path)
             self.pathSet = False
             self.path = None
       
     def redrawPathsAndTags(self):
-        self.sideWays.removeWayPtTags()
+        self.pathWays.removeWayPtTags()
         self.removePath()
         self.addPath()
-        self.sideWays.addWayPtTags()
+        self.pathWays.addWayPtTags()
 
     def changePathColor(self):
         self.color = getColorStr()
@@ -322,49 +318,6 @@ class PathMaker(QWidget):
         if bool: path.closeSubpath()
         return path
     
-### ---------------------- pathTest ------------------------
-    def pathTest(self):
-        if self.pts and self.pathSet:
-            if not self.pathTestSet:
-                self.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + \
-                    'ball.png'))
-                node = Node(self.ball)
-                self.ball.setZValue(self.drawing.findTop()+10)
-       
-                self.pathTestNode = QPropertyAnimation(node, b'pos')
-                self.pathTestNode.setDuration(self.seconds * 1000)
-
-                path = self.setPaintPath(True)  ## close subpath, uses    
-                b = self.ball.boundingRect() 
-                pt = QPointF(b.width()/2, b.height()/2)
-           
-                self.pathTestNode.setStartValue(path.pointAtPercent(0.0)-pt)
-                for i in range(1, 99):   
-                    self.pathTestNode.setKeyValueAt(
-                        i/100.0, 
-                        path.pointAtPercent(i/100.0)-pt
-                        )
-                self.pathTestNode.setEndValue(path.pointAtPercent(1.0)-pt) 
-                self.pathTestNode.setLoopCount(-1) 
-                del path
-                self.startPathTest()
-            else:
-                self.stopPathTest()
-
-    def startPathTest(self):
-        self.scene.addItem(self.ball)
-        self.pathTestNode.start()
-        self.pathTestSet = True
-
-    def stopPathTest(self): 
-        if self.pathTestSet:  
-            self.pathTestNode.stop()
-            self.scene.removeItem(self.ball)
-            self.ball = None
-            self.pathTestNode = None
-            self.pathTestSet = False
-            self.drawing.redrawPoints(self.drawing.pointItemsSet())
-
 ### -------------------- dotsPathMaker ---------------------
 
 

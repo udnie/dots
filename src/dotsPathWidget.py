@@ -1,29 +1,21 @@
 
-import os
-import math
+from PyQt6.QtCore       import Qt, QPoint, QRectF, QPointF
+from PyQt6.QtGui        import QColor, QPen, QPainter, QPen
+from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
+                               QHBoxLayout, QVBoxLayout, QPushButton, QVBoxLayout
 
-from PyQt6.QtCore       import Qt, QPoint, QRectF, QPointF,QSize, QEvent
-from PyQt6.QtGui        import QColor, QPen, QPainter, QPen, QPolygonF, QFontMetrics, \
-                               QFont, QBrush
-from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, QHBoxLayout,  \
-                               QVBoxLayout, QPushButton,QScrollArea, QGridLayout, QVBoxLayout
-
-from dotsSideGig        import getPathList, getPts
-
-ScaleRotate = ('<', '>', '+', '-')  ## sent from keyboard
-
-### --------------------------------------------------------        
+### -------------------- dotsPathWidget---------------------       
 class PathWidget(QWidget): 
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
                                         
         self.pathMaker = parent
-        self.sideWays  = self.pathMaker.sideWays 
-        self.drawing   = self.pathMaker.drawing 
-        
+        self.pathWays  = self.pathMaker.pathWays 
+        self.widget    = self.pathMaker.widget  
+            
         self.type = 'widget'
-        self.save = QPointF(0.0,0.0)
+        self.save = QPointF()
         
         self.WidgetW, self.WidgetH = 330.0, 215.0
         
@@ -79,12 +71,41 @@ class PathWidget(QWidget):
         self.save = e.globalPosition()
         
     def mouseDoubleClickEvent(self, e):
-        self.pathMaker.closeWidget()
+        self.pathMaker.pathWorks.closeWidget()
         e.accept()
-   
+  
+ ### --------------------------------------------------------    
     def resetSliders(self):
         self.secondsSlider.setValue(self.pathMaker.seconds)
    
+    def Seconds(self, val):  
+        self.pathMaker.seconds = val    
+        self.secondsValue.setText('{:2d}'.format(val))
+   
+    def Rotate(self, val): 
+        self.rotatePath(val)
+        self.rotateValue.setText('{:3d}'.format(val))
+   
+    def rotatePath(self, val): 
+        inc = (val - self.rotate)
+        self.rotateScale(0, -inc)
+        self.rotate = val
+            
+    def Scale(self, val):
+        op = (val/100)
+        self.scalePath(op)
+        self.scaleValue.setText('{0:.2f}'.format(op))
+                               
+    def scalePath(self, val): 
+        per = (val - self.scale) / self.scale    
+        self.rotateScale(per, 0)
+        self.scale = val
+ 
+    def rotateScale(self, per, inc):  ## handles both rotation and scaling 
+        if len(self.pathMaker.pts) == 0: 
+            return 
+        self.pathMaker.pathWorks.scaleRotate('A', per, inc)  ## used by other classes as well
+              
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate  Scale  Seconds' )
@@ -167,14 +188,14 @@ class PathWidget(QWidget):
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
     
-        waysBtn.clicked.connect(self.sideWays.addWayPtTags)
-        saveBtn.clicked.connect(self.sideWays.savePath)
-        editBtn.clicked.connect(self.drawing.editPoints)
-        centerBtn.clicked.connect(self.sideWays.centerPath)
-        self.newBtn.clicked.connect(self.drawing.toggleNewPath)
+        waysBtn.clicked.connect(self.pathWays.addWayPtTags)
+        saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
+        editBtn.clicked.connect(self.pathMaker.drawing.editPoints)
+        centerBtn.clicked.connect(self.pathMaker.pathWays.centerPath)
+        self.newBtn.clicked.connect(self.pathMaker.drawing.toggleNewPath)
         filesBtn.clicked.connect(self.pathMaker.pathChooser)
         delBtn.clicked.connect(self.pathMaker.delete)
-        quitBtn.clicked.connect(self.pathMaker.closeWidget)
+        quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)
     
         hbox = QVBoxLayout(self)
         hbox.addWidget(saveBtn)    
@@ -188,184 +209,9 @@ class PathWidget(QWidget):
                 
         groupBox.setLayout(hbox)
         return groupBox
+                                                                                                                                                                                                                                   
+### ------------------- dotsPathWidget ---------------------
 
-### -------------------------------------------------------- 
-    def Rotate(self, val):  ## setting rotate in shadowMaker
-        self.rotatePath(val)
-        self.rotateValue.setText('{:3d}'.format(val))
-             
-    def Scale(self, val):  ## setting rotate in shadowMaker
-        op = (val/100)
-        self.scalePath(op)
-        self.scaleValue.setText('{0:.2f}'.format(op))
-                        
-    def Seconds(self, val):  
-        self.pathMaker.seconds = val    
-        self.secondsValue.setText('{:2d}'.format(val))
-        
-    def rotatePath(self, val): 
-        inc = (val - self.rotate)
-        self.rotateScale(0, -inc)
-        self.rotate = val
-          
-    def scalePath(self, val): 
-        per = (val - self.scale) / self.scale    
-        self.rotateScale(per, 0)
-        self.scale = val
-    
-    def rotateScale(self, per, inc):  ## handles both rotation and scaling 
-        if len(self.pathMaker.pts) == 0: 
-            return 
-        self.sideWays.scaleRotate('A', per, inc)  ## used by other classes as well
-                                                                                           
-### --------------------------------------------------------
-class DoodleMaker(QWidget): ## my file display of path files
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
 
-        self.pathMaker = parent
-                 
-        self.type = 'widget'
-        self.save = QPointF(0.0,0.0)
-        
-        self.rotate = 0
-        self.scale  = 0
-        
-        self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 530, 400
-        
-        self.setFixedSize(self.WidgetW, self.WidgetH)
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-    
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)
-              
-        vbox = QVBoxLayout()
-         
-        vbox.addSpacing(0)
-        vbox.addWidget(self.addGrid())
-        vbox.addSpacing(0)
-        vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        self.setLayout(vbox)
-                
-### --------------------------------------------------------                                          
-    def paintEvent(self, e): 
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        
-        rect = QRectF(4, 4, self.WidgetW-8, self.WidgetH-8)
-        painter.setPen(QPen(QColor(104,255,204), 6, Qt.PenStyle.SolidLine,  ## border
-            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
-        painter.setBrush(QColor(225,225,225)) 
-        painter.drawRoundedRect(rect, 15, 15)
-        
-    def addClose(self): 
-        quitBtn = QPushButton('Close')
-        quitBtn.clicked.connect(self.closeWidget)
-        quitBtn.setStyleSheet('background: rgb(245, 245, 245)')
-        quitBtn.setFixedWidth(100) 
-        return quitBtn 
-           
-    def closeWidget(self):       
-        self.pathMaker.pathChooserOff()
-     
-    def addGrid(self):           
-        widget = QWidget()
-        self.gLayout = QGridLayout(widget)
-        self.gLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
-        self.gLayout.setHorizontalSpacing(5)
-        self.gLayout.setContentsMargins(5, 5, 5, 5)
-
-        self.updateGrid()
-
-        scroll = QScrollArea()
-        scroll.setFixedSize(self.WidgetW-40, self.WidgetH-70)
-        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        
-        scroll.setStyleSheet('background: rgb(220, 220, 220)')
-        scroll.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
-            'background: rgb(245,245,245) }');  ## shows handle better
-            
-        scroll.setWidget(widget)
-        return scroll
-    
-    def updateGrid(self):
-        for file in getPathList():    
-            df = Doddle(self, self.pathMaker, file)
-            self.gLayout.addWidget(df)
-            
-    def delete(self, this):
-        os.remove(this.file)
-        for i in reversed(range(self.gLayout.count())):
-            self.gLayout.removeItem(self.gLayout.itemAt(i))
-        self.updateGrid()
-        self.pathMaker.removePath()  
-         
-### --------------------------------------------------------
-class Doddle(QLabel):  ## small drawing of path file content with filename
-### --------------------------------------------------------
-    def __init__(self, parent, path, file):
-        super().__init__()
-
-        self.doodle = parent
-        self.pathMaker = path
-        
-        self.file = file
-        scalor = .10
-        self.W, self.H = 150, 100
-    
-        self.setStyleSheet('background: rgb(235, 235, 235)')
-        
-        self.font = QFont()
-        self.font.setFamily('Helvetica')
-        self.font.setPointSize(12)
-
-        self.pen = QPen(QColor(0,0,0))                     
-        self.pen.setWidth(1)                                       
-        self.brush = QBrush(QColor(255,255,255,255)) 
-        ## scale down screen drawing --  file, scalor, offset        
-        self.df = getPts(self.file, scalor, 10)  
-  
-    def minimumSizeHint(self):
-        return QSize(self.W, self.H)
-
-    def sizeHint(self):
-        return self.minimumSizeHint()
-
-    def mousePressEvent(self, e): 
-        if e.type() == QEvent.Type.MouseButtonPress and \
-            e.button() == Qt.MouseButton.RightButton:
-            return
-        elif self.pathMaker.key == 'del':
-            self.doodle.delete(self)
-            return
-        self.pathMaker.pts = getPts(self.file)  ## from sideGig
-        self.pathMaker.addPath()
-        self.pathMaker.openPathFile = os.path.basename(self.file) 
-        self.pathMaker.pathChooserOff() 
-        e.accept()
-                                   
-    def paintEvent(self, event):  ## draw the paths
-        painter = QPainter(self)
-        painter.setBrush(self.brush) 
-        painter.setPen(QPen(QColor('DODGERBLUE'), 2, Qt.PenStyle.DashDotLine))
-        painter.drawPolygon(QPolygonF(self.df))
-        painter.setBrush(Qt.BrushStyle.NoBrush) 
-        painter.setPen(QPen(Qt.GlobalColor.darkGray, 2)) 
-        painter.drawRect(0, 0, self.W, self.H)
-        painter.setPen(QPen(Qt.GlobalColor.black, 2))
-
-        metrics = QFontMetrics(self.font)
-        txt = os.path.basename(self.file)
-        m = metrics.boundingRect(txt)
-        w = m.width()
-
-        w = int((self.W - w)/2 )
-        painter.drawText(w-5, self.H-10, txt)
-                                                                                                                                         
-### ------------------- dotsPathWidget ---------------------                               
+                               
                                   

@@ -9,11 +9,10 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem, QGraphicsEllipseItem
 from dotsShared         import common
 from dotsSideGig        import point
 
-PathStr = ['topLeft','topRight','botRight','botLeft']
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
 
 ### ---------------------- dotsShadow ----------------------
-''' classes: Shadow, PointItem, and cv2 functions... 
+''' classes: Shadow and cv2 functions... 
     Shadow doesn't hold state as it's constantly being updated - 
     ShadowMaker's shadow is where to look '''                                                    
 ### --------------------------------------------------------
@@ -35,7 +34,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.fileName = 'shadow'
                                        
         self.dragCnt = 0
-        self.save    = QPointF()
+        self.save = QPointF()  ## mapToScene - used with updatePath
                              
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False) 
@@ -44,41 +43,36 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
     def itemChange(self, change, value):  ## continue to updatePath when animated
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
             if self.maker.linked: 
-                if self.maker.outline.isVisible() == True: self.maker.works.hideOutline()
+                if self.maker.outline.isVisible() == True: 
+                    self.maker.works.hideOutline()
                 self.dragCnt += 1
                 if self.dragCnt % 5 == 0:  
-                    dif = value - self.save          
-                    for i in range(4):  
-                        self.maker.path[i] = self.maker.path[i] + dif
-                        self.maker.updatePoints(i, self.maker.path[i].x(), self.maker.path[i].y())
-                    self.save = value
+                    self.maker.updatePath(value)  ## and sets shadows position       
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
 
 ### --------------------------------------------------------
     def mousePressEvent(self, e):  
-        self.save = self.mapToScene(e.pos())         
-        if e.button() == Qt.MouseButton.RightButton:  
+        self.save = self.mapToScene(e.pos())
+        if e.button() == Qt.MouseButton.RightButton: 
             self.maker.addWidget()  ## only place it's used
-            self.maker.works.resetSliders() 
-            e.accept()
-            return
-        elif self.maker.linked == False:
+        elif self.maker.linked == False:  
             self.updOutline(e)
         e.accept() 
 
     def mouseMoveEvent(self, e):
         if self.maker.linked == False:
             self.dragCnt += 1
-            if self.dragCnt % 5 == 0:                     
+            if self.dragCnt % 5 == 0:                  
                 self.maker.updatePath(self.mapToScene(e.pos()))  
                 self.maker.works.updateOutline() 
         e.accept()       
                           
     def mouseReleaseEvent(self, e): 
-        self.maker.updatePath(self.mapToScene(e.pos())) 
-        self.updOutline(e)
-        self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving
-        e.accept()
+        if self.maker.linked == False:  
+            self.maker.updatePath(self.mapToScene(e.pos())) 
+            self.updOutline(e)
+            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving
+            e.accept()
  
     def updOutline(self, e):  ## so as not to be confused with updateOutline
         self.save = self.mapToScene(e.pos())    
@@ -88,35 +82,36 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
   
   ### --------------------------------------------------------                                       
     def linkShadow(self):
-        b = self.pos()    
-        self.maker.linked = True  
-        self.setParentItem(self.pixitem)   
-        ## there's a problem if the pixitem is rotated/scaled
-        self.setPos(-self.pixitem.pos()+b)       
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIgnoresTransformations)
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)       
+        b = self.pos()
+        if self.maker.widget != None:
+            self.maker.widget.linkBtn.setText('Link') 
+        self.maker.linked = True          
+        self.pixitem.offset = -self.pixitem.pos()+self.pos()  ## may change
+        self.setZValue(self.pixitem.zValue()-1)  
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)  
+        self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)  
         self.maker.works.hideOutline()
-        self.maker.hidden = True 
-        if self.maker.widget:       
+        self.maker.hidden = True    
+        if self.maker.widget != None:
             self.maker.works.closeWidget()
-        self.save = b  ## starting value
+        self.save = b
                    
-    def unLinkShadow(self):
-        b = self.save  ## self.pixitem.pos()+self.shadow.pos()    
-        self.anime = None    
-        self.maker.linked = False          
-        self.setParentItem(None)    
+    def unLinkShadow(self):  
+        b = self.save    
+        self.anime = None     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)
-        self.maker.updatePath(b)  ## ending value       
+        self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)         
+        self.setPos(self.pixitem.pos()+self.pixitem.offset)
+        self.maker.linked = False 
+        self.maker.updatePath(b)  ## ending value    
         self.maker.updateShadow() 
         self.maker.addPoints() 
-        self.maker.works.showOutline()       
-        if self.maker.widget:
-            self.maker.works.closeWidget()  
-     
+        self.maker.works.showOutline() 
+        self.maker.widget.linkBtn.setText('Link')  ## keep it open  
+        self.maker.works.resetSliders() 
+       
 ### --------------------------------------------------------        
-    def initPoints(self):  ## initial path and points setting           
+    def initPoints(self):  ## initial path and points setting from maker.addShadow         
         self.path = []
         self.maker.outline = None
         
@@ -130,9 +125,8 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.pixitem.scale != 1.0 or self.pixitem.rotation != 0:    
             self.scaleRotateShadow()
             
-    def scaleRotateShadow(self):    
+    def scaleRotateShadow(self):  ## only if new     
         self.maker.shadow.setRotation(self.pixitem.rotation)
-        self.maker.shadow.setScale(self.pixitem.scale)
     
         self.maker.setPath(self.pixitem.boundingRect(), self.pixitem.pos() + QPointF(-50,-15))
      
@@ -145,9 +139,15 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
             self.maker.scalor = self.pixitem.scale
 
         self.maker.addPoints()     
-        self.maker.works.updateOutline()         
-                
-        self.maker.shadow.show()
+        self.maker.works.updateOutline() 
+       
+        self.maker.updateShadow()
+           
+    def setOriginPt(self):    
+        b = self.boundingRect()
+        op = QPointF(b.width()/2, b.height()/2)
+        self.setTransformOriginPoint(op)
+        self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                                                                                                 
 ### --------------------------------------------------------        
 def initShadow(file, w, h, flop):  ## replace all colors with grey    
@@ -173,7 +173,7 @@ def initShadow(file, w, h, flop):  ## replace all colors with grey
 ### --------------------------------------------------------          
 def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on path xy's         
     p = []                      
-    for i in range(4):  ## get current location of points from path
+    for i in [0,1,2,3]: ## range(4):  ## get current location of points from path
         x,y = int(path[i].x()), int(path[i].y()) 
         p.append([x,y])
             
@@ -187,102 +187,15 @@ def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on
     bytesPerLine = ch * width  ## 4 bits of information
     
     return img, width, height, bytesPerLine   
-                       
+                                 
 ### --------------------------------------------------------
     # def paint(self, painter, option, widget=None):  ## just in case
-    #     super().paint(painter, option, widget)  ## for shadow
+    #     super().paint(painter, option, widget)      ## for shadow
     #     if self.isSelected():
     #         pen = QPen(QColor('lime'))
     #         pen.setWidth(2)
     #         painter.setPen(pen)
     #         painter.drawRect(self.boundingRect())
-      
-### --------------------------------------------------------
-class PointItem(QGraphicsEllipseItem):  ## not to be confused with pathMaker's PointItem
-### --------------------------------------------------------
-    def __init__(self, pt, ptStr, parent):
-        super().__init__()
-
-        self.maker = parent
-        self.path  = self.maker.path   
-        self.ptStr = ptStr
-        
-        self.type    = 'point'
-        self.fileName = 'point'
-        self.tag     = 'point'  
-        self.dragCnt = 0
-          
-        ## -V*.5 so it's centered on the path 
-        self.x = pt.x()-V*.5
-        self.y = pt.y()-V*.5
-        
-        self.setZValue(common['points'])      
-        self.setRect(self.x, self.y, V, V)  
-        
-        self.setPen(QPen(QColor('gray'), 1))
-        if self.ptStr in ('topLeft','topRight'):
-            self.setBrush(QColor('yellow'))
-        else:
-            self.setBrush(QColor('lime'))
-            
-        self.setAcceptHoverEvents(True)
-                        
- ### --------------------------------------------------------
-    def hoverEnterEvent(self, e):
-        p = self.rect()      
-        if p.width() < V*1.5:
-            self.setRect(QRectF(p.x(), p.y(), V*1.5, V*1.5))
-        e.accept()
-        
-    def hoverLeaveEvent(self, e):  
-        p = self.rect()
-        self.setRect(QRectF(p.x(), p.y(), V, V))
-        e.accept()
-
-### --------------------------------------------------------
-    def mousePressEvent(self, e):  
-        e.accept() 
-        
-    def mouseMoveEvent(self, e):
-        self.dragCnt += 1
-        if self.dragCnt % 5 == 0:            
-            self.moveIt(e.pos()) 
-            self.maker.updateShadow()             
-        e.accept()
-                       
-    def mouseReleaseEvent(self, e):
-        self.moveIt(e.pos())
-        self.maker.updateShadow()
-        e.accept()
-                                        
-    def moveIt(self, e):     
-        pos = self.mapToScene(e)
-        x, y = pos.x(), pos.y()
-        self.setRect(x-V*.5, y-V*.5, V,V)  ## set current point    
-        if self.ptStr == 'topLeft':  ## push right
-            self.topLeft(x, y)
-        elif self.ptStr == 'botLeft':    
-            self.botLeft(x, y)
-        else:  
-            i = PathStr.index(self.ptStr)  ## move only 
-            self.path[i] = QPointF(x,y)                  
-        
-    def topLeft(self, x, y):
-        w, y1 = self.current(0,1)            
-        self.path[0] = QPointF(x,y) 
-        self.path[1] = QPointF(x+w,y1)
-        self.maker.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)  
-        
-    def botLeft(self, x, y):
-        w, y1 = self.current(3,2)            
-        self.path[3] = QPointF(x,y) 
-        self.path[2] = QPointF(x+w,y1)
-        self.maker.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
-        
-    def current(self,a,b):
-        l = self.path[a].x()
-        r = self.path[b].x()
-        return r - l,  self.path[b].y()
                               
 ### ---------------------- dotsShadow ----------------------
 

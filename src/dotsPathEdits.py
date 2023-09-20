@@ -4,21 +4,21 @@ from PyQt6.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplic
 from PyQt6.QtWidgets import QWidget, QGraphicsPolygonItem 
                             
 from dotsShared      import common
-from dotsPointItem   import PointItem
+from dotsPathItem    import PathItem
 
 ### ------------------- dotsPathEdits ---------------------
 ''' class: PathEdits, functions; newPath, lasso '''
 ### --------------------------------------------------------
 class PathEdits(QWidget):
 ### --------------------------------------------------------
-    def __init__(self, parent, sideWays):  
+    def __init__(self, parent, pathWays):  
         super().__init__()
         
         self.pathMaker = parent
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
-        self.sideWays  = sideWays
+        self.pathWays  = pathWays
 
         self.lasso = None           
         self.dragCnt = 0    
@@ -63,7 +63,7 @@ class PathEdits(QWidget):
         self.pathMaker.npts = 0
         self.pathMaker.pts = []
         self.editBtn('ClosePath')
-        self.pathMaker.closeWidget()
+        self.pathMaker.pathWorks.closeWidget()
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note
@@ -100,7 +100,7 @@ class PathEdits(QWidget):
     def newLasso(self): 
         self.lasso = []  
         if self.pathMaker.widget != None:
-            self.pathMaker.widget.close()
+            self.pathMaker.pathWorks.closeWidget()
         QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
                 
     def addLassoPts(self, p):
@@ -146,19 +146,19 @@ class PathEdits(QWidget):
         QTimer.singleShot(200, self.updatePath)  ## it works better this way   
                                          
 ### -------------------- pointItems ------------------------    
-    def togglePointItems(self):  ## the letter 'V'
+    def togglePathItems(self):  ## the letter 'V'
         if self.lasso != None:
             self.deleteLasso()
         if self.pointItemsSet():
-            self.removePointItems()
+            self.removePathItems()
         else:
-            self.addPointItems()
+            self.addPathItems()
 
-    def addPointItems(self): 
+    def addPathItems(self): 
         idx = 0 
         add = self.findTop() + 10  ## added to idx to set zvalue
         for pt in self.pathMaker.pts:  
-            self.scene.addItem(PointItem(self, self.canvas, pt, idx, add))
+            self.scene.addItem(PathItem(self, self.canvas, pt, idx, add))
             idx += 1
 
     def editPoints(self):
@@ -167,7 +167,7 @@ class PathEdits(QWidget):
         if self.pathMaker.editingPts == False:
             self.pathMaker.editingPts = True
             self.pathMaker.selections = []  
-            self.addPointItems()
+            self.addPathItems()
             self.turnBlue()
         else:
             self.editPointsOff()
@@ -175,19 +175,19 @@ class PathEdits(QWidget):
     def editPointsOff(self):
         self.pathMaker.editingPts = False
         self.pathMaker.selections = []
-        self.removePointItems()
+        self.removePathItems()
         self.pathMaker.turnGreen()
                    
-    def removePointItems(self):   
+    def removePathItems(self):   
         for ptr in self.scene.items():
             if ptr.type in ('pt','ptTag'):
                 self.scene.removeItem(ptr)
                 del ptr
 
     def updatePath(self):  ## pointItem responding to mouse events
-        self.removePointItems()      
+        self.removePathItems()      
         self.pathMaker.addPath() 
-        self.addPointItems()  
+        self.addPathItems()  
         
     def pointItemsSet(self):
         for itm in self.scene.items():
@@ -195,7 +195,7 @@ class PathEdits(QWidget):
                 return True
         return False
 
-    def insertPointItem(self, pointItem):  ## halfway between points
+    def insertPathItem(self, pointItem):  ## halfway between points
         idx, pt = pointItem.idx + 1, pointItem.pt  ## idx, the next point
         if idx == len(self.pathMaker.pts): 
             idx = 0   
@@ -207,18 +207,18 @@ class PathEdits(QWidget):
         self.pathMaker.pts.insert(idx, pt1)
         self.redrawPoints()  
             
-    def deletePointItem(self, idx):  
+    def deletePathItem(self, idx):  
         self.removeSelection(idx)
         self.pathMaker.pts.pop(idx) 
         self.redrawPoints()
        
     def redrawPoints(self, bool=True):  ## pointItems - non-edit
-        self.removePointItems()
-        if self.sideWays.tagCount() > 0:
+        self.removePathItems()
+        if self.pathWays.tagCount() > 0:
             self.pathMaker.redrawPathsAndTags()
         else:
             self.pathMaker.addPath()
-        if bool: self.addPointItems()
+        if bool: self.addPathItems()
         
 ### -------------------- selections ------------------------                
     def deleteSections(self):  ## selected with lasso

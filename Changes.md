@@ -5,17 +5,30 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**August 2023**  
+
+**September 2023**  
+About two hours after I posted my last effort to GitHub and YouTube I had a moment of clarity and decided I should try using something like the translate transformation rather than the parent/child method I was currently using in order to link the shadow. I replaced it by using an **offset** variable located in **pixItem**. It seems to be the right choice and without any of the previous issues.
+
+You'll need to **unlink** the shadow before making any **additional** changes for scaling or rotation but not for opacity. I've made this easier by **not closing** the widget when you click on **'UnLink'** - big win.  The shadow is no longer linked, the widget hasn't gone away, the shadow outline now appears and the unlink button now reads **'Link'**.  Make your changes, **Relink** the shadow and you should be good to go.  
+
+There's more.  Added two buttons to the **BackGround** widget, one to set the **background scrolling** left to right, the other right to left, plus a button to open the **Matte** widget. That adds three more keys to the mix, **shift-R** to run anything runnable, **shift-P** to pause and resume it, and **shift-S** to stop - but only if the **Matte** is displayed which requires a background.
+
+Lastly, changes to the **scrolling background** making it possible to have two running at the same time in the same or opposite in directions.
+
+New video:
+
+---
+
+**August 2023**   
 A few more key changes; **'O'** now toggles shadow outlines on and off rather than just off -
-**'Shift-O'** now hides shadow outlines. Some bug fixes and a **link** added to shadows that allows the shadow to follow a pixItem when the pixItem is either moved or animated. This works as expected as long as the pixItem hasn't been rotated or scaled.  
+**'Shift-O'** now hides shadow outlines. Some bug fixes and a **link** added to shadows that allows the shadow to follow a pixItem when the pixItem is either moved or animated. This works as expected as long as the pixItem hasn't been rotated or scaled.  **Changed - see September and it's video.**
   
     PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
         # "apple": (650, 450),  ## see setPixSizes below if you need more to add more chars
-        # 'doral': (300, 500),
-        'ariel':   (300,300),            
+        'doral': (215, 215),
     }
     
-Scaling up or down can be handled without triggering any issues by editing the **PixSizes** dictionary in **dotsPixWidget.py** and setting the size there rather than using the slider in the pixItem widget as scaling is applied to the pixItem before it hits the canvas.  See the video for the rotation work-around. Also added a button to the pixItem widget to launch the **Animation Menu** and a slider to the pathMaker widget to change the number of seconds it takes Mr.Ball to complete a circuit around a path. The default is 10 seconds.
+**No longer necessary**. Scaling up or down can be handled without triggering any issues by editing the **PixSizes** dictionary in **dotsPixWidget.py** and setting the size there rather than using the slider in the pixItem widget as scaling is applied to the pixItem before it hits the canvas.  **No need to watch this video see the next video instead.** Also added a button to the pixItem widget to launch the **Animation Menu** and a slider to the pathMaker widget to change the number of seconds it takes Mr.Ball to complete a circuit around a path. The default is 10 seconds.
 
 New video: <<https://youtu.be/FFn2sq3R3nU>>
 
@@ -374,3 +387,4 @@ Added two new buttons. The save button maps the canvas items, pixItems and backg
  
 **June 2020**  
 Initial posting followed by minor bug fixes and fussy changes. The original video that illustrates some of the features of this app. <https://youtu.be/rd4LtR88UjE> 
+≠≠≠

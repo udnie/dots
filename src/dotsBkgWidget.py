@@ -1,159 +1,12 @@
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF
-from PyQt6.QtGui        import QColor, QPen, QPainter, QPainterPath, QBrush, QImage
+from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QSlider, QHBoxLayout, QVBoxLayout, QPushButton
-    
-from dotsShared         import common, paths
-                    
-### ------------------- dotsDotsWidget ---------------------
-''' classes:  Matte, BkgWidget '''        
-### --------------------------------------------------------
-class Matte(QWidget):
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
-
-        self.bkgItem = parent 
-        self.canvas  = self.bkgItem.canvas
-         
-        self.type = 'widget'       
-        self.save = QPointF(0.0,0.0)
-     
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.FramelessWindowHint|\
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.NoDropShadowWindowHint|\
-            Qt.WindowType.WindowStaysOnTopHint) 
-
-        self.setAccessibleName('widget')
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-        
-        p = self.canvas.mapToGlobal(QPoint(0,0))
-        
-        self.x = p.x()
-        self.y = p.y()
-    
-        self.black = QBrush(QColor('black'))
-        self.grey  = QBrush(QColor(250,250,250))
-        self.pix   = None
-        
-        self.img = QImage(paths['bkgPath'] + 'abstract.jpg')
-    
-        self.border = 25  ## inital
-        self.step   = 25
-        self.stop   = 50  ## min y.() - Max Headroom
-        self.brush  = self.grey  ## default   
-          
-        self.ratio = 1.0    
-        self.altRatio = .77 ##.55 = 16:9 # .77  
-        self.resize(common['ViewW']+100, common['ViewH']+100) 
-        
-        self.move(self.x, self.y) 
-        
-        self.grabKeyboard()
-        
-        self.show()
- 
-### --------------------------------------------------------
-    def paintEvent(self, e):            
-        qp = QPainter()
-        qp.begin(self)
- 
-        path = QPainterPath() 
-    
-        viewW = int(common['ViewW']+(self.border*2))
-        viewH = int(common['ViewH']+(self.border*2)*self.ratio)
-    
-        self.resize(viewW, viewH) 
-    
-        path.addRect(0, 0, viewW, viewH)  ## outer
-        path.addRect(self.border+2, int(self.border*self.ratio)+2, common['ViewW']-4, int(common['ViewH'])-2)  ## inner
-  
-        if self.pix != None:   
-            self.pix= self.img.scaled(viewW, viewH,
-                Qt.AspectRatioMode.IgnoreAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)      
-            self.brush = QBrush(self.pix)
       
-        qp.setBrush(self.brush)  
-        qp.drawPath(path)
-        
-        self.move(self.x-self.border, int(self.y-(self.border)*self.ratio))
-                
-        qp.end()
-        
-### --------------------------------------------------------
-    def keyPressEvent(self, e):
-        key = e.key()   
-        if key == Qt.Key.Key_Greater:  ## scale up  
-            self.scaleThis(key)
-            if self.y-(self.border*self.ratio) <= self.stop:
-                self.border -= self.step ## back it off
-                e.accept()  
-        elif key == Qt.Key.Key_Less:  ## scale down
-            self.scaleThis(key)          
-        elif key in (Qt.Key.Key_Alt, Qt.Key.Key_X):
-            self.bkgItem.matte = None
-            self.close()         
-        elif key == Qt.Key.Key_C:  ## change color
-            if self.pix != None:
-                self.pix = None
-                self.brush = self.grey
-            elif self.brush == self.grey:
-                self.brush = self.black
-            elif self.brush == self.black:
-                self.brush = self.grey             
-        elif key == Qt.Key.Key_P:  ## use pix 
-            if self.pix == None:    
-                self.pix = self.img  ## something to initialize it  
-                # self.brush = QBrush(self.pix)  ## handled in painter
-            else:
-                self.pix = None
-                self.brush = self.grey              
-        elif key == Qt.Key.Key_R:  ## set screen format ratio to around .61 
-            if self.ratio == 1.0:  ## midway between 16:9 and 3:2 - approx .56/.66
-                self.ratio = self.altRatio  ## this value works
-            else:
-                self.ratio = 1.0    
-        self.update()
-        e.accept()
-    
-    def scaleThis(self, key):
-        if key == Qt.Key.Key_Greater:
-            if self.border == 5:
-                self.border = 12     
-            elif self.border == 12: 
-                self.border = self.step  
-            elif self.border >= self.step:
-                self.border += self.step             
-        else:    
-            if self.border == self.step: 
-                self.border = 12  
-            elif self.border == 12:
-                self.border = 5
-            elif self.border > self.step:
-                self.border -= self.step            
-                          
-### --------------------------------------------------------
-    def mousePressEvent(self, e):
-        self.save = e.globalPosition()
-        e.accept()
-
-    def mouseMoveEvent(self, e):
-        self.moveThis(e)
-        e.accept()
-        
-    def mouseReleaseEvent(self, e):
-        self.moveThis(e)
-        e.accept()
+from dotsBkgMatte       import Matte
                       
-    def moveThis(self, e):
-        dif = e.globalPosition() - self.save      
-        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-        self.save = e.globalPosition()
-                                                                                                           
-### --------------------------------------------------------        
+### ------------------- dotsShadowWidget -------------------                                                                                                                                                            
 class BkgWidget(QWidget):  
 ### -------------------------------------------------------- 
     def __init__(self, parent, maker):
@@ -161,27 +14,40 @@ class BkgWidget(QWidget):
                                         
         self.bkgItem  = parent     
         self.bkgMaker = maker
-        
+        self.canvas   = self.bkgItem.canvas
+           
         self.type = 'widget'
-        self.save = QPointF(0,0)
+        self.save = QPointF()
                 
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 215.0
-                   
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
-        hbox.addSpacing(5) 
-        hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignBottom)
-        self.setLayout(hbox)
         
+        self.WidgetW, self.WidgetH = 330.0, 300.0
         self.setFixedHeight(int(self.WidgetH))  
+                   
+        vbox = QVBoxLayout()
+        
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignTop)
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignTop)
+        
+        sbox = QHBoxLayout()
+        sbox.addWidget(self.scrollGroup(), Qt.AlignmentFlag.AlignBottom)
+        
+        vbox.addLayout(hbox)    
+        vbox.addLayout(sbox) 
+       
+        self.setLayout(vbox)
+              
         self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
-        self.setContentsMargins(0,15,0,-15) 
+        self.setContentsMargins(0, 0, 0, 0) 
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)             
+          
+        self.toggleLock()
                                                      
         self.show()
                 
@@ -218,56 +84,80 @@ class BkgWidget(QWidget):
  
 ### --------------------------------------------------------   
     def resetSliders(self, bkgItem):
-        if bkgItem and bkgItem.fileName != 'flat':
-            self.opacitySlider.setValue(int(bkgItem.opacity*100))
-            self.scaleSlider.setValue(int(bkgItem.scale*100))
-            self.rotaryDial.setValue(int(bkgItem.rotation))
-            self.setLocks()
+        if self.bkgItem:
+            if bkgItem.fileName != 'flat':
+                self.opacitySlider.setValue(int(bkgItem.opacity*100))
+                self.scaleSlider.setValue(int(bkgItem.scale*100))
+                self.rotaryDial.setValue(int(bkgItem.rotation))
+                self.setLocks()
             
     def setLocks(self):
-        if self.bkgItem.locked == False:
-            self.lockBtn.setText('UnLocked')
-        else:
-            self.lockBtn.setText('Locked')
+        if self.bkgItem:  ## shouldn't need this but - could have just started to clear
+            if self.bkgItem.locked == False:
+                self.lockBtn.setText('UnLocked')
+            else:
+                self.lockBtn.setText('Locked')
             
     def toggleLock(self):
-        if self.bkgItem:
+        if self.bkgItem:  
             if self.bkgItem.locked == False:
                 self.bkgMaker.lockBkg()
             else:
-                self.bkgMaker.unlockBkg()       
-            
+                self.bkgMaker.unlockBkg()    
+                    
     def setBkgRotate(self, val):
-        if self.bkgItem and self.bkgItem.locked == False and self.bkgItem.fileName != 'flat':
-            self.bkgItem.setOrigin()  
-            if val< 0: val = 0
-            self.bkgItem.rotation = val   
-            self.bkgItem.setRotation(self.bkgItem.rotation)
-            self.rotateValue.setText('{:3d}'.format(val))
+        if self.bkgItem:
+            if self.bkgItem.locked == False and self.bkgItem.fileName != 'flat':
+                self.bkgItem.setOrigin()  
+                if val< 0: val = 0
+                self.bkgItem.rotation = val   
+                self.bkgItem.setRotation(self.bkgItem.rotation)
+                self.rotateValue.setText('{:3d}'.format(val))
             
     def setBkgScale(self, val):
-        if self.bkgItem and self.bkgItem.locked == False and self.bkgItem.fileName != 'flat':
-            self.bkgItem.setOrigin()
-            op = (val/100)
-            self.bkgItem.scale = op
-            self.bkgItem.setScale(self.bkgItem.scale)
-            self.scaleValue.setText('{0:.2f}'.format(op))
+        if self.bkgItem:
+            if self.bkgItem.locked == False and self.bkgItem.fileName != 'flat':
+                self.bkgItem.setOrigin()
+                op = (val/100)
+                self.bkgItem.scale = op
+                self.bkgItem.setScale(self.bkgItem.scale)
+                self.scaleValue.setText('{0:.2f}'.format(op))
    
     def setBkgOpacity(self, val):
-        if self.bkgItem and self.bkgItem.locked == False: 
-            op = (val/100)
-            self.bkgItem.opacity = op    
-            self.bkgItem.setOpacity(self.bkgItem.opacity)
-            self.opacityValue.setText('{0:.2f}'.format(op))
+        if self.bkgItem:
+            if self.bkgItem.locked == False: 
+                op = (val/100)
+                self.bkgItem.opacity = op    
+                self.bkgItem.setOpacity(self.bkgItem.opacity)
+                self.opacityValue.setText('{0:.2f}'.format(op))
             
     def centerBkg(self):
-        if self.bkgItem and self.bkgItem.fileName != 'flat':  
-            width = self.bkgItem.imgFile.width()
-            height = self.bkgItem.imgFile.height()
-            self.bkgItem.x = (self.bkgItem.ViewW - width)/2
-            self.bkgItem.y = (self.bkgItem.ViewH - height)/2
-            self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
-                                
+        if self.bkgItem:
+            if self.bkgItem.fileName != 'flat':  
+                width = self.bkgItem.imgFile.width()
+                height = self.bkgItem.imgFile.height()
+                self.bkgItem.x = (self.bkgItem.ViewW - width)/2
+                self.bkgItem.y = (self.bkgItem.ViewH - height)/2
+                self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
+                                        
+    def setLeft(self):
+        if self.bkgItem.scrollable:
+            self.bkgMaker.closeWidget() 
+            self.bkgItem.setDirection('left')
+        else:
+            self.bkgItem.notScrollable() 
+        
+    def setRight(self):
+        if self.bkgItem.scrollable:
+            self.bkgMaker.closeWidget()  
+            self.bkgItem.setDirection('right')  
+        else:
+            self.bkgItem.notScrollable() 
+            
+    def setMatte(self):
+        self.bkgMaker.closeWidget()
+        self.bkgMaker.matte = Matte(self.bkgItem)
+                                                               
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')
@@ -345,8 +235,8 @@ class BkgWidget(QWidget):
         saveBtn   = QPushButton('Save')               
         setBtn    = QPushButton('Set')
         self.lockBtn = QPushButton('Locked')
-        colorBtn  = QPushButton('Color')
         flopBtn    = QPushButton('Flop')
+        matteBtn  = QPushButton('Matte')
         deleteBtn = QPushButton('Delete')
         centerBtn = QPushButton('Center')
         quitBtn   = QPushButton('Close')
@@ -354,8 +244,8 @@ class BkgWidget(QWidget):
         saveBtn.clicked.connect(self.bkgMaker.saveBkg)
         setBtn.clicked.connect(self.bkgMaker.setBkg)     
         self.lockBtn.clicked.connect(self.toggleLock)   
-        colorBtn.clicked.connect(self.bkgMaker.bkgColor)
         flopBtn.clicked.connect(self.bkgMaker.flopIt)
+        matteBtn.clicked.connect(self.setMatte)
         centerBtn.clicked.connect( self.centerBkg)    
         deleteBtn.clicked.connect(self.bkgItem.delete)
         quitBtn.clicked.connect(self.bkgMaker.closeWidget)
@@ -364,8 +254,8 @@ class BkgWidget(QWidget):
         vbox.addWidget(saveBtn)
         vbox.addWidget(setBtn)
         vbox.addWidget(self.lockBtn)
-        vbox.addWidget(colorBtn)
         vbox.addWidget(flopBtn)
+        vbox.addWidget(matteBtn)
         vbox.addWidget(deleteBtn)
         vbox.addWidget(centerBtn)
         vbox.addWidget(quitBtn)
@@ -373,6 +263,27 @@ class BkgWidget(QWidget):
         groupBox.setLayout(vbox)
         return groupBox
                          
+    def scrollGroup(self):
+        groupBox = QLabel()
+        groupBox.setAlignment(Qt.AlignmentFlag.AlignBaseline) 
+        
+        groupBox.setFixedHeight(40)
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
+      
+        leftBtn  = QPushButton('Scroll to Left')               
+        rightBtn = QPushButton('Scroll to Right')
+        
+        leftBtn.clicked.connect(self.setLeft)
+        rightBtn.clicked.connect(self.setRight)
+        
+        hbox = QHBoxLayout(self)
+        hbox.addWidget(leftBtn)
+        hbox.addSpacing(20)
+        hbox.addWidget(rightBtn)
+        
+        groupBox.setLayout(hbox)
+        return groupBox
+                                                                      
 ### ------------------- dotsDotsWidget ---------------------
   
 

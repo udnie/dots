@@ -53,7 +53,7 @@ class DotsQt(QMainWindow):
         self.setStatusBar(self.statusBar) 
                 
         self.canvas = canvas.StoryBoard(self)
-        self.setCentralWidget(self.canvas)  
+        self.setCentralWidget(self.canvas)
         
         self.move(getX(), getY())  ## adjusted for app size and display
    
@@ -61,7 +61,7 @@ class DotsQt(QMainWindow):
         QTimer.singleShot(100, self.canvas.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always
                          
-        self.show()
+        QTimer.singleShot(100, self.show)
                      
 ### --------------------------------------------------------       
     def closeAll(self):  ## close all app widgets
@@ -93,5 +93,6 @@ if __name__ == '__main__':
     sys.exit(app.exec())    
       
 ### ------------------------- dotsQt -----------------------
+
 
 

@@ -110,7 +110,7 @@ class ShowTime:
                 continue
             if isinstance(pix, QGraphicsPolygonItem):
                 continue 
-            if pix.fileName in ('frame','flat'):
+            if pix.fileName in ('frame','flat','shadow'):
                 continue       
             if pix.type in ('pix', 'snake', 'bkg'):
                 if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Paused:
@@ -148,8 +148,11 @@ class ShowTime:
                     if pix.part in ('left','right'):  
                         continue  ## these stop when pivot stops  
                           
-                    if action != 'clear':    
-                        pix.reprise() 
+                    if action != 'clear':
+                        if pix.type == 'pix':
+                            pix.works.reprise()  ## moved
+                        elif pix.type == 'snake':
+                            pix.reprise()
 
         self.cleanUpScrollers(scrolling) 
         self.sideCar.enablePlay() 
@@ -160,27 +163,26 @@ class ShowTime:
     def cleanUpScrollers(self, scrolling):  
         if len(scrolling) == 0:
             return       
-        fname = None
-        direction = ''
-        save = None
-        for p in scrolling:  ## could be one on the way
-            if fname == None:    ## save first
-                fname     = p.fileName
-                direction = p.direction
-                save      = p  ## save it
-            else:
+        fname = ''
+        for p in scrolling:  ## look for bkg in que
+            if fname != p.fileName: ## save the first
+                fname = p.fileName
+            elif p.fileName == fname:
                 self.scene.removeItem(p)
-                del p       
-        del scrolling 
-                   
-        if fname != None: 
-            self.scene.removeItem(save)
-            p = BkgItem(fname, self.canvas)
-            p.tag = 'scroller'
-            p.direction = direction 
-            if 'abstract' in p.fileName and direction == 'right':
-                p.setPos(QPointF(p.runway, 0))  ## offset to right         
-            self.scene.addItem(p)    
+                scrolling.remove(p)
+                      
+        for p in scrolling: 
+            fname = p.fileName
+            direction = p.direction
+            z = p.zValue()
+            self.scene.removeItem(p)
+            b = BkgItem(fname, self.canvas)
+            b.tag = 'scroller'
+            b.direction = direction 
+            b.setZValue(z)
+            if direction == 'right':
+                b.setPos(QPointF(b.runway, 0))  ## offset to right                 
+            self.scene.addItem(b)    
             
 ### --------------------------------------------------------
     def savePlay(self):   
@@ -191,7 +193,7 @@ class ShowTime:
             return  
                    
         if self.canvas.pathMakerOn:  ## using load in pathMaker
-            self.pathMaker.sideWays.savePath()
+            self.pathMaker.pathWays.savePath()
             return          
         elif len(self.scene.items()) == 0:
             return   
@@ -211,12 +213,12 @@ class ShowTime:
                   
             elif pix.type == 'bkg':
                 if pix.fileName != 'flat':      
-                    dlist.append(saveBkg(pix))  ## in sideGig
+                    dlist.append(saveBkg(pix)) 
                 else:
-                    dlist.append(saveFlat(pix))  ## in sideGig            
+                    dlist.append(saveFlat(pix))            
         if dlist:
             try:
-                self.sideCar.saveToJson(dlist)
+                self.sideCar.saveToPlays(dlist)
             except Exception:
                 MsgBox('Error saving file...', 5)         
         del dlist
