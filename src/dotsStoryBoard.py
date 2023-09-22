@@ -223,22 +223,24 @@ class StoryBoard(QWidget):
         self.dots.closeAll()
         QTimer.singleShot(20, self.dots.close)   
                     
-    def clear(self):  ## do this before exiting app  
-        if self.control != '':
-            self.showTime.stop('clear')
-            
-        self.mapper.clearMap()               
-        self.sideCar.clearWidgets()
-         
-        if self.sideShow.demoAvailable:   
+    def clear(self):  ## do this before exiting app   
+        if self.canvas.pathMakerOn:  ## changed 10/21/23
+            self.pathMaker.pathMakerOff()
+            self.pathMaker.pathChooserOff()   
+                       
+        self.sideCar.clearWidgets() 
+        self.scene.clear()
+        
+        self.showTime.stop('clear')      
+        self.mapper.clearMap()      
+          
+        if self.sideShow.demoAvailable != None:  
             self.sideShow.snakes.delSnakes()                     
             self.sideShow.demoMenu.closeDemoMenu() 
-            
-        self.sideShow.screenMenu.closeScreenMenu()
-               
-        self.pathMaker.pathMakerOff()
-        self.pathMaker.pathChooserOff()
-  
+           
+        if self.sideShow.screenMenu != None:   
+            self.sideShow.screenMenu.closeScreenMenu()
+           
         if not self.dots.Vertical:
             self.bkgMaker.disableBkgBtns()   
       
@@ -247,7 +249,6 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.scene.clear()
         gc
            
     def loadSprites(self):

@@ -110,8 +110,11 @@ class ShowTime:
                 continue
             if isinstance(pix, QGraphicsPolygonItem):
                 continue 
-            if pix.fileName in ('frame','flat','shadow'):
-                continue       
+            try:  ## the CAT bug likes this line sometimes
+                if pix.type in ('bkg', 'pix') and pix.fileName in ('frame','flat'):
+                    continue   
+            except:
+                continue  
             if pix.type in ('pix', 'snake', 'bkg'):
                 if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Paused:
                     pix.anime.resume()                   

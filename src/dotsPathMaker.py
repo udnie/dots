@@ -291,8 +291,9 @@ class PathMaker(QWidget):
   
     def removePath(self):       
         if self.pathSet:
-            self.pathWays.removeWayPtTags()  
-            self.scene.removeItem(self.path)
+            self.pathWays.removeWayPtTags()
+            if self.path != None:
+                self.scene.removeItem(self.path)
             self.pathSet = False
             self.path = None
       

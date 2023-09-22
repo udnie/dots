@@ -10,17 +10,17 @@ import dotsAnimation    as Anime
 
 
 ### --------------------- dotsPixWorks ---------------------
-''' classes:  Works '''                                                                                           
+''' classes: Works - small functions that were in Pixitem '''                                                                                           
 ### --------------------------------------------------------
 
 Pct = -0.50   ## used by constrain - percent allowable off screen
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
     # "apple": (650, 450),  ## see setPixSizes below
-    'doral': (215, 215),
+    'doral': (215, 215), 
 }
                                                                                
 ### --------------------------------------------------------
-class Works:  ## small functions that were in Pixitem
+class Works: 
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
