@@ -104,7 +104,9 @@ class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
     def __init__(self, fileName, id, x, y, parent):
         super().__init__()
 
-        self.canvas = parent               
+        self.canvas = parent   
+        
+        self.type = 'snake'            
         self.fileName = fileName
           
         self.id = int(id) 
@@ -129,7 +131,6 @@ class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
   
         self.tag  = ''  
         self.part = 'segment'    
-        self.type = 'snake'
         
         self.x = 0
         self.y = 0

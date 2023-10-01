@@ -32,9 +32,11 @@ class PathItem(QGraphicsEllipseItem):
         self.pt = pt
         self.idx = idx
         self.setZValue(int(idx+adto)) 
+        
+        self.pointTag = ''
 
         self.type = 'pt'
-        self.pointTag = ''
+        self.fileName = None  ## just to make sure if referenced
      
         ## -V*.5 so it's centered on the path 
         self.x = pt.x()-V*.5
@@ -255,10 +257,15 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
         elif self.pathMaker.key == 'del':
             self.doodle.delete(self)
             return
+        ## where .pts come from once saved as a file
         self.pathMaker.pts = getPts(self.file)  ## from sideGig
         self.pathMaker.addPath()
         self.pathMaker.openPathFile = os.path.basename(self.file) 
         self.pathMaker.pathChooserOff() 
+        
+        if self.pathMaker.widget != None:
+            self.pathMaker.widget.resetSliders()
+          
         e.accept()
                                    
     def paintEvent(self, event):  ## draw the paths

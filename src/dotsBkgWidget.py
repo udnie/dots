@@ -20,25 +20,23 @@ class BkgWidget(QWidget):
         self.save = QPointF()
                 
         self.setAccessibleName('widget')
-        
         self.WidgetW, self.WidgetH = 330.0, 300.0
-        self.setFixedHeight(int(self.WidgetH))  
-                   
-        vbox = QVBoxLayout()
-        
+                    
+        vbox = QVBoxLayout()  
+          
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignTop)
         hbox.addSpacing(5) 
         hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignTop)
         
         sbox = QHBoxLayout()
-        sbox.addWidget(self.scrollGroup(), Qt.AlignmentFlag.AlignBottom)
-        
+        sbox.addWidget(self.scrollButtons(), Qt.AlignmentFlag.AlignBottom)
         vbox.addLayout(hbox)    
         vbox.addLayout(sbox) 
-       
+        
         self.setLayout(vbox)
-              
+        
+        self.setFixedHeight(int(self.WidgetH)) 
         self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
         self.setContentsMargins(0, 0, 0, 0) 
         
@@ -263,7 +261,7 @@ class BkgWidget(QWidget):
         groupBox.setLayout(vbox)
         return groupBox
                          
-    def scrollGroup(self):
+    def scrollButtons(self):
         groupBox = QLabel()
         groupBox.setAlignment(Qt.AlignmentFlag.AlignBaseline) 
         

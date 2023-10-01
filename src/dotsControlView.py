@@ -15,6 +15,7 @@ FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
 ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
             Qt.Key.Key_W,  Qt.Key.Key_O)
+UpDownKeys = (Qt.Key.Key_Down, Qt.Key.Key_Up)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
 ### ------------------ dotsControlView ---------------------
@@ -112,8 +113,9 @@ class ControlView(QGraphicsView):
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
                         
-        ## shift keys - D, P, T, V, H , O 
-        elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:            
+        ##  all the shift keys 
+        elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:   
+            ## keys - D, P, T, V, H , O        
             if key == Qt.Key.Key_D:   
                 if self.canvas.pathMakerOn:
                     self.setKey('delPts')  ## send to pathmaker
@@ -124,27 +126,28 @@ class ControlView(QGraphicsView):
                 if self.canvas.pathMakerOn:  
                     self.canvas.pathMaker.pathWays.addWayPtTags()  
             elif key == Qt.Key.Key_O:         
-                 self.sideCar.hideOutlines()                 
+                self.sideCar.hideOutlines()                 
             elif key == Qt.Key.Key_T:         
                 self.mapper.toggleTagItems('select')     
             elif key == Qt.Key.Key_H:
                 self.sideCar.hideSelectedShadows()
                 self.sideCar.clearWidgets()
                 self.sideCar.toggleOutlines()
-          
-        ## used by scrollpanel to scroll sprites  
-        elif mod & Qt.KeyboardModifier.AltModifier and self.canvas.pathMakerOn == False:
-            self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                self.sideCar.pageDown('up')    
-                             
-        elif mod & Qt.KeyboardModifier.ControlModifier and self.canvas.pathMakerOn == False:
-            self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
-                self.sideCar.pageDown('-1') 
-                            
-        # shift keys used in locking screen items - L, R, U
-        elif mod & Qt.KeyboardModifier.ShiftModifier and key in LockKeys:
+                    
+        # keys used in locking screen items - L, R, U
+        elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier: 
             self.canvas.togglePixLocks(singleKeys[key]) 
-                                               
+    
+        ## keys to scroll scrollPanel - alt and control modifier      
+        elif key in UpDownKeys and self.canvas.pathMakerOn == False:           
+            if mod & Qt.KeyboardModifier.AltModifier:  
+                self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
+                    self.sideCar.pageDown('-1') 
+                    
+            elif mod & Qt.KeyboardModifier.ControlModifier:
+                self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
+                    self.sideCar.pageDown('up')  
+                                                                           
         elif key in DFTWKeys:  ## set key as well - used by pathMaker
             if key == Qt.Key.Key_D:  
                 self.setKey('D') 

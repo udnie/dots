@@ -28,7 +28,7 @@ class PathWays:
     
 ### -------------------- path transforms -------------------
     def centerPath(self):
-        if self.pathMaker.pathSet:
+        if self.pathMaker.pathSet and self.pathMaker.path != None:
             p = self.pathMaker.path.sceneBoundingRect()
             w = (common['ViewW'] - p.width()) /2
             h = (common['ViewH'] - p.height()) / 2
@@ -40,25 +40,27 @@ class PathWays:
             self.updatePts(float(x), float(y))
             self.editingPtsSet()  
         
-    def flipPath(self):         
-        p = self.pathMaker.path.sceneBoundingRect()
-        max = p.y() + p.height()
-        for i in range(0, len(self.pathMaker.pts)):
-            self.pathMaker.pts[i] = QPointF(
-                self.pathMaker.pts[i].x(), 
-                max - self.pathMaker.pts[i].y() + p.y())
-        self.pathMaker.addPath()
-        self.editingPtsSet()  
+    def flipPath(self):   
+        if self.pathMaker.path != None:      
+            p = self.pathMaker.path.sceneBoundingRect()
+            max = p.y() + p.height()
+            for i in range(0, len(self.pathMaker.pts)):
+                self.pathMaker.pts[i] = QPointF(
+                    self.pathMaker.pts[i].x(), 
+                    max - self.pathMaker.pts[i].y() + p.y())
+            self.pathMaker.addPath()
+            self.editingPtsSet()  
   
-    def flopPath(self):  
-        p = self.pathMaker.path.sceneBoundingRect()
-        max = p.x() + p.width()
-        for i in range(0, len(self.pathMaker.pts)):
-            self.pathMaker.pts[i] = QPointF(
-                max - self.pathMaker.pts[i].x() + p.x(), 
-                self.pathMaker.pts[i].y())
-        self.pathMaker.addPath()
-        self.editingPtsSet()  
+    def flopPath(self): 
+        if self.pathMaker.path != None: 
+            p = self.pathMaker.path.sceneBoundingRect()
+            max = p.x() + p.width()
+            for i in range(0, len(self.pathMaker.pts)):
+                self.pathMaker.pts[i] = QPointF(
+                    max - self.pathMaker.pts[i].x() + p.x(), 
+                    self.pathMaker.pts[i].y())
+            self.pathMaker.addPath()
+            self.editingPtsSet()  
 
     def fullPath(self):
         self.halfPath(True)

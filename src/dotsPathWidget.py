@@ -17,13 +17,12 @@ class PathWidget(QWidget):
         self.type = 'widget'
         self.save = QPointF()
         
-        self.WidgetW, self.WidgetH = 330.0, 215.0
+        self.setAccessibleName('widget')
+        self.WidgetW, self.WidgetH = 330.0, 235.0
         
         self.rotate = 0
         self.scale  = 1.0
-        
-        self.setAccessibleName('widget')
-                
+                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())
         hbox.addSpacing(5) 
@@ -76,8 +75,14 @@ class PathWidget(QWidget):
   
  ### --------------------------------------------------------    
     def resetSliders(self):
+        self.rotate = 0
+        self.scale  = 1.0 
+        self.rotaryDial.setValue(0)
+        self.rotateValue.setText('{:3d}'.format(0))
+        self.scaleSlider.setValue(int(100))
+        self.scaleValue.setText('{0:.2f}'.format(1.0))
         self.secondsSlider.setValue(self.pathMaker.seconds)
-   
+           
     def Seconds(self, val):  
         self.pathMaker.seconds = val    
         self.secondsValue.setText('{:2d}'.format(val))

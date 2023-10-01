@@ -15,7 +15,10 @@ There's more.  Added two buttons to the **BackGround** widget, one to set the **
 
 Lastly, changes to the **scrolling background** making it possible to have two running at the same time in the same or opposite in directions.
 
-There are two problems I've encountered recently. The first was with **QMessageBox** not displaying correctly in PyQt5 and this known Apple/Python bug [:] **+[CATransaction synchronize] called within transaction**, can cause dots to end abruptly, at least on my M1 Mac running Ventura. 
+There are three problems I've encountered recently. The first was with **QMessageBox** not displaying correctly in PyQt5.  The second, a known Apple/Python bug [:] **+[CATransaction synchronize] called within transaction**, can cause dots to end abruptly, at least on my M1 Mac running Ventura. The third one, a shell error when running dots on the desktop. They all seem to have started with Ventura.
+
+I've also fixed a few embarrassing bugs which caused some keys and key combinations
+to fail and a sure kill lurking in PathWorks. Along with those I've turned off most of the garbage collection as it seems to be connected to an emergent desktop problem. 
 
 New video: <https://youtu.be/FZTsYaU3Eiw>
 

@@ -8,7 +8,7 @@ from dotsPixWorks       import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 
-##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 import dotsAnimation  as Anime
@@ -28,10 +28,12 @@ class PixItem(QGraphicsPixmapItem):
         self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
     
+        self.type = 'pix'
         self.fileName = fileName
+        
         self.flopped  = mirror
-    
         self.id = int(id)  ## used by mapper
+        
         self.x  = x
         self.y  = y
         
@@ -61,8 +63,7 @@ class PixItem(QGraphicsPixmapItem):
 
         self.key = ""
         self.dragCnt = 0
-   
-        self.type = 'pix'
+        
         self.part = ""  ## used by wings 
   
         self.alpha2  = 1.0  ## alpha was already being used and opacity can be a function
@@ -197,7 +198,7 @@ class PixItem(QGraphicsPixmapItem):
         
     def mouseDoubleClickEvent(self, e):
         if 'frame' in self.fileName or \
-            self.key in TagKeys or self.locked:
+            self.key in TagKeys:
             return 
         elif self.canvas.control not in PlayKeys:
             if self.key == 'opt':  

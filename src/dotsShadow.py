@@ -30,6 +30,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.setZValue(common['shadow']) 
         
         self.tag = ''
+        
         self.type = 'shadow' 
         self.fileName = 'shadow'
                                        

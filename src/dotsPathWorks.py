@@ -48,7 +48,7 @@ class PathWorks:
                 xdist, ydist = dist, dist      
                 xdist = dist + (dist * per)              
                 ydist = xdist
-            else:   
+            else:  ## from keyboard
                 inc, xdist, ydist = 0, dist, dist  ## initialize    
                 ## scale up, scale down
                 if key in ScaleUpKeys:  
@@ -80,7 +80,7 @@ class PathWorks:
                     
         self.pathMaker.addPath()    
         self.pathMaker.pathWays.editingPtsSet() 
-        
+                  
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
         if self.pathMaker.pts and self.pathMaker.pathSet:

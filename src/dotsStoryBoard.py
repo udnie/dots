@@ -196,7 +196,7 @@ class StoryBoard(QWidget):
             self.mapper.updateMap()
 
     def togglePixLocks(self, key):
-        if self.control == '': 
+        if self.control != '':  ## animation running
             return 
         stub = '' 
         for pix in self.scene.items(): 
@@ -249,7 +249,7 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        gc
+        # gc  ## testing exit problem
            
     def loadSprites(self):
         self.sideCar.enablePlay()
@@ -287,7 +287,7 @@ class StoryBoard(QWidget):
                 del pix
                 k += 1
         if k > 0: self.sideCar.enablePlay()  ## stop it - otherwise it's hung
-        gc.collect()
+        # gc.collect()
     
     def flopSelected(self):    
         if not self.pathMakerOn:

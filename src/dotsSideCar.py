@@ -124,7 +124,7 @@ class SideCar:
     
     def pageDown(self, key):  ## for sprite scrollPanel
         self.canvas.scroll.pageDown(key)
-     
+        
 ### --------------------------------------------------------                                                                                                                
     def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():

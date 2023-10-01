@@ -16,7 +16,7 @@ class PixWidget(QWidget):
         self.type = 'widget'
         self.save = QPointF()
                 
-        self.setAccessibleName('widget')
+        self.setAccessibleName('widget')  
         self.WidgetW, self.WidgetH = 340.0, 230.0
                    
         hbox = QHBoxLayout()
