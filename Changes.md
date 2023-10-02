@@ -5,11 +5,11 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**September 29 2023**   
+**September 30 2023**   
 Fixed a few embarrassing bugs which caused some keys and key combinations
 to fail as well as a sure kill lurking in PathWays code. I've also turned off most of the garbage collection as it seems to be connected to an emergent problem when running on the desktop.
 
-**September 27 2023**  
+**September 21 2023**  
 About two hours after I posted my last effort to GitHub and YouTube I had a moment of clarity and decided I should try using something like the translate transformation rather than the parent/child method I was currently using in order to link the shadow. I replaced it by using an **offset** variable located in **pixItem**. It seems to be the right choice and without any of the previous issues.
 
 You'll need to **unlink** the shadow before making any **additional** changes for scaling or rotation but not for opacity. I've made this easier by **not closing** the widget when you click on **'UnLink'** - big win.  The shadow is no longer linked, the widget hasn't gone away, the shadow outline now appears and the unlink button now reads **'Link'**.  Make your changes, **Relink** the shadow and you should be good to go.  
