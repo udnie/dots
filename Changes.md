@@ -18,7 +18,7 @@ New video: <https://youtu.be/Eu3OqKjtBgw>
 Last, here's the url for where I found the scrolling background I used, <https://www.artstation.com>, it was free and a needed visual aid.
 
 
---
+---
 
 **September 30 2023**   
 Fixed a few embarrassing bugs which caused some keys and key combinations
