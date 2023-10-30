@@ -17,7 +17,7 @@ class PixWidget(QWidget):
         self.save = QPointF()
                 
         self.setAccessibleName('widget')  
-        self.WidgetW, self.WidgetH = 340.0, 230.0
+        self.WidgetW, self.WidgetH = 340.0, 235.0
                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)

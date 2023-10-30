@@ -20,6 +20,7 @@ from dotsKeysPanel      import KeysPanel
 from dotsScrollPanel    import ScrollPanel
 from dotsDocks          import *
 from dotsAbstractBats   import Wings
+from dotsSideWorks      import SideWorks
 
 Play = ('L','R','P','S','A')
 
@@ -40,10 +41,11 @@ class StoryBoard(QWidget):
         self.view.setGeometry(QRect(0,0,common['ViewW']+2, common['ViewH']+2))
         self.setFixedSize(common['ViewW']+2, common['ViewH']+2)
      
-        self.control = ''         ## shared
-        self.pathMakerOn = False  ## shared
-        self.openPlayFile = ''    ## shared 
-        self.pathList = []        ## used by animations, updated here
+        ## these variables are shared across some classes
+        self.control = ''           ## shared
+        self.pathMakerOn = False    ## shared
+        self.openPlayFile = ''      ## shared 
+        self.pathList = []          ## used by animations and animation menu
     
         self.canvas    = self
         self.sideCar   = SideCar(self)   
@@ -58,7 +60,8 @@ class StoryBoard(QWidget):
         self.animation = Animation(self)    
                  
         self.sideShow  = SideShow(self)  ## reads .play files    
-        self.showTime  = ShowTime(self)  ## runs anything tagged as an animation 
+        self.showtime  = ShowTime(self)  ## runs anything tagged as an animation 
+        self.sideWorks = SideWorks(self) 
          
         addScrollDock(self)  ## add button groups from dotsDocks
         addKeysDock(self)
@@ -126,7 +129,7 @@ class StoryBoard(QWidget):
                     if self.control not in PlayKeys:
                         self.mapper.updatePixItemPos()  
                                           
-                ## show play files on right mouse click if nothing at location       
+                ## show play files on right mouse click if no screen objects     
                 elif e.button() == Qt.MouseButton.RightButton:
                     if len(self.scene.items()) == 0:
                         self.sideShow.loadPlay()
@@ -194,29 +197,6 @@ class StoryBoard(QWidget):
                 break
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
-
-    def togglePixLocks(self, key):
-        if self.control != '':  ## animation running
-            return 
-        stub = '' 
-        for pix in self.scene.items(): 
-            if pix.type == 'pix':
-                if pix.anime != None and \
-                    pix.anime.state() == QAbstractAnimation.State.Running:
-                    return 
-                if key == 'R': 
-                    pix.locked = True
-                    stub = 'all'
-                elif key == 'U': 
-                    pix.locked = False
-                    stub = 'all'
-                elif key == 'L' and pix.isSelected():
-                    pix.togglelock()  ## wait to toggleTagItems
-                    stub = 'select'
-            elif pix.zValue() <= common['pathZ']:
-                break
-        self.mapper.clearMap()
-        self.mapper.toggleTagItems(stub)
                   
     def exit(self):
         self.clear() 
@@ -224,14 +204,14 @@ class StoryBoard(QWidget):
         QTimer.singleShot(20, self.dots.close)   
                     
     def clear(self):  ## do this before exiting app   
-        if self.canvas.pathMakerOn:  ## changed 10/21/23
-            self.pathMaker.pathMakerOff()
-            self.pathMaker.pathChooserOff()   
+        # if self.canvas.pathMakerOn:  ## changed 10/21/23
+        self.pathMaker.pathMakerOff()
+            # self.pathMaker.pathChooserOff()   
                        
         self.sideCar.clearWidgets() 
         self.scene.clear()
         
-        self.showTime.stop('clear')      
+        self.showtime.stop('clear')      
         self.mapper.clearMap()      
           
         if self.sideShow.demoAvailable != None:  
@@ -252,7 +232,7 @@ class StoryBoard(QWidget):
         # gc  ## testing exit problem
            
     def loadSprites(self):
-        self.sideCar.enablePlay()
+        self.sideWorks.enablePlay()
         self.scroll.loadSprites()
  
     def selectAll(self):
@@ -286,7 +266,7 @@ class StoryBoard(QWidget):
                 pix.deletePix()  ## deletes shadow as well 
                 del pix
                 k += 1
-        if k > 0: self.sideCar.enablePlay()  ## stop it - otherwise it's hung
+        if k > 0: self.sideWorks.enablePlay()  ## stop it - otherwise it's hung
         # gc.collect()
     
     def flopSelected(self):    

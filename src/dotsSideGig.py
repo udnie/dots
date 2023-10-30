@@ -3,16 +3,15 @@ import random
 import os
 import math
 
-from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint, QSize
+from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint
 from PyQt6.QtGui        import QPainter, QBrush, QFontMetrics, QColor, QFont, \
-                                QGuiApplication, QImage, QPixmap, QPen
-from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem, QPushButton, \
-                                QWidget, QVBoxLayout, QDialog, QHBoxLayout,QLabel
-
+                                QGuiApplication, QImage, QPixmap
+from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem
+         
 from dotsShared         import common, paths, pathcolors, PlayKeys
 
 ### ---------------------- dotsSideGig ---------------------
-''' classes: MsgBox, TagIt - plus savePix ...'''
+''' classes: MsgBox, TagIt plus misc  ...'''
 ### --------------------------------------------------------
 class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------
@@ -62,10 +61,10 @@ class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------
 class TagIt(QGraphicsSimpleTextItem):
 ### --------------------------------------------------------   
-    def __init__(self, control, tag, color, zval=None):
+    def __init__(self, token, tag, color, zval=None):
         super().__init__()
     
-        if control == 'paths':
+        if token == 'paths':
             color = 'lime'
             if 'Locked Random' in tag:
                 tag = tag[14:] 
@@ -73,31 +72,36 @@ class TagIt(QGraphicsSimpleTextItem):
                 tag = tag[7:]
             n = tag.find('path') + 5
             tag = tag[0:n]
-        elif control in PlayKeys and 'Random' in tag:
+            
+        elif token in PlayKeys and 'Random' in tag:
             tag = tag[7:]
             self.color = QColor(0,255,127)
-        elif control == 'pathMaker':
+            
+        elif token == 'pathMaker':
             if ' 0.00%' in tag:
                 color = QColor('LIGHTSEAGREEN')
             if len(tag.strip()) > 0: self.color = QColor(color)
-        elif control == 'points':
+            
+        elif token == 'points':
             self.color = QColor(color)
+            
         else:
             self.color = QColor(255,165,0)
             if 'Locked Random' in tag:
                 tag = tag[0:13] 
             elif 'Random' in tag:
                 tag = tag[0:6] 
+                
         if color:
             self.color = QColor(color)
 
-        if zval != None and control != 'paths':
+        if zval != None and token != 'paths':
             if len(tag) > 0:  
                 tag = tag + ': ' + str(zval)
             else:
                 tag = str(zval)
     
-        if control == 'points':
+        if token == 'points':
             self.type = 'ptTag'  ## changed from 'pt'
         else:
             self.type = 'tag'
@@ -114,10 +118,11 @@ class TagIt(QGraphicsSimpleTextItem):
  
         self.rect = QRectF(0, 0, p+13, 19)
         self.waypt = 0
-
+            
     def boundingRect(self):
         return self.rect
-
+    
+### --------------------------------------------------------
     def paint(self, painter, option, widget): 
         brush = QBrush()
         brush.setColor(self.color)
@@ -131,6 +136,8 @@ class TagIt(QGraphicsSimpleTextItem):
         painter.drawText(self.boundingRect(), 
             Qt.AlignmentFlag.AlignCenter, self.text)
 
+### --------------------------------------------------------
+''' functions that mostly return values follow '''
 ### --------------------------------------------------------
 def constrain(lastXY, objSize, panelSize, overlap):
     if lastXY + objSize > panelSize - overlap:
@@ -200,14 +207,24 @@ def distance(x1, x2, y1, y2):
     dy = y1 - y2
     return math.sqrt((dx * dx ) + (dy * dy)) 
 
-def point(pt, st=''):  ## you never know when you'll need this
-    s = '(' + '{0:2d}'.format(int(pt.x()))
-    s = s + ',' + '{0:2d}'.format(int(pt.y())) + ')' 
-    if st != '':
-        return st +'; ' + s
+def point(pt, st=""):  ## you never know when you'll need this
+    if isinstance(pt, QPointF):
+        pt = pt.toPoint()   
+    if st == '':
+        return f'{pt.x(), pt.y()}'
     else:
-        return s
+        a = ': '
+        return f'{st}{a}{pt.x(), pt.y()}'
     
+def rect(pt, st=''):  ## ditto
+    if isinstance(pt, QRectF):
+        pt = pt.toRect()  
+    if st == '':
+        return f'{pt.x(), pt.y(), pt.width(), pt.height()}'
+    else:
+        a = ': '
+        return f'{st}{a}{pt.x(), pt.y(), pt.width(), pt.height()}'
+
 def getCrop(path):  ## from path - bounding size and position
     x, y, x1, y1 = common['ViewW'], common['ViewH'], 0.0, 0.0
     for p in path:

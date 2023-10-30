@@ -18,7 +18,7 @@ class PathWidget(QWidget):
         self.save = QPointF()
         
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 235.0
+        self.WidgetW, self.WidgetH = 330.0, 245.0
         
         self.rotate = 0
         self.scale  = 1.0

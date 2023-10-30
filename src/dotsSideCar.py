@@ -2,12 +2,12 @@
 import os
 import os.path
 import random
-import json
 
-from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QRect
+
+from PyQt6.QtCore       import QAbstractAnimation, Qt, QPointF, QPoint, QSize, QRect
 from PyQt6.QtGui        import QPen, QColor
-from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
-                                QApplication, QMenu
+from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, \
+                                QGraphicsLineItem, QApplication, QMenu
                                                     
 from dotsShared      import common, paths
 from dotsPixItem     import PixItem
@@ -28,7 +28,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = InitMap(self.canvas)
-      
+          
         self.gridZ     = common['gridZ']    
         self.gridGroup = None  
         self.menu      = None 
@@ -48,7 +48,10 @@ class SideCar:
         pix.setOpacity(pix.alpha2)
                                                               
         self.scene.addItem(pix)
-            
+        
+        if pix.tag == 'scroller' and pix.direction == 'right':
+            pix.setPos(QPointF(pix.runway, 0))  ## offset to right  
+    
 ### --------------------------------------------------------
     def pixTest(self):
         if not self.canvas.pathMakerOn:  
@@ -124,7 +127,44 @@ class SideCar:
     
     def pageDown(self, key):  ## for sprite scrollPanel
         self.canvas.scroll.pageDown(key)
-        
+      
+    def dumpBkgs(self):
+        for p in self.scene.items():
+            if p.type == 'bkg' and 'flat' not in p.fileName:
+                file = os.path.basename(p.fileName)   
+                factor = 1.0
+                print( f'dumpBkgs  {file}\t{p.direction}\t{p.mirroring}\t{p.zValue()}\t{p.locked}\t{factor}')
+        print()
+      
+### --------------------------------------------------------    
+    def togglePixLocks(self, key):
+        if self.canvas.control != '':  ## animation running
+            return 
+        stub = '' 
+        for pix in self.scene.items(): 
+            if pix.type in ('pix', 'bkg'):
+                if pix.fileName == 'flat':
+                    continue
+                elif pix.anime != None and \
+                    pix.anime.state() == QAbstractAnimation.State.Running:
+                    return    
+                if key == 'R': 
+                    pix.locked = True
+                    stub = 'all'
+                elif key == 'U': 
+                    pix.locked = False
+                    stub = 'all'
+                    if pix.type == 'bkg': 
+                        pix.bkgMaker.toggleBkgLocks(pix, 'unlock')      
+                elif key == 'L' and pix.isSelected() or pix.type == 'bkg': 
+                    if pix.type == 'pix':
+                        pix.togglelock()  ## wait to toggleTagItems
+                    elif pix.type == 'bkg': 
+                        pix.bkgMaker.toggleBkgLocks(pix) 
+                    stub = 'select'
+        self.mapper.clearMap()
+        self.mapper.toggleTagItems(stub)  
+      
 ### --------------------------------------------------------                                                                                                                
     def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():
@@ -167,10 +207,10 @@ class SideCar:
                 lambda chk, anime=anime: self.setAnimationTag(anime))
             
         self.menu.addSeparator()
-        for anime in rlst:
-            action = self.menu.addAction(anime)
-            action.triggered.connect(
-                lambda chk, anime=anime: self.setAnimationTag(anime))    
+        anime = 'Path Menu'  ## uses pathChooser
+        action = self.menu.addAction(anime) 
+        action.triggered.connect(
+            lambda chk, anime=anime: self.setAnimationTag('Path Menu'))     
          
         self.menu.addSeparator()
         anime = 'Clear Tags'
@@ -193,6 +233,9 @@ class SideCar:
         self.closeMenu()
         if self.mapper.tagSet and tag == 'Clear Tags':
             self.mapper.clearTagGroup()
+        elif tag == 'Path Menu':  ## once selected change it for pathMaker 
+            self.canvas.pathMaker.pathChooser('Path Menu') 
+            return
         for pix in self.scene.selectedItems(): 
             if pix.type != 'pix':
                 continue
@@ -234,51 +277,7 @@ class SideCar:
     def gridCount(self):  
         return sum(pix.type == 'grid' 
             for pix in self.canvas.scene.items())
-        
-### ------------------ moved from sideShow -----------------
-    def setPauseKey(self):        
-        if self.canvas.control == 'pause': 
-            self.canvas.btnPause.setText( 'Resume' );
-            self.canvas.control = 'resume'
-        elif self.canvas.control == 'resume':
-            self.canvas.btnPause.setText( 'Pause' );
-            self.canvas.control = 'pause'
 
-    def enablePlay(self):
-        self.canvas.control = ''
-        self.canvas.btnRun.setEnabled(True)
-        self.canvas.btnPause.setEnabled(False)
-        self.canvas.btnStop.setEnabled(False) 
-        self.canvas.btnSave.setEnabled(True) 
- 
-    def disablePlay(self):
-        self.canvas.control = 'pause'
-        self.canvas.btnRun.setEnabled(False)
-        self.canvas.btnPause.setEnabled(True)
-        self.canvas.btnStop.setEnabled(True)  
-        self.canvas.btnSave.setEnabled(False)  
-
-    def saveToPlays(self, dlist):     
-        if self.canvas.openPlayFile == '':
-            self.canvas.openPlayFile = paths['playPath'] + 'tmp.play'       
-        Q = QFileDialog()        
-        Q.Option.DontUseNativeDialog    
-        Q.setDirectory(paths['playPath'])
-        f = Q.getSaveFileName(self.canvas, paths['playPath'],  
-            self.canvas.openPlayFile)
-        Q.accept()
-        if not f[0]: 
-            return
-        if not f[0].lower().endswith('.play'):
-            MsgBox("saveToPlays: Wrong file extention - use '.play'", 5)  
-            return
-        else:
-            try:
-                with open(f[0], 'w') as fp:
-                    json.dump(dlist, fp)
-            except IOError:
-                MsgBox('saveToPlays: Error saving file', 5)
-        del dlist
                 
 ### ---------------------- dotsSideCar ---------------------
 

@@ -31,11 +31,11 @@ class PixItem(QGraphicsPixmapItem):
         self.type = 'pix'
         self.fileName = fileName
         
-        self.flopped  = mirror
+        self.flopped = mirror
         self.id = int(id)  ## used by mapper
         
-        self.x  = x
-        self.y  = y
+        self.x = x 
+        self.y = y
         
         self.shadowMaker = ShadowMaker(self)  ## returns isActive is False if from shadow_dummy
         self.works = Works(self)              ## functions and PixSizes moved from here
@@ -112,7 +112,7 @@ class PixItem(QGraphicsPixmapItem):
             pen.setWidth(2)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
-            
+     
     def hoverEnterEvent(self, e):
         if self.locked: 
             self.toggleTagItems(self.id)   
@@ -143,7 +143,7 @@ class PixItem(QGraphicsPixmapItem):
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
             
     def mousePressEvent(self, e):    
-        if self.canvas.control not in PlayKeys: 
+        if self.canvas.control not in PlayKeys:  
             ## right mouse clk triggers Animation menu on selected screen items 
             if e.button() == Qt.MouseButton.RightButton:
                 ## if 'pivot' in self.fileName or 'frame' in self.fileName or \                
@@ -193,7 +193,7 @@ class PixItem(QGraphicsPixmapItem):
         self.dragCnt = 0   
         self.canvas.key = ""
         self.works.updateXY(self.mapToScene(e.pos()))
-        self.setPos(self.x, self.y)
+        self.setPos(self.x, self.y)  
         e.accept()
         
     def mouseDoubleClickEvent(self, e):
@@ -248,6 +248,7 @@ class PixItem(QGraphicsPixmapItem):
         x, y = self.works.makeXY()     
         x = int(x - int(self.widget.WidgetW)-10)
         y = int(y - int(self.widget.WidgetH)/6)
+        self.widget.save = QPointF(x,y)
         self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.works.resetSliders()
         self.setLockBtnText()
@@ -273,7 +274,7 @@ class PixItem(QGraphicsPixmapItem):
         op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-    
+     
     def setLockBtnText(self):
         if self.widget != None:
             if self.locked == False:

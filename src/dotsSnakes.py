@@ -162,8 +162,9 @@ class Snakes:
         self.canvas   = parent
         self.scene    = self.canvas.scene
         self.mapper   = self.canvas.mapper
-        self.bkgMaker = self.canvas.bkgMaker              
-        self.sideCar  = SideCar(self.canvas)
+        self.bkgMaker = self.canvas.bkgMaker 
+                     
+        self.sideCar   = SideCar(self.canvas)
         
         self.what = ''
                                                       
@@ -180,37 +181,18 @@ class Snakes:
             3: 'cactus-1.png',
         }
       
-        scroll = None  
-        snakes = 3  ## if scrolling  
+        self.scroller = None  
+        snakes = 3  ## ## if scrollering make these many and quit
+        
+        if what == 'blue':  ## not scrolling
+            snakes = 4  
         
         if what not in ('blue', 'left', 'vertical'):
             MsgBox('Something wrong with Snakes')
             return
                
-        if what == 'blue':
-            snakes = 4  ## make these many and quit
-            color  = QColor(QColor(0,84,127) )  ## ocean blue                                
-            self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99 
-            
-        elif what == 'left':
-            scroll = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
-            scroll.direction = 'left' 
-            scroll.tag = 'scroller'
-            scroll.anime = scroll.setScrollerPath(scroll, 'first')  ## the first background 
-            
-        elif what == 'vertical':
-            scroll = BkgItem(paths['demo'] + 'snakes_vertical.jpg', self.canvas) 
-            scroll.direction = 'vertical'   
-            scroll.tag = 'scroller'
-            scroll.anime = scroll.setScrollerPath(scroll, 'first')  ## it's always the first - it sets the 2nd
-            scroll.runway = int(common['ViewH'] - scroll.height) + scroll.showtime  
-            scroll.setPos(QPointF(0, scroll.runway))
-            
-        if what in ('vertical', 'left'): 
-            scroll.addedScroller == False   
-            scroll.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
-            self.scene.addItem(scroll)
-                         
+        self.setSelection(what)
+                      
         MsgBox('Processing...' + '  ', 2, getCtr(-100,-175))
      
 ### -------------------------------------------------------- 
@@ -256,12 +238,42 @@ class Snakes:
             QTimer.singleShot(k * 300, partial(self.run, path))  ## leave some time between snakes
             
             if k == snakes:        
-                self.sideCar.disablePlay()  ## turns on pause/resume/stop
-                if what in ('vertical', 'left'): 
-                    if scroll.anime: QTimer.singleShot(200, scroll.anime.start)                                      
+                self.canvas.sideWorks.disablePlay()  ## turns off play - turns on pause/resume/stop
+                if what in ('vertical', 'left'):     ## run the scrolling background
+                    if self.scroller.anime: QTimer.singleShot(200, self.scroller.anime.start)                                      
                 break
     
-### --------------------------------------------------------      
+### -------------------------------------------------------- 
+    def setSelection(self, what):  ## no right scrolling for snakes
+        if what == 'blue':
+            # snakes = 4  ## make these many and quit
+            color  = QColor(QColor(0,84,127) )  ## ocean blue                                
+            self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99
+             
+        elif what == 'left':
+            self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
+            self.scroller.direction = 'left' 
+            self.scroller.tag = 'scroller'
+            self.scroller.bkgWorks.addTracker(self.scroller)
+            self.scroller.mirroring = True
+            self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
+            
+        elif what == 'vertical':
+            self.scroller = BkgItem(paths['demo'] + 'snakes_vertical.jpg', self.canvas) 
+            self.scroller.direction = 'vertical'   
+            self.scroller.tag = 'scroller'
+            self.scroller.bkgWorks.addTracker(self.scroller)
+            self.scroller.mirroring = True
+            self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
+            self.scroller.runway = int(common['ViewH'] - self.scroller.height) + self.scroller.showtime  
+            self.scroller.setPos(QPointF(0, self.scroller.runway))
+            
+        if what in ('vertical', 'left'): 
+            self.scroller.addedScroller == False   
+            self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
+            self.scene.addItem(self.scroller)
+            
+ ### -------------------------------------------------------- 
     def addSnakes(self, idx, fileName, waypts, sync):                                                                                  
         if idx % 3 != 0:  ## vary the segments
             pix = Snake(paths['demo'] + self.a, self.canvas.pixCount, 0, 0, self.canvas)

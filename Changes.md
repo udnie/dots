@@ -5,6 +5,21 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**October 2023**        
+The 'Save' button in the Backgrounds group will now save only 'flats', full color canvases.
+To save a scrolling background you need to save it to a play file - that way you preserve your settings.  I've added another scrolling button, **'Mirroring On/Off/Not Scrollable'**. The default has been Mirroring On from the beginning as I didn't have any pre-made scrolling backgrounds and I liked the mirror effect. I decided now that I can scroll more than one background at a time I should add scrolling without mirroring and see where that goes.
+
+Most of the Halloween demo is not mirrored. I think it should be possible use parallax scrolling backgrounds in dots as long as they've been scaled to **1280X640**, that's all I did for the desert demo section. I've also added some behind the scenes methods to insure I not saving any duplicate backgrounds.  My original method wasn't working as well it should, once a scroller animation starts there will almost always be two backgrounds present, visible or not. 
+
+The Halloween demo also used a random value , 'factor/fact', between .85 - 1.50 by .05 to vary each backgrounds time needed to move one screen width.  It can be found in **BkgWorks.py** in the **'addTracker'** function.  I've commented out the random generator and set the default **factor** to 1.0.  Make sure you have a workable example(s) before commenting it out.
+
+New video: <https://youtu.be/Eu3OqKjtBgw>
+
+Last, here's the url for where I found the scrolling background I used, <https://www.artstation.com>, it was free and a needed visual aid.
+
+
+--
+
 **September 30 2023**   
 Fixed a few embarrassing bugs which caused some keys and key combinations
 to fail as well as a sure kill lurking in PathWays code. I've also turned off most of the garbage collection as it seems to be connected to an emergent problem when running on the desktop.

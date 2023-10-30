@@ -1,10 +1,11 @@
 
 import random
 
-from PyQt6.QtCore   import QPointF, pyqtProperty, QPropertyAnimation, \
+from PyQt6.QtCore   import QPoint, QPointF, pyqtProperty, QPropertyAnimation, \
                         QParallelAnimationGroup, QSequentialAnimationGroup, \
                         QEasingCurve, QObject
 
+from dotsSideGig    import point
 from dotsShared     import common
 
 import dotsSidePath as sidePath
@@ -220,11 +221,14 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     node.pix.setOriginPt()
     sync = 1000
 
+    if pix.type == 'pix' and  pix.part in ('left','right'): 
+        return
+        
     reprise = QPropertyAnimation(node, b'pos') 
     reprise.setDuration(int(sync))
     reprise.setStartValue(node.pix.pos())
     reprise.setEndValue(QPointF(pix.x, pix.y))
-
+    
     if pix.type == 'pix' and pix.part == "pivot":
         return reprise
 

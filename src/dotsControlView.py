@@ -13,8 +13,8 @@ from dotsMapItem     import InitMap
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
-ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_P, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
-            Qt.Key.Key_W,  Qt.Key.Key_O)
+ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
+                Qt.Key.Key_W,  Qt.Key.Key_O, Qt.Key.Key_B)
 UpDownKeys = (Qt.Key.Key_Down, Qt.Key.Key_Up)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
@@ -115,13 +115,10 @@ class ControlView(QGraphicsView):
                         
         ##  all the shift keys 
         elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:   
-            ## keys - D, P, T, V, H , O        
+            ## keys - D, T, V, H , O        
             if key == Qt.Key.Key_D:   
                 if self.canvas.pathMakerOn:
                     self.setKey('delPts')  ## send to pathmaker
-            elif key == Qt.Key.Key_P:  ## show pix path tags
-                if not self.canvas.pathMakerOn:
-                    self.mapper.toggleTagItems('paths') 
             elif key == Qt.Key.Key_W:  ## show waypts
                 if self.canvas.pathMakerOn:  
                     self.canvas.pathMaker.pathWays.addWayPtTags()  
@@ -133,10 +130,12 @@ class ControlView(QGraphicsView):
                 self.sideCar.hideSelectedShadows()
                 self.sideCar.clearWidgets()
                 self.sideCar.toggleOutlines()
+            elif key == Qt.Key.Key_B:
+                self.sideCar.dumpBkgs()
                     
         # keys used in locking screen items - L, R, U
         elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier: 
-            self.canvas.togglePixLocks(singleKeys[key]) 
+            self.sideCar.togglePixLocks(singleKeys[key]) 
     
         ## keys to scroll scrollPanel - alt and control modifier      
         elif key in UpDownKeys and self.canvas.pathMakerOn == False:           

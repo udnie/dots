@@ -180,29 +180,31 @@ class ShadowMaker:
     def addWidget(self):  ## creates a shadow widget     
         self.works.closeWidget()
         self.widget = ShadowWidget(self)  
-  
+        
         if self.linked == False:  ## not linked
             self.widget.linkBtn.setText('Link') 
         else:      
             self.widget.linkBtn.setText('UnLink')  ## link == True
           
         p = self.shadow.pos()                                            
-        x, y = int(p.x()), int(p.y()) 
-        
+        x, y = int(p.x()), int(p.y())  
         self.last = QPointF(x,y)  ## last position   
-         
+            
         p = self.canvas.mapToGlobal(QPoint(x, y))
-        x, y = int(p.x()), int(p.y())   
-        
+        x, y = int(p.x()), int(p.y())       
         x = int(x - int(self.widget.WidgetW)-10)  ## offset from shadow
         y = int(y - int(self.widget.WidgetH)/6)    
-  
+        
+        self.widget.save = QPointF(x,y)  
         self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))   
+        
         self.works.resetSliders() 
                                                 
 ### --------------------------------------------------------
     def addPoints(self): 
         self.works.deletePoints() 
+        
+        if self.path == None: self.path = []
           
         self.topLeft  = PointItem(self.path[0], 'topLeft', self)
         self.topRight = PointItem(self.path[1], 'topRight', self)

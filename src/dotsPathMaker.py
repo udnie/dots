@@ -198,7 +198,8 @@ class PathMaker(QWidget):
         self.pathWorks.closeWidget()
         self.widget = PathWidget(self)       
         p = common['widgetXY']
-        p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))                          
+        p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))       
+        self.widget.save = QPointF(p.x(), p.y())                          
         self.widget.setGeometry(p.x(), p.y(), \
             int(self.widget.WidgetW), int(self.widget.WidgetH))
         if self.addingNewPath:
@@ -261,11 +262,14 @@ class PathMaker(QWidget):
         self.poly = None
                     
 ### --------------------------------------------------------
-    def pathChooser(self): 
+    def pathChooser(self, where=''): 
         if not self.pathChooserSet and not self.addingNewPath:
             if not self.editingPts:
-                self.chooser = DoodleMaker(self) 
-                b = getCtr(-270,-265)      
+                self.chooser = DoodleMaker(self, where) 
+                if where == 'Path Menu':  ## from animation menu
+                    b = getCtr(-270,-385) 
+                else:
+                    b = getCtr(-270,-265)      
                 self.chooser.move(int(b.x()), int(b.y()))
                 self.chooser.show()
                 self.pathChooserSet = True

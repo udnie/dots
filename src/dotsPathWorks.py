@@ -124,7 +124,6 @@ class PathWorks:
             self.pathMaker.pathTestSet = False
             self.pathMaker.drawing.redrawPoints(self.pathMaker.drawing.pointItemsSet())
    
-   
 ### -------------------- dotsPathWorks ---------------------                                                                                                                                      
 
 

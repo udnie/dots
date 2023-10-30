@@ -15,6 +15,7 @@ from dotsShared         import paths, common
 from dotsSideGig        import *
 from dotsBkgMaker       import BkgItem
 from dotsPixItem        import PixItem
+from dotsSideWorks      import SideWorks
 
 backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directory
     '1080':  'montreaux.jpg', 
@@ -41,7 +42,7 @@ class Wings:
         self.rightWing = self.right(paths['imagePath'] + 'bat-wings.png', x, y)
         self.leftWing  = self.left(paths['imagePath'] + 'bat-wings.png', x, y)
                                              
-        self.half   = self.pivot.width/2   
+        self.half   = self.pivot.width/2 
         self.height = self.pivot.height/5    
 
         if common['Screen'] in ('1215', '1440'):
@@ -50,7 +51,8 @@ class Wings:
             self.height = self.pivot.height/9  
           
         try:
-            self.pivot.setPos(self.pivot.x - self.half, self.pivot.y - self.height - 5)
+            # self.pivot.setPos(self.pivot.x - self.half, self.pivot.y - self.height - 5) why???
+            self.pivot.setPos(self.pivot.x, self.pivot.y)
             self.pivot.setScale(.60)
             self.pivot.setOriginPt() 
         except IOError:
@@ -125,6 +127,8 @@ class Bats:
                                          
         self.sideCar   = self.canvas.sideCar
         self.animation = self.canvas.animation
+        
+        self.sideWorks = SideWorks(self.canvas)
                                                    
 ### -------------------------------------------------------- 
     def makeBats(self):  ## makes aliens and bats                 
@@ -141,7 +145,7 @@ class Bats:
         self.batWings()       
         self.greys()
         self.run()
-        self.sideCar.disablePlay()
+        self.sideWorks.disablePlay()
                       
 ### --------------------------------------------------------
     def batWings(self):  ## these go to screen and wait to be run
@@ -209,7 +213,7 @@ class Bats:
     def rerun(self):  ## no reason to delete     
         clearPaths(self)
         self.run()
-        self.sideCar.disablePlay()
+        self.sideWorks.disablePlay()
      
     def delBats(self):
         if len(self.scene.items()) > 0:
@@ -232,6 +236,7 @@ class Abstract:  ## hats
         
         self.sideCar   = self.canvas.sideCar                                          
         self.animation = self.canvas.animation
+        self.sideWorks = SideWorks(self.canvas)
    
         self.hats = 7
         self.shadows = False
@@ -250,21 +255,23 @@ class Abstract:  ## hats
             MsgBox('Adding Shadows,  please wait...', int(1 + (self.hats * .25)))
             self.addShadows()
                    
-        QTimer.singleShot(200, self.bkg.anime.start)  ## run scrolling background  
+        QTimer.singleShot(200, self.bkgItem.anime.start)  ## run scrolling background  
         self.run()  
-        self.sideCar.disablePlay()
+        self.sideWorks.disablePlay()
 
 ### --------------------------------------------------------            
     def setBackGround(self):
-        self.bkg = BkgItem(paths['bkgPath'] + 'abstract.jpg', self.canvas)   
-        self.bkg.tag = 'scroller'
-        self.bkg.direction = self.direction
-        self.bkg.anime = self.bkg.setScrollerPath(self.bkg, 'first')       
+        self.bkgItem = BkgItem(paths['demo'] + 'abstract.jpg', self.canvas)   
+        self.bkgItem.tag = 'scroller'
+        self.bkgItem.direction = self.direction
+        self.canvas.mirroring = True
+        self.bkgItem.bkgWorks.addTracker(self.bkgItem)
+        self.bkgItem.anime = self.bkgItem.setScrollerPath(self.bkgItem, 'first')       
         if self.direction == 'right':
-            self.bkg.setPos(QPointF(self.bkg.runway, 0))  ## offset to right     
-        self.bkg.addedScroller == False   
-        self.bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
-        self.scene.addItem(self.bkg)  
+            self.bkgItem.setPos(QPointF(self.bkgItem.runway, 0))  ## offset to right     
+        self.bkgItem.addedScroller == False   
+        self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
+        self.scene.addItem(self.bkgItem)  
   
     def setHats(self): 
         apaths = getPathList()  ## from sideGig  

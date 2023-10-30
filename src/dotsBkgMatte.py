@@ -1,62 +1,14 @@
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF
-from PyQt6.QtGui        import QColor, QPixmap, QPainter, QPainterPath, QBrush, QImage
-from PyQt6.QtWidgets    import QWidget, QGraphicsPixmapItem
+from PyQt6.QtGui        import QColor, QPainter, QPainterPath, QBrush, QImage
+from PyQt6.QtWidgets    import QWidget
     
 from dotsShared         import common, paths
 
 ShiftKeys = (Qt.Key.Key_R, Qt.Key.Key_P, Qt.Key.Key_S)
 
 ### -------------------- dotsBkgMatte ----------------------
-''' classes:  Flat, Matte '''    
-### -------------------------------------------------------- 
-class Flat(QGraphicsPixmapItem):
-### --------------------------------------------------------   
-    def __init__(self, color, canvas, z=common['bkgZ']):
-        super().__init__()
-
-        self.canvas   = canvas
-        self.scene    = canvas.scene
-        self.bkgMaker = self.canvas.bkgMaker
-        
-        self.type = 'bkg'
-        self.color = color
-        
-        self.fileName = 'flat'
-        self.locked = False
-        
-        self.tag = ''
-        self.id = 0   
-
-        p = QPixmap(common['ViewW'],common['ViewH'])
-        p.fill(self.color)
-        
-        self.setPixmap(p)
-        self.setZValue(z)
-   
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-        
-### --------------------------------------------------------
-    def mousePressEvent(self, e):      
-        if not self.canvas.pathMakerOn:
-            if e.button() == Qt.MouseButton.RightButton:    
-                self.bkgMaker.addWidget(self)        
-            elif self.canvas.key == 'del':     
-                self.delete()
-            elif self.canvas.key == '/':  ## to back
-                self.bkgMaker.back(self)
-            elif self.canvas.key in ('enter','return'):  
-                self.bkgMaker.front(self)                             
-        e.accept()
-      
-    def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
-            self.canvas.key = ''       
-        e.accept()
-     
-    def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
-            
+''' class: Matte '''        
 ### --------------------------------------------------------
 class Matte(QWidget):
 ### --------------------------------------------------------
@@ -139,11 +91,11 @@ class Matte(QWidget):
      
         if key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:  
             if key == Qt.Key.Key_R: 
-                self.canvas.showTime.run()
+                self.canvas.showtime.run()
             elif key == Qt.Key.Key_P: 
-                self.canvas.showTime.pause()
+                self.canvas.showtime.pause()
             else:
-                self.canvas.showTime.stop()
+                self.canvas.showtime.stop()
 
         elif key == Qt.Key.Key_Greater:  ## scale up  
             self.scaleThis(key)
@@ -157,12 +109,17 @@ class Matte(QWidget):
             self.bkgItem.matte = None
             self.close()         
             
-        elif key == Qt.Key.Key_C:  ## change color
+        elif key in (Qt.Key.Key_B, Qt.Key.Key_C):  ## change color
             if self.pix != None:
                 self.pix = None
                 self.brush = self.grey
+                
+            elif key == Qt.Key.Key_B:
+                self.brush = self.black
+                
             elif self.brush == self.grey:
                 self.brush = self.black
+                
             elif self.brush == self.black:
                 self.brush = self.grey      
                        
@@ -178,7 +135,8 @@ class Matte(QWidget):
             if self.ratio == 1.0:  ## midway between 16:9 and 3:2 - approx .56/.66
                 self.ratio = self.altRatio  ## this value works
             else:
-                self.ratio = 1.0    
+                self.ratio = 1.0   
+                 
         self.update()
         e.accept()
     

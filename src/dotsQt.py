@@ -13,7 +13,7 @@ import dotsStoryBoard   as canvas
 
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widgets.
-    See dotsShared.py for common shared variables and path
+    See dotsShared.py for common,,,,, shared variables and path
     dictionaries shared across classes and files''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
@@ -37,7 +37,10 @@ class DotsQt(QMainWindow):
             self.screen = setCommon(sys.argv[1])  ## setCommon in screens
         else:
             self.screen = setCommon()  ## default - 1080X720 
-                                   
+           
+        # print('version', platform.version())
+        # print('py_verion', platform.python_version())
+                                        
         self.init()
     
     def init(self):  
@@ -82,9 +85,7 @@ class DotsQt(QMainWindow):
         common = self.saveCommon.copy()  ## copy it back
         self.screen = setCommon(key)     ## see dotsScreens
         self.init()
-                                                                                      
-        # print(platform.python_version())
-         
+                                                                                            
 ### --------------------------------------------------------
 if __name__ == '__main__':
     app = QApplication(sys.argv)

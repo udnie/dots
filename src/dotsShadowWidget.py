@@ -18,7 +18,7 @@ class ShadowWidget(QWidget):
         self.save = QPointF()
                 
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 225.0
+        self.WidgetW, self.WidgetH = 330.0, 235.0
                 
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())

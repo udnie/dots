@@ -2,10 +2,10 @@
 from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt6.QtGui     import QColor, QPen
 from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
-                            QGraphicsPixmapItem
+                            QGraphicsPixmapItem, QGraphicsSimpleTextItem
 
 from dotsShared      import common
-from dotsSideGig     import TagIt, getColorStr
+from dotsSideGig     import TagIt, getColorStr, getCtr
 from dotsSidePath    import pathLoader
 
 All = -999
@@ -200,7 +200,7 @@ class InitMap:
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type in ('pix', 'snake'):
+            if pix.type in ('pix', 'snake', 'bkg') and pix.fileName != 'fiat':
                 if 'path' in pix.tag and pid == 'paths':
                     self.tagIt('paths', pix, tf) 
                     k += 1
@@ -229,19 +229,16 @@ class InitMap:
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
  
-    def clearTagGroup(self):
-        if self.tagGroup != None:
-            self.scene.removeItem(self.tagGroup) 
+    def clearTagGroup(self):     
         if self.tagCount() > 0:  ## backup B
             self.removeTags()
-        self.tagGroup = None
-        self.tagSet = False 
+            self.tagGroup = None
+            self.tagSet = False 
             
     def removeTags(self):
-        if self.tagCount() > 0:
-            for p in self.canvas.scene.items():
-                if p.type == 'tag':
-                    self.scene.removeItem(p)
+        for p in self.canvas.scene.items():
+            if p.type == 'tag':
+                self.scene.removeItem(p)
         
     def tagIt(self, token, pix, tf):  
         p = pix.sceneBoundingRect()
@@ -255,7 +252,7 @@ class InitMap:
             x, y = common['ViewW']*.47, common['ViewH']-35
             pix.tag = ''
 
-        if pix.type == 'pix' and pix.locked == True:
+        if pix.type in ('pix','bkg') and pix.locked == True:
             tag = 'Locked ' + tag 
 
         if pix.zValue() == tf: 
@@ -269,23 +266,27 @@ class InitMap:
         if tag == 'UnLocked': color = 'orange'
 
         tag = TagIt(token, tag, color, pix.zValue())
+          
+        if pix.type == 'bkg':
+            return  ## for now
+            # b = getCtr(-270,-265)      
+            # x, y = b.x(), b.y()
+
         tag.setPos(x,y)
         tag.setZValue(self.toFront(45.0))
         self.tagGroup.addToGroup(tag)
         self.tagSet = True
 
     def tagCount(self):  
-        return sum(
-            pix.type == 'tag' 
-            for pix in self.scene.items()
-        )
+        return sum( pix.type == 'tag' 
+            for pix in self.scene.items())
 
 ### -------------------- mostly paths ----------------------
     def togglePaths(self):
         if self.canvas.pathMakerOn:
             return
         if self.pathSet:
-            self.clearPaths()  
+            self.clearPaths() 
             return
         if self.scene.items():
             k = 0
@@ -310,7 +311,7 @@ class InitMap:
         self.pathGroup.setZValue(self.toFront(35.0))    
         self.scene.addItem(self.pathGroup)
     
-    def addPathTagGroup(self):
+    def addPathTagGroup(self):   
         ## add pathTags group to keep tags separate and visible
         self.pathTagZ = self.toFront(35.0)  ## otherwise it can be hidden 
         self.pathTagGroup = QGraphicsItemGroup()
@@ -319,10 +320,11 @@ class InitMap:
 
     def clearPaths(self):
         if self.pathSet:
-            if self.pathGroup:     
-                self.scene.removeItem(self.pathGroup)
-            if self.pathTagGroup:  
-                self.scene.removeItem(self.pathTagGroup)
+            for pix in self.scene.items():
+                if isinstance(pix, QGraphicsPathItem):
+                    self.scene.removeItem(pix)
+                if isinstance(pix, QGraphicsSimpleTextItem):
+                   self.scene.removeItem(pix)
             for pix in self.scene.items():
                 if pix.type in ('pix', 'snake') and not pix.tag.endswith('.path'):
                     if pix.anime and pix.anime.state() ==  QAbstractAnimation.State.Paused:
@@ -332,6 +334,7 @@ class InitMap:
                     break
         self.pathSet = False
         self.paths = []
+        self.pathTagGroup = None
 
     def displayPath(self, pix):
         tag = pix.tag 
@@ -377,7 +380,7 @@ class InitMap:
             elif pix.zValue() <= common['pathZ']:
                 break
         return inc + first
-    
+           
     def tagCount(self):  
         return sum(pix.type == 'tag' 
             for pix in self.scene.items())

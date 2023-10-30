@@ -8,15 +8,14 @@ from dotsShared         import common, RotateKeys
 
 import dotsAnimation    as Anime
 
-
 ### --------------------- dotsPixWorks ---------------------
-''' classes: Works - small functions that were in Pixitem '''                                                                                           
+''' classes: Works - functions moved from Pixitem '''                                                                                           
 ### --------------------------------------------------------
 
 Pct = -0.50   ## used by constrain - percent allowable off screen
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
     # "apple": (650, 450),  ## see setPixSizes below
-    'doral': (215, 215), 
+    'doral': (215, 215),
 }
                                                                                
 ### --------------------------------------------------------

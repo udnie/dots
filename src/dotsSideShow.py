@@ -2,8 +2,6 @@
 from os import path
 
 import json
-import random
-
 import asyncio
 import time
 
@@ -16,6 +14,7 @@ from dotsBkgMaker       import *
 from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
+from dotsSideWorks      import SideWorks
 
 from dotsSnakes         import DemoMenu, Snakes
 from dotsScreens        import ScreenMenu
@@ -33,7 +32,9 @@ class SideShow:
         self.scene    = self.canvas.scene
         self.dots     = self.canvas.dots
         self.mapper   = self.canvas.mapper
-        self.sideCar  = SideCar(self.canvas) 
+        
+        self.sideCar   = SideCar(self.canvas) 
+        self.sideWorks = SideWorks(self.canvas) 
         
         self.pathMaker = self.canvas.pathMaker
         self.bkgMaker  = self.canvas.bkgMaker
@@ -46,7 +47,7 @@ class SideShow:
             self.abstract  = Abstract(self.canvas) 
             self.demoMenu  = DemoMenu(self.canvas, self)
  
-        self.showTime   = ShowTime(self.canvas)
+        self.showtime   = ShowTime(self.canvas)
         self.screenMenu = ScreenMenu(self.canvas)  ## in screens
  
         self.locks = 0
@@ -66,7 +67,7 @@ class SideShow:
                         self.runThese()                                        
                 elif key == 'S':
                     if self.canvas.control != '':
-                        self.showTime.stop()        
+                        self.showtime.stop()        
             elif key in ('R', 'S', 'A'):  ## single key command - no sceneItems
                 self.RSA(key)
                 
@@ -80,7 +81,7 @@ class SideShow:
             elif self.canvas.openPlayFile == 'bats':
                 self.bats.rerun()
         else:
-            self.showTime.run()
+            self.showtime.run()
                
     def RSA(self, key):
         if key == 'R':   
@@ -110,7 +111,7 @@ class SideShow:
                     self.openPlay(file) 
                     self.canvas.openPlayFile = file
                 except IOError:
-                    MsgBox(file + 'Not Found')
+                    MsgBox('loadPlay ' + file + 'Not Found')
             else:
                 return
             
@@ -118,7 +119,7 @@ class SideShow:
         if not self.scene.items():
             self.openPlay(paths['playPath'] + file)  ## also adds pix to scene
             self.canvas.openPlayFile = file  ## give it time to load
-            QTimer.singleShot(200, self.showTime.run) 
+            QTimer.singleShot(200, self.showtime.run) 
        
 ### -------------------------------------------------------- 
     def openPlay(self, file):  ## adds play file contents to screen    
@@ -128,11 +129,13 @@ class SideShow:
                 dlist = json.load(fp)
         except IOError:
             MsgBox('openPlay: Error loading ' + file, 5)
-            return       
-        self.mapper.clearMap()  ## just clear it  
+            return   
+                     
+        self.mapper.clearMap()  ## just clear it
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
-         
+        self.canvas.bkgMaker.directions = []
+                 
         ## number of pixitems, bkg zval, number of shadows, scrollers            
         kix, bkz, ns, scr, f = 0, 0, 0, 0, '' 
         lnn = len(dlist)
@@ -186,7 +189,7 @@ class SideShow:
                             MsgBox( paths['bkgPath'] + tmp['fname'] + ' Not Found', 5)
                             return
                         else:
-                            pix = BkgItem(paths['bkgPath'] + tmp['fname'], self.canvas, bkz)  
+                            pix = BkgItem(paths['bkgPath'] + tmp['fname'], self.canvas, bkz)              
                     self.addPixToScene(pix, tmp)  ## finish unpacking tmp 
                 bkz -= 1   
             del tmp 
@@ -228,9 +231,9 @@ class SideShow:
                        
  ### --------------------------------------------------------
     def addPixToScene(self, pix, tmp):  ## treats pix, bkg, shadow as a pix 
-        pix = self.setAll(pix, tmp)                    
+        pix = self.sideWorks.setAll(pix, tmp)                    
         if pix.type == 'pix': 
-            pix = self.setPixitem(pix, tmp)
+            pix = self.sideWorks.setPixitem(pix, tmp)
 
         if 'tag' not in tmp.keys():     ## pix and bkg
             tmp['tag'] = ''
@@ -244,79 +247,20 @@ class SideShow:
         pix.locked = tmp['locked']  
                     
         if 'scalor' in tmp.keys():   
-            pix = self.setShadow(pix, tmp)     
-        elif pix.type == 'bkg':
-            pix = self.setBackGround(pix, tmp)                                                                         
+            pix = self.sideWorks.setShadow(pix, tmp)  
+            
+        elif pix.type == 'bkg' and pix.fileName != 'flat': 
+            pix = self.sideWorks.setBackGround(pix, tmp)  ## adding the rest of it                                           
         del tmp 
+                                                                                                 
+        ## adds pix to the scene and performs any transforms - used by other classes
+        if pix != None: self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
 
-        if pix.type == 'bkg' and pix.locked:
-            pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)   
-                                                                                               
-        ## adds pix to the scene and performs any transforms
-        self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
-   
-### --------------------------------------------------------
-    def setAll(self, pix, tmp):
-        pix.type = tmp['type']                 
-        pix.x    = float('{0:.2f}'.format(tmp['x']))
-        pix.y    = float('{0:.2f}'.format(tmp['y']))   
-        pix.setZValue(tmp['z']),  ## use the new one
-        pix.setMirrored(tmp['mirror']),
-        pix.rotation = tmp['rotation']
-        pix.scale    = tmp['scale']
-        return pix
-
-    def setPixitem(self, pix, tmp):
-        pix.setZValue(pix.zValue() + 100)  ## not for 'bkg'
-        pix.setPos(pix.x, pix.y)     
-        if 'frame' not in pix.fileName:
-            pix.locked = tmp['locked']
-            if pix.locked: self.locks += 1
-            pix.part = tmp['part']
-            pix = lookForStrays(pix)
-        return pix        
-
-    def setBackGround(self, pix, tmp):
-        if 'scrollable' not in tmp.keys(): 
-            tmp['scrollable'] = False
-        if 'direction' not in tmp.keys(): 
-            tmp['direction'] = 'left'    
-        if 'anime' not in tmp.keys(): 
-            tmp['anime'] = None            
-        pix.scrollable = tmp['scrollable']
-        pix.direction  = tmp['direction']
-        pix.anime      = tmp['anime']
-        pix.locked     = tmp['locked']
-        return pix          
- 
-    def setShadow(self, pix, tmp):
-        pix.shadow = {
-            'alpha':    tmp['alpha'],
-            'scalor':   tmp['scalor'],  ## unique to shadow
-            'rotate':   tmp['rotate'],
-            'width':    tmp['width'],
-            'height':   tmp['height'],
-            'pathX':    tmp['pathX'],
-            'pathY':    tmp['pathY'],  
-        }                   
-        if 'flopped' not in tmp.keys():      
-            pix.shadow['flopped'] = None
-        else:
-            pix.shadow['flopped'] = tmp['flopped']
-        if 'fileName' not in tmp.keys(): 
-            pix.shadow['fileName'] = 'shadow' 
-        if 'linked' not in tmp.keys(): 
-            pix.shadow['linked'] = False
-        else:
-            pix.shadow['linked'] = tmp['linked']
-        return pix
-                      
-### --------------------------------------------------------
-def lookForStrays(pix):
-    if pix.x < -25 or pix.x > common['ViewW'] -10:
-        pix.setPos(float(random.randint(25, 100) * 2.5), pix.y)      
-    if pix.y < -25 or pix.y > common['ViewH']-10:
-        pix.setPos(pix.x, random.randint(25, 100) * 1.5) 
-    return pix
+        del pix
         
 ### ---------------------- dotsSideShow --------------------
+
+
+
+
+

@@ -5,9 +5,9 @@ from PyQt6.QtWidgets    import QWidget, QDockWidget, QPushButton, \
                        
 docks = {
     "fixedHgt":     82, 
-    "scrollGrp":  370,  
+    "scrollGrp":  350,  
     "playGrp":    345,
-    "backGrp":    270,
+    "backGrp":    250,
     "canvasGrp":  355,
     "spacer":      10,  ## forces buttons closer together
 }
@@ -100,8 +100,6 @@ def addScrollBtnGroup(self):
     btnTop = QPushButton("Top")
     btnBottom = QPushButton("Bottom")
     btnClear = QPushButton("Clear")
-    if not self.dots.Vertical:  ## removes files button
-        btnFiles = QPushButton("Files")
     btnLoad = QPushButton("Sprites")
 
     layout = QHBoxLayout()
@@ -110,8 +108,6 @@ def addScrollBtnGroup(self):
     layout.addWidget(btnTop)
     layout.addWidget(btnBottom)
     layout.addWidget(btnClear)
-    if not self.dots.Vertical:
-        layout.addWidget(btnFiles)
     layout.addWidget(btnLoad)
     
     panel = self.scroll  ## make it easier to type
@@ -120,8 +116,6 @@ def addScrollBtnGroup(self):
     btnTop.clicked.connect(panel.top)
     btnBottom.clicked.connect(panel.bottom)
     btnClear.clicked.connect(panel.clear)
-    if not self.dots.Vertical:   ## removes files button
-        btnFiles.clicked.connect(panel.scrollFiles)
     btnLoad.clicked.connect(panel.loadSprites)
     
     self.scrollGroup.setLayout(layout)
@@ -154,13 +148,13 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnSave)
 
     sideShow = self.sideShow
-    showTime = self.showTime
+    showtime = self.showtime
 
     btnLoad.clicked.connect(sideShow.loadPlay)
-    self.btnSave.clicked.connect(showTime.savePlay) 
+    self.btnSave.clicked.connect(showtime.savePlay) 
     self.btnRun.clicked.connect(lambda: sideShow.keysInPlay('R'))
-    self.btnPause.clicked.connect(showTime.pause)
-    self.btnStop.clicked.connect(showTime.stop)
+    self.btnPause.clicked.connect(showtime.pause)
+    self.btnStop.clicked.connect(showtime.stop)
 
     self.playGroup.setLayout(layout)
 
@@ -175,15 +169,15 @@ def addBkgBtnGroup(self):
 
     self.btnAddBkg  = QPushButton(" Add ")
     self.btnSetBkg  = QPushButton(" Set ")      
-    self.btnSaveBkg = QPushButton("Save")
     self.btnBkgColor = QPushButton("Color")
+    self.btnSaveBkg = QPushButton("Save")
 
     layout = QHBoxLayout()    
 
     layout.addWidget(self.btnAddBkg) 
     layout.addWidget(self.btnSetBkg) 
-    layout.addWidget(self.btnSaveBkg) 
     layout.addWidget(self.btnBkgColor)
+    layout.addWidget(self.btnSaveBkg) 
 
     bkg  = self.bkgMaker
 

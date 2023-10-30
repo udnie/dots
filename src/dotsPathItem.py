@@ -1,14 +1,14 @@
 
 import os
 
-from PyQt6.QtCore       import Qt, QRectF, QPointF,QSize, QEvent, pyqtSlot
+from PyQt6.QtCore       import Qt, QRectF, QRect, QPointF,QPoint, QSize, QEvent, pyqtSlot
 from PyQt6.QtGui        import QColor, QPen, QPainter, QPen, QPolygonF, QFontMetrics, \
                                QFont, QBrush
 from PyQt6.QtWidgets    import QWidget, QLabel, QVBoxLayout, QPushButton, QScrollArea, \
                                 QGridLayout, QVBoxLayout, QGraphicsEllipseItem
 
 from dotsShared         import MoveKeys    
-from dotsSideGig        import getPathList, getPts, TagIt
+from dotsSideGig        import getPathList, getPts, TagIt, point, rect
         
 V = 7.5  ## the diameter of a pointItem
 
@@ -135,16 +135,17 @@ class PathItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
 class DoodleMaker(QWidget): ## my file display of path files
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, where=''):  ## can come from 'Path Menu'
         super().__init__()
 
         self.pathMaker = parent
-                 
+                         
         self.type = 'widget'
         self.save = QPointF()
-        
+                
         self.rotate = 0
         self.scale  = 0
+        self.where  = where
         
         self.setAccessibleName('widget')
         self.WidgetW, self.WidgetH = 530, 400
@@ -165,7 +166,7 @@ class DoodleMaker(QWidget): ## my file display of path files
         vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.setLayout(vbox)
-                
+                                           
 ### --------------------------------------------------------                                          
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -175,7 +176,25 @@ class DoodleMaker(QWidget): ## my file display of path files
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
         painter.setBrush(QColor(225,225,225)) 
         painter.drawRoundedRect(rect, 15, 15)
+   
+    def mousePressEvent(self, e):
+        self.save = e.globalPosition()  ## works the best, needs to change for PyQt6
+        e.accept()
+
+    def mouseMoveEvent(self, e):
+        self.moveThis(e)
+        e.accept()
         
+    def mouseReleaseEvent(self, e):
+        self.moveThis(e)
+        e.accept()
+
+    def moveThis(self, e):
+        dif = e.globalPosition() - self.save         
+        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())) )
+        self.save = e.globalPosition()
+        
+### -------------------------------------------------------- 
     def addClose(self): 
         quitBtn = QPushButton('Close')
         quitBtn.clicked.connect(self.closeWidget)
@@ -206,7 +225,7 @@ class DoodleMaker(QWidget): ## my file display of path files
             
         scroll.setWidget(widget)
         return scroll
-    
+      
     def updateGrid(self):
         for file in getPathList():    
             df = Doddle(self, self.pathMaker, file)
@@ -243,7 +262,7 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
         self.brush = QBrush(QColor(255,255,255,255)) 
         ## scale down screen drawing --  file, scalor, offset        
         self.df = getPts(self.file, scalor, 10)  
-  
+        
     def minimumSizeHint(self):
         return QSize(self.W, self.H)
 
@@ -254,6 +273,18 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
         if e.type() == QEvent.Type.MouseButtonPress and \
             e.button() == Qt.MouseButton.RightButton:
             return
+          
+        if self.doodle.where == 'Path Menu':  ## from animation menu - sideCar
+            for pix in self.pathMaker.canvas.scene.selectedItems(): 
+                if pix.type != 'pix':
+                    continue
+                else:
+                    pix.tag = os.path.basename(self.file) 
+                    pix.anime = None        ## set by play
+                    pix.setSelected(False)  ## when tagged 
+            self.pathMaker.pathChooserOff() 
+            return
+    
         elif self.pathMaker.key == 'del':
             self.doodle.delete(self)
             return
@@ -265,7 +296,7 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
         
         if self.pathMaker.widget != None:
             self.pathMaker.widget.resetSliders()
-          
+        
         e.accept()
                                    
     def paintEvent(self, event):  ## draw the paths

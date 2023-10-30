@@ -232,17 +232,6 @@ class ScrollPanel(QWidget):
             self.layout.itemAt(i).widget().deleteLater()
         self.scrollCount = 0
         self.scrollList = []
- 
-    def scrollFiles(self):
-        Q = QFileDialog()
-        Q.Option.DontUseNativeDialog
-        files, _ = Q.getOpenFileNames(self,
-            'Choose an image file to open', paths['snapShot'], 
-            'Images Files(*.bmp *.jpg *.png)')
-        if files:
-            for fileName in files:
-                self.add(fileName)
-        Q.accept()
           
     def loadSprites(self):
         sprites = sorted(self.spriteList())
