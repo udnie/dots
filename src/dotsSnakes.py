@@ -76,6 +76,7 @@ class DemoMenu:
         elif key == 'blue':
             self.runSnakes('blue') 
         elif key == 'snakes':
+            self.canvas.bkgMaker.directions = []
             if self.dots.Vertical:   
                 self.runSnakes('vertical') 
             else:
@@ -83,7 +84,8 @@ class DemoMenu:
         elif key in ('left', 'right'):
             if self.dots.Vertical:     
                 MsgBox('Not Implemented for Vertical Format')
-                return             
+                return            
+            self.canvas.bkgMaker.directions = []
             if key == 'left':  ## direction of travel
                 self.abstract.makeAbstracts('left')  ## right to left 
             else: 
@@ -114,7 +116,7 @@ class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
         
         img = QImage(fileName)
 
-        w = img.width() * common['factor']
+        w = img.width() * common['factor']  ## from screens
         h = img.height() * common['factor']
    
         img = img.scaled(int(w), int(h),
@@ -182,7 +184,7 @@ class Snakes:
         }
       
         self.scroller = None  
-        snakes = 3  ## ## if scrollering make these many and quit
+        snakes = 3  ## ## if scrolling make these many and quit
         
         if what == 'blue':  ## not scrolling
             snakes = 4  
@@ -246,25 +248,27 @@ class Snakes:
 ### -------------------------------------------------------- 
     def setSelection(self, what):  ## no right scrolling for snakes
         if what == 'blue':
-            # snakes = 4  ## make these many and quit
             color  = QColor(QColor(0,84,127) )  ## ocean blue                                
             self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99
              
         elif what == 'left':
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
+            
             self.scroller.direction = 'left' 
             self.scroller.tag = 'scroller'
+            self.scroller.mirroring = True  
             self.scroller.bkgWorks.addTracker(self.scroller)
-            self.scroller.mirroring = True
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
             
         elif what == 'vertical':
             self.scroller = BkgItem(paths['demo'] + 'snakes_vertical.jpg', self.canvas) 
+            
             self.scroller.direction = 'vertical'   
             self.scroller.tag = 'scroller'
+            self.scroller.mirroring = True       
             self.scroller.bkgWorks.addTracker(self.scroller)
-            self.scroller.mirroring = True
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
+            
             self.scroller.runway = int(common['ViewH'] - self.scroller.height) + self.scroller.showtime  
             self.scroller.setPos(QPointF(0, self.scroller.runway))
             

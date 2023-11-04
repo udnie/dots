@@ -202,16 +202,24 @@ class StoryBoard(QWidget):
         self.clear() 
         self.dots.closeAll()
         QTimer.singleShot(20, self.dots.close)   
-                    
-    def clear(self):  ## do this before exiting app   
-        # if self.canvas.pathMakerOn:  ## changed 10/21/23
+                
+    def clearSceneItems(self):
+        for p in self.scene.items():      
+            if p.type == 'pix' and p.part in ('left', 'right'):
+                continue
+            try:
+                self.scene.removeItem(p) 
+            except Exception:
+                continue
+               
+    def clear(self):  ## do this before exiting app as well 
         self.pathMaker.pathMakerOff()
-            # self.pathMaker.pathChooserOff()   
-                       
+                        
         self.sideCar.clearWidgets() 
+        self.showtime.stop('clear')     
+        self.clearSceneItems() 
         self.scene.clear()
-        
-        self.showtime.stop('clear')      
+             
         self.mapper.clearMap()      
           
         if self.sideShow.demoAvailable != None:  
@@ -229,7 +237,8 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        # gc  ## testing exit problem
+        self.bkgMaker.directions = []
+        gc  ## testing exit problem - it's the CAT error
            
     def loadSprites(self):
         self.sideWorks.enablePlay()

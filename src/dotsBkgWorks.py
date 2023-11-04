@@ -4,11 +4,11 @@ import math
 import random
 
 from PyQt6.QtCore       import Qt, QPoint
-from PyQt6.QtGui        import QPixmap
-from PyQt6.QtWidgets    import QGraphicsPixmapItem
+from PyQt6.QtGui        import QColor
+from PyQt6.QtWidgets    import QGraphicsSimpleTextItem
                         
 from dotsShared         import common
-from dotsSideGig        import MsgBox
+from dotsSideGig        import MsgBox, point
 from dotsBkgMatte       import Matte
 
 ### --------------------- dotsBkgWorks --------------------- 
@@ -34,16 +34,19 @@ class BkgWorks:
         self.bkgMaker = self.bkgItem.bkgMaker
         self.canvas   = self.bkgItem.canvas
         self.dots     = self.bkgItem.dots
- 
+        
 ### -------------------------------------------------------- 
-    def addTracker(self, pix):  ## when loading a play file and adding from screen
-        file = os.path.basename(pix.fileName)    
+    def addTracker(self, bkg):  ## when loading a play file and adding from screen
+        file = os.path.basename(bkg.fileName) 
+        ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
+        ## if randomizing speed factor do this 
         # fact = float((random.randint(17,30) *5)/100)  ## .85-1.50
-        fact = 1.0  ## default
+        # bkg.factor = fact  ## if using a random screen speed factor 
+    
         if len(self.bkgMaker.directions) == 0:
-            x = Tracker(file, pix.direction, pix.mirroring, fact)
+            x = Tracker(file, bkg.direction, bkg.mirroring, bkg.factor)
             self.bkgMaker.directions.append(x)
-            # print( f'inital  {file}\t{pix.direction}\t{pix.mirroring}\t{x.factor}\t{pix.zValue()}')
+            # self.filePixX(file, bkg, x)
             return True
         else:
             k = 0
@@ -51,13 +54,22 @@ class BkgWorks:
                 if p.file == file:
                     k += 1
             if k == 0:  ## no others found - add it 
-                x = Tracker(file, pix.direction, pix.mirroring, fact)
+                x = Tracker(file, bkg.direction, bkg.mirroring, bkg.factor)
                 self.bkgMaker.directions.append(x) 
-                # print( f'adding  {file}\t{pix.direction}\t{pix.mirroring}\t{x.factor}\t{pix.zValue()}')
+                # self.filePixX(file, bkg, x)
                 return True
             else:
                 return False  ## must be a duplicate, skip processing 
             
+    def filePixX(self, file, bkg, x):
+        print( f'tracker {file}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.factor}\t{bkg.zValue()}')
+              
+    def delTracker(self, bkg):
+        file = os.path.basename(bkg.fileName)  
+        for item in self.bkgMaker.directions:  ## see if it's already there
+            if item.file == file:  
+                self.bkgMaker.directions.remove(item)
+                         
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):  ## from keybooard or widget - sets 'first'      
         if math.fabs(self.bkgItem.runway) < self.bkgItem.showtime:
@@ -75,8 +87,7 @@ class BkgWorks:
                 if p.file == file:
                     p.direction = self.bkgItem.direction 
                     
-            self.bkgMaker.lockBkg()
-                
+            self.bkgMaker.lockBkg()      
             self.setBtns()
                   
 ### -------------------------------------------------------- 
@@ -95,14 +106,15 @@ class BkgWorks:
         self.setMirrorBtnText() 
 
 ### -------------------------------------------------------- 
-    def restoreDirections(self, pix, where):  ## returns what gets lost on each reincarnation
-        file = os.path.basename(pix.fileName)  ## opposite of setMirroring
+    def restoreDirections(self, bkg, where):  ## returns what gets lost on each reincarnation
+        file = os.path.basename(bkg.fileName)  ## opposite of setMirroring
         for p in self.bkgMaker.directions:
             if p.file == file:
-                pix.mirroring = p.mirroring   
-                pix.direction = p.direction 
-                return p.factor
-       
+                bkg.mirroring = p.mirroring   
+                bkg.direction = p.direction 
+                bkg.factor    = p.factor
+                return bkg.factor
+                
     def setLeft(self):
         if self.bkgItem.scrollable:
             self.setDirection('left')      
@@ -137,19 +149,19 @@ class BkgWorks:
         if self.bkgItem:  ## shouldn't need this but - could have just started to clear                         
             if self.bkgItem.scrollable == False:
                 self.bkgMaker.widget.mirrorBtn.setText('Not Scrollable')         
-            elif self.bkgItem.mirroring == True:
-                self.bkgMaker.widget.mirrorBtn.setText('Mirroring On')         
             elif self.bkgItem.mirroring == False:
-                self.bkgMaker.widget.mirrorBtn.setText('Mirroring Off')    
+                self.bkgMaker.widget.mirrorBtn.setText('Continuous')         
+            elif self.bkgItem.mirroring == True:
+                self.bkgMaker.widget.mirrorBtn.setText('Mirrored')    
                                    
     def reset(self):
         file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
         for p in self.bkgMaker.directions:
             if p.file == file:
                 p.direction = ''
-                p.mirroring = True
+                p.mirroring = self.bkgMaker.mirroring
         self.bkgItem.tag = ''                
-        self.bkgItem.mirroring = True   
+        self.bkgItem.mirroring = self.bkgMaker.mirroring  
         self.bkgItem.direction = ''
         self.bkgMaker.widget.close()
         self.bkgMaker.addWidget(self.bkgItem)
@@ -157,23 +169,40 @@ class BkgWorks:
     def setMatte(self):
         self.bkgMaker.closeWidget()
         self.bkgMaker.matte = Matte(self.bkgItem)  
-                                          
+                               
+    def tagBkg(self, bkg, pos):
+        self.bkgItem = bkg
+        x, y = pos.x(), pos.y()
+        z = self.bkgItem.zValue()
+        text = QGraphicsSimpleTextItem() 
+        if self.bkgItem.locked == True:
+            text = 'Locked' 
+        else:
+            text = 'Unlocked'
+        file = os.path.basename(bkg.fileName)
+        tag = file + " " + text    
+        if self.bkgItem.direction == ' left':
+            tag = tag + ' Left'
+        elif self.bkgItem.direction == 'right': 
+            tag = tag + ' Right'            
+        self.canvas.mapper.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
+                                                          
 ### --------------------------------------------------------                
-    def left(self, path, pix, rate, which, fact):  ## which rate to use, 1 == rate[0] 
+    def left(self, path, bkg, rate, which, fact):  ## which rate to use, 1 == rate[0] 
         if which == 'first':
             path.setDuration(int(common['ViewW'] * (rate[0]*fact)))  ## rate time equals time to clear   
             path.setStartValue(QPoint(0,0)) 
-            path.setEndValue(QPoint(-int(pix.width), 0))
+            path.setEndValue(QPoint(-int(bkg.width), 0))
         else:    
             rate_one = rate[1]
-            # if 'snakes' in pix.fileName:  ## looks better and not another dictionary to maintain
+            # if 'snakes' in bkg.fileName:  ## looks better and not another dictionary to maintain
             #     rate_one = rate_one + .2
             path.setDuration(int(common['ViewW'] * (rate_one*fact)))    
             path.setStartValue(QPoint(common['ViewW'], 0))
-            path.setEndValue(QPoint(int(-pix.width), 0))
+            path.setEndValue(QPoint(int(-bkg.width), 0))
         return path
     
-    def right(self, path, pix, rate, which, fact):  ## which column to read from
+    def right(self, path, bkg, rate, which, fact):  ## which column to read from
         if which == 'first':        
             path.setDuration(int(common['ViewW'] * (rate[0]*fact)))
             path.setStartValue(QPoint(self.bkgItem.runway, 0))
@@ -184,14 +213,14 @@ class BkgWorks:
             path.setEndValue(QPoint(int(common['ViewW']), 0))
         return path
                      
-    def vertical(self, path, pix, rate, which, fact):       
+    def vertical(self, path, bkg, rate, which, fact):       
         if which == 'first': 
             path.setDuration(int(common['ViewH'] * (rate[0]*fact)))  ## rate time equals time to clear   
             path.setStartValue(QPoint(0, self.bkgItem.runway+self.bkgItem.showtime))
             path.setEndValue(QPoint(0, -self.bkgItem.height))
         else:    
             rate_one = rate[1]
-            if 'snakes' in pix.fileName:  
+            if 'snakes' in bkg.fileName:  
                 rate_one = rate_one + .2
             path.setDuration(int(common['ViewH'] * (rate_one*fact)))    
             path.setStartValue(QPoint(0, self.bkgItem.height+self.bkgItem.runway))
@@ -230,55 +259,7 @@ class BkgWorks:
         self.bkgItem.scrollable = True   
         del img 
         del imf
-    
- ### -------------------------------------------------------- 
-class Flat(QGraphicsPixmapItem):
-### --------------------------------------------------------   
-    def __init__(self, color, canvas, z=common['bkgZ']):
-        super().__init__()
-
-        self.canvas   = canvas
-        self.scene    = canvas.scene
-        self.bkgMaker = self.canvas.bkgMaker
-        
-        self.type = 'bkg'
-        self.color = color
-        
-        self.fileName = 'flat'
-        self.locked = False
-        
-        self.tag = ''
-        self.id = 0   
-
-        p = QPixmap(common['ViewW'],common['ViewH'])
-        p.fill(self.color)
-        
-        self.setPixmap(p)
-        self.setZValue(z)
-   
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-        
-### --------------------------------------------------------
-    def mousePressEvent(self, e):      
-        if not self.canvas.pathMakerOn:
-            if e.button() == Qt.MouseButton.RightButton:    
-                self.bkgMaker.addWidget(self)        
-            elif self.canvas.key == 'del':     
-                self.delete()
-            elif self.canvas.key == '/':  ## to back
-                self.bkgMaker.back(self)
-            elif self.canvas.key in ('enter','return'):  
-                self.bkgMaker.front(self)                             
-        e.accept()
-      
-    def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
-            self.canvas.key = ''       
-        e.accept()
-     
-    def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
-                                                                                
+                                                                                    
 ### --------------------- dotsBkgWorks ---------------------
 
 

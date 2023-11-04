@@ -66,16 +66,15 @@ class ShowTime:
                         pix)        
                 elif pix.type == 'bkg': 
                     if pix.tag == 'scroller':                
-                        # print(f'stop  {os.path.basename(pix.fileName)}\t{pix.direction}\t{pix.mirroring}')
                         pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem 
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)
                     if pix.locked:
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable,False) 
-                             
+                                    
                 k += 1  ## k = number of pixitems - bats count as three
                 if pix.anime == None:  ## not animated
                     continue
-                else:   
+                else:  ## staggering the start 
                     QTimer.singleShot(100 + (k * 35), pix.anime.start)  #   
                     
                 ### --->> optional drop shadow <<-- ###
@@ -140,7 +139,11 @@ class ShowTime:
             
             if pix.type in ('pix', 'snake', 'bkg'):                   
                 if pix.anime != None and pix.anime.state() != QAbstractAnimation.State.Stopped:       
-                    pix.anime.stop()                         
+                    pix.anime.stop()                   
+                    
+                    # if pix.type == 'bkg':
+                    #     print(f'stop  {os.path.basename(pix.fileName)}\t{pix.direction}\t{pix.mirroring}')
+                              
                     if pix.tag == 'scroller':  ## can be more than one
                         pix.anime = None
                         scrolling.append(pix.tag)
@@ -162,7 +165,7 @@ class ShowTime:
                             pix.reprise()
                             
         if len(scrolling) > 0:
-            self.sideWorks.cleanUpScrollers()
+            self.sideWorks.cleanUpScrollers(self.canvas.scene)
         self.sideWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  

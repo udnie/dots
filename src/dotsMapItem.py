@@ -193,7 +193,7 @@ class InitMap:
 
     def tagWorks(self, pid):
         k = 0
-        tf = self.toFront()  ## only once
+        topZVal = self.toFront()  ## only once
         self.tagSet = False
         if pid == '': 
             pid = 'all'
@@ -202,19 +202,19 @@ class InitMap:
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
             if pix.type in ('pix', 'snake', 'bkg') and pix.fileName != 'fiat':
                 if 'path' in pix.tag and pid == 'paths':
-                    self.tagIt('paths', pix, tf) 
+                    self.tagIt('paths', pix, topZVal) 
                     k += 1
                 if pid == 'all':
                     k += 1
                     if alltags != pix.tag:  ## only one per snake
                         alltags = pix.tag
-                        self.tagIt('',pix, tf)         
+                        self.tagIt('',pix, topZVal)         
                 # elif pid == 'select' and pix.isSelected():
                 elif pix.isSelected():
-                    self.tagIt('',pix, tf)
+                    self.tagIt('',pix, topZVal)
                     k += 1
                 elif pid == pix.id:  ## single tag
-                    self.tagIt('',pix, tf) 
+                    self.tagIt('',pix, topZVal) 
                     k = 1
                     break
         if k > 0: 
@@ -240,7 +240,7 @@ class InitMap:
             if p.type == 'tag':
                 self.scene.removeItem(p)
         
-    def tagIt(self, token, pix, tf):  
+    def tagIt(self, token, pix, topZVal):  
         p = pix.sceneBoundingRect()
         x = p.x() + p.width()*.45
         y = p.y() + p.height()*.45
@@ -255,7 +255,7 @@ class InitMap:
         if pix.type in ('pix','bkg') and pix.locked == True:
             tag = 'Locked ' + tag 
 
-        if pix.zValue() == tf: 
+        if pix.zValue() == topZVal:  ## set to front ZValue
             color = 'yellow'
 
         if token == 'paths':
@@ -264,17 +264,19 @@ class InitMap:
             token = self.canvas.control
             
         if tag == 'UnLocked': color = 'orange'
-
-        tag = TagIt(token, tag, color, pix.zValue())
           
-        if pix.type == 'bkg':
-            return  ## for now
-            # b = getCtr(-270,-265)      
-            # x, y = b.x(), b.y()
-
-        tag.setPos(x,y)
+        self.TagItTwo(token, tag, color, x, y, pix.zValue())
+        
+    def TagItTwo(self, token, tag, color, x, y, z, src=''):
+        ## this way I can stretch it for backgrounds
+        tag = TagIt(token, tag, color, z)
         tag.setZValue(self.toFront(45.0))
-        self.tagGroup.addToGroup(tag)
+        if src == 'bkg':
+            tag.setPos(x-50.0, y-30.0)
+            self.scene.addItem(tag)
+        else:
+            tag.setPos(x,y)
+            self.tagGroup.addToGroup(tag)
         self.tagSet = True
 
     def tagCount(self):  

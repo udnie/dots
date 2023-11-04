@@ -51,19 +51,20 @@ class Wings:
             self.height = self.pivot.height/9  
           
         try:
-            # self.pivot.setPos(self.pivot.x - self.half, self.pivot.y - self.height - 5) why???
             self.pivot.setPos(self.pivot.x, self.pivot.y)
             self.pivot.setScale(.60)
             self.pivot.setOriginPt() 
         except IOError:
             pass    
-       
+                
         ## center wings around pivot - some magic numbers
         self.rightWing.setPos(self.half+1, self.height-2)
         self.leftWing.setPos(-self.leftWing.width+(self.half+5), self.height-5)
 
         self.rightWing.setParentItem(self.pivot)  
         self.leftWing.setParentItem(self.pivot)
+        
+        self.scene.addItem(self.pivot)
                    
 ### --------------------------------------------------------
     def pivot(self, file, x, y, tag):  ## was wings
@@ -79,9 +80,7 @@ class Wings:
         pivot.setZValue(pivot.zValue() + 200)
         pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True)  
         pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
-        
-        self.scene.addItem(pivot)
-                            
+                    
         return pivot
    
 ### --------------------------------------------------------  
@@ -110,10 +109,9 @@ class Wings:
         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIgnoresParentOpacity, True)  ## won't disappear
-        pix.setAcceptedMouseButtons(Qt.MouseButton.NoButton)  ## mouse ignored - wings can't be move
-        self.scene.addItem(pix)      
-        return pix 
-           
+        pix.setAcceptedMouseButtons(Qt.MouseButton.NoButton)  ## mouse ignored - wings can't be move       
+        return pix
+            
 ### --------------------------------------------------------
 class Bats:     
 ### --------------------------------------------------------
@@ -241,13 +239,16 @@ class Abstract:  ## hats
         self.hats = 7
         self.shadows = False
         self.direction = ''
+        
         self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
+        
+        self.scroller = None
         
 ### --------------------------------------------------------      
     def makeAbstracts(self, direction):
         self.direction = direction
         self.canvas.openPlayFile = 'abstract'     
-               
+                       
         self.setBackGround()
         self.setHats()        
         
@@ -255,23 +256,30 @@ class Abstract:  ## hats
             MsgBox('Adding Shadows,  please wait...', int(1 + (self.hats * .25)))
             self.addShadows()
                    
-        QTimer.singleShot(200, self.bkgItem.anime.start)  ## run scrolling background  
+        QTimer.singleShot(200, self.scroller.anime.start)  ## run scrolling background  
         self.run()  
         self.sideWorks.disablePlay()
 
 ### --------------------------------------------------------            
     def setBackGround(self):
-        self.bkgItem = BkgItem(paths['demo'] + 'abstract.jpg', self.canvas)   
-        self.bkgItem.tag = 'scroller'
-        self.bkgItem.direction = self.direction
-        self.canvas.mirroring = True
-        self.bkgItem.bkgWorks.addTracker(self.bkgItem)
-        self.bkgItem.anime = self.bkgItem.setScrollerPath(self.bkgItem, 'first')       
+        if self.scroller != None:
+            self.scroller.init()
+        else:
+            self.scroller = BkgItem(paths['demo'] + 'abstract.jpg', self.canvas)
+   
+        self.scroller.direction = self.direction       
+        self.scroller.tag = 'scroller'
+        self.scroller.mirroring = True      
+        self.scroller.bkgWorks.addTracker(self.scroller)  
+
+        self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  
+  
         if self.direction == 'right':
-            self.bkgItem.setPos(QPointF(self.bkgItem.runway, 0))  ## offset to right     
-        self.bkgItem.addedScroller == False   
-        self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
-        self.scene.addItem(self.bkgItem)  
+            self.scroller.setPos(QPointF(self.scroller.runway, 0))  ## offset to right    
+  
+        self.scroller.addedScroller == False   
+        self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
+        self.scene.addItem(self.scroller)  
   
     def setHats(self): 
         apaths = getPathList()  ## from sideGig  
@@ -327,9 +335,10 @@ class Abstract:  ## hats
                 k += 1
        
 ### --------------------------------------------------------                                                
-    def rerun(self, direction):         
+    def rerunAbstract(self, direction):       
         clearPaths(self)
         self.delHats() 
+        self.scroller.bkgWorks.delTracker(self.scroller) 
         self.makeAbstracts(direction) 
       
     def delHats(self):

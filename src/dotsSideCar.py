@@ -62,7 +62,7 @@ class SideCar:
                         self.canvas)
                 ## note -> self.xy()
                 pix.x = int(constrain(self.xy(common['ViewW']), pix.width, common['ViewW'], 
-                        pix.width * -common['factor']))
+                        pix.width * -common['factor']))  ## factor from screens
                 pix.y = int(constrain(self.xy(common['ViewH']), pix.height, common['ViewH'],
                         pix.height * -common['factor']))
                 pix.setPos(pix.x, pix.y)
@@ -128,12 +128,11 @@ class SideCar:
     def pageDown(self, key):  ## for sprite scrollPanel
         self.canvas.scroll.pageDown(key)
       
-    def dumpBkgs(self):
+    def dumpBkgs(self):  ## shift-B 
         for p in self.scene.items():
             if p.type == 'bkg' and 'flat' not in p.fileName:
                 file = os.path.basename(p.fileName)   
-                factor = 1.0
-                print( f'dumpBkgs  {file}\t{p.direction}\t{p.mirroring}\t{p.zValue()}\t{p.locked}\t{factor}')
+                print( f'dumpBkgs  {file}\t{p.direction}\t{p.mirroring}\t{p.zValue()}\t{p.locked}\t{p.factor}')
         print()
       
 ### --------------------------------------------------------    

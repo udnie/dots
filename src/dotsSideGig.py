@@ -111,7 +111,10 @@ class TagIt(QGraphicsSimpleTextItem):
         self.font = QFont()
         self.font.setFamily('Helvetica')
         self.font.setPointSize(12)
-
+        
+        if token == 'bkg':
+            self.font.setPointSize(14)
+        
         metrics = QFontMetrics(self.font)
         p = metrics.boundingRect(self.text)
         p = p.width()

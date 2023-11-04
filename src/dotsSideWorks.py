@@ -22,7 +22,8 @@ class SideWorks:
         self.scene  = self.canvas.scene
   
 ### --------------------------------------------------------  
-    def cleanUpScrollers(self):  ## called from showtime  
+    def cleanUpScrollers(self, scene):  ## called from showtime  
+        self.scene = scene
         for t in self.canvas.bkgMaker.directions:
             tracker = t.file  
             k = 0 

@@ -14,7 +14,7 @@ from dotsShared         import common, paths, PlayKeys
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
-from dotsBkgWorks       import Flat
+from dotsBkgMatte       import Flat
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -34,6 +34,7 @@ class BkgMaker(QWidget):
         self.bkgItem = None 
         self.matte   = None 
 
+        self.mirroring = False  ## set in bkgItem
         self.directions = []  ## tracks backgrounds and holds state of direction, mirroring  
             
 ### --------------------------------------------------------
@@ -117,9 +118,9 @@ class BkgMaker(QWidget):
             self.scene.addItem(self.bkgItem)
             self.updateZvals(self.bkgItem)
     
-    def delScroller(self, pix):
-        self.scene.removeItem(pix)
-        del pix
+    def delScroller(self, bkg):
+        self.scene.removeItem(bkg)
+        del bkg
  
 ### -------------------------------------------------------- 
     def addWidget(self, item):  ## background widget

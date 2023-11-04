@@ -5,6 +5,10 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**November 3 2023**       
+A bug fix to the demos scrolling backgrounds and a change to the scrolling default from **Mirrored** to **Continuous**.  The default is set in **BkgMaker.py** as is the **directions** list used by **tracker**. I also removed the keyboard commands in backgrounds used for setting the scrolling direction and the key command to trigger the matte as they're now both in the widget.
+
+---
 **October 2023**        
 The 'Save' button in the Backgrounds group will now save only 'flats', full color canvases.
 To save a scrolling background you need to save it to a play file - that way you preserve your settings.  I've added another scrolling button, **'Mirroring On/Off/Not Scrollable'**. The default has been Mirroring On from the beginning as I didn't have any pre-made scrolling backgrounds and I liked the mirror effect. I decided now that I can scroll more than one background at a time I should add scrolling without mirroring and see where that goes.
@@ -16,7 +20,6 @@ The Halloween demo also used a random value , 'factor/fact', between .85 - 1.50 
 New video: <https://youtu.be/Eu3OqKjtBgw>
 
 Last, here's the url for where I found the scrolling background I used, <https://www.artstation.com>, it was free and a needed visual aid.
-
 
 ---
 

@@ -77,7 +77,7 @@ class SideShow:
             if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
                 self.snakes.rerun(self.snakes.what)  
             elif self.canvas.openPlayFile == 'abstract' and self.abstract.direction != '':
-                self.abstract.rerun(self.abstract.direction)  
+                self.abstract.rerunAbstract(self.abstract.direction)  
             elif self.canvas.openPlayFile == 'bats':
                 self.bats.rerun()
         else:
@@ -87,11 +87,11 @@ class SideShow:
         if key == 'R':   
             self.screenMenu.closeScreenMenu()
             if self.demoAvailable: 
-                self.demoMenu.openDemoMenu()  
+                self.demoMenu.openDemoMenu()  ## in snakes 
         elif key == 'S':   
             if self.demoAvailable:  
                 self.demoMenu.closeDemoMenu()
-                self.screenMenu.openScreenMenu()
+                self.screenMenu.openScreenMenu() ## in screens
         elif key == 'A':
             self.bkgMaker.openBkgFiles()          
                                    
@@ -210,7 +210,7 @@ class SideShow:
         elif self.locks > 0:
             MsgBox('Some screen items are locked', 5)  ## seconds
             self.canvas.mapper.toggleTagItems('all')
-    
+                
 ### --------------------------------------------------------             
     def addShadows(self):  ## add shadows after adding pixitems     
         tasks = []         

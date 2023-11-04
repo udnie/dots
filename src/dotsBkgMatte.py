@@ -1,14 +1,15 @@
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF
-from PyQt6.QtGui        import QColor, QPainter, QPainterPath, QBrush, QImage
-from PyQt6.QtWidgets    import QWidget
+from PyQt6.QtGui        import QColor, QPainter, QPainterPath, QBrush, QImage, \
+                                QPixmap
+from PyQt6.QtWidgets    import QWidget,  QGraphicsPixmapItem
     
 from dotsShared         import common, paths
 
 ShiftKeys = (Qt.Key.Key_R, Qt.Key.Key_P, Qt.Key.Key_S)
 
 ### -------------------- dotsBkgMatte ----------------------
-''' class: Matte '''        
+''' classes: Matte and Flat '''        
 ### --------------------------------------------------------
 class Matte(QWidget):
 ### --------------------------------------------------------
@@ -37,7 +38,7 @@ class Matte(QWidget):
     
         self.black = QBrush(QColor('black'))
         self.grey  = QBrush(QColor(250,250,250))
-        self.pix   = None
+        self.pix   = None  ## not exactly a background
         
         self.img = QImage(paths['bkgPath'] + 'abstract.jpg')  ## used as a matte
     
@@ -173,6 +174,54 @@ class Matte(QWidget):
         self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
         self.save = e.globalPosition()
 
+ ### -------------------------------------------------------- 
+class Flat(QGraphicsPixmapItem):
+### --------------------------------------------------------   
+    def __init__(self, color, canvas, z=common['bkgZ']):
+        super().__init__()
+
+        self.canvas   = canvas
+        self.scene    = canvas.scene
+        self.bkgMaker = self.canvas.bkgMaker
+        
+        self.type = 'bkg'
+        self.color = color
+        
+        self.fileName = 'flat'
+        self.locked = False
+        
+        self.tag = ''
+        self.id = 0   
+
+        p = QPixmap(common['ViewW'],common['ViewH'])
+        p.fill(self.color)
+        
+        self.setPixmap(p)
+        self.setZValue(z)
+   
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        
+### --------------------------------------------------------
+    def mousePressEvent(self, e):      
+        if not self.canvas.pathMakerOn:
+            if e.button() == Qt.MouseButton.RightButton:    
+                self.bkgMaker.addWidget(self)        
+            elif self.canvas.key == 'del':     
+                self.delete()
+            elif self.canvas.key == '/':  ## to back
+                self.bkgMaker.back(self)
+            elif self.canvas.key in ('enter','return'):  
+                self.bkgMaker.front(self)                             
+        e.accept()
+      
+    def mouseReleaseEvent(self, e):
+        if not self.canvas.pathMakerOn:
+            self.canvas.key = ''       
+        e.accept()
+     
+    def delete(self):  ## also called by widget
+        self.bkgMaker.deleteBkg(self)
+                                           
 ### -------------------- dotsBkgMatte ----------------------
 
 
