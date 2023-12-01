@@ -40,7 +40,7 @@ class Matte(QWidget):
         self.grey  = QBrush(QColor(250,250,250))
         self.pix   = None  ## not exactly a background
         
-        self.img = QImage(paths['bkgPath'] + 'abstract.jpg')  ## used as a matte
+        self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## used as a matte
     
         self.border = 100  ## inital
         self.step   = 25

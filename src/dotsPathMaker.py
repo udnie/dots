@@ -301,7 +301,7 @@ class PathMaker(QWidget):
             self.pathSet = False
             self.path = None
       
-    def redrawPathsAndTags(self):
+    def redrawTagsAndPaths(self):
         self.pathWays.removeWayPtTags()
         self.removePath()
         self.addPath()

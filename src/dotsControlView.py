@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QGraphicsView
 from dotsSideGig     import MsgBox
 from dotsShared      import singleKeys
 from dotsSideCar     import SideCar
-from dotsMapItem     import InitMap
+from dotsMapMaker     import MapMaker
 
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
@@ -30,7 +30,7 @@ class ControlView(QGraphicsView):
         super().__init__(parent)
 
         self.canvas  = parent         
-        self.mapper  = InitMap(self.canvas)  ## carry mapper to sidecar  
+        self.mapper  = MapMaker(self.canvas)  ## carry mapper to sidecar  
         self.sideCar = SideCar(self.canvas)
         
         self.setObjectName('ControlView')
@@ -56,7 +56,7 @@ class ControlView(QGraphicsView):
       
         self.direct = {
             # Qt.Key.Key_A: self.canvas.selectAll,  << moved to storyBoard
-            Qt.Key.Key_H: self.canvas.hideSelected,
+            Qt.Key.Key_H: self.sideCar.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
             Qt.Key.Key_O: self.sideCar.toggleOutlines,   
         }
@@ -92,8 +92,8 @@ class ControlView(QGraphicsView):
             fileName = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.mapper.toFront(0)
-            # self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(),  ## PyQt6 uses pos
-            self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### PyQt6 takes position
+            # self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(), ### Qt5 uses pos
+            self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### Qt6 takes position
                 None, False)
             
     def dragLeaveEvent(self, e):
@@ -158,8 +158,11 @@ class ControlView(QGraphicsView):
                 self.setKey('T') if self.canvas.pathMakerOn else \
                     self.mapper.toggleTagItems('all')
             elif key == Qt.Key.Key_W:
-                self.sideCar.clearWidgets()        
-                                                            
+                self.sideCar.clearWidgets()    
+                
+        elif key == Qt.Key.Key_Space and self.canvas.control != '':
+            self.sideCar.pause() 
+                                        
         elif key in self.direct: 
             self.direct[key]()  ## dictionary
             

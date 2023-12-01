@@ -5,11 +5,12 @@ from PyQt6.QtCore       import QPoint
   
 from dotsSideGig        import constrain
 from dotsShared         import common, RotateKeys 
+from dotsMenus          import AnimationMenu
 
 import dotsAnimation    as Anime
 
 ### --------------------- dotsPixWorks ---------------------
-''' classes: Works - functions moved from Pixitem '''                                                                                           
+''' no class: functions moved from Pixitem '''                                                                                           
 ### --------------------------------------------------------
 
 Pct = -0.50   ## used by constrain - percent allowable off screen
@@ -36,9 +37,14 @@ class Works:
                     
     def resetSliders(self):
         self.pix.widget.opacitySlider.setValue(int(self.pix.alpha2*100))
+        self.pix.widget.opacityValue.setText('{0:.2f}'.format((self.pix.alpha2)))
+        
         self.pix.widget.scaleSlider.setValue(int(self.pix.scale*100))
+        self.pix.widget.scaleValue.setText('{0:.2f}'.format(self.pix.scale))
+        
         self.pix.widget.rotaryDial.setValue(int(self.pix.rotation))
-          
+        self.pix.widget.rotateValue.setText('{:3d}'.format(int(self.pix.rotation)))
+              
     def removeThis(self):
         self.pix.clearFocus() 
         self.pix.setEnabled(False)
@@ -89,10 +95,11 @@ class Works:
  
     def animeMenu(self):
         x, y = self.makeXY()  
-        self.pix.setSelected(True)  ## needs to be selected for menu to work
-        self.closeWidget()
-        self.pix.canvas.sideCar.animeMenu(QPoint(x+50, y+50), 'pix')
- 
+        self.pix.setSelected(True)  ## needs to be selected for menu to work   
+        menu = AnimationMenu(self.canvas)     
+        self.closeWidget()   
+        menu.animeMenu(QPoint(x+50, y+50), 'pix')
+
     def reprise(self):  ## return pixitem to its original position
         if self.pix.tag == '':  ## you're done
             return

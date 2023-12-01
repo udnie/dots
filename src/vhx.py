@@ -3,9 +3,9 @@ import sys
 
 # import PyQt6  ## required for pyside version
 
-from PyQt6.QtCore    import Qt, QPointF
-from PyQt6.QtGui     import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
-from PyQt6.QtWidgets import QApplication, QWidget
+from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
+from PyQt6.QtWidgets    import QApplication, QWidget
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)  ## '</>'

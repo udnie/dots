@@ -141,9 +141,9 @@ class ShowTime:
                 if pix.anime != None and pix.anime.state() != QAbstractAnimation.State.Stopped:       
                     pix.anime.stop()                   
                     
-                    # if pix.type == 'bkg':
-                    #     print(f'stop  {os.path.basename(pix.fileName)}\t{pix.direction}\t{pix.mirroring}')
-                              
+                    # if pix.type == 'bkg':      
+                    #     print(f'stop  {os.path.basename(pix.fileName)}\t{pix.direction}\t{pix.mirroring}\t{pix.factor}')
+                    
                     if pix.tag == 'scroller':  ## can be more than one
                         pix.anime = None
                         scrolling.append(pix.tag)
@@ -268,6 +268,7 @@ def saveBkg(pix):
         'scrollable':   pix.scrollable,
         'direction':    pix.direction,
         'mirroring':    pix.mirroring,
+        'factor':       pix.factor,
     }  
       
     return tmp

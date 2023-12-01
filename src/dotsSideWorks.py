@@ -6,7 +6,6 @@ import random
 from PyQt6.QtCore       import QPointF
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem
 
-from dotsBkgMaker    import BkgItem
 from dotsShared      import common, paths
 from dotsSideGig     import MsgBox
 
@@ -24,7 +23,7 @@ class SideWorks:
 ### --------------------------------------------------------  
     def cleanUpScrollers(self, scene):  ## called from showtime  
         self.scene = scene
-        for t in self.canvas.bkgMaker.directions:
+        for t in self.canvas.bkgMaker.trackers:
             tracker = t.file  
             k = 0 
             for p in self.scene.items():  ## delete duplicates
@@ -33,27 +32,33 @@ class SideWorks:
                         if k == 0:
                             self.dothis(p) 
                             k = 1
-                        else:
+                        elif k > 0:
                             self.scene.removeItem(p)
                                                                 
     def dothis(self, p):    
         direction = p.direction
         mirroring = p.mirroring
+        factor    = p.factor
+        showtime  = p.showtime
         z = p.zValue()
 
         p.init()
         p.tag = 'scroller'
         p.direction = direction 
         p.mirroring = mirroring
-        p.setZValue(z)
-                
-        if direction == 'right':
-            p.setPos(QPointF(p.runway, 0)) 
-        else:
-            p.setPos(QPointF())  
-            
+        p.factor    = factor
+        p.showtime  = showtime  ## required
+        
+        p.setZValue(z)   
         p.locked == True
-        p.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        p.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)          
+
+        if p.direction == 'right':
+            p.setPos(QPointF(p.runway, 0)) 
+        elif p.direction == 'left':      
+            p.setPos(QPointF())  
+        elif p.direction == 'vertical':
+            p.setPos(QPointF(0.0, float(p.runway)))
    
 ### --------------------------------------------------------      
     def setPauseKey(self):  ## sideShow all the way down    
@@ -122,6 +127,7 @@ class SideWorks:
         return pix 
      
     def setBackGround(self, pix, tmp):  ## pix is a stand_in for bkg
+        ## doing this only if missing in .play file other gets the default
         if 'scrollable' not in tmp.keys(): 
             tmp['scrollable'] = False
             
@@ -132,22 +138,27 @@ class SideWorks:
             tmp['anime'] = None       
             
         if 'mirroring' not in tmp.keys(): 
-            tmp['mirroring'] = True  
-              
+            tmp['mirroring'] = self.canvas.bkgMaker.mirroring    
+            
+        if 'factor' not in tmp.keys(): 
+            tmp['factor'] = self.canvas.bkgMaker.factor
+            
+        if 'opacity' not in tmp.keys(): 
+            tmp['opacity'] = 1.0
+                   
         pix.scrollable  = tmp['scrollable']
         pix.anime       = tmp['anime']
         pix.locked      = tmp['locked']
         pix.mirroring   = tmp['mirroring']
         pix.direction   = tmp['direction']
-                
-        result = pix.bkgWorks.addTracker(pix)
-        
+        pix.factor      = tmp['factor']
+        pix.opacity     = tmp['opacity']
+                  
+        result = pix.bkgWorks.addTracker(pix)    
         if result == False:  ## must be a dupe
             del pix          ## not yet added to scene
             return None
-        else:
-            pix.bkgMaker.lockBkg(pix)  ## lock when loading from a play file
-        
+           
         return pix  ## return to sideShow
     
     def setShadow(self, pix, tmp):

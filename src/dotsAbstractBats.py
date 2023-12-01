@@ -24,7 +24,9 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1440':  'montreaux-1280.jpg',
     '1296':  'montreaux.jpg',    
     '1536':  'montreaux-1280.jpg',
-     '620':  'bats_vertical.jpg',
+     '900':  'bats_vertical.jpg',   
+     '912':  'bats_vertical.jpg', 
+    '1102':  'bats_vertical.jpg',
 }
     
 ### ------------------- dotsAbstractBats -------------------
@@ -181,8 +183,11 @@ class Bats:
         pix.x = random.randrange(200, common['ViewW']-300)
         pix.y = random.randrange(200, common['ViewH']-300)
         pix.setPos(pix.x, pix.y)     
-        pix.setScale(.65)    
-        pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory             
+        pix.setScale(.65)   
+        if common['Screen'] == '912':
+            pix.tag = 'demo-' + '900' + '.path' 
+        else:
+            pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory             
         return pix
                                        
     def runGrey(self, pix, k, scale):

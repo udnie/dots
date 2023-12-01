@@ -26,6 +26,9 @@ class KeysPanel(QWidget):
         self.layout = QVBoxLayout(self)        
         self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignCenter) 
         self.layout.setContentsMargins(10, common['margin1'],0, common['margin2']+3)
+        
+        if common['Screen'] == '912':
+            self.layout.setContentsMargins(0, common['margin1'],0, common['margin2']+3)
             
 ### --------------------------------------------------------
     def toggleMenu(self):  ## called thru sideCar 'K' key

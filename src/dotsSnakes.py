@@ -4,11 +4,10 @@ import random
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtGui        import QColor, QImage, QPixmap
-from PyQt6.QtWidgets    import QGraphicsPixmapItem, QMenu
+from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 import dotsAnimation    as Anime
 
-from dotsSideCar        import SideCar
 from dotsSidePath       import pathLoader, pathWorks
 from dotsShared         import paths, common
 from dotsSideGig        import *
@@ -16,90 +15,8 @@ from functools          import partial
 from dotsBkgMaker       import BkgItem
 from dotsAbstractBats   import getPath
 
-demos = {  ## used by demo menu
-    'bats':   'Original Batwings',
-    'blue':   'Snakes Blue Background',
-    'left':   'Right to Left Scrolling',  
-    'right':  'Left to Right Scrolling',  
-    'snakes': 'Snakes Scrolling Background',    
-}
-
 ### --------------------- dotsSnakes ----------------------- 
-''' classes: DemoMenu, Snake, Snakes '''
-### --------------------------------------------------------     
-class DemoMenu:  
-### --------------------------------------------------------
-    def __init__(self, parent, sideShow):
-        super().__init__()  
-   
-        self.canvas = parent
-        self.sideShow = sideShow
-        
-        self.dots   = self.canvas.dots
-        self.scene  = self.canvas.scene
-        self.view   = self.canvas.view 
-     
-        self.snakes   = self.sideShow.snakes   
-        self.bats     = self.sideShow.bats
-        self.abstract = self.sideShow.abstract  ## hats and bats
-       
-        self.demoMenu = None
-                       
-    def openDemoMenu(self):
-        self.closeDemoMenu()
-        self.demoMenu = QMenu(self.canvas) 
-        self.demoMenu.addAction('Demos Menu'.rjust(20,' '))
-        self.demoMenu.addSeparator()
-        for demo in demos.values():
-            action = self.demoMenu.addAction(demo)
-            self.demoMenu.addSeparator()
-            action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))            
-        self.demoMenu.setFixedSize(220, 190)
-        self.demoMenu.move(getCtr(-130, -225))   
-        self.demoMenu.show()
-
-    def clicked(self, demo):
-        for key, value in demos.items():
-            if value == demo:  ## singleshot needed for menu to clear
-                QTimer.singleShot(200, partial(self.run, key))
-                break
-        self.closeDemoMenu()
-        
-    def closeDemoMenu(self):
-        if self.demoMenu:
-            self.demoMenu.close()           
-        self.demoMenu = None
-           
-    def run(self, key):                         
-        if key == 'bats':
-            self.bats.makeBats()
-        elif key == 'blue':
-            self.runSnakes('blue') 
-        elif key == 'snakes':
-            self.canvas.bkgMaker.directions = []
-            if self.dots.Vertical:   
-                self.runSnakes('vertical') 
-            else:
-                self.runSnakes('left')              
-        elif key in ('left', 'right'):
-            if self.dots.Vertical:     
-                MsgBox('Not Implemented for Vertical Format')
-                return            
-            self.canvas.bkgMaker.directions = []
-            if key == 'left':  ## direction of travel
-                self.abstract.makeAbstracts('left')  ## right to left 
-            else: 
-                self.abstract.makeAbstracts('right') ## left to right   
-
-    def runSnakes(self, what): 
-        if what in ('blue', 'snakes'): 
-            self.snakes.delSnakes()    
-        if what != '':
-            QTimer.singleShot(100, partial(self.snakes.makeSnakes, what))           
-        elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
-            MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 6, getCtr(-225,-175))
-            return 
-                    
+''' classes: Snake, Snakes '''               
 ### --------------------------------------------------------
 class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
 ### --------------------------------------------------------
@@ -163,11 +80,10 @@ class Snakes:
  
         self.canvas   = parent
         self.scene    = self.canvas.scene
+        self.dots     = self.canvas.dots
         self.mapper   = self.canvas.mapper
         self.bkgMaker = self.canvas.bkgMaker 
-                     
-        self.sideCar   = SideCar(self.canvas)
-        
+                           
         self.what = ''
                                                       
 ### -------------------------------------------------------- 
@@ -232,7 +148,7 @@ class Snakes:
                 pix = self.addSnakes(idx, path, waypts, sync)    
                 rotation = (random.randint(-8, 8) * 3)  
                     
-                self.sideCar.transFormPixItem(pix, rotation, skale, 1.0)  ## adds it to screen 
+                self.canvas.sideCar.transFormPixItem(pix, rotation, skale, 1.0)  ## adds it to screen 
                 self.canvas.pixCount -= 1  ## start at the highest zvalue, runs from front to back  
                 idx += 1   
                      
@@ -261,17 +177,25 @@ class Snakes:
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
             
         elif what == 'vertical':
-            self.scroller = BkgItem(paths['demo'] + 'snakes_vertical.jpg', self.canvas) 
-            
+            if common['Screen'] == '1102':
+                self.scroller = BkgItem(paths['demo'] + 'snakes_1102.jpg', self.canvas) 
+            else:
+                self.scroller =  BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)
+                
             self.scroller.direction = 'vertical'   
             self.scroller.tag = 'scroller'
-            self.scroller.mirroring = True       
+            
+            if common['Screen'] in ('900', '912'):
+                self.scroller.mirroring = False
+            else:
+                self.scroller.mirroring = True    
+                   
             self.scroller.bkgWorks.addTracker(self.scroller)
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
             
-            self.scroller.runway = int(common['ViewH'] - self.scroller.height) + self.scroller.showtime  
+            self.scroller.runway = int(common['ViewH'] - self.scroller.height)  
             self.scroller.setPos(QPointF(0, self.scroller.runway))
-            
+                      
         if what in ('vertical', 'left'): 
             self.scroller.addedScroller == False   
             self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
@@ -307,16 +231,17 @@ class Snakes:
     def rerun(self, what): 
         self.mapper.clearTagGroup()
         self.mapper.clearPaths()
-        self.delSnakes()
+        self.scroller.bkgWorks.delTracker(self.scroller) 
+        self.delSnakes()        
         self.makeSnakes(what)
               
     def delSnakes(self):
-        if len(self.canvas.scene.items()) > 0:
-            for pix in self.canvas.scene.items():      
-                if pix.type == 'snake':
-                    self.canvas.scene.removeItem(pix)
+        if len(self.scene.items()) > 0:
+            for pix in self.scene.items():      
+                if pix.type in ('snake','bkg'):
+                    self.scene.removeItem(pix)
                     del pix
-                                                                                                                   
+                                                                                                                               
 ### ---------------------- dotsSnakes ----------------------     
 
 

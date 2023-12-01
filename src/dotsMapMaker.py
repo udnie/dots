@@ -1,18 +1,16 @@
 
 from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt6.QtGui     import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
+from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem,  \
                             QGraphicsPixmapItem, QGraphicsSimpleTextItem
 
-from dotsShared      import common
-from dotsSideGig     import TagIt, getColorStr, getCtr
-from dotsSidePath    import pathLoader
+from dotsShared         import common
+from dotsSideGig        import TagIt
+from dotsTagsAndPaths   import TagsAndPaths
 
-All = -999
-
-### ---------------------- dotsMapItem ---------------------
-''' dotsMapItem: handles the mapItem, tags and paths display.
-    Classes: MapItem, InitMap - uses self.canvas for canvas '''
+### --------------------- dotsMapMaker ---------------------
+''' dotsMapMaker: handles the mapItem, tags and paths display.
+    Classes: MapItem, MapMaker - uses self.canvas for canvas '''
 ### --------------------------------------------------------
 class MapItem(QGraphicsItem):
 ### --------------------------------------------------------
@@ -49,8 +47,8 @@ class MapItem(QGraphicsItem):
     def mouseReleaseEvent(self, e):
         QGraphicsItem.mouseReleaseEvent(self, e)
 
-### ---------------------- dotsMapItem ---------------------
-class InitMap:
+### --------------------- dotsMapMaker ---------------------
+class MapMaker:
 ### --------------------------------------------------------
     def __init__(self, canvas):
         super().__init__()
@@ -58,6 +56,8 @@ class InitMap:
         self.canvas = canvas
         self.scene  = self.canvas.scene
         self.dots   = self.canvas.dots
+        
+        self.pathsAndTags = TagsAndPaths(self)
 
         self.tagZ = 0
         self.pathTagZ = 0  ## only by paths
@@ -143,7 +143,7 @@ class InitMap:
             self.selections = []      ## not the same as in PathEdits
             for pix in self.scene.selectedItems():  ## only items selected
                 self.selections.append(pix.id)
-            if self.scene.selectedItems() or self.canvas.hasHiddenPix():
+            if self.scene.selectedItems() or self.canvas.sideCar.hasHiddenPix():
                 self.addMapItem()
         else:
             self.removeMap()
@@ -174,11 +174,11 @@ class InitMap:
                     del pix
                     break
 
-### ------------------- tags and paths ---------------------
-    def toggleTagItems(self, pid):  
+# ### ------------------- tags and paths ---------------------
+    def toggleTagItems(self, pid): 
         if self.canvas.pathMakerOn:
             return
-        if self.tagCount() > 0:           
+        if self.pathsAndTags.tagCount() > 0:           
             self.clearTagGroup()
             self.clearPaths() 
             self.tagGroup = None
@@ -188,139 +188,16 @@ class InitMap:
         if self.scene.items():  ## tag them all
             if self.pathSet:
                 QTimer.singleShot(200, self.clearPaths)
-            self.addTagGroup()
-            self.tagWorks(pid)
+            self.pathsAndTags.addTagGroup()
+            self.pathsAndTags.tagWorks(pid)
 
-    def tagWorks(self, pid):
-        k = 0
-        topZVal = self.toFront()  ## only once
-        self.tagSet = False
-        if pid == '': 
-            pid = 'all'
-        alltags = ''
-        ## changed order - otherwise the top tag can be hidden 
-        for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type in ('pix', 'snake', 'bkg') and pix.fileName != 'fiat':
-                if 'path' in pix.tag and pid == 'paths':
-                    self.tagIt('paths', pix, topZVal) 
-                    k += 1
-                if pid == 'all':
-                    k += 1
-                    if alltags != pix.tag:  ## only one per snake
-                        alltags = pix.tag
-                        self.tagIt('',pix, topZVal)         
-                # elif pid == 'select' and pix.isSelected():
-                elif pix.isSelected():
-                    self.tagIt('',pix, topZVal)
-                    k += 1
-                elif pid == pix.id:  ## single tag
-                    self.tagIt('',pix, topZVal) 
-                    k = 1
-                    break
-        if k > 0: 
-            self.tagSet = True
-            self.dots.statusBar.showMessage('Number Tagged:  {}'.format(k),2500)
-        else:
-            self.clearTagGroup()
-
-    def addTagGroup(self):
-        self.tagZ = self.toFront(45.0)   ## otherwise it can be hidden 
-        self.tagGroup = QGraphicsItemGroup()
-        self.tagGroup.setZValue(self.tagZ)     
-        self.scene.addItem(self.tagGroup)
- 
     def clearTagGroup(self):     
-        if self.tagCount() > 0:  ## backup B
-            self.removeTags()
+        if self.pathsAndTags.tagCount() > 0: 
+            self.pathsAndTags.removeTags()
             self.tagGroup = None
             self.tagSet = False 
-            
-    def removeTags(self):
-        for p in self.canvas.scene.items():
-            if p.type == 'tag':
-                self.scene.removeItem(p)
-        
-    def tagIt(self, token, pix, topZVal):  
-        p = pix.sceneBoundingRect()
-        x = p.x() + p.width()*.45
-        y = p.y() + p.height()*.45
-
-        tag = pix.tag
-        color = ''
-
-        if 'frame' in pix.fileName: 
-            x, y = common['ViewW']*.47, common['ViewH']-35
-            pix.tag = ''
-
-        if pix.type in ('pix','bkg') and pix.locked == True:
-            tag = 'Locked ' + tag 
-
-        if pix.zValue() == topZVal:  ## set to front ZValue
-            color = 'yellow'
-
-        if token == 'paths':
-            y = y - 20
-        else:
-            token = self.canvas.control
-            
-        if tag == 'UnLocked': color = 'orange'
-          
-        self.TagItTwo(token, tag, color, x, y, pix.zValue())
-        
-    def TagItTwo(self, token, tag, color, x, y, z, src=''):
-        ## this way I can stretch it for backgrounds
-        tag = TagIt(token, tag, color, z)
-        tag.setZValue(self.toFront(45.0))
-        if src == 'bkg':
-            tag.setPos(x-50.0, y-30.0)
-            self.scene.addItem(tag)
-        else:
-            tag.setPos(x,y)
-            self.tagGroup.addToGroup(tag)
-        self.tagSet = True
-
-    def tagCount(self):  
-        return sum( pix.type == 'tag' 
-            for pix in self.scene.items())
-
-### -------------------- mostly paths ----------------------
-    def togglePaths(self):
-        if self.canvas.pathMakerOn:
-            return
-        if self.pathSet:
-            self.clearPaths() 
-            return
-        if self.scene.items():
-            k = 0
-            self.pathSet = False  
-            self.addPathGroup()
-            self.addPathTagGroup()
-            for pix in self.scene.items():
-                if pix.type in ('pix', 'snake'):
-                    if  pix.tag.endswith('.path'):
-                        k += self.displayPath(pix)  ## anything displayed?
-                    elif pix.anime and pix.anime.state() == QAbstractAnimation.State.Running:
-                        pix.anime.pause()
-                elif pix.zValue() <= common['pathZ']:
-                    break
-            if k > 0: 
-                self.pathSet = True
-            else:
-                self.clearPaths()
-     
-    def addPathGroup(self):
-        self.pathGroup = QGraphicsItemGroup()
-        self.pathGroup.setZValue(self.toFront(35.0))    
-        self.scene.addItem(self.pathGroup)
-    
-    def addPathTagGroup(self):   
-        ## add pathTags group to keep tags separate and visible
-        self.pathTagZ = self.toFront(35.0)  ## otherwise it can be hidden 
-        self.pathTagGroup = QGraphicsItemGroup()
-        self.pathTagGroup.setZValue(self.pathTagZ)     
-        self.scene.addItem(self.pathTagGroup)
-
-    def clearPaths(self):
+                  
+    def clearPaths(self):  ## used in many places
         if self.pathSet:
             for pix in self.scene.items():
                 if isinstance(pix, QGraphicsPathItem):
@@ -337,35 +214,7 @@ class InitMap:
         self.pathSet = False
         self.paths = []
         self.pathTagGroup = None
-
-    def displayPath(self, pix):
-        tag = pix.tag 
-        if 'Random' in tag: tag = tag[7:]
-        ## don't add duplicates - causes performance issues
-        if not tag in self.paths:
-            self.paths.append(tag)
-            self.addPainterPath(tag)
-            return 1
-        else:
-            return 0
-
-    def addPainterPath(self, tag):
-        color = getColorStr()
-        path = pathLoader(tag)  ## return painter path     
-        pathPt = path.pointAtPercent(0.0)  ## so its consistent
-        ## use painter path
-        pathItem = QGraphicsPathItem(path)        
-        pathItem.setPen(QPen(QColor(color), 3, Qt.PenStyle.DashDotLine))
-        pathItem.setFlag(QGraphicsPathItem.GraphicsItemFlag.ItemIsMovable, False)
-        self.pathGroup.addToGroup(pathItem)
-        self.addTag(tag, color, pathPt)
-
-    def addTag(self, tag, color, pt):  ## use same offsets and color as path     
-        tag = TagIt('', tag, color)   
-        tag.setPos(pt)
-        tag.setZValue(self.toFront(45.0))  ## use pathTagZ instead of tagZ
-        self.pathTagGroup.addToGroup(tag)
-        
+      
     def lastZval(self, str):  ## finds the lowest pix or bkg zValue
         last = 100000.0
         for itm in self.scene.items():
@@ -382,10 +231,8 @@ class InitMap:
             elif pix.zValue() <= common['pathZ']:
                 break
         return inc + first
-           
-    def tagCount(self):  
-        return sum(pix.type == 'tag' 
-            for pix in self.scene.items())
-        
-### --------------------- dotsMapItem ----------------------
+                 
+### -------------------- dotsMapMaker ----------------------
+
+
 

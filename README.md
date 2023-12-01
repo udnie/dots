@@ -1,7 +1,7 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations with scrolling backgrounds and create sprites.  **SpriteMaker** is now stand-alone and is easily converted to run in **PySide6** - see **SpiteMaker.md**.
 
-As of **May 2023** dots was updated to **PyQt 6.5**, **Python 3.11.3** and **Ventura 13.4**. You need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.  Dots doesn't currently run in **PySide6** and
+As of **November 2023** dots was updated to **PyQt 6.6**, **Python 3.12** and **Ventura 13.6.2**. You need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.  Dots doesn't currently run in **PySide6** and
 **PyQt 5.17** now has issues with QMessageBox on my current setup.
 
 **StartHere.md** has been updated as well as **Changes.md** and **keys.pdf** .  See **Changes** for the latest documentation and links to videos - the earlier ones best watched with closed captions as I was very intimated by having to speak into a very visible microphone.
@@ -25,7 +25,7 @@ The **star** in scrollPanel isn't currently designed to be dragged to the canvas
 
 
 ## Requirements
-* PyQt6 though you can probably still run PyQt5 with some edits 
+* PyQt5 though you can probably still run PyQt5 with some edits 
 * functools, though I'm sure it's built-in
 * cv2 and numpy for Sprites and Shadows
 * Your favorite program for creating transparent pngs if you have one or try **ShadowMaker**, it works and requires cv2 and numpy.

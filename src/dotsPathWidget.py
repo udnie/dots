@@ -77,10 +77,13 @@ class PathWidget(QWidget):
     def resetSliders(self):
         self.rotate = 0
         self.scale  = 1.0 
+        
         self.rotaryDial.setValue(0)
         self.rotateValue.setText('{:3d}'.format(0))
+        
         self.scaleSlider.setValue(int(100))
         self.scaleValue.setText('{0:.2f}'.format(1.0))
+        
         self.secondsSlider.setValue(self.pathMaker.seconds)
            
     def Seconds(self, val):  

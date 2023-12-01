@@ -40,22 +40,23 @@ class BkgWorks:
         file = os.path.basename(bkg.fileName) 
         ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
         ## if randomizing speed factor do this 
+        
         # fact = float((random.randint(17,30) *5)/100)  ## .85-1.50
         # bkg.factor = fact  ## if using a random screen speed factor 
-    
-        if len(self.bkgMaker.directions) == 0:
+          
+        if len(self.bkgMaker.trackers) == 0:
             x = Tracker(file, bkg.direction, bkg.mirroring, bkg.factor)
-            self.bkgMaker.directions.append(x)
-            # self.filePixX(file, bkg, x)
+            self.bkgMaker.trackers.append(x)
+            # self.filePixX(file, bkg, x)  ## for debug
             return True
         else:
             k = 0
-            for p in self.bkgMaker.directions:  ## see if it's already there
+            for p in self.bkgMaker.trackers:  ## see if it's already there
                 if p.file == file:
                     k += 1
             if k == 0:  ## no others found - add it 
                 x = Tracker(file, bkg.direction, bkg.mirroring, bkg.factor)
-                self.bkgMaker.directions.append(x) 
+                self.bkgMaker.trackers.append(x) 
                 # self.filePixX(file, bkg, x)
                 return True
             else:
@@ -66,27 +67,25 @@ class BkgWorks:
               
     def delTracker(self, bkg):
         file = os.path.basename(bkg.fileName)  
-        for item in self.bkgMaker.directions:  ## see if it's already there
+        for item in self.bkgMaker.trackers:  ## see if it's already there
             if item.file == file:  
-                self.bkgMaker.directions.remove(item)
+                self.bkgMaker.trackers.remove(item)
                          
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):  ## from keybooard or widget - sets 'first'      
         if math.fabs(self.bkgItem.runway) < self.bkgItem.showtime:
             self.notScrollable()   
-            return   
-        
+            return     
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
             if self.dots.Vertical: 
                 key = 'vertical'        
             self.bkgItem.direction = key  
-            self.bkgItem.tag = 'scroller'
-                 
+            self.bkgItem.tag = 'scroller' 
+            self.bkgItem.setShowTime()          
             file = os.path.basename(self.bkgItem.fileName)  
-            for p in self.bkgMaker.directions:
+            for p in self.bkgMaker.trackers:
                 if p.file == file:
-                    p.direction = self.bkgItem.direction 
-                    
+                    p.direction = self.bkgItem.direction              
             self.bkgMaker.lockBkg()      
             self.setBtns()
                   
@@ -94,21 +93,62 @@ class BkgWorks:
     def setMirroring(self):
         if self.bkgItem.scrollable:                                  
             if self.bkgItem.mirroring == True: 
-                self.bkgItem.mirroring = False
+                self.bkgItem.mirroring = False ## continuous
             else:
-                self.bkgItem.mirroring = True  
-                                   
+                self.bkgItem.mirroring = True  ## mirrored                               
         file = os.path.basename(self.bkgItem.fileName)  
-        for p in self.bkgMaker.directions:
+        for p in self.bkgMaker.trackers:
             if p.file == file:
-                p.mirroring = self.bkgItem.mirroring 
-                                            
+                p.mirroring = self.bkgItem.mirroring                                        
         self.setMirrorBtnText() 
+               
+    def setFactor(self):
+        if self.bkgItem.scrollable:                                                               
+            file = os.path.basename(self.bkgItem.fileName)  
+            for p in self.bkgMaker.trackers:
+                if p.file == file:
+                    p.factor = self.bkgItem.factor
+
+### --------------------------------------------------------
+    def left(self, path, bkg, rate, which, fact):  ## which rate to use, 1 == rate[0] 
+        if which == 'first':
+            path.setDuration(int(common['ViewW'] * (rate[0]*fact)))  ## rate time equals time to clear   
+            path.setStartValue(QPoint(0,0)) 
+            path.setEndValue(QPoint(-int(bkg.width), 0))
+        else:    
+            rate_one = rate[1]
+            path.setDuration(int(common['ViewW'] * (rate_one*fact)))    
+            path.setStartValue(QPoint(common['ViewW'], 0))
+            path.setEndValue(QPoint(int(-bkg.width), 0))
+        return path
+
+    def right(self, path, bkg, rate, which, fact):  ## which column to read from
+        if which == 'first':        
+            path.setDuration(int(common['ViewW'] * (rate[0]*fact)))
+            path.setStartValue(QPoint(self.bkgItem.runway, 0))
+            path.setEndValue(QPoint(int(common['ViewW']), 0))
+        else:
+            path.setDuration(int(common['ViewW'] * (rate[2]*fact)))  
+            path.setStartValue(QPoint(-self.bkgItem.width, 0))
+            path.setEndValue(QPoint(int(common['ViewW']), 0))
+        return path
+                     
+    def vertical(self, path, bkg, rate, which, fact):                 
+        if which == 'first': 
+            path.setDuration(int(common['ViewH'] * (rate[0]*fact)))  ## rate time equals time to clear   
+            path.setStartValue(QPoint(0, self.bkgItem.runway))
+            path.setEndValue(QPoint(0, -self.bkgItem.height))
+        else:    
+            rate_one = rate[1]
+            path.setDuration(int(common['ViewH'] * (rate_one*fact)))  ## this works - magic 
+            path.setStartValue(QPoint(0, common['ViewH']-self.bkgItem.showtime))
+            path.setEndValue(QPoint(0, -self.bkgItem.height))
+        return path       
 
 ### -------------------------------------------------------- 
-    def restoreDirections(self, bkg, where):  ## returns what gets lost on each reincarnation
+    def restoreFromTrackers(self, bkg, where):  ## returns what gets lost on each reincarnation
         file = os.path.basename(bkg.fileName)  ## opposite of setMirroring
-        for p in self.bkgMaker.directions:
+        for p in self.bkgMaker.trackers:
             if p.file == file:
                 bkg.mirroring = p.mirroring   
                 bkg.direction = p.direction 
@@ -156,19 +196,36 @@ class BkgWorks:
                                    
     def reset(self):
         file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
-        for p in self.bkgMaker.directions:
+        for p in self.bkgMaker.trackers:
             if p.file == file:
                 p.direction = ''
                 p.mirroring = self.bkgMaker.mirroring
-        self.bkgItem.tag = ''                
+                p.factor    = self.bkgMaker.factor
+        self.bkgItem.tag = ''   
+        self.bkgItem.direction = ''             
         self.bkgItem.mirroring = self.bkgMaker.mirroring  
-        self.bkgItem.direction = ''
+        self.bkgItem.factor    = self.bkgMaker.factor
         self.bkgMaker.widget.close()
         self.bkgMaker.addWidget(self.bkgItem)
-                                     
+              
+    def centerBkg(self):
+        if self.bkgItem != None and self.bkgItem.fileName != 'flat':  
+            width = self.bkgItem.imgFile.width()
+            height = self.bkgItem.imgFile.height()
+            self.bkgItem.x = (common['ViewW']- width)/2
+            self.bkgItem.y = (common['ViewH']- height)/2
+            self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
+                                           
     def setMatte(self):
         self.bkgMaker.closeWidget()
         self.bkgMaker.matte = Matte(self.bkgItem)  
+      
+    def toggleBkgLock(self):
+        if self.bkgItem:  
+            if self.bkgItem.locked == False:
+                self.bkgMaker.lockBkg()
+            else:
+                self.bkgMaker.unlockBkg()
                                
     def tagBkg(self, bkg, pos):
         self.bkgItem = bkg
@@ -185,48 +242,8 @@ class BkgWorks:
             tag = tag + ' Left'
         elif self.bkgItem.direction == 'right': 
             tag = tag + ' Right'            
-        self.canvas.mapper.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
+        self.canvas.mapper.pathsAndTags.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
                                                           
-### --------------------------------------------------------                
-    def left(self, path, bkg, rate, which, fact):  ## which rate to use, 1 == rate[0] 
-        if which == 'first':
-            path.setDuration(int(common['ViewW'] * (rate[0]*fact)))  ## rate time equals time to clear   
-            path.setStartValue(QPoint(0,0)) 
-            path.setEndValue(QPoint(-int(bkg.width), 0))
-        else:    
-            rate_one = rate[1]
-            # if 'snakes' in bkg.fileName:  ## looks better and not another dictionary to maintain
-            #     rate_one = rate_one + .2
-            path.setDuration(int(common['ViewW'] * (rate_one*fact)))    
-            path.setStartValue(QPoint(common['ViewW'], 0))
-            path.setEndValue(QPoint(int(-bkg.width), 0))
-        return path
-    
-    def right(self, path, bkg, rate, which, fact):  ## which column to read from
-        if which == 'first':        
-            path.setDuration(int(common['ViewW'] * (rate[0]*fact)))
-            path.setStartValue(QPoint(self.bkgItem.runway, 0))
-            path.setEndValue(QPoint(int(common['ViewW']), 0))
-        else:
-            path.setDuration(int(common['ViewW'] * (rate[2]*fact)))  
-            path.setStartValue(QPoint(-self.bkgItem.width, 0))
-            path.setEndValue(QPoint(int(common['ViewW']), 0))
-        return path
-                     
-    def vertical(self, path, bkg, rate, which, fact):       
-        if which == 'first': 
-            path.setDuration(int(common['ViewH'] * (rate[0]*fact)))  ## rate time equals time to clear   
-            path.setStartValue(QPoint(0, self.bkgItem.runway+self.bkgItem.showtime))
-            path.setEndValue(QPoint(0, -self.bkgItem.height))
-        else:    
-            rate_one = rate[1]
-            if 'snakes' in bkg.fileName:  
-                rate_one = rate_one + .2
-            path.setDuration(int(common['ViewH'] * (rate_one*fact)))    
-            path.setStartValue(QPoint(0, self.bkgItem.height+self.bkgItem.runway))
-            path.setEndValue(QPoint(0, -self.bkgItem.height))
-        return path       
-   
 ### --------------------------------------------------------                    
     def notScrollable(self):
         MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
@@ -255,8 +272,9 @@ class BkgWorks:
         
     def setVertical(self, img):  
         imf = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
-        self.bkgItem.imgFile = imf
-        self.bkgItem.scrollable = True   
+        self.bkgItem.imgFile = imf       
+        if imf.height() > self.bkgItem.ViewH:  ## its scrollable enough
+            self.bkgItem.scrollable = True  
         del img 
         del imf
                                                                                     

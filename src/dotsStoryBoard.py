@@ -11,7 +11,7 @@ from dotsAnimation      import *
 from dotsSideCar        import SideCar
 from dotsControlView    import ControlView
 from dotsPixItem        import PixItem
-from dotsMapItem        import InitMap
+from dotsMapMaker       import MapMaker
 from dotsBkgMaker       import *
 from dotsSideShow       import SideShow
 from dotsShowTime       import ShowTime
@@ -21,6 +21,7 @@ from dotsScrollPanel    import ScrollPanel
 from dotsDocks          import *
 from dotsAbstractBats   import Wings
 from dotsSideWorks      import SideWorks
+from dotsMenus          import AnimationMenu
 
 Play = ('L','R','P','S','A')
 
@@ -54,7 +55,7 @@ class StoryBoard(QWidget):
         self.scroll    = ScrollPanel(self)
         self.pathMaker = PathMaker(self)
 
-        self.mapper    = InitMap(self) 
+        self.mapper    = MapMaker(self) 
         self.bkgMaker  = BkgMaker(self)
      
         self.animation = Animation(self)    
@@ -125,7 +126,7 @@ class StoryBoard(QWidget):
                 if self.key == 'cmd':        ## only used by eventFilter
                     self.mapper.clearMap()   ## set rubberband if mapset
                     self.unSelect()      
-                elif self.hasHiddenPix() or self.mapper.selections:
+                elif self.sideCar.hasHiddenPix() or self.mapper.selections:
                     if self.control not in PlayKeys:
                         self.mapper.updatePixItemPos()  
                                           
@@ -237,7 +238,7 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match sideshow
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.bkgMaker.directions = []
+        self.bkgMaker.trackers = []
         gc  ## testing exit problem - it's the CAT error
            
     def loadSprites(self):
@@ -289,36 +290,13 @@ class StoryBoard(QWidget):
                             pix.setMirrored(True)
                 elif pix.zValue() <= common['pathZ']:
                     break
-
-    def hasHiddenPix(self):
-        for pix in self.scene.items():
-            if pix.type == 'pix'and pix.part not in ('pivot', 'left','right'):
-                if pix.isHidden: 
-                    return True  ## found one
-            elif pix.zValue() <= common['pathZ']:
-                break
-        return False
-
-    ## added dlbclk if hidden to re-select ##
-    def hideSelected(self): 
-        ## if self.mapper.mapSet and self.hasHiddenPix():  
-        self.mapper.removeMap()  ## also updates pix.pos()
-        for pix in self.scene.items():
-            if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
-                if pix.isSelected():
-                    pix.setSelected(False)
-                    pix.isHidden = True
-                elif pix.isHidden:
-                    pix.setSelected(True)
-                    pix.isHidden = False
-            elif pix.zValue() <= common['pathZ']:
-                break
                        
 ### --------------------------------------------------------
-    def contextMenuEvent(self, e):
+    def contextMenuEvent(self, e):  ## needs to stay here 
         if not self.scene.selectedItems():
             return
-        self.sideCar.animeMenu(e.globalPos())
+        menu = AnimationMenu(self)
+        menu.animeMenu(e.globalPos())
         
 ### -------------------- dotsStoryBoard --------------------
 

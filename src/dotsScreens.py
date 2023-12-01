@@ -1,88 +1,11 @@
 
-from functools          import partial
-
-from PyQt6.QtCore       import QTimer
+from datetime           import datetime
 from PyQt6.QtGui        import QGuiApplication
-from PyQt6.QtWidgets    import QMenu
 
-from datetime       import datetime
-from dotsShared     import common
-from dotsSideGig    import MsgBox, getCtr
-
-MaxWidth = 1680  ##  position dock to screen bottom for max default display width
-                 ##  on my mac with dock on left side, not on bottom
-MaxScreens = ('1440','1536', '620')  ## requires 1920X1280 display size
+from dotsShared         import common, screens
 
 ### -------------------- dotsScreens -----------------------
-''' classes: ScreenMenu and various screen formats and functions 
-    used in the title bar '''
-### -------------------------------------------------------- 
-screens = {  ## the keys aren't shown
-    '1080': '1080X720 -  3:2',
-    '1280': '1280X720 - 16:9',
-    '1215': '1215X810 -  3:2',
-    '1440': '1440X810 - 16:9',
-    '1296': '1296X864 -  3:2',
-    '1536': '1536X864 - 16:9',
-     '620': '620X1102 -  9:16',
-}
-
-### --------------------------------------------------------     
-class ScreenMenu:  
-### -------------------------------------------------------- 
-    def __init__(self, parent):
-        super().__init__()  
-   
-        self.canvas = parent  ## all these are necessary to clear the screen
-        self.dots   = self.canvas.dots
-        self.scene  = self.canvas.scene
-        self.view   = self.canvas.view  
-        
-        self.screenMenu = None
-                     
-    def openScreenMenu(self):
-        self.closeScreenMenu()
-        self.screenMenu = QMenu(self.canvas)    
-        self.screenMenu.addAction(' Screen Formats')
-        self.screenMenu.addSeparator()
-        for screen in screens.values():
-            action = self.screenMenu.addAction(screen)
-            self.screenMenu.addSeparator()
-            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
-        self.screenMenu.move(getCtr(-85,-225)) 
-        self.screenMenu.setFixedSize(150, 252)
-        self.screenMenu.show()
-    
-    def clicked(self, screen):
-        for key, value in screens.items():
-            if value == screen:  ## singleshot needed for menu to clear
-                QTimer.singleShot(200, partial(self.displayChk, self.switchKey(key)))
-                break      
-        self.closeScreenMenu()  
-                    
-    def closeScreenMenu(self):   
-        if self.screenMenu:
-            self.screenMenu.close()
-        self.screenMenu = None
-              
-    def switchKey(self, key):                 
-        if self.displayChk(key) == True:
-            self.canvas.clear()       
-            self.canvas.dots.switch(key) 
-        else:
-            return
-    
-    def displayChk(self, key):  ## switch screen format
-        p = QGuiApplication.primaryScreen().availableGeometry()
-        if key in MaxScreens and p.width() < MaxWidth:  ## current screen width < 1680
-            self.exceedsMsg() 
-            return False
-        else:
-            return True            
-        
-    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
-        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
-     
+''' no class: screen formats and functions '''     
 ### -------------------------------------------------------- 
 def setCommon(format=''):
     if format == '1080':      ## 1080X720 - 3:2 same as default
@@ -114,10 +37,21 @@ def setCommon(format=''):
         common.update(fifteen36) 
         common.update(eight64) 
         return screens['1536']   
+         
+    elif format == '1102':       ## 620X1102 - 9:16
+        common.update(vert)
+        common.update(six20)              
+        return screens['1102'] 
     
-    elif format == '620':       ## 620X1100 - 9:16
-        common.update(V620)              
-        return screens['620'] 
+    elif format == '900':       ## 600X900 - 2:3
+        common.update(vert)
+        common.update(six30)              
+        return screens['900'] 
+    
+    elif format == '912':       ## 513X912 - 9:16
+        common.update(vert)
+        common.update(nine12)              
+        return screens['912'] 
      
     else:
         common.update(ten80)  ## 1080X720 - 3:2 - default
@@ -182,8 +116,8 @@ fourteen40 = {  ## 1440X810 - 16:9
     'scaleX':    1.30,
 }
 
-## ----------- 1264X864 - 3:2 and 1536X864 16:9  -----------
-eight64 = {  ## used by both 1296X864 and 1536X864px  
+### ---------- used by both 1296X864 and 1536X864px -------- 
+eight64 = { 
     'DotsH':     966,     
     'ViewH':     864,    
     'ScrollH':   787,  ## scroll panel height
@@ -213,22 +147,50 @@ fifteen36 = {
     'scaleX':    1.40,
 }
 
-### -------------------- 620X1102 - 9:16 --------------------
-V620 = {             ## 620 - must be a string not a number
-    'Screen':   '620',  
-    'DotsW':      952,
-    'DotsH':     1204, 
-    'ViewW':      620,  
-    'ViewH':     1102,     
-    'ScrollH':    977,
-    'SliderH':    977,    
-    'margin1':     22,
-    'margin2':     -5,
-    'gridSize': 34.43, 
+### ---------- used by both 600X900px and 620X1102px -------- 
+vert = {  
     'factor':    0.33, 
     'scaleX':     0.5,
     'scaleY':    1.40,  
     'steps':       10, 
+}
+
+### -------------------- 620X1102 - 9:16 --------------------
+six20 = {             ## 1102 - must be a string not a number
+    'Screen':   '1102',  
+    'DotsW':      955,
+    'DotsH':     1204, 
+    'ViewW':      620, 
+    'ViewH':     1102,  
+    'margin1':     22,   
+    'margin2':     -5,       
+    'ScrollH':    977,
+    'SliderH':    977, 
+    'gridSize': 34.43,
+}
+
+six30 = {
+    'Screen':   '900',  
+    'DotsW':      932,
+    'DotsH':     1002,  
+    'ViewW':      600, 
+    'ViewH':      900,   
+    'margin1':     10,    
+    'ScrollH':    867,
+    'SliderH':    862, 
+    'gridSize':  30.0,
+}
+
+nine12 = {
+    'Screen':    '912',  
+    'DotsW':      880,
+    'DotsH':     1015,  
+    'ViewW':      513, 
+    'ViewH':      912,   
+    'margin1':     10,    
+    'ScrollH':    867,
+    'SliderH':    862, 
+    'gridSize':  28.5,
 }
 
 ### -----------------------------------------------------        
@@ -242,8 +204,11 @@ def getX():  ## adjusted for app size and display
 
 def getY():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()  
-    return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.65)  
-
+    if common['Screen'] in ('900', '912'):    
+        return 0    
+    else:
+       return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.65)   
+   
 ### -------------------- dotsScreens -----------------------
 
 

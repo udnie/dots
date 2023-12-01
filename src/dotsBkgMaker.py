@@ -34,9 +34,10 @@ class BkgMaker(QWidget):
         self.bkgItem = None 
         self.matte   = None 
 
-        self.mirroring = False  ## set in bkgItem
-        self.directions = []  ## tracks backgrounds and holds state of direction, mirroring  
-            
+        self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
+        self.mirroring = False  
+        self.trackers = []  ## tracks backgrounds and holds state of direction, mirroring  
+        
 ### --------------------------------------------------------
     def openBkgFiles(self):
         if self.canvas.control in PlayKeys:
@@ -75,10 +76,10 @@ class BkgMaker(QWidget):
         self.enableBkgBtns(True)  ## hasn't been set 
             
         self.bkgItem.bkgWorks.addTracker(self.bkgItem)  ## always - even if not a scroller
-        
+             
         if self.canvas.pathMakerOn:
             self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            
+                      
         if self.widget: QTimer.singleShot(0, partial(self.widget.resetSliders, self.bkgItem))
 
     def saveBkg(self):  ## saves a color 'flat' file
@@ -133,7 +134,7 @@ class BkgMaker(QWidget):
         p = common['widgetXY']
         p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))       
         self.widget.save = QPointF(p.x(), p.y())
-        self.bkgItem.bkgWorks.restoreDirections(self.bkgItem, 'wid')
+        self.bkgItem.bkgWorks.restoreFromTrackers(self.bkgItem, 'wid')
         self.widget.setGeometry(p.x(), p.y(), int(self.widget.WidgetW), \
             int(self.widget.WidgetH))
         self.widget.resetSliders(self.bkgItem)
@@ -189,7 +190,7 @@ class BkgMaker(QWidget):
             self.bkgItem.locked = False
             if self.widget: self.widget.lockBtn.setText('UnLocked')
        
-    def showtime(self):
+    def showtime(self):  ## 'run' from widget button
         self.closeWidget()
         p = QCursor.pos()
         QCursor.setPos(int(p.x()+220), int(p.y()+650.0))  ## works for 720

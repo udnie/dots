@@ -6,18 +6,17 @@ import random
 
 from PyQt6.QtCore       import QAbstractAnimation, Qt, QPointF, QPoint, QSize, QRect
 from PyQt6.QtGui        import QPen, QColor
-from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, \
-                                QGraphicsLineItem, QApplication, QMenu
+from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
+                                QApplication
                                                     
-from dotsShared      import common, paths
-from dotsPixItem     import PixItem
-from dotsSideGig     import MsgBox, constrain, getPathList
-from dotsMapItem     import InitMap
-from dotsAnimation   import *
+from dotsShared         import common, paths
+from dotsPixItem        import PixItem
+from dotsSideGig        import MsgBox, constrain
+from dotsMapMaker       import MapMaker
 
 ### ---------------------- dotsSideCar ---------------------
-''' no class: pixTest, transFormPixitem, snapShot, toggleGrid, 
-    animationMenu, assorted small functions and a few from sideShow '''   
+''' no class: just stuff - pixTest, transFormPixitem, snapShot, toggleGrid, 
+    assorted small functions and a few from sideShow '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -27,8 +26,8 @@ class SideCar:
         self.canvas = parent
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
-        self.mapper = InitMap(self.canvas)
-          
+        self.mapper = MapMaker(self.canvas)
+                  
         self.gridZ     = common['gridZ']    
         self.gridGroup = None  
         self.menu      = None 
@@ -50,8 +49,10 @@ class SideCar:
         self.scene.addItem(pix)
         
         if pix.tag == 'scroller' and pix.direction == 'right':
-            pix.setPos(QPointF(pix.runway, 0))  ## offset to right  
-    
+            pix.setPos(QPointF(pix.runway, 0))  ## offset to right 
+        elif pix.type == 'bkg' and pix.direction == 'vertical':
+            pix.setPos(QPointF(0.0, float(pix.runway)))
+              
 ### --------------------------------------------------------
     def pixTest(self):
         if not self.canvas.pathMakerOn:  
@@ -105,25 +106,22 @@ class SideCar:
             pix.save(paths['snapShot'] + snap, format='jpg',
                 quality=100)        
             MsgBox('Saved as ' + snap, 3)
-        
-    def hasBackGround(self):
-        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if itm.type == 'bkg':
-                return True
-        return False
-    
-    def snapTag(self):
-        return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
-             
-### --------------------------------------------------------           
-    def toggleMenu(self):
-        self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
-                                                                                           
+  
+### --------------------------------------------------------
     def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
+  
+    def hasBackGround(self):
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itm.type == 'bkg':
+                return True
+        return False
+                                                                                                                        
+    def pause(self):
+        self.canvas.showtime.pause()
     
     def pageDown(self, key):  ## for sprite scrollPanel
         self.canvas.scroll.pageDown(key)
@@ -134,8 +132,19 @@ class SideCar:
                 file = os.path.basename(p.fileName)   
                 print( f'dumpBkgs  {file}\t{p.direction}\t{p.mirroring}\t{p.zValue()}\t{p.locked}\t{p.factor}')
         print()
-      
-### --------------------------------------------------------    
+  
+    def snapTag(self):
+        return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
+        
+### --------------------------------------------------------
+    def toggleMenu(self):
+        self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
+  
+    def toggleOutlines(self):  ## runs from O as in Ohio
+        for pix in self.scene.items():
+            if pix.type == 'pix' and pix.shadowMaker.isActive == True:
+                pix.shadowMaker.works.toggleOutline()
+                  
     def togglePixLocks(self, key):
         if self.canvas.control != '':  ## animation running
             return 
@@ -163,18 +172,37 @@ class SideCar:
                     stub = 'select'
         self.mapper.clearMap()
         self.mapper.toggleTagItems(stub)  
-      
-### --------------------------------------------------------                                                                                                                
-    def toggleOutlines(self):  ## runs from O as in Ohio
+                                                                                                                                                                          
+### --------------------------------------------------------                                                
+    def hasHiddenPix(self):
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadowMaker.isActive == True:
-                pix.shadowMaker.works.toggleOutline()
-                                                                                                          
+            if pix.type == 'pix'and pix.part not in ('pivot', 'left','right'):
+                if pix.isHidden: 
+                    return True  ## found one
+            elif pix.zValue() <= common['pathZ']:
+                break
+        return False                                              
+                                                                                                                                                            
     def hideOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
             if pix.type == 'pix'and pix.shadowMaker.isActive == True:
                 pix.shadowMaker.works.hideOutline()
-                                                                                                                                                                                                       
+         
+    ## added dlbclk if hidden to re-select ##
+    def hideSelected(self): 
+        ## if self.mapper.mapSet and self.hasHiddenPix():  
+        self.mapper.removeMap()  ## also updates pix.pos()
+        for pix in self.scene.items():
+            if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
+                if pix.isSelected():
+                    pix.setSelected(False)
+                    pix.isHidden = True
+                elif pix.isHidden:
+                    pix.setSelected(True)
+                    pix.isHidden = False
+            elif pix.zValue() <= common['pathZ']:
+                break
+                                                                                                                                                                                           
     def hideSelectedShadows(self):  ## runs from shift-H
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker.isActive == True:
@@ -183,71 +211,8 @@ class SideCar:
                 elif pix.isVisible() == False:
                     pix.show()       
                     pix.setSelected(True)
- 
+  
 ### --------------------------------------------------------                               
-    def animeMenu(self, pos, where=''): ## shared with canvas thru context menu
-        self.closeMenu()                ## and with pixitem thru pixwidget
-         
-        self.menu = QMenu(self.canvas)                   
-        alst = sorted(AnimeList)
-        
-        ## basing pathlist on what's in the directory
-        self.canvas.pathList = getPathList(True)  ## names only
-        
-        rlst = sorted(self.canvas.pathList)     
-        alst.extend(['Random']) ## add random to lst
-        
-        self.menu.addAction('Animations and Paths')
-        self.menu.addSeparator()   
-        
-        for anime in alst:
-            action = self.menu.addAction(anime)
-            action.triggered.connect(
-                lambda chk, anime=anime: self.setAnimationTag(anime))
-            
-        self.menu.addSeparator()
-        anime = 'Path Menu'  ## uses pathChooser
-        action = self.menu.addAction(anime) 
-        action.triggered.connect(
-            lambda chk, anime=anime: self.setAnimationTag('Path Menu'))     
-         
-        self.menu.addSeparator()
-        anime = 'Clear Tags'
-        action = self.menu.addAction(anime)
-        action.triggered.connect(
-            lambda chk, anime=anime: self.setAnimationTag(anime))
-        
-        if where == 'pix':
-            self.menu.move(pos) 
-            self.menu.show()
-        else:
-            self.menu.exec(pos)
-         
-    def closeMenu(self):   
-        if self.menu:
-            self.menu.close()
-        self.menu = None    
-    
-    def setAnimationTag(self, tag):
-        self.closeMenu()
-        if self.mapper.tagSet and tag == 'Clear Tags':
-            self.mapper.clearTagGroup()
-        elif tag == 'Path Menu':  ## once selected change it for pathMaker 
-            self.canvas.pathMaker.pathChooser('Path Menu') 
-            return
-        for pix in self.scene.selectedItems(): 
-            if pix.type != 'pix':
-                continue
-            if tag == 'Clear Tags':
-                pix.tag = ''
-            else:
-                pix.tag = tag
-            pix.anime = None        ## set by play
-            pix.setSelected(False)  ## when tagged 
-        if self.mapper.isMapSet(): 
-            self.mapper.removeMap()               
-                
-### --------------------------------------------------------
     def toggleGrid(self):
         if self.gridGroup:
             self.scene.removeItem(self.gridGroup)
@@ -276,8 +241,7 @@ class SideCar:
     def gridCount(self):  
         return sum(pix.type == 'grid' 
             for pix in self.canvas.scene.items())
-
-                
+              
 ### ---------------------- dotsSideCar ---------------------
 
 

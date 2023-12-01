@@ -3,17 +3,18 @@ import sys
 import platform
 import os
 
-from PyQt6.QtCore       import QTimer
+from PyQt6.QtCore       import QTimer, QT_VERSION_STR, PYQT_VERSION_STR
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *
 from dotsShared         import common
+from dotsMenus          import MaxScreens, MaxWidth
 
 import dotsStoryBoard   as canvas
 
 ### ----------------------- dotsQt -------------------------
 ''' dotsQt: parent container for the major widgets.
-    See dotsShared.py for common,,,,, shared variables and path
+    See dotsShared.py for common,,,,, shared variables and      
     dictionaries shared across classes and files''' 
 ### --------------------------------------------------------
 class DotsQt(QMainWindow):
@@ -38,13 +39,14 @@ class DotsQt(QMainWindow):
         else:
             self.screen = setCommon()  ## default - 1080X720 
            
-        # print('version', platform.version())
-        # print('py_verion', platform.python_version())
-                                        
+        # print('\n' + 'version', platform.version())
+        # print('\nPython Version:\t', platform.python_version())
+        # print("Qt Version:\t", QT_VERSION_STR)
+        # print('PyQt Version\t', PYQT_VERSION_STR, '\n')
+                               
         self.init()
     
     def init(self):  
-        self.dragCnt = 0
         dir = os.path.basename(os.path.dirname(os.getcwd()))
         self.setWindowTitle('DotsQt - ' + dir + "/" + os.path.basename(os.getcwd()) + \
             ' ~ ' + self.screen)  ## or getDate()
@@ -57,8 +59,9 @@ class DotsQt(QMainWindow):
                 
         self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)
-        
-        self.move(getX(), getY())  ## adjusted for app size and display
+
+        ## adjusted for app size and display, see getY() for '900' screen
+        self.move(getX(), getY()) 
    
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
@@ -78,7 +81,7 @@ class DotsQt(QMainWindow):
     def switch(self, key):  ## from screenMenu in screens
         QApplication.setQuitOnLastWindowClosed(False)
         self.closeAll()
-        if key == '620': 
+        if key in ('1102', '900', '912'): 
             self.Vertical = True
         else:
             self.Vertical = False               
@@ -94,6 +97,5 @@ if __name__ == '__main__':
     sys.exit(app.exec())    
       
 ### ------------------------- dotsQt -----------------------
-
 
 

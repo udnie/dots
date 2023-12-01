@@ -8,7 +8,7 @@ from dotsPixWorks       import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 
-## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 import dotsAnimation  as Anime
@@ -38,7 +38,7 @@ class PixItem(QGraphicsPixmapItem):
         self.y = y
         
         self.shadowMaker = ShadowMaker(self)  ## returns isActive is False if from shadow_dummy
-        self.works = Works(self)              ## functions and PixSizes moved from here
+        self.works = Works(self)  ## functions and PixSizes moved from here
         
         img = QImage(self.fileName)
 
@@ -47,7 +47,7 @@ class PixItem(QGraphicsPixmapItem):
             self.x, self.y = 0,0
         else:  ## see pixSizes dictionary to make changes - moved to pixWorks
             newW, newH = self.works.setPixSizes(  
-                img.width() * common["factor"], 
+                img.width() * common["factor"],  ## from screens
                 img.height() * common["factor"])
    
         ## don't change
@@ -115,7 +115,7 @@ class PixItem(QGraphicsPixmapItem):
      
     def hoverEnterEvent(self, e):
         if self.locked: 
-            self.toggleTagItems(self.id)   
+            self.toggleThisTag(self.id)   
         e.accept()
                    
     def hoverLeaveEvent(self, e):
@@ -154,7 +154,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.works.rotateThis(self.key)
             elif self.key == '\'': 
                 self.togglelock()  ## single tag
-                self.toggleTagItems(self.id)
+                self.toggleThisTag(self.id)
             elif self.key == 'del':  # delete
                 self.deletePix()     
             elif self.key == 'shift':  # flop if selected or hidden        
@@ -169,7 +169,7 @@ class PixItem(QGraphicsPixmapItem):
                 elif self.key == '.':
                     p = self.zValue()+1  
                 self.setZValue(p)
-                self.toggleTagItems(self.id) 
+                self.toggleThisTag(self.id) 
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
         e.accept()
@@ -236,7 +236,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.works.closeWidget()   
                 self.shadow = self.shadowMaker.shadow  
                 
-    def toggleTagItems(self, id):  ## too annoying if linked
+    def toggleThisTag(self, id):
         if self.shadowMaker.shadow != None and self.shadowMaker.linked:
             return
         else:
@@ -286,13 +286,13 @@ class PixItem(QGraphicsPixmapItem):
         if self.locked == False:
             self.locked = True
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            self.toggleTagItems(self.id)  
+            self.toggleThisTag(self.id)  
             QTimer.singleShot(2000, self.mapper.clearTagGroup)  ## the other tag
         else:
             self.locked = False
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
             self.tag = 'UnLocked'
-            self.toggleTagItems(self.id) 
+            self.toggleThisTag(self.id) 
             QTimer.singleShot(2000, self.mapper.clearTagGroup)
             self.tag = ''
         self.setLockBtnText()

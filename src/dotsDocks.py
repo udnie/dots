@@ -2,7 +2,9 @@
 from PyQt6.QtCore       import Qt
 from PyQt6.QtWidgets    import QWidget, QDockWidget, QPushButton, \
                                QGroupBox, QHBoxLayout, QVBoxLayout, QLayout
-                       
+                  
+from dotsShared         import common 
+   
 docks = {
     "fixedHgt":     82, 
     "scrollGrp":  350,  
@@ -13,10 +15,21 @@ docks = {
 }
 
 newWidths = {     ## if vertical
-    "scrollGrp":  270,  
-    "playGrp":    270,
+    "fixedHgt":     70, 
+    "scrollGrp":  265,  
+    "playGrp":    265,
     "canvasGrp":  345,
+    "spacer":      10,  ## forces buttons closer together
 }
+
+five13 = {
+    "fixedHgt":     70, 
+    "scrollGrp":  235,  
+    "playGrp":    230,
+    "canvasGrp":  345,
+    "spacer":      8,  ## forces buttons closer together       
+}
+
 
 ### ---------------------- dotsDocks -----------------------
 ''' no classes: dockwidgets and buttons groups '''
@@ -89,22 +102,23 @@ def addKeysDock(self):
 def addScrollBtnGroup(self):  
     self.scrollGroup = QGroupBox("Scroll Panel")
 
-    if not self.dots.Vertical:
+    if not self.dots.Vertical:  ## set in dotsQt
         self.scrollGroup.setFixedWidth(docks['scrollGrp'])
+    elif common['Screen'] != '912':  
+        self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])    
     else:
-        self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])
+        self.scrollGroup.setFixedWidth(five13['scrollGrp'])   
+        
     ## sets the position of the title
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-
-    btnAdd = QPushButton("Star")
+        
     btnTop = QPushButton("Top")
     btnBottom = QPushButton("Bottom")
     btnClear = QPushButton("Clear")
     btnLoad = QPushButton("Sprites")
 
     layout = QHBoxLayout()
-
-    layout.addWidget(btnAdd)
+        
     layout.addWidget(btnTop)
     layout.addWidget(btnBottom)
     layout.addWidget(btnClear)
@@ -112,12 +126,16 @@ def addScrollBtnGroup(self):
     
     panel = self.scroll  ## make it easier to type
 
-    btnAdd.clicked.connect(panel.Star)
+    if common['Screen'] != '912':
+        btnStar = QPushButton("Star")
+        layout.addWidget(btnStar)
+        btnStar.clicked.connect(panel.Star)
+       
     btnTop.clicked.connect(panel.top)
     btnBottom.clicked.connect(panel.bottom)
     btnClear.clicked.connect(panel.clear)
     btnLoad.clicked.connect(panel.loadSprites)
-    
+ 
     self.scrollGroup.setLayout(layout)
 
     return  self.scrollGroup
@@ -128,9 +146,11 @@ def addPlayBtnGroup(self):
 
     if not self.dots.Vertical:  ## nothing changes but the width
         self.playGroup.setFixedWidth(docks['playGrp'])
-    else:
+    elif common['Screen'] != '912':
         self.playGroup.setFixedWidth(newWidths['playGrp'])
-        
+    else:
+        self.scrollGroup.setFixedWidth(five13['playGrp']) 
+               
     self.playGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     btnLoad  = QPushButton("Load")
@@ -196,9 +216,11 @@ def addCanvasBtnGroup(self):
     
     if not self.dots.Vertical:
         self.canvasGroup.setFixedWidth(docks['canvasGrp'])
-    else:
+    elif common['Screen'] != '912':
         self.canvasGroup.setFixedWidth(newWidths['canvasGrp'])
-     
+    else:
+        self.canvasGroup.setFixedWidth(five13['canvasGrp'])
+           
     self.canvasGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     if not self.dots.Vertical:

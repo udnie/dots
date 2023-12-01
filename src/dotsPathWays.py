@@ -114,7 +114,7 @@ class PathWays:
             
     def cleanUp(self):
         if self.tagCount() > 0:
-            self.pathMaker.redrawPathsAndTags() 
+            self.pathMaker.redrawTagsAndPaths() 
         else: 
             self.pathMaker.addPath()    
         self.drawing.redrawPoints(self.drawing.pointItemsSet())

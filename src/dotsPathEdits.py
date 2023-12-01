@@ -215,7 +215,7 @@ class PathEdits(QWidget):
     def redrawPoints(self, bool=True):  ## pointItems - non-edit
         self.removePathItems()
         if self.pathWays.tagCount() > 0:
-            self.pathMaker.redrawPathsAndTags()
+            self.pathMaker.redrawTagsAndPaths()
         else:
             self.pathMaker.addPath()
         if bool: self.addPathItems()

@@ -1,9 +1,10 @@
 
-from os import path
-
 import json
 import asyncio
 import time
+
+from os                 import path
+from functools          import partial
 
 from PyQt6.QtCore       import QTimer
 
@@ -16,8 +17,8 @@ from dotsSideGig        import *
 from dotsSideCar        import SideCar 
 from dotsSideWorks      import SideWorks
 
-from dotsSnakes         import DemoMenu, Snakes
-from dotsScreens        import ScreenMenu
+from dotsMenus          import DemoMenu, ScreenMenu
+from dotsSnakes         import Snakes
 from dotsAbstractBats   import Abstract, Bats, Wings
 
 ### ---------------------- dotsSideShow --------------------
@@ -59,7 +60,7 @@ class SideShow:
                 self.loadPlay()                
             elif len(self.scene.items()) > 0:  ## stuff on screen
                 if key == 'P':  ## always
-                    self.mapper.togglePaths()                                
+                    self.mapper.pathsAndTags.togglePaths()                                
                 elif key == 'R':    
                     if self.canvas.control != '':
                         return
@@ -134,7 +135,7 @@ class SideShow:
         self.mapper.clearMap()  ## just clear it
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.directions = []
+        self.canvas.bkgMaker.trackers = []
                  
         ## number of pixitems, bkg zval, number of shadows, scrollers            
         kix, bkz, ns, scr, f = 0, 0, 0, 0, '' 
@@ -250,7 +251,8 @@ class SideShow:
             pix = self.sideWorks.setShadow(pix, tmp)  
             
         elif pix.type == 'bkg' and pix.fileName != 'flat': 
-            pix = self.sideWorks.setBackGround(pix, tmp)  ## adding the rest of it                                           
+            pix = self.sideWorks.setBackGround(pix, tmp)  ## adding the rest of it, lock them all    
+            if pix != None: QTimer.singleShot(300, partial(pix.bkgMaker.lockBkg, pix))                                    
         del tmp 
                                                                                                  
         ## adds pix to the scene and performs any transforms - used by other classes

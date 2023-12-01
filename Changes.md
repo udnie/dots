@@ -5,8 +5,18 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**November 3 2023**       
-A bug fix to the demos scrolling backgrounds and a change to the scrolling default from **Mirrored** to **Continuous**.  The default is set in **BkgMaker.py** as is the **directions** list used by **tracker**. I also removed the keyboard commands in backgrounds used for setting the scrolling direction and the key command to trigger the matte as they're now both in the widget.
+**November 2023**       
+A bug fix to the demos scrolling backgrounds and a change to the scrolling default from **Mirrored** to **Continuous**.  The default is set in **BkgMaker.py** as is the **trackers** list used to track and update backgrounds. I also removed the **keyboard commands** in backgrounds used for setting the scrolling direction and the key command to trigger the matte as they're now both in the widget.     
+  
+And since November 3, additional changes to scrolling backgrounds and two new screen formats. I suggest looking at **StartHere.md** which now has an entry detailing how scrolling currently works and where the numbers in the **screentime** and **moretimes** dictionaries come from and why. It may help explain things. It was originally in **BkgItem** and has been moved and updated.
+
+The **3:2** format now works for scrolling background photo assets that are closer to a **3:2** format by resizing them to **1080X640** rather than the **1280X640** used by the **16:9** format.  Also added, a new widget control, **'Factor'**, that modifies how fast a background moves across the scene and two vertical screen formats. The first is a **2:3** format sized to **600X900 pixels** followed by a **9:16** format sized to **513X912 pixels**. 
+
+Other than resizing a background to either **1080X640** or **1280X640** the only other requirements are to keep the file sizes under 500K and no duplicate background file names.
+
+Upgrading to Python 3.12 and PyQt6.6 changed the timing in scrolling a bit but it may not mean much in the long run.
+
+New video: <https://youtu.be/aknawo7igVs>
 
 ---
 **October 2023**        
@@ -103,7 +113,7 @@ Renamed dotsDrawsPaths.py to dotsPathEdits.py.  What was I thinking.
 Moved the Screen Formats Menu to dotsScreens.py and the Demos Menu to dotsSnakes.py. I've also added the appropriate messages to fill-in what I left out earlier.
 
 **May 23 2023**      
-Upgraded both PyQt6 and PyQt6 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
+Upgraded both PyQt5 and PyQt5 to their latest versions as of the first week of May 2023.  I've also updated to the latest version of Ventura.  Seems there's a bug between Python 3.11 and Ventura.  Here's a sample, it doesn't show on the desktop. I followed some suggested fixes and it seems to cut down on the occurrences but it hasn't gone away.  It also didn't go away with Ventura 13.4.
 
     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
        
@@ -224,8 +234,8 @@ Renamed **dotsDropCanvas** to **dotsStoryBoard**, **dotsBkgItem** to **dotsBkgMa
 ---
 
 **October 2022**        
-**Dots** updated to **PyQt 6.4**, **PyQt6.17** and **Python 3.11**. 
-**Dots** doesn't run in **PyQt6** but **VHX** and **SpriteMaker** can with minor edits.
+**Dots** updated to **PyQt 6.4**, **PyQt5.17** and **Python 3.11**. 
+**Dots** doesn't run in **PyQt5** but **VHX** and **SpriteMaker** can with minor edits.
 
 Some additions and updates to **Shadows**. There's a new button added to the  shadow widget for flopping the shadow, also known as a horizontal flip. Along with that the screen-item's scaling and rotational properties are now applied to the shadow when created.  Some new keys and one update.  The **shift-W** key that cleared widgets is now **W**, no-shift. Added keys are the **O** key to clear shadow outlines and the **shift-H** key which clears widgets, hides select boxes, outlines, and pixitems - leaving only the shadows. It's also a toggle and entering it again restores all except the widgets. **open-cv** and **numpy** are required to run **Shadows** and **SpriteMaker**. Latest video:<https://youtu.be/CLOVUHtD-Ts>
 
@@ -234,12 +244,12 @@ Some additions and updates to **Shadows**. There's a new button added to the  sh
 **September 2022**  
 Minor edits to widgets and sliders, mostly for scaling. 
 
-A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPosition() to e.globalPosition(), plus of course, PyQt6 to PyQt6. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  
+A **reminder** for edits going from 6.3 to 5.16. In **dotsControlView.py** change e.position() to e.pos(). For the rest change e.globalPos() to e.globalPos(), plus of course, PyQt5 to PyQt5. Going the other way, in dotsDropCanvas.py leave globalPos alone - doesn't like it otherwise.  
 
 ---
 
 **July 2022**     
-See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PyQt6.3.1** and **PyQt6** with some minor edits. Latest video:
+See **SpriteMaker.md** for current changes as I'm breaking **SpriteMaker** out of **dots**.  It's still part of the package as it shares two folders which can be relocated. It's also possible to run **SpriteMaker** in **PyQt5.3.1** and **PyQt5** with some minor edits. Latest video:
 <https://youtu.be/bGYBj_bjEJU>
 
 
@@ -257,19 +267,19 @@ Some cosmetic changes to the right-click widgets. Also, I finally was able to fi
 A few small dumb bug fixes, I'm sorry for any problems they may have caused. I've added a sprite-maker, **SpriteMaker.py**, currently standalone as it requires **cv2** and **numpy**. I decided to leave it outside of dots for the present, however it does rely on dotsQt for some data, functions, and directories(folders), so it's not totally standalone. A good deal of its code is based on pathMaker, including being able to add or delete points so it may prove familiar.
 See the demo: <https://youtu.be/sySmphW7bYA>
 
-As of April dots was updated to **PyQt6.3** and **Python 3.10.4**. If you're on a Mac laptop running either Big Sur or Monterey and you _*_**don't**_*_ use a mouse there's good change you'll see this warning
+As of April dots was updated to **PyQt5.3** and **Python 3.10.4**. If you're on a Mac laptop running either Big Sur or Monterey and you _*_**don't**_*_ use a mouse there's good change you'll see this warning
 many times.
 
 
     qt.pointer.dispatch: delivering touch release to same window QWindow(0x0) not QWidgetWindow(0x7f888e691040, name="CasterClassWindow")
     qt.pointer.dispatch: skipping QEventPoint(id=1 ts=0 pos=0,0 scn=789.445,580.564 gbl=789.445,580.564 Released ellipse=(1x1 ∡ 0) vel=0,0 press=-789.445,-580.564 last=-789.445,-580.564 Δ 789.445,580.564) : no target window
 
-The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another Mac user has it as well.  You might want to let Qt know if you experience it. I'm going to that as soon as I finish posting the latest to GitHub. The warning also appears running PyQt6.
+The easiest way to make it go away is to use a mouse. Pretty sure this is a qt bug as another Mac user has it as well.  You might want to let Qt know if you experience it. I'm going to that as soon as I finish posting the latest to GitHub. The warning also appears running PyQt5.
 
 ---
 
 **April 2022**  
-DotsQt has been updated to **PyQt6.3** and **Python 3.10.4**.
+DotsQt has been updated to **PyQt5.3** and **Python 3.10.4**.
 
 I also made some additions that aren't in the video, mainly to do with editing in pathMaker and centering backgrounds.  The big new stuff follows.
   
