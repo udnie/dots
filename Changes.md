@@ -10,7 +10,7 @@ A bug fix to the demos scrolling backgrounds and a change to the scrolling defau
   
 And since November 3, additional changes to scrolling backgrounds and two new screen formats. I suggest looking at **StartHere.md** which now has an entry detailing how scrolling currently works and where the numbers in the **screentime** and **moretimes** dictionaries come from and why. It may help explain things. It was originally in **BkgItem** and has been moved and updated.
 
-The **3:2** format now works for scrolling background photo assets that are closer to a **3:2** format by resizing them to **1080X640** rather than the **1280X640** used by the **16:9** format.  Also added, a new widget control, **'Factor'**, that modifies how fast a background moves across the scene and two vertical screen formats. The first is a **2:3** format sized to **600X900 pixels** followed by a **9:16** format sized to **513X912 pixels**. 
+The **3:2** format now works for scrolling background photo assets that are closer to a **3:2** format by resizing them to **1080X640** rather than the **1280X640** used by the **16:9** format.  Also added, a new widget control, **'Factor'**, that modifies how fast a background moves across the scene and two vertical screen formats. The first is a **2:3** format sized to **600X900 pixels** followed by a **9:16** format sized to **513X912 pixels**, both designed to work on displays of 1080 pixels in height. 
 
 Other than resizing a background to either **1080X640** or **1280X640** the only other requirements are to keep the file sizes under 500K and no duplicate background file names.
 
