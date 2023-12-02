@@ -6,8 +6,13 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **December 2023**   
-That was fast.  I had made some small changes to the vertical screen code and posted them to GitHub when I noticed one of the files hadn't made it.  It turns out a number of files, going back two months or so hadn't made it either.  They were somehow tagged to the gitignore file, a few, many times over.  I'm very glad I found it and sorry for any difficulties it may have caused.  Something to remember.  
+That was fast.  I had made some small changes to the vertical screen code and posted them to GitHub when I noticed one of the files hadn't made it.  It turns out five files, going back two months or so hadn't made it either.  They were somehow tagged to the **gitignore file**, a few, many times over.  I'm very glad I found it and sorry for any difficulties it may have caused.  Something to remember.  
 
+The next day, a bug fix to scrolling directions.
+
+A reminder: scrolling backgrounds need to be tailored to your os/computer/python/pyqt environment by adjusting the values in the **showtime** and **moretimes** dictionaries in **BkgItem.py**. 
+
+From what I can distill from the Qt.io docs, there's no frames per second method that would do away with my approach to scrolling backgrounds, at least for now.  
 
 ---
 **November 2023**       
