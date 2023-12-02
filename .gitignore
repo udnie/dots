@@ -11,8 +11,6 @@ dotsDrawWidget.py
 dotsDrawWidget.py
 dotsDrawWidget.py
 plays/original-demo.play
-StartHere .md
-StartHere .md
 paths/tmp.path
 plays/tmp.play
 plays/tmp.play
@@ -27,18 +25,7 @@ __pycache__/spriteLoupe.cpython-310.pyc
 backgrounds/tma.bkg
 plays/tmp.play
 dotsShadowMaker (original).py
-dotsBkgItem.py
 dotsDropCanvas.py
-dotsDropCanvas.py
-dotsBkgItem.py
-dotsDropCanvas.py
-dotsBkgItem.py
-dotsDropCanvas.py
-dotsBkgItem.py
-dotsDropCanvas.py
-dotsBkgItem.py
-dotsBkgItem.py
-dotsBkgItem.py
 paths/demo.path
 plays/demo.play
 paths/demo.path
@@ -54,4 +41,4 @@ plays/demo-1350.play
 *.png
 dotsBkgWrks.py
 dotsSliderPanel.py
-src/dotsShadowWorks.py
+
