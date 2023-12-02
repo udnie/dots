@@ -4,6 +4,11 @@
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
+--
+**December 2023**   
+That was fast.  I had made some small changes to the vertical screen code and posted them to GitHub when I noticed one of the files hadn't made it.  It turns out a number of files, going back two months or so hadn't made it either.  They were somehow tagged to the gitignore file, a few, many times over.  I'm very glad I found it and sorry for any difficulties it may have caused.  Something to remember.  
+
+
 ---
 **November 2023**       
 A bug fix to the demos scrolling backgrounds and a change to the scrolling default from **Mirrored** to **Continuous**.  The default is set in **BkgMaker.py** as is the **trackers** list used to track and update backgrounds. I also removed the **keyboard commands** in backgrounds used for setting the scrolling direction and the key command to trigger the matte as they're now both in the widget.     
