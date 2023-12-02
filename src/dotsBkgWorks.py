@@ -79,6 +79,8 @@ class BkgWorks:
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
             if self.dots.Vertical: 
                 self.bkgItem.direction = 'vertical'
+            else:
+                self.bkgItem.direction = key
             self.bkgItem.tag = 'scroller'    
             self.bkgItem.setShowTime()       
             file = os.path.basename(self.bkgItem.fileName) 

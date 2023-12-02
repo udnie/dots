@@ -39,7 +39,7 @@ moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
     'snakes':   15,  ## also used by vertical 
     'left':     11, 
-    'right':    13,  
+    'right':    15,  
     'vertical': 15,  ## trying this out 
 }
        
