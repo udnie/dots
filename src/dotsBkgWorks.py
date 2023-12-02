@@ -78,14 +78,17 @@ class BkgWorks:
             return     
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
             if self.dots.Vertical: 
-                key = 'vertical'        
-            self.bkgItem.direction = key  
-            self.bkgItem.tag = 'scroller' 
-            self.bkgItem.setShowTime()          
-            file = os.path.basename(self.bkgItem.fileName)  
+                self.bkgItem.direction = 'vertical'
+            self.bkgItem.tag = 'scroller'    
+            self.bkgItem.setShowTime()       
+            file = os.path.basename(self.bkgItem.fileName) 
+            k = 0 
             for p in self.bkgMaker.trackers:
                 if p.file == file:
-                    p.direction = self.bkgItem.direction              
+                    k += 1
+                    p.direction = self.bkgItem.direction  
+            if k == 0:
+                self.addTracker(self.bkgItem)
             self.bkgMaker.lockBkg()      
             self.setBtns()
                   
@@ -139,9 +142,12 @@ class BkgWorks:
             path.setStartValue(QPoint(0, self.bkgItem.runway))
             path.setEndValue(QPoint(0, -self.bkgItem.height))
         else:    
-            rate_one = rate[1]
-            path.setDuration(int(common['ViewH'] * (rate_one*fact)))  ## this works - magic 
-            path.setStartValue(QPoint(0, common['ViewH']-self.bkgItem.showtime))
+            rate_one = rate[1]  
+            # if 'snakes' in bkg.fileName:  ## early kludge  
+            #     rate_one = rate_one + .2 
+            path.setDuration(int(common['ViewH'] * (rate_one*fact))) 
+            ## current kludge advances background into scene before starting - also doubled showtime 
+            path.setStartValue(QPoint(0, common['ViewH']-int(self.bkgItem.showtime*.75)))
             path.setEndValue(QPoint(0, -self.bkgItem.height))
         return path       
 
