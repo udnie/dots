@@ -4,7 +4,7 @@
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
---
+---
 **December 2023**   
 That was fast.  I had made some small changes to the vertical screen code and posted them to GitHub when I noticed one of the files hadn't made it.  It turns out a number of files, going back two months or so hadn't made it either.  They were somehow tagged to the gitignore file, a few, many times over.  I'm very glad I found it and sorry for any difficulties it may have caused.  Something to remember.  
 
