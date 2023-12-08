@@ -14,7 +14,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 A reminder: scrolling backgrounds need to be tailored to your os/computer/python/pyqt environment by adjusting the values in the **showtime** and **moretimes** dictionaries in **BkgItem.py**. From what I can distill from the Qt.io docs, there's no frames per second method that would do away with my approach to scrolling backgrounds, at least for now. 
 
-**December 7** - Renamed **SideWorks** to **ShowWorks**. Did some work on **PathChooser** so it  now works better if there are no path files found. Applied the changes to the demos as well. Updated MacOS to Sonoma. The **CATransaction sync** problem seems to be gone - there's something else in its place but it appears to be benign.
+**December 7** - Renamed **SideWorks** to **ShowWorks**. Did some work on **PathChooser** so it  now works better if no path files are found. Applied the changes to the demos as well. Updated MacOS to Sonoma. The **CATransaction sync** problem seems to be gone - there's something else in its place but it appears so far to be benign - other than writing to the desktop.
 
      **Python[976:11264] +[CATransaction synchronize] called within transaction** 
 
