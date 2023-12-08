@@ -47,7 +47,10 @@ class AnimationMenu:
         
         ## basing pathlist on what's in the directory
         self.canvas.pathList = getPathList(True)  ## names only
-        
+        if self.canvas.pathList == []:
+            MsgBox('getPathList: No Paths Found!', 5)
+            return 
+  
         rlst = sorted(self.canvas.pathList)     
         alst.extend(['Random']) ## add random to lst
         

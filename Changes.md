@@ -5,14 +5,18 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**December 2023**   
-That was fast.  I had made some small changes to the vertical screen code and posted them to GitHub when I noticed one of the files hadn't made it.  It turns out five files, going back two months or so hadn't made it either.  They were somehow tagged to the **gitignore file**, a few, many times over.  I'm very glad I found it and sorry for any difficulties it may have caused.  Something to remember.  
+**December 2023**
 
-The next day, a bug fix to scrolling directions.
+ 
+**December 1**  - That was fast.  I had made some small changes to the vertical screen code and posted them to GitHub when I noticed one of the files hadn't made it.  It turns out five files, going back two months or so hadn't made it either.  They were somehow tagged to the **gitignore file**, a few, many times over.  I'm very glad I found it and sorry for any difficulties it may have caused.  Something to remember.  
 
-A reminder: scrolling backgrounds need to be tailored to your os/computer/python/pyqt environment by adjusting the values in the **showtime** and **moretimes** dictionaries in **BkgItem.py**. 
+**December 2** The next day, a bug fix to scrolling directions.
 
-From what I can distill from the Qt.io docs, there's no frames per second method that would do away with my approach to scrolling backgrounds, at least for now.  
+A reminder: scrolling backgrounds need to be tailored to your os/computer/python/pyqt environment by adjusting the values in the **showtime** and **moretimes** dictionaries in **BkgItem.py**. From what I can distill from the Qt.io docs, there's no frames per second method that would do away with my approach to scrolling backgrounds, at least for now. 
+
+**December 7** - Renamed **SideWorks** to **ShowWorks**. Did some work on **PathChooser** so it  now works better if there are no path files found. Applied the changes to the demos as well. Updated MacOS to Sonoma. The **CATransaction sync** problem seems to be gone - there's something else in its place but it appears to be benign.
+
+     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
 
 ---
 **November 2023**       

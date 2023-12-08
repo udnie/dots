@@ -116,8 +116,12 @@ class Snakes:
 ### -------------------------------------------------------- 
         k = 0  ## outside counter - number of paths - quit at 3
         self.canvas.pixCount = 400  ## nothing else on the screen except background
-        apaths = getPathList()   
-                                   
+        apaths = getPathList()  
+        if apaths == []: 
+            MsgBox('getPathList: No Paths Found!', 5)
+            QTimer.singleShot(200, self.canvas.clear)   
+            return 
+                          
         while k <= snakes:
             path = getPath(apaths) 
             waypts = pathLoader(path)  
@@ -156,7 +160,7 @@ class Snakes:
             QTimer.singleShot(k * 300, partial(self.run, path))  ## leave some time between snakes
             
             if k == snakes:        
-                self.canvas.sideWorks.disablePlay()  ## turns off play - turns on pause/resume/stop
+                self.canvas.showWorks.disablePlay()  ## turns off play - turns on pause/resume/stop
                 if what in ('vertical', 'left'):     ## run the scrolling background
                     if self.scroller.anime: QTimer.singleShot(200, self.scroller.anime.start)                                      
                 break
@@ -166,7 +170,9 @@ class Snakes:
         if what == 'blue':
             color  = QColor(QColor(0,84,127) )  ## ocean blue                                
             self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99
-             
+            
+        if self.scroller != None:
+            self.scroller.init()  
         elif what == 'left':
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
             
@@ -174,6 +180,7 @@ class Snakes:
             self.scroller.tag = 'scroller'
             self.scroller.mirroring = True  
             self.scroller.bkgWorks.addTracker(self.scroller)
+            
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
             
         elif what == 'vertical':
@@ -188,9 +195,9 @@ class Snakes:
             if common['Screen'] in ('900', '912'):
                 self.scroller.mirroring = False
             else:
-                self.scroller.mirroring = True    
-                   
+                self.scroller.mirroring = True     
             self.scroller.bkgWorks.addTracker(self.scroller)
+            
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
             
             self.scroller.runway = int(common['ViewH'] - self.scroller.height)  

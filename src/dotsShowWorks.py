@@ -6,13 +6,13 @@ import random
 from PyQt6.QtCore       import QPointF
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem
 
-from dotsShared      import common, paths
-from dotsSideGig     import MsgBox
+from dotsShared         import common, paths
+from dotsSideGig        import MsgBox
 
-### --------------------- dotsSideWorks --------------------
+### --------------------- dotsShowWorks --------------------
 '''  ## mostly overflow from sideShow and showtime '''
 ### --------------------------------------------------------
-class SideWorks: 
+class ShowWorks: 
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
@@ -193,6 +193,6 @@ def lookForStrays(pix):  ## it can happen
         pix.setPos(pix.x, random.randint(25, 100) * 1.5) 
     return pix
      
-### ---------------------- dotsSideWorks -------------------
+### ---------------------- dotsShowWorks -------------------
 
 

@@ -42,11 +42,16 @@ class Matte(QWidget):
         
         self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## used as a matte
     
-        self.border = 100  ## inital
+        self.border = 100  ## inital        
         self.step   = 25
+        
         self.stop   = 50  ## min y.() - Max Headroom
         self.brush  = self.grey  ## default   
-          
+        
+        if common['Screen'] in ('900', '912'):
+            self.border = 30
+            self.step   = 5
+         
         self.ratio = 1.0    
         self.altRatio = .77 ##.55 = 16:9 # .77  
         self.resize(common['ViewW']+100, common['ViewH']+100) 
@@ -82,7 +87,7 @@ class Matte(QWidget):
         qp.drawPath(path)
         
         self.move(self.x-self.border, int(self.y-(self.border)*self.ratio))
-                
+              
         qp.end()
         
 ### --------------------------------------------------------
@@ -142,21 +147,29 @@ class Matte(QWidget):
         e.accept()
     
     def scaleThis(self, key):
-        if key == Qt.Key.Key_Greater:
-            if self.border == 5:
-                self.border = 12     
-            elif self.border == 12: 
-                self.border = self.step  
-            elif self.border >= self.step:
-                self.border += self.step             
-        else:    
-            if self.border == self.step: 
-                self.border = 12  
-            elif self.border == 12:
-                self.border = 5
-            elif self.border > self.step:
-                self.border -= self.step            
-                          
+        if common['Screen'] not in ('900', '912'):
+            if key == Qt.Key.Key_Greater:
+                if self.border == 5:
+                    self.border = 12     
+                elif self.border == 12: 
+                    self.border = self.step  
+                elif self.border >= self.step:
+                    self.border += self.step             
+            else:    
+                if self.border == self.step: 
+                    self.border = 12  
+                elif self.border == 12:
+                    self.border = 5
+                elif self.border > self.step:
+                    self.border -= self.step   
+        else:
+            if key == Qt.Key.Key_Greater:  ## stops at 20 px because it's getting too close to the top 
+                if self.border >= 5 and self.border < 35: 
+                    self.border += self.step  
+            else:    
+                if self.border > self.step and self.border > 5:
+                    self.border -= self.step       
+                                                    
     def mousePressEvent(self, e):
         self.save = e.globalPosition()
         e.accept()

@@ -15,7 +15,7 @@ docks = {
 }
 
 newWidths = {     ## if vertical
-    "fixedHgt":     70, 
+    "fixedHgt":     65, 
     "scrollGrp":  265,  
     "playGrp":    265,
     "canvasGrp":  345,
@@ -23,9 +23,9 @@ newWidths = {     ## if vertical
 }
 
 five13 = {
-    "fixedHgt":     70, 
-    "scrollGrp":  235,  
-    "playGrp":    230,
+    "fixedHgt":     65, 
+    "scrollGrp":  180,  
+    "playGrp":    210,
     "canvasGrp":  345,
     "spacer":      8,  ## forces buttons closer together       
 }
@@ -107,33 +107,35 @@ def addScrollBtnGroup(self):
     elif common['Screen'] != '912':  
         self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])    
     else:
-        self.scrollGroup.setFixedWidth(five13['scrollGrp'])   
+        self.scrollGroup.setFixedWidth(five13['scrollGrp']) 
         
     ## sets the position of the title
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
     btnTop = QPushButton("Top")
     btnBottom = QPushButton("Bottom")
-    btnClear = QPushButton("Clear")
     btnLoad = QPushButton("Sprites")
 
     layout = QHBoxLayout()
         
     layout.addWidget(btnTop)
     layout.addWidget(btnBottom)
-    layout.addWidget(btnClear)
     layout.addWidget(btnLoad)
     
     panel = self.scroll  ## make it easier to type
 
     if common['Screen'] != '912':
+        btnClear = QPushButton("Clear")
         btnStar = QPushButton("Star")
+        layout.addWidget(btnClear)
         layout.addWidget(btnStar)
+        btnClear.clicked.connect(panel.clear)
         btnStar.clicked.connect(panel.Star)
+    else:
+        btnLoad.setEnabled(False) 
        
     btnTop.clicked.connect(panel.top)
     btnBottom.clicked.connect(panel.bottom)
-    btnClear.clicked.connect(panel.clear)
     btnLoad.clicked.connect(panel.loadSprites)
  
     self.scrollGroup.setLayout(layout)

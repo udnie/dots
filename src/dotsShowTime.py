@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
 
 from dotsSideGig        import *
 from dotsSideCar        import SideCar
-from dotsSideWorks      import SideWorks
+from dotsShowWorks      import ShowWorks
 
 Demos = ['snakes', 'bats', 'abstract']
 
@@ -26,7 +26,7 @@ class ShowTime:
         self.mapper   = self.canvas.mapper
         
         self.sideCar   = SideCar(self.canvas)  ## additional extentions
-        self.sideWorks = SideWorks(self.canvas)
+        self.showWorks = ShowWorks(self.canvas)
     
         self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
@@ -42,8 +42,11 @@ class ShowTime:
         self.sideCar.hideOutlines()
                        
         if not self.canvas.pathList:  ## should already exist - moved from animations
-            self.canvas.pathList = getPathList(True)  
-              
+            self.canvas.pathList = getPathList(True) 
+            if self.canvas.pathList == []:
+                MsgBox('getPathList: No Paths Found!', 5)
+                return 
+                 
         b, k = 0, 0  ## counts bats and pixitems
         for pix in self.scene.items():  ## sets the animation and run it <<----
             
@@ -65,12 +68,19 @@ class ShowTime:
                         pix.tag, 
                         pix)        
                 elif pix.type == 'bkg': 
-                    if pix.tag == 'scroller':                
+                    if pix.tag == 'scroller':                       
                         pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem 
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)
                     if pix.locked:
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable,False) 
-                                    
+                     
+                # if pix.type == 'pix' and pix.part == 'pivot': ## this needs to go
+                #     if b == 1: 
+                #         pix.setZValue(-101) 
+                #     elif b == 2:            
+                #         pix.setZValue(-102) 
+                #     b += 1  
+                   
                 k += 1  ## k = number of pixitems - bats count as three
                 if pix.anime == None:  ## not animated
                     continue
@@ -82,7 +92,7 @@ class ShowTime:
                 # pix.setGraphicsEffect(shadow)
 
         if k > 0:
-            self.sideWorks.disablePlay()  ## sets pause/resume/stop
+            self.showWorks.disablePlay()  ## sets pause/resume/stop
             file = os.path.basename(self.canvas.openPlayFile)
             if "play" in file:
                 self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(k))  
@@ -103,7 +113,7 @@ class ShowTime:
                 if pix.type in ('pix', 'snake', 'bkg'):
                     if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Running:  ## running
                         pix.anime.pause() 
-            self.sideWorks.setPauseKey()
+            self.showWorks.setPauseKey()
 
     def resume(self):   
         for pix in self.scene.items():   
@@ -119,7 +129,7 @@ class ShowTime:
             if pix.type in ('pix', 'snake', 'bkg'):
                 if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Paused:
                     pix.anime.resume()                   
-        self.sideWorks.setPauseKey()
+        self.showWorks.setPauseKey()
         
 ### --------------------------------------------------------
     def stop(self, action=''):  ## action used by clear 
@@ -141,9 +151,9 @@ class ShowTime:
                 if pix.anime != None and pix.anime.state() != QAbstractAnimation.State.Stopped:       
                     pix.anime.stop()                   
                     
-                    # if pix.type == 'bkg':      
+                    # if pix.type == 'bkg':
                     #     print(f'stop  {os.path.basename(pix.fileName)}\t{pix.direction}\t{pix.mirroring}\t{pix.factor}')
-                    
+                              
                     if pix.tag == 'scroller':  ## can be more than one
                         pix.anime = None
                         scrolling.append(pix.tag)
@@ -163,17 +173,17 @@ class ShowTime:
                             
                         elif pix.type == 'snake':
                             pix.reprise()
-                            
+                      
         if len(scrolling) > 0:
-            self.sideWorks.cleanUpScrollers(self.canvas.scene)
-        self.sideWorks.enablePlay() 
+            self.showWorks.cleanUpScrollers(self.canvas.scene)
+        self.showWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  
                       
 ### --------------------------------------------------------
     def savePlay(self):   
         if self.canvas.openPlayFile in Demos:
-            self.sideWorks.enablePlay()
+            self.showWorks.enablePlay()
             demo = self.canvas.openPlayFile 
             MsgBox("Can't Save " + demo.capitalize() + " as a Play File", 6)  ## seconds
             return                 
@@ -204,7 +214,7 @@ class ShowTime:
                         dlist.append(saveFlat(pix))            
         if dlist:
             try:
-                self.sideWorks.saveToPlays(dlist)
+                self.showWorks.saveToPlays(dlist)
             except Exception:
                 MsgBox('Error saving file...', 5)         
         del dlist

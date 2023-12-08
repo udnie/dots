@@ -128,14 +128,41 @@ class SideCar:
       
     def dumpBkgs(self):  ## shift-B 
         for p in self.scene.items():
-            if p.type == 'bkg' and 'flat' not in p.fileName:
-                file = os.path.basename(p.fileName)   
-                print( f'dumpBkgs  {file}\t{p.direction}\t{p.mirroring}\t{p.zValue()}\t{p.locked}\t{p.factor}')
+            if p.type == 'bkg' and 'flat' not in p.fileName:  
+                file, direction, mirror, locked = self.addBkgLabels(p)
+                showtime = p.showtime
+                print( f'dumpBkgs  {file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.factor}\t{showtime}')
         print()
   
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
         
+    def addBkgLabels(self, bkg): 
+        file = os.path.basename(bkg.fileName)        
+        if bkg.locked == True:
+            locked = 'Locked' 
+        else:
+            locked = 'UnLocked' 
+        if bkg.direction == 'left':
+            direction = 'Left'
+        elif bkg.direction == 'right': 
+            direction = 'Right'     
+        elif self.dots.Vertical:
+            direction = 'Vertical'
+        else:
+            for item in self.canvas.bkgMaker.trackers:  ## see if it's already there
+                if item.file == file:  
+                    direction = item.direction
+            if direction == '':
+                direction = 'NoDirection'
+        if bkg.mirroring == False:
+            mirror = 'Continuous'
+        elif bkg.mirroring == True:
+            mirror = 'Mirrored'
+        if bkg.scrollable == False:
+            mirror = 'Not Scrollable'    
+        return file.capitalize(), direction, mirror, locked
+  
 ### --------------------------------------------------------
     def toggleMenu(self):
         self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView

@@ -15,7 +15,7 @@ from dotsBkgMaker       import *
 from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
-from dotsSideWorks      import SideWorks
+from dotsShowWorks      import ShowWorks
 
 from dotsMenus          import DemoMenu, ScreenMenu
 from dotsSnakes         import Snakes
@@ -35,7 +35,7 @@ class SideShow:
         self.mapper   = self.canvas.mapper
         
         self.sideCar   = SideCar(self.canvas) 
-        self.sideWorks = SideWorks(self.canvas) 
+        self.showWorks = ShowWorks(self.canvas) 
         
         self.pathMaker = self.canvas.pathMaker
         self.bkgMaker  = self.canvas.bkgMaker
@@ -232,9 +232,9 @@ class SideShow:
                        
  ### --------------------------------------------------------
     def addPixToScene(self, pix, tmp):  ## treats pix, bkg, shadow as a pix 
-        pix = self.sideWorks.setAll(pix, tmp)                    
+        pix = self.showWorks.setAll(pix, tmp)                    
         if pix.type == 'pix': 
-            pix = self.sideWorks.setPixitem(pix, tmp)
+            pix = self.showWorks.setPixitem(pix, tmp)
 
         if 'tag' not in tmp.keys():     ## pix and bkg
             tmp['tag'] = ''
@@ -248,10 +248,10 @@ class SideShow:
         pix.locked = tmp['locked']  
                     
         if 'scalor' in tmp.keys():   
-            pix = self.sideWorks.setShadow(pix, tmp)  
+            pix = self.showWorks.setShadow(pix, tmp)  
             
         elif pix.type == 'bkg' and pix.fileName != 'flat': 
-            pix = self.sideWorks.setBackGround(pix, tmp)  ## adding the rest of it, lock them all    
+            pix = self.showWorks.setBackGround(pix, tmp)  ## adding the rest of it, lock them all    
             if pix != None: QTimer.singleShot(300, partial(pix.bkgMaker.lockBkg, pix))                                    
         del tmp 
                                                                                                  

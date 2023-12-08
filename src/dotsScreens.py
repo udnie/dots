@@ -73,7 +73,7 @@ seven20 = {     ## used by both 1080X720 and 1280X720px
 
 ten80 = {   ## 1080X720 - 3:2        
     'Screen':   '1080',     
-    'DotsW':      1415,  
+    'DotsW':      1422,  
     'ViewW':      1080,  
     'gridSize':   30.0,       ## gridline spacing - seems to work, consistant
     'scaleX':      1.0,
@@ -81,7 +81,7 @@ ten80 = {   ## 1080X720 - 3:2
 
 twelve80 = {    ## 1280X720 - 16:9
     'Screen':   '1280',        
-    'DotsW':      1615, 
+    'DotsW':      1623, 
     'ViewW':      1280,  
     'gridSize':  26.66,  
     'scaleX':     1.15,
@@ -102,7 +102,7 @@ eight10 = {  ## used by both 1215X810 and 140X810px
 
 twelve15 = {    ## 1215X810 - 3:2 format
     'Screen':   '1215',  
-    'DotsW':      1550,   
+    'DotsW':      1558,   
     'ViewW':      1215,    
     'gridSize': 28.925, 
     'scaleX':     1.05,
@@ -110,7 +110,7 @@ twelve15 = {    ## 1215X810 - 3:2 format
     
 fourteen40 = {  ## 1440X810 - 16:9 
     'Screen':  '1440',         
-    'DotsW':     1775,
+    'DotsW':     1783,
     'ViewW':     1440,
     'gridSize':    30, 
     'scaleX':    1.30,
@@ -132,7 +132,7 @@ eight64 = {
 ### ------------------ 1264X864 - 3:2 ----------------------
 twelve96 = {  
     'Screen':   '1296',  
-    'DotsW':     1629,
+    'DotsW':     1637,
     'ViewW':     1296,  
     'gridSize':    30, 
     'scaleX':   1.123,
@@ -141,7 +141,7 @@ twelve96 = {
 ### ------------------ 1536X864 - 16:9 ---------------------
 fifteen36 = {      
     'Screen':  '1536',   ## think about 1560X878 in 1920X1080
-    'DotsW':     1869, 
+    'DotsW':     1877, 
     'ViewW':     1536,      
     'gridSize':    32,  
     'scaleX':    1.40,
@@ -158,7 +158,7 @@ vert = {
 ### -------------------- 620X1102 - 9:16 --------------------
 six20 = {             ## 1102 - must be a string not a number
     'Screen':   '1102',  
-    'DotsW':      955,
+    'DotsW':      970,
     'DotsH':     1204, 
     'ViewW':      620, 
     'ViewH':     1102,  
@@ -171,7 +171,7 @@ six20 = {             ## 1102 - must be a string not a number
 
 six30 = {
     'Screen':   '900',  
-    'DotsW':      932,
+    'DotsW':      944,
     'DotsH':     1002,  
     'ViewW':      600, 
     'ViewH':      900,   
@@ -183,7 +183,7 @@ six30 = {
 
 nine12 = {
     'Screen':    '912',  
-    'DotsW':      880,
+    'DotsW':      885,
     'DotsH':     1015,  
     'ViewW':      513, 
     'ViewH':      912,   
@@ -205,7 +205,7 @@ def getX():  ## adjusted for app size and display
 def getY():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()  
     if common['Screen'] in ('900', '912'):    
-        return 0    
+        return 0
     else:
        return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.65)   
    

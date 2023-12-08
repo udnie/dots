@@ -18,11 +18,11 @@ import dotsAnimation    as Anime
 
 screentime = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
         ##   first, next-left, next-right --- there are always two backgrounds once started
-    '1080':  (10.0,  17.35,  17.40),     ## 1440px actual size when scaled 1280X640 for 16:9
+    '1080':  (10.0,  17.50,  17.40),     ## 1440px actual size when scaled 1280X640 for 16:9
     '1280':  (10.0,  18.75,  18.85),  
-    '1215':  (10.0,  17.35,  17.4),     ## 1620px actual size when scaled 1280X640 for 16:9
-    '1440':  (10.0,  18.7,   18.85),
-    '1296':  (10.0,  17.35,  17.4),     ## 1728px actual size when scaled 1280X640 for 16:9
+    '1215':  (10.0,  17.50,  17.4),     ## 1620px actual size when scaled 1280X640 for 16:9
+    '1440':  (10.0,  18.8,   18.85),
+    '1296':  (10.0,  17.50,  17.4),     ## 1728px actual size when scaled 1280X640 for 16:9
     '1536':  (10.0,  18.65,  18.60),  
     '1102':  (10.0,  20.9,    0.0),
     '900':   (10.0,  23.2,    0.0),
@@ -37,10 +37,10 @@ moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
 }
 
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
-    'snakes':   15,  ## also used by vertical 
+    'snakes':   15,   
     'left':     11, 
     'right':    15,  
-    'vertical': 15,  ## trying this out 
+    'vertical': 17, 
 }
        
 ScaleKeys  = ("<",">")
@@ -112,7 +112,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.showtime = 0  
         self.runway = 0  ## what's not visible
            
-        self.setShowTime()
         self.setRunWay()  
     
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
@@ -152,7 +151,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 self.bkgMaker.backOne(self)  
             elif self.key == '.':
                 self.bkgMaker.upOne(self)  
-            elif self.key == 'space':  ## show background tag
+            elif self.key == 'opt':  ## show background tag
                 self.bkgWorks.tagBkg(self, e.scenePos())
             self.initX, self.initY = self.x, self.y  
             self.dragCnt = self.mapToScene(e.pos())
@@ -178,16 +177,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.runway = int(common['ViewH'] - self.height) 
               
     def setShowTime(self):  ## updated
-        if self.direction == 'left':   
+        if 'snakes' in self.fileName and self.direction != 'vertical':
+            self.showtime = showtime['snakes']   
+        elif self.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge
+            self.showtime = showtime['vertical']       
+        elif self.direction == 'left':   
             self.showtime = showtime['left']
         elif self.direction == 'right':  
             self.showtime = showtime['right']      
         ## snakes need more time - the rest vary to build and position and comes before vertical 
-        elif 'snakes' in self.fileName and self.direction != 'vertical':
-            self.showtime = showtime['snakes']   
-        elif self.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge
-            self.showtime = showtime['vertical']   
-                            
+                           
 ### -------------------------------------------------------- 
     def itemChange(self, change, value):
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
@@ -224,8 +223,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                                
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
-        item.showtime = self.showtime   
-             
+              
         self.bkgWorks.restoreFromTrackers(item, 'addnxt')  ## gets set to default   
         item.anime = self.setScrollerPath(item, 'next')  ## txt for debugging      
   
@@ -268,12 +266,14 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             rate = moretimes[common['Screen']]    
         else:   
             rate = screentime[common['Screen']]  ## 16:9 format 
-       
+            
         if self.canvas.openPlayFile in ('snakes', 'bats', 'abstract'): 
             fact = bkg.factor  ## should be 1.0 or default
         else:                           
             fact = self.bkgWorks.restoreFromTrackers(bkg, 'setscr') 
-                                                                                                                              
+                       
+        bkg.setShowTime()  ## set it to make sure 
+                                                                                                                                        
         if bkg.direction == 'left': 
             return self.bkgWorks.left(path, bkg, rate, which, fact)                    
         elif bkg.direction == 'right':

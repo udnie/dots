@@ -70,6 +70,7 @@ class BkgWorks:
         for item in self.bkgMaker.trackers:  ## see if it's already there
             if item.file == file:  
                 self.bkgMaker.trackers.remove(item)
+                break
                          
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):  ## from keybooard or widget - sets 'first'      
@@ -77,20 +78,16 @@ class BkgWorks:
             self.notScrollable()   
             return     
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
-            if self.dots.Vertical: 
+            if self.dots.Vertical:   ## no direction equals 'not scrollable'
                 self.bkgItem.direction = 'vertical'
             else:
                 self.bkgItem.direction = key
             self.bkgItem.tag = 'scroller'    
-            self.bkgItem.setShowTime()       
             file = os.path.basename(self.bkgItem.fileName) 
-            k = 0 
             for p in self.bkgMaker.trackers:
                 if p.file == file:
-                    k += 1
-                    p.direction = self.bkgItem.direction  
-            if k == 0:
-                self.addTracker(self.bkgItem)
+                    p.direction = self.bkgItem.direction 
+                    break 
             self.bkgMaker.lockBkg()      
             self.setBtns()
                   
@@ -104,7 +101,8 @@ class BkgWorks:
         file = os.path.basename(self.bkgItem.fileName)  
         for p in self.bkgMaker.trackers:
             if p.file == file:
-                p.mirroring = self.bkgItem.mirroring                                        
+                p.mirroring = self.bkgItem.mirroring    
+                break                                    
         self.setMirrorBtnText() 
                
     def setFactor(self):
@@ -113,6 +111,7 @@ class BkgWorks:
             for p in self.bkgMaker.trackers:
                 if p.file == file:
                     p.factor = self.bkgItem.factor
+                    break
 
 ### --------------------------------------------------------
     def left(self, path, bkg, rate, which, fact):  ## which rate to use, 1 == rate[0] 
@@ -130,27 +129,27 @@ class BkgWorks:
     def right(self, path, bkg, rate, which, fact):  ## which column to read from
         if which == 'first':        
             path.setDuration(int(common['ViewW'] * (rate[0]*fact)))
-            path.setStartValue(QPoint(self.bkgItem.runway, 0))
+            path.setStartValue(QPoint(bkg.runway, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
         else:
             path.setDuration(int(common['ViewW'] * (rate[2]*fact)))  
-            path.setStartValue(QPoint(-self.bkgItem.width, 0))
+            path.setStartValue(QPoint(-bkg.width, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
         return path
                      
     def vertical(self, path, bkg, rate, which, fact):                 
         if which == 'first': 
             path.setDuration(int(common['ViewH'] * (rate[0]*fact)))  ## rate time equals time to clear   
-            path.setStartValue(QPoint(0, self.bkgItem.runway))
-            path.setEndValue(QPoint(0, -self.bkgItem.height))
+            path.setStartValue(QPoint(0, bkg.runway))
+            path.setEndValue(QPoint(0, -bkg.height))
         else:    
             rate_one = rate[1]  
             # if 'snakes' in bkg.fileName:  ## early kludge  
             #     rate_one = rate_one + .2 
             path.setDuration(int(common['ViewH'] * (rate_one*fact))) 
             ## current kludge advances background into scene before starting - also doubled showtime 
-            path.setStartValue(QPoint(0, common['ViewH']-int(self.bkgItem.showtime*.75)))
-            path.setEndValue(QPoint(0, -self.bkgItem.height))
+            path.setStartValue(QPoint(0, common['ViewH']-int(bkg.showtime*.75)))
+            path.setEndValue(QPoint(0, -bkg.height))
         return path       
 
 ### -------------------------------------------------------- 
@@ -162,7 +161,7 @@ class BkgWorks:
                 bkg.direction = p.direction 
                 bkg.factor    = p.factor
                 return bkg.factor
-                
+                    
     def setLeft(self):
         if self.bkgItem.scrollable:
             self.setDirection('left')      
@@ -209,6 +208,7 @@ class BkgWorks:
                 p.direction = ''
                 p.mirroring = self.bkgMaker.mirroring
                 p.factor    = self.bkgMaker.factor
+                break
         self.bkgItem.tag = ''   
         self.bkgItem.direction = ''             
         self.bkgItem.mirroring = self.bkgMaker.mirroring  
@@ -239,17 +239,8 @@ class BkgWorks:
         self.bkgItem = bkg
         x, y = pos.x(), pos.y()
         z = self.bkgItem.zValue()
-        text = QGraphicsSimpleTextItem() 
-        if self.bkgItem.locked == True:
-            text = 'Locked' 
-        else:
-            text = 'Unlocked'
-        file = os.path.basename(bkg.fileName)
-        tag = file + " " + text    
-        if self.bkgItem.direction == ' left':
-            tag = tag + ' Left'
-        elif self.bkgItem.direction == 'right': 
-            tag = tag + ' Right'            
+        file, direction, mirror, locked = self.canvas.sideCar.addBkgLabels(bkg)    
+        tag = f'{file}\t{direction}\t{mirror}\t{locked}'       
         self.canvas.mapper.pathsAndTags.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
                                                           
 ### --------------------------------------------------------                    

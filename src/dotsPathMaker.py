@@ -4,14 +4,14 @@ from PyQt6.QtGui        import QColor, QPen, QPainterPath
 from PyQt6.QtWidgets    import QWidget, QGraphicsPolygonItem, \
                                 QGraphicsPathItem
 
-from dotsAnimation      import *                          
+from dotsAnimation      import *       
+from dotsSideGig        import getPathList                   
 from dotsSideGig        import MsgBox, getColorStr, distance, getCtr
 from dotsShared         import common, MoveKeys, ScaleRotateKeys
 from dotsSideCar        import SideCar
 from dotsPathWays       import PathWays
 from dotsPathEdits      import PathEdits
-from dotsPathItem       import DoodleMaker
-from dotsPathWorks      import PathWorks
+from dotsPathWorks      import PathWorks, DoodleMaker
 from dotsPathWidget     import PathWidget
 
 ### -------------------- dotsPathMaker ---------------------
@@ -265,6 +265,10 @@ class PathMaker(QWidget):
     def pathChooser(self, where=''): 
         if not self.pathChooserSet and not self.addingNewPath:
             if not self.editingPts:
+                paths = getPathList()
+                if paths == None or paths == []:
+                    MsgBox('getPathList: No Paths Found!', 5)
+                    return None
                 self.chooser = DoodleMaker(self, where) 
                 if where == 'Path Menu':  ## from animation menu
                     b = getCtr(-270,-385) 
@@ -272,7 +276,7 @@ class PathMaker(QWidget):
                     b = getCtr(-270,-265)      
                 self.chooser.move(int(b.x()), int(b.y()))
                 self.chooser.show()
-                self.pathChooserSet = True
+                self.pathChooserSet = True 
         else:  
             self.pathChooserOff()
 

@@ -15,7 +15,7 @@ from dotsShared         import paths, common
 from dotsSideGig        import *
 from dotsBkgMaker       import BkgItem
 from dotsPixItem        import PixItem
-from dotsSideWorks      import SideWorks
+from dotsShowWorks      import ShowWorks
 
 backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directory
     '1080':  'montreaux.jpg', 
@@ -24,7 +24,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1440':  'montreaux-1280.jpg',
     '1296':  'montreaux.jpg',    
     '1536':  'montreaux-1280.jpg',
-     '900':  'bats_vertical.jpg',   
+     '900':  'bats_vertical.jpg',  ## blue night photo
      '912':  'bats_vertical.jpg', 
     '1102':  'bats_vertical.jpg',
 }
@@ -128,7 +128,7 @@ class Bats:
         self.sideCar   = self.canvas.sideCar
         self.animation = self.canvas.animation
         
-        self.sideWorks = SideWorks(self.canvas)
+        self.showWorks = ShowWorks(self.canvas)
                                                    
 ### -------------------------------------------------------- 
     def makeBats(self):  ## makes aliens and bats                 
@@ -145,13 +145,17 @@ class Bats:
         self.batWings()       
         self.greys()
         self.run()
-        self.sideWorks.disablePlay()
+        self.showWorks.disablePlay()
                       
 ### --------------------------------------------------------
     def batWings(self):  ## these go to screen and wait to be run
         k = 0   
         bats = 3 
-        apaths = getPathList()
+        apaths = getPathList()        
+        if apaths == []:
+            MsgBox('getPathList: No Paths Found!', 5)
+            QTimer.singleShot(200, self.canvas.clear)    
+            return 
         while k < bats:      
             x = random.randrange(200, common['ViewW']-300)
             y = random.randrange(200, common['ViewH']-300) 
@@ -216,7 +220,7 @@ class Bats:
     def rerun(self):  ## no reason to delete     
         clearPaths(self)
         self.run()
-        self.sideWorks.disablePlay()
+        self.showWorks.disablePlay()
      
     def delBats(self):
         if len(self.scene.items()) > 0:
@@ -239,7 +243,7 @@ class Abstract:  ## hats
         
         self.sideCar   = self.canvas.sideCar                                          
         self.animation = self.canvas.animation
-        self.sideWorks = SideWorks(self.canvas)
+        self.showWorks = ShowWorks(self.canvas)
    
         self.hats = 7
         self.shadows = False
@@ -263,7 +267,7 @@ class Abstract:  ## hats
                    
         QTimer.singleShot(200, self.scroller.anime.start)  ## run scrolling background  
         self.run()  
-        self.sideWorks.disablePlay()
+        self.showWorks.disablePlay()
 
 ### --------------------------------------------------------            
     def setBackGround(self):
@@ -288,6 +292,10 @@ class Abstract:  ## hats
   
     def setHats(self): 
         apaths = getPathList()  ## from sideGig  
+        if apaths == []:
+            MsgBox('getPathList: No Paths Found!', 5)
+            QTimer.singleShot(200, self.canvas.clear)     
+            return 
         for i in range(0, self.hats):  
             path = getPath(apaths)                                           
             self.makeHats(path)

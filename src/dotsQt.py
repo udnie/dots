@@ -61,7 +61,7 @@ class DotsQt(QMainWindow):
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        self.move(getX(), getY()) 
+        self.move(getX(), getY())  ## functions in screens 
    
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)

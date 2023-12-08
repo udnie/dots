@@ -20,7 +20,7 @@ from dotsKeysPanel      import KeysPanel
 from dotsScrollPanel    import ScrollPanel
 from dotsDocks          import *
 from dotsAbstractBats   import Wings
-from dotsSideWorks      import SideWorks
+from dotsShowWorks      import ShowWorks
 from dotsMenus          import AnimationMenu
 
 Play = ('L','R','P','S','A')
@@ -62,7 +62,7 @@ class StoryBoard(QWidget):
                  
         self.sideShow  = SideShow(self)  ## reads .play files    
         self.showtime  = ShowTime(self)  ## runs anything tagged as an animation 
-        self.sideWorks = SideWorks(self) 
+        self.showWorks = ShowWorks(self) 
          
         addScrollDock(self)  ## add button groups from dotsDocks
         addKeysDock(self)
@@ -242,7 +242,7 @@ class StoryBoard(QWidget):
         gc  ## testing exit problem - it's the CAT error
            
     def loadSprites(self):
-        self.sideWorks.enablePlay()
+        self.showWorks.enablePlay()
         self.scroll.loadSprites()
  
     def selectAll(self):
@@ -276,7 +276,7 @@ class StoryBoard(QWidget):
                 pix.deletePix()  ## deletes shadow as well 
                 del pix
                 k += 1
-        if k > 0: self.sideWorks.enablePlay()  ## stop it - otherwise it's hung
+        if k > 0: self.showWorks.enablePlay()  ## stop it - otherwise it's hung
         # gc.collect()
     
     def flopSelected(self):    

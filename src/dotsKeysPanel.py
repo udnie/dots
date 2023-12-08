@@ -24,11 +24,13 @@ class KeysPanel(QWidget):
         self.setFixedSize(common['SliderW'], common['SliderH']) 
         
         self.layout = QVBoxLayout(self)        
-        self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignCenter) 
-        self.layout.setContentsMargins(10, common['margin1'],0, common['margin2']+3)
+        self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignVCenter) 
+        self.layout.setContentsMargins(0, common['margin1'],0, common['margin2']+3)
         
         if common['Screen'] == '912':
-            self.layout.setContentsMargins(0, common['margin1'],0, common['margin2']+3)
+            self.layout.setContentsMargins(0, common['margin1'],15, common['margin2']+3)
+        
+        self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
             
 ### --------------------------------------------------------
     def toggleMenu(self):  ## called thru sideCar 'K' key
@@ -98,6 +100,7 @@ class KeysPanel(QWidget):
                 'alternate-background-color: rgb(220,220,220);\n'
                 'font-size: 12px;\n'
                 '}') 
+                        
         del list 
             
 ### --------------------------------------------------------    

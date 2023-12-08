@@ -150,6 +150,40 @@ def constrain(lastXY, objSize, panelSize, overlap):
     else:
         return lastXY
 
+def getPathList(bool=False):  ## used by DoodleMaker & context menu
+    try:                        
+        files = os.listdir(paths['paths'])
+    except IOError:
+        # MsgBox('getPathList: No Path Directory Found!', 5)
+        return None    
+    if not files:
+        # MsgBox('getPathList: No Paths Found!', 5)
+        return None  
+    filenames = []
+    for file in files:
+        if file.lower().endswith('path'):
+            if bool:    
+                file = os.path.basename(file)  ## short list
+                filenames.append(file)
+            else:
+                filenames.append(paths['paths'] + file)
+    filenames.sort()  ## can't return it sorted otherwise 
+    return filenames
+
+def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
+    try:
+        tmp = []
+        with open(file, 'r') as fp: 
+            for line in fp:
+                ln = line.rstrip()  
+                if len(ln) == 0: continue  ## skip empty lines
+                ln = list(map(float, ln.split(',')))   
+                tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
+        return tmp
+    except IOError:
+        MsgBox('getPts: Error reading pts file', 5)
+        
+
 def DemoAvailable():
     if os.path.exists(paths['demo']):  ## note
         return True
@@ -166,39 +200,6 @@ def xy(max):
 def getCtr(x,y):  ## return center x,y with offsets
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()
     return QPoint(ctr.x()+x, ctr.y()+y)
-
-def getPathList(bool=False):  ## used by DoodleMaker & context menu
-    try:                        
-        files = os.listdir(paths['paths'])
-    except IOError:
-        MsgBox('getPathList: No Path Directory Found!', 5)
-        return None  
-    filenames = []
-    for file in files:
-        if file.lower().endswith('path'):
-            if bool:    
-                file = os.path.basename(file)  ## short list
-                filenames.append(file)
-            else:
-                filenames.append(paths['paths'] + file)
-    if not filenames:
-        MsgBox('getPathList: No Paths Found!', 5)
-        return
-    filenames.sort()  ## can't return it sorted otherwise 
-    return filenames
-
-def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
-    try:
-        tmp = []
-        with open(file, 'r') as fp: 
-            for line in fp:
-                ln = line.rstrip()  
-                if len(ln) == 0: continue  ## skip empty lines
-                ln = list(map(float, ln.split(',')))   
-                tmp.append(QPointF(ln[0]*scalor+inc, ln[1]*scalor+inc))
-        return tmp
-    except IOError:
-        MsgBox('getPts: Error reading pts file', 5)
 
 def getColorStr():  
     random.seed()
