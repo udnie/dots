@@ -21,7 +21,7 @@ A reminder: scrolling backgrounds need to be tailored to your os/computer/python
 
 **December 30** - Added **Duration** and **Showtime** to the **Background** widget replacing the **Scale** and **Rotate** controls as I can't remember needing to use them.  The new controls make it possible to make adjustments to the values pulled from the dictionaries in **BkgItem.py**  without having to edit the underlying code. Works for me.  Just remember to save the background in a **.play** file using the **Play Save Button** and not the **Background Save Button**.  
 
-Now that it's easy to make adjustments to the next backgrounds duration settings I think it may be possible revisit my initial suggested formats and just stick with scaling the background to 640 pixels on its short side and letting the long side go - staying close or under a 2:1 or 1:2 ratio.  The 350kb.jpg file size is still recommended unless it's a transparent .png. 
+Now that it's easy to make adjustments to the next backgrounds duration settings I think it may be possible revisit my initial suggested formats and just stick with scaling the background to 640 pixels on its short side and letting the long side go - staying close or under a 2:1 or 1:2 ratio.  The 350kb.jpg file size is still recommended unless it's a transparent .png. I should also mention that the values in the three dictionaries were derived based on the either a 1280X640 pixel file or a 1080X640 file.  Your results may vary.
 
 New Video: <https://youtu.be/7cdPFkifbC8>
 

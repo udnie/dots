@@ -1,9 +1,7 @@
 # .gitignore
 _pycache__/
-dots.code-workspace
 dots*.pyc
 
-.vscode/launch.json
 dots_9556U.jpg
 dots_9556U.jpg
 dots_9556U.jpg
@@ -30,7 +28,6 @@ plays/demo-1350.play
 paths/demo-1320.path
 paths/demo-1502.path
 plays/demo-1350.play
-*.png
 dotsBkgWrks.py
-dotsSliderPanel.py
+
 
