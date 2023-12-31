@@ -12,13 +12,18 @@ That was fast.  I had made some small changes to the vertical screen code and po
 
 A reminder: scrolling backgrounds need to be tailored to your os/computer/python/pyqt environment by adjusting the values in the **showtime** and **moretimes** dictionaries in **BkgItem.py**. From what I can distill from the Qt.io docs, there's no frames per second method that would do away with my approach to scrolling backgrounds, at least for now. 
 
-**December 7** - Renamed **SideWorks** to **ShowWorks**. Did some work on **PathChooser** so it  now works better if no path files are found. Applied the changes to the demos as well. Updated MacOS to Sonoma. The **CATransaction sync** problem seems to be gone - there's something else in its place but it appears so far to be benign - other than writing to the desktop.
+**December 7** - Renamed **SideWorks** to **ShowWorks**. Did some work on **PathChooser** so it  now works better if no path files are found. Applied the changes to the demos as well. Updated MacOS to **Sonoma**. The **CATransaction sync** problem seems to be gone - there's something else in its place.  It may have the same effect - that is, locking the app.
 
-     **Python[976:11264] +[CATransaction synchronize] called within transaction** 
+     Python[4447:75880] WARNING: Secure coding is not enabled for restorable state! 
+     Enable secure coding by implementing
+     NSApplicationDelegate.applicationSupportsSecureRestorableState: and returning YES.
+     
 
 **December 30** - Added **Duration** and **Showtime** to the **Background** widget replacing the **Scale** and **Rotate** controls as I can't remember needing to use them.  The new controls make it possible to make adjustments to the values pulled from the dictionaries in **BkgItem.py**  without having to edit the underlying code. Works for me.  Just remember to save the background in a **.play** file using the **Play Save Button** and not the **Background Save Button**.  
 
 Now that it's easy to make adjustments to the next backgrounds duration settings I think it may be possible revisit my initial suggested formats and just stick with scaling the background to 640 pixels on its short side and letting the long side go - staying close or under a 2:1 or 1:2 ratio.  The 350kb.jpg file size is still recommended unless it's a transparent .png. 
+
+New Video: <https://youtu.be/7cdPFkifbC8>
 
 ---
 **November 2023**       
