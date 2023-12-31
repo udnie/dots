@@ -213,7 +213,9 @@ class ScrollPanel(QWidget):
         self.layout.addWidget(label)
         self.bottom()
         
-    def Star(self):    
+    def Star(self):  
+        if self.canvas.pathMakerOn: 
+            return  
         self.add('Star')
              
     def deleteImgLabel(self, this):
@@ -223,24 +225,32 @@ class ScrollPanel(QWidget):
         self.scroll.verticalScrollBar().setSliderPosition(int(p))
 
     def top(self):           
+        if self.canvas.pathMakerOn: 
+            return  
         if self.layout.count() > 0:
             firstItem = self.layout.itemAt(0).widget()
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
                 firstItem))
 
     def bottom(self):  ## thanks stackoverflow
+        if self.canvas.pathMakerOn: 
+            return  
         if self.layout.count() > 0:
             lastItem = self.layout.itemAt(self.layout.count()-1).widget()
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
                 lastItem))
    
     def clear(self):
+        if self.canvas.pathMakerOn: 
+            return  
         for i in reversed(range(self.layout.count())): 
             self.layout.itemAt(i).widget().deleteLater()
         self.scrollCount = 0
         self.scrollList = []
           
     def loadSprites(self):
+        if self.canvas.pathMakerOn: 
+            return  
         sprites = sorted(self.spriteList())
         if sprites:
             for s in sprites:

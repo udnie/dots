@@ -207,7 +207,8 @@ def getY():
     if common['Screen'] in ('900', '912'):    
         return 0
     else:
-       return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.65)   
+        # return 50
+        return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.45)   
    
 ### -------------------- dotsScreens -----------------------
 

@@ -93,7 +93,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlags(False) if 'frame' in self.fileName else self.setFlags(True)
                                        
 ### --------------------------------------------------------
-    @pyqtSlot(str)
+    @pyqtSlot(str)  ## actually updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
         if self.isHidden or self.isSelected() and self.locked == False:
@@ -287,13 +287,13 @@ class PixItem(QGraphicsPixmapItem):
             self.locked = True
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
             self.toggleThisTag(self.id)  
-            QTimer.singleShot(2000, self.mapper.clearTagGroup)  ## the other tag
+            QTimer.singleShot(1000, self.mapper.clearTagGroup)  ## the other tag
         else:
             self.locked = False
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
             self.tag = 'UnLocked'
             self.toggleThisTag(self.id) 
-            QTimer.singleShot(2000, self.mapper.clearTagGroup)
+            QTimer.singleShot(1000, self.mapper.clearTagGroup)
             self.tag = ''
         self.setLockBtnText()
             

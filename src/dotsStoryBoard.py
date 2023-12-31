@@ -2,6 +2,8 @@
 import random
 import gc
 
+from functools          import partial
+
 from PyQt6.QtCore       import QAbstractAnimation, QTimer, QEvent, QPointF, pyqtSlot
 from PyQt6.QtGui        import QTransform
 from PyQt6.QtWidgets    import QWidget, QRubberBand, QGraphicsScene
@@ -192,10 +194,8 @@ class StoryBoard(QWidget):
                 if itm.type == 'pt' or itm.type == 'pix' and \
                     itm.part not in ('pivot','left','right'):  ## 06-23-23
                     itm.setPixKeys(self.key)
-                elif itm.type == 'bkg' and itm.fileName != 'flat':  
-                    itm.setPixKeys(self.key)
-            elif itm.zValue() <= common['pathZ']:
-                break
+                elif itm.type == 'bkg':
+                    itm.setPixKeys(self.key)     
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
                   
@@ -229,10 +229,7 @@ class StoryBoard(QWidget):
            
         if self.sideShow.screenMenu != None:   
             self.sideShow.screenMenu.closeScreenMenu()
-           
-        if not self.dots.Vertical:
-            self.bkgMaker.disableBkgBtns()   
-      
+                 
         self.btnAddBkg.setEnabled(True)                  
         self.dots.statusBar.clearMessage()
         self.pixCount = 0  ## set it to match sideshow

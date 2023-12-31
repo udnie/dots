@@ -115,7 +115,7 @@ class ControlView(QGraphicsView):
                         
         ##  all the shift keys 
         elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:   
-            ## keys - D, T, V, H , O        
+            ## keys - D, T, V, H , O, B        
             if key == Qt.Key.Key_D:   
                 if self.canvas.pathMakerOn:
                     self.setKey('delPts')  ## send to pathmaker
@@ -138,7 +138,8 @@ class ControlView(QGraphicsView):
             self.sideCar.togglePixLocks(singleKeys[key]) 
     
         ## keys to scroll scrollPanel - alt and control modifier      
-        elif key in UpDownKeys and self.canvas.pathMakerOn == False:           
+        elif key in UpDownKeys and self.canvas.pathMakerOn == False:  
+                     
             if mod & Qt.KeyboardModifier.AltModifier:  
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('-1') 
@@ -146,7 +147,10 @@ class ControlView(QGraphicsView):
             elif mod & Qt.KeyboardModifier.ControlModifier:
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('up')  
-                                                                           
+                    
+            else:                  
+                self.setKey(singleKeys[key])  ## broadcast to widgets - bkgWidget
+                                                                                        
         elif key in DFTWKeys:  ## set key as well - used by pathMaker
             if key == Qt.Key.Key_D:  
                 self.setKey('D') 

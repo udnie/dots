@@ -1,7 +1,7 @@
 
 from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt6.QtGui     import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem,  \
+from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
                             QGraphicsPixmapItem, QGraphicsSimpleTextItem
 
 from dotsShared         import common
@@ -174,11 +174,17 @@ class MapMaker:
                     del pix
                     break
 
-# ### ------------------- tags and paths ---------------------
+### ------------------- tags and paths ---------------------      
+    def addTagGroup(self):
+        self.tagZ = self.toFront(45.0)   ## otherwise it can be hidden 
+        self.tagGroup = QGraphicsItemGroup()
+        self.tagGroup.setZValue(self.tagZ)     
+        self.scene.addItem(self.tagGroup)
+
     def toggleTagItems(self, pid): 
         if self.canvas.pathMakerOn:
             return
-        if self.pathsAndTags.tagCount() > 0:           
+        if self.tagCount() > 0:           
             self.clearTagGroup()
             self.clearPaths() 
             self.tagGroup = None
@@ -188,12 +194,12 @@ class MapMaker:
         if self.scene.items():  ## tag them all
             if self.pathSet:
                 QTimer.singleShot(200, self.clearPaths)
-            self.pathsAndTags.addTagGroup()
+            self.addTagGroup()
             self.pathsAndTags.tagWorks(pid)
 
     def clearTagGroup(self):     
-        if self.pathsAndTags.tagCount() > 0: 
-            self.pathsAndTags.removeTags()
+        if self.tagCount() > 0: 
+            self.removeTags()
             self.tagGroup = None
             self.tagSet = False 
                   
@@ -221,7 +227,12 @@ class MapMaker:
             if itm.type == str and itm.zValue() < last:
                 last = itm.zValue()
         return last
-
+        
+    def removeTags(self):
+        for p in self.canvas.scene.items():
+            if p.type == 'tag':
+                self.scene.removeItem(p)  
+    
     def toFront(self, inc=0):  ## finds the highest pixitem zValue
         first = 0               ## returns it plus the increment
         for pix in self.scene.items():
@@ -231,6 +242,10 @@ class MapMaker:
             elif pix.zValue() <= common['pathZ']:
                 break
         return inc + first
+   
+    def tagCount(self):  
+        return sum( pix.type == 'tag' 
+            for pix in self.scene.items())
                  
 ### -------------------- dotsMapMaker ----------------------
 

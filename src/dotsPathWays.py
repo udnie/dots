@@ -68,7 +68,7 @@ class PathWays:
 
     def halfPath(self, full=False):
         if self.pathMaker.pathTestSet:
-            self.pathMaker.stopPathTest()
+            self.pathWorks.stopPathTest()
         tmp = []
         if full:  ## use all the points
             lnn = len(self.pathMaker.pts)    
@@ -102,7 +102,7 @@ class PathWays:
     def reversePath(self):  
         if self.pathMaker.pts:
             if self.pathMaker.pathTestSet:
-                self.pathMaker.stopPathTest()      
+                self.pathWorks.stopPathTest()      
             tmp = []    
             lnn = len(self.pathMaker.pts)-1        
             for i in range(0, len(self.pathMaker.pts)):
@@ -132,14 +132,13 @@ class PathWays:
         Q.Option.DontUseNativeDialog
         Q.setDirectory(paths['paths'])
         file, _ = Q.getOpenFileName(self.canvas,
-            'Choose a path file to open', paths['paths'],
-            'Files(*.path)')
+            'Choose a path file to open', paths['paths'], 'Files(*.path)')
         Q.accept()
         if file:
             self.pathMaker.pts = getPts(file)  ## in sideGig  
             self.pathMaker.openPathFile = os.path.basename(file)
             self.pathMaker.addPath()
-       
+         
     def savePath(self):
         if self.pathMaker.pts:
             if self.pathMaker.addingNewPath != False: 
@@ -158,12 +157,13 @@ class PathWays:
                 paths['paths'] + self.pathMaker.openPathFile,  
                 'Files(*.path)')  ## <--- note
             Q.accept()  
-                                   
+                                                          
             if not f[0]: 
                 return
             if not f[0].lower().endswith('.path'):
                 MsgBox("savePath: Missing or Wrong file extention - use '.path'", 5)   
                 return  
+            
             try:
                 with open(f[0], 'w') as fp:
                     for i in range(0, len(self.pathMaker.pts)):
@@ -251,11 +251,7 @@ class PathWays:
         s = s + '  ' + '{0:2d}'.format(idx)
         return s
         
-    def pixCount(self):  
-        return sum(pix.type == 'pix' 
-            for pix in self.scene.items())
-        
-    def tagCount(self):  
+    def tagCount(self):  ## shared among path modules - there's one in mapper used by it
         return sum(pix.type == 'tag' 
             for pix in self.scene.items())
                          

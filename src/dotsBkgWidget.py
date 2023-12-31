@@ -1,10 +1,14 @@
 
-from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF
+import os.path
+
+from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF, QTimer, pyqtSlot 
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QSlider, QHBoxLayout, QVBoxLayout, QPushButton
-                                
+
+from dotsShared         import common                                
 from dotsBkgWorks       import BkgWorks
+from dotsBkgMatte       import Matte
                       
 ### ------------------- dotsShadowWidget -------------------                                                                                                                                                            
 class BkgWidget(QWidget):  
@@ -15,6 +19,7 @@ class BkgWidget(QWidget):
         self.bkgItem  = parent     
         self.bkgMaker = maker
         self.canvas   = self.bkgItem.canvas
+        self.view     = self.bkgItem.canvas.view
         
         self.bkgWorks = BkgWorks(self.bkgItem)
            
@@ -22,15 +27,14 @@ class BkgWidget(QWidget):
         self.save = QPointF()
                 
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 355.0, 305.0
+        self.WidgetW, self.WidgetH = 360.0, 305.0
                     
         vbox = QVBoxLayout()  
           
         hbox = QHBoxLayout()
-        hbox.addWidget(self.dialGroup(), Qt.AlignmentFlag.AlignTop)
-        hbox.addSpacing(-5)
+        hbox.addSpacing(0)   
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignTop)
-        hbox.addSpacing(-5) 
+        hbox.addSpacing(0) 
         hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignTop)
         
         sbox = QHBoxLayout()
@@ -40,6 +44,9 @@ class BkgWidget(QWidget):
         
         self.setLayout(vbox)
         
+        self.label.setText(os.path.basename(self.bkgItem.fileName))
+        self.label.setStyleSheet("QLabel{font-size: 14pt;}")
+        
         self.setFixedHeight(int(self.WidgetH)) 
         self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
         self.setContentsMargins(-5, 0, 0, 0) 
@@ -47,11 +54,19 @@ class BkgWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)             
-                                                                
+            Qt.WindowType.WindowStaysOnTopHint)    
+           
+        self.view.keysSignal[str].connect(self.setKeys)                                                                                         
         self.show()
                    
-### --------------------------------------------------------                    
+### --------------------------------------------------------
+    @pyqtSlot(str)
+    def setKeys(self, key):  ## managing storyboard and pathMaker          
+        if key == 'up':  ## scale up  
+            self.setBkgRate(int(self.bkgItem.rate *100) + 5)
+        elif key == 'down':  ## scale down
+            self.setBkgRate(int(self.bkgItem.rate *100) - 5)
+                     
     def paintEvent(self, e): 
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        
@@ -62,7 +77,7 @@ class BkgWidget(QWidget):
         painter.drawRoundedRect(rect, 15, 15)
               
     def mousePressEvent(self, e):
-        self.save = e.globalPosition()  ## works the best, needs to change for PyQt6
+        self.save = e.globalPosition()  ## works the best, needs to change for pyqt6
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -82,85 +97,48 @@ class BkgWidget(QWidget):
         self.bkgMaker.closeWidget()
         e.accept()
  
-### --------------------------------------------------------   
-    def resetSliders(self, bkgItem):
-        if self.bkgItem != None and bkgItem.fileName != 'flat':
-                    
-            self.opacitySlider.setValue(int(bkgItem.opacity*100))
-            self.opacityValue.setText('{0:.2f}'.format(bkgItem.opacity))
+### --------------------------------------------------------
+    def centerBkg(self):
+        if self.bkgItem != None and self.bkgItem.type == 'bkg':  
+            width = self.bkgItem.imgFile.width()
+            height = self.bkgItem.imgFile.height()
+            self.bkgItem.x = (common['ViewW']- width)/2
+            self.bkgItem.y = (common['ViewH']- height)/2
+            self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
             
-            self.scaleSlider.setValue(int(bkgItem.scale*100))
-            self.scaleValue.setText('{0:.2f}'.format(bkgItem.scale))
+    def setMatte(self):
+        self.bkgMaker.closeWidget()
+        self.bkgMaker.matte = Matte(self.bkgItem) 
+                                             
+    def setBkgRate(self, val):
+        if self.bkgItem != None and self.bkgItem.type == 'bkg':                         
+            self.bkgItem.rate = val/100  
+            self.rateSlider.setValue(val)    
+            self.rateValue.setText('{0:.2f}'.format(val/100))   
+            self.bkgWorks.setRateTrackers()
+                       
+    def setBkgShowtime(self, val):
+        if self.bkgItem != None and self.bkgItem.type == 'bkg':  
+            self.bkgItem.showtime = val   
+            self.showtimeSlider.setValue(val)   
+            self.showtimeValue.setText('{:2d}'.format(val))
+            self.bkgWorks.setShowTimeTrackers()
             
-            self.rotaryDial.setValue(int(bkgItem.rotation))
-            self.rotateValue.setText('{:3d}'.format(bkgItem.rotation))
-            
-            self.factorDial.setValue(int(bkgItem.factor*100))
-            self.factorValue.setText('{0:.2f}'.format(bkgItem.factor))
-            
-            self.bkgWorks.setMirrorBtnText()
-            self.bkgWorks.setBtns()
-            self.setLocks()
-  
-    def setLocks(self):
-        if self.bkgItem:  ## shouldn't need this but - could have just started to clear
-            if self.bkgItem.locked == False:
-                self.lockBtn.setText('UnLocked')
-            else:
-                self.lockBtn.setText('Locked')
-                                   
     def setBkgFactor(self, val):
-        if self.bkgItem != None and self.bkgItem.fileName != 'flat':
+        if self.bkgItem != None and self.bkgItem.type == 'bkg':  
             self.bkgItem.factor = val/100
+            self.factorDial.setValue(val)
             self.factorValue.setText('{0:.2f}'.format(val/100))
-            self.bkgWorks.setFactor()
-              
-    def setBkgRotate(self, val):
-        if self.bkgItem != None and self.bkgItem.fileName != 'flat':
-            self.bkgItem.setOrigin()  
-            if val< 0: val = 0
-            self.bkgItem.rotation = val   
-            self.bkgItem.setRotation(self.bkgItem.rotation)
-            self.rotateValue.setText('{:3d}'.format(val))
-            
-    def setBkgScale(self, val):
-        if self.bkgItem != None and self.bkgItem.fileName != 'flat':       
-            self.bkgItem.setOrigin()
-            op = (val/100)
-            self.bkgItem.scale = op
-            self.bkgItem.setScale(self.bkgItem.scale)
-            self.scaleValue.setText('{0:.2f}'.format(op))
-   
-    def setBkgOpacity(self, val):
-        if self.bkgItem != None and self.bkgItem.fileName != 'flat':
-            op = (val/100)
-            self.bkgItem.opacity = op    
-            self.bkgItem.setOpacity(self.bkgItem.opacity)
-            self.opacityValue.setText('{0:.2f}'.format(op))
-                                                                                                                   
-### -------------------------------------------------------- 
-    def dialGroup(self):
-        groupBox = QGroupBox('Rotate')
-        
-        groupBox.setFixedWidth(75)
-        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
-   
-        self.rotateValue = QLabel('0', alignment=Qt.AlignmentFlag.AlignCenter)
-        self.rotateValue.setFixedWidth(50)
-        self.rotaryDial = QDial()
-        self.rotaryDial.setFixedWidth(50)
-        self.rotaryDial.setMinimum(0)
-        self.rotaryDial.setMaximum(360)
-        self.rotaryDial.setValue(0)
-        self.rotaryDial.setWrapping(False)
-        self.rotaryDial.setNotchesVisible(True)
-        self.rotaryDial.setNotchTarget(23.0)
-        self.rotaryDial.setSingleStep(1)
-        self.rotaryDial.valueChanged.connect(self.setBkgRotate)
+            self.bkgWorks.setFactorTrackers()
      
+### --------------------------------------------------------
+    def sliderGroup(self):
+        groupBox = QGroupBox(' Duration  Showtime  Factor')
+        groupBox.setFixedWidth(185)   
+        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
+            
         self.factorValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignCenter)
-        self.factorValue.setFixedWidth(50)
+        self.factorValue.setFixedWidth(40)
         self.factorDial = QDial()
         self.factorDial.setFixedWidth(50)
         self.factorDial.setMinimum(50)
@@ -171,99 +149,96 @@ class BkgWidget(QWidget):
         self.factorDial.setNotchTarget(5)
         self.factorDial.setSingleStep(10)
         self.factorDial.valueChanged.connect(self.setBkgFactor)
+          
+        self.rateValue = QLabel('')
+        self.rateValue.setFixedWidth(50)
+        self.rateSlider = QSlider(Qt.Orientation.Vertical)
+        self.rateSlider.setMinimum(1250)
+        self.rateSlider.setMaximum(2500)
+        self.rateSlider.setSingleStep(1)
+        self.rateSlider.setValue(0)
+        self.rateSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.rateSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.rateSlider.setTickInterval(250)  
+        self.rateSlider.valueChanged.connect(self.setBkgRate)   
         
-        rbox = QVBoxLayout()    
-        rbox.addWidget(self.rotaryDial, Qt.AlignmentFlag.AlignLeft) 
-        rbox.addWidget(self.rotateValue, Qt.AlignmentFlag.AlignCenter) 
-            
-        rbox.addWidget(self.factorDial, Qt.AlignmentFlag.AlignLeft)    
-        rbox.addWidget(self.factorValue, Qt.AlignmentFlag.AlignCenter)
+        self.showtimeValue = QLabel('')
+        self.showtimeValue.setFixedWidth(50)
+        self.showtimeSlider = QSlider(Qt.Orientation.Vertical)
+        self.showtimeSlider.setMinimum(5)
+        self.showtimeSlider.setMaximum(30)
+        self.showtimeSlider.setSingleStep(1)
+        self.showtimeSlider.setValue(5)
+        self.showtimeSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.showtimeSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.showtimeSlider.setTickInterval(5)  
+        self.showtimeSlider.valueChanged.connect(self.setBkgShowtime)
+                                                  
+        sbox = QHBoxLayout()  ## controls 
         
-        rbox.addSpacing(5)
-        fact = QLabel('  Factor')
-        fact.setFixedWidth(50)
-        rbox.addWidget(fact, Qt.AlignmentFlag.AlignHCenter)
-               
-        groupBox.setLayout(rbox)
-        return groupBox
-
-### -------------------------------------------------------- 
-    def sliderGroup(self):
-        groupBox = QGroupBox('Scale  Opacity  ')
+        sbox.addSpacing(10)       
+        sbox.addWidget(self.rateSlider) 
+        sbox.addSpacing(20)                
+        sbox.addWidget(self.showtimeSlider) 
+        sbox.addSpacing(5)         
+        sbox.addWidget(self.factorDial) 
+       
+        hbox = QHBoxLayout()  ## values
+       
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.rateValue, Qt.AlignmentFlag.AlignRight)     
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.showtimeValue)  
+        hbox.setAlignment(Qt.AlignmentFlag.AlignBottom)
+        hbox.addSpacing(-10) 
+        hbox.addWidget(self.factorValue) 
+   
+        fbox = QHBoxLayout()  
+        self.label = QLabel('file name goes here', alignment=Qt.AlignmentFlag.AlignCenter)
+        fbox.addWidget(self.label)
         
-        groupBox.setFixedWidth(105)
-        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
-
-        self.scaleValue = QLabel('1.00')
-        self.scaleValue.setFixedWidth(50)
-        self.scaleSlider = QSlider(Qt.Orientation.Vertical)
-        self.scaleSlider.setMinimum(25)
-        self.scaleSlider.setMaximum(225)
-        self.scaleSlider.setSingleStep(1)
-        self.scaleSlider.setValue(100)
-        self.scaleSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.scaleSlider.setTickInterval(25)  
-        self.scaleSlider.valueChanged.connect(self.setBkgScale)   
-        
-        self.opacityValue = QLabel('1.00')
-        self.opacityValue.setFixedWidth(50)
-        self.opacitySlider = QSlider(Qt.Orientation.Vertical)
-        self.opacitySlider.setMinimum(0)
-        self.opacitySlider.setMaximum(100)
-        self.opacitySlider.setSingleStep(1)
-        self.opacitySlider.setValue(100)
-        self.opacitySlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.opacitySlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.opacitySlider.setTickInterval(16)  
-        self.opacitySlider.valueChanged.connect(self.setBkgOpacity)
-                       
-        sbox = QHBoxLayout()  ## sliders      
-        sbox.addWidget(self.scaleSlider, Qt.AlignmentFlag.AlignRight)                
-        sbox.addWidget(self.opacitySlider, Qt.AlignmentFlag.AlignRight)
-        
-        vabox = QHBoxLayout()  ## values
-        vabox.addWidget(self.scaleValue, Qt.AlignmentFlag.AlignRight)     
-        vabox.addWidget(self.opacityValue, Qt.AlignmentFlag.AlignRight) 
-        vabox.setAlignment(Qt.AlignmentFlag.AlignBottom)
          
-        vbox = QVBoxLayout() 
+        vbox = QVBoxLayout()  
+        
+        vbox.addSpacing(-5)
         vbox.addLayout(sbox)
-        vbox.addLayout(vabox)
+        vbox.addLayout(hbox)  
+        vbox.addSpacing(-5) 
+        vbox.addLayout(fbox) 
+        vbox.addSpacing(-5) 
                 
         groupBox.setLayout(vbox)
-        return groupBox
-    
+        return groupBox                  
+
 ### -------------------------------------------------------- 
     def buttonGroup(self):
         groupBox = QGroupBox('BackGrounds  ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
-        groupBox.setFixedWidth(110)
+        groupBox.setFixedWidth(115)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
       
-        resetBtn   = QPushButton('Reset')               
-        setBtn    = QPushButton('Run')
-        self.lockBtn = QPushButton('Locked')
+        resetBtn  = QPushButton('Reset')               
+        runBtn    = QPushButton('Run')
+        self.lockBtn  = QPushButton('Locked')
         flopBtn    = QPushButton('Flop')
         matteBtn  = QPushButton('Matte')
         deleteBtn = QPushButton('Delete')
         centerBtn = QPushButton('Center')
         quitBtn   = QPushButton('Close')
-        
+              
         resetBtn.clicked.connect(self.bkgWorks.reset)
-        setBtn.clicked.connect(self.bkgMaker.showtime)     
-        self.lockBtn.clicked.connect(self.bkgWorks.toggleBkgLock)   
+        runBtn.clicked.connect(self.bkgMaker.showtime)    
+        self.lockBtn.clicked.connect(self.bkgWorks.toggleBkgLocks)   
         flopBtn.clicked.connect(self.bkgMaker.flopIt)
-        matteBtn.clicked.connect(self.bkgWorks.setMatte)
-        centerBtn.clicked.connect( self.bkgWorks.centerBkg)    
+        matteBtn.clicked.connect(self.setMatte)
+        centerBtn.clicked.connect(self.centerBkg)    
         deleteBtn.clicked.connect(self.bkgItem.delete)
         quitBtn.clicked.connect(self.bkgMaker.closeWidget)
     
         vbox = QVBoxLayout(self)
         vbox.addWidget(resetBtn)
-        vbox.addWidget(setBtn)
+        vbox.addWidget(runBtn)
         vbox.addWidget(self.lockBtn)
         vbox.addWidget(flopBtn)
         vbox.addWidget(matteBtn)
@@ -273,7 +248,8 @@ class BkgWidget(QWidget):
                 
         groupBox.setLayout(vbox)
         return groupBox
-                         
+  
+### --------------------------------------------------------                       
     def scrollButtons(self):
         groupBox = QLabel()
         groupBox.setAlignment(Qt.AlignmentFlag.AlignBaseline) 
@@ -281,7 +257,7 @@ class BkgWidget(QWidget):
         groupBox.setFixedHeight(40)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
       
-        self.mirrorBtn = QPushButton('Mirroring Off')
+        self.mirrorBtn = QPushButton('Continuous')
         self.leftBtn   = QPushButton('Right to Left')               
         self.rightBtn  = QPushButton('Left to Right')
         
@@ -304,5 +280,10 @@ class BkgWidget(QWidget):
 ### ------------------- dotsDotsWidget ---------------------
   
 
+    # cursor: QCursor = QCursor()  ## ----->>  leaving this in as it works as well
+    # QGuiApplication.setOverrideCursor(cursor)
+    # p = self.mapFromGlobal(cursor.pos())  
+    # cursor.setPos(p.x()+420, int(p.y()+850.0))  ## worked for 720 
+    # QGuiApplication.changeOverrideCursor(cursor)      
 
 

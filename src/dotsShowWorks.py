@@ -10,7 +10,7 @@ from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 
 ### --------------------- dotsShowWorks --------------------
-'''  ## mostly overflow from sideShow and showtime '''
+'''  ## saving to a play file from showtime and setting play buttons '''
 ### --------------------------------------------------------
 class ShowWorks: 
 ### -------------------------------------------------------- 
@@ -40,6 +40,7 @@ class ShowWorks:
         mirroring = p.mirroring
         factor    = p.factor
         showtime  = p.showtime
+        rate      = p.rate
         z = p.zValue()
 
         p.init()
@@ -47,7 +48,8 @@ class ShowWorks:
         p.direction = direction 
         p.mirroring = mirroring
         p.factor    = factor
-        p.showtime  = showtime  ## required
+        p.showtime  = showtime 
+        p.rate      = rate
         
         p.setZValue(z)   
         p.locked == True
@@ -112,8 +114,11 @@ class ShowWorks:
         pix.y    = float('{0:.2f}'.format(tmp['y']))   
         pix.setZValue(tmp['z']),  ## use the new one
         pix.setMirrored(tmp['mirror']),
-        pix.rotation = tmp['rotation']
-        pix.scale    = tmp['scale']
+        if pix.fileName == 'flat':
+            pix.type = 'flat'
+        elif pix.type != 'bkg':   
+            pix.rotation = tmp['rotation']
+            pix.scale    = tmp['scale']
         return pix
 
     def setPixitem(self, pix, tmp):
@@ -121,39 +126,43 @@ class ShowWorks:
         pix.setPos(pix.x, pix.y)     
         if 'frame' not in pix.fileName:
             pix.locked = tmp['locked']
-            if pix.locked: self.locks += 1
+            if pix.locked: self.canvas.sideShow.locks += 1
             pix.part = tmp['part']
             pix = lookForStrays(pix)
         return pix 
      
     def setBackGround(self, pix, tmp):  ## pix is a stand_in for bkg
-        ## doing this only if missing in .play file other gets the default
+        ## doing this only if missing in .play file other gets the default     
+        if 'anime' not in tmp.keys(): 
+            tmp['anime'] = None   
+        
         if 'scrollable' not in tmp.keys(): 
             tmp['scrollable'] = False
             
         if 'direction' not in tmp.keys(): 
             tmp['direction'] = 'left'   
-             
-        if 'anime' not in tmp.keys(): 
-            tmp['anime'] = None       
-            
+                 
         if 'mirroring' not in tmp.keys(): 
             tmp['mirroring'] = self.canvas.bkgMaker.mirroring    
             
         if 'factor' not in tmp.keys(): 
             tmp['factor'] = self.canvas.bkgMaker.factor
-            
-        if 'opacity' not in tmp.keys(): 
-            tmp['opacity'] = 1.0
-                   
-        pix.scrollable  = tmp['scrollable']
+                    
+        if 'rate' not in tmp.keys(): 
+            tmp['rate'] = 0
+  
+        if 'showtime' not in tmp.keys(): 
+            tmp['showtime'] = 0
+  
+        pix.locked      = tmp['locked']                 
         pix.anime       = tmp['anime']
-        pix.locked      = tmp['locked']
+        pix.scrollable  = tmp['scrollable']
         pix.mirroring   = tmp['mirroring']
         pix.direction   = tmp['direction']
         pix.factor      = tmp['factor']
-        pix.opacity     = tmp['opacity']
-                  
+        pix.rate        = tmp['rate']
+        pix.showtime    = tmp['showtime']
+             
         result = pix.bkgWorks.addTracker(pix)    
         if result == False:  ## must be a dupe
             del pix          ## not yet added to scene
@@ -182,7 +191,7 @@ class ShowWorks:
             pix.shadow['linked'] = False
         else:
             pix.shadow['linked'] = tmp['linked']
-            
+                       
         return pix
             
 ### --------------------------------------------------------

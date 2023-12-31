@@ -6,7 +6,7 @@ import time
 from os                 import path
 from functools          import partial
 
-from PyQt6.QtCore       import QTimer
+from PyQt6.QtCore       import QTimer, QPointF
 
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
@@ -55,12 +55,10 @@ class SideShow:
         
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
-        if self.canvas.pathMakerOn == False:      
-            if key == 'L' and self.canvas.control == '':
-                self.loadPlay()                
-            elif len(self.scene.items()) > 0:  ## stuff on screen
+        if self.canvas.pathMakerOn == False:                    
+            if len(self.scene.items()) > 0:  ## stuff on screen
                 if key == 'P':  ## always
-                    self.mapper.pathsAndTags.togglePaths()                                
+                    self.mapper.pathsAndTags.togglePaths()                               
                 elif key == 'R':    
                     if self.canvas.control != '':
                         return
@@ -68,8 +66,9 @@ class SideShow:
                         self.runThese()                                        
                 elif key == 'S':
                     if self.canvas.control != '':
-                        self.showtime.stop()        
-            elif key in ('R', 'S', 'A'):  ## single key command - no sceneItems
+                        self.showtime.stop()   
+            ## single key command - no sceneItems
+            elif self.canvas.control == '' and key in ('L', 'R', 'S', 'A', 'P'): 
                 self.RSA(key)
                 
 ### --------------------------------------------------------            
@@ -85,7 +84,9 @@ class SideShow:
             self.showtime.run()
                
     def RSA(self, key):
-        if key == 'R':   
+        if key == 'L':
+            self.loadPlay()  
+        elif key == 'R':   
             self.screenMenu.closeScreenMenu()
             if self.demoAvailable: 
                 self.demoMenu.openDemoMenu()  ## in snakes 
@@ -94,27 +95,28 @@ class SideShow:
                 self.demoMenu.closeDemoMenu()
                 self.screenMenu.openScreenMenu() ## in screens
         elif key == 'A':
-            self.bkgMaker.openBkgFiles()          
+            self.bkgMaker.openBkgFiles()   
+        elif key == 'P':
+            self.pathMaker.initPathMaker()       
                                    
 ### --------------------------------------------------------                            
     def loadPlay(self):   
-        if self.canvas.pathMakerOn:  ## using load in pathMaker
-            self.pathMaker.pathWays.openFiles()
+        if self.canvas.pathMakerOn:  ## use pathChooser - was loader once but now you can see them
             return
-        else: 
-            Q = QFileDialog()
-            Q.Option.DontUseNativeDialog
-            file, _ = Q.getOpenFileName(self.canvas, 
-                'Choose a file to open', paths['playPath'], 'Files (*.play)', None)
-            Q.accept()      
-            if file:
-                try:
-                    self.openPlay(file) 
-                    self.canvas.openPlayFile = file
-                except IOError:
-                    MsgBox('loadPlay ' + file + 'Not Found')
-            else:
-                return
+
+        Q = QFileDialog()
+        Q.Option.DontUseNativeDialog
+        file, _ = Q.getOpenFileName(self.canvas, 
+            'Choose a file to open', paths['playPath'], 'Files (*.play)', None)
+        Q.accept()      
+        if file:
+            try:
+                self.openPlay(file) 
+                self.canvas.openPlayFile = file
+            except IOError:
+                MsgBox('loadPlay ' + file + 'Not Found')
+        else:
+            return
             
     def runThis(self, file):  ## doesn't ask - called by demo menu - runs abstracts
         if not self.scene.items():
@@ -143,8 +145,9 @@ class SideShow:
         lnn = lnn + self.mapper.toFront(0)  ## start at the top
         plist  = ['abstract', 'snakes']  ## demo pic are in images
                             
-        for tmp in dlist:                  
-            if tmp['type'] == 'bkg:' and tmp['fname'] != 'flat' and \
+        for tmp in dlist:     
+            ##  check if there            
+            if tmp['type'] == 'bkg' and \
                 not path.exists(paths['bkgPath']   + tmp['fname']) and\
                 not path.exists(paths['imagePath'] + tmp['fname']):    
                 MsgBox('openPlay: Error loading '  + paths['bkgPath'] + tmp['fname'], 5)  
@@ -172,12 +175,12 @@ class SideShow:
                 self.addPixToScene(pix, tmp)  ## finish unpacking tmp                 
                 lnn -= 1 
                                  
-            elif tmp['type'] == 'bkg':  ## could be more than one background or flat
+            elif tmp['type'] in ('bkg', 'flat'):  ## could be more than one background or flat
                 if bkz == 0:
                     bkz = common['bkgZ']  ## starts at -99.0
                 tmp['z'] = bkz                
-                if tmp['fname'] == 'flat': 
-                    self.bkgMaker.setBkgColor(QColor(tmp['tag']), bkz)           
+                if tmp['type'] == 'flat':  ## does not rely on a bkg.file once it's saved to a play.file
+                    self.bkgMaker.setBkgColor(QColor(tmp['tag']), bkz)  ## sets flat to scene as well 
                 else:          
                     if any(thing in tmp['fname'] for thing in plist):  ## demos are in images dir
                         if not os.path.exists(paths['bkgPath'] + tmp['fname']):
@@ -190,7 +193,9 @@ class SideShow:
                             MsgBox( paths['bkgPath'] + tmp['fname'] + ' Not Found', 5)
                             return
                         else:
-                            pix = BkgItem(paths['bkgPath'] + tmp['fname'], self.canvas, bkz)              
+                            pix = BkgItem(paths['bkgPath'] + tmp['fname'], self.canvas, bkz)
+                            pix.bkgMaker.lockBkg(pix) 
+                                         
                     self.addPixToScene(pix, tmp)  ## finish unpacking tmp 
                 bkz -= 1   
             del tmp 
@@ -198,7 +203,6 @@ class SideShow:
         
         del dlist
         
-        self.bkgMaker.disableBkgBtns()
         file = os.path.basename(self.canvas.openPlayFile)
         
         if 'play' in file and ns == 0 and self.locks == 0:
@@ -231,8 +235,9 @@ class SideShow:
         self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)        
                        
  ### --------------------------------------------------------
-    def addPixToScene(self, pix, tmp):  ## treats pix, bkg, shadow as a pix 
-        pix = self.showWorks.setAll(pix, tmp)                    
+    def addPixToScene(self, pix, tmp):  ## fills in the blanks and treats shadow as a pix 
+        pix = self.showWorks.setAll(pix, tmp)  
+                          
         if pix.type == 'pix': 
             pix = self.showWorks.setPixitem(pix, tmp)
 
@@ -250,13 +255,20 @@ class SideShow:
         if 'scalor' in tmp.keys():   
             pix = self.showWorks.setShadow(pix, tmp)  
             
-        elif pix.type == 'bkg' and pix.fileName != 'flat': 
-            pix = self.showWorks.setBackGround(pix, tmp)  ## adding the rest of it, lock them all    
-            if pix != None: QTimer.singleShot(300, partial(pix.bkgMaker.lockBkg, pix))                                    
+        elif pix.type == 'bkg':  ## adding the rest of it
+            pix = self.showWorks.setBackGround(pix, tmp)  ## checking if a dupe
+            if pix != None:
+                self.scene.addItem(pix)     
+                if pix.tag == 'scroller':  ## replace transformPix.. action
+                    if pix.direction == 'right':
+                        pix.setPos(QPointF(pix.runway, 0))  ## offset to right 
+                    elif pix.direction == 'vertical':
+                        pix.setPos(QPointF(0.0, float(pix.runway)))                             
         del tmp 
                                                                                                  
         ## adds pix to the scene and performs any transforms - used by other classes
-        if pix != None: self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
+        if pix != None and pix.type == 'pix': 
+            self.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
 
         del pix
         

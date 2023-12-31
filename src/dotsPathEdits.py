@@ -68,7 +68,7 @@ class PathEdits(QWidget):
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note
             self.removeNewPath()  
-            self.pathMaker.turnGreen()
+            self.pathMaker.pathWorks.turnGreen()
             self.pathMaker.addPath()  ## draws a polygon rather than painter path
    
     def removeNewPath(self):  ## keep self.pathMaker.pts for path
@@ -86,16 +86,16 @@ class PathEdits(QWidget):
     def deleteNewPath(self):  ## changed your mind, doesn't save pts
         if self.pathMaker.addingNewPath:
             self.removeNewPath()
-            self.pathMaker.turnGreen()
+            self.pathMaker.pathWorks.turnGreen()
             self.pathMaker.pts = []
             self.pathMaker.pathSet = False
                       
 ### ------------------------ lasso ------------------------- 
     def toggleLasso(self):
-        if self.lasso != None:
+        if self.lasso == None:
+            self.newLasso()   
+        elif self.lasso != None:
             self.deleteLasso()   
-        elif self.lasso == None:
-            self.newLasso()
         
     def newLasso(self): 
         self.lasso = []  
@@ -114,7 +114,7 @@ class PathEdits(QWidget):
         return poly               
                                 
     def drawLasso(self):
-        self.pathMaker.removePoly()    
+        self.pathMaker.pathWorks.removePoly()    
         self.pathMaker.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
         self.pathMaker.poly.setBrush(QBrush(QColor(160,160,160,50)))
         self.pathMaker.poly.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
@@ -122,7 +122,7 @@ class PathEdits(QWidget):
         self.pathMaker.scene.addItem(self.pathMaker.poly)
     
     def deleteLasso(self):  
-        self.pathMaker.removePoly()
+        self.pathMaker.pathWorks.removePoly()
         self.lasso = None
         QGuiApplication.restoreOverrideCursor()
                 
@@ -168,7 +168,7 @@ class PathEdits(QWidget):
             self.pathMaker.editingPts = True
             self.pathMaker.selections = []  
             self.addPathItems()
-            self.turnBlue()
+            self.pathMaker.pathWorks.turnBlue()
         else:
             self.editPointsOff()
 
@@ -176,7 +176,7 @@ class PathEdits(QWidget):
         self.pathMaker.editingPts = False
         self.pathMaker.selections = []
         self.removePathItems()
-        self.pathMaker.turnGreen()
+        self.pathMaker.pathWorks.turnGreen()
                    
     def removePathItems(self):   
         for ptr in self.scene.items():
@@ -223,14 +223,13 @@ class PathEdits(QWidget):
 ### -------------------- selections ------------------------                
     def deleteSections(self):  ## selected with lasso
         if self.pathMaker.selections: 
-            self.pathMaker.selections.sort()  ## works better this way
-            sel = self.pathMaker.selections[::-1]  ## reverse list 
+            sel = sorted(self.pathMaker.selections, reverse=True)  
             for i in sel:
                 self.pathMaker.pts.pop(i)  
+            del sel         
             self.pathMaker.selections = []
-            del sel
             self.redrawPoints()
-       
+          
     def insertSelection(self, idx):  ## used only by pointItems 
         if self.pathMaker.selections:       
             self.pathMaker.selections.sort()  
@@ -298,10 +297,6 @@ class PathEdits(QWidget):
         for itm in self.scene.items():
             return itm.zValue()
         return 0
-    
-    def turnBlue(self):
-        self.canvas.btnPathMaker.setStyleSheet(
-        'background-color: rgb(118,214,255)')
        
 ### ------------------- dotsPathEdits ---------------------
 

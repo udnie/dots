@@ -30,7 +30,7 @@ class TagsAndPaths:
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type in ('pix', 'snake', 'bkg') and pix.fileName != 'fiat':
+            if pix.type in ('pix', 'snake', 'bkg'):
                 if 'path' in pix.tag and pid == 'paths':
                     self.tagIt('paths', pix, topZVal) 
                     k += 1
@@ -91,46 +91,58 @@ class TagsAndPaths:
             tag.setPos(x,y)
             self.mapper.tagGroup.addToGroup(tag)
         self.mapper.tagSet = True
-        
-    def addTagGroup(self):
-        self.tagZ = self.mapper.toFront(45.0)   ## otherwise it can be hidden 
-        self.mapper.tagGroup = QGraphicsItemGroup()
-        self.mapper.tagGroup.setZValue(self.tagZ)     
-        self.scene.addItem(self.mapper.tagGroup)
-      
-    def removeTags(self):
-        for p in self.canvas.scene.items():
-            if p.type == 'tag':
-                self.scene.removeItem(p)
-                     
-    def tagCount(self):  
-        return sum( pix.type == 'tag' 
-            for pix in self.scene.items())
-
+ 
 ### -------------------- mostly paths ----------------------
     def togglePaths(self):  ## use by sideShow
         if self.canvas.pathMakerOn:
             return
+        
         if self.mapper.pathSet:
             self.mapper.clearPaths() 
             return
-        if self.scene.items():
-            k = 0
-            self.mapper.pathSet = False  
-            self.addPathGroup()
-            self.addPathTagGroup()
-            for pix in self.scene.items():
-                if pix.type in ('pix', 'snake'):
-                    if  pix.tag.endswith('.path'):
-                        k += self.displayPath(pix)  ## anything displayed?
-                    elif pix.anime and pix.anime.state() == QAbstractAnimation.State.Running:
-                        pix.anime.pause()
-                elif pix.zValue() <= common['pathZ']:
-                    break
-            if k > 0: 
-                self.mapper.pathSet = True
-            else:
-                self.mapper.clearPaths()
+
+        k = 0
+        self.mapper.pathSet = False  
+        self.addPathGroup()
+        self.addPathTagGroup()
+        for pix in self.scene.items():
+            if pix.type in ('pix', 'snake'):
+                if  pix.tag.endswith('.path'): 
+                    k += self.displayPath(pix)  
+                    if k > 7: break  ## good plan 
+                elif pix.anime and pix.anime.state() == QAbstractAnimation.State.Running:
+                    pix.anime.pause()
+            elif pix.zValue() <= common['pathZ']:
+                break
+        if k > 0: 
+            self.mapper.pathSet = True
+        else:
+            self.mapper.clearPaths()
+
+    def displayPath(self, pix):
+        tag = pix.tag 
+        if 'Random' in tag: tag = tag[7:]
+        ## don't add duplicates - causes performance issues
+        if not tag in self.mapper.paths:
+            path = self.addPainterPath(tag)
+            if path != None:
+                self.mapper.paths.append(tag)
+            return 1
+        else:
+            return 0
+
+    def addPainterPath(self, tag):
+        color = getColorStr()
+        path = pathLoader(tag)  ## return painter path  
+        if path == None:
+            return None   
+        pathPt = path.pointAtPercent(0.0)  ## so its consistent
+        ## use painter path
+        pathItem = QGraphicsPathItem(path)        
+        pathItem.setPen(QPen(QColor(color), 3, Qt.PenStyle.DashDotLine))
+        pathItem.setFlag(QGraphicsPathItem.GraphicsItemFlag.ItemIsMovable, False)
+        self.pathGroup.addToGroup(pathItem)
+        self.addTag(tag, color, pathPt)      
 
     def addPathGroup(self):
         self.pathGroup = QGraphicsItemGroup()
@@ -144,37 +156,11 @@ class TagsAndPaths:
         self.pathTagGroup.setZValue(self.pathTagZ)     
         self.scene.addItem(self.pathTagGroup)
 
-    def displayPath(self, pix):
-        tag = pix.tag 
-        if 'Random' in tag: tag = tag[7:]
-        ## don't add duplicates - causes performance issues
-        if not tag in self.mapper.paths:
-            self.mapper.paths.append(tag)
-            self.addPainterPath(tag)
-            return 1
-        else:
-            return 0
-
-    def addPainterPath(self, tag):
-        color = getColorStr()
-        path = pathLoader(tag)  ## return painter path     
-        pathPt = path.pointAtPercent(0.0)  ## so its consistent
-        ## use painter path
-        pathItem = QGraphicsPathItem(path)        
-        pathItem.setPen(QPen(QColor(color), 3, Qt.PenStyle.DashDotLine))
-        pathItem.setFlag(QGraphicsPathItem.GraphicsItemFlag.ItemIsMovable, False)
-        self.pathGroup.addToGroup(pathItem)
-        self.addTag(tag, color, pathPt)
-
     def addTag(self, tag, color, pt):  ## use same offsets and color as path     
         tag = TagIt('', tag, color)   
         tag.setPos(pt)
         tag.setZValue(self.mapper.toFront(45.0))  ## use pathTagZ instead of tagZ
         self.pathTagGroup.addToGroup(tag)
-                   
-    def tagCount(self):  
-        return sum(pix.type == 'tag' 
-            for pix in self.scene.items())
 
 ### ------------------- dotsTagsAndPaths -------------------        
         

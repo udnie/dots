@@ -108,7 +108,7 @@ class ShowTime:
                     continue
                 if isinstance(pix, QGraphicsPolygonItem):
                     continue         
-                if pix.type in ('bkg', 'pix') and pix.fileName in ('frame','flat'):
+                if pix.type == 'flat' or pix.fileName == 'frame':
                     continue               
                 if pix.type in ('pix', 'snake', 'bkg'):
                     if pix.anime != None and pix.anime.state() == QAbstractAnimation.State.Running:  ## running
@@ -122,7 +122,7 @@ class ShowTime:
             if isinstance(pix, QGraphicsPolygonItem):
                 continue 
             try:  ## the CAT bug likes this line sometimes
-                if pix.type in ('bkg', 'pix') and pix.fileName in ('frame','flat'):
+                if pix.type == 'flat' or pix.fileName == 'frame':
                     continue   
             except:
                 continue  
@@ -150,10 +150,7 @@ class ShowTime:
             if pix.type in ('pix', 'snake', 'bkg'):                   
                 if pix.anime != None and pix.anime.state() != QAbstractAnimation.State.Stopped:       
                     pix.anime.stop()                   
-                    
-                    # if pix.type == 'bkg':
-                    #     print(f'stop  {os.path.basename(pix.fileName)}\t{pix.direction}\t{pix.mirroring}\t{pix.factor}')
-                              
+                                     
                     if pix.tag == 'scroller':  ## can be more than one
                         pix.anime = None
                         scrolling.append(pix.tag)
@@ -197,21 +194,17 @@ class ShowTime:
     def reallySaveIt(self):      
         dlist = [] 
         for pix in self.scene.items():          
-            if pix.type in ('pix','bkg'): 
-                if pix.fileName != 'flat' and \
-                    not path.exists(pix.fileName):  ## note
-                    continue  
-                     
-                elif pix.type == 'pix':   
+            if pix.type in ('pix','bkg', 'flat'):            
+                if pix.type == 'pix':   
                     if pix.part in ('left','right'):  ## let pivot thru
                         continue                  
                     dlist.append(savePix(pix)) 
-                               
-                elif pix.type == 'bkg':
-                    if pix.fileName != 'flat':       
-                        dlist.append(saveBkg(pix)) 
-                    else:
-                        dlist.append(saveFlat(pix))            
+                                   
+                elif pix.type == 'bkg':    
+                    dlist.append(saveBkgnd(pix))
+                     
+                elif pix.type == 'flat': 
+                    dlist.append(saveFlat(pix))            
         if dlist:
             try:
                 self.showWorks.saveToPlays(dlist)
@@ -259,8 +252,8 @@ def savePix(pix):
           
     return tmp 
 
-def saveBkg(pix):
-    p = pix.boundingRect() 
+def saveBkgnd(pix):
+    p = pix.boundingRect()      
     tmp = {
         'fname':    os.path.basename(pix.fileName),
         'type':    'bkg',
@@ -269,9 +262,6 @@ def saveBkg(pix):
         'z':        pix.zValue(),
         'mirror':   pix.flopped,
         'locked':   pix.locked,
-        'rotation': pix.rotation,
-        'scale':    float('{0:.2f}'.format(pix.scale)),
-        'opacity':  float('{0:.2f}'.format(pix.opacity)),
         'width':    int(p.width()),
         'height':   int(p.height()),
         'tag':      pix.tag,
@@ -279,14 +269,17 @@ def saveBkg(pix):
         'direction':    pix.direction,
         'mirroring':    pix.mirroring,
         'factor':       pix.factor,
+        'rate':         pix.rate,
+        'showtime':     pix.showtime,
+        
     }  
-      
+    
     return tmp
 
-def saveFlat(pix):
+def saveFlat(pix):       
     tmp = {
         'fname': 'flat',
-        'type':  'bkg',
+        'type':  'flat',
         'z':      pix.zValue(),
         'tag':    pix.color.name(),
         'color':  pix.color.name(),

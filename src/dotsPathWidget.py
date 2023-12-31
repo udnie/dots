@@ -1,4 +1,7 @@
 
+import os.path
+from posix import lchown
+
 from PyQt6.QtCore       import Qt, QPoint, QRectF, QPointF
 from PyQt6.QtGui        import QColor, QPen, QPainter, QPen
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
@@ -12,13 +15,13 @@ class PathWidget(QWidget):
                                         
         self.pathMaker = parent
         self.pathWays  = self.pathMaker.pathWays 
-        self.widget    = self.pathMaker.widget  
-            
-        self.type = 'widget'
-        self.save = QPointF()
+             
+        self.type  = 'widget'
+        self.save  = QPointF()
+        self.label = QLabel('', alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 245.0
+        self.WidgetW, self.WidgetH = 330.0, 250.0
         
         self.rotate = 0
         self.scale  = 1.0
@@ -28,7 +31,7 @@ class PathWidget(QWidget):
         hbox.addSpacing(5) 
         hbox.addWidget(self.buttonGroup())
         self.setLayout(hbox)
-        
+              
         self.setFixedHeight(int(self.WidgetH))
         self.setStyleSheet('background-color: rgba(0,0,0,0)')
         self.setContentsMargins(0,15,0,-15)
@@ -116,7 +119,7 @@ class PathWidget(QWidget):
               
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox('Rotate  Scale  Seconds' )
+        groupBox = QGroupBox('Rotate    Scale  Seconds' )
         
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -171,10 +174,17 @@ class PathWidget(QWidget):
         vabox.addSpacing(10) 
         vabox.addWidget(self.secondsValue)      
         vabox.setAlignment(Qt.AlignmentFlag.AlignBottom)
-         
+                 
         vbox = QVBoxLayout()  
         vbox.addLayout(sbox)
         vbox.addLayout(vabox)
+        
+        lbox = QHBoxLayout()  
+        lbox.addWidget(self.label)
+        
+        vbox.addSpacing(5) 
+        vbox.addLayout(lbox) 
+        vbox.addSpacing(-5) 
         
         groupBox.setLayout(vbox)
         return groupBox

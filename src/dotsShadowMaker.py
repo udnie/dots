@@ -103,7 +103,7 @@ class ShadowMaker:
             self.path.append(QPointF(x,y))
                   
         self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
-                    
+
         file, w, h = self.works.pixWidthHeight()  
         flop = self.pixitem.flopped 
                     

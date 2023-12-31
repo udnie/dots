@@ -47,11 +47,6 @@ class SideCar:
         pix.setOpacity(pix.alpha2)
                                                               
         self.scene.addItem(pix)
-        
-        if pix.tag == 'scroller' and pix.direction == 'right':
-            pix.setPos(QPointF(pix.runway, 0))  ## offset to right 
-        elif pix.type == 'bkg' and pix.direction == 'vertical':
-            pix.setPos(QPointF(0.0, float(pix.runway)))
               
 ### --------------------------------------------------------
     def pixTest(self):
@@ -126,17 +121,17 @@ class SideCar:
     def pageDown(self, key):  ## for sprite scrollPanel
         self.canvas.scroll.pageDown(key)
       
-    def dumpBkgs(self):  ## shift-B 
-        for p in self.scene.items():
-            if p.type == 'bkg' and 'flat' not in p.fileName:  
-                file, direction, mirror, locked = self.addBkgLabels(p)
-                showtime = p.showtime
-                print( f'dumpBkgs  {file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.factor}\t{showtime}')
-        print()
-  
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
-        
+      
+    def dumpBkgs(self):  ## shift-B 
+        for p in self.scene.items():
+            if p.type == 'bkg':
+                file, direction, mirror, locked = self.addBkgLabels(p)
+                showtime = p.showtime
+                print( f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
+        print()
+          
     def addBkgLabels(self, bkg): 
         file = os.path.basename(bkg.fileName)        
         if bkg.locked == True:
@@ -153,6 +148,7 @@ class SideCar:
             for item in self.canvas.bkgMaker.trackers:  ## see if it's already there
                 if item.file == file:  
                     direction = item.direction
+                    break
             if direction == '':
                 direction = 'NoDirection'
         if bkg.mirroring == False:
@@ -178,9 +174,7 @@ class SideCar:
         stub = '' 
         for pix in self.scene.items(): 
             if pix.type in ('pix', 'bkg'):
-                if pix.fileName == 'flat':
-                    continue
-                elif pix.anime != None and \
+                if pix.anime != None and \
                     pix.anime.state() == QAbstractAnimation.State.Running:
                     return    
                 if key == 'R': 
@@ -190,12 +184,12 @@ class SideCar:
                     pix.locked = False
                     stub = 'all'
                     if pix.type == 'bkg': 
-                        pix.bkgMaker.toggleBkgLocks(pix, 'unlock')      
+                        pix.bkgMaker.unlockBkg(pix)      
                 elif key == 'L' and pix.isSelected() or pix.type == 'bkg': 
                     if pix.type == 'pix':
                         pix.togglelock()  ## wait to toggleTagItems
                     elif pix.type == 'bkg': 
-                        pix.bkgMaker.toggleBkgLocks(pix) 
+                        pix.bkgWorks.toggleBkgLocks()  ## toggle bkgItem
                     stub = 'select'
         self.mapper.clearMap()
         self.mapper.toggleTagItems(stub)  

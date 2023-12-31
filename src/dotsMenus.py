@@ -71,6 +71,7 @@ class AnimationMenu:
         self.menu.addSeparator()
         anime = 'Clear Tags'
         action = self.menu.addAction(anime)
+        
         action.triggered.connect(
             lambda chk, anime=anime: self.setAnimationTag(anime))
         
@@ -89,9 +90,11 @@ class AnimationMenu:
         self.closeMenu()
         if self.mapper.tagSet and tag == 'Clear Tags':
             self.mapper.clearTagGroup()
+            
         elif tag == 'Path Menu':  ## use pathChooser from pathMaker 
             self.canvas.pathMaker.pathChooser('Path Menu') 
             return
+        
         for pix in self.scene.selectedItems(): 
             if pix.type != 'pix':
                 continue
@@ -101,6 +104,7 @@ class AnimationMenu:
                 pix.tag = tag
             pix.anime = None        ## set by play
             pix.setSelected(False)  ## when tagged
+            
         if self.mapper.isMapSet(): 
             self.mapper.removeMap()  
 
