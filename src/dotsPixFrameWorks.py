@@ -1,26 +1,90 @@
 
 import os
   
-from PyQt6.QtCore       import QPoint
-  
+from PyQt6.QtCore       import Qt, QPoint, QPointF, pyqtSlot
+from PyQt6.QtGui        import QPixmap, QImage, QCursor
+from PyQt6.QtWidgets    import QGraphicsPixmapItem
+
 from dotsSideGig        import constrain
 from dotsShared         import common, RotateKeys 
 from dotsMenus          import AnimationMenu
+from dotsTagsAndPaths   import TagsAndPaths
 
 import dotsAnimation    as Anime
 
-### --------------------- dotsPixWorks ---------------------
-''' no class: functions moved from Pixitem '''                                                                                           
+### ------------------- dotsPixFrameWorks ------------------
+''' classes: Frame and Works(functions moved from Pixitem and PixWidget) '''                                                                                           
 ### --------------------------------------------------------
-
 Pct = -0.50   ## used by constrain - percent allowable off screen
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
     # "apple": (650, 450),  ## see setPixSizes below
     'doral': (215, 215),
 }
-                                                                               
+ 
 ### --------------------------------------------------------
-class Works: 
+class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's here, sort of
+### --------------------------------------------------------
+    def __init__(self, fileName, parent):
+        super().__init__()
+
+        self.canvas = parent  
+        self.mapper = self.canvas.mapper
+        self.tagsAndPaths = TagsAndPaths(self)
+        
+        self.type = 'frame'            
+        self.fileName = fileName  ## needs to contain 'frame'
+          
+        self.setZValue(self.canvas.pixCount)
+        self.tag = ''
+        self.key = ''
+        
+        self.locked = True
+        self.id = self.canvas.pixCount ## used by mapper
+        
+        img = QImage(fileName)
+
+        w = common["ViewW"]  ## from screens
+        h = common["ViewH"] 
+   
+        img = img.scaled(int(w), int(h),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+         
+        self.setPixmap(QPixmap(img))
+        self.setPos(QPointF(0,0))
+        
+        del img
+        
+        self.setAcceptHoverEvents(True)
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
+  
+  ### --------------------------------------------------------
+    @pyqtSlot(str)  ## actually updated by storyboard
+    def setPixKeys(self, key):
+        self.key = key  
+            
+    def hoverLeaveEvent(self, e):
+        self.mapper.clearTagGroup()
+        e.accept()
+           
+    def mousePressEvent(self, e):     
+        if not self.canvas.pathMakerOn:        
+            if self.key == 'del':     
+                self.canvas.sideCar.deleteFrame(self)  
+            elif self.key in ('enter','return'):  
+                self.setZValue(self.canvas.mapper.toFront(1)) 
+            elif self.key == 'tag': 
+                self.mapper.toggleTagItems(self)
+            e.accept()
+      
+    def mouseReleaseEvent(self, e):
+        if not self.canvas.pathMakerOn:
+            self.key = '' 
+            self.canvas.key = ''      
+            e.accept()
+                                                                                 
+### --------------------------------------------------------
+class Works:  ## extends pixitem and pixwidget
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -49,7 +113,7 @@ class Works:
         self.pix.clearFocus() 
         self.pix.setEnabled(False)
         self.scene.removeItem(self.pix)
-        
+      
     def clearTag(self):  ## reset canvas key to '' 
         self.pix.mapper.clearTagGroup()
         self.pix.canvas.setKeys('') 
@@ -93,6 +157,12 @@ class Works:
         self.pix.rotation = p
         self.pix.setRotation(self.pix.rotation) 
  
+    def newTag(self):  ## hold on to this - position tag above cursor
+        p = self.canvas.mapFromGlobal(QPointF(QCursor.pos()))  
+        x = p.x()+ 20 
+        y = p.y()-20
+        return x, y        
+
     def animeMenu(self):
         x, y = self.makeXY()  
         self.pix.setSelected(True)  ## needs to be selected for menu to work   
@@ -128,7 +198,8 @@ class Works:
                                                                                        
     def flopIt(self):
         self.pix.setMirrored(False) if self.pix.flopped else self.pix.setMirrored(True)
-  
-### --------------------- dotsPixWorks ---------------------                                                                                                         
+                                                                                                          
+### ------------------- dotsPixFrameWorks ------------------
+
 
 

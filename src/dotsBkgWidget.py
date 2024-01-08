@@ -1,14 +1,14 @@
 
 import os.path
 
-from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF, QTimer, pyqtSlot 
+from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF, pyqtSlot 
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QSlider, QHBoxLayout, QVBoxLayout, QPushButton
 
 from dotsShared         import common                                
 from dotsBkgWorks       import BkgWorks
-from dotsBkgMatte       import Matte
+from dotsBkgFlatMatte   import Matte
                       
 ### ------------------- dotsShadowWidget -------------------                                                                                                                                                            
 class BkgWidget(QWidget):  
@@ -196,7 +196,6 @@ class BkgWidget(QWidget):
         fbox = QHBoxLayout()  
         self.label = QLabel('file name goes here', alignment=Qt.AlignmentFlag.AlignCenter)
         fbox.addWidget(self.label)
-        
          
         vbox = QVBoxLayout()  
         

@@ -1,14 +1,15 @@
 
 import os
 
-from PyQt6.QtCore    import QPointF, QTimer
-from PyQt6.QtGui     import QColor
-from PyQt6.QtWidgets import QFileDialog,  QGraphicsItemGroup
+from PyQt6.QtCore       import QPointF, QTimer
+from PyQt6.QtGui        import QColor
+from PyQt6.QtWidgets    import QFileDialog,  QGraphicsItemGroup
 
-from dotsAnimation   import *  
-from dotsShared      import common, paths
-from dotsSideGig     import MsgBox, getPts, TagIt
-from dotsPathEdits   import PathEdits
+from dotsAnimation      import *  
+from dotsShared         import common, paths
+from dotsSideGig        import MsgBox, getPts
+from dotsPathEdits      import PathEdits
+from dotsTagsAndPaths   import TagIt
                                  
 ### --------------------- dotsPathWays ---------------------
 ''' class PathWays: extends pathMaker. Includes path and wayPoints
@@ -44,7 +45,7 @@ class PathWays:
         if self.pathMaker.path != None:      
             p = self.pathMaker.path.sceneBoundingRect()
             max = p.y() + p.height()
-            for i in range(0, len(self.pathMaker.pts)):
+            for i in range(len(self.pathMaker.pts)):
                 self.pathMaker.pts[i] = QPointF(
                     self.pathMaker.pts[i].x(), 
                     max - self.pathMaker.pts[i].y() + p.y())
@@ -55,7 +56,7 @@ class PathWays:
         if self.pathMaker.path != None: 
             p = self.pathMaker.path.sceneBoundingRect()
             max = p.x() + p.width()
-            for i in range(0, len(self.pathMaker.pts)):
+            for i in range(len(self.pathMaker.pts)):
                 self.pathMaker.pts[i] = QPointF(
                     max - self.pathMaker.pts[i].x() + p.x(), 
                     self.pathMaker.pts[i].y())
@@ -76,7 +77,7 @@ class PathWays:
             lnn = int(len(self.pathMaker.pts)/2) + 1       
         ## using painter path to get the pointAtPercent
         path = self.pathMaker.setPaintPath(True)  ## close subpath, uses self.pts
-        vals = [p/lnn for p in range(0, lnn)]  ## evenly spaced points
+        vals = [p/lnn for p in range(lnn)]  ## evenly spaced points
         for i in vals:
             tmp.append(QPointF(path.pointAtPercent(i)))
         self.pathMaker.pts = tmp    
@@ -105,7 +106,7 @@ class PathWays:
                 self.pathWorks.stopPathTest()      
             tmp = []    
             lnn = len(self.pathMaker.pts)-1        
-            for i in range(0, len(self.pathMaker.pts)):
+            for i in range(len(self.pathMaker.pts)):
                 tmp.append(self.pathMaker.pts[lnn - i])
             tmp.insert(0,self.pathMaker.pts[0])  ## start at zero
             self.pathMaker.pts = tmp[:-1] 
@@ -166,7 +167,7 @@ class PathWays:
             
             try:
                 with open(f[0], 'w') as fp:
-                    for i in range(0, len(self.pathMaker.pts)):
+                    for i in range(len(self.pathMaker.pts)):
                         p = self.pathMaker.pts[i]
                         x = '{0:.2f}'.format(p.x())
                         y = '{0:.2f}'.format(p.y())
@@ -191,12 +192,12 @@ class PathWays:
         if key == '>':
             for i in range(lnn, len(self.pathMaker.pts)):
                 tmp.append(self.pathMaker.pts[i])
-            for i in range(0, len(self.pathMaker.pts)-len(tmp)):
+            for i in range(len(self.pathMaker.pts)-len(tmp)):
                 tmp.append(self.pathMaker.pts[i])
         else:
             for i in range(len(self.pathMaker.pts)-lnn, len(self.pathMaker.pts)):
                 tmp.append(self.pathMaker.pts[i])
-            for i in range(0, len(self.pathMaker.pts)-len(tmp)):
+            for i in range(len(self.pathMaker.pts)-len(tmp)):
                 tmp.append(self.pathMaker.pts[i])
         self.pathMaker.pts = tmp
         del tmp
@@ -218,7 +219,7 @@ class PathWays:
     def makeTags(self, lnn):
         self.addWayPtTagsGroup()
         inc = int(lnn/10)  ## approximate a 10% increment
-        list = (x*inc for x in range(0,10))  ## get the indexes
+        list = (x*inc for x in range(10))  ## get the indexes
         for idx in list:
             pt = QPointF(self.pathMaker.pts[idx])
             pct = (idx/lnn)*100
@@ -251,7 +252,7 @@ class PathWays:
         s = s + '  ' + '{0:2d}'.format(idx)
         return s
         
-    def tagCount(self):  ## shared among path modules - there's one in mapper used by it
+    def tagCount(self):  ## shared among path modules - there's one in mapper as well
         return sum(pix.type == 'tag' 
             for pix in self.scene.items())
                          

@@ -183,18 +183,18 @@ class StoryBoard(QWidget):
                     clone[1] * random.randrange(95, 105)/100.0,
                     pix.alpha2)
                 return   
-            elif 'frame' in pix.fileName:  ## pin it on drag and drop
-                pix.setPos(0,0)
-                pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)   
-            self.scene.addItem(pix)
+            elif 'frame' in pix.fileName: 
+                self.sideCar.addFrame(pix.fileName)  ## pin it on drag and drop
+            else:
+                self.scene.addItem(pix)
         
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys
         for itm in self.scene.items():  ## used with lasso to move selections
-            if itm.type in ('pt','pix', 'bkg'):    
+            if itm.type in ('pt','pix', 'bkg', 'frame'):    
                 if itm.type == 'pt' or itm.type == 'pix' and \
                     itm.part not in ('pivot','left','right'):  ## 06-23-23
                     itm.setPixKeys(self.key)
-                elif itm.type == 'bkg':
+                elif itm.type in ('bkg', 'frame'):  
                     itm.setPixKeys(self.key)     
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
@@ -236,13 +236,16 @@ class StoryBoard(QWidget):
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.bkgMaker.trackers = []
-        gc  ## testing exit problem - it's the CAT error
+        gc.collect()  ## testing exit problem - it's the CAT error
            
     def loadSprites(self):
         self.showWorks.enablePlay()
         self.scroll.loadSprites()
  
     def selectAll(self):
+        if len(self.scene.items()) == 0:  ## uses 'A'
+            self.bkgMaker.openBkgFiles() 
+            return
         for pix in self.scene.items():
             if pix.type in ('pix', 'shadow'):
                 pix.setSelected(True)
@@ -274,7 +277,7 @@ class StoryBoard(QWidget):
                 del pix
                 k += 1
         if k > 0: self.showWorks.enablePlay()  ## stop it - otherwise it's hung
-        # gc.collect()
+        gc.collect()
     
     def flopSelected(self):    
         if not self.pathMakerOn:

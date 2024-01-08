@@ -111,7 +111,7 @@ class BkgWorks:
             if p.file == file:
                 p.mirroring = self.bkgItem.mirroring   
                 break                                     
-        self.setMirrorBtnText() 
+        self.bkgMaker.setMirrorBtnText() 
                
     def setFactorTrackers(self):
         if self.bkgItem.scrollable:                                                                 
@@ -140,10 +140,9 @@ class BkgWorks:
                     break
 
     def toggleBkgLocks(self):
-        # self.bkgMaker.bkgItem = self.bkgItem  ## don't ever change this - used to set lock/unlock !!!!
         if self.bkgItem:
             if self.bkgItem.locked == False:
-                self.bkgMaker.lockBkg(self.bkgItem)
+                self.bkgMaker.lockBkg(self.bkgItem) 
             else:
                 self.bkgMaker.unlockBkg(self.bkgItem) 
 
@@ -222,33 +221,7 @@ class BkgWorks:
         else:
             self.notScrollable() 
 
-### -------------------------------------------------------- 
-    def setBtns(self):
-        if self.bkgItem:
-            if self.bkgItem.direction == 'right': 
-                self.bkgMaker.widget.rightBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                self.bkgMaker.widget.leftBtn.setStyleSheet(
-                    'background-color: None')            
-            elif self.bkgItem.direction == 'left': 
-                self.bkgMaker.widget.leftBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                self.bkgMaker.widget.rightBtn.setStyleSheet(
-                    'background-color: None')
-            elif self.bkgItem.direction == 'vertical':
-                self.bkgMaker.widget.leftBtn.setText('Vertical')   
-                self.bkgMaker.widget.leftBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                                                  
-    def setMirrorBtnText(self):  ## if added 
-        if self.bkgItem:  ## shouldn't need this but - could have just started to clear                         
-            if self.bkgItem.scrollable == False:
-                self.bkgMaker.widget.mirrorBtn.setText('Not Scrollable')         
-            elif self.bkgItem.mirroring == False:
-                self.bkgMaker.widget.mirrorBtn.setText('Continuous')         
-            elif self.bkgItem.mirroring == True:
-                self.bkgMaker.widget.mirrorBtn.setText('Mirrored')    
-                                   
+### --------------------------------------------------------                                                                                      
     def reset(self):  ## reset both tracker and bkgItem
             file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
             for p in self.bkgMaker.trackers:
@@ -283,7 +256,7 @@ class BkgWorks:
             tag = tag + ' Left'
         elif self.bkgItem.direction == 'right': 
             tag = tag + ' Right'            
-        self.canvas.mapper.pathsAndTags.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
+        self.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
                                                           
 ### --------------------------------------------------------                    
     def notScrollable(self):
@@ -318,13 +291,7 @@ class BkgWorks:
             self.bkgItem.scrollable = True  
         del img 
         del imf
-                               
-    def bkgTag(self, bkg, which=''):
-        file = os.path.basename(bkg.fileName) 
-        if which != '':
-            file = which + ': ' + file
-        return f'{file}\t{bkg.direction}\t{bkg.rate}\t{bkg.factor}\t{bkg.showtime}'  
-                                                                                                   
+                                                                                                    
 ### --------------------- dotsBkgWorks ---------------------
 
 

@@ -5,7 +5,6 @@ from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup
                             QGraphicsPixmapItem, QGraphicsSimpleTextItem
 
 from dotsShared         import common
-from dotsSideGig        import TagIt
 from dotsTagsAndPaths   import TagsAndPaths
 
 ### --------------------- dotsMapMaker ---------------------
@@ -57,7 +56,7 @@ class MapMaker:
         self.scene  = self.canvas.scene
         self.dots   = self.canvas.dots
         
-        self.pathsAndTags = TagsAndPaths(self)
+        self.tagsAndPaths = TagsAndPaths(self)
 
         self.tagZ = 0
         self.pathTagZ = 0  ## only by paths
@@ -81,8 +80,6 @@ class MapMaker:
         rect = QRect(self.canvas.rubberBand.geometry())
         for pix in self.scene.items():
             if pix.type == 'pix':
-                if 'frame' in pix.fileName: 
-                    continue
                 p = pix.sceneBoundingRect()
                 x = int(p.x() + p.width()/2)
                 y = int(p.y() + p.height()/2)
@@ -182,9 +179,9 @@ class MapMaker:
         self.scene.addItem(self.tagGroup)
 
     def toggleTagItems(self, pid): 
-        if self.canvas.pathMakerOn:
-            return
-        if self.tagCount() > 0:           
+        if self.canvas.pathMakerOn:  ## doesn't work here
+            return  
+        elif self.tagCount() > 0:  ## clear tags     
             self.clearTagGroup()
             self.clearPaths() 
             self.tagGroup = None
@@ -195,7 +192,7 @@ class MapMaker:
             if self.pathSet:
                 QTimer.singleShot(200, self.clearPaths)
             self.addTagGroup()
-            self.pathsAndTags.tagWorks(pid)
+            self.tagsAndPaths.tagWorks(pid)
 
     def clearTagGroup(self):     
         if self.tagCount() > 0: 
@@ -203,7 +200,7 @@ class MapMaker:
             self.tagGroup = None
             self.tagSet = False 
                   
-    def clearPaths(self):  ## used in many places
+    def clearPaths(self):  ## used by snakes, showtime, abstractbats, and tagsandspaths
         if self.pathSet:
             for pix in self.scene.items():
                 if isinstance(pix, QGraphicsPathItem):

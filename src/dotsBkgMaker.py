@@ -12,7 +12,7 @@ from dotsShared         import common, paths, PlayKeys
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
-from dotsBkgMatte       import Flat
+from dotsBkgFlatMatte   import Flat
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -117,18 +117,15 @@ class BkgMaker(QWidget):
     def addWidget(self, item):  ## background widget
         self.closeWidget()       
         if item.type == 'flat':
-            return  
-            
+            return   
         self.bkgItem = item             
         self.widget = BkgWidget(self.bkgItem, self) 
         self.lockBkg(item)
-        
         p = common['widgetXY']
         p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))       
         self.widget.save = QPointF(p.x(), p.y())
         self.widget.setGeometry(p.x(), p.y(), int(self.widget.WidgetW), \
             int(self.widget.WidgetH))
-        
         self.bkgItem.bkgWorks.restoreFromTrackers(self.bkgItem)
         self.resetSliders()
         self.updateWidget()

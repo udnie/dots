@@ -5,7 +5,7 @@ import random
 import asyncio
 import time
 
-from PyQt6.QtCore       import QTimer
+from PyQt6.QtCore       import Qt, QTimer
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 import dotsAnimation    as Anime
@@ -178,7 +178,7 @@ class Bats:
     def greys(self):  ## these go to screen and wait to be run
         greys = 23  
         pathStr = paths['spritePath'] + 'alien.png'     
-        for i in range(0, greys):
+        for i in range(greys):
             pix = self.oneGrey(pathStr)
             self.scene.addItem(pix)
             
@@ -296,7 +296,7 @@ class Abstract:  ## hats
             MsgBox('getPathList: No Paths Found!', 5)
             QTimer.singleShot(200, self.canvas.clear)     
             return 
-        for i in range(0, self.hats):  
+        for i in range(self.hats):  
             path = getPath(apaths)                                           
             self.makeHats(path)
   

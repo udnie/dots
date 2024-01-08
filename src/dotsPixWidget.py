@@ -28,7 +28,7 @@ class PixWidget(QWidget):
         self.setLayout(hbox)
         
         file = os.path.basename(self.pix.fileName)
-        self.label.setText(file.capitalize())
+        self.label.setText(file)
         self.label.setStyleSheet("QLabel{font-size: 15pt;}")
         
         self.setFixedHeight(int(self.WidgetH))  

@@ -55,7 +55,7 @@ class ControlView(QGraphicsView):
         self.grabKeyboard()  ## happy days
       
         self.direct = {
-            # Qt.Key.Key_A: self.canvas.selectAll,  << moved to storyBoard
+            Qt.Key.Key_A: self.canvas.selectAll,  ## opens background if no sceneitems 
             Qt.Key.Key_H: self.sideCar.hideSelected,
             Qt.Key.Key_U: self.canvas.unSelect,
             Qt.Key.Key_O: self.sideCar.toggleOutlines,   
@@ -123,9 +123,9 @@ class ControlView(QGraphicsView):
                 if self.canvas.pathMakerOn:  
                     self.canvas.pathMaker.pathWays.addWayPtTags()  
             elif key == Qt.Key.Key_O:         
-                self.sideCar.hideOutlines()                 
+                self.sideCar.hideOutlines()                      
             elif key == Qt.Key.Key_T:         
-                self.mapper.toggleTagItems('select')     
+                self.mapper.toggleTagItems('select')  ## 'shift-T'  
             elif key == Qt.Key.Key_H:
                 self.sideCar.hideSelectedShadows()
                 self.sideCar.clearWidgets()
@@ -158,9 +158,10 @@ class ControlView(QGraphicsView):
             elif key == Qt.Key.Key_F:
                 self.setKey('F') 
                 self.canvas.flopSelected()  
-            elif key == Qt.Key.Key_T:
+            elif key == Qt.Key.Key_T:  ## just 'T'
                 self.setKey('T') if self.canvas.pathMakerOn else \
                     self.mapper.toggleTagItems('all')
+         
             elif key == Qt.Key.Key_W:
                 self.sideCar.clearWidgets()    
                 

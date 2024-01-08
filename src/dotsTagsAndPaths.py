@@ -1,14 +1,97 @@
 
-from PyQt6.QtCore    import Qt, QAbstractAnimation
-from PyQt6.QtGui     import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsPathItem, QGraphicsItemGroup
+from PyQt6.QtCore       import Qt, QAbstractAnimation, QRectF
+from PyQt6.QtGui        import QColor, QPen, QPainter, QBrush, QFontMetrics, QColor, QFont
+from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, QGraphicsSimpleTextItem
                             
-from dotsShared      import common
-from dotsSideGig     import TagIt, getColorStr
-from dotsSidePath    import pathLoader
+from dotsShared         import common, PlayKeys
+from dotsSideGig        import getColorStr
+from dotsSidePath       import pathLoader
 
 ### ------------------- dotsTagsAndPaths -------------------
-''' dotsTagsAndPaths handles tags and paths display '''
+''' classes: TagIt, TagsAndPaths  - TagIt is used by PathItem and PathWays 
+    directly and is managed by them. TagsAndPaths also uses TagIt but is
+    mainly managed thru mapper. - another project awaits '''
+### --------------------------------------------------------
+class TagIt(QGraphicsSimpleTextItem):  
+### --------------------------------------------------------   
+    def __init__(self, token, tag, color, zval=None):
+        super().__init__()
+  
+        if token == 'paths':
+            color = 'lime'
+            if 'Locked Random' in tag:
+                tag = tag[14:] 
+            elif 'Random' in tag:
+                tag = tag[7:]
+            n = tag.find('path') + 5
+            tag = tag[0:n]
+            
+        elif token in PlayKeys and 'Random' in tag:
+            tag = tag[7:]
+            self.color = QColor(0,255,127)
+            
+        elif token == 'pathMaker':
+            if ' 0.00%' in tag:
+                color = QColor('LIGHTSEAGREEN')
+            if len(tag.strip()) > 0: self.color = QColor(color)
+            
+        elif token == 'points':
+            self.color = QColor(color)
+            
+        else:
+            self.color = QColor(255,165,0)
+            if 'Locked Random' in tag:
+                tag = tag[0:13] 
+            elif 'Random' in tag:
+                tag = tag[0:6] 
+                
+        if color:
+            self.color = QColor(color)
+
+        if zval != None and token != 'paths':
+            if len(tag) > 0:  
+                tag = tag + ': ' + str(zval)
+            else:
+                tag = str(zval)
+    
+        if token == 'points':
+            self.type = 'ptTag'  ## changed from 'pt'
+        else:
+            self.type = 'tag'
+
+        self.text = tag   
+     
+        self.font = QFont()
+        self.font.setFamily('Helvetica')
+        self.font.setPointSize(12)
+        
+        if token == 'bkg':
+            self.font.setPointSize(14)
+        
+        metrics = QFontMetrics(self.font)
+        p = metrics.boundingRect(self.text)
+        p = p.width()
+ 
+        self.rect = QRectF(0, 0, p+13, 19)
+        self.waypt = 0
+            
+    def boundingRect(self):
+        return self.rect
+    
+### --------------------------------------------------------
+    def paint(self, painter, option, widget): 
+        brush = QBrush()
+        brush.setColor(self.color)
+        brush.setStyle(Qt.BrushStyle.SolidPattern)
+
+        painter.fillRect(self.boundingRect(), brush)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        painter.setPen(Qt.GlobalColor.black)
+        painter.setFont(self.font)
+        painter.drawText(self.boundingRect(), 
+            Qt.AlignmentFlag.AlignCenter, self.text)
+        
 ### --------------------------------------------------------
 class TagsAndPaths:
 ### --------------------------------------------------------
@@ -19,48 +102,48 @@ class TagsAndPaths:
         self.scene  = self.mapper.scene
         self.canvas = self.mapper.canvas
         self.dots   = self.canvas.dots
-        
-### --------------------------------------------------------      
+
+### --------------------------------------------------------     
     def tagWorks(self, pid):
         k = 0
         topZVal = self.mapper.toFront()  ## only once
         self.mapper.tagSet = False
-        if pid == '': 
+        if pid == '':  ## pid can also equal the pixItem.id
             pid = 'all'
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type in ('pix', 'snake', 'bkg'):
+            if pix.type in ('pix', 'snake', 'bkg', 'frame'):
                 if 'path' in pix.tag and pid == 'paths':
-                    self.tagIt('paths', pix, topZVal) 
+                    self.tagThis('paths', pix, topZVal) 
                     k += 1
                 if pid == 'all':
                     k += 1
                     if alltags != pix.tag:  ## only one per snake
                         alltags = pix.tag
-                        self.tagIt('',pix, topZVal)         
+                        self.tagThis('',pix, topZVal)         
                 # elif pid == 'select' and pix.isSelected():
                 elif pix.isSelected():
-                    self.tagIt('',pix, topZVal)
+                    self.tagThis('',pix, topZVal)
                     k += 1
-                elif pid == pix.id:  ## single tag
-                    self.tagIt('',pix, topZVal) 
+                elif pid == pix.id or pix.type == 'frame':  ## single tag  
+                    self.tagThis('',pix, topZVal) 
                     k = 1
-                    break
+                    break     
         if k > 0: 
             self.mapper.tagSet = True
             self.dots.statusBar.showMessage('Number Tagged:  {}'.format(k),2500)
         else:
             self.mapper.clearTagGroup()
         
-    def tagIt(self, token, pix, topZVal):  
+    def tagThis(self, token, pix, topZVal):  
         p = pix.sceneBoundingRect()
         x = p.x() + p.width()*.45
         y = p.y() + p.height()*.45
 
         tag = pix.tag
         color = ''
-
+  
         if 'frame' in pix.fileName: 
             x, y = common['ViewW']*.47, common['ViewH']-35
             pix.tag = ''
@@ -91,16 +174,14 @@ class TagsAndPaths:
             tag.setPos(x,y)
             self.mapper.tagGroup.addToGroup(tag)
         self.mapper.tagSet = True
- 
+
 ### -------------------- mostly paths ----------------------
     def togglePaths(self):  ## use by sideShow
         if self.canvas.pathMakerOn:
-            return
-        
+            return 
         if self.mapper.pathSet:
             self.mapper.clearPaths() 
             return
-
         k = 0
         self.mapper.pathSet = False  
         self.addPathGroup()

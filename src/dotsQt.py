@@ -43,7 +43,6 @@ class DotsQt(QMainWindow):
         # print('\nPython Version:\t', platform.python_version())
         # print("Qt Version:\t", QT_VERSION_STR)
         # print('PyQt Version\t', PYQT_VERSION_STR, '\n')
-                               
         self.init()
     
     def init(self):  

@@ -63,7 +63,7 @@ class PathWorks:
         centerY = p.y() + p.height() /2 
                 
         ## for each pt compute distance from center
-        for i in range(0, len(self.pathMaker.pts)):    
+        for i in range(len(self.pathMaker.pts)):    
             dist = distance(self.pathMaker.pts[i].x(), centerX, self.pathMaker.pts[i].y(), centerY)
               
             if key == 'A':  ## it's from pathWidget, scale or rotate

@@ -11,6 +11,7 @@ from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineIte
                                                     
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
+from dotsPixFrameWorks  import Frame
 from dotsSideGig        import MsgBox, constrain
 from dotsMapMaker       import MapMaker
 
@@ -159,7 +160,15 @@ class SideCar:
             mirror = 'Not Scrollable'    
         return file.capitalize(), direction, mirror, locked
   
-### --------------------------------------------------------
+### --------------------------------------------------------  
+    def addFrame(self, frame):
+        frame = Frame(frame, self.canvas)
+        self.scene.addItem(frame)
+        
+    def deleteFrame(self, frame):
+        self.scene.removeItem(frame)
+        frame = None
+
     def toggleMenu(self):
         self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
   

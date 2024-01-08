@@ -4,12 +4,12 @@ from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
-from dotsPixWorks       import Works
+from dotsPixFrameWorks  import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 
-##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
-from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
+from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+##from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 import dotsAnimation  as Anime
 
@@ -42,13 +42,10 @@ class PixItem(QGraphicsPixmapItem):
         
         img = QImage(self.fileName)
 
-        if 'frame' in self.fileName: 
-            newW, newH = common["ViewW"],common["ViewH"]
-            self.x, self.y = 0,0
-        else:  ## see pixSizes dictionary to make changes - moved to pixWorks
-            newW, newH = self.works.setPixSizes(  
-                img.width() * common["factor"],  ## from screens
-                img.height() * common["factor"])
+        ## see pixSizes dictionary to make changes - moved to pixWorks
+        newW, newH = self.works.setPixSizes(  
+        img.width() * common["factor"],  ## from screens
+        img.height() * common["factor"])
    
         ## don't change
         img = img.scaled(int(newW), int(newH),
@@ -90,7 +87,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setMirrored(mirror)
         
         self.setAcceptHoverEvents(True)
-        self.setFlags(False) if 'frame' in self.fileName else self.setFlags(True)
+        self.setFlags(True)
                                        
 ### --------------------------------------------------------
     @pyqtSlot(str)  ## actually updated by storyboard
@@ -152,13 +149,10 @@ class PixItem(QGraphicsPixmapItem):
                     e.accept()
             elif self.key in RotateKeys: 
                 self.works.rotateThis(self.key)
-            elif self.key == '\'': 
-                self.togglelock()  ## single tag
-                self.toggleThisTag(self.id)
             elif self.key == 'del':  # delete
                 self.deletePix()     
             elif self.key == 'shift':  # flop if selected or hidden        
-                self.setMirrored(False) if self.flopped else self.setMirrored(True)         
+                self.setMirrored(False) if self.flopped else self.setMirrored(True)                                      
             elif self.key in TagKeys: 
                 if self.key == '/':        # send to back of pixItems
                     p = self.mapper.lastZval('pix')-1
@@ -170,9 +164,11 @@ class PixItem(QGraphicsPixmapItem):
                     p = self.zValue()+1  
                 self.setZValue(p)
                 self.toggleThisTag(self.id) 
+            elif self.key == 'tag':
+                self.mapper.toggleTagItems(self.id)
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
-        e.accept()
+            e.accept()
 
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName or self.locked:
@@ -185,20 +181,20 @@ class PixItem(QGraphicsPixmapItem):
             self.dragCnt +=1
             if self.key == 'opt' and self.dragCnt % 5 == 0:  
                 self.works.cloneThis() 
-        e.accept()
+            e.accept()
             
     def mouseReleaseEvent(self, e): 
         if self.key in TagKeys or self.mapper.tagSet:
             self.works.clearTag()
         self.dragCnt = 0   
         self.canvas.key = ""
+        self.key = ''
         self.works.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)  
         e.accept()
         
     def mouseDoubleClickEvent(self, e):
-        if 'frame' in self.fileName or \
-            self.key in TagKeys:
+        if 'frame' in self.fileName or self.key in TagKeys:
             return 
         elif self.canvas.control not in PlayKeys:
             if self.key == 'opt':  
@@ -220,7 +216,7 @@ class PixItem(QGraphicsPixmapItem):
                 elif self.isSelected():
                     self.setSelected(False)
                 self.isHidden = False 
-        e.accept()
+            e.accept()
             
 ### --------------------------------------------------------
     def addShadow(self):  ## from pixwidget 
@@ -284,30 +280,25 @@ class PixItem(QGraphicsPixmapItem):
                 
     def togglelock(self):
         if self.locked == False:
-            self.locked = True
+            self.locked = True     
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            self.toggleThisTag(self.id)  
-            QTimer.singleShot(1000, self.mapper.clearTagGroup)  ## the other tag
         else:
             self.locked = False
-            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
-            self.tag = 'UnLocked'
-            self.toggleThisTag(self.id) 
-            QTimer.singleShot(1000, self.mapper.clearTagGroup)
-            self.tag = ''
+            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)      
+        self.toggleThisTag(self.id) 
+        QTimer.singleShot(1000, self.mapper.clearTagGroup)
         self.setLockBtnText()
             
     def deletePix(self):
-        if 'frame' in self.fileName:
-            self.works.removeThis()
-        else:
-            if self.shadowMaker.isActive == True:
-                self.shadowMaker.works.deleteShadow()
-            self.works.closeWidget()
-            self.anime 
-            self.anime = Anime.fin(self)
-            self.anime.start()
-            self.anime.finished.connect(self.works.removeThis)
+        if self.shadowMaker.isActive == True:
+            self.shadowMaker.works.deleteShadow()
+        self.works.closeWidget()
+        self.anime 
+        self.anime = Anime.fin(self)
+        self.anime.start()
+        self.anime.finished.connect(self.works.removeThis)
                 
 ### -------------------- dotsPixItem -----------------------
 
+
+         

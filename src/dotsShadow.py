@@ -174,7 +174,7 @@ def initShadow(file, w, h, flop):  ## replace all colors with grey
 ### --------------------------------------------------------          
 def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on path xy's         
     p = []                      
-    for i in [0,1,2,3]: ## range(4):  ## get current location of points from path
+    for i in range(4):  ## get current location of points from path
         x,y = int(path[i].x()), int(path[i].y()) 
         p.append([x,y])
             

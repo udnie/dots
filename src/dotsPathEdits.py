@@ -129,7 +129,7 @@ class PathEdits(QWidget):
     def finalizeSelections(self, pt): 
         self.lasso.append(QPointF(pt))
         poly = self.drawPoly(self.lasso)  ## return a polygon
-        for i in range(0, len(self.pathMaker.pts)):  
+        for i in range(len(self.pathMaker.pts)):  
             p = QPointF(self.pathMaker.pts[i])
             if poly.containsPoint(p, Qt.FillRule.WindingFill):  ## match 
                 if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
@@ -234,7 +234,7 @@ class PathEdits(QWidget):
         if self.pathMaker.selections:       
             self.pathMaker.selections.sort()  
             if idx < self.pathMaker.selections[0]:  ## if first
-                for i in range(0, len(self.pathMaker.selections)):  
+                for i in range(len(self.pathMaker.selections)):  
                     self.pathMaker.selections[i] += 1 
             elif idx > self.pathMaker.selections[-1]:  ## if last
                 return
@@ -248,7 +248,7 @@ class PathEdits(QWidget):
             for k in range(j, len(self.pathMaker.selections)):
                 self.pathMaker.selections[k] += 1         
         else:
-            for i in range(0, len(self.pathMaker.selections)): 
+            for i in range(len(self.pathMaker.selections)): 
                 if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
                     # print('k-insert: ', idx, self.pathMaker.selections[i])
                     for k in range(i+1, len(self.pathMaker.selections)):
@@ -264,7 +264,7 @@ class PathEdits(QWidget):
             if idx <= self.pathMaker.selections[0]:  ## test for first
                 if idx == self.pathMaker.selections[0]: 
                     self.pathMaker.selections.pop(0)  
-                for i in range(0, len(self.pathMaker.selections)):
+                for i in range(len(self.pathMaker.selections)):
                     self.pathMaker.selections[i] += -1  
             elif idx >= self.pathMaker.selections[-1]:
                 if idx == self.pathMaker.selections[-1]:
@@ -282,7 +282,7 @@ class PathEdits(QWidget):
             for i in range(idx, len(self.pathMaker.selections)):  ## only returns index
                 self.pathMaker.selections[i] += -1  ## from this point on  
         else:             
-            for i in range(0, len(self.pathMaker.selections)):  ## just renumber
+            for i in range(len(self.pathMaker.selections)):  ## just renumber
                 # print('c-delete: ', idx, self.pathMaker.selections[i])              
                 if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
                     for k in range(i+1, len(self.pathMaker.selections)):

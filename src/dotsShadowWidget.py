@@ -1,4 +1,6 @@
 
+import os
+
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QLabel, QDial, \
@@ -25,6 +27,10 @@ class ShadowWidget(QWidget):
         hbox.addSpacing(5) 
         hbox.addWidget(self.buttonGroup())
         self.setLayout(hbox)
+        
+        file = os.path.basename(self.pix.fileName)
+        self.label.setText(file)
+        self.label.setStyleSheet("QLabel{font-size: 15pt;}")
         
         self.setFixedHeight(int(self.WidgetH))
         self.setStyleSheet('background-color: rgba(0,0,0,0)')
@@ -150,6 +156,12 @@ class ShadowWidget(QWidget):
         vbox.addLayout(sbox)
         vbox.addLayout(vabox)
         
+        fbox = QHBoxLayout()  
+        self.label = QLabel('file name goes here', alignment=Qt.AlignmentFlag.AlignCenter)
+        fbox.addWidget(self.label) 
+  
+        vbox.addLayout(fbox)
+  
         groupBox.setLayout(vbox)
         return groupBox
     

@@ -3,15 +3,14 @@ import random
 import os
 import math
 
-from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint
-from PyQt6.QtGui        import QPainter, QBrush, QFontMetrics, QColor, QFont, \
-                                QGuiApplication, QImage, QPixmap
-from PyQt6.QtWidgets    import QMessageBox, QGraphicsSimpleTextItem
+from PyQt6.QtCore       import QTimer, QPointF, QRectF, QPoint
+from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap
+from PyQt6.QtWidgets    import QMessageBox
          
-from dotsShared         import common, paths, pathcolors, PlayKeys
+from dotsShared         import common, paths, pathcolors
 
 ### ---------------------- dotsSideGig ---------------------
-''' classes: MsgBox, TagIt plus misc  ...'''
+''' class: MsgBox plus misc  ...'''
 ### --------------------------------------------------------
 class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------
@@ -59,87 +58,6 @@ class MsgBox:  ## always use getCtr for setting point
         e.accept() 
 
 ### --------------------------------------------------------
-class TagIt(QGraphicsSimpleTextItem):
-### --------------------------------------------------------   
-    def __init__(self, token, tag, color, zval=None):
-        super().__init__()
-    
-        if token == 'paths':
-            color = 'lime'
-            if 'Locked Random' in tag:
-                tag = tag[14:] 
-            elif 'Random' in tag:
-                tag = tag[7:]
-            n = tag.find('path') + 5
-            tag = tag[0:n]
-            
-        elif token in PlayKeys and 'Random' in tag:
-            tag = tag[7:]
-            self.color = QColor(0,255,127)
-            
-        elif token == 'pathMaker':
-            if ' 0.00%' in tag:
-                color = QColor('LIGHTSEAGREEN')
-            if len(tag.strip()) > 0: self.color = QColor(color)
-            
-        elif token == 'points':
-            self.color = QColor(color)
-            
-        else:
-            self.color = QColor(255,165,0)
-            if 'Locked Random' in tag:
-                tag = tag[0:13] 
-            elif 'Random' in tag:
-                tag = tag[0:6] 
-                
-        if color:
-            self.color = QColor(color)
-
-        if zval != None and token != 'paths':
-            if len(tag) > 0:  
-                tag = tag + ': ' + str(zval)
-            else:
-                tag = str(zval)
-    
-        if token == 'points':
-            self.type = 'ptTag'  ## changed from 'pt'
-        else:
-            self.type = 'tag'
-
-        self.text = tag   
-
-        self.font = QFont()
-        self.font.setFamily('Helvetica')
-        self.font.setPointSize(12)
-        
-        if token == 'bkg':
-            self.font.setPointSize(14)
-        
-        metrics = QFontMetrics(self.font)
-        p = metrics.boundingRect(self.text)
-        p = p.width()
- 
-        self.rect = QRectF(0, 0, p+13, 19)
-        self.waypt = 0
-            
-    def boundingRect(self):
-        return self.rect
-    
-### --------------------------------------------------------
-    def paint(self, painter, option, widget): 
-        brush = QBrush()
-        brush.setColor(self.color)
-        brush.setStyle(Qt.BrushStyle.SolidPattern)
-
-        painter.fillRect(self.boundingRect(), brush)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-
-        painter.setPen(Qt.GlobalColor.black)
-        painter.setFont(self.font)
-        painter.drawText(self.boundingRect(), 
-            Qt.AlignmentFlag.AlignCenter, self.text)
-
-### --------------------------------------------------------
 ''' functions that mostly return values follow '''
 ### --------------------------------------------------------
 def constrain(lastXY, objSize, panelSize, overlap):
@@ -183,7 +101,6 @@ def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
     except IOError:
         MsgBox('getPts: Error reading pts file', 5)
         
-
 def DemoAvailable():
     if os.path.exists(paths['demo']):  ## note
         return True

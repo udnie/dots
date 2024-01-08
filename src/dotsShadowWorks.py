@@ -175,7 +175,7 @@ class Works:  ## small functions that were in ShadowMaker
         self.maker.shadow.setTransformOriginPoint(centerX, centerY)
         self.maker.shadow.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
            
-        for i in  [0,1,2,3]: ## range(4):  ## if you don't get 4 points...  
+        for i in range(4):  ## if you don't get 4 points...  
             dist = distance(self.maker.path[i].x(), centerX, self.maker.path[i].y(), centerY) 
               
             xdist, ydist = dist, dist      

@@ -59,8 +59,9 @@ class ShowTime:
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
                     pix.tag = pix.tag[0:len('Random')]
-                if 'frame' in pix.fileName:
-                    pix.tag = 'idle' 
+                    
+                # if 'frame' in pix.fileName:
+                #     pix.tag = 'idle' 
                                  
                 ## set the animation using the tag
                 if pix.type == 'pix':
@@ -173,6 +174,7 @@ class ShowTime:
                       
         if len(scrolling) > 0:
             self.showWorks.cleanUpScrollers(self.canvas.scene)
+            
         self.showWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  
@@ -194,7 +196,7 @@ class ShowTime:
     def reallySaveIt(self):      
         dlist = [] 
         for pix in self.scene.items():          
-            if pix.type in ('pix','bkg', 'flat'):            
+            if pix.type in ('pix','bkg', 'flat', 'frame'):            
                 if pix.type == 'pix':   
                     if pix.part in ('left','right'):  ## let pivot thru
                         continue                  
@@ -204,7 +206,11 @@ class ShowTime:
                     dlist.append(saveBkgnd(pix))
                      
                 elif pix.type == 'flat': 
-                    dlist.append(saveFlat(pix))            
+                    dlist.append(saveFlat(pix))      
+                    
+                elif pix.type == 'frame': 
+                    dlist.append(saveFrame(pix)) 
+                                    
         if dlist:
             try:
                 self.showWorks.saveToPlays(dlist)
@@ -274,6 +280,15 @@ def saveBkgnd(pix):
         
     }  
     
+    return tmp
+
+def saveFrame(pix):       
+    tmp = {
+        'fname':  os.path.basename(pix.fileName),
+        'type':  'frame',
+        'tag':    '',
+    }
+
     return tmp
 
 def saveFlat(pix):       

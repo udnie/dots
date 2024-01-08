@@ -97,7 +97,7 @@ class ShadowMaker:
                                                                                                                                                                    
 ### --------------------------------------------------------                         
     async def restoreShadow(self):  ## reads from play file   
-        for k in [0,1,2,3]: ## range(4):
+        for k in range(4):
             x = self.pixitem.shadow['pathX'][k]
             y = self.pixitem.shadow['pathY'][k]
             self.path.append(QPointF(x,y))
@@ -239,7 +239,7 @@ class ShadowMaker:
     def updatePath(self, val):  ## see shadow for ItemSendsScenePositionChanges
         # start = time.time()  ## curious
         dif = val - self.shadow.save        
-        for i in [0,1,2,3]: ## range(4):
+        for i in range(4):
             self.path[i] = self.path[i] + dif
             self.updatePoints(i, self.path[i].x(), self.path[i].y())
         self.shadow.save = val   

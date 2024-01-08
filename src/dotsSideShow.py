@@ -16,6 +16,7 @@ from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
 from dotsShowWorks      import ShowWorks
+from dotsPixFrameWorks  import Frame
 
 from dotsMenus          import DemoMenu, ScreenMenu
 from dotsSnakes         import Snakes
@@ -58,7 +59,7 @@ class SideShow:
         if self.canvas.pathMakerOn == False:                    
             if len(self.scene.items()) > 0:  ## stuff on screen
                 if key == 'P':  ## always
-                    self.mapper.pathsAndTags.togglePaths()                               
+                    self.mapper.tagsAndPaths.togglePaths()                               
                 elif key == 'R':    
                     if self.canvas.control != '':
                         return
@@ -94,8 +95,8 @@ class SideShow:
             if self.demoAvailable:  
                 self.demoMenu.closeDemoMenu()
                 self.screenMenu.openScreenMenu() ## in screens
-        elif key == 'A':
-            self.bkgMaker.openBkgFiles()   
+        # elif key == 'A':  ## see controlview and storyboard for replacement
+        #     self.bkgMaker.openBkgFiles()   
         elif key == 'P':
             self.pathMaker.initPathMaker()       
                                    
@@ -163,6 +164,12 @@ class SideShow:
                 Wings(self.canvas, tmp['x'], tmp['y'], tmp['tag'])  ## added self to scene
                 continue
                
+            elif tmp['type'] == 'frame' or 'frame' in tmp['fname']:  
+                self.canvas.pixCount += 1  ## id used by mapper  
+                pathStr = paths['spritePath'] + tmp['fname']          
+                frame = Frame(pathStr, self.canvas)
+                self.scene.addItem(frame)
+  
             elif tmp['type'] == 'pix':
                 kix += 1  ## counts pixitems
                 self.canvas.pixCount += 1  ## id used by mapper            

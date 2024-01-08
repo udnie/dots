@@ -13,7 +13,7 @@ from dotsSideCar        import SideCar
 from dotsPathWays       import PathWays
 from dotsPathEdits      import PathEdits
 from dotsPathWorks      import PathWorks
-from dotsPathItem       import DoodleMaker
+from dotsDoodleMaker    import DoodleMaker
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,

@@ -2,14 +2,12 @@
 from PyQt6.QtCore       import Qt, QPoint, QPointF
 from PyQt6.QtGui        import QColor, QPixmap, QPainter, QPainterPath, QBrush, QImage
 from PyQt6.QtWidgets    import QWidget, QGraphicsPixmapItem
-    
+   
 from dotsShared         import common, paths
 
 ShiftKeys = (Qt.Key.Key_R, Qt.Key.Key_P, Qt.Key.Key_S)  ## in place of play buttons which can be covered
 
-### -------------------- dotsBkgMatte ----------------------
-''' classes:  Flat, Matte '''    
-### -------------------------------------------------------- 
+### ------------------ dotsBkgFlatMatte --------------------
 class Flat(QGraphicsPixmapItem):
 ### --------------------------------------------------------   
     def __init__(self, color, canvas, z=common['bkgZ']):
@@ -38,10 +36,8 @@ class Flat(QGraphicsPixmapItem):
         
 ### --------------------------------------------------------
     def mousePressEvent(self, e):      
-        if not self.canvas.pathMakerOn:
-            if e.button() == Qt.MouseButton.RightButton:    
-                self.bkgMaker.addWidget(self)        
-            elif self.canvas.key == 'del':     
+        if not self.canvas.pathMakerOn:       
+            if self.canvas.key == 'del':     
                 self.delete()
             elif self.canvas.key == '/':  ## to back
                 self.bkgMaker.back(self)
@@ -56,8 +52,8 @@ class Flat(QGraphicsPixmapItem):
      
     def delete(self):  ## also called by widget
         self.bkgMaker.deleteBkg(self)
-            
-### --------------------------------------------------------
+        
+### --------------------------------------------------------       
 class Matte(QWidget):
 ### --------------------------------------------------------
     def __init__(self, parent):
@@ -87,7 +83,7 @@ class Matte(QWidget):
         self.grey  = QBrush(QColor(250,250,250))
         self.pix   = None
         
-        self.img = QImage(paths['bkgPath'] + 'abstract.jpg')  ## used as a matte
+        self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## used as a matte
     
         self.border = 100  ## inital
         self.step   = 25
@@ -215,6 +211,6 @@ class Matte(QWidget):
         self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
         self.save = e.globalPosition()
 
-### -------------------- dotsBkgMatte ----------------------
+### ------------------ dotsBkgFlatMatte --------------------
 
 

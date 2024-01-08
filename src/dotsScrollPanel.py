@@ -31,10 +31,10 @@ class ImgLabel(QLabel):  ## makes sprite tiles (labels)
         super().__init__()
    
         self.scrollPanel = parent
-        self.canvas = parent.canvas
+        self.canvas      = parent.canvas
 
         self.fileName = fileName
-        self.id = count 
+        self.id      = count  ## used to delete specific label
 
         self.setFrameStyle(QFrame.Shape.Panel|QFrame.Shadow.Raised)
 
