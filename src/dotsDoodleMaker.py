@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QPushButton, QScrollArea, Q
 
 from dotsSideGig        import getPathList, getPts 
 
-### -------------------- dotsDoodleMaker --------------------
+### -------------------- dotsDoodleMaker -------------------
 class DoodleMaker(QWidget): ## my file display of path files
 ### --------------------------------------------------------
     def __init__(self, parent, where=''):  ## can come from 'Path Menu'
@@ -184,7 +184,7 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
         w = int((self.W - w)/2 )
         painter.drawText(w-5, self.H-10, txt)
  
-### ------------------ dotsDoodleMaker -----------------
+ ### ----------------- dotsDoodleMaker -----------------
                                                                                                                                                              
 
 
