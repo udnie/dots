@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt6.QtCore       import QPointF, pyqtSlot, QRect
+from PyQt6.QtCore       import QPointF, pyqtSlot, QRect, QRectF
 from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QGraphicsEllipseItem
 
@@ -11,25 +11,23 @@ from dotsTagsAndPaths   import TagIt
 V = 7.5  ## the diameter of a pointItem
 
 ### -------------------- dotsPathItem ----------------------
-''' classes:  PathItem - represents a point '''                                                                                         
+''' classes:  PathItem - represents a point  '''                                                                                         
 ### --------------------------------------------------------
 class PathItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
-    def __init__(self, drawing, parent, pt, idx, adto):
+    def __init__(self, parent, pt, idx, adto):
         super().__init__()
 
-        self.canvas = parent
-        self.scene  = self.canvas.scene
-    
-        self.drawing   = drawing
-        self.pathMaker = drawing.pathMaker
-        self.pathWays  = drawing.pathWays
-        
-        self.selections = self.pathMaker.selections
-     
+        self.pathMaker = parent
+        self.canvas    = self.pathMaker.canvas
+        self.scene     = self.pathMaker.scene
+        self.edits     = self.pathMaker.edits
+          
         self.pt = pt
         self.idx = idx
         self.setZValue(int(idx+adto)) 
+        
+        self.selections = self.pathMaker.selections  ## less to type
         
         self.pointTag = ''
 
@@ -59,33 +57,36 @@ class PathItem(QGraphicsEllipseItem):
     def setPixKeys(self, key):
         if self.idx in self.selections and key in MoveKeys: 
             self.moveThis(MoveKeys[key])
-                                    
+            
     def hoverEnterEvent(self, e):
         if self.pathMaker.pathSet:  
             pct = (self.idx/len(self.pathMaker.pts))*100
             tag = self.pathMaker.pathWays.makePtsTag(self.pt, self.idx, pct)
             self.pointTag = TagIt('points', tag, QColor('YELLOW')) 
-            self.pointTag.setPos(QPointF(self.pt)+QPointF(-20.0,-25.0))
-            self.pointTag.setZValue(self.drawing.findTop()+5)
+            self.pointTag.setPos(QPointF(self.pt)+QPointF(-20.0,-30.0))
+            self.pointTag.setZValue(self.pathMaker.pathWorks.findTop()+5)
             self.scene.addItem(self.pointTag)
+            p = self.rect()      
+            if p.width() < V*1.5:  ## make it larger
+                self.setRect(QRectF(p.x(), p.y(), V*1.5, V*1.5))   
         e.accept()
 
     def hoverLeaveEvent(self, e):
-        self.removePointTag()  ## used twice
+        self.cleanUp()
         e.accept()
 
-    def mousePressEvent(self, e):     
-        self.removePointTag()  ## second time, just in case 
+    def mousePressEvent(self, e):   
         if self.pathMaker.key == 'del':  
-            self.drawing.deletePathItem(self.idx)
+            self.edits.deletePathItem(self.idx)
         elif self.pathMaker.key == 'opt': 
-            self.drawing.insertPathItem(self) 
+            self.edits.insertPathItem(self) 
         if self.pathMaker.key in ('del','opt'):   
             self.pathMaker.key = ''       
         e.accept() 
         
     def mouseMoveEvent(self, e):
-        if self.pathWays.tagCount() == 0:
+        if self.pointTag: self.removePointTag()
+        if self.pathMaker.pathWays.tagCount() == 0:
             if self.pathMaker.editingPts == True:
                 self.dragCnt += 1
                 if self.dragCnt % 5 == 0:        
@@ -99,18 +100,24 @@ class PathItem(QGraphicsEllipseItem):
             self.selections.append(self.idx)            
         else:        
             self.selections.remove(self.idx)  
-        self.drawing.updatePath()
+        self.edits.updatePath()
         e.accept()
              
     def mouseReleaseEvent(self, e):
         if self.pathMaker.editingPts == True:        
             if self.dragCnt > 0:
                 self.pathMaker.pts[self.idx] = self.mapToScene(e.pos())                
-                self.drawing.updatePath()  ## rewrites pointItems as well
+                self.edits.updatePath()  ## rewrites pointItems as well
         e.accept()
               
+    def cleanUp(self):
+        p = self.rect()
+        self.setRect(QRectF(p.x(), p.y(), V, V))  ## reset size
+        self.removePointTag()     
+              
     def moveIt(self, x, y):
-        self.setRect(x-V*.5, y-V*.5, V,V)             
+        # self.setRect(x-V*.5, y-V*.5, V,V)  
+        self.setRect(QRectF(x-V*.5, y-V*.5, V*1.5, V*1.5))              
         self.pathMaker.pts[self.idx] = QPointF(x,y) 
         self.pathMaker.addPath() 
           
@@ -118,7 +125,8 @@ class PathItem(QGraphicsEllipseItem):
         self.setOriginPt()  ## updates width and height        
         self.x = self.x + key[0]
         self.y = self.y + key[1]
-        self.moveIt(self.x, self.y)           
+        self.moveIt(self.x, self.y) 
+        self.setRect(self.x-V*.5, self.y-V*.5, V,V)            
                    
     def removePointTag(self):
         if self.pointTag != '':  ## there can be only one

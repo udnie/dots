@@ -55,9 +55,9 @@ class ControlView(QGraphicsView):
         self.grabKeyboard()  ## happy days
       
         self.direct = {
-            Qt.Key.Key_A: self.canvas.selectAll,  ## opens background if no sceneitems 
+            Qt.Key.Key_A: self.canvas.selectAll,    ## opens background if no sceneitems 
             Qt.Key.Key_H: self.sideCar.hideSelected,
-            Qt.Key.Key_U: self.canvas.unSelect,
+            Qt.Key.Key_U: self.canvas.unSelect,     ## shared with pathitems for selections
             Qt.Key.Key_O: self.sideCar.toggleOutlines,   
         }
 

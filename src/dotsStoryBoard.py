@@ -110,7 +110,7 @@ class StoryBoard(QWidget):
                     self.sendPixKeys()      
                              
         ## send MoveKeys to PathItem selections in PathEdits
-        elif self.pathMaker.drawing.pointItemsSet() == True and \
+        elif self.pathMaker.edits.pointItemsSet() == True and \
             self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
                 self.sendPixKeys()  ## pointItems get messaged
                           
@@ -214,7 +214,8 @@ class StoryBoard(QWidget):
                 continue
                
     def clear(self):  ## do this before exiting app as well 
-        self.pathMaker.pathMakerOff()
+        if self.canvas.pathMakerOn:
+            self.pathMaker.pathMakerOff()
                         
         self.sideCar.clearWidgets() 
         self.showtime.stop('clear')     
@@ -236,7 +237,7 @@ class StoryBoard(QWidget):
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.bkgMaker.trackers = []
-        gc.collect()  ## testing exit problem - it's the CAT error
+        # gc.collect()  ## testing exit problem again
            
     def loadSprites(self):
         self.showWorks.enablePlay()
@@ -253,15 +254,20 @@ class StoryBoard(QWidget):
             elif pix.zValue() <= common['pathZ']:
                 break
 
-    def unSelect(self):
-        self.mapper.clearMap()
-        for itm in self.scene.items():
-            if itm.zValue() <= common['pathZ']:
-                break     
-            itm.setSelected(False)  
+    def unSelect(self):  ## sharing the 'U' with pathMaker for unselect
+        self.mapper.clearMap()  
+        for itm in self.scene.items():  
             if itm.type == 'pix':
-               itm.isHidden = False 
-    
+                itm.isHidden = False 
+                itm.setSelected(False)  
+            elif itm.type == 'pt' and self.pathMaker.selections and \
+                itm.idx in self.pathMaker.selections:
+                    idx = self.pathMaker.selections.index(itm.idx)  ## use the index        
+                    self.pathMaker.selections.pop(idx)  
+                    itm.setBrush(QColor('white'))   
+            if itm.zValue() <= common['pathZ']:
+                break          
+         
 ### --------------------------------------------------------
     def deleteSelected(self):  ## self.pathMakerOn equals false
         self.mapper.clearMap()
@@ -277,7 +283,7 @@ class StoryBoard(QWidget):
                 del pix
                 k += 1
         if k > 0: self.showWorks.enablePlay()  ## stop it - otherwise it's hung
-        gc.collect()
+        # gc.collect()   ## testing again with new recurring *NSmsg
     
     def flopSelected(self):    
         if not self.pathMakerOn:

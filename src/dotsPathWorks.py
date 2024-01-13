@@ -3,7 +3,7 @@ import os
 import math
 
 from PyQt6.QtCore       import QRect, QPointF, QPoint
-from PyQt6.QtGui        import QPixmap 
+from PyQt6.QtGui        import QPixmap, QPainterPath
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsAnimation      import *  
@@ -39,7 +39,7 @@ class PathWorks:
         self.widget.setGeometry(p.x(), p.y(), \
             int(self.widget.WidgetW), int(self.widget.WidgetH))
         if self.pathMaker.addingNewPath:
-            self.pathMaker.drawing.editBtn('ClosePath')
+            self.pathMaker.edits.editBtn('ClosePath')
         if self.pathMaker.openPathFile != None:
             self.widget.label.setText(self.pathMaker.openPathFile)
             
@@ -53,7 +53,8 @@ class PathWorks:
         self.pathMaker.removePath()  
         self.pathMaker.pathChooserOff()
         self.pathMaker.pathChooser()
-    
+ 
+ ### --------------------------------------------------------    
     def scaleRotate(self, key, per=0, inc=0):  ## also used by pathWidget
         if len(self.pathMaker.pts) == 0: 
             return 
@@ -102,7 +103,17 @@ class PathWorks:
                     
         self.pathMaker.addPath()    
         self.pathMaker.pathWays.editingPtsSet() 
-                  
+         
+### --------------------------------------------------------  
+    def setPaintPath(self, bool=False):  ## used for animation and newPath
+        path = QPainterPath()       
+        for pt in self.pathMaker.pts:  ## pts on the screen 
+            if path.elementCount() == 0:  ## first point always moveto
+                path.moveTo(QPointF(pt))
+            path.lineTo(QPointF(pt)) 
+        if bool: path.closeSubpath()
+        return path
+                         
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
         if self.pathMaker.pts and self.pathMaker.pathSet:
@@ -110,12 +121,12 @@ class PathWorks:
                 self.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + \
                     'ball.png'))
                 node = Node(self.ball)
-                self.ball.setZValue(self.pathMaker.drawing.findTop()+10)
+                self.ball.setZValue(self.findTop()+10)
        
                 self.pathTestNode = QPropertyAnimation(node, b'pos')
                 self.pathTestNode.setDuration(self.pathMaker.seconds * 1000)
 
-                path = self.pathMaker.setPaintPath(True)  ## close subpath, uses    
+                path = self.setPaintPath(True)  ## close subpath, uses    
                 b = self.ball.boundingRect() 
                 pt = QPointF(b.width()/2, b.height()/2)
            
@@ -144,7 +155,7 @@ class PathWorks:
             self.ball = None
             self.pathTestNode = None
             self.pathMaker.pathTestSet = False
-            self.pathMaker.drawing.redrawPoints(self.pathMaker.drawing.pointItemsSet())
+            self.pathMaker.edits.redrawPoints(self.pathMaker.edits.pointItemsSet())
             
 ### --------------------------------------------------------
     def changePathColor(self):
@@ -173,7 +184,14 @@ class PathWorks:
             'border:  1px solid rgb(240,240,240); \n'
             'font-size: 13px;\n'
             'color:  white;')
-                                                                                            
+                                       
+    def findTop(self):
+        ## save
+        #  self.setZValue(self.parent.scene.items()[0].zValue() + 1)    
+        for itm in self.scene.items():
+            return itm.zValue()
+        return 0
+                                                                                                                                  
 ### -------------------- dotsPathWorks ---------------------                                                                                                                                      
 
 

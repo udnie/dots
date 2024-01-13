@@ -188,6 +188,7 @@ def pathMaker():
         ('R', 'Reverse Path'),
         ('S', 'Save Path'),
         ('T', 'Test'),
+        ('U', 'UnSelect Points'),
         ('V', '..View Points'),
         ('Shift', '+D Delete Pts'),
         ('Shift', '+W Way Pts'),

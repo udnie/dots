@@ -38,8 +38,8 @@ screens = {  ## the keys aren't shown
         
 ### --------------------------------------------------------
              
-CanvasStr = "A,L,R,P,S,C,T,W,M,\",<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
-PathStr = "C,D,E,F,L,M,N,P,R,S,T,V,K,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+CanvasStr = "A,C,L,M,P,R,S,T,W,\",<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
+PathStr = "C,D,E,F,K,L,M,N,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 ## use this and make sure your editor points to the right directory

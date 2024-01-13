@@ -168,7 +168,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.mapper.toggleTagItems(self.id)
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
-            e.accept()
+        e.accept()
 
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName or self.locked:
@@ -181,7 +181,7 @@ class PixItem(QGraphicsPixmapItem):
             self.dragCnt +=1
             if self.key == 'opt' and self.dragCnt % 5 == 0:  
                 self.works.cloneThis() 
-            e.accept()
+        e.accept()
             
     def mouseReleaseEvent(self, e): 
         if self.key in TagKeys or self.mapper.tagSet:
@@ -216,7 +216,7 @@ class PixItem(QGraphicsPixmapItem):
                 elif self.isSelected():
                     self.setSelected(False)
                 self.isHidden = False 
-            e.accept()
+        e.accept()
             
 ### --------------------------------------------------------
     def addShadow(self):  ## from pixwidget 

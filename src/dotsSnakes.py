@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 import dotsAnimation    as Anime
 
-from dotsSidePath       import pathLoader, pathWorks
+from dotsSidePath       import pathLoader, pathAnimator
 from dotsShared         import paths, common
 from dotsSideGig        import *
 from functools          import partial
@@ -223,7 +223,7 @@ class Snakes:
         pix.setPos(pix.x, pix.y)                                                   
         node = Anime.Node(pix)  ## get pix pos property    
         pix.tag = fileName        
-        pix.anime = pathWorks(node, sync, waypts)  ## set path animation      
+        pix.anime = pathAnimator(node, sync, waypts)  ## set path animation      
         return pix
         
     def run(self, p):

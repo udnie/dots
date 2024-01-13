@@ -115,10 +115,10 @@ def setPaths(tag, node):  ## called by setAnimation, one at a time
     k = random.randint(55,105) % 5  ## just to make things interesting
     if k == 0: 
         waypts = waypts.toReversed()
-    return pathWorks(node, sync, waypts)  ## shared
+    return pathAnimator(node, sync, waypts)  ## shared
 
 ### --------------------------------------------------------
-def pathWorks(node, sync, wpts):         
+def pathAnimator(node, sync, wpts):         
     path = QPropertyAnimation(node, b'pos')  
     pt = getOffSet(node.pix)  
     path.setDuration(sync)  

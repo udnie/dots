@@ -11,18 +11,17 @@ from dotsPathItem    import PathItem
 ### --------------------------------------------------------
 class PathEdits(QWidget):
 ### --------------------------------------------------------
-    def __init__(self, parent, pathWays):  
+    def __init__(self, parent):  
         super().__init__()
         
         self.pathMaker = parent
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
-        self.pathWays  = pathWays
 
         self.lasso = None           
-        self.dragCnt = 0    
-           
+        self.dragCnt = 0   
+    
         self.view.viewport().installEventFilter(self)
              
 ### --------------------- event filter ----------------------          
@@ -144,7 +143,7 @@ class PathEdits(QWidget):
         if self.pathMaker.selections:
             self.pathMaker.selections.sort()
         QTimer.singleShot(200, self.updatePath)  ## it works better this way   
-                                         
+                                 
 ### -------------------- pointItems ------------------------    
     def togglePathItems(self):  ## the letter 'V'
         if self.lasso != None:
@@ -153,13 +152,6 @@ class PathEdits(QWidget):
             self.removePathItems()
         else:
             self.addPathItems()
-
-    def addPathItems(self): 
-        idx = 0 
-        add = self.findTop() + 10  ## added to idx to set zvalue
-        for pt in self.pathMaker.pts:  
-            self.scene.addItem(PathItem(self, self.canvas, pt, idx, add))
-            idx += 1
 
     def editPoints(self):
         if not self.pathMaker.pts:
@@ -177,7 +169,14 @@ class PathEdits(QWidget):
         self.pathMaker.selections = []
         self.removePathItems()
         self.pathMaker.pathWorks.turnGreen()
-                   
+      
+    def addPathItems(self): 
+        idx = 0 
+        add = self.pathMaker.pathWorks.findTop() + 10  ## added to idx to set zvalue
+        for pt in self.pathMaker.pts:  
+            self.scene.addItem(PathItem(self.pathMaker, pt, idx, add))
+            idx += 1  
+               
     def removePathItems(self):   
         for ptr in self.scene.items():
             if ptr.type in ('pt','ptTag'):
@@ -214,8 +213,8 @@ class PathEdits(QWidget):
        
     def redrawPoints(self, bool=True):  ## pointItems - non-edit
         self.removePathItems()
-        if self.pathWays.tagCount() > 0:
-            self.pathMaker.redrawTagsAndPaths()
+        if self.pathMaker.pathWays.tagCount() > 0:
+            self.pathMaker.pathWays.redrawTagsAndPaths()
         else:
             self.pathMaker.addPath()
         if bool: self.addPathItems()
@@ -290,14 +289,7 @@ class PathEdits(QWidget):
                         self.pathMaker.selections[k] += -1       
                     break
         # print('d-delete: ', self.pathMaker.selections, '\n')
-                
-    def findTop(self):
-        ## save
-        #  self.setZValue(self.parent.scene.items()[0].zValue() + 1)    
-        for itm in self.scene.items():
-            return itm.zValue()
-        return 0
-       
+                       
 ### ------------------- dotsPathEdits ---------------------
 
 

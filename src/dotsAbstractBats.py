@@ -10,7 +10,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 import dotsAnimation    as Anime
 
-from dotsSidePath       import pathLoader, pathWorks
+from dotsSidePath       import pathLoader, pathAnimator
 from dotsShared         import paths, common
 from dotsSideGig        import *
 from dotsBkgMaker       import BkgItem
@@ -168,7 +168,7 @@ class Bats:
             node = Anime.Node(pix)  ## gets pix pos property 
             sync = random.randint(11,16) * 1000  ## sets duration 
             waypts = pathLoader(pix.tag)  ## get the path        
-            pix.anime = pathWorks(node, sync, waypts)  ## sets a path to follow     
+            pix.anime = pathAnimator(node, sync, waypts)  ## sets a path to follow     
             QTimer.singleShot(100 + (n * t), pix.anime.start)  
         elif pix.part in ('left','right'): 
             pix.anime = self.animation.setAnimation(pix.tag, pix)  ## Flapper in Wings   
@@ -343,7 +343,7 @@ class Abstract:  ## hats
                 node = Anime.Node(pix)  ## get pix pos property 
                 sync   = random.randint(11,16) * 1000  ## duration   
                 waypts = pathLoader(pix.tag)
-                pix.anime = pathWorks(node, sync, waypts)  ## set path animation 
+                pix.anime = pathAnimator(node, sync, waypts)  ## set path animation 
                 QTimer.singleShot(100 + (k * 60), pix.anime.start)
                 k += 1
        

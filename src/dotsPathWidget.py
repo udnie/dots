@@ -208,9 +208,9 @@ class PathWidget(QWidget):
     
         waysBtn.clicked.connect(self.pathWays.addWayPtTags)
         saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
-        editBtn.clicked.connect(self.pathMaker.drawing.editPoints)
+        editBtn.clicked.connect(self.pathMaker.edits.editPoints)
         centerBtn.clicked.connect(self.pathMaker.pathWays.centerPath)
-        self.newBtn.clicked.connect(self.pathMaker.drawing.toggleNewPath)
+        self.newBtn.clicked.connect(self.pathMaker.edits.toggleNewPath)
         filesBtn.clicked.connect(self.pathMaker.pathChooser)
         delBtn.clicked.connect(self.pathMaker.delete)
         quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)

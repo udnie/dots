@@ -97,7 +97,7 @@ class SideShow:
                 self.screenMenu.openScreenMenu() ## in screens
         # elif key == 'A':  ## see controlview and storyboard for replacement
         #     self.bkgMaker.openBkgFiles()   
-        elif key == 'P':
+        elif key == 'P':  
             self.pathMaker.initPathMaker()       
                                    
 ### --------------------------------------------------------                            

@@ -1,8 +1,8 @@
 
 import os.path
 
-from PyQt6.QtCore       import Qt, QEvent, QPointF, QPoint, pyqtSlot
-from PyQt6.QtGui        import QColor, QPen, QPainterPath
+from PyQt6.QtCore       import Qt, QEvent, QPoint, pyqtSlot
+from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QWidget, QGraphicsPolygonItem, QGraphicsPathItem
 
 from dotsAnimation      import *       
@@ -12,6 +12,7 @@ from dotsShared         import common, MoveKeys, ScaleRotateKeys
 from dotsSideCar        import SideCar
 from dotsPathWays       import PathWays
 from dotsPathEdits      import PathEdits
+
 from dotsPathWorks      import PathWorks
 from dotsDoodleMaker    import DoodleMaker
 
@@ -37,34 +38,34 @@ class PathMaker(QWidget):
         self.widget  = None
         self.seconds = 10  ## set how long it takes mr.ball to complete a path
      
-        self.pathWorks = PathWorks(self)             
-        self.pathWays  = PathWays(self)  ## extends pathMaker
-        self.drawing   = PathEdits(self, self.pathWays) 
-               
-        self.initThis()
+        self.pathWorks  = PathWorks(self)             
+        self.pathWays   = PathWays(self)  
+        self.edits      = PathEdits(self) 
+        
+        self.initThis()  
              
         self.doFirst = {
             'D':   self.delete,
             '/':   self.pathWorks.changePathColor,
-            'cmd': self.drawing.closeNewPath,
+            'cmd': self.edits.closeNewPath,
         }
 
         self.direct = {
             'F': self.pathWays.openFiles,
             'P': self.pathChooser,
-            'E': self.drawing.editPoints,
+            'E': self.edits.editPoints,
             '{': self.pathWays.flipPath,
             '}': self.pathWays.flopPath,
         }
 
         self.editKeys = {
-            'E': self.drawing.editPoints,
+            'E': self.edits.editPoints,
             'R': self.pathWays.reversePath,
             'S': self.pathWays.savePath,
             'T': self.pathWorks.pathTest,   
             '!': self.pathWays.halfPath,
             '@': self.pathWays.fullPath,
-       'delPts': self.drawing.deleteSections,
+       'delPts': self.edits.deleteSections,
         }
 
         self.noPathKeysSet = {
@@ -72,13 +73,13 @@ class PathMaker(QWidget):
             'C': self.pathWays.centerPath,    
             'R': self.pathWays.reversePath,
             'S': self.pathWays.savePath,     
-            'N': self.drawing.toggleNewPath,
+            'N': self.edits.toggleNewPath,
         }
 
         self.WayPtsKeys = {
             '!': self.pathWays.halfPath,
             '@': self.pathWays.fullPath,
-            'V': self.drawing.togglePathItems,
+            'V': self.edits.togglePathItems,
             '<': self.pathWays.shiftWayPtsLeft,
             '>': self.pathWays.shiftWayPtsRight,
         }
@@ -125,15 +126,15 @@ class PathMaker(QWidget):
             self.pathWays.removeWayPtTags()
             if self.selections:
                 self.editingPts = True
-                self.drawing.updatePath()
+                self.edits.updatePath()
                 self.pathWorks.turnBlue()
             else:
-                self.drawing.editPointsOff()
-                self.drawing.editPoints()
+                self.edits.editPointsOff()
+                self.edits.editPoints()
             
         elif self.key == 'L' and self.editingPts == True:
             self.pathWorks.closeWidget()
-            self.drawing.toggleLasso()
+            self.edits.toggleLasso()
                                                                   
         elif self.key in self.editKeys and self.editingPts == True:
             self.editKeys[self.key]()  
@@ -141,7 +142,7 @@ class PathMaker(QWidget):
         elif self.key in self.noPathKeysSet:  
             self.noPathKeysSet[self.key]()  
             if self.selections:
-                self.drawing.updatePath()
+                self.edits.updatePath()
 
         elif self.pathWays.tagCount() == 0 and self.addingNewPath == False:
             if self.key in self.direct: 
@@ -163,8 +164,8 @@ class PathMaker(QWidget):
             if self.addingNewPath:  ## draws path
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
-                    self.drawing.npts = 0  
-                    self.drawing.last = e.pos()
+                    self.edits.npts = 0  
+                    self.edits.last = e.pos()
                     self.addNewPathPts(QPoint(e.pos()))  
 
                 elif e.type() == QEvent.Type.MouseMove and \
@@ -198,10 +199,10 @@ class PathMaker(QWidget):
                                                                        
     def delete(self):
         self.pathWorks.stopPathTest()
-        self.drawing.deleteLasso()    ## reset cursor
-        self.drawing.deleteNewPath()  ## turns green if nothing else
-        self.drawing.removeNewPath()
-        self.drawing.editPointsOff()
+        self.edits.deleteLasso()    ## reset cursor
+        self.edits.deleteNewPath()  ## turns green if nothing else
+        self.edits.removeNewPath()
+        self.edits.editPointsOff()
         self.pathWays.removeWayPtTags()
         self.removePath()
         self.pathChooserOff() 
@@ -234,9 +235,9 @@ class PathMaker(QWidget):
            
     def updateNewPath(self):
         if self.addingNewPath:  ## list of points
-            self.drawing.removeNewPath()  ## clean up just in case
+            self.edits.removeNewPath()  ## clean up just in case
             ## no polyline in pyqt - use open painter path instead 
-            self.newPath = QGraphicsPathItem(self.setPaintPath())
+            self.newPath = QGraphicsPathItem(self.pathWorks.setPaintPath())
             self.newPath.setPen(QPen(QColor(self.color), 3, Qt.PenStyle.DashDotLine))
             self.newPath.setZValue(common['pathZ']) 
             self.scene.addItem(self.newPath)  ## only one - no group needed
@@ -270,13 +271,13 @@ class PathMaker(QWidget):
                 ' - Number of Points ' + str(len(self.pts)))
             if self.pathWorks.widget != None:
                 file = os.path.basename(self.openPathFile)
-                self.pathWorks.widget.label.setText(file.capitalize())
-                self.pathWorks.widget.label.setStyleSheet("QLabel{font-size: 15pt;}") 
+                self.pathWorks.widget.label.setText(file)
+                self.pathWorks.widget.label.setStyleSheet("QLabel{font-size: 14pt;}") 
                            
 ### -------------------- path stuff ------------------------
     def addPath(self):
         self.removePath()  ## not for animation
-        self.path = QGraphicsPolygonItem(self.drawing.drawPoly(self.pts))       
+        self.path = QGraphicsPolygonItem(self.edits.drawPoly(self.pts))       
         self.path.setPen(QPen(QColor(self.color), 3, Qt.PenStyle.DashDotLine))
         self.path.setZValue(common['pathZ']) 
         self.scene.addItem(self.path)
@@ -289,22 +290,7 @@ class PathMaker(QWidget):
                 self.scene.removeItem(self.path)
             self.pathSet = False
             self.path = None
-     
-    def redrawTagsAndPaths(self):
-        self.pathWays.removeWayPtTags()
-        self.removePath()
-        self.addPath()
-        self.pathWays.addWayPtTags()
-                                    
-    def setPaintPath(self, bool=False):  ## used for animation and newPath
-        path = QPainterPath()       
-        for pt in self.pts:  ## pts on the screen 
-            if path.elementCount() == 0:  ## first point always moveto
-                path.moveTo(QPointF(pt))
-            path.lineTo(QPointF(pt)) 
-        if bool: path.closeSubpath()
-        return path
-    
+                                        
 ### -------------------- dotsPathMaker ---------------------
 
 

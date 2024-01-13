@@ -8,7 +8,6 @@ from PyQt6.QtWidgets    import QFileDialog,  QGraphicsItemGroup
 from dotsAnimation      import *  
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox, getPts
-from dotsPathEdits      import PathEdits
 from dotsTagsAndPaths   import TagIt
                                  
 ### --------------------- dotsPathWays ---------------------
@@ -23,8 +22,7 @@ class PathWays:
         self.pathMaker = parent
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.canvas.scene
-        self.drawing   = PathEdits(self.pathMaker, self) 
-        
+            
         self.tagGroup = None  
     
 ### -------------------- path transforms -------------------
@@ -69,14 +67,14 @@ class PathWays:
 
     def halfPath(self, full=False):
         if self.pathMaker.pathTestSet:
-            self.pathWorks.stopPathTest()
+            self.pathMaker.pathWorks.stopPathTest()
         tmp = []
         if full:  ## use all the points
             lnn = len(self.pathMaker.pts)    
         else:     ## use half the points
             lnn = int(len(self.pathMaker.pts)/2) + 1       
         ## using painter path to get the pointAtPercent
-        path = self.pathMaker.setPaintPath(True)  ## close subpath, uses self.pts
+        path = self.pathMaker.pathWorks.setPaintPath(True)  ## close subpath, uses self.pts
         vals = [p/lnn for p in range(lnn)]  ## evenly spaced points
         for i in vals:
             tmp.append(QPointF(path.pointAtPercent(i)))
@@ -84,7 +82,7 @@ class PathWays:
         del tmp
         del vals
         del path
-        QTimer.singleShot(200, self.drawing.redrawPoints)
+        QTimer.singleShot(200, self.pathMaker.edits.redrawPoints)
 
     def movePath(self, key):  ## updates one tick[key] at a time
         pos = self.pathMaker.path.pos()
@@ -103,7 +101,7 @@ class PathWays:
     def reversePath(self):  
         if self.pathMaker.pts:
             if self.pathMaker.pathTestSet:
-                self.pathWorks.stopPathTest()      
+                self.pathMaker.pathWorks.stopPathTest()      
             tmp = []    
             lnn = len(self.pathMaker.pts)-1        
             for i in range(len(self.pathMaker.pts)):
@@ -115,15 +113,15 @@ class PathWays:
             
     def cleanUp(self):
         if self.tagCount() > 0:
-            self.pathMaker.redrawTagsAndPaths() 
+            self.redrawTagsAndPaths() 
         else: 
             self.pathMaker.addPath()    
-        self.drawing.redrawPoints(self.drawing.pointItemsSet())
+        self.pathMaker.edits.redrawPoints(self.pathMaker.edits.pointItemsSet())
          
     def editingPtsSet(self):
         if self.pathMaker.editingPts == True:
-            self.drawing.updatePath()
-     
+            self.pathMaker.edits.updatePath()
+                            
 ### ----------------- load and save paths ------------------
     def openFiles(self):
         if self.pathMaker.pts:
@@ -239,7 +237,13 @@ class PathWays:
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue(common['tagZ']+5)
         self.scene.addItem(self.tagGroup)
-         
+                 
+    def redrawTagsAndPaths(self):
+        self.removeWayPtTags()
+        self.pathMaker.removePath()
+        self.pathMaker.addPath()
+        self.addWayPtTags()
+             
     def removeWayPtTags(self):   
         if self.tagCount() > 0:  ## don't change
             self.scene.removeItem(self.tagGroup) 
