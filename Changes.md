@@ -13,7 +13,7 @@ I went through a number of revisions of **dotsTableView.py** until I finally arr
 
 As a reminder, **'J'** is the command that launches the **json .play file viewer** which also works in **StoryBoard** - where the work gets done.  Saving a **.play file** with missing files in **StoryBoard** will delete them as it saves only what's displayed while saving from the **canvas** saves what's in the file including the missing file records. 
 
-New Video:      
+New Video: <https://youtu.be/DoCMdEPZi8E>
 
 ---
                           
