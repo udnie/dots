@@ -1,12 +1,13 @@
 
 import cv2
 import numpy as np
+import os.path
 
 from PyQt6.QtCore       import Qt, QPointF, QRectF
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QGraphicsPixmapItem, QGraphicsEllipseItem
                                
-from dotsShared         import common
+from dotsShared         import common, paths
 from dotsSideGig        import point
 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
@@ -27,7 +28,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.path    = self.maker.path
        
         self.anime = None 
-        self.setZValue(common['shadow']) 
+        self.setZValue(self.pixitem.zValue()-1) 
         
         self.tag = ''
         
@@ -151,8 +152,10 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                                                                                                 
 ### --------------------------------------------------------        
-def initShadow(file, w, h, flop):  ## replace all colors with grey    
-    img = cv2.imread(file, cv2.IMREAD_UNCHANGED)   
+def initShadow(file, w, h, flop):  ## replace all colors with grey  
+    file = paths['spritePath'] + os.path.basename(file)         
+    img = cv2.imread(file, cv2.IMREAD_UNCHANGED)  
+     
     if flop: img = cv2.flip(img, 1)  ## works after the read   
     rows, cols, _ = img.shape
 

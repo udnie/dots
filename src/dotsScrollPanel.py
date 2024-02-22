@@ -6,7 +6,7 @@ from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF,
 from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, \
                             QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
 from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
-                            QFrame, QFileDialog, QLayout
+                            QFrame, QLayout
 
 from dotsShared      import paths, Star, common
 from functools       import partial
@@ -205,18 +205,18 @@ class ScrollPanel(QWidget):
         return vBoxLayout
                                                         
  ### --------------------------------------------------------               
-    def add(self, fname):   
+    def addImageTile(self, sprite):   
         self.scrollCount += 1
         self.scrollList.append(self.scrollCount)   
-        label = ImgLabel(fname, self.scrollCount, self)
-        label.setFixedHeight(panel['LabelH'])      
-        self.layout.addWidget(label)
+        tile = ImgLabel(sprite, self.scrollCount, self)
+        tile.setFixedHeight(panel['LabelH'])      
+        self.layout.addWidget(tile)
         self.bottom()
         
     def Star(self):  
         if self.canvas.pathMakerOn: 
             return  
-        self.add('Star')
+        self.addImageTile('Star')
              
     def deleteImgLabel(self, this):
         p = self.scrollList.index(this.id)
@@ -252,11 +252,12 @@ class ScrollPanel(QWidget):
         if self.canvas.pathMakerOn: 
             return  
         sprites = sorted(self.spriteList())
+        if sprites == None: return
         if sprites:
             for s in sprites:
-                self.add(s)
+                self.addImageTile(s)
             self.top()   
-        self.dots.statusBar.showMessage('Number of Sprites:  {}'.format(self.scrollCount)) 
+        self.dots.statusBar.showMessage(('Number of Sprites:  {}'.format(self.scrollCount)) , 8000)
 
     def spriteList(self):
         try:
@@ -270,7 +271,7 @@ class ScrollPanel(QWidget):
                 filenames.append(paths['spritePath'] + file.lower())       
         if not filenames:
             MsgBox('No Sprites Found!', 5)
-            return
+            return None
         return filenames
 
 ### ------------------- dotsScrollPanel --------------------

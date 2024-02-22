@@ -3,7 +3,7 @@ from PyQt6.QtCore       import Qt, QTimer, QPoint, pyqtSlot, QPointF
 from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-from dotsShared         import common, MoveKeys, RotateKeys, PlayKeys
+from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
 from dotsPixFrameWorks  import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
@@ -40,6 +40,7 @@ class PixItem(QGraphicsPixmapItem):
         self.shadowMaker = ShadowMaker(self)  ## returns isActive is False if from shadow_dummy
         self.works = Works(self)  ## functions and PixSizes moved from here
         
+        img = None
         img = QImage(self.fileName)
 
         ## see pixSizes dictionary to make changes - moved to pixWorks
@@ -140,7 +141,7 @@ class PixItem(QGraphicsPixmapItem):
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
             
     def mousePressEvent(self, e):    
-        if self.canvas.control not in PlayKeys:  
+        if self.canvas.control not in ControlKeys:  
             ## right mouse clk triggers Animation menu on selected screen items 
             if e.button() == Qt.MouseButton.RightButton:
                 ## if 'pivot' in self.fileName or 'frame' in self.fileName or \                
@@ -173,7 +174,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName or self.locked:
             return
-        elif self.canvas.control not in PlayKeys:
+        elif self.canvas.control not in ControlKeys:
             if self.key in TagKeys or self.mapper.tagSet:
                 self.works.clearTag() 
             self.works.updateXY(self.mapToScene(e.pos()))
@@ -196,7 +197,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseDoubleClickEvent(self, e):
         if 'frame' in self.fileName or self.key in TagKeys:
             return 
-        elif self.canvas.control not in PlayKeys:
+        elif self.canvas.control not in ControlKeys:
             if self.key == 'opt':  
                 self.works.cloneThis()
             elif self.canvas.key == 'noMap': 

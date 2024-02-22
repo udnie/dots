@@ -11,13 +11,12 @@ from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineIte
                                                     
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
-from dotsPixFrameWorks  import Frame
 from dotsSideGig        import MsgBox, constrain
 from dotsMapMaker       import MapMaker
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: just stuff - pixTest, transFormPixitem, snapShot, toggleGrid, 
-    assorted small functions and a few from sideShow '''   
+    assorted small functions and a few from showbiz '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -28,7 +27,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-                  
+                    
         self.gridZ     = common['gridZ']    
         self.gridGroup = None  
         self.menu      = None 
@@ -91,7 +90,6 @@ class SideCar:
                 f = Q.getSaveFileName(self.canvas, paths['snapShot'],
                     paths['snapShot'] + snap)
                 Q.accept()
-        
                 if not f[0]:
                     return
                 elif not f[0].lower().endswith('.jpg'):
@@ -160,15 +158,7 @@ class SideCar:
             mirror = 'Not Scrollable'    
         return file.capitalize(), direction, mirror, locked
   
-### --------------------------------------------------------  
-    def addFrame(self, frame):
-        frame = Frame(frame, self.canvas)
-        self.scene.addItem(frame)
-        
-    def deleteFrame(self, frame):
-        self.scene.removeItem(frame)
-        frame = None
-
+### --------------------------------------------------------
     def toggleMenu(self):
         self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
   
@@ -192,8 +182,8 @@ class SideCar:
                 elif key == 'U': 
                     pix.locked = False
                     stub = 'all'
-                    if pix.type == 'bkg': 
-                        pix.bkgMaker.unlockBkg(pix)      
+                    # if pix.type == 'bkg': 
+                    #     pix.bkgMaker.unlockBkg(pix)      
                 elif key == 'L' and pix.isSelected() or pix.type == 'bkg': 
                     if pix.type == 'pix':
                         pix.togglelock()  ## wait to toggleTagItems

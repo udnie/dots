@@ -220,15 +220,6 @@ class PathEdits(QWidget):
         if bool: self.addPathItems()
         
 ### -------------------- selections ------------------------                
-    def deleteSections(self):  ## selected with lasso
-        if self.pathMaker.selections: 
-            sel = sorted(self.pathMaker.selections, reverse=True)  
-            for i in sel:
-                self.pathMaker.pts.pop(i)  
-            del sel         
-            self.pathMaker.selections = []
-            self.redrawPoints()
-          
     def insertSelection(self, idx):  ## used only by pointItems 
         if self.pathMaker.selections:       
             self.pathMaker.selections.sort()  

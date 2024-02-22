@@ -111,19 +111,19 @@ class AnimationMenu:
 ### --------------------------------------------------------     
 class DemoMenu:  
 ### --------------------------------------------------------
-    def __init__(self, parent, sideShow):
+    def __init__(self, parent, showbiz):
         super().__init__()  
    
         self.canvas = parent
-        self.sideShow = sideShow
+        self.showbiz = showbiz
         
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view 
      
-        self.snakes   = self.sideShow.snakes   
-        self.bats     = self.sideShow.bats
-        self.abstract = self.sideShow.abstract  ## hats and bats
+        self.snakes   = self.showbiz.snakes   
+        self.bats     = self.showbiz.bats
+        self.abstract = self.showbiz.abstract  ## hats and bats
        
         self.demoMenu = None
                        

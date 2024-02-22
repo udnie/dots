@@ -122,7 +122,7 @@ class Works:  ## small functions that were in ShadowMaker
         self.maker.scalor = val
                                                                                                              
     def pixWidthHeight(self):
-        b = self.maker.pixitem.boundingRect()
+        b = self.maker.pixitem.boundingRect()  
         return self.maker.pixitem.fileName, b.width(), b.height() 
    
 ### --------------------------------------------------------  

@@ -5,7 +5,7 @@ import time
 from PyQt6.QtCore       import QPoint, QPointF, QTimer
 from PyQt6.QtGui        import QImage, QPixmap
 
-from dotsShared         import common
+from dotsShared         import common, paths
 from dotsShadow         import *                      
 from dotsShadowWidget   import ShadowWidget
 from dotsShadowWorks    import Works, PointItem
@@ -65,7 +65,9 @@ class ShadowMaker:
         if self.shadow != None:
             return 
                  
-        file, w, h = self.works.pixWidthHeight()                                                      
+        file, w, h = self.works.pixWidthHeight()          
+        file = paths['spritePath'] + os.path.basename(file) 
+                                 
         img, width, height, bytesPerLine = initShadow(file, w, h, self.pixitem.flopped)
        
         self.cpy = img   ## save it for later  
@@ -104,7 +106,9 @@ class ShadowMaker:
                   
         self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
 
-        file, w, h = self.works.pixWidthHeight()  
+        file, w, h = self.works.pixWidthHeight()   
+        file = paths['spritePath'] + os.path.basename(file) 
+      
         flop = self.pixitem.flopped 
                     
         try:  ## without the await it takes longer 

@@ -6,7 +6,7 @@ from PyQt6.QtGui        import QPixmap, QImage, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsSideGig        import constrain
-from dotsShared         import common, RotateKeys 
+from dotsShared         import common, RotateKeys
 from dotsMenus          import AnimationMenu
 from dotsTagsAndPaths   import TagsAndPaths
 
@@ -16,6 +16,7 @@ import dotsAnimation    as Anime
 ''' classes: Frame and Works(functions moved from Pixitem and PixWidget) '''                                                                                           
 ### --------------------------------------------------------
 Pct = -0.50   ## used by constrain - percent allowable off screen
+
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
     # "apple": (650, 450),  ## see setPixSizes below
     'doral': (215, 215),
@@ -24,32 +25,35 @@ PixSizes = {  ## match up on base filename using 5 characters - sometimes called
 ### --------------------------------------------------------
 class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's here, sort of
 ### --------------------------------------------------------
-    def __init__(self, fileName, parent):
+    def __init__(self, fileName, parent, z):  
         super().__init__()
 
         self.canvas = parent  
         self.mapper = self.canvas.mapper
+        
         self.tagsAndPaths = TagsAndPaths(self)
-        
-        self.type = 'frame'            
+              
         self.fileName = fileName  ## needs to contain 'frame'
+        self.type = 'frame'  
           
-        self.setZValue(self.canvas.pixCount)
-        self.tag = ''
-        self.key = ''
+        self.x, self.y = 0, 0  
+        self.setZValue(z)
         
+        self.tag = ''  
         self.locked = True
-        self.id = self.canvas.pixCount ## used by mapper
         
+        self.id = self.canvas.pixCount ## used by mapper
+        self.key = ''
+    
         img = QImage(fileName)
-
+        
         w = common["ViewW"]  ## from screens
         h = common["ViewH"] 
-   
+
         img = img.scaled(int(w), int(h),
             Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation)
-         
+        Qt.TransformationMode.SmoothTransformation)
+        
         self.setPixmap(QPixmap(img))
         self.setPos(QPointF(0,0))
         
@@ -57,9 +61,9 @@ class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's he
         
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
-  
+         
   ### --------------------------------------------------------
-    @pyqtSlot(str)  ## actually updated by storyboard
+    @pyqtSlot(str)  ## updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
             
@@ -70,17 +74,19 @@ class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's he
     def mousePressEvent(self, e):     
         if not self.canvas.pathMakerOn:        
             if self.key == 'del':     
-                self.canvas.sideCar.deleteFrame(self)  
+                self.canvas.showWorks.deleteFrame(self)  
             elif self.key in ('enter','return'):  
+                if self.locked:
+                    self.locked = False
                 self.setZValue(self.canvas.mapper.toFront(1)) 
+                self.locked = True
             elif self.key == 'tag': 
-                self.mapper.toggleTagItems(self)
+                self.mapper.toggleTagItems(self.id)
             e.accept()
       
     def mouseReleaseEvent(self, e):
         if not self.canvas.pathMakerOn:
             self.key = '' 
-            self.canvas.key = ''      
             e.accept()
                                                                                  
 ### --------------------------------------------------------

@@ -5,10 +5,22 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+                          
+**February 2024**    
+I decided to tackle a few things on my todo list and finally got around to fixing the **'missing file'** recovery problem.  I used **QTableView** to display the contents of the **json .play file** and highlight any missing files as well as providing a means to delete them.  In the past when a missing file was encountered you were returned to the canvas and not able to access the **.play file** until you either managed to come up with the missing file or a like named substitute - or, editing the **.play file** with something like **text-edit**, which can work if there's only one file to delete or rename. As a rule, the only way a missing file comes about is you either deleted it, renamed it, or moved it as **dots** expects a particular screen type to be in a designated directory.
 
+I went through a number of revisions of **dotsTableView.py** until I finally arrived at what's here. It helps to have a plan, I have written that before.  **TableView** is in part, is the result of a number of searches on **StackOverFlow** and dives into **Martin Fitzpatrick** online examples, both of which were instrumental in filling in the gaps. The rest of it - mostly trial and error and OJT.
+
+As a reminder, **'J'** is the command that launches the **json .play file viewer** which also works in **StoryBoard** - where the work gets done.  Saving a **.play file** with missing files in **StoryBoard** will delete them as it saves only what's displayed while saving from the **canvas** saves what's in the file including the missing file records. 
+
+New Video:      
+
+---
                           
 **January 2024**       
-A repeat of January 2023. A few bug fixes and mostly trying to clarify my code by clearing up some naming issues and moving code around. Added some new files and renamed a few to make it easier to locate classes which may have been hidden.
+A repeat of January 2023. A few bug fixes and mostly trying to clarify my code by clearing up some naming issues and moving code around. Added some new files and renamed a few to make it easier to locate some classes which may have been hidden.
+
+
 
 ---
 **December 1 2023**  

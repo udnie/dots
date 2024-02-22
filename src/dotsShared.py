@@ -38,9 +38,11 @@ screens = {  ## the keys aren't shown
         
 ### --------------------------------------------------------
              
-CanvasStr = "A,C,L,M,P,R,S,T,W,\",<,>,[,],_,+,/,-,=,;,.,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
+CanvasStr = "A,B,C,J,L,M,P,R,S,T,W,\",<,>,[,],_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
 PathStr = "C,D,E,F,K,L,M,N,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
+Types = ['frame', 'pix', 'bkg', 'flat']
 
 ## use this and make sure your editor points to the right directory
 paths = {        
@@ -54,7 +56,10 @@ paths = {
     'demo':         './../demo/',
 }
 
+
 Tick = 2.0
+
+ControlKeys = ('resume','pause')
 
 MoveKeys = {
     'right': (Tick, 0.0),
@@ -63,7 +68,7 @@ MoveKeys = {
     'down':  (0.0, Tick),
 }
 
-PlayKeys = ('resume','pause')
+PlayKeys = ('L', 'R', 'P', 'S', 'A', 'J')
 
 RotateKeys = {  ## works in reverse
     '+':  -1.0,
@@ -111,12 +116,14 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_Enter:     'enter',
     Qt.Key.Key_Return:   'return',
     Qt.Key.Key_Space:     'space',  
-    Qt.Key.Key_Backslash:  'tag',   
-    Qt.Key.Key_A: 'A',        
+    Qt.Key.Key_Backslash:   'tag',   
+    Qt.Key.Key_A: 'A',   
+    Qt.Key.Key_B: 'B',     
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
+    Qt.Key.Key_J: 'J', 
     Qt.Key.Key_K: 'K',  
-    Qt.Key.Key_L: 'L',  
+    Qt.Key.Key_L: 'L',   
     Qt.Key.Key_M: 'M', 
     Qt.Key.Key_N: 'N', 
     Qt.Key.Key_O: 'O',  

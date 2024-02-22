@@ -1,7 +1,7 @@
 
 
 ### ------------------ dotsShadow_Dummy --------------------
-''' comment out import ShadowMaker in dotsPixItem and dotsSideShow
+''' comment out import ShadowMaker in dotsPixItem and dotsShowBiz
     and replace with import Shadow_Dummy to turn off shadows '''                                                                                                                    
 ### -------------------------------------------------------- 
 class ShadowMaker:  

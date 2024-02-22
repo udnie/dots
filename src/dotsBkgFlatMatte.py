@@ -16,22 +16,25 @@ class Flat(QGraphicsPixmapItem):
         self.canvas   = canvas
         self.scene    = canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
-        
-        self.type = 'flat'
-        self.color = color
-        
+     
         self.fileName = 'flat'
-        self.locked = False
+        self.type    = 'flat'
         
-        self.tag = ''
+        self.color = QColor(color)
+        self.tag =  QColor(color)
+      
+        self.locked = True
+        self.setZValue(z)
+        
         self.id = 0   
 
         p = QPixmap(common['ViewW'],common['ViewH'])
         p.fill(self.color)
         
         self.setPixmap(p)
-        self.setZValue(z)
-   
+        
+        self.x, self.y = 0, 0
+      
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         
 ### --------------------------------------------------------
@@ -42,7 +45,7 @@ class Flat(QGraphicsPixmapItem):
             elif self.canvas.key == '/':  ## to back
                 self.bkgMaker.back(self)
             elif self.canvas.key in ('enter','return'):  
-                self.bkgMaker.front(self)                             
+                self.setZValue(self.canvas.mapper.toFront())                            
         e.accept()
       
     def mouseReleaseEvent(self, e):
@@ -135,11 +138,11 @@ class Matte(QWidget):
      
         if key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:  
             if key == Qt.Key.Key_R: 
-                self.canvas.showTime.run()
+                self.canvas.showtime.run()
             elif key == Qt.Key.Key_P: 
-                self.canvas.showTime.pause()
+                self.canvas.showtime.pause()
             else:
-                self.canvas.showTime.stop()
+                self.canvas.showtime.stop()
 
         elif key == Qt.Key.Key_Greater:  ## scale up  
             self.scaleThis(key)
@@ -160,8 +163,11 @@ class Matte(QWidget):
             elif self.brush == self.grey:
                 self.brush = self.black
             elif self.brush == self.black:
-                self.brush = self.grey      
-                       
+                self.brush = self.grey  
+                
+        elif key == Qt.Key.Key_B:  ## change color  
+            self.brush = self.black  
+                         
         elif key == Qt.Key.Key_P:  ## use pix 
             if self.pix == None:    
                 self.pix = self.img  ## something to initialize it  

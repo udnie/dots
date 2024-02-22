@@ -1,5 +1,5 @@
-
-import os 
+  
+import os
 import json
 import random
 
@@ -8,9 +8,10 @@ from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem
 
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
+from dotsPixFrameWorks  import Frame
 
 ### --------------------- dotsShowWorks --------------------
-'''  ## saving to a play file from showtime and setting play buttons '''
+''' functions for scroller cleanup, saving play files, setting play buttons '''                                  
 ### --------------------------------------------------------
 class ShowWorks: 
 ### -------------------------------------------------------- 
@@ -19,7 +20,7 @@ class ShowWorks:
 
         self.canvas = parent
         self.scene  = self.canvas.scene
-  
+          
 ### --------------------------------------------------------  
     def cleanUpScrollers(self, scene):  ## called from showtime  
         self.scene = scene
@@ -34,7 +35,17 @@ class ShowWorks:
                             k = 1
                         elif k > 0:
                             self.scene.removeItem(p)
-                                                                
+  ### --------------------------------------------------------      
+    def cleanupMenus(self, showbiz):    
+        if showbiz.tableView != None: 
+            showbiz.tableView.bye()      
+        if showbiz.demoAvailable != None:  
+            showbiz.snakes.delSnakes()                     
+            showbiz.demoMenu.closeDemoMenu()     
+        if showbiz.screenMenu != None:   
+            showbiz.screenMenu.closeScreenMenu()
+            
+### --------------------------------------------------------                                                            
     def dothis(self, p):    
         direction = p.direction
         mirroring = p.mirroring
@@ -43,8 +54,9 @@ class ShowWorks:
         rate      = p.rate
         z = p.zValue()
 
-        p.init()
-        p.tag = 'scroller'
+        p.init()  ## just to make sure
+        
+        p.tag       = 'scroller'
         p.direction = direction 
         p.mirroring = mirroring
         p.factor    = factor
@@ -63,7 +75,7 @@ class ShowWorks:
             p.setPos(QPointF(0.0, float(p.runway)))
    
 ### --------------------------------------------------------      
-    def setPauseKey(self):  ## sideShow all the way down    
+    def setPauseKey(self):  ## showbiz all the way down    
         if self.canvas.control == 'pause': 
             self.canvas.btnPause.setText( 'Resume' );
             self.canvas.control = 'resume'
@@ -84,7 +96,17 @@ class ShowWorks:
         self.canvas.btnPause.setEnabled(True)
         self.canvas.btnStop.setEnabled(True)  
         self.canvas.btnSave.setEnabled(False)  
-
+    
+### --------------------------------------------------------
+    def addFrame(self, frame):  ## it's a handoff 
+        frame = Frame(frame, self.canvas, self.canvas.mapper.toFront(1))
+        self.scene.addItem(frame)
+    
+    def deleteFrame(self, frame):
+        self.scene.removeItem(frame)
+        frame = None    
+          
+### -------------------------------------------------------- 
     def saveToPlays(self, dlist):     
         if self.canvas.openPlayFile == '':
             self.canvas.openPlayFile = paths['playPath'] + 'tmp.play'       
@@ -106,102 +128,98 @@ class ShowWorks:
             except IOError:
                 MsgBox('saveToPlays: Error saving file', 5)
         del dlist
-     
-  ### --------------------------------------------------------
-    def setAll(self, pix, tmp):  ## from a play file
-        pix.type = tmp['type']                 
-        pix.x    = float('{0:.2f}'.format(tmp['x']))
-        pix.y    = float('{0:.2f}'.format(tmp['y']))   
-        pix.setZValue(tmp['z']),  ## use the new one
-        pix.setMirrored(tmp['mirror']),
-        if pix.fileName == 'flat':
-            pix.type = 'flat'
-        elif pix.type != 'bkg':   
-            pix.rotation = tmp['rotation']
-            pix.scale    = tmp['scale']
-        return pix
-
-    def setPixitem(self, pix, tmp):
-        pix.setZValue(pix.zValue() + 100)  ## not for 'bkg'
-        pix.setPos(pix.x, pix.y)     
-        if 'frame' not in pix.fileName:
-            pix.locked = tmp['locked']
-            if pix.locked: self.canvas.sideShow.locks += 1
-            pix.part = tmp['part']
-            pix = lookForStrays(pix)
-        return pix 
-     
-    def setBackGround(self, pix, tmp):  ## pix is a stand_in for bkg
-        ## doing this only if missing in .play file other gets the default     
-        if 'anime' not in tmp.keys(): 
-            tmp['anime'] = None   
-        
-        if 'scrollable' not in tmp.keys(): 
-            tmp['scrollable'] = False
-            
-        if 'direction' not in tmp.keys(): 
-            tmp['direction'] = 'left'   
-                 
-        if 'mirroring' not in tmp.keys(): 
-            tmp['mirroring'] = self.canvas.bkgMaker.mirroring    
-            
-        if 'factor' not in tmp.keys(): 
-            tmp['factor'] = self.canvas.bkgMaker.factor
+        self.canvas.dots.statusBar.showMessage('') 
                     
-        if 'rate' not in tmp.keys(): 
-            tmp['rate'] = 0
-  
-        if 'showtime' not in tmp.keys(): 
-            tmp['showtime'] = 0
-  
-        pix.locked      = tmp['locked']                 
-        pix.anime       = tmp['anime']
-        pix.scrollable  = tmp['scrollable']
-        pix.mirroring   = tmp['mirroring']
-        pix.direction   = tmp['direction']
-        pix.factor      = tmp['factor']
-        pix.rate        = tmp['rate']
-        pix.showtime    = tmp['showtime']
-             
-        result = pix.bkgWorks.addTracker(pix)    
-        if result == False:  ## must be a dupe
-            del pix          ## not yet added to scene
-            return None
-           
-        return pix  ## return to sideShow
-    
-    def setShadow(self, pix, tmp):
-        pix.shadow = {
-            'alpha':    tmp['alpha'],
-            'scalor':   tmp['scalor'],  ## unique to shadow
-            'rotate':   tmp['rotate'],
-            'width':    tmp['width'],
-            'height':   tmp['height'],
-            'pathX':    tmp['pathX'],
-            'pathY':    tmp['pathY'],  
-        }   
-                        
-        if 'flopped' not in tmp.keys():      
-            pix.shadow['flopped'] = None
-        else:
-            pix.shadow['flopped'] = tmp['flopped']
-        if 'fileName' not in tmp.keys(): 
-            pix.shadow['fileName'] = 'shadow' 
-        if 'linked' not in tmp.keys(): 
-            pix.shadow['linked'] = False
-        else:
-            pix.shadow['linked'] = tmp['linked']
-                       
-        return pix
-            
 ### --------------------------------------------------------
-def lookForStrays(pix):  ## it can happen
-    if pix.x < -25 or pix.x > common['ViewW'] -10:
-        pix.setPos(float(random.randint(25, 100) * 2.5), pix.y)      
-    if pix.y < -25 or pix.y > common['ViewH']-10:
-        pix.setPos(pix.x, random.randint(25, 100) * 1.5) 
-    return pix
+    def lookForStrays(self, pix):  ## it can happen
+        if pix.x < -25 or pix.x > common['ViewW'] -10:
+            pix.setPos(float(random.randint(25, 100) * 2.5), pix.y)      
+        if pix.y < -25 or pix.y > common['ViewH']-10:
+            pix.setPos(pix.x, random.randint(25, 100) * 1.5) 
+        return pix
      
+### --------------------------------------------------------
+class LostFiles:
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+
+        self.canvas = parent
+        self.scene  = self.canvas.scene
+ 
+ ### --------------------------------------------------------
+    def writeMissingFiles(self, rows):
+        file = self.maketmp()
+        print('write', file, len(rows))
+        try:
+            with open(file, 'w') as fp:
+                json.dump(rows, fp)
+        except IOError:
+            MsgBox('writeMissingFiles: Error writing file', 5)
+            return
+ 
+    def returnMissingFiles(self):  ## if there's a tmp file
+        file = self.maketmp()
+        if os.path.exists(file): 
+            print('return', file) 
+            try:
+                with open(file, 'r') as fp: 
+                    rows = json.load(fp)   
+            except IOError:
+                MsgBox('returnMissingFiles: Error reading file', 5)
+                return None       
+            return rows  ## as a json file
+ 
+    def lookForDupes(self, rows, dlist):
+        for tmp in dlist:
+            for row in rows:
+                if tmp['fileName'] == row['fileName'] and tmp['z'] == row['z']:
+                    rows.remove(row)   
+                    break
+        if len(rows) == 0:
+            self.deletetmp()
+        else:
+            for row in rows:  ## still missing and not in dlist
+                dlist.append(row)
+        dlist = sorted(dlist, key=lambda x: x['fileName'], reverse=True) 
+        return dlist    
+ 
+    def deleteSelectedFiles(self, selected):  ## get started
+        file = self.maketmp() 
+        if rows := self.returnMissingFiles(file):
+            self.removeMissingFiles(file, selected, rows)                            
+
+    def removeMissingFiles(self, file, selected, rows):  ## delete selected files
+        print('remove', file) 
+        for s in selected:
+            for tmp in rows:
+                print('remove', tmp['fileName'], tmp['z'])
+                if s[0] == tmp['fileName'] and s[1] == tmp['z']:
+                    rows.remove(tmp)    
+        print('nrows', len(rows)) 
+        self.deletetmp()       
+        if len(rows) > 0:
+            self.writeMissingFiles(file, rows)
+    
+    def hastmp(self):
+        return os.path.exists(self.maketmp()) 
+ 
+    def maketmp(self):
+        file = os.path.basename(self.canvas.openPlayFile)
+        return paths['playPath'] + file[:file.index('.')] + '.tmp'
+         
+    def deletetmp(self):
+        if self.hastmp():  
+            file = self.maketmp()
+            print('deleting', file)
+            try:
+                os.remove(file)     
+            except IOError:
+                MsgBox('selMissingFiles: Error reading file', 5)
+                return  
+                    
 ### ---------------------- dotsShowWorks -------------------
+
+
 
 

@@ -65,7 +65,7 @@ class PathMaker(QWidget):
             'T': self.pathWorks.pathTest,   
             '!': self.pathWays.halfPath,
             '@': self.pathWays.fullPath,
-       'delPts': self.edits.deleteSections,
+       'delPts': self.pathWorks.deleteSelections,
         }
 
         self.noPathKeysSet = {
@@ -292,5 +292,7 @@ class PathMaker(QWidget):
             self.path = None
                                         
 ### -------------------- dotsPathMaker ---------------------
+
+
 
 

@@ -48,7 +48,7 @@ class KeysPanel(QWidget):
         self.tableView.setFixedSize(common['SliderW']-common['OffSet'], \
             common['SliderH']-common['fix'])        
         self.tableView.setAlternatingRowColors(True) 
-        self.tableView.setStyleSheet('border: 1px solid rgb(130,130,130)')
+        self.tableView.setStyleSheet('border: 1px solid rgb(180,180,180)')
          
         font = QFont()
         font.setFamily('Arial')
@@ -139,6 +139,7 @@ def storyBoard():
         ('F', 'Flop Selected'),
         ('G', 'Add/Hide Grid'),
         ('H', 'Hide/UnHide'),
+        ('J', 'JSON Viewer'),
         ('K', 'Toggle KeyList'),
         ('L', 'Load Play'),
         ('M', 'Map Selected'),
@@ -159,7 +160,9 @@ def storyBoard():
         ('Opt', 'Show this Tag'),
         ('Rtn', 'Enter to Front'),
         ('Shift', 'Clk to Flop'),   
+        ('Shift', '+B Dump Bkgs'),   
         ('Shift', '+H Hide Selected'), 
+        ('Shift', '+J Play Table'), 
         ('Shift', '+L ToggleLocks'),
         ('Shift', '+O Hide Outlines'),
         ('Shift', '+R Locks All'),
@@ -189,27 +192,27 @@ def pathMaker():
         ('S', 'Save Path'),
         ('T', 'Test'),
         ('U', 'UnSelect Points'),
-        ('V', '..View Points'),
+        ('V', 'View Points'),
+        ('cmd',   'Closes Path'),   
+        ('del',   'Delete a Point'),     
+        ('opt',   'Add a Point'),
         ('Shift', '+D Delete Pts'),
         ('Shift', '+W Way Pts'),
-        ('cmd', 'Closes Path'),
-        ('/', 'Path Color'),
+        ('>',   'Shift WayPts +5%'),
+        ('<',   'Shift WayPts -5%'),
+        ('</>', 'Toggle Size'), 
+        ('! ',  'Half Path Size'),
+        ('@ ',  'Redistribute Pts'),        
+        ('/',   'Path Color'),    
+        ('} ',  'Flop Path'),
+        ('{ ',  'Flip Path'),     
+        (':/\'', 'Scale X'),
+        (';/\'', 'Scale Y'),    
+        ('U/D',  'Arrow Keys'),
+        ('L/R',  'Arrow Keys'), 
         ('_/+',  'Rotate 1 deg'),  
         ('-/=',  'Rotate 15 deg'),
         ('[/]',  'Rotate 45 deg'),
-        ('</>',  'Toggle Size'),
-        ('} ',   'Flop Path'),
-        ('{ ',   'Flip Path'),  
-        (':/\'', 'Scale X'),
-        (';/\'', 'Scale Y'),
-        ('U/D',  'Arrow Keys'),
-        ('L/R',  'Arrow Keys'),   
-        ('opt',  'Add a Point'),
-        ('del',  'Delete a Point'),
-        ('>',    'Shift Pts +5%'),
-        ('<',    'Shift Pts -5%'),
-        ('! ',   'Half Path Size'),
-        ('@ ',   'Redistribute Pts'),
     )
     return menu
 

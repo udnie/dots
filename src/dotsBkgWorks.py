@@ -7,7 +7,7 @@ from PyQt6.QtCore       import Qt, QPoint, QTimer
 from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QGraphicsSimpleTextItem
                         
-from dotsShared         import common
+from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 
 ### --------------------- dotsBkgWorks --------------------- 
@@ -38,6 +38,7 @@ class BkgWorks:
         
 ### -------------------------------------------------------- 
     def addTracker(self, bkg):  ## when loading a play file and adding from screen
+        bkg.fileName = bkg.path + os.path.basename(bkg.fileName) 
         file = os.path.basename(bkg.fileName) 
         
         ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
@@ -62,10 +63,10 @@ class BkgWorks:
             else:
                 return False  ## must be a duplicate, skip processing 
             
-    def filePixX(self, file, bkg):
+    def filePixX(self, file, bkg):  ## also see dumpBkgs - shift 'B'
+        file = os.path.basename(bkg.fileName)
         print( f'tracker {file}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.factor}\t{bkg.zValue()}')
-        # print(f'stop  {os.path.basename(bkg.fileName)}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.factor}')
-              
+           
     def delTracker(self, bkg):
         file = os.path.basename(bkg.fileName)  
         for item in self.bkgMaker.trackers:  ## see if it's already there
@@ -271,22 +272,30 @@ class BkgWorks:
             'ShowTime: ' + '  ' + str(self.bkgItem.showtime)    + '    ' +\
             'Ratio: '    + '  ' + str(self.bkgItem.ratio)+ ':9')
   
-    def setWidthHeight(self, img):              
-        imf = img.scaledToHeight(self.bkgItem.ViewH, Qt.TransformationMode.SmoothTransformation)
+    def setWidthHeight(self, img):     
+        if img == None:
+            return   
+        imf = img.scaledToHeight(self.bkgItem.ViewH, Qt.TransformationMode.SmoothTransformation) 
         if imf.width() > self.bkgItem.ViewW:  ## its scrollable enough
             self.bkgItem.imgFile = imf
             self.bkgItem.scrollable = True               
         else:   
-            self.bkgItem.imgFile = img.scaled(  ## fill to width or height
-                self.bkgItem.ViewW, 
-                self.bkgItem.ViewH,
-                Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        del img
-        del imf
-        
+            try:
+                self.bkgItem.imgFile = img.scaled(  ## fill to width or height
+                    self.bkgItem.ViewW, 
+                    self.bkgItem.ViewH,
+                    Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            except:
+                del img
+                del imf
+                 
     def setVertical(self, img):  
+        if img == None:
+            return
+        
         imf = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
-        self.bkgItem.imgFile = imf       
+        self.bkgItem.imgFile = imf     
+          
         if imf.height() > self.bkgItem.ViewH:  ## its scrollable enough
             self.bkgItem.scrollable = True  
         del img 

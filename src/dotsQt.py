@@ -43,13 +43,14 @@ class DotsQt(QMainWindow):
         # print('\nPython Version:\t', platform.python_version())
         # print("Qt Version:\t", QT_VERSION_STR)
         # print('PyQt Version\t', PYQT_VERSION_STR, '\n')
+        
         self.init()
     
     def init(self):  
         dir = os.path.basename(os.path.dirname(os.getcwd()))
         self.setWindowTitle('DotsQt - ' + dir + "/" + os.path.basename(os.getcwd()) + \
             ' ~ ' + self.screen)  ## or getDate()
-                    
+            
         self.setStyleSheet(open('./dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
                                
@@ -60,7 +61,7 @@ class DotsQt(QMainWindow):
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        self.move(getX(), getY())  ## functions in screens 
+        self.move(getX(), getY()+50)  ## functions in screens 
    
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
@@ -96,9 +97,6 @@ if __name__ == '__main__':
     sys.exit(app.exec())    
       
 ### ------------------------- dotsQt -----------------------
-
-
-
 
 
 

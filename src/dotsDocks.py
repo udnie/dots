@@ -167,12 +167,12 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnStop)
     layout.addWidget(self.btnSave)
 
-    sideShow = self.sideShow
+    showbiz = self.showbiz
     showtime = self.showtime
 
-    btnLoad.clicked.connect(sideShow.loadPlay)
+    btnLoad.clicked.connect(showbiz.loadPlay)
     self.btnSave.clicked.connect(showtime.savePlay) 
-    self.btnRun.clicked.connect(lambda: sideShow.keysInPlay('R'))
+    self.btnRun.clicked.connect(lambda: showbiz.keysInPlay('R'))
     self.btnPause.clicked.connect(showtime.pause)
     self.btnStop.clicked.connect(showtime.stop)
 

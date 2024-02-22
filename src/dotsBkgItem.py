@@ -4,8 +4,8 @@ import os
 from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
-                        
-from dotsShared         import common
+                 
+from dotsShared         import common, paths
 from dotsSideGig        import MsgBox, point
 from dotsBkgWorks       import BkgWorks
 
@@ -28,7 +28,7 @@ screentime = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
 }
 
 moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
-    '1080':  (10.0,   18.88, 19.05),   ## 1215px actual size when scaled 1080X640 for 3:2
+    '1080':  (10.0,   19.05, 19.05),   ## 1215px actual size when scaled 1080X640 for 3:2
     '1215':  (10.0,   18.88, 18.89),   ## 1367px actual size when scaled 1080X640 for 3:2
     '1296':  (10.0,   18.88, 18.87),   ## 1458px actual size when scaled 1080X640 for 3:2
     '900':   (10.0,   21.4,   0.0),    ## 1013px actual size when scaled 640X1080 for 2:3
@@ -59,14 +59,18 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
         self.type = 'bkg'
         self.fileName = fileName  
-              
+           
         self.setZValue(z)      
         self.init()
-  
+                  
 ### --------------------------------------------------------   
     def init(self):    
+        self.path = paths['bkgPath']
+        self.imgFile  = None      
         self.scrollable = False
-        self.imgFile = None    
+          
+        if 'demo' in self.fileName: self.path = paths['demo']
+        self.fileName = self.path + os.path.basename(self.fileName) 
         
         try:   ## --- sets if scrollable --- ##
             if not self.dots.Vertical: 
@@ -151,16 +155,14 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def itemChange(self, change, value):
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
             if self.direction == '':
-                return      
-              
+                return            
             ## 'first' has already set its setScrollerPath                 
             elif self.addedScroller == False:  ## check if its showtime                      
                 if self.direction  == 'left'  and int(value.x()-self.runway) <= self.showtime or\
                     self.direction == 'right' and int(value.x()) >= -self.showtime or\
                     self.direction == 'vertical' and int(value.y())-self.runway <= self.showtime:  
                     self.addNextScroller() 
-                    self.addedScroller = True  
-                                                 
+                    self.addedScroller = True                                           
             elif self.addedScroller == True:  ## test if nolonger in view
                 if self.direction   == 'left'  and abs((value.x())) >= self.width or \
                     self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
@@ -171,7 +173,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
  
 ### --------------------------------------------------------                       
-    def addNextScroller(self):  ## add and scroll the next background           
+    def addNextScroller(self):  ## add and scroll the next background    
+        self.fileName = self.path + os.path.basename(self.fileName)      
         item = BkgItem(self.fileName, self.canvas, common['bkgZ']) 
                    
         if self.mirroring == False:  ## continuous
@@ -234,7 +237,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
   
 ### --------------------------------------------------------                  
     def setShowTime(self, which=''): 
-        ## snakes need more time - the rest vary to build and position and comes before vertical       
+        ## snakes need more time - the rest vary to build and position and comes before vertical 
         if 'snakes' in self.fileName and self.direction != 'vertical':
             show = showtime['snakes']   
         elif self.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge

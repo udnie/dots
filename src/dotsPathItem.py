@@ -115,8 +115,7 @@ class PathItem(QGraphicsEllipseItem):
         self.setRect(QRectF(p.x(), p.y(), V, V))  ## reset size
         self.removePointTag()     
               
-    def moveIt(self, x, y):
-        # self.setRect(x-V*.5, y-V*.5, V,V)  
+    def moveIt(self, x, y):  ## by mouse
         self.setRect(QRectF(x-V*.5, y-V*.5, V*1.5, V*1.5))              
         self.pathMaker.pts[self.idx] = QPointF(x,y) 
         self.pathMaker.addPath() 

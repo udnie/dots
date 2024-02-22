@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
                                 QColorDialog
 
 from dotsSideGig        import MsgBox
-from dotsShared         import common, paths, PlayKeys
+from dotsShared         import common, paths, ControlKeys
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
@@ -30,22 +30,23 @@ class BkgMaker(QWidget):
    
         self.widget  = None
         self.bkgItem = None 
-        self.matte   = None 
-
+        self.flat     = None
+    
         self.factor    = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False  
         self.trackers  = []  ## tracks backgrounds and holds state of direction, mirroring  
         
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats
-        if self.canvas.control in PlayKeys:
+        if self.canvas.control in ControlKeys:
             return
         Q = QFileDialog()
         Q.Option.DontUseNativeDialog
         file, _ = Q.getOpenFileName(self.canvas,
             'Choose an image file to open', paths['bkgPath'],
-            'Images Files(*.bmp *.jpg *.png *.bkg)')
+            'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG)')
         if file:  ## it's either a flat or an jpg/png
+            file = paths['bkgPath'] + os.path.basename(file) 
             self.openFlatFile(file) if file.endswith('.bkg') else self.addBkg(file)
         Q.accept()
           
@@ -78,20 +79,21 @@ class BkgMaker(QWidget):
             return
 
     def bkgColor(self):  ## from button or widget   
-        if self.canvas.control in PlayKeys:  ## running animation
+        if self.canvas.control in ControlKeys:  ## running animation
             return
         self.setBkgColor(QColorDialog.getColor())
 
     def setBkgColor(self, color, bkz=common['bkgZ']):  ## add a flat color to canvas
         if color.isValid():
-            self.bkgItem = Flat(color, self.canvas, bkz)    
-            self.scene.addItem(self.bkgItem)
-            self.updateZvals(self.bkgItem)
+            self.flat = Flat(color, self.canvas, bkz) 
+            self.scene.addItem(self.flat)
+            self.updateZvals(self.flat)
 
-    def saveFlat(self):  ## saves a color 'flat' file
-        if self.bkgItem != None and self.bkgItem.type == 'flat':
-            self.saveBkgColor()  
-            return  
+    def saveFlat(self):  ## saves a color 'flat' file - from bkg save button
+        if self.flat != None and self.flat.type == 'flat':
+            if self.flat.zValue() == self.mapper.toFront():  ## top most screen item   
+                self.saveBkgColor()  
+                return  
 
     def saveBkgColor(self):  ## write to .bkg file
         Q = QFileDialog()
@@ -108,10 +110,10 @@ class BkgMaker(QWidget):
         else:
             try:
                 with open(f[0], 'w') as fp:
-                    fp.write(self.bkgItem.color.name())
+                    fp.write(self.flat.color.name())
             except IOError:
                 MsgBox('saveBkgColor: Error saving file', 5)
-            self.bkgItem = None
+            self.flat = None
                                                                             
 ### -------------------------------------------------------- 
     def addWidget(self, item):  ## background widget
@@ -227,8 +229,11 @@ class BkgMaker(QWidget):
         self.lockBkg()  
         self.closeWidget() 
         
-    def back(self, bkg):    
-        bkg.setZValue(self.mapper.lastZval('bkg')-1)  
+    def back(self, bkg): 
+        if bkg.type == 'flat':
+            bkg.setZValue(self.mapper.lastZval('flat')-1)
+        else:
+            bkg.setZValue(self.mapper.lastZval('bkg')-1)  
         self.lockBkg()   
         self.closeWidget() 
         

@@ -105,6 +105,15 @@ class PathWorks:
         self.pathMaker.pathWays.editingPtsSet() 
          
 ### --------------------------------------------------------  
+    def deleteSelections(self):  ## selected with lasso
+        if self.pathMaker.selections: 
+            sel = sorted(self.pathMaker.selections, reverse=True)  
+            for i in sel:
+                self.pathMaker.pts.pop(i)  
+            del sel         
+            self.pathMaker.selections = []
+            self.pathMaker.edits.redrawPoints()
+
     def setPaintPath(self, bool=False):  ## used for animation and newPath
         path = QPainterPath()       
         for pt in self.pathMaker.pts:  ## pts on the screen 
@@ -174,14 +183,20 @@ class PathWorks:
         self.canvas.btnPathMaker.setStyleSheet(
             'background-color: rgb(55,240,140);\n'
             'border:  1px solid rgb(240,240,240); \n'
+            'border-style: outset; \n'
+            'border-width: 2px; \n'
+            'border-color: beige; \n'
             'font-size: 13px;\n'
-            'color:  white;')
+            'color:  white;')        
         self.canvas.showWorks.disablePlay()
          
     def turnBlue(self):
         self.canvas.btnPathMaker.setStyleSheet(
             'background-color: rgb(200,128,255);\n'
             'border:  1px solid rgb(240,240,240); \n'
+            'border-style: outset; \n'
+            'border-width: 2px; \n'
+            'border-color: beige; \n'
             'font-size: 13px;\n'
             'color:  white;')
                                        

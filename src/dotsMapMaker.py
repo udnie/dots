@@ -171,7 +171,11 @@ class MapMaker:
                     del pix
                     break
 
-### ------------------- tags and paths ---------------------      
+### ------------------- tags and paths ---------------------                        
+    def clearPathsandTags(self):
+        self.clearTagGroup()
+        self.clearPaths()  ## clears tags as well
+
     def addTagGroup(self):
         self.tagZ = self.toFront(45.0)   ## otherwise it can be hidden 
         self.tagGroup = QGraphicsItemGroup()
@@ -233,7 +237,7 @@ class MapMaker:
     def toFront(self, inc=0):  ## finds the highest pixitem zValue
         first = 0               ## returns it plus the increment
         for pix in self.scene.items():
-            if pix.type in ('pix', 'snake'): 
+            if pix.type in ('flat', 'pix', 'snake', 'frame', 'bat'): 
                 first = pix.zValue()
                 break
             elif pix.zValue() <= common['pathZ']:

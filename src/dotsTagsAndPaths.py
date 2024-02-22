@@ -3,7 +3,7 @@ from PyQt6.QtCore       import Qt, QAbstractAnimation, QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter, QBrush, QFontMetrics, QColor, QFont
 from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, QGraphicsSimpleTextItem
                             
-from dotsShared         import common, PlayKeys
+from dotsShared         import common, ControlKeys
 from dotsSideGig        import getColorStr
 from dotsSidePath       import pathLoader
 
@@ -26,7 +26,7 @@ class TagIt(QGraphicsSimpleTextItem):
             n = tag.find('path') + 5
             tag = tag[0:n]
             
-        elif token in PlayKeys and 'Random' in tag:
+        elif token in ControlKeys and 'Random' in tag:
             tag = tag[7:]
             self.color = QColor(0,255,127)
             
@@ -103,7 +103,7 @@ class TagsAndPaths:
         self.canvas = self.mapper.canvas
         self.dots   = self.canvas.dots
 
-### --------------------------------------------------------     
+### --------------------------------------------------------  
     def tagWorks(self, pid):
         k = 0
         topZVal = self.mapper.toFront()  ## only once
@@ -168,7 +168,7 @@ class TagsAndPaths:
         tag = TagIt(token, tag, color, z)
         tag.setZValue(self.mapper.toFront(45.0))
         if src == 'bkg':
-            tag.setPos(x-50.0, y-30.0)
+            tag.setPos(x-50.0, y-30.0)  ## position it near cursor
             self.scene.addItem(tag)
         else:
             tag.setPos(x,y)
@@ -176,7 +176,7 @@ class TagsAndPaths:
         self.mapper.tagSet = True
 
 ### -------------------- mostly paths ----------------------
-    def togglePaths(self):  ## use by sideShow
+    def togglePaths(self):  ## use by showbiz
         if self.canvas.pathMakerOn:
             return 
         if self.mapper.pathSet:

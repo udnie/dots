@@ -1,6 +1,5 @@
 
 import random
-import gc
 
 from functools          import partial
 
@@ -8,14 +7,14 @@ from PyQt6.QtCore       import QAbstractAnimation, QTimer, QEvent, QPointF, pyqt
 from PyQt6.QtGui        import QTransform
 from PyQt6.QtWidgets    import QWidget, QRubberBand, QGraphicsScene
                                         
-from dotsShared         import common, CanvasStr, PathStr, MoveKeys, PlayKeys
+from dotsShared         import common, CanvasStr, PathStr, MoveKeys, ControlKeys, PlayKeys
 from dotsAnimation      import *
 from dotsSideCar        import SideCar
 from dotsControlView    import ControlView
 from dotsPixItem        import PixItem
 from dotsMapMaker       import MapMaker
 from dotsBkgMaker       import *
-from dotsSideShow       import SideShow
+from dotsShowBiz        import ShowBiz
 from dotsShowTime       import ShowTime
 from dotsPathMaker      import PathMaker
 from dotsKeysPanel      import KeysPanel
@@ -24,8 +23,6 @@ from dotsDocks          import *
 from dotsAbstractBats   import Wings
 from dotsShowWorks      import ShowWorks
 from dotsMenus          import AnimationMenu
-
-Play = ('L','R','P','S','A')
 
 ### -------------------- dotsStoryBoard --------------------
 ''' class StoryBoard: program hub/canvas, includes context menu and 
@@ -62,9 +59,9 @@ class StoryBoard(QWidget):
      
         self.animation = Animation(self)    
                  
-        self.sideShow  = SideShow(self)  ## reads .play files    
-        self.showtime  = ShowTime(self)  ## runs anything tagged as an animation 
-        self.showWorks = ShowWorks(self) 
+        self.showbiz    = ShowBiz(self)  ## reads .play files    
+        self.showtime   = ShowTime(self)  ## runs anything tagged as an animation 
+        self.showWorks  = ShowWorks(self) 
          
         addScrollDock(self)  ## add button groups from dotsDocks
         addKeysDock(self)
@@ -101,11 +98,11 @@ class StoryBoard(QWidget):
                 
         elif not self.pathMakerOn:  ## canvas
             if self.key in CanvasStr or self.key == '':
-                if self.key in Play:  ## clear screen canvas hotkeys 
+                if self.key in PlayKeys:  ## clear screen canvas hotkeys 
                     if self.key == 'A' and len(self.scene.items()) > 0:
                         self.canvas.selectAll()
-                    else:  ## need to slow it down after changing screen format
-                        QTimer.singleShot(100, partial(self.sideShow.keysInPlay, self.key))  
+                    else:  ## need to slow it down after changing screen format - single key commands processed in showbiz
+                        QTimer.singleShot(100, partial(self.showbiz.keysInPlay, self.key))  
                 else:
                     self.sendPixKeys()      
                              
@@ -120,44 +117,37 @@ class StoryBoard(QWidget):
 
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e):  ## used by mapper for selecting
-        if not self.pathMakerOn:     
-             
+        if not self.pathMakerOn:           
             if e.type() == QEvent.Type.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()  ## chks if set
-                if self.key == 'cmd':        ## only used by eventFilter
+                ## also used in pathMaker but for editing
+                if self.key == 'cmd':  
                     self.mapper.clearMap()   ## set rubberband if mapset
-                    self.unSelect()      
+                    self.unSelect()              
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
-                    if self.control not in PlayKeys:
-                        self.mapper.updatePixItemPos()  
-                                          
-                ## show play files on right mouse click if no screen objects     
-                elif e.button() == Qt.MouseButton.RightButton:
-                    if len(self.scene.items()) == 0:
-                        self.sideShow.loadPlay()
-                        
-            elif e.type() == QEvent.Type.MouseMove:
+                    if self.control not in ControlKeys:
+                        self.mapper.updatePixItemPos()                   
+            ## the rubberband kicks in after you start to move the mouse then enter 'cmd', but not before
+            elif e.type() == QEvent.Type.MouseMove:  
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
                         self.mapper.removeMap()
                     self.rubberBand.show()
-                    self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())
+                    self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())          
                 elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
-                elif self.control not in PlayKeys:  ## no animations running
-                    self.mapper.updatePixItemPos()  ## costly but necessary 
-                    
+                elif self.control not in ControlKeys:  ## no animations running
+                    self.mapper.updatePixItemPos()  ## costly but necessary               
             elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
-                    self.mapper.addSelectionsFromCanvas() 
+                    self.mapper.addSelectionsFromCanvas()           
                 if self.key == 'cmd'and self.mapper.isMapSet():
-                    self.setKeys('')
+                    self.setKeys('')           
                 if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
-                self.mapper.updatePixItemPos()  
-                
+                self.mapper.updatePixItemPos()           
             elif e.type() == QEvent.Type.MouseButtonDblClick:
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 
@@ -172,7 +162,7 @@ class StoryBoard(QWidget):
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, fileName, x, y, clone, mirror):  
-        if 'wings' in fileName:  ## see AbstractBats for wings
+        if 'wings' in fileName:  ## see abstractBats for wings
             Wings(self, x, y, '')       
         else:
             self.pixCount += 1  
@@ -184,7 +174,7 @@ class StoryBoard(QWidget):
                     pix.alpha2)
                 return   
             elif 'frame' in pix.fileName: 
-                self.sideCar.addFrame(pix.fileName)  ## pin it on drag and drop
+                self.showWorks.addFrame(pix.fileName)  ## pin it on drag and drop
             else:
                 self.scene.addItem(pix)
         
@@ -215,30 +205,20 @@ class StoryBoard(QWidget):
                
     def clear(self):  ## do this before exiting app as well 
         if self.canvas.pathMakerOn:
-            self.pathMaker.pathMakerOff()
-                        
-        self.sideCar.clearWidgets() 
-        self.showtime.stop('clear')     
+            self.pathMaker.pathMakerOff()                   
+        self.sideCar.clearWidgets()    
+        self.showtime.stop('clear')   
+        self.showWorks.cleanupMenus(self.showbiz)     
         self.clearSceneItems() 
-        self.scene.clear()
-             
-        self.mapper.clearMap()      
-          
-        if self.sideShow.demoAvailable != None:  
-            self.sideShow.snakes.delSnakes()                     
-            self.sideShow.demoMenu.closeDemoMenu() 
-           
-        if self.sideShow.screenMenu != None:   
-            self.sideShow.screenMenu.closeScreenMenu()
-                 
+        self.scene.clear()          
+        self.mapper.clearMap()          
         self.btnAddBkg.setEnabled(True)                  
         self.dots.statusBar.clearMessage()
-        self.pixCount = 0  ## set it to match sideshow
+        self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.bkgMaker.trackers = []
-        # gc.collect()  ## testing exit problem again
-           
+         
     def loadSprites(self):
         self.showWorks.enablePlay()
         self.scroll.loadSprites()
@@ -283,7 +263,6 @@ class StoryBoard(QWidget):
                 del pix
                 k += 1
         if k > 0: self.showWorks.enablePlay()  ## stop it - otherwise it's hung
-        # gc.collect()   ## testing again with new recurring *NSmsg
     
     def flopSelected(self):    
         if not self.pathMakerOn:
@@ -298,7 +277,7 @@ class StoryBoard(QWidget):
                     break
                        
 ### --------------------------------------------------------
-    def contextMenuEvent(self, e):  ## needs to stay here 
+    def contextMenuEvent(self, e):  ## needs to stay here - pix popup menu for animations and paths
         if not self.scene.selectedItems():
             return
         menu = AnimationMenu(self)

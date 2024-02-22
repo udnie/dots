@@ -8,13 +8,13 @@ from PyQt6.QtWidgets import QGraphicsView
 from dotsSideGig     import MsgBox
 from dotsShared      import singleKeys
 from dotsSideCar     import SideCar
-from dotsMapMaker     import MapMaker
+from dotsMapMaker    import MapMaker
 
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
 ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
-                Qt.Key.Key_W,  Qt.Key.Key_O, Qt.Key.Key_B)
+            Qt.Key.Key_W,  Qt.Key.Key_O, Qt.Key.Key_B, Qt.Key.Key_J)
 UpDownKeys = (Qt.Key.Key_Down, Qt.Key.Key_Up)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
@@ -132,7 +132,7 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleOutlines()
             elif key == Qt.Key.Key_B:
                 self.sideCar.dumpBkgs()
-                    
+                        
         # keys used in locking screen items - L, R, U
         elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier: 
             self.sideCar.togglePixLocks(singleKeys[key]) 
@@ -142,12 +142,10 @@ class ControlView(QGraphicsView):
                      
             if mod & Qt.KeyboardModifier.AltModifier:  
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('-1') 
-                    
+                    self.sideCar.pageDown('-1')            
             elif mod & Qt.KeyboardModifier.ControlModifier:
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('up')  
-                    
+                    self.sideCar.pageDown('up')          
             else:                  
                 self.setKey(singleKeys[key])  ## broadcast to widgets - bkgWidget
                                                                                         
@@ -160,8 +158,7 @@ class ControlView(QGraphicsView):
                 self.canvas.flopSelected()  
             elif key == Qt.Key.Key_T:  ## just 'T'
                 self.setKey('T') if self.canvas.pathMakerOn else \
-                    self.mapper.toggleTagItems('all')
-         
+                    self.mapper.toggleTagItems('all')   
             elif key == Qt.Key.Key_W:
                 self.sideCar.clearWidgets()    
                 

@@ -198,6 +198,10 @@ def getDate():  ## these 3 used by DotsQt.py - piggie-backing on screens
     d = datetime.now()
     return d.strftime('%m-%d-%Y')
 
+def getCtr():  ## adjusted for app size and display
+    ctr = QGuiApplication.primaryScreen().availableGeometry().center()
+    return ctr
+
 def getX():  ## adjusted for app size and display
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()
     return int(((ctr.x() * 2 ) - common['DotsW'])/2)

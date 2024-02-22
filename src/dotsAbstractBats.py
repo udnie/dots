@@ -34,15 +34,15 @@ class Wings:
 ### --------------------------------------------------------    
     ''' Wings no longer come off, only the bat can move, wings still flap '''   
 ### --------------------------------------------------------
-    def __init__(self, parent, x, y, tag):
+    def __init__(self, parent, x, y, tag): 
         super().__init__()
  
         self.canvas = parent    
         self.scene  = self.canvas.scene
-     
-        self.pivot     = self.pivot(paths['imagePath'] + 'bat-pivot.png',x, y, tag)
+       
+        self.pivot     = self.pivot(paths['imagePath'] + 'bat-pivot.png', x, y, tag)
         self.rightWing = self.right(paths['imagePath'] + 'bat-wings.png', x, y)
-        self.leftWing  = self.left(paths['imagePath'] + 'bat-wings.png', x, y)
+        self.leftWing  = self.left(paths['imagePath']  + 'bat-wings.png', x, y)
                                              
         self.half   = self.pivot.width/2 
         self.height = self.pivot.height/5    
@@ -69,7 +69,7 @@ class Wings:
         self.scene.addItem(self.pivot)
                    
 ### --------------------------------------------------------
-    def pivot(self, file, x, y, tag):  ## was wings
+    def pivot(self, file, x, y, tag):  ## tag may be empty - used for setting path or animation
         self.canvas.pixCount += 1         
         pivot = PixItem(file, 
             self.canvas.pixCount,
@@ -78,8 +78,8 @@ class Wings:
         ) 
         pivot.part = 'pivot' 
         pivot.tag  = tag  ## path to follow - random select
-      
-        pivot.setZValue(pivot.zValue() + 200)
+  
+        pivot.setZValue(self.canvas.mapper.toFront(-1))
         pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True)  
         pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
                     
@@ -107,7 +107,7 @@ class Wings:
     def setWing(self, pix, wing):   
         pix.part = wing  ## part could be other than a wing   
         pix.tag  = 'Flapper'  ## applies this animation when run
-        pix.setZValue(pix.zValue() + 200)  ## reset wing zvals
+        pix.setZValue(pix.zValue())  ## reset wing zvals
         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIgnoresParentOpacity, True)  ## won't disappear

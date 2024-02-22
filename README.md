@@ -1,8 +1,7 @@
 ## DotsQt  
-**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations with scrolling backgrounds and create sprites.  **SpriteMaker** is now stand-alone and is easily converted to run in **PySide6** - see **SpiteMaker.md**.
+**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations with scrolling backgrounds and create sprites. 
 
-As of **December 2023** dots has been updated to **PyQt 6.6**, **Python 3.12** and **Sonoma 14.1.2** on a M1 MacBook running in X86 mode, Rosetta. You will need to install **numpy** and **open-cv** as well if using **SpriteMaker** or **ShadowMaker**.  Dots doesn't currently run in **PySide6** and
-**PyQt 5.17** now has issues with QMessageBox on my current setup.
+As of **February** dots has been updated to **PyQt 6.6**, **Python 3.12** and **Sonoma 14.2.1** on a M1 MacBook running in X86 mode, **Rosetta**. You will need to install **numpy** and **open-cv** as well if planning to use **SpriteMaker**, **ShadowMaker** or **Shadows**.
 
 **StartHere.md** has been updated as well as **Changes.md** and **keys.pdf** .  See **Changes** for the latest documentation and links to videos - the earlier ones best watched with closed captions as I was very intimated by having to speak into a very visible microphone.
 	  
