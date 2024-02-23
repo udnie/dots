@@ -72,9 +72,10 @@ class ShowBiz:
                     else:
                         self.showtime.savePlay()
                 elif key == 'J':  ## view the layout of the currently opened play file 
-                    dlist = self.openPlay(self.canvas.openPlayFile)  
-                    if len(dlist) > 0:  
-                        self.makeTableView(dlist, 'view')    
+                    if self.canvas.control == '':
+                        dlist = self.openPlay(self.canvas.openPlayFile)  
+                        if len(dlist) > 0:  
+                            self.makeTableView(dlist, 'view')    
             ## single key command - no sceneItems
             elif self.canvas.control == '' and key in PlayKeys: 
                 self.RSA(key)
