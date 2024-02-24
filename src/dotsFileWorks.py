@@ -65,7 +65,7 @@ class FileWorks:
         pix.alpha2 = tmp['alpha2']
         pix.locked = tmp['locked']  
                                                                 
-        if 'scalor' in tmp.keys():   
+        if pix.type == 'pix' and pix.shadowMaker.isActive == True and 'scalor' in tmp.keys(): 
             pix = self.setShadow(pix, tmp)        
         elif pix.type == 'bkg':  ## adding the rest of it
             pix = self.setBackGround(pix, tmp, z)  ## checking if a dupe

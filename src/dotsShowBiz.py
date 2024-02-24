@@ -162,13 +162,12 @@ class ShowBiz:
         self.mapper.clearMap() 
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.trackers = []  
-               
+        self.canvas.bkgMaker.trackers = []            
         ## number of pixitems, bkg zval, number of shadows, scrollers         
         kix, bkgz, ns = 0, 0, 0
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
-        lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top for all but bkgs and flats 
-                                       
+        lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top for all but bkgs and flats                                 
+      
         for tmp in dlist:                                 
             if self.fileWorks.fileNotFound(tmp):  ## the reason missing files don't get saved
                 continue                
@@ -185,7 +184,7 @@ class ShowBiz:
                 self.fileWorks.addPixToScene(pix, tmp, lnn)  ## finish unpacking tmp 
                 lnn -= 1            
                 ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
-                if 'scalor' in tmp.keys() and pix.shadowMaker.isActive == True:
+                if pix.shadowMaker.isActive == True and 'scalor' in tmp.keys(): 
                     ns += 1                        
             
             elif 'bat' in tmp['fileName']:  ## make a bat - not from demoMenu, adds self to scene
@@ -200,7 +199,7 @@ class ShowBiz:
                 ## a flat does not rely on a bkg.file once it's saved to a play.file
                 if tmp['type'] == 'flat' and QColor().isValidColor(tmp['color']):
                     pix = Flat(tmp['color'], self.canvas, bkgz)  
-                         
+                              
                 elif tmp['type'] == 'bkg':    
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
                     
@@ -216,7 +215,7 @@ class ShowBiz:
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
         file = os.path.basename(self.canvas.openPlayFile) 
-        if 'play' in file:
+        if 'play' in file:  ## could be something else
             if ns == 0 and self.locks == 0:
                 self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(kix))       
             elif ns > 0:  ## there must be shadows
