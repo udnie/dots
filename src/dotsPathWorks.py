@@ -106,7 +106,7 @@ class PathWorks:
          
 ### --------------------------------------------------------  
     def deleteSelections(self):  ## selected with lasso
-        if self.pathMaker.selections: 
+        if len(self.pathMaker.selections) > 0: 
             sel = sorted(self.pathMaker.selections, reverse=True)  
             for i in sel:
                 self.pathMaker.pts.pop(i)  
@@ -125,8 +125,8 @@ class PathWorks:
                          
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
-        if self.pathMaker.pts and self.pathMaker.pathSet:
-            if not self.pathMaker.pathTestSet:
+        if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet == True:
+            if self.pathMaker.pathTestSet == False:
                 self.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + \
                     'ball.png'))
                 node = Node(self.ball)
@@ -184,7 +184,7 @@ class PathWorks:
             'background-color: rgb(55,240,140);\n'
             'border:  1px solid rgb(240,240,240); \n'
             'border-style: outset; \n'
-            'border-width: 2px; \n'
+            'border-width: 1px; \n'
             'border-color: beige; \n'
             'font-size: 13px;\n'
             'color:  white;')        
@@ -195,7 +195,7 @@ class PathWorks:
             'background-color: rgb(200,128,255);\n'
             'border:  1px solid rgb(240,240,240); \n'
             'border-style: outset; \n'
-            'border-width: 2px; \n'
+            'border-width: 1px; \n'
             'border-color: beige; \n'
             'font-size: 13px;\n'
             'color:  white;')

@@ -6,11 +6,11 @@ from PyQt6.QtGui        import QColor
 
 from dotsShared         import paths
 
-### --------------------- dotsFileWorks --------------------
+### --------------------- dotsShowFiles --------------------
 ''' functions fileNotFound, functions used by showbiz to create screen 
     items and functions used by showtime to save screen items '''          
 ### --------------------------------------------------------
-class FileWorks:
+class ShowFiles:
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -19,7 +19,7 @@ class FileWorks:
         self.scene  = self.canvas.scene
 
 ### -------------------------------------------------------- 
-    def fileNotFound(self, tmp):  ## look in the paths set by types
+    def fileNotFound(self, tmp):  ## look in the paths set by types - used by dictionaries
         if 'fname' in list(tmp.keys()):  ## just to make sure
             tmp['fileName'] = tmp['fname']                    
         if tmp['type'] == 'bkg' and tmp['fileName'] == 'flat':  ## no file, only stores the color
@@ -271,7 +271,7 @@ def saveFlat(pix):
     }  
     return tmp
    
-### --------------------- dotsFileWorks --------------------   
+### --------------------- dotsShowFiles --------------------   
     
     
     

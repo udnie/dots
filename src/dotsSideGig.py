@@ -89,8 +89,8 @@ def getPathList(bool=False):  ## used by DoodleMaker & context menu
     return filenames
 
 def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
-    try:
-        tmp = []
+    tmp = []
+    try:  
         with open(file, 'r') as fp: 
             for line in fp:
                 ln = line.rstrip()  
@@ -129,7 +129,7 @@ def distance(x1, x2, y1, y2):
     return math.sqrt((dx * dx ) + (dy * dy)) 
 
 def point(pt, st=""):  ## you never know when you'll need this
-    if isinstance(pt, QPointF):
+    if isinstance(pt, QPointF):  ## formats point(f) as fstr
         pt = pt.toPoint()   
     if st == '':
         return f'{pt.x(), pt.y()}'
@@ -138,7 +138,7 @@ def point(pt, st=""):  ## you never know when you'll need this
         return f'{st}{a}{pt.x(), pt.y()}'
     
 def rect(pt, st=''):  ## ditto
-    if isinstance(pt, QRectF):
+    if isinstance(pt, QRectF):  ## formats rect(f) as fstr
         pt = pt.toRect()  
     if st == '':
         return f'{pt.x(), pt.y(), pt.width(), pt.height()}'

@@ -72,7 +72,7 @@ class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's he
         e.accept()
            
     def mousePressEvent(self, e):     
-        if not self.canvas.pathMakerOn:        
+        if self.canvas.pathMakerOn == False:      
             if self.key == 'del':     
                 self.canvas.showWorks.deleteFrame(self)  
             elif self.key in ('enter','return'):  
@@ -85,7 +85,7 @@ class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's he
             e.accept()
       
     def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
+        if self.canvas.pathMakerOn == False:
             self.key = '' 
             e.accept()
                                                                                  

@@ -15,7 +15,7 @@ from dotsBkgMaker       import *
 from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
-from dotsFileWorks      import FileWorks   
+from dotsShowFiles      import ShowFiles   
 from dotsPixFrameWorks  import Frame
 from dotsTableMaker     import TableView
 
@@ -50,7 +50,7 @@ class ShowBiz:
  
         self.showtime   = ShowTime(self.canvas)
         self.screenMenu = ScreenMenu(self.canvas)  ## in screens
-        self.fileWorks   = FileWorks(self.canvas) 
+        self.showFiles  = ShowFiles(self.canvas) 
         
         self.locks = 0
         self.tableView = None 
@@ -112,7 +112,7 @@ class ShowBiz:
             self.showtime.run()
       
     def runThis(self, file):  ## doesn't ask - called by demo menu - runs abstracts
-        if not self.scene.items():
+        if len(self.scene.items()) == 0:
             self.openPlay(paths['playPath'] + file)  ## also adds pix to scene
             self.canvas.openPlayFile = file  ## give it time to load 
             QTimer.singleShot(200, self.showtime.run)
@@ -162,26 +162,26 @@ class ShowBiz:
         self.mapper.clearMap() 
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.trackers = []            
-        ## number of pixitems, bkg zval, number of shadows, scrollers         
+        self.canvas.bkgMaker.trackers.clear()          
+        ## number of pixitems, backgrounds zval, number of shadows        
         kix, bkgz, ns = 0, 0, 0
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
-        lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top for all but bkgs and flats                                 
+        lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top  for sprites and frames                               
       
         for tmp in dlist:                                 
-            if self.fileWorks.fileNotFound(tmp):  ## the reason missing files don't get saved
+            if self.showFiles.fileNotFound(tmp):  ## the reason missing files don't get saved - works with dictionaries
                 continue                
      
             if tmp['type'] == 'frame' or 'frame' in tmp['fileName']:        
                 frame = Frame(paths['spritePath'] + tmp['fileName'], self.canvas, lnn)
-                self.fileWorks.addPixToScene(frame, tmp, lnn)  ## finish unpacking tmp                 
+                self.showFiles.addPixToScene(frame, tmp, lnn)  ## finish unpacking tmp                 
                 lnn -= 1 
   
             elif tmp['type'] == 'pix' and 'bat' not in tmp['fileName']:
                 kix += 1  ## counts pixitems               
                 pix = PixItem( paths['spritePath'] + tmp['fileName'], self.canvas.pixCount, \
                     0, 0, self.canvas) 
-                self.fileWorks.addPixToScene(pix, tmp, lnn)  ## finish unpacking tmp 
+                self.showFiles.addPixToScene(pix, tmp, lnn)  ## finish unpacking tmp 
                 lnn -= 1            
                 ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
                 if pix.shadowMaker.isActive == True and 'scalor' in tmp.keys(): 
@@ -204,11 +204,11 @@ class ShowBiz:
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
                     
                 pix.bkgMaker.lockBkg(pix)                                         
-                self.fileWorks.addPixToScene(pix, tmp, bkgz)  ## finish unpacking tmp         
+                self.showFiles.addPixToScene(pix, tmp, bkgz)  ## finish unpacking tmp         
                 bkgz -= 1           
-            del tmp     
-               
-        ## end for loop                    
+            del tmp              
+        ## end for loop   
+                         
         del dlist
         self.cleanup(ns, kix)
   

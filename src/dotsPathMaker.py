@@ -124,7 +124,7 @@ class PathMaker(QWidget):
                     
         elif self.key == 'E' and self.pathWays.tagCount() > 0:
             self.pathWays.removeWayPtTags()
-            if self.selections:
+            if len(self.selections) > 0:
                 self.editingPts = True
                 self.edits.updatePath()
                 self.pathWorks.turnBlue()
@@ -141,7 +141,7 @@ class PathMaker(QWidget):
 
         elif self.key in self.noPathKeysSet:  
             self.noPathKeysSet[self.key]()  
-            if self.selections:
+            if len(self.selections) > 0:
                 self.edits.updatePath()
 
         elif self.pathWays.tagCount() == 0 and self.addingNewPath == False:
@@ -149,7 +149,7 @@ class PathMaker(QWidget):
                 self.direct[self.key]() 
 
             elif len(self.pts) > 0:  ## works with edit - no points selected
-                if self.key in MoveKeys and self.selections == []:
+                if self.key in MoveKeys and len(self.selections) == 0:
                     self.pathWays.movePath(MoveKeys[self.key])
                 elif self.key in ScaleRotateKeys:
                     self.pathWorks.scaleRotate(self.key)
@@ -184,7 +184,7 @@ class PathMaker(QWidget):
 
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
-        if len(self.scene.items()) > 0 and not self.canvas.pathMakerOn:
+        if len(self.scene.items()) > 0 and self.canvas.pathMakerOn == False:
             MsgBox('Clear Scene First to run PathMaker', 5)
             return
         if self.canvas.pathMakerOn:
@@ -266,7 +266,7 @@ class PathMaker(QWidget):
         if self.chooser: self.chooser.close()
         self.chooser = None
         self.pathChooserSet = False 
-        if self.openPathFile:  ## statusBar
+        if len(self.openPathFile) > 0:  ## statusBar
             self.dots.statusBar.showMessage(self.openPathFile + \
                 ' - Number of Points ' + str(len(self.pts)))
             if self.pathWorks.widget != None:
@@ -284,7 +284,7 @@ class PathMaker(QWidget):
         self.pathSet = True
     
     def removePath(self):       
-        if self.pathSet:
+        if self.pathSet == True:
             self.pathWays.removeWayPtTags()
             if self.path != None:
                 self.scene.removeItem(self.path)

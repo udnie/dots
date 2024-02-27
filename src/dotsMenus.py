@@ -36,22 +36,26 @@ class AnimationMenu:
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
     
-        self.menu      = None 
+        self.menu = None 
 
 ### --------------------------------------------------------
-    def animeMenu(self, pos, where=''): ## shared with canvas thru context menu
-        self.closeMenu()                ## and with pixitem thru pixwidget
-         
+    ## shared with canvas thru context menu and with pixitem thru pixwidget
+    def animeMenu(self, pos, where=''): 
+        self.closeMenu()               
+       
+        for pix in self.scene.items():  ## too confusing
+            if pix.type == 'widget':
+                return
+                    
         self.menu = QMenu(self.canvas)                   
         alst = sorted(AnimeList)
         
         ## basing pathlist on what's in the directory
         self.canvas.pathList = getPathList(True)  ## names only
-        if self.canvas.pathList == []:
+        if len(self.canvas.pathList) == 0:
             MsgBox('getPathList: No Paths Found!', 5)
             return 
-  
-        rlst = sorted(self.canvas.pathList)     
+    
         alst.extend(['Random']) ## add random to lst
         
         self.menu.addAction('Animations and Paths')
@@ -79,7 +83,7 @@ class AnimationMenu:
             self.menu.move(pos) 
             self.menu.show()
         else:
-            self.menu.exec(pos)
+            self.menu.exec(pos)  ## last cursor
          
     def closeMenu(self):   
         if self.menu:
@@ -167,7 +171,7 @@ class DemoMenu:
         elif key == 'blue':
             self.runSnakes('blue') 
         elif key == 'snakes':
-            self.canvas.bkgMaker.trackers = []
+            self.canvas.bkgMaker.trackers.clear()
             if self.dots.Vertical:   
                 self.runSnakes('vertical') 
             else:
@@ -176,7 +180,7 @@ class DemoMenu:
             if self.dots.Vertical:     
                 MsgBox('Not Implemented for Vertical Format')
                 return            
-            self.canvas.bkgMaker.trackers = []
+            self.canvas.bkgMaker.trackers.clear()
             if key == 'left':  ## direction of travel
                 self.abstract.makeAbstracts('left')  ## right to left 
             else: 

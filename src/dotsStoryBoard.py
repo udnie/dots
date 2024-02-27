@@ -217,7 +217,7 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.bkgMaker.trackers = []
+        self.bkgMaker.trackers.clear()
          
     def loadSprites(self):
         self.showWorks.enablePlay()
@@ -265,7 +265,7 @@ class StoryBoard(QWidget):
         if k > 0: self.showWorks.enablePlay()  ## stop it - otherwise it's hung
     
     def flopSelected(self):    
-        if not self.pathMakerOn:
+        if self.pathMakerOn == False:
             for pix in self.scene.items():
                 if pix.type == 'pix':
                     if pix.isSelected() or pix.isHidden:
@@ -278,10 +278,9 @@ class StoryBoard(QWidget):
                        
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):  ## needs to stay here - pix popup menu for animations and paths
-        if not self.scene.selectedItems():
-            return
-        menu = AnimationMenu(self)
-        menu.animeMenu(e.globalPos())
+        if len(self.scene.selectedItems()) > 0:
+            menu = AnimationMenu(self)
+            menu.animeMenu(e.globalPos())
         
 ### -------------------- dotsStoryBoard --------------------
 

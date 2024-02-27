@@ -19,8 +19,10 @@ class PathEdits(QWidget):
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
 
-        self.lasso = None           
+        self.lasso = []           
         self.dragCnt = 0   
+        
+        self.movingPathItem = False
     
         self.view.viewport().installEventFilter(self)
              
@@ -28,13 +30,15 @@ class PathEdits(QWidget):
     def eventFilter(self, source, e):  ## used by lasso    
         if self.canvas.pathMakerOn:
     
-            if self.pathMaker.editingPts and self.lasso != None:
+            if self.pathMaker.editingPts == True:  
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.addLassoPts(e.pos()) 
              
                 elif e.type() == QEvent.Type.MouseMove and \
-                    e.buttons() == Qt.MouseButton.LeftButton:
+                    e.buttons() == Qt.MouseButton.LeftButton and \
+                        self.movingPathItem == False:
+                        
                     self.dragCnt += 1
                     if self.dragCnt % 5 == 0:        
                         self.addLassoPts(e.pos()) 
@@ -60,7 +64,7 @@ class PathEdits(QWidget):
         self.pathMaker.addingNewPath = True
         self.pathMaker.newPath = None
         self.pathMaker.npts = 0
-        self.pathMaker.pts = []
+        self.pathMaker.pts.clear()
         self.editBtn('ClosePath')
         self.pathMaker.pathWorks.closeWidget()
  
@@ -86,20 +90,19 @@ class PathEdits(QWidget):
         if self.pathMaker.addingNewPath:
             self.removeNewPath()
             self.pathMaker.pathWorks.turnGreen()
-            self.pathMaker.pts = []
+            self.pathMaker.pts.clear()
             self.pathMaker.pathSet = False
                       
 ### ------------------------ lasso ------------------------- 
     def toggleLasso(self):
-        if self.lasso == None:
+        if len(self.lasso) == 0:
             self.newLasso()   
-        elif self.lasso != None:
+        else:
             self.deleteLasso()   
         
     def newLasso(self): 
-        self.lasso = []  
-        if self.pathMaker.widget != None:
-            self.pathMaker.pathWorks.closeWidget()
+        self.lasso.clear()
+        self.pathMaker.pathWorks.closeWidget()
         QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
                 
     def addLassoPts(self, p):
@@ -122,7 +125,7 @@ class PathEdits(QWidget):
     
     def deleteLasso(self):  
         self.pathMaker.pathWorks.removePoly()
-        self.lasso = None
+        self.lasso.clear()
         QGuiApplication.restoreOverrideCursor()
                 
     def finalizeSelections(self, pt): 
@@ -146,7 +149,7 @@ class PathEdits(QWidget):
                                  
 ### -------------------- pointItems ------------------------    
     def togglePathItems(self):  ## the letter 'V'
-        if self.lasso != None:
+        if len(self.lasso) > 0: 
             self.deleteLasso()
         if self.pointItemsSet():
             self.removePathItems()
@@ -158,7 +161,7 @@ class PathEdits(QWidget):
             return
         if self.pathMaker.editingPts == False:
             self.pathMaker.editingPts = True
-            self.pathMaker.selections = []  
+            self.pathMaker.selections.clear() 
             self.addPathItems()
             self.pathMaker.pathWorks.turnBlue()
         else:
@@ -166,7 +169,7 @@ class PathEdits(QWidget):
 
     def editPointsOff(self):
         self.pathMaker.editingPts = False
-        self.pathMaker.selections = []
+        self.pathMaker.selections.clear()
         self.removePathItems()
         self.pathMaker.pathWorks.turnGreen()
       

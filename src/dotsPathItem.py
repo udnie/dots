@@ -39,7 +39,7 @@ class PathItem(QGraphicsEllipseItem):
         self.y = pt.y()-V*.5
         self.setRect(self.x, self.y, V, V)  
         
-        if self.selections and idx in self.selections:
+        if len(self.selections) > 0 and idx in self.selections:
             self.setBrush(QColor('lime'))
         else:
             self.setBrush(QColor('white'))   
@@ -85,6 +85,7 @@ class PathItem(QGraphicsEllipseItem):
         e.accept() 
         
     def mouseMoveEvent(self, e):
+        self.edits.movingPathItem = True
         if self.pointTag: self.removePointTag()
         if self.pathMaker.pathWays.tagCount() == 0:
             if self.pathMaker.editingPts == True:
@@ -108,6 +109,7 @@ class PathItem(QGraphicsEllipseItem):
             if self.dragCnt > 0:
                 self.pathMaker.pts[self.idx] = self.mapToScene(e.pos())                
                 self.edits.updatePath()  ## rewrites pointItems as well
+            self.edits.movingPathItem = False
         e.accept()
               
     def cleanUp(self):

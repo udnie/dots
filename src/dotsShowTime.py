@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
 
 from dotsSideGig        import *
 from dotsSideCar        import SideCar
-from dotsFileWorks      import savePix, saveBkgnd, saveFrame, saveFlat
+from dotsShowFiles      import savePix, saveBkgnd, saveFrame, saveFlat
 from dotsShowWorks      import ShowWorks
 from dotsShared         import Types, ControlKeys
 
@@ -46,7 +46,7 @@ class ShowTime:
                        
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = getPathList(True) 
-            if self.canvas.pathList == []:
+            if len(self.canvas.pathList) == 0:
                 MsgBox('getPathList: No Paths Found!', 5)
                 return 
                  
@@ -172,17 +172,17 @@ class ShowTime:
                          
 ### --------------------------------------------------------
     def savePlay(self):   
-        if self.canvas.control in ControlKeys:  ## there's an animation - needs to be stopped first
+        if self.canvas.control in ControlKeys:  ## there's an animation running - needs to be stopped first
             return 
-        if self.canvas.openPlayFile in Demos:
+        elif self.canvas.openPlayFile in Demos:
             self.showWorks.enablePlay()
             demo = self.canvas.openPlayFile 
             MsgBox("Can't Save " + demo + " as a Play File", 5)  ## seconds
             return                 
-        if self.canvas.pathMakerOn:  ## using load in pathMaker
+        elif self.canvas.pathMakerOn == True:  ## using load in pathMaker
             self.pathMaker.pathWays.savePath()
             return                   
-        if len(self.scene.items()) == 0:
+        elif len(self.scene.items()) == 0:
             MsgBox("Nothing on Screen to Save", 5)
             return     
         self.reallySaveIt()

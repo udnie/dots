@@ -4,8 +4,7 @@ import numpy as np
 import os.path
 
 from PyQt6.QtCore       import Qt, QPointF, QRectF
-from PyQt6.QtGui        import QColor, QPen
-from PyQt6.QtWidgets    import QGraphicsPixmapItem, QGraphicsEllipseItem
+from PyQt6.QtWidgets    import QGraphicsPixmapItem
                                
 from dotsShared         import common, paths
 from dotsSideGig        import point

@@ -127,8 +127,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, bool)  
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, bool)
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False) 
-            
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)         
         if self.locked:
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
      
@@ -141,7 +140,7 @@ class PixItem(QGraphicsPixmapItem):
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
             
     def mousePressEvent(self, e):    
-        if self.canvas.control not in ControlKeys:  
+        if self.canvas.control not in ControlKeys:  ## ('resume', 'pause') - animation running
             ## right mouse clk triggers Animation menu on selected screen items 
             if e.button() == Qt.MouseButton.RightButton:
                 ## if 'pivot' in self.fileName or 'frame' in self.fileName or \                
@@ -152,10 +151,10 @@ class PixItem(QGraphicsPixmapItem):
                 self.works.rotateThis(self.key)
             elif self.key == 'del':  # delete
                 self.deletePix()     
-            elif self.key == 'shift':  # flop if selected or hidden        
+            elif self.key == 'shift':  ## flop if selected or hidden        
                 self.setMirrored(False) if self.flopped else self.setMirrored(True)                                      
             elif self.key in TagKeys: 
-                if self.key == '/':        # send to back of pixItems
+                if self.key == '/':  ## send to back of pixItems
                     p = self.mapper.lastZval('pix')-1
                 elif self.key in('enter','return'): # send to front
                     p = self.mapper.toFront(1)
@@ -174,7 +173,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName or self.locked:
             return
-        elif self.canvas.control not in ControlKeys:
+        if self.canvas.control not in ControlKeys:
             if self.key in TagKeys or self.mapper.tagSet:
                 self.works.clearTag() 
             self.works.updateXY(self.mapToScene(e.pos()))
@@ -188,8 +187,6 @@ class PixItem(QGraphicsPixmapItem):
         if self.key in TagKeys or self.mapper.tagSet:
             self.works.clearTag()
         self.dragCnt = 0   
-        self.canvas.key = ""
-        self.key = ''
         self.works.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)  
         e.accept()
@@ -197,7 +194,7 @@ class PixItem(QGraphicsPixmapItem):
     def mouseDoubleClickEvent(self, e):
         if 'frame' in self.fileName or self.key in TagKeys:
             return 
-        elif self.canvas.control not in ControlKeys:
+        if self.canvas.control not in ControlKeys:  ##  (',', '.', '/', 'enter', 'return')
             if self.key == 'opt':  
                 self.works.cloneThis()
             elif self.canvas.key == 'noMap': 
@@ -226,7 +223,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.works.closeWidget()
                 MsgBox("No Shadows for BatWings", 4)
                 return 
-            elif self.shadowMaker.shadow == None:
+            if self.shadowMaker.shadow == None:
                 self.shadowMaker.works.cleanUpShadow()
                 self.shadowMaker.init()  ## this holds much of the shadows state              
                 self.shadowMaker.addShadow(self.x, self.y, common["ViewW"],common["ViewH"])

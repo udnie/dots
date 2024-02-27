@@ -25,10 +25,10 @@ class ShadowMaker:
         self.canvas  = self.pixitem.canvas
         self.scene   = self.pixitem.scene
         
-        self.init()
-      
+        self.init()    
         self.works = Works(self)  ## small functions and pointItem
 
+### --------------------------------------------------------
     def init(self):
         self.topLeft  = None
         self.topRight = None
@@ -63,8 +63,7 @@ class ShadowMaker:
 ### --------------------------------------------------------
     def addShadow(self, w, h, viewW, viewH):  ## initial shadow       
         if self.shadow != None:
-            return 
-                 
+            return        
         file, w, h = self.works.pixWidthHeight()          
         file = paths['spritePath'] + os.path.basename(file) 
                                  
@@ -110,7 +109,7 @@ class ShadowMaker:
         file = paths['spritePath'] + os.path.basename(file) 
       
         flop = self.pixitem.flopped 
-                    
+                         
         try:  ## without the await it takes longer 
             await self.addShadow(w, h, self.viewW, self.viewH) 
             self.cpy, _, _, _ = await initShadow(file, w, h, flop)
@@ -128,7 +127,7 @@ class ShadowMaker:
         self.type = 'shadow'
         self.fileName = 'shadow'
         self.restore = True
-                               
+                                            
         self.addPoints() 
         self.updateShadow()
         
@@ -148,15 +147,13 @@ class ShadowMaker:
             self.imgSize[0], 
             self.imgSize[1],
             cpy, 
-            self.viewW, self.viewH)
-         
+            self.viewW, self.viewH)   
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32) 
         
         x, y, w, h = getCrop(self.path)        
         img = img.copy(x, y, w, h) 
                          
-        pixmap = QPixmap.fromImage(img) 
-            
+        pixmap = QPixmap.fromImage(img)          
         self.works.removeShadow()
           
         self.shadow = Shadow(self)      
@@ -175,9 +172,9 @@ class ShadowMaker:
             self.shadow.setX(x)  
             self.shadow.setY(y) 
            
-        self.shadow.setOpacity(self.alpha)  
-        
-        self.scene.addItem(self.shadow)    
+        self.shadow.setOpacity(self.alpha)        
+        self.scene.addItem(self.shadow)   
+         
         self.works.updateOutline()
                                                                                                 
 ### --------------------------------------------------------    
@@ -206,10 +203,12 @@ class ShadowMaker:
                                                 
 ### --------------------------------------------------------
     def addPoints(self): 
-        self.works.deletePoints() 
-        
-        if self.path == None: self.path = []
-          
+        self.works.deletePoints()  ## cleared points
+
+        if len(self.path) == 0:
+            for i in range(4): 
+                self.path.append(QPointF())
+   
         self.topLeft  = PointItem(self.path[0], 'topLeft', self)
         self.topRight = PointItem(self.path[1], 'topRight', self)
         self.botRight = PointItem(self.path[2], 'botRight', self)
@@ -234,7 +233,7 @@ class ShadowMaker:
 
 ### --------------------------------------------------------
     def setPath(self, b, p):  ## boundingRect and position
-        self.path = []
+        self.path.clear()
         self.path.append(p)  
         self.path.append(QPointF(p.x() + b.width(), p.y()))  
         self.path.append(QPointF(p.x() + b.width(), p.y() + b.height()))         

@@ -9,7 +9,7 @@ from PyQt6.QtWidgets    import QTableView, QAbstractItemView
 from dotsScreens        import getCtr
 from dotsShared         import Types
 from dotsTableModel     import TableModel, Typelist
-from dotsFileWorks      import FileWorks 
+from dotsShowFiles      import ShowFiles 
 from dotsShowWorks      import ShowWorks 
 
 MinRows = 5
@@ -37,7 +37,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.showtime  = self.showbiz.showtime   
         self.showWorks = ShowWorks(self.canvas)
      
-        self.fileWorks = FileWorks(self.canvas) 
+        self.showFiles = ShowFiles(self.canvas) 
   
         self.hdr, self.cols = '', 0
         self.deleteKey = False
@@ -117,7 +117,7 @@ class TableView:  ## formats a json .play file to display missing files or not
  
 ### --------------------------------------------------------
     def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
-        self.selected = []    
+        self.selected.clear() 
         if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
             for indexes in sorted(self.tableView.selectionModel().selectedRows()):
                 # print(self.model.data[indexes.row()][:5])
@@ -151,11 +151,10 @@ class TableView:  ## formats a json .play file to display missing files or not
      
 ### --------------------------------------------------------
     def missing(self, tmp, miss, k):
-        if self.fileWorks.fileNotFound(tmp):          
+        if self.showFiles.fileNotFound(tmp):          
             miss.append(k) 
             self.Missingfiles.append(tmp)       
-        return tmp
-              
+
     def shuffle(self):
         if self.src != 'table':  
             self.showtime.savePlay()  ## drops missing
@@ -167,6 +166,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         ## order .play file by Types = ['frame', 'pix', 'bkg', 'flat'] - see common
         ## flat and frame make it difficult to sort correctly as 'flat' comes before 'frame'
         typ, save = [], [] 
+        self.typelist.clear()
         for type in Types:
             for tmp in dlist: 
                 if tmp['type'] == type:
@@ -194,7 +194,7 @@ class TableView:  ## formats a json .play file to display missing files or not
     
 ### -------------------------------------------------------- 
     def unpackIt(self, dlist):
-        self.Missingfiles = []
+        self.Missingfiles.clear()
         ## unpack dictionary values and save them as a list in data
         data, save, miss, k, first = [], [],[], 0, ''
         for tmp in dlist:  
@@ -207,7 +207,7 @@ class TableView:  ## formats a json .play file to display missing files or not
                         save.append(k)  ## keep track of hdr row index
                         k += 1
                     first = typ.type                        
-            tmp = self.missing(tmp, miss, k)                                              
+            self.missing(tmp, miss, k)                                              
             data.append(list(tmp.values()))  
             k += 1  ## tracking the row number       
                           

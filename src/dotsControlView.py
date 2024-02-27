@@ -137,13 +137,12 @@ class ControlView(QGraphicsView):
         elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier: 
             self.sideCar.togglePixLocks(singleKeys[key]) 
     
-        ## keys to scroll scrollPanel - alt and control modifier      
-        elif key in UpDownKeys and self.canvas.pathMakerOn == False:  
-                     
-            if mod & Qt.KeyboardModifier.AltModifier:  
+        ## keys to scroll scrollPanel - alt and control modifier - control first then arrow  
+        elif key in UpDownKeys and self.canvas.pathMakerOn == False:      
+            if mod & Qt.KeyboardModifier.AltModifier:  ## apple option key
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('-1')            
-            elif mod & Qt.KeyboardModifier.ControlModifier:
+            elif mod & Qt.KeyboardModifier.ControlModifier:  ## apple cmd key
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('up')          
             else:                  

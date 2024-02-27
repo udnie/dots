@@ -224,23 +224,23 @@ class BkgWorks:
 
 ### --------------------------------------------------------                                                                                      
     def reset(self):  ## reset both tracker and bkgItem
-            file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
-            for p in self.bkgMaker.trackers:
-                if p.file == file:
-                    p.direction = ''
-                    p.mirroring = self.bkgMaker.mirroring
-                    p.factor    = self.bkgMaker.factor
-                    p.rate      = 0
-                    p.showtime  = 0
-                    break
-                
-            self.bkgItem.tag = ''   
-            self.bkgItem.direction = ''             
-            self.bkgItem.mirroring = self.bkgMaker.mirroring  
-            self.bkgItem.factor    = self.bkgMaker.factor
-            self.bkgItem.rate      = 0
-            self.bkgItem.showtime  = 0
-            self.bkgMaker.addWidget(self.bkgItem)
+        file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
+        for p in self.bkgMaker.trackers:
+            if p.file == file:
+                p.direction = ''
+                p.mirroring = self.bkgMaker.mirroring
+                p.factor    = self.bkgMaker.factor
+                p.rate      = 0
+                p.showtime  = 0
+                break
+            
+        self.bkgItem.tag = ''   
+        self.bkgItem.direction = ''             
+        self.bkgItem.mirroring = self.bkgMaker.mirroring  
+        self.bkgItem.factor    = self.bkgMaker.factor
+        self.bkgItem.rate      = 0
+        self.bkgItem.showtime  = 0
+        self.bkgMaker.addWidget(self.bkgItem)
                                                                     
     def tagBkg(self, bkg, pos):
         self.bkgItem = bkg

@@ -65,8 +65,8 @@ class PathWays:
         self.halfPath(True)
         self.editingPtsSet()  
 
-    def halfPath(self, full=False):
-        if self.pathMaker.pathTestSet:
+    def halfPath(self, full=False):  ## reduces number of points in half
+        if self.pathMaker.pathTestSet == True:
             self.pathMaker.pathWorks.stopPathTest()
         tmp = []
         if full:  ## use all the points
@@ -99,7 +99,7 @@ class PathWays:
         del tmp
         
     def reversePath(self):  
-        if self.pathMaker.pts:
+        if len(self.pathMaker.pts) > 0:
             if self.pathMaker.pathTestSet:
                 self.pathMaker.pathWorks.stopPathTest()      
             tmp = []    
@@ -139,30 +139,25 @@ class PathWays:
             self.pathMaker.addPath()
          
     def savePath(self):
-        if self.pathMaker.pts:
+        if len(self.pathMaker.pts) > 0:
             if self.pathMaker.addingNewPath != False: 
                 MsgBox("savePath: Close the new path using 'cmd'", 5)  
-                return  
-            
+                return     
             if self.pathMaker.openPathFile == '':
-                self.pathMaker.openPathFile = paths['paths'] + 'tmp.path' 
-                     
+                self.pathMaker.openPathFile = paths['paths'] + 'tmp.path'          
             ##  self.pathMaker.openPathFile has no path attached to it            
             Q = QFileDialog()
             Q.Option.DontUseNativeDialog
             Q.setDirectory(paths['paths'])
-       
             f = Q.getSaveFileName(self.canvas, paths['paths'],
                 paths['paths'] + self.pathMaker.openPathFile,  
                 'Files(*.path)')  ## <--- note
-            Q.accept()  
-                                                          
+            Q.accept()                                                  
             if not f[0]: 
                 return
             if not f[0].lower().endswith('.path'):
                 MsgBox("savePath: Missing or Wrong file extention - use '.path'", 5)   
-                return  
-            
+                return       
             try:
                 with open(f[0], 'w') as fp:
                     for i in range(len(self.pathMaker.pts)):

@@ -38,8 +38,11 @@ class Wings:
         super().__init__()
  
         self.canvas = parent    
-        self.scene  = self.canvas.scene
-       
+        self.scene  = self.canvas.scene     
+        
+        if not os.path.exists(paths['imagePath'] + 'bat-pivot.png'):
+            return
+    
         self.pivot     = self.pivot(paths['imagePath'] + 'bat-pivot.png', x, y, tag)
         self.rightWing = self.right(paths['imagePath'] + 'bat-wings.png', x, y)
         self.leftWing  = self.left(paths['imagePath']  + 'bat-wings.png', x, y)
@@ -127,7 +130,7 @@ class Bats:
                                          
         self.sideCar   = self.canvas.sideCar
         self.animation = self.canvas.animation
-        
+       
         self.showWorks = ShowWorks(self.canvas)
                                                    
 ### -------------------------------------------------------- 
@@ -177,13 +180,17 @@ class Bats:
 ### --------------------------------------------------------                 
     def greys(self):  ## these go to screen and wait to be run
         greys = 23  
+       
+        if not os.path.exists(paths['spritePath'] + 'alien.png'):
+            return
+  
         pathStr = paths['spritePath'] + 'alien.png'     
         for i in range(greys):
             pix = self.oneGrey(pathStr)
             self.scene.addItem(pix)
             
     def oneGrey(self, pathStr):
-        pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas)        
+        pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas)       
         pix.x = random.randrange(200, common['ViewW']-300)
         pix.y = random.randrange(200, common['ViewH']-300)
         pix.setPos(pix.x, pix.y)     
@@ -300,7 +307,9 @@ class Abstract:  ## hats
             path = getPath(apaths)                                           
             self.makeHats(path)
   
-    def makeHats(self, path): 
+    def makeHats(self, path):      
+        if not os.path.exists(paths['spritePath'] + 'doral.png'):
+            return   
         pathStr = paths['spritePath'] + 'doral.png'
         pix = PixItem(pathStr, self.canvas.pixCount, 0, 0, self.canvas)        
         pix.x = random.randrange(200, common['ViewW']-300)

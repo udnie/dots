@@ -153,7 +153,7 @@ class ScrollPanel(QWidget):
         self.scroll.verticalScrollBar().sliderReleased.connect(self.reposition)
       
         self.scrollCount = 0
-        self.scrollList  = []
+        self.scrollList = []
             
         self.widget.installEventFilter(self)
         
@@ -173,9 +173,9 @@ class ScrollPanel(QWidget):
     def pageDown(self, key):
         scrollBar = self.scroll.verticalScrollBar()
         if key == 'down': 
-            steps = common['steps']
+            steps = common['steps'] - 1
         elif key == 'up':
-            steps = common['steps'] * -1
+            steps = (common['steps'] - 1 ) * -1
         elif key == '1':
             steps = 1
         else:
@@ -214,9 +214,8 @@ class ScrollPanel(QWidget):
         self.bottom()
         
     def Star(self):  
-        if self.canvas.pathMakerOn: 
-            return  
-        self.addImageTile('Star')
+        if self.canvas.pathMakerOn == False:  
+            self.addImageTile('Star')
              
     def deleteImgLabel(self, this):
         p = self.scrollList.index(this.id)
@@ -225,39 +224,33 @@ class ScrollPanel(QWidget):
         self.scroll.verticalScrollBar().setSliderPosition(int(p))
 
     def top(self):           
-        if self.canvas.pathMakerOn: 
-            return  
-        if self.layout.count() > 0:
+        if self.canvas.pathMakerOn == False and self.layout.count() > 0:
             firstItem = self.layout.itemAt(0).widget()
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
                 firstItem))
 
     def bottom(self):  ## thanks stackoverflow
-        if self.canvas.pathMakerOn: 
-            return  
-        if self.layout.count() > 0:
+        if self.canvas.pathMakerOn == False and self.layout.count() > 0:
             lastItem = self.layout.itemAt(self.layout.count()-1).widget()
             QTimer.singleShot(0, partial(self.scroll.ensureWidgetVisible, 
                 lastItem))
    
     def clear(self):
-        if self.canvas.pathMakerOn: 
-            return  
-        for i in reversed(range(self.layout.count())): 
-            self.layout.itemAt(i).widget().deleteLater()
-        self.scrollCount = 0
-        self.scrollList = []
+        if self.canvas.pathMakerOn == False:
+            for i in reversed(range(self.layout.count())): 
+                self.layout.itemAt(i).widget().deleteLater()
+            self.scrollCount = 0
+            self.scrollList.clear()
           
     def loadSprites(self):
-        if self.canvas.pathMakerOn: 
-            return  
-        sprites = sorted(self.spriteList())
-        if sprites == None: return
-        if sprites:
-            for s in sprites:
-                self.addImageTile(s)
-            self.top()   
-        self.dots.statusBar.showMessage(('Number of Sprites:  {}'.format(self.scrollCount)) , 8000)
+        if self.canvas.pathMakerOn == False: 
+            sprites = sorted(self.spriteList())
+            if sprites == None: return
+            if sprites:
+                for s in sprites:
+                    self.addImageTile(s)
+                self.top()   
+            self.dots.statusBar.showMessage(('Number of Sprites:  {}'.format(self.scrollCount)) , 8000)
 
     def spriteList(self):
         try:

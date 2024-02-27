@@ -113,9 +113,8 @@ class PathWidget(QWidget):
         self.scale = val
  
     def rotateScale(self, per, inc):  ## handles both rotation and scaling 
-        if len(self.pathMaker.pts) == 0: 
-            return 
-        self.pathMaker.pathWorks.scaleRotate('A', per, inc)  ## used by other classes as well
+        if len(self.pathMaker.pts) > 0: 
+            self.pathMaker.pathWorks.scaleRotate('A', per, inc)  ## used by other classes as well
               
 ### -------------------------------------------------------- 
     def sliderGroup(self):

@@ -65,7 +65,7 @@ class Works:  ## small functions that were in ShadowMaker
         for p in self.maker.points:  
             self.scene.removeItem(p) 
             del p
-        self.maker.points = [] 
+        self.maker.points.clear()
  
     def updateOutline(self): 
         self.deleteOutline()
@@ -166,7 +166,7 @@ class Works:  ## small functions that were in ShadowMaker
         self.maker.updatePoints(1, x, y)
         
 ### --------------------------------------------------------            
-    def rotateScale(self, per, inc):  ## uses path rather than pts
+    def rotateScale(self, per, inc):  ## uses path rather than pts 
         self.maker.shadow.setOriginPt() 
         
         x, y, w, h = getCrop(self.maker.path)   ## uses getCrop 
