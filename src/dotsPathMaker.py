@@ -248,7 +248,7 @@ class PathMaker(QWidget):
         if not self.pathChooserSet and not self.addingNewPath:
             if not self.editingPts:
                 paths = getPathList()
-                if paths == None or paths == []:
+                if len(paths) == 0:
                     MsgBox('getPathList: No Paths Found!', 5)
                     return None
                 self.chooser = DoodleMaker(self, where) 

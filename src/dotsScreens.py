@@ -208,7 +208,7 @@ def getX():  ## adjusted for app size and display
 
 def getY():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()  
-    if common['Screen'] in ('900', '912'):    
+    if common['Screen'] in ('1102','900', '912'):    
         return 0
     else:
         # return 50

@@ -121,14 +121,15 @@ class StoryBoard(QWidget):
             if e.type() == QEvent.Type.MouseButtonPress:
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()  ## chks if set
-                ## also used in pathMaker but for editing
+                ## 'cmd' also used in pathMaker but for editing
                 if self.key == 'cmd':  
                     self.mapper.clearMap()   ## set rubberband if mapset
                     self.unSelect()              
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
                     if self.control not in ControlKeys:
-                        self.mapper.updatePixItemPos()                   
-            ## the rubberband kicks in after you start to move the mouse then enter 'cmd', but not before
+                        self.mapper.updatePixItemPos()   
+                                        
+            ##  enter 'cmd' before you move the mouse and the rubberband kicks in, but not after
             elif e.type() == QEvent.Type.MouseMove:  
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
@@ -138,7 +139,8 @@ class StoryBoard(QWidget):
                 elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                 elif self.control not in ControlKeys:  ## no animations running
-                    self.mapper.updatePixItemPos()  ## costly but necessary               
+                    self.mapper.updatePixItemPos()  ## costly but necessary    
+                               
             elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
@@ -147,7 +149,8 @@ class StoryBoard(QWidget):
                     self.setKeys('')           
                 if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
-                self.mapper.updatePixItemPos()           
+                self.mapper.updatePixItemPos()    
+                       
             elif e.type() == QEvent.Type.MouseButtonDblClick:
                 ## to preseve selections dblclk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the 

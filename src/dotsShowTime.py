@@ -174,17 +174,17 @@ class ShowTime:
     def savePlay(self):   
         if self.canvas.control in ControlKeys:  ## there's an animation running - needs to be stopped first
             return 
-        elif self.canvas.openPlayFile in Demos:
+        if self.canvas.openPlayFile in Demos:
             self.showWorks.enablePlay()
             demo = self.canvas.openPlayFile 
             MsgBox("Can't Save " + demo + " as a Play File", 5)  ## seconds
             return                 
-        elif self.canvas.pathMakerOn == True:  ## using load in pathMaker
+        if self.canvas.pathMakerOn == True:  ## using load in pathMaker
             self.pathMaker.pathWays.savePath()
             return                   
-        elif len(self.scene.items()) == 0:
+        if len(self.scene.items()) == 0:
             MsgBox("Nothing on Screen to Save", 5)
-            return     
+            return    
         self.reallySaveIt()
             
     def reallySaveIt(self):                                    

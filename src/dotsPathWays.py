@@ -245,12 +245,8 @@ class PathWays:
             self.tagGroup = None
                    
     def makePtsTag(self, pt, idx, pct):  ## used by pointItem as well
-        s = '(' + '{:2d}'.format(int(pt.x()))
-        s = s + ', ' + '{:2d}'.format(int(pt.y())) + ')'
-        s = s + '  ' + '{0:.2f}%'.format(pct)
-        s = s + '  ' + '{0:2d}'.format(idx)
-        return s
-        
+        return f"({pt.x():.2f}, {pt.y():.2f})  %{pct:.2f}   {idx}"
+    
     def tagCount(self):  ## shared among path modules - there's one in mapper as well
         return sum(pix.type == 'tag' 
             for pix in self.scene.items())

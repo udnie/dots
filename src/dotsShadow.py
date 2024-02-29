@@ -55,7 +55,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
     def mousePressEvent(self, e):  
         self.save = self.mapToScene(e.pos())
         if e.button() == Qt.MouseButton.RightButton: 
-            self.maker.addWidget()  ## only place it's used
+            self.maker.addWidget(self.save)  ## only place it's used
         elif self.maker.linked == False:  
             self.updOutline(e)
         e.accept() 

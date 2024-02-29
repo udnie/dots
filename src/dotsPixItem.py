@@ -197,15 +197,12 @@ class PixItem(QGraphicsPixmapItem):
         if self.canvas.control not in ControlKeys:  ##  (',', '.', '/', 'enter', 'return')
             if self.key == 'opt':  
                 self.works.cloneThis()
-            elif self.canvas.key == 'noMap': 
-                ## consumed map's dblclk need to set it back 
+            elif self.canvas.key == 'noMap':   ## consumed map's dblclk need to set it back 
                 self.canvas.setKeys('')      
                 if self.isHidden == False or self.isSelected():
                     self.setSelected(True) 
                     return            
-            elif self.isHidden:   
-                ## otherwise you're stuck if others are 
-                ## selected as the others will become hidden 
+            elif self.isHidden:  ## otherwise you're stuck if others are selected as the others will become hidden
                 self.setSelected(True) 
                 self.isHidden = False  
             elif self.canvas.key not in ('opt','cmd','shift'):
@@ -240,8 +237,8 @@ class PixItem(QGraphicsPixmapItem):
         self.works.closeWidget()
         self.widget = PixWidget(self)      
         x, y = self.works.makeXY()     
-        x = int(x - int(self.widget.WidgetW)-10)
-        y = int(y - int(self.widget.WidgetH)/6)
+        x = int(x - int(self.widget.WidgetW)-20)
+        y = int(y - int(self.widget.WidgetH)*.20)
         self.widget.save = QPointF(x,y)
         self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
         self.works.resetSliders()

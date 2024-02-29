@@ -18,6 +18,7 @@ class PathEdits(QWidget):
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
+        self.pathWorks = self.pathMaker.pathWorks
 
         self.lasso = []           
         self.dragCnt = 0   
@@ -30,21 +31,21 @@ class PathEdits(QWidget):
     def eventFilter(self, source, e):  ## used by lasso    
         if self.canvas.pathMakerOn:
     
-            if self.pathMaker.editingPts == True:  
+            if self.pathMaker.editingPts == True:
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
                     self.addLassoPts(e.pos()) 
              
                 elif e.type() == QEvent.Type.MouseMove and \
                     e.buttons() == Qt.MouseButton.LeftButton and \
-                        self.movingPathItem == False:
-                        
+                    self.movingPathItem == False:
                     self.dragCnt += 1
                     if self.dragCnt % 5 == 0:        
                         self.addLassoPts(e.pos()) 
                          
                 elif e.type() == QEvent.Type.MouseButtonRelease:
                     self.finalizeSelections(e.pos())
+                    self.movingPathItem = True
                
         return QWidget.eventFilter(self, source, e)    
      
@@ -66,12 +67,12 @@ class PathEdits(QWidget):
         self.pathMaker.npts = 0
         self.pathMaker.pts.clear()
         self.editBtn('ClosePath')
-        self.pathMaker.pathWorks.closeWidget()
+        self.pathWorks.closeWidget()
  
     def closeNewPath(self):  ## applies only to adding a path
         if self.pathMaker.addingNewPath:  ## note
             self.removeNewPath()  
-            self.pathMaker.pathWorks.turnGreen()
+            self.pathWorks.turnGreen()
             self.pathMaker.addPath()  ## draws a polygon rather than painter path
    
     def removeNewPath(self):  ## keep self.pathMaker.pts for path
@@ -89,7 +90,7 @@ class PathEdits(QWidget):
     def deleteNewPath(self):  ## changed your mind, doesn't save pts
         if self.pathMaker.addingNewPath:
             self.removeNewPath()
-            self.pathMaker.pathWorks.turnGreen()
+            self.pathWorks.turnGreen()
             self.pathMaker.pts.clear()
             self.pathMaker.pathSet = False
                       
@@ -102,7 +103,7 @@ class PathEdits(QWidget):
         
     def newLasso(self): 
         self.lasso.clear()
-        self.pathMaker.pathWorks.closeWidget()
+        self.pathWorks.closeWidget()
         QGuiApplication.setOverrideCursor(QCursor(Qt.CursorShape.CrossCursor))
                 
     def addLassoPts(self, p):
@@ -116,7 +117,7 @@ class PathEdits(QWidget):
         return poly               
                                 
     def drawLasso(self):
-        self.pathMaker.pathWorks.removePoly()    
+        self.pathWorks.removePoly()    
         self.pathMaker.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
         self.pathMaker.poly.setBrush(QBrush(QColor(160,160,160,50)))
         self.pathMaker.poly.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
@@ -124,7 +125,7 @@ class PathEdits(QWidget):
         self.pathMaker.scene.addItem(self.pathMaker.poly)
     
     def deleteLasso(self):  
-        self.pathMaker.pathWorks.removePoly()
+        self.pathWorks.removePoly()
         self.lasso.clear()
         QGuiApplication.restoreOverrideCursor()
                 
@@ -157,25 +158,26 @@ class PathEdits(QWidget):
             self.addPathItems()
 
     def editPoints(self):
-        if not self.pathMaker.pts:
-            return
-        if self.pathMaker.editingPts == False:
-            self.pathMaker.editingPts = True
-            self.pathMaker.selections.clear() 
-            self.addPathItems()
-            self.pathMaker.pathWorks.turnBlue()
-        else:
-            self.editPointsOff()
+        if len(self.pathMaker.pts) > 0:
+            if self.pathMaker.editingPts == False:
+                self.pathMaker.editingPts = True
+                self.pathMaker.selections.clear() 
+                self.lasso.clear()
+                self.addPathItems()
+                self.pathWorks.turnBlue()
+                self.pathWorks.closeWidget()
+            else:
+                self.editPointsOff()
 
     def editPointsOff(self):
         self.pathMaker.editingPts = False
         self.pathMaker.selections.clear()
         self.removePathItems()
-        self.pathMaker.pathWorks.turnGreen()
+        self.pathWorks.turnGreen()
       
     def addPathItems(self): 
         idx = 0 
-        add = self.pathMaker.pathWorks.findTop() + 10  ## added to idx to set zvalue
+        add = self.pathWorks.findTop() + 10  ## added to idx to set zvalue
         for pt in self.pathMaker.pts:  
             self.scene.addItem(PathItem(self.pathMaker, pt, idx, add))
             idx += 1  

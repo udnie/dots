@@ -93,8 +93,7 @@ class AnimationMenu:
     def setAnimationTag(self, tag):
         self.closeMenu()
         if self.mapper.tagSet and tag == 'Clear Tags':
-            self.mapper.clearTagGroup()
-            
+            self.mapper.clearTagGroup()        
         elif tag == 'Path Menu':  ## use pathChooser from pathMaker 
             self.canvas.pathMaker.pathChooser('Path Menu') 
             return
@@ -130,15 +129,16 @@ class DemoMenu:
         self.abstract = self.showbiz.abstract  ## hats and bats
        
         self.demoMenu = None
-                       
+        
+### --------------------------------------------------------                     
     def openDemoMenu(self):
         self.closeDemoMenu()
         self.demoMenu = QMenu(self.canvas) 
         self.demoMenu.addAction('Demos Menu'.rjust(20,' '))
         self.demoMenu.addSeparator()
+        
         for key, demo in demos.items():            
-  
-            if self.dots.Vertical and key in ('left', 'right'):
+            if self.dots.Vertical and key in ('left', 'right'):  ## wings follow pivots
                 continue
             else:
                 action = self.demoMenu.addAction(demo)
@@ -207,7 +207,8 @@ class ScreenMenu:
         self.view   = self.canvas.view  
         
         self.screenMenu = None
-                     
+ 
+### --------------------------------------------------------                     
     def openScreenMenu(self):
         self.closeScreenMenu()
         self.screenMenu = QMenu(self.canvas)    

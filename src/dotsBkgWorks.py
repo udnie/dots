@@ -232,8 +232,7 @@ class BkgWorks:
                 p.factor    = self.bkgMaker.factor
                 p.rate      = 0
                 p.showtime  = 0
-                break
-            
+                break      
         self.bkgItem.tag = ''   
         self.bkgItem.direction = ''             
         self.bkgItem.mirroring = self.bkgMaker.mirroring  
@@ -292,10 +291,8 @@ class BkgWorks:
     def setVertical(self, img):  
         if img == None:
             return
-        
         imf = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
-        self.bkgItem.imgFile = imf     
-          
+        self.bkgItem.imgFile = imf       
         if imf.height() > self.bkgItem.ViewH:  ## its scrollable enough
             self.bkgItem.scrollable = True  
         del img 

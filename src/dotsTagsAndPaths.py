@@ -40,16 +40,17 @@ class TagIt(QGraphicsSimpleTextItem):
             
         else:
             self.color = QColor(255,165,0)
-            if 'Locked Random' in tag:
-                tag = tag[0:13] 
-            elif 'Random' in tag:
-                tag = tag[0:6] 
+            if type(tag) == str and len(tag) > 0: 
+                if 'Locked Random' in tag:
+                    tag = tag[0:13] 
+                elif 'Random' in tag:
+                    tag = tag[0:6] 
                 
         if color:
             self.color = QColor(color)
 
         if zval != None and token != 'paths':
-            if len(tag) > 0:  
+            if type(tag) == str and len(tag) > 0:  
                 tag = tag + ': ' + str(zval)
             else:
                 tag = str(zval)
@@ -65,7 +66,7 @@ class TagIt(QGraphicsSimpleTextItem):
         self.font.setFamily('Helvetica')
         self.font.setPointSize(12)
         
-        if token == 'bkg':
+        if token in ('bkg', 'points'):
             self.font.setPointSize(14)
         
         metrics = QFontMetrics(self.font)
@@ -113,8 +114,8 @@ class TagsAndPaths:
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type in ('pix', 'snake', 'bkg', 'frame'):
-                if 'path' in pix.tag and pid == 'paths':
+            if pix.type in ( 'frame', 'pix', 'snake', 'bkg'):
+                if type(pix.tag) == str and 'path' in pix.tag and pid == 'paths':
                     self.tagThis('paths', pix, topZVal) 
                     k += 1
                 if pid == 'all':
@@ -122,11 +123,10 @@ class TagsAndPaths:
                     if alltags != pix.tag:  ## only one per snake
                         alltags = pix.tag
                         self.tagThis('',pix, topZVal)         
-                # elif pid == 'select' and pix.isSelected():
                 elif pix.isSelected():
                     self.tagThis('',pix, topZVal)
                     k += 1
-                elif pid == pix.id or pix.type == 'frame':  ## single tag  
+                elif pix.type == 'frame':  ## single tag  
                     self.tagThis('',pix, topZVal) 
                     k = 1
                     break     
@@ -146,9 +146,9 @@ class TagsAndPaths:
   
         if 'frame' in pix.fileName: 
             x, y = common['ViewW']*.47, common['ViewH']-35
-            pix.tag = ''
+            pix.tag = topZVal
 
-        if pix.type in ('pix','bkg') and pix.locked == True:
+        if pix.type in ('pix','bkg','frame') and pix.locked == True:
             tag = 'Locked ' + tag 
 
         if pix.zValue() == topZVal:  ## set to front ZValue

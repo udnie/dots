@@ -13,13 +13,16 @@ I went through a number of revisions of **dotsTableView.py** until I finally arr
 
 As a reminder, **'J'** is the command that launches the **json .play file viewer** which also works in **StoryBoard** - where the work gets done.  Saving a **.play file** with missing files in **StoryBoard** will delete them as it saves only what's displayed while saving from the **canvas** saves what's in the file including the missing file records. 
 
+New Video: <https://youtu.be/DoCMdEPZi8E>
+
+
 **February 23** - Added **'S'** to **save** the **.play file** in **StoryBoard** if there are no animations running. Why I didn't do that two years ago is a good question.  Made sure typing **'J'** to launch the file viewer won't work if an animation is running.   
 
 Here's an interesting something to be aware of. If you turned **shadows on**, did some stuff, saved it and then turned **shadows off**  it could be an issue in the future if you went to reload the file and **shadows** were still **turned off**.  The data that describes the shadow will disappear as the imports, **numpy** and **openCV**, required to build a shadow aren't found. It hasn't been a problem for me as it's always on in development and turned off on GitHub except for testing.
 
 **February 26** - A few bug fixes and making lists more consistent in how they're closed and tested for being empty. 
 
-New Video: <https://youtu.be/DoCMdEPZi8E>
+**February 28** - A few more tweaks, mainly to Lasso in Paths and the Shadow Widget.
 
 ---
                           

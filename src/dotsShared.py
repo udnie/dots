@@ -38,7 +38,7 @@ screens = {  ## the keys aren't shown
         
 ### --------------------------------------------------------
              
-CanvasStr = "A,B,C,J,L,M,P,R,S,T,W,\",<,>,[,],_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
+CanvasStr = "A,B,C,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
 PathStr = "C,D,E,F,K,L,M,N,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
@@ -55,7 +55,6 @@ paths = {
     'txy':          './../txy/',
     'demo':         './../demo/',
 }
-
 
 Tick = 2.0
 
@@ -77,6 +76,8 @@ RotateKeys = {  ## works in reverse
     '=': -15.0,
     ']': -45.0,   
     '[':  45.0,
+    '}': -90.0,   
+    '{':  90.0,
 }
 
 Star = ((100, 20), (112, 63), (158, 63), (122, 91), 

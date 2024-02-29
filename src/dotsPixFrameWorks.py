@@ -80,7 +80,7 @@ class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's he
                     self.locked = False
                 self.setZValue(self.canvas.mapper.toFront(1)) 
                 self.locked = True
-            elif self.key == 'tag': 
+            elif self.key == 'opt': 
                 self.mapper.toggleTagItems(self.id)
             e.accept()
       
@@ -153,8 +153,8 @@ class Works:  ## extends pixitem and pixwidget
         self.pix.setScale(self.pix.scale)
             
     def rotateThis(self, key):
-        self.pix.setOriginPt() 
-        angle = RotateKeys[key]        ## thanks Martin
+        self.pix.setOriginPt()
+        angle = RotateKeys[key]  ## thanks Martin
         p = self.pix.rotation - angle  ## necessary to match scaleRotate in pathWays
         if p > 360:                    ## now only one source and one set of keys 
             p = p - 360

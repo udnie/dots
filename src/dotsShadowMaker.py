@@ -178,7 +178,7 @@ class ShadowMaker:
         self.works.updateOutline()
                                                                                                 
 ### --------------------------------------------------------    
-    def addWidget(self):  ## creates a shadow widget     
+    def addWidget(self, save):  ## creates a shadow widget     
         self.works.closeWidget()
         self.widget = ShadowWidget(self)  
         
@@ -187,14 +187,14 @@ class ShadowMaker:
         else:      
             self.widget.linkBtn.setText('UnLink')  ## link == True
           
-        p = self.shadow.pos()                                            
+        p = save                                        
         x, y = int(p.x()), int(p.y())  
         self.last = QPointF(x,y)  ## last position   
             
         p = self.canvas.mapToGlobal(QPoint(x, y))
         x, y = int(p.x()), int(p.y())       
-        x = int(x - int(self.widget.WidgetW)-10)  ## offset from shadow
-        y = int(y - int(self.widget.WidgetH)/6)    
+        x = int(x - int(self.widget.WidgetW)-50)  ## offset from shadow
+        y = int(y - int(self.widget.WidgetH)*.35)    
         
         self.widget.save = QPointF(x,y)  
         self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))   
@@ -240,19 +240,20 @@ class ShadowMaker:
         self.path.append(QPointF(p.x(), p.y() + b.height()))
  
     def updatePath(self, val):  ## see shadow for ItemSendsScenePositionChanges
-        # start = time.time()  ## curious
-        dif = val - self.shadow.save        
+        dif = val - self.shadow.save  
+        
+        self.addPoints()
+             
         for i in range(4):
             self.path[i] = self.path[i] + dif
             self.updatePoints(i, self.path[i].x(), self.path[i].y())
+            
         self.shadow.save = val   
         if self.linked == False:    ## updated by shadow
             self.shadow.setPos(self.shadow.pos()+dif)   
         else:                       ## updated by pixitem
             self.shadow.setPos(self.pixitem.pos()+self.pixitem.offset)
-        # end = time.time()  ## roughly .01...
-        # print(end - start)  
-        
+      
 ### -------------------------------------------------------- 
     def newShadow(self):  ## add shadow from shadow widget
         self.works.cleanUpShadow()
