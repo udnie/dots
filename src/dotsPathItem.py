@@ -5,7 +5,7 @@ from PyQt6.QtCore       import QPointF, pyqtSlot, QRect, QRectF
 from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QGraphicsEllipseItem
 
-from dotsShared         import MoveKeys    
+from dotsShared         import MoveKeys, common 
 from dotsTagsAndPaths   import TagIt
        
 V = 7.5  ## the diameter of a pointItem
@@ -25,7 +25,7 @@ class PathItem(QGraphicsEllipseItem):
           
         self.pt = pt
         self.idx = idx
-        self.setZValue(int(idx+adto)) 
+        self.setZValue(adto)
         
         self.selections = self.pathMaker.selections  ## less to type
         
@@ -64,7 +64,7 @@ class PathItem(QGraphicsEllipseItem):
             tag = self.pathMaker.pathWays.makePtsTag(self.pt, self.idx, pct)
             self.pointTag = TagIt('points', tag, QColor('YELLOW')) 
             self.pointTag.setPos(QPointF(self.pt)+QPointF(-20.0,-30.0))
-            self.pointTag.setZValue(self.pathMaker.pathWorks.findTop()+5)
+            self.pointTag.setZValue(common['pathZ']+100)
             self.scene.addItem(self.pointTag)
             p = self.rect()      
             if p.width() < V*1.5:  ## make it larger

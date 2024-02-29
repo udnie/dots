@@ -217,10 +217,11 @@ class ShowBiz:
         file = os.path.basename(self.canvas.openPlayFile) 
         if 'play' in file:  ## could be something else
             if ns == 0 and self.locks == 0:
-                self.dots.statusBar.showMessage(file + ' - ' + 'Number of Pixitems: {}'.format(kix))       
+                self.dots.statusBar.showMessage(f"{file} - Number of Pixitems: {kix}")
             elif ns > 0:  ## there must be shadows
                 QTimer.singleShot(200, self.addShadows)
-                MsgBox('Adding Shadows,  please wait...', int(1 + (ns * .25)))                
+                t = int(1 + (ns * .25))
+                MsgBox('Adding Shadows, please wait...', t)                
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
                 self.canvas.mapper.toggleTagItems('all')                                                  
@@ -239,9 +240,9 @@ class ShowBiz:
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()        
-        self.sideCar.hideOutlines()  ## turns them off               
-        str = ' Number of Shadows: {0}  seconds:  {1:.2f}'  
-        self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)        
+        self.sideCar.hideOutlines()  ## turns them off                
+        str = f" Number of Shadows: {len(tasks)}  seconds:  {time.time() - start:.2f}" 
+        self.dots.statusBar.showMessage(str, 10000)        
 
 ### ---------------------- dotsShowBiz --------------------
 

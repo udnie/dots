@@ -66,7 +66,7 @@ class TagIt(QGraphicsSimpleTextItem):
         self.font.setFamily('Helvetica')
         self.font.setPointSize(12)
         
-        if token in ('bkg', 'points'):
+        if token in ('bkg', 'points', 'pathMaker'):
             self.font.setPointSize(14)
         
         metrics = QFontMetrics(self.font)

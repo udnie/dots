@@ -225,12 +225,12 @@ class PathWays:
     def addWayPtTag(self, tag, pt):
         self.tag = TagIt('pathMaker', tag, QColor('TOMATO'))   
         self.tag.setPos(QPointF(pt))
-        self.tag.setZValue(common['tagZ']+5) 
+        self.tag.setZValue((common['pathZ'])+35) 
         self.tagGroup.addToGroup(self.tag)
            
     def addWayPtTagsGroup(self):
         self.tagGroup = QGraphicsItemGroup()
-        self.tagGroup.setZValue(common['tagZ']+5)
+        self.tagGroup.setZValue((common['pathZ'])+35)
         self.scene.addItem(self.tagGroup)
                  
     def redrawTagsAndPaths(self):

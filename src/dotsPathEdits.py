@@ -179,7 +179,7 @@ class PathEdits(QWidget):
         idx = 0 
         add = self.pathWorks.findTop() + 10  ## added to idx to set zvalue
         for pt in self.pathMaker.pts:  
-            self.scene.addItem(PathItem(self.pathMaker, pt, idx, add))
+            self.scene.addItem(PathItem(self.pathMaker, pt, idx, common['pathZ']+10)) 
             idx += 1  
                
     def removePathItems(self):   
