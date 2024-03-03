@@ -57,7 +57,7 @@ class Works:  ## small functions that were in ShadowMaker
     
     def addPointsToScene(self):
         for p in self.maker.points:   
-            if self.maker.isHidden:
+            if self.maker.isHidden or self.maker.linked == True:
                 p.hide()                              
             self.scene.addItem(p)
                              
@@ -67,12 +67,20 @@ class Works:  ## small functions that were in ShadowMaker
             del p
         self.maker.points.clear()
  
+### --------------------------------------------------------
+    def toggleOutline(self):
+        if self.maker.outline != None:
+            if self.maker.outline.isVisible() == True:
+                self.hideOutline() 
+            elif self.maker.outline.isVisible() == False:
+                self.showOutline()
+  
     def updateOutline(self): 
         self.deleteOutline()
         self.maker.outline = QGraphicsPolygonItem(self.makeOutline()) 
         self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
         self.maker.outline.setZValue(common['outline'])       
-        if self.maker.linked == True: ## used throughout shadow and updateShadow
+        if self.maker.linked == True:  ## used throughout shadow and updateShadow
             self.hideOutline()      
         self.scene.addItem(self.maker.outline)
 
@@ -103,14 +111,8 @@ class Works:  ## small functions that were in ShadowMaker
             self.updateOutline()
             self.maker.outline.show()
             self.hidePoints(False)      
-   
-    def toggleOutline(self):
-        if self.maker.outline != None:
-            if self.maker.outline.isVisible() == True:
-                self.hideOutline()  
-            elif self.maker.outline.isVisible() == False:
-                self.showOutline()            
-                                                                   
+      
+### --------------------------------------------------------                                                                
     def rotateShadow(self, val): 
         inc = (val - self.maker.rotate)
         self.rotateScale(0, -inc)

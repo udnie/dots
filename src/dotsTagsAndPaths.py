@@ -132,7 +132,7 @@ class TagsAndPaths:
                     break     
         if k > 0: 
             self.mapper.tagSet = True
-            self.dots.statusBar.showMessage('Number Tagged:  {}'.format(k),2500)
+            self.dots.statusBar.showMessage(f"Number Tagged: {k}", 5000)
         else:
             self.mapper.clearTagGroup()
         

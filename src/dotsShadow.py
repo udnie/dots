@@ -55,26 +55,28 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
     def mousePressEvent(self, e):  
         self.save = self.mapToScene(e.pos())
         if e.button() == Qt.MouseButton.RightButton: 
-            self.maker.addWidget(self.save)  ## only place it's used
-        elif self.maker.linked == False:  
-            self.updOutline(e)
+            self.maker.addWidget(self)  ## only place it's used 
+        self.maker.works.hideOutline() 
+        self.maker.works.hidePoints()
         e.accept() 
 
     def mouseMoveEvent(self, e):
         if self.maker.linked == False:
             self.dragCnt += 1
             if self.dragCnt % 5 == 0:                  
-                self.maker.updatePath(self.mapToScene(e.pos()))  
-                self.maker.works.updateOutline() 
+                self.maker.updatePath(self.mapToScene(e.pos()))
+        self.maker.works.hidePoints()  
         e.accept()       
                           
     def mouseReleaseEvent(self, e): 
         if self.maker.linked == False:  
             self.maker.updatePath(self.mapToScene(e.pos())) 
             self.updOutline(e)
-            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving
-            e.accept()
- 
+            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving     
+        self.maker.works.hideOutline() 
+        self.maker.works.hidePoints()       
+        e.accept()
+  
     def updOutline(self, e):  ## so as not to be confused with updateOutline
         self.save = self.mapToScene(e.pos())    
         self.maker.addPoints() 

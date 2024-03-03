@@ -156,7 +156,7 @@ def pathLoader(path):  ## used by MapItem, Snakes. Abstract, Bats
         path.closeSubpath()
         return path
     except IOError:
-        MsgBox('pathLoader: Error loading pathFile, ' + os.path.basename(file), 5)
+        MsgBox(f'pathLoader: Error loading pathFile, {os.path.basename(file)}', 5)
         return None
 
 ### ---------------------- dotsSidePath --------------------

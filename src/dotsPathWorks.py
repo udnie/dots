@@ -42,6 +42,8 @@ class PathWorks:
             self.pathMaker.edits.editBtn('ClosePath')
         if self.pathMaker.openPathFile != None:
             self.widget.label.setText(self.pathMaker.openPathFile)
+        self.pathMaker.editingPts == False
+        self.pathMaker.edits.deleteLasso()
             
     def closeWidget(self):
         if self.widget != None:

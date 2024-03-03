@@ -108,26 +108,26 @@ class TableModel(QAbstractTableModel):
     def __init__(self, data, hdr):   
         super().__init__()
         
-        self._data = data
-        self._header = hdr
+        self.data = data
+        self.header = hdr
              
     def data(self, index, role):
         if role == Qt.ItemDataRole.DisplayRole:
-            return self._data[index.row()][index.column()]
+            return self.data[index.row()][index.column()]
         elif index.column() == 0:
             if role == Qt.ItemDataRole.TextAlignmentRole:
                 return Qt.AlignmentFlag.AlignHCenter + Qt.AlignmentFlag.AlignVCenter
            
     def rowCount(self, index):
-        return len(self._data)
+        return len(self.data)
 
     def columnCount(self, index):
-        return len(self._data[0])
+        return len(self.data[0])
   
     def headerData(self, col, orientation, role):
         if orientation == Qt.Orientation.Horizontal and \
             role == Qt.ItemDataRole.DisplayRole:
-            return self._header[col]
+            return self.header[col]
         return None
   
 ### --------------------------------------------------------      

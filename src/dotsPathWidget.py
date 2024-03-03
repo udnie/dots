@@ -80,22 +80,21 @@ class PathWidget(QWidget):
     def resetSliders(self):
         self.rotate = 0
         self.scale  = 1.0 
+        self.pathMaker.seconds = 10
         
         self.rotaryDial.setValue(0)
-        self.rotateValue.setText('{:3d}'.format(0))
+        self.rotateValue.setText(f'{0:3d}') 
         
         self.scaleSlider.setValue(int(100))
-        self.scaleValue.setText('{0:.2f}'.format(1.0))
-        
-        self.secondsSlider.setValue(self.pathMaker.seconds)
-           
+        self.scaleValue.setText(f'{1:.2f}') 
+               
     def Seconds(self, val):  
         self.pathMaker.seconds = val    
-        self.secondsValue.setText('{:2d}'.format(val))
+        self.secondsValue.setText(f'{val:2d}') 
    
     def Rotate(self, val): 
         self.rotatePath(val)
-        self.rotateValue.setText('{:3d}'.format(val))
+        self.rotateValue.setText(f'{val:3d}') 
    
     def rotatePath(self, val): 
         inc = (val - self.rotate)
@@ -105,7 +104,7 @@ class PathWidget(QWidget):
     def Scale(self, val):
         op = (val/100)
         self.scalePath(op)
-        self.scaleValue.setText('{0:.2f}'.format(op))
+        self.scaleValue.setText(f'{op:.2f}')  ## .format(op))
                                
     def scalePath(self, val): 
         per = (val - self.scale) / self.scale    

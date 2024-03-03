@@ -76,7 +76,6 @@ class PathItem(QGraphicsEllipseItem):
         e.accept()
 
     def mousePressEvent(self, e):   
-        self.edits.movingPathItem = True
         if self.pathMaker.key == 'del':  
             self.edits.deletePathItem(self.idx)
         elif self.pathMaker.key == 'opt': 
@@ -109,7 +108,6 @@ class PathItem(QGraphicsEllipseItem):
             if self.dragCnt > 0:
                 self.pathMaker.pts[self.idx] = self.mapToScene(e.pos())                
                 self.edits.updatePath()  ## rewrites pointItems as well
-            self.edits.movingPathItem = False
         e.accept()
               
     def cleanUp(self):

@@ -250,7 +250,7 @@ class ScrollPanel(QWidget):
                 for s in sprites:
                     self.addImageTile(s)
                 self.top()   
-            self.dots.statusBar.showMessage(('Number of Sprites:  {}'.format(self.scrollCount)) , 8000)
+            self.dots.statusBar.showMessage(f'Number of Sprites: {self.scrollCount}', 9000)
 
     def spriteList(self):
         try:

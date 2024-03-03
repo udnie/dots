@@ -215,7 +215,7 @@ class LostFiles:
             try:
                 os.remove(file)     
             except IOError:
-                MsgBox('selMissingFiles: Error reading file', 5)
+                MsgBox('MissingFiles: Error deleting tmp file', 5)
                 return  
                     
 ### ---------------------- dotsShowWorks -------------------

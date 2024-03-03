@@ -79,20 +79,20 @@ class ShadowWidget(QWidget):
         if self.maker.linked == False:
             self.maker.shadow.setOriginPt()
             self.works.rotateShadow(val)
-            self.rotateValue.setText('{:3d}'.format(val))
+            self.rotateValue.setText(f'{val:3d}') 
              
     def Scale(self, val):  
         if self.maker.linked == False:
             self.maker.shadow.setOriginPt()
             op = (val/100)
             self.works.scaleShadow(op) 
-            self.scaleValue.setText('{0:.2f}'.format(op))
+            self.scaleValue.setText(f'{op:.2f}')
                     
     def Opacity(self, val):
         op = (val/100)
         self.maker.shadow.setOpacity(op)
         self.maker.alpha = op
-        self.opacityValue.setText('{0:.2f}'.format(op))        
+        self.opacityValue.setText(f'{op:.2f}')        
               
 ### -------------------------------------------------------- 
     def sliderGroup(self):

@@ -258,11 +258,6 @@ class BkgMaker(QWidget):
             if itm.type == 'bkg':
                 print(itm.zValue())
                                 
-    def settingBkgMsg(self):
-        if self.bkgItem.type == 'bkg':  
-            txt = os.path.basename(self.bkgItem.fileName)
-            MsgBox(txt + ' ' +  'set to background', 4) 
-     
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()
         bkg.setPos(p.x() , p.y())

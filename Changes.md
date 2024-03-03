@@ -5,6 +5,11 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+ **March 3 2024**   
+Back again roping in Lasso in Paths and trying to find a balance in Shadows between outline vs. no outline and how to manage that. The 'O' key which toggles shadow outlines off and on is the best solution so far.  A few more bug fixes plus updating older string formats to f-strings.
+
+ ___
+ 
                           
 **February 22 2024**    
 I decided to tackle a few things on my todo list and finally got around to fixing the **'missing file'** recovery problem.  I used **QTableView** to display the contents of the **json .play file** and highlight any missing files as well as providing a means to delete them.  In the past when a missing file was encountered you were returned to the canvas and not able to access the **.play file** until you either managed to come up with the missing file or a like named substitute - or, editing the **.play file** with something like **text-edit**, which can work if there's only one file to delete or rename. As a rule, the only way a missing file comes about is you either deleted it, renamed it, or moved it as **dots** expects a particular screen type to be in a designated directory.

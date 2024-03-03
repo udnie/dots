@@ -106,6 +106,7 @@ class PathMaker(QWidget):
         
         self.editingPts = False
         self.pathTestSet = False
+        self.lassoOn = False
          
         self.ball = None
         self.path = None                 
@@ -132,9 +133,11 @@ class PathMaker(QWidget):
                 self.edits.editPointsOff()
                 self.edits.editPoints()
             
-        elif self.key == 'L' and self.editingPts == True:
-            self.pathWorks.closeWidget()
-            self.edits.toggleLasso()
+        elif self.key == 'L' and self.editingPts == True:  ## turn lasso on/off
+            if self.lassoOn == False:
+                self.edits.newLasso()
+            else:
+                self.edits.deleteLasso()
                                                                   
         elif self.key in self.editKeys and self.editingPts == True:
             self.editKeys[self.key]()  
@@ -199,6 +202,7 @@ class PathMaker(QWidget):
                                                                        
     def delete(self):
         self.pathWorks.stopPathTest()
+        self.editingPts == False
         self.edits.deleteLasso()    ## reset cursor
         self.edits.deleteNewPath()  ## turns green if nothing else
         self.edits.removeNewPath()
@@ -218,8 +222,7 @@ class PathMaker(QWidget):
             self.canvas.sideCar.clearWidgets()
             if self.keysPanel.pathMenuSet:
                 self.keysPanel.toggleMenu()
-            self.canvas.btnPathMaker.setStyleSheet(
-                'background-color: white')
+            self.canvas.btnPathMaker.setStyleSheet('background-color: white')
             self.canvas.showWorks.enablePlay()
          
     def addNewPathPts(self, pt):
@@ -267,9 +270,10 @@ class PathMaker(QWidget):
         self.chooser = None
         self.pathChooserSet = False 
         if len(self.openPathFile) > 0:  ## statusBar
-            self.dots.statusBar.showMessage(self.openPathFile + \
-                ' - Number of Points ' + str(len(self.pts)))
+            self.dots.statusBar.showMessage(
+                f"{self.openPathFile} - Number of Points {len(self.pts)}")
             if self.pathWorks.widget != None:
+                self.pathWorks.widget.resetSliders()
                 file = os.path.basename(self.openPathFile)
                 self.pathWorks.widget.label.setText(file)
                 self.pathWorks.widget.label.setStyleSheet("QLabel{font-size: 14pt;}") 

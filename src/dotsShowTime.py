@@ -135,7 +135,6 @@ class ShowTime:
                 isinstance(pix, QGraphicsPolygonItem):
                 continue              
             try:
-                # if pix.fileName in ('frame','flat'):
                 if pix.type in ('frame','flat'):
                     continue       
             except:

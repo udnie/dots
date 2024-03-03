@@ -31,7 +31,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.canvas   = self.showbiz.canvas
         self.dots     = self.canvas.dots
  
-        self.src = src  ## if it's 'table' then it's from  a 'Shift-J' 
+        self.src = src  ## if it's 'table' then it's from the canvas - typed in 'J'
         self.data = data
     
         self.showtime  = self.showbiz.showtime   
@@ -51,10 +51,11 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.tableView.horizontalHeader().setStretchLastSection(True)
     
         self.tableView.horizontalScrollBar().setStyleSheet('QScrollBar:horizontal{\n' 
-            'background: rgb(200,200,200)}'); 
-        
+            'background-color: rgb(225,225,225)}'); 
+           
         self.tableView.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
-            'background: rgb(200,200,200)}');
+            'backround: rgb(245,245,245) ; \n'                                  
+            'background-color: rgb(225,225,225)}');
         
         self.tableView.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
             'background-color: rgb(225,225,225);\n'
@@ -75,6 +76,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.shortcut = QShortcut(QKeySequence("C"), self.tableView)
         self.shortcut.activated.connect(self.bye)
         
+        ## saves to file, but undeleted files won't disappear if saved from canvas rather than storyboard
         self.shortcut = QShortcut(QKeySequence("S"), self.tableView)
         self.shortcut.activated.connect(self.shuffle)
                          
@@ -93,7 +95,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         file = os.path.basename(self.canvas.openPlayFile)
         
         self.dots.statusBar.showMessage(file) 
-        self.tableView.setWindowTitle(file + ' - ' + str(len(data)) + ' rows') 
+        self.tableView.setWindowTitle(f"{file} - {len(data)} rows") 
         
         self.model = TableModel(data, self.cols, self.hdr)   
         self.tableView.setModel(self.model)
@@ -148,18 +150,12 @@ class TableView:  ## formats a json .play file to display missing files or not
                 if s[0] == tmp['fileName'] and s[1] == tmp['z']:
                     self.data.remove(tmp) 
                     break   
-     
-### --------------------------------------------------------
-    def missing(self, tmp, miss, k):
-        if self.showFiles.fileNotFound(tmp):          
-            miss.append(k) 
-            self.Missingfiles.append(tmp)       
 
-    def shuffle(self):
+    def shuffle(self):  ## the save key
         if self.src != 'table':  
-            self.showtime.savePlay()  ## drops missing
+            self.showtime.savePlay()  ## drops missing files if any
         else:
-            self.showWorks.saveToPlays(self.data)  ## by-passes showtime - doesn't filter out missing
+            self.showWorks.saveToPlays(self.data)  ## doesn't filter out missing
                         
 ### --------------------------------------------------------          
     def makeTable(self, dlist):  ## first make the typelist 
@@ -206,15 +202,20 @@ class TableView:  ## formats a json .play file to display missing files or not
                         data.append(typ.hdr)  ## do this when the type changes 
                         save.append(k)  ## keep track of hdr row index
                         k += 1
-                    first = typ.type                        
-            self.missing(tmp, miss, k)                                              
+                    first = typ.type   
+                    
+            if self.showFiles.fileNotFound(tmp):          
+                miss.append(k) 
+                self.Missingfiles.append(tmp)                
+                                          
             data.append(list(tmp.values()))  
             k += 1  ## tracking the row number       
                           
         if self.deleteKey == True or self.src in('view', 'table') or len(self.Missingfiles) > 0:
             self.addTable(data, miss, save) 
             self.deleteKey == False     
-        elif len(self.Missingfiles) == 0 and self.src != 'table':
+            
+        elif len(self.Missingfiles) == 0 and self.src != 'table':  ## nothing to show 
             return
                  
 ### --------------------------------------------------------

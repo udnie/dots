@@ -333,8 +333,8 @@ class Abstract:  ## hats
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()  
-        str = 'Number of Shadows: {0}  seconds:  {1:.2f}'  
-        self.dots.statusBar.showMessage(str.format(len(tasks), time.time() - start), 10000)                            
+        self.dots.statusBar.showMessage(
+            f"Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}", 10000)                            
  
     async def newShadow(self, pix): 
         pix.addShadow() 

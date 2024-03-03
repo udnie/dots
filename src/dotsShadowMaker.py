@@ -82,15 +82,19 @@ class ShadowMaker:
         del image
         del pixmap
                       
+        self.alpha, self.scalor, self.rotate = .50, 1.0, 0
+        
         self.imgSize = width, height  ## save for later 
         self.viewW, self.viewH = viewW, viewH
         
         pos = self.pixitem.pos()
         x, y = pos.x(), pos.y()
                                   
+        self.shadow.setZValue(self.pixitem.zValue()-1) 
+                                                               
         self.shadow.setX(x-50)  ## same as pixitem, add offset
         self.shadow.setY(y-15)  
-            
+       
         self.shadow.setOpacity(self.alpha)                                  
         self.scene.addItem(self.shadow)  
    
@@ -132,7 +136,7 @@ class ShadowMaker:
         self.updateShadow()
         
         if self.linked == True: self.shadow.linkShadow()
-        
+     
         self.shadow.setOpacity(self.alpha)
                                                                                                                                                        
 ### --------------------------------------------------------
@@ -178,7 +182,7 @@ class ShadowMaker:
         self.works.updateOutline()
                                                                                                 
 ### --------------------------------------------------------    
-    def addWidget(self, save):  ## creates a shadow widget     
+    def addWidget(self, pix):  ## creates a shadow widget     
         self.works.closeWidget()
         self.widget = ShadowWidget(self)  
         
@@ -187,14 +191,14 @@ class ShadowMaker:
         else:      
             self.widget.linkBtn.setText('UnLink')  ## link == True
           
-        p = save                                        
+        p = pix.sceneBoundingRect()                                    
         x, y = int(p.x()), int(p.y())  
         self.last = QPointF(x,y)  ## last position   
             
         p = self.canvas.mapToGlobal(QPoint(x, y))
         x, y = int(p.x()), int(p.y())       
-        x = int(x - int(self.widget.WidgetW)-50)  ## offset from shadow
-        y = int(y - int(self.widget.WidgetH)*.35)    
+        x = int(x - int(self.widget.WidgetW)-10)  ## offset from shadow
+        y = int(y - int(self.widget.WidgetH)*.15)    
         
         self.widget.save = QPointF(x,y)  
         self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))   
@@ -259,7 +263,6 @@ class ShadowMaker:
         self.works.cleanUpShadow()
         b = self.pixitem.boundingRect()
         self.addShadow(b.width(), b.height(), self.viewW, self.viewH)      
-        self.alpha, self.scalor, self.rotate = .50, 1.0, 0
                          
     def toggleLink(self): 
         if self.shadow != None:

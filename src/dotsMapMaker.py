@@ -104,7 +104,7 @@ class MapMaker:
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
         k = len(self.selections)
-        self.dots.statusBar.showMessage('Number Selected:  {}'.format(k),2500)
+        self.dots.statusBar.showMessage(f'Number Selected: {k}', 5000)
 
     def mapBoundingRects(self):
         tx, ty = common['ViewW'], common['ViewH']
