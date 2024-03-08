@@ -14,7 +14,8 @@ ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
 LockKeys  = (Qt.Key.Key_L, Qt.Key.Key_R, Qt.Key.Key_U) 
 ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
-            Qt.Key.Key_W,  Qt.Key.Key_O, Qt.Key.Key_B, Qt.Key.Key_J)
+            Qt.Key.Key_W,  Qt.Key.Key_O, Qt.Key.Key_B, Qt.Key.Key_J, \
+            Qt.Key.Key_S)
 UpDownKeys = (Qt.Key.Key_Down, Qt.Key.Key_Up)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
 
@@ -115,7 +116,7 @@ class ControlView(QGraphicsView):
                         
         ##  all the shift keys 
         elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:   
-            ## keys - D, T, V, H , O, B        
+            ## keys - D, T, V, H , O, B, S        
             if key == Qt.Key.Key_D:   
                 if self.canvas.pathMakerOn:
                     self.setKey('delPts')  ## send to pathmaker
@@ -132,6 +133,8 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleOutlines()
             elif key == Qt.Key.Key_B:
                 self.sideCar.dumpBkgs()
+            elif key == Qt.Key.Key_S:
+                self.sideCar.unlinkShadows()
                         
         # keys used in locking screen items - L, R, U
         elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier: 

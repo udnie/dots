@@ -128,6 +128,9 @@ class TableModel(QAbstractTableModel):
         # atmp =  atmp + list(tmp.items())[3:]  ## glue it back together
         # tmp  = dict(atmp)    
   
+        #  f"({pt.x():.2f}, {pt.y():.2f})  %{pct:.2f}   {idx}"
+  
+  
         ## for k in newlist: print(k['fileName'], k['z'])         
         # dlist = sorted(dlist, key=lambda x: x['z'], reverse=True)  ## sort by 'z' val  
   

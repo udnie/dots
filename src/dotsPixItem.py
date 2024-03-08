@@ -8,6 +8,7 @@ from dotsPixFrameWorks  import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 
+
 ## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
@@ -37,7 +38,7 @@ class PixItem(QGraphicsPixmapItem):
         self.x = x 
         self.y = y
         
-        self.shadowMaker = ShadowMaker(self)  ## returns isActive is False if from shadow_dummy
+        self.shadowMaker = ShadowMaker(self)  ## returns isActive equals False if from shadow_dummy
         self.works = Works(self)  ## functions and PixSizes moved from here
         
         img = None
@@ -75,7 +76,7 @@ class PixItem(QGraphicsPixmapItem):
         self.tag = ''
         
         self.anime  = None   
-        self.shadow = None  ## holds a dictionary of shadow stuff if there is one
+        self.shadow = {} ## holds a dictionary of shadow stuff if there is one
         self.widget = None
  
         self.dragAnchor = QPoint()

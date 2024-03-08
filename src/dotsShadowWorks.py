@@ -108,7 +108,7 @@ class Works:  ## small functions that were in ShadowMaker
     def showOutline(self):
         if self.maker.outline != None:
             self.maker.outline.setVisible(True)
-            self.maker.updatePath(self.maker.shadow.save) 
+            self.maker.updatePath(self.maker.shadow.save)  ## a QPointF class attr.
             self.updateOutline()
             self.maker.outline.show()
             self.hidePoints(False)      

@@ -8,7 +8,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
  **March 3 2024**   
 Back again roping in Lasso in Paths and trying to find a balance in Shadows between outline vs. no outline and how to manage that. The 'O' key which toggles shadow outlines off and on is the best solution so far.  A few more bug fixes plus updating older string formats to f-strings.
 
-**March 7 2024** - More work on shadow outlines. They're now off until you either double-click on the shadow or choose outline from its widget. The outline and points are only needed if you plan to make any changes. Also turned 'J'  into a toggle which can close the file viewer as well as triggering it. Typing 'C' to close the viewer still works.
+**March 7 2024** - More work on shadow outlines. They're now off until you either **double-click** on the shadow or choose outline from its widget. The outline and points are only needed if you plan to make any changes. Also turned **'J'**  into a toggle which can close the file viewer as well as triggering it. Typing **'C'** to close the viewer still works.  Added a **shift-S** command to **unlink** all shadows.  A reminder: if you've saved any play files with shadows and then turned shadows off - loading that file and saving it without shadows back on will cause the shadow data to be lost. 
 
  ___
  

@@ -166,6 +166,7 @@ def storyBoard():
         ('Shift', '+L ToggleLocks'),
         ('Shift', '+O Hide Outlines'),
         ('Shift', '+R Locks All'),
+        ('Shift', '+S UnLinks All'),
         ('Shift', '+T TagSelected'),
         ('Shift', '+U Unlocks All'),  
         ('\'', 'Toggle this lock'),

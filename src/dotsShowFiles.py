@@ -171,9 +171,9 @@ class ShowFiles:
             return None      
         return bkg ## return to showbiz
     
-    def setShadow(self, pix, tmp):  ## read by restore shadows - coping one dictionary to another with some possible changes
+    def setShadow(self, pix, tmp):  ## read by restore shadows - copies one dictionary to another with some possible changes
         try:
-            pix.shadow = {  ## if it exists and pix.shadowMaker.isActive == True
+            pix.shadow = {  ## makes any stmp data available after the .play file is read
                 'alpha':    tmp['alpha'],
                 'scalor':   tmp['scalor'],  ## unique to shadow  - used for a test
                 'rotate':   tmp['rotate'],
@@ -215,15 +215,14 @@ class ShowFiles:
             'part':     pix.part,
         }  
    
-        if pix.shadowMaker.shadow != None:
-            shadow = {}
+        if pix.shadowMaker.shadow != None and isinstance(pix.shadowMaker.alpha, float):
             try:
                 shadow = {
                     'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
                     'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
                     'rotate':   pix.shadowMaker.rotate,
-                    'width':    pix.shadowMaker.imgSize[0],
-                    'height':   pix.shadowMaker.imgSize[1],
+                    'width':    pix.shadowMaker.width,
+                    'height':   pix.shadowMaker.height,
                     'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
                                     for k in range(4)],
                     'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
@@ -232,7 +231,7 @@ class ShowFiles:
                     'linked':   pix.shadowMaker.linked,
                 }
             except:       
-                shadow = None
+                shadow = {}
                 self.errorOnShadows = True   
             tmp.update(shadow)             
         return tmp 

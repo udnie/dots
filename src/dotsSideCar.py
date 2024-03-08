@@ -202,7 +202,13 @@ class SideCar:
             elif pix.zValue() <= common['pathZ']:
                 break
         return False                                              
-                                                                                                                                                            
+     
+    def unlinkShadows(self):
+        for pix in self.scene.items():
+            if pix.type == 'pix'and pix.shadowMaker.linked == True:
+                pix.shadowMaker.shadow.unLinkShadow()
+                pix.shadowMaker.works.hideOutline()
+                                                                                                              
     def hideOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
             if pix.type == 'pix'and pix.shadowMaker.isActive == True:

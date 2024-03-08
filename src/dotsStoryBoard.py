@@ -184,7 +184,7 @@ class StoryBoard(QWidget):
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys
         for itm in self.scene.items():  ## used with lasso to move selections
             if itm.type in ('pt','pix', 'bkg', 'frame'):   
-                if itm.type in ('pt','pix') and \
+                if itm.type == 'pt' or itm.type == 'pix' and \
                     itm.part not in ('pivot','left','right'):  ## 06-23-23
                     itm.setPixKeys(self.key)
                 elif itm.type in ('bkg', 'frame'):  

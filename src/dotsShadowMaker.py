@@ -55,16 +55,18 @@ class ShadowMaker:
         self.shadow  = None
         self.widget  = None
        
-        self.imgSize = 0,0  ## last width and height of shadow
+        self.width = 0
+        self.height = 0
+       
         self.viewW, self.viewH = 0,0
         
         self.last = QPointF()
  
 ### --------------------------------------------------------
-    def addShadow(self, w, h, viewW, viewH):  ## initial shadow       
+    def addShadow(self, w, h, viewW, viewH):  ## from scatch      
         if self.shadow != None:
             return        
-        file, w, h = self.works.pixWidthHeight()          
+        file, w, h = self.works.pixWidthHeight()  ## returns file as well as width and height      
         file = paths['spritePath'] + os.path.basename(file) 
                                  
         img, width, height, bytesPerLine = initShadow(file, w, h, self.pixitem.flopped)
@@ -101,7 +103,7 @@ class ShadowMaker:
         QTimer.singleShot(100, self.shadow.initPoints)  
                                                                                                                                                                    
 ### --------------------------------------------------------                         
-    async def restoreShadow(self):  ## reads from play file   
+    async def restoreShadow(self):  ## reads from pixitem.shadow, a copy of the shadow data from the .play file
         for k in range(4):
             x = self.pixitem.shadow['pathX'][k]
             y = self.pixitem.shadow['pathY'][k]
@@ -120,7 +122,8 @@ class ShadowMaker:
         except TypeError:  ## no fault error trap
             pass
                                                    
-        self.imgSize = self.pixitem.shadow['width'], self.pixitem.shadow['height']  
+        self.width   = self.pixitem.shadow['width']
+        self.height  = self.pixitem.shadow['height']  
         self.alpha   = self.pixitem.shadow['alpha']
         self.scalor  = self.pixitem.shadow['scalor']
         self.rotate  = self.pixitem.shadow['rotate']
@@ -148,8 +151,8 @@ class ShadowMaker:
                           
         img, width, height, bytesPerLine = setPerspective(
             self.path, 
-            self.imgSize[0], 
-            self.imgSize[1],
+            self.width, 
+            self.height,
             cpy, 
             self.viewW, self.viewH)   
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32) 
@@ -178,7 +181,7 @@ class ShadowMaker:
            
         self.shadow.setOpacity(self.alpha)        
         self.scene.addItem(self.shadow)   
-         
+                        
         self.works.updateOutline(what)  ## to turn off outline
                                                                                                 
 ### --------------------------------------------------------    
@@ -249,7 +252,7 @@ class ShadowMaker:
         for i in range(4):
             self.path[i] = self.path[i] + dif
             self.updatePoints(i, self.path[i].x(), self.path[i].y())
-            
+        
         self.shadow.save = val   
         if self.linked == False:    ## updated by shadow
             self.shadow.setPos(self.shadow.pos()+dif)   

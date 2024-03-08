@@ -116,12 +116,13 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)         
         self.setPos(self.pixitem.pos()+self.pixitem.offset)
         self.maker.linked = False 
-        self.maker.updatePath(b)  ## ending value    
-        self.maker.updateShadow() 
+        self.maker.updatePath(b)  ## ending value   
+        self.maker.updateShadow()  
         self.maker.addPoints() 
         self.maker.works.showOutline() 
-        self.maker.widget.linkBtn.setText('Link')  ## keep it open  
-        self.maker.works.resetSliders() 
+        if self.maker.widget != None:
+            self.maker.widget.linkBtn.setText('Link')  ## keep it open  
+            self.maker.works.resetSliders() 
        
 ### --------------------------------------------------------        
     def initPoints(self):  ## initial path and points setting from maker.addShadow         
