@@ -128,7 +128,7 @@ class SideCar:
             if p.type == 'bkg':
                 file, direction, mirror, locked = self.addBkgLabels(p)
                 showtime = p.showtime
-                print( f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
+                print(f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
         print()
           
     def addBkgLabels(self, bkg): 
@@ -208,6 +208,11 @@ class SideCar:
             if pix.type == 'pix'and pix.shadowMaker.isActive == True:
                 pix.shadowMaker.works.hideOutline()
          
+    def showOutlines(self):  ## runs from shift-O
+        for pix in self.scene.items():
+            if pix.type == 'pix'and pix.shadowMaker.isActive == True:
+                pix.shadowMaker.works.showOutline()
+                 
     ## added dlbclk if hidden to re-select ##
     def hideSelected(self): 
         ## if self.mapper.mapSet and self.hasHiddenPix():  

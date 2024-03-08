@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
 
 from dotsSideGig        import *
 from dotsSideCar        import SideCar
-from dotsShowFiles      import savePix, saveBkgnd, saveFrame, saveFlat
+from dotsShowFiles      import ShowFiles
 from dotsShowWorks      import ShowWorks
 from dotsShared         import Types, ControlKeys
 
@@ -30,6 +30,7 @@ class ShowTime:
         
         self.sideCar   = SideCar(self.canvas) 
         self.showWorks = ShowWorks(self.canvas)
+        self.showFiles = ShowFiles(self.canvas) 
         
         self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
@@ -194,6 +195,8 @@ class ShowTime:
             except Exception:
                 MsgBox('Error saving file...', 5)         
         del dlist
+        if self.showFiles.errorOnShadows == True:
+            MsgBox('Error on Saving Some Shadows...', 5)
                             
     def updlist(self):
         dlist = []
@@ -202,13 +205,13 @@ class ShowTime:
                 if pix.type == 'pix' and pix.part in ('left','right'): 
                     continue    
                 if pix.type == 'frame': 
-                    dlist.append(saveFrame(pix))       
+                    dlist.append(self.showFiles.saveFrame(pix))       
                 elif pix.type == 'pix':                 
-                    dlist.append(savePix(pix))                    
+                    dlist.append(self.showFiles.savePix(pix))                    
                 elif pix.type == 'bkg':    
-                    dlist.append(saveBkgnd(pix)) 
+                    dlist.append(self.showFiles.saveBkgnd(pix)) 
                 elif pix.type == 'flat': 
-                    dlist.append(saveFlat(pix)) 
+                    dlist.append(self.showFiles.saveFlat(pix)) 
         return dlist           
    
 ### ---------------------- dotsShowTime --------------------

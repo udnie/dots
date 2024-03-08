@@ -54,7 +54,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             'background-color: rgb(225,225,225)}'); 
            
         self.tableView.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
-            'backround: rgb(245,245,245) ; \n'                                  
+            'background: rgb(245,245,245) ; \n'                                  
             'background-color: rgb(225,225,225)}');
         
         self.tableView.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
@@ -74,6 +74,10 @@ class TableView:  ## formats a json .play file to display missing files or not
         
         ##  or use 'C' to clear the tableview and not what it's in back of it
         self.shortcut = QShortcut(QKeySequence("C"), self.tableView)
+        self.shortcut.activated.connect(self.bye)
+        
+        ##  or use 'J' to clear the tableview and not what it's in back of it
+        self.shortcut = QShortcut(QKeySequence("J"), self.tableView)
         self.shortcut.activated.connect(self.bye)
         
         ## saves to file, but undeleted files won't disappear if saved from canvas rather than storyboard

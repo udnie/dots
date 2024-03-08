@@ -62,7 +62,7 @@ class DotsQt(QMainWindow):
 
         ## adjusted for app size and display, see getY() for '900' screen
         self.move(getX(), getY()+50)  ## functions in screens 
-   
+
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always

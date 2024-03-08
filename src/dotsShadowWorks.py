@@ -74,13 +74,14 @@ class Works:  ## small functions that were in ShadowMaker
                 self.hideOutline() 
             elif self.maker.outline.isVisible() == False:
                 self.showOutline()
+            self.closeWidget()
   
-    def updateOutline(self): 
+    def updateOutline(self, hide=''): 
         self.deleteOutline()
         self.maker.outline = QGraphicsPolygonItem(self.makeOutline()) 
         self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
         self.maker.outline.setZValue(common['outline'])       
-        if self.maker.linked == True:  ## used throughout shadow and updateShadow
+        if self.maker.linked == True or hide != '':  ## used throughout shadow and updateShadow
             self.hideOutline()      
         self.scene.addItem(self.maker.outline)
 
@@ -196,7 +197,7 @@ class Works:  ## small functions that were in ShadowMaker
             self.maker.path[i] = QPointF(plotX, plotY)
             self.maker.updatePoints(i, plotX, plotY)
                  
-        self.maker.updateShadow()  
+        self.maker.updateShadow('nope')  
            
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem): 

@@ -140,7 +140,7 @@ class ShadowMaker:
         self.shadow.setOpacity(self.alpha)
                                                                                                                                                        
 ### --------------------------------------------------------
-    def updateShadow(self):  ## if rotated, scaled or points moved           
+    def updateShadow(self, what=''):  ## if rotated, scaled or points moved           
         cpy = self.flopCpy if self.flopped else self.cpy  ## called by shadow and poinitem
         
         linked = self.linked     ## these 2 aren't carried over and need to be restored
@@ -179,7 +179,7 @@ class ShadowMaker:
         self.shadow.setOpacity(self.alpha)        
         self.scene.addItem(self.shadow)   
          
-        self.works.updateOutline()
+        self.works.updateOutline(what)  ## to turn off outline
                                                                                                 
 ### --------------------------------------------------------    
     def addWidget(self, pix):  ## creates a shadow widget     
@@ -245,9 +245,7 @@ class ShadowMaker:
  
     def updatePath(self, val):  ## see shadow for ItemSendsScenePositionChanges
         dif = val - self.shadow.save  
-        
-        self.addPoints()
-             
+                    
         for i in range(4):
             self.path[i] = self.path[i] + dif
             self.updatePoints(i, self.path[i].x(), self.path[i].y())

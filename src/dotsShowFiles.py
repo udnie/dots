@@ -15,8 +15,10 @@ class ShowFiles:
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas = parent
-        self.scene  = self.canvas.scene
+        self.canvas  = parent
+        self.scene   = self.canvas.scene
+ 
+        self.errorOnShadows = False
 
 ### -------------------------------------------------------- 
     def fileNotFound(self, tmp):  ## look in the paths set by types - used by dictionaries
@@ -64,9 +66,11 @@ class ShowFiles:
         pix.tag    = tmp['tag'] 
         pix.alpha2 = tmp['alpha2']
         pix.locked = tmp['locked']  
-                                                                
-        if pix.type == 'pix' and pix.shadowMaker.isActive == True and 'scalor' in tmp.keys(): 
-            pix = self.setShadow(pix, tmp)        
+                                        
+        ### if pix.type == 'pix' and pix.shadowMaker.isActive == True and 'scalor' in tmp.keys():                         
+        if pix.type == 'pix' and 'scalor' in tmp.keys():  ## test pix.shadowMaker.isActive when adding to scene
+            pix = self.setShadow(pix, tmp)   
+                 
         elif pix.type == 'bkg':  ## adding the rest of it
             pix = self.setBackGround(pix, tmp, z)  ## checking if a dupe
             if pix != None:
@@ -167,109 +171,118 @@ class ShowFiles:
             return None      
         return bkg ## return to showbiz
     
-    def setShadow(self, pix, tmp):
-        pix.shadow = {  ## pix.shadow is a dictionary in pix - if it exists and pix.shadowMaker.isActive == True otherwise, no shadows
-            'alpha':    tmp['alpha'],
-            'scalor':   tmp['scalor'],  ## unique to shadow  - used for a test
-            'rotate':   tmp['rotate'],
-            'width':    tmp['width'],
-            'height':   tmp['height'],
-            'pathX':    tmp['pathX'],
-            'pathY':    tmp['pathY'],  
-        }                         
-        if 'flopped' not in tmp.keys():      
-            pix.shadow['flopped'] = None
-        else:
-            pix.shadow['flopped'] = tmp['flopped']
-        if 'fileName' not in tmp.keys(): 
-            pix.shadow['fileName'] = 'shadow' 
-        if 'linked' not in tmp.keys(): 
-            pix.shadow['linked'] = False
-        else:
-            pix.shadow['linked'] = tmp['linked']                  
+    def setShadow(self, pix, tmp):  ## read by restore shadows - coping one dictionary to another with some possible changes
+        try:
+            pix.shadow = {  ## if it exists and pix.shadowMaker.isActive == True
+                'alpha':    tmp['alpha'],
+                'scalor':   tmp['scalor'],  ## unique to shadow  - used for a test
+                'rotate':   tmp['rotate'],
+                'width':    tmp['width'],
+                'height':   tmp['height'],
+                'pathX':    tmp['pathX'],
+                'pathY':    tmp['pathY'],  
+            }                         
+            if 'flopped' not in tmp.keys():      
+                pix.shadow['flopped'] = None
+            else:
+                pix.shadow['flopped'] = tmp['flopped']
+            if 'fileName' not in tmp.keys(): 
+                pix.shadow['fileName'] = 'shadow' 
+            if 'linked' not in tmp.keys(): 
+                pix.shadow['linked'] = False
+            else:
+                pix.shadow['linked'] = tmp['linked']  
+        except:
+            pix.shadow = {} 
+            self.errorOnShadows = True               
         return pix
     
 ### --------------------------------------------------------
-def savePix(pix):  ## used by showtime when saving scene items
-    p = pix.pos() 
-    tmp = {
-        'fileName':  os.path.basename(pix.fileName),
-        'type':     'pix',
-        'x':        float('{0:.2f}'.format(p.x())),
-        'y':        float('{0:.2f}'.format(p.y())),
-        'z':        pix.zValue(),
-        'tag':      pix.tag,
-        'locked':   pix.locked,
-        'mirror':   pix.flopped,
-        'rotation': pix.rotation,
-        'scale':    float('{0:.2f}'.format(pix.scale)),
-        'alpha2':   float('{0:.2f}'.format(pix.alpha2)), 
-        'part':     pix.part,
-    }  
+    def savePix(self, pix):  ## used by showtime when saving scene items
+        p = pix.pos() 
+        tmp = {
+            'fileName':  os.path.basename(pix.fileName),
+            'type':     'pix',
+            'x':        float('{0:.2f}'.format(p.x())),
+            'y':        float('{0:.2f}'.format(p.y())),
+            'z':        pix.zValue(),
+            'tag':      pix.tag,
+            'locked':   pix.locked,
+            'mirror':   pix.flopped,
+            'rotation': pix.rotation,
+            'scale':    float('{0:.2f}'.format(pix.scale)),
+            'alpha2':   float('{0:.2f}'.format(pix.alpha2)), 
+            'part':     pix.part,
+        }  
    
-    if pix.shadowMaker.isActive == True and pix.shadow != None:   
-        shadow = {
-            'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
-            'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
-            'rotate':   pix.shadowMaker.rotate,
-            'width':    pix.shadowMaker.imgSize[0],
-            'height':   pix.shadowMaker.imgSize[1],
-            'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
-                            for k in range(4)],
-            'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
-                            for k in range(4)],
-            'flopped':   pix.shadowMaker.flopped,
-            'linked':   pix.shadowMaker.linked,
+        if pix.shadowMaker.shadow != None:
+            shadow = {}
+            try:
+                shadow = {
+                    'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
+                    'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
+                    'rotate':   pix.shadowMaker.rotate,
+                    'width':    pix.shadowMaker.imgSize[0],
+                    'height':   pix.shadowMaker.imgSize[1],
+                    'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
+                                    for k in range(4)],
+                    'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
+                                    for k in range(4)],
+                    'flopped':   pix.shadowMaker.flopped,
+                    'linked':   pix.shadowMaker.linked,
+                }
+            except:       
+                shadow = None
+                self.errorOnShadows = True   
+            tmp.update(shadow)             
+        return tmp 
+
+    def saveBkgnd(self, pix):
+        p = pix.boundingRect()      
+        tmp = {
+            'fileName':  os.path.basename(pix.fileName),
+            'type':     'bkg',
+            'x':        float('{0:.2f}'.format(pix.x)),
+            'y':        float('{0:.2f}'.format(pix.y)),
+            'z':        pix.zValue(),
+            'tag':      pix.tag,
+            'locked':   pix.locked,
+            'mirror':   pix.flopped,
+            'width':    int(p.width()),
+            'height':   int(p.height()),
+            'scrollable':   pix.scrollable,
+            'direction':    pix.direction,
+            'mirroring':    pix.mirroring,
+            'factor':       pix.factor,
+            'rate':         pix.rate,
+            'showtime':     pix.showtime,      
+        }     
+        return tmp
+
+    def saveFrame(pix):       
+        tmp = {
+            'fileName':  os.path.basename(pix.fileName),
+            'type':     'frame',
+            'x':        float('{0:.2f}'.format(pix.x)),
+            'y':        float('{0:.2f}'.format(pix.y)),
+            'z':        pix.zValue(),   
+            'tag':      '',
+            'locked':   pix.locked,
         }
-        tmp.update(shadow)       
-    return tmp 
+        return tmp
 
-def saveBkgnd(pix):
-    p = pix.boundingRect()      
-    tmp = {
-        'fileName':  os.path.basename(pix.fileName),
-        'type':     'bkg',
-        'x':        float('{0:.2f}'.format(pix.x)),
-        'y':        float('{0:.2f}'.format(pix.y)),
-        'z':        pix.zValue(),
-        'tag':      pix.tag,
-        'locked':   pix.locked,
-        'mirror':   pix.flopped,
-        'width':    int(p.width()),
-        'height':   int(p.height()),
-        'scrollable':   pix.scrollable,
-        'direction':    pix.direction,
-        'mirroring':    pix.mirroring,
-        'factor':       pix.factor,
-        'rate':         pix.rate,
-        'showtime':     pix.showtime,      
-    }     
-    return tmp
-
-def saveFrame(pix):       
-    tmp = {
-        'fileName':  os.path.basename(pix.fileName),
-        'type':     'frame',
-        'x':        float('{0:.2f}'.format(pix.x)),
-        'y':        float('{0:.2f}'.format(pix.y)),
-        'z':        pix.zValue(),   
-        'tag':      '',
-        'locked':   pix.locked,
-    }
-    return tmp
-
-def saveFlat(pix):       
-    tmp = {
-        'fileName':  'flat',
-        'type':     'flat',
-        'x':        float('{0:.2f}'.format(pix.x)),
-        'y':        float('{0:.2f}'.format(pix.y)),   
-        'z':        pix.zValue(),
-        'tag':      pix.color.name(),
-        'locked':   pix.locked,
-        'color':    pix.color.name(),
-    }  
-    return tmp
+    def saveFlat(self, pix):       
+        tmp = {
+            'fileName':  'flat',
+            'type':     'flat',
+            'x':        float('{0:.2f}'.format(pix.x)),
+            'y':        float('{0:.2f}'.format(pix.y)),   
+            'z':        pix.zValue(),
+            'tag':      pix.color.name(),
+            'locked':   pix.locked,
+            'color':    pix.color.name(),
+        }  
+        return tmp
    
 ### --------------------- dotsShowFiles --------------------   
     

@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF, QRectF
+from PyQt6.QtCore       import Qt, QPointF ##, QRectF
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
                                
 from dotsShared         import common, paths
@@ -33,8 +33,10 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         
         self.type = 'shadow' 
         self.fileName = 'shadow'
-                                       
+        
+        self.dblclk = False                  
         self.dragCnt = 0
+        
         self.save = QPointF()  ## mapToScene - used with updatePath
                              
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
@@ -64,7 +66,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.maker.linked == False:
             self.dragCnt += 1
             if self.dragCnt % 5 == 0:                  
-                self.maker.updatePath(self.mapToScene(e.pos()))
+                self.maker.updatePath(self.mapToScene(e.pos()))         
         self.maker.works.hidePoints()  
         e.accept()       
                           
@@ -72,9 +74,17 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.maker.linked == False:  
             self.maker.updatePath(self.mapToScene(e.pos())) 
             self.updOutline(e)
-            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving     
-        self.maker.works.hideOutline() 
-        self.maker.works.hidePoints()       
+            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving   
+        if self.dblclk == False:  
+            self.maker.works.hideOutline() 
+            self.maker.works.hidePoints() 
+        else:
+            self.dblclk == False  ## otherwise it hides the outline from a dlbclk
+        e.accept()
+  
+    def mouseDoubleClickEvent(self, e):
+        self.dblclk = True
+        self.updOutline(e)
         e.accept()
   
     def updOutline(self, e):  ## so as not to be confused with updateOutline
@@ -128,9 +138,8 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.pixitem.scale != 1.0 or self.pixitem.rotation != 0:    
             self.scaleRotateShadow()
             
-    def scaleRotateShadow(self):  ## only if new     
+    def scaleRotateShadow(self):  ## only if new    
         self.maker.shadow.setRotation(self.pixitem.rotation)
-    
         self.maker.setPath(self.pixitem.boundingRect(), self.pixitem.pos() + QPointF(-50,-15))
      
         if self.pixitem.rotation != 0:
@@ -141,9 +150,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
             self.maker.works.scaleShadow(self.pixitem.scale)      
             self.maker.scalor = self.pixitem.scale
 
-        self.maker.addPoints()     
-        self.maker.works.updateOutline() 
-       
+        self.maker.addPoints()      
         self.maker.updateShadow()
            
     def setOriginPt(self):    

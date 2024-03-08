@@ -151,14 +151,14 @@ class ShowBiz:
                 MsgBox('loadPlay ' + file + 'Not Found')              
             if len(dlist) > 0: 
                 self.makeTableView(dlist, src)  ## display any missing files or what's there if 'table'
-                if src == 'table':              ## show tableview when run from canvas when typing 'j'
+                if src == 'table':  ## show tableview when run from canvas when typing 'j'
                     return  
-                self.updateCanvas(dlist)  ## turn the contents of the .play file into scene items
+                self.updateStoryBoard(dlist) 
             else:
                 return
               
 ### -------------------------------------------------------- 
-    def updateCanvas(self, dlist):               
+    def updateStoryBoard(self, dlist):  ## turn the contents of the .play file into scene items            
         self.mapper.clearMap() 
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
@@ -210,7 +210,7 @@ class ShowBiz:
         ## end for loop   
                          
         del dlist
-        self.cleanup(ns, kix)
+        self.cleanup(ns, kix)  ## add shadows
   
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
@@ -221,12 +221,16 @@ class ShowBiz:
             elif ns > 0:  ## there must be shadows
                 QTimer.singleShot(200, self.addShadows)
                 t = int(1 + (ns * .25))
-                MsgBox('Adding Shadows, please wait...', t)                
+                if self.showFiles.errorOnShadows == True:  ## will try and add if shadowMaker is on
+                    MsgBox('Error Loading some Shadows...', 5)
+                    self.showFiles.errorOnShadows = False  ## may need it again
+                else:
+                    MsgBox('Adding Shadows, please wait...', t)              
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
                 self.canvas.mapper.toggleTagItems('all')                                                  
         QTimer.singleShot(12000, partial(self.dots.statusBar.showMessage, file)) 
-   
+
 ### --------------------------------------------------------                                                  
     def addShadows(self):  ## add shadows after adding pixitems     
         tasks = []         
@@ -234,15 +238,16 @@ class ShowBiz:
         loop  = asyncio.new_event_loop() 
         ## thanks to a dev community post - it took some work to find a useful example
         for pix in self.scene.items():      
-            if pix.type == 'pix' and pix.shadow != None:
+            if pix.type == 'pix' and pix.shadowMaker.isActive == True and pix.shadow != None:
                 pix.fileName = paths['spritePath'] + pix.fileName      
                 tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
-        loop.close()        
-        self.sideCar.hideOutlines()  ## turns them off                
-        str = f" Number of Shadows: {len(tasks)}  seconds:  {time.time() - start:.2f}" 
-        self.dots.statusBar.showMessage(str, 10000)        
+        loop.close()           
+        self.sideCar.showOutlines()  ## turns them on              
+        str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
+        self.dots.statusBar.showMessage(str, 10000)   
+        QTimer.singleShot(5000, self.sideCar.hideOutlines)   
 
 ### ---------------------- dotsShowBiz --------------------
 
