@@ -10,7 +10,7 @@ Back again roping in Lasso in Paths and trying to find a balance in Shadows betw
 
 **March 7 2024** - More work on shadow outlines. They're now off until you either **double-click** on the shadow or choose outline from its widget. The outline and points are only needed if you plan to make any changes. Also turned **'J'**  into a toggle which can close the file viewer as well as triggering it. Typing **'C'** to close the viewer still works.  Added a **shift-S** command to **unlink** all shadows. 
 
-~~~~A reminder: if you've saved any play files with shadows and then turned shadows off - loading that file and saving it without shadows back on will cause the shadow data to be lost.~~~~
+~~A reminder: if you've saved any play files with shadows and then turned shadows off - loading that file and saving it without shadows back on will cause the shadow data to be lost.~~
 
 **March 10 2024** - Another update for shadows.  Disregard the last line, I made a change so even if you do turn off shadows after creating and saving any the shadow data will be retained and should work once shadows are turned back on.
 
