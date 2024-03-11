@@ -237,8 +237,8 @@ class ShowBiz:
         start = time.time()
         loop  = asyncio.new_event_loop() 
         ## thanks to a dev community post - it took some work to find a useful example
-        for pix in self.scene.items():      
-            if pix.type == 'pix' and pix.shadowMaker.isActive == True and pix.shadow != None:
+        for pix in self.scene.items(): 
+            if pix.type == 'pix' and pix.shadowMaker.isActive == True and len(pix.shadow) > 0:
                 pix.fileName = paths['spritePath'] + pix.fileName      
                 tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
         if len(tasks) > 0:

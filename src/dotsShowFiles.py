@@ -66,10 +66,9 @@ class ShowFiles:
         pix.tag    = tmp['tag'] 
         pix.alpha2 = tmp['alpha2']
         pix.locked = tmp['locked']  
-                                        
-        ### if pix.type == 'pix' and pix.shadowMaker.isActive == True and 'scalor' in tmp.keys():                         
+                                                                
         if pix.type == 'pix' and 'scalor' in tmp.keys():  ## test pix.shadowMaker.isActive when adding to scene
-            pix = self.setShadow(pix, tmp)   
+            pix = self.setShadow(pix, tmp)  
                  
         elif pix.type == 'bkg':  ## adding the rest of it
             pix = self.setBackGround(pix, tmp, z)  ## checking if a dupe
@@ -215,24 +214,27 @@ class ShowFiles:
             'part':     pix.part,
         }  
    
-        if pix.shadowMaker.shadow != None and isinstance(pix.shadowMaker.alpha, float):
-            try:
-                shadow = {
-                    'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
-                    'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
-                    'rotate':   pix.shadowMaker.rotate,
-                    'width':    pix.shadowMaker.width,
-                    'height':   pix.shadowMaker.height,
-                    'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
-                                    for k in range(4)],
-                    'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
-                                    for k in range(4)],
-                    'flopped':   pix.shadowMaker.flopped,
-                    'linked':   pix.shadowMaker.linked,
-                }
-            except:       
-                shadow = {}
-                self.errorOnShadows = True   
+        if len(pix.shadow) > 0:
+            if pix.shadowMaker.isActive == True:
+                try:
+                    shadow = {
+                        'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
+                        'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
+                        'rotate':   pix.shadowMaker.rotate,
+                        'width':    pix.shadowMaker.width,
+                        'height':   pix.shadowMaker.height,
+                        'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
+                                        for k in range(4)],
+                        'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
+                                        for k in range(4)],
+                        'flopped':   pix.shadowMaker.flopped,
+                        'linked':   pix.shadowMaker.linked,
+                    }
+                except:       
+                    shadow = {}
+                    self.errorOnShadows = True   
+            else:
+                 shadow = pix.shadow   
             tmp.update(shadow)             
         return tmp 
 

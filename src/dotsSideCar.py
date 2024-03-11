@@ -125,11 +125,12 @@ class SideCar:
       
     def dumpBkgs(self):  ## shift-B 
         for p in self.scene.items():
-            if p.type == 'bkg':
-                file, direction, mirror, locked = self.addBkgLabels(p)
-                showtime = p.showtime
-                print(f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
-        print()
+            if p.type == 'pix' and len(p.shadow) > 0:
+        #         file, direction, mirror, locked = self.addBkgLabels(p)
+        #         showtime = p.showtime
+        #         print(f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
+        # print()
+                print('db', list(p.shadow.values()))
           
     def addBkgLabels(self, bkg): 
         file = os.path.basename(bkg.fileName)        

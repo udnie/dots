@@ -8,7 +8,11 @@ Before all else I'd like to thank those individuals who were kind enough to awar
  **March 3 2024**   
 Back again roping in Lasso in Paths and trying to find a balance in Shadows between outline vs. no outline and how to manage that. The 'O' key which toggles shadow outlines off and on is the best solution so far.  A few more bug fixes plus updating older string formats to f-strings.
 
-**March 7 2024** - More work on shadow outlines. They're now off until you either **double-click** on the shadow or choose outline from its widget. The outline and points are only needed if you plan to make any changes. Also turned **'J'**  into a toggle which can close the file viewer as well as triggering it. Typing **'C'** to close the viewer still works.  Added a **shift-S** command to **unlink** all shadows.  A reminder: if you've saved any play files with shadows and then turned shadows off - loading that file and saving it without shadows back on will cause the shadow data to be lost. 
+**March 7 2024** - More work on shadow outlines. They're now off until you either **double-click** on the shadow or choose outline from its widget. The outline and points are only needed if you plan to make any changes. Also turned **'J'**  into a toggle which can close the file viewer as well as triggering it. Typing **'C'** to close the viewer still works.  Added a **shift-S** command to **unlink** all shadows. 
+
+~~~~A reminder: if you've saved any play files with shadows and then turned shadows off - loading that file and saving it without shadows back on will cause the shadow data to be lost.~~~~
+
+**March 10 2024** - Another update for shadows.  Disregard the last line, I made a change so even if you do turn off shadows after creating and saving any the shadow data will be retained and should work once shadows are turned back on.
 
  ___
  
@@ -20,7 +24,7 @@ I went through a number of revisions of **dotsTableView.py** until I finally arr
 
 As a reminder, **'J'** is the command that launches the **json .play file viewer** which also works in **StoryBoard** - where the work gets done.  Saving a **.play file** with missing files in **StoryBoard** will delete them as it saves only what's displayed while saving from the **canvas** saves what's in the file including the missing file records. 
 
-New Video: <https://youtu.be/DoCMdEPZi8E>
+New Video: <https://youtube/DoCMdEPZi8E>
 
 
 **February 23** - Added **'S'** to **save** the **.play file** in **StoryBoard** if there are no animations running. Why I didn't do that two years ago is a good question.  Made sure typing **'J'** to launch the file viewer won't work if an animation is running.   

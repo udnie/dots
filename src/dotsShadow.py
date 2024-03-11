@@ -72,15 +72,15 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                           
     def mouseReleaseEvent(self, e): 
         if self.maker.linked == False:  
-            self.maker.updatePath(self.mapToScene(e.pos())) 
+            self.maker.updatePath(self.mapToScene(e.pos()))          
             self.updOutline(e)
             self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving   
-        if self.dblclk == False:  
-            self.maker.works.hideOutline() 
-            self.maker.works.hidePoints() 
-        else:
-            self.dblclk == False  ## otherwise it hides the outline from a dlbclk
-        e.accept()
+            if self.dblclk == False:  
+                self.maker.works.hideOutline() 
+                self.maker.works.hidePoints() 
+            else:
+                self.dblclk == False  ## otherwise it hides the outline from a dlbclk
+            e.accept()
   
     def mouseDoubleClickEvent(self, e):
         self.dblclk = True

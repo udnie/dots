@@ -83,10 +83,8 @@ class ShadowMaker:
         del img
         del image
         del pixmap
-                      
-        self.alpha, self.scalor, self.rotate = .50, 1.0, 0
-        
-        self.imgSize = width, height  ## save for later 
+                              
+        self.width, self.height = width, height  ## save for later 
         self.viewW, self.viewH = viewW, viewH
         
         pos = self.pixitem.pos()
@@ -108,7 +106,7 @@ class ShadowMaker:
             x = self.pixitem.shadow['pathX'][k]
             y = self.pixitem.shadow['pathY'][k]
             self.path.append(QPointF(x,y))
-                  
+         
         self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
 
         file, w, h = self.works.pixWidthHeight()   
@@ -121,7 +119,7 @@ class ShadowMaker:
             self.cpy, _, _, _ = await initShadow(file, w, h, flop)
         except TypeError:  ## no fault error trap
             pass
-                                                   
+                                         
         self.width   = self.pixitem.shadow['width']
         self.height  = self.pixitem.shadow['height']  
         self.alpha   = self.pixitem.shadow['alpha']
@@ -137,6 +135,9 @@ class ShadowMaker:
                                             
         self.addPoints() 
         self.updateShadow()
+        
+
+        
         
         if self.linked == True: self.shadow.linkShadow()
      
@@ -165,7 +166,7 @@ class ShadowMaker:
           
         self.shadow = Shadow(self)      
         self.shadow.setPixmap(pixmap)   
-        
+                  
         del img
         del pixmap
         
@@ -264,6 +265,7 @@ class ShadowMaker:
         self.works.cleanUpShadow()
         b = self.pixitem.boundingRect()
         self.addShadow(b.width(), b.height(), self.viewW, self.viewH)      
+        self.alpha, self.scalor, self.rotate = .50, 1.0, 0
                          
     def toggleLink(self): 
         if self.shadow != None:

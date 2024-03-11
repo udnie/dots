@@ -9,7 +9,7 @@ from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 
 
-## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 import dotsAnimation  as Anime
