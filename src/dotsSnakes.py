@@ -13,7 +13,7 @@ from dotsShared         import paths, common
 from dotsSideGig        import *
 from functools          import partial
 from dotsBkgMaker       import BkgItem
-from dotsAbstractBats   import getPath
+from dotsBatsAndHats    import getPath
 
 ### --------------------- dotsSnakes ----------------------- 
 ''' classes: Snake, Snakes '''               
@@ -180,6 +180,7 @@ class Snakes:
             self.scroller.tag = 'scroller'
             self.scroller.mirroring = True  
             self.scroller.bkgWorks.addTracker(self.scroller)
+            self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
             
@@ -197,6 +198,7 @@ class Snakes:
             else:
                 self.scroller.mirroring = True     
             self.scroller.bkgWorks.addTracker(self.scroller)
+            self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
             

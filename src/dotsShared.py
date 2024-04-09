@@ -16,29 +16,28 @@ common = {  ## wherever it's needed
     'outline':   30.0,    ## Zvalue for outline in shadows
     
     'ScrollW':      118,  ## used by both 1080 and 1280X720 px
-    'SliderW':      175,  ## used by both 1080 and 1280X720 px
+    'SliderW':      127,  ## used by both 1080 and 1280X720 px
     'OffSet':         0,  ## keysPanel width, used to set fixed size 
     'fix':            23,  ## keysPanel height, used to set fixed size 
     'V':           12.0,  ## diameter of pointItems in shadows
     'widgetXY': (25,25),  ## position pathWidget and BkgWidget 
 } 
 
-screens = {  ## the keys aren't shown
+screens = {  
     '1080': '1080X720 -  3:2',
     '1280': '1280X720 - 16:9',
-    '1215': '1215X810 -  3:2',
+    '1215': ' 1215X810 -  3:2',
     '1440': '1440X810 - 16:9',
     '1296': '1296X864 -  3:2',
     '1536': '1536X864 - 16:9',
-    '900':  '  600X900 -  2:3',    
-    '912':  '   513X912 -  9:16',
-    '1102': '620X1102 -  9:16',
-
+    '900':  '   600X900 -  2:3',    
+    '912':  '    513X912 -  9:16',
+    '1102': '  620X1102 -  9:16',
 }
-        
+       
 ### --------------------------------------------------------
              
-CanvasStr = "A,B,C,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
+CanvasStr = "A,B,C,D,G,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
 PathStr = "C,D,E,F,K,L,M,N,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
 ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
@@ -67,7 +66,9 @@ MoveKeys = {
     'down':  (0.0, Tick),
 }
 
-PlayKeys = ('L', 'R', 'P', 'S', 'A', 'J')
+''' 'L' load a play file, 'D' and 'R' display the Demo Menu, 'P' switch to PathMaker, 
+    'S' display the Screen Menu, 'A' and 'B' add a Background, 'J' json file viewer '''
+PlayKeys = ('L', 'R', 'P', 'S', 'A', 'J', 'D', 'B', 'H')  ## empty canvas - nothing displayed
 
 RotateKeys = {  ## works in reverse
     '+':  -1.0,
@@ -122,6 +123,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_B: 'B',     
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
+    Qt.Key.Key_H: 'H', 
     Qt.Key.Key_J: 'J', 
     Qt.Key.Key_K: 'K',  
     Qt.Key.Key_L: 'L',   

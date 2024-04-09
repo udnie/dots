@@ -5,7 +5,7 @@ import random
 import asyncio
 import time
 
-from PyQt6.QtCore       import Qt, QTimer
+from PyQt6.QtCore       import QTimer
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 import dotsAnimation    as Anime
@@ -16,6 +16,7 @@ from dotsSideGig        import *
 from dotsBkgMaker       import BkgItem
 from dotsPixItem        import PixItem
 from dotsShowWorks      import ShowWorks
+from dotsWings          import Wings
 
 backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directory
     '1080':  'montreaux.jpg', 
@@ -29,95 +30,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1102':  'bats_vertical.jpg',
 }
     
-### ------------------- dotsAbstractBats -------------------
-class Wings: 
-### --------------------------------------------------------    
-    ''' Wings no longer come off, only the bat can move, wings still flap '''   
-### --------------------------------------------------------
-    def __init__(self, parent, x, y, tag): 
-        super().__init__()
- 
-        self.canvas = parent    
-        self.scene  = self.canvas.scene     
-        
-        if not os.path.exists(paths['imagePath'] + 'bat-pivot.png'):
-            return
-    
-        self.pivot     = self.pivot(paths['imagePath'] + 'bat-pivot.png', x, y, tag)
-        self.rightWing = self.right(paths['imagePath'] + 'bat-wings.png', x, y)
-        self.leftWing  = self.left(paths['imagePath']  + 'bat-wings.png', x, y)
-                                             
-        self.half   = self.pivot.width/2 
-        self.height = self.pivot.height/5    
-
-        if common['Screen'] in ('1215', '1440'):
-            self.height = self.pivot.height/7  ## drops too low otherwise
-        elif common['Screen'] in ('1536', '1296'):
-            self.height = self.pivot.height/9  
-          
-        try:
-            self.pivot.setPos(self.pivot.x, self.pivot.y)
-            self.pivot.setScale(.60)
-            self.pivot.setOriginPt() 
-        except IOError:
-            pass    
-                
-        ## center wings around pivot - some magic numbers
-        self.rightWing.setPos(self.half+1, self.height-2)
-        self.leftWing.setPos(-self.leftWing.width+(self.half+5), self.height-5)
-
-        self.rightWing.setParentItem(self.pivot)  
-        self.leftWing.setParentItem(self.pivot)
-        
-        self.scene.addItem(self.pivot)
-                   
-### --------------------------------------------------------
-    def pivot(self, file, x, y, tag):  ## tag may be empty - used for setting path or animation
-        self.canvas.pixCount += 1         
-        pivot = PixItem(file, 
-            self.canvas.pixCount,
-            x, y,  
-            self.canvas
-        ) 
-        pivot.part = 'pivot' 
-        pivot.tag  = tag  ## path to follow - random select
-  
-        pivot.setZValue(self.canvas.mapper.toFront(-1))
-        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, True)  
-        pivot.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
-                    
-        return pivot
-   
-### --------------------------------------------------------  
-    def right(self, file, x, y):            
-        self.canvas.pixCount += 1
-        pix = PixItem(file, self.canvas.pixCount, x-20, y, 
-            self.canvas,
-            False,
-        )  ## don't flop it 
-        return self.setWing(pix, 'right')  
-            
-### --------------------------------------------------------          
-    def left(self, file, x, y):         
-        self.canvas.pixCount += 1
-        pix = PixItem(file, self.canvas.pixCount, x + self.rightWing.width, y,  ## offset to left
-            self.canvas,
-            True
-        )  ## flop it
-        return self.setWing(pix, 'left') 
-   
-### --------------------------------------------------------              
-    def setWing(self, pix, wing):   
-        pix.part = wing  ## part could be other than a wing   
-        pix.tag  = 'Flapper'  ## applies this animation when run
-        pix.setZValue(pix.zValue())  ## reset wing zvals
-        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, False)
-        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemStacksBehindParent)
-        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIgnoresParentOpacity, True)  ## won't disappear
-        pix.setAcceptedMouseButtons(Qt.MouseButton.NoButton)  ## mouse ignored - wings can't be move       
-        return pix
-            
-### --------------------------------------------------------
+### -------------------- dotsBatsAndHats -------------------
 class Bats:     
 ### --------------------------------------------------------
     def __init__(self, parent):
@@ -178,12 +91,10 @@ class Bats:
             QTimer.singleShot(100 + (n * t), pix.anime.start)
                    
 ### --------------------------------------------------------                 
-    def greys(self):  ## these go to screen and wait to be run
-        greys = 23  
-       
+    def greys(self):  ## these go to screen and wait to be run   
         if not os.path.exists(paths['spritePath'] + 'alien.png'):
             return
-  
+        greys = 23  
         pathStr = paths['spritePath'] + 'alien.png'     
         for i in range(greys):
             pix = self.oneGrey(pathStr)
@@ -238,7 +149,7 @@ class Bats:
                         del pix
                                        
 ### --------------------------------------------------------
-class Abstract:  ## hats
+class Hats:  ## hats - was abstract
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -261,9 +172,9 @@ class Abstract:  ## hats
         self.scroller = None
         
 ### --------------------------------------------------------      
-    def makeAbstracts(self, direction):
+    def makeHatsDemo(self, direction):
         self.direction = direction
-        self.canvas.openPlayFile = 'abstract'     
+        self.canvas.openPlayFile = 'hats'     
                        
         self.setBackGround()
         self.setHats()        
@@ -281,15 +192,16 @@ class Abstract:  ## hats
         if self.scroller != None:
             self.scroller.init()
         else:
-            self.scroller = BkgItem(paths['demo'] + 'abstract.jpg', self.canvas)
+            self.scroller = BkgItem(paths['demo'] + 'bluestone.jpg', self.canvas)
    
         self.scroller.direction = self.direction       
         self.scroller.tag = 'scroller'
         self.scroller.mirroring = True      
         self.scroller.bkgWorks.addTracker(self.scroller)  
+        self.scroller.bkgWorks.setDirection(self.scroller.direction)
 
         self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  
-  
+    
         if self.direction == 'right':
             self.scroller.setPos(QPointF(self.scroller.runway, 0))  ## offset to right    
   
@@ -333,9 +245,9 @@ class Abstract:  ## hats
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()  
-        self.dots.statusBar.showMessage(
-            f"Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}", 10000)                            
- 
+        str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
+        self.dots.statusBar.showMessage(str, 10000)
+                              
     async def newShadow(self, pix): 
         pix.addShadow() 
         pix.shadowMaker.shadow.setPos(self.setXY(), self.setXY())
@@ -361,7 +273,7 @@ class Abstract:  ## hats
         clearPaths(self)
         self.delHats() 
         self.scroller.bkgWorks.delTracker(self.scroller) 
-        self.makeAbstracts(direction) 
+        self.makeHatsDemo(direction) 
       
     def delHats(self):
         if len(self.scene.items()) > 0:
@@ -385,7 +297,8 @@ def getPath(apaths):
         if any(ele in p for ele in plist): 
             continue   
         return os.path.basename(p)
-         
-### ------------------- dotsAbstractBats -------------------
+
+### -------------------- dotsBatsAndHats -------------------
+
 
 

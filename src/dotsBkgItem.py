@@ -1,5 +1,6 @@
 
 import os
+import json
 
 from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap
@@ -8,39 +9,34 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox, point
 from dotsBkgWorks       import BkgWorks
+from dotsBkgScrollWrks  import BkgScrollWrks
 
 import dotsAnimation    as Anime
 
 ### ---------------------- dotsBkgItem ---------------------                   
-''' See StartHere.md for a detailed explanation on scrolling backgrounds '''  
+''' Background Class - there can be more than one background in a scene '''
 ### --------------------------------------------------------
-screentime = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
-        ##   first, next-left, next-right --- there are always two backgrounds once started
-    '1080':  (10.0,  17.50,  17.45),     ## 1440px actual size when scaled 1280X640 for 16:9
-    '1280':  (10.0,  18.75,  18.85),  
-    '1215':  (10.0,  17.35,  17.4),     ## 1620px actual size when scaled 1280X640 for 16:9
-    '1440':  (10.0,  18.7,   18.85),
-    '1296':  (10.0,  17.50,  17.45),     ## 1728px actual size when scaled 1280X640 for 16:9
-    '1536':  (10.0,  18.65,  18.60),  
-    '1102':  (10.0,  20.9,    0.0),
-    '900':   (10.0,  23.2,    0.0),
-    '912':   (10.0,  20.9,   0.0),
-}
-
-moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
-    '1080':  (10.0,   19.05, 19.05),   ## 1215px actual size when scaled 1080X640 for 3:2
-    '1215':  (10.0,   18.88, 18.89),   ## 1367px actual size when scaled 1080X640 for 3:2
-    '1296':  (10.0,   18.88, 18.87),   ## 1458px actual size when scaled 1080X640 for 3:2
-    '900':   (10.0,   21.4,   0.0),    ## 1013px actual size when scaled 640X1080 for 2:3
-}
-
-showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
-    'snakes':   15,  ## also used by vertical 
-    'left':     11, 
-    'right':    15,  
-    'vertical': 17,  ## trying this out 
-}
-        
+''' screentimes and moretimes are now screenrates.dict in the play directory
+            also direction refers to the direction of travel
+# screentimes = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
+#         ##   first, next-rt<lft, next-lft>right --- there are always two backgrounds once started
+#     '1080':  [10.0,  17.50,  17.45],     ## 1440px actual size when scaled 1280X640 for 16:9
+#     '1280':  [10.0,  18.75,  18.85],  
+#     '1215':  [10.0,  17.35,  17.4],     ## 1620px actual size when scaled 1280X640 for 16:9
+#     '1440':  [10.0,  18.7,   18.85],
+#     '1296':  [10.0,  17.50,  17.45],     ## 1728px actual size when scaled 1280X640 for 16:9
+#     '1536':  [10.0,  18.65,  18.60],  
+#     '1102':  [10.0,  20.9,    0.0],
+#     '900':   [10.0,  23.2,    0.0],
+#     '912':   [10.0,  20.9,   0.0],
+# }
+# moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
+#     '1080':  [10.0,   19.05, 19.05],   ## 1215px actual size when scaled 1080X640 for 3:2
+#     '1215':  [10.0,   18.88, 18.89],   ## 1367px actual size when scaled 1080X640 for 3:2
+#     '1296':  [10.0,   18.88, 18.87],   ## 1458px actual size when scaled 1080X640 for 3:2
+#     '900':   [10.0,   21.4,   0.0]     ## 1013px actual size when scaled 640X1080 for 2:3
+# } '''
+    
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):  ## background
 ### --------------------------------------------------------
@@ -53,6 +49,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.bkgMaker = self.canvas.bkgMaker
         
         self.bkgWorks = BkgWorks(self)
+        self.bkgScrollWrks = BkgScrollWrks(self)
     
         self.ViewW = common['ViewW']
         self.ViewH = common['ViewH']
@@ -97,18 +94,18 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         
         self.tag = ''  
         self.anime = None
-        self.matte = None
         
         self.addedScroller = False
            
-        self.direction = ''  ## direction of scroll 
-        self.factor    = self.bkgMaker.factor    ## sets default    
+        self.direction = ''  ## direction of travel   
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
-        self.rate      = 0
+        self.factor    = self.bkgMaker.factor    ## sets default 
         self.showtime  = 0  ## number of pixels before the runway ends and then it's showtime
+        self.useThis   = ''
+        self.rate      = 0
         
         self.runway    = 0  ## what's not visible     
-        self.setRunWay()  
+        self.bkgScrollWrks.setRunWay()  
         
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
                               
@@ -121,7 +118,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = ''    
         self.dragCnt = 0
         self.save = QPointF()  
-              
+                  
+        self.canvas.dots.statusBar.showMessage(os.path.basename(self.fileName), 5000) 
+             
 ### -------------------------------------------------------- 
     @pyqtSlot(str)
     def setPixKeys(self, key):
@@ -132,7 +131,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             if e.button() == Qt.MouseButton.RightButton:
                 self.bkgMaker.addWidget(self)                    
             elif self.canvas.key == 'del':    
-                self.delete()          
+                self.bkgMaker.deleteBkg(self)          
             elif self.canvas.key == '/':  ## to back
                 self.bkgMaker.back(self)     
             elif self.canvas.key == 'shift':  ## flop it
@@ -145,7 +144,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.key == '.': 
                 self.bkgMaker.upOne(self)  
             elif self.key == 'opt':  ## show background tag
-                self.bkgWorks.tagBkg(self, e.scenePos())
+                self.bkgScrollWrks.tagBkg(self, e.scenePos())
             self.initX, self.initY = self.x, self.y  
             self.dragCnt = self.mapToScene(e.pos())
             self.canvas.key = ''
@@ -168,7 +167,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
                     self.direction  == 'vertical' and int(value.y()) >= self.height:
                     self.anime.stop()
-                    self.bkgMaker.deleteBkg(self)  ## deleteBkg()   
+                    self.bkgMaker.deleteBkg(self) 
                                                     
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
  
@@ -205,12 +204,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
         path = self.setNode(bkg)         
         if path == None:
-            MsgBox('setScrollerPath: error setting scroller path...')
+            MsgBox('setScrollerPath: Error setting scroller path...')
             return
                 
         if bkg.direction in ('left', 'right') and bkg.width < common['ViewW'] or\
             bkg.direction == 'vertical' and bkg.height < common['ViewH']:
-            self.bkgWorks.notScrollable()  
+            self.bkgScrollWrks.notScrollable()  
             return 
  
         if bkg.direction == 'right':  ## gets it pointed in the right direction
@@ -219,76 +218,23 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             bkg.setPos(QPointF())
         else:
             bkg.setPos(QPointF(0.0, float(bkg.runway)))
-                        
-        bkg.rate = bkg.setRate(which)  ## always to make sure     
-        bkg.showtime = bkg.setShowTime(which)   
-                                    
+                  
+        bkg.showtime = bkg.bkgScrollWrks.setShowTime(which)  
+        
+        if which == 'first':  
+            bkg.rate = bkg.bkgWorks.getScreenRate(which)  ## set tracker for 'next'
+        else:
+            bkg.rate = bkg.bkgScrollWrks.getTrackerRate(bkg)
+           
+        if bkg.rate == 0 or bkg.useThis == '':
+            return
+                                      
         if which == 'next':            
             return self.bkgWorks.setNextPath(path, bkg)  
         else:
             return self.bkgWorks.setFirstPath(path, bkg) 
 
-### --------------------------------------------------------
-    def setRunWay(self):      
-        if not self.dots.Vertical:             
-            self.runway = int(common['ViewW'] - self.width)  ## pixels outside of view
-        else:
-            self.runway = int(common['ViewH'] - self.height) 
-  
-### --------------------------------------------------------                  
-    def setShowTime(self, which=''): 
-        ## snakes need more time - the rest vary to build and position and comes before vertical 
-        if 'snakes' in self.fileName and self.direction != 'vertical':
-            show = showtime['snakes']   
-        elif self.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge
-            show = showtime['vertical']       
-        elif self.direction == 'left':   
-            show = showtime['left']
-        elif self.direction == 'right':  
-            show = showtime['right'] 
-                                
-        if which == 'next':
-            val = self.bkgWorks.getShowtimeFromTrackers(self)  
-            if val != 0:
-                show = val                   
-        return show
-  
-### --------------------------------------------------------  
-    def setRate(self, which =''):
-        rate = self.getRate()   
-                   
-        if which == 'first':
-            rate = rate[0]    
-            
-        elif self.rate == 0:  ## needs to be 0
-            if self.direction == 'right':
-                rate = rate[2]
-            else:
-                rate = rate[1]      
-            self.rate = rate  ## good idea 
- 
-        if which == 'next':
-            val = self.bkgWorks.getRateFromTrackers(self)  
-            if val != 0:
-                rate = val   
-                               
-        return rate
-    
-### --------------------------------------------------------
-    def getRate(self):
-        if common['Screen'] == '1080' and self.width < 1315:  ## 1080X640 3:2 format else use 16:9
-            rate = moretimes[common['Screen']]
-        elif common['Screen'] == '1215' and self.width < 1467:
-            rate = moretimes[common['Screen']]
-        elif common['Screen'] == '1296' and self.width < 1558:
-            rate = moretimes[common['Screen']]       
-        elif common['Screen'] == '900'  and self.height < 1115:  ##dd in this case 2:3
-            rate = moretimes[common['Screen']]    
-        else:   
-            rate = screentime[common['Screen']]  ## 16:9 format 
-        return rate
-                                                   
-### --------------------------------------------------------  
+### --------------------------------------------------------            
     def updateXY(self, pos):
         dragX = pos.x() - self.dragCnt.x()
         dragY = pos.y() - self.dragCnt.y()      
@@ -310,9 +256,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             return QPropertyAnimation(node, b'pos') 
         except RuntimeError:
             return None
-                       
-    def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
    
     def setMirrored(self, bool):
         self.flopped = bool  

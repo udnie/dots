@@ -167,7 +167,7 @@ class PathWidget(QWidget):
         vabox = QHBoxLayout()  ## values
         vabox.addSpacing(0) 
         vabox.addWidget(self.rotateValue)        
-        vabox.addSpacing(0) 
+        vabox.addSpacing(10) 
         vabox.addWidget(self.scaleValue)  
         vabox.addSpacing(10) 
         vabox.addWidget(self.secondsValue)      

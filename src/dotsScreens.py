@@ -73,7 +73,7 @@ seven20 = {     ## used by both 1080X720 and 1280X720px
 
 ten80 = {   ## 1080X720 - 3:2        
     'Screen':   '1080',     
-    'DotsW':      1422,  
+    'DotsW':      1382,  
     'ViewW':      1080,  
     'gridSize':   30.0,       ## gridline spacing - seems to work, consistant
     'scaleX':      1.0,
@@ -81,7 +81,7 @@ ten80 = {   ## 1080X720 - 3:2
 
 twelve80 = {    ## 1280X720 - 16:9
     'Screen':   '1280',        
-    'DotsW':      1623, 
+    'DotsW':      1583, 
     'ViewW':      1280,  
     'gridSize':  26.66,  
     'scaleX':     1.15,
@@ -102,7 +102,7 @@ eight10 = {  ## used by both 1215X810 and 140X810px
 
 twelve15 = {    ## 1215X810 - 3:2 format
     'Screen':   '1215',  
-    'DotsW':      1558,   
+    'DotsW':      1518,   
     'ViewW':      1215,    
     'gridSize': 28.925, 
     'scaleX':     1.05,
@@ -110,7 +110,7 @@ twelve15 = {    ## 1215X810 - 3:2 format
     
 fourteen40 = {  ## 1440X810 - 16:9 
     'Screen':  '1440',         
-    'DotsW':     1783,
+    'DotsW':     1743,
     'ViewW':     1440,
     'gridSize':    30, 
     'scaleX':    1.30,
@@ -132,7 +132,7 @@ eight64 = {
 ### ------------------ 1264X864 - 3:2 ----------------------
 twelve96 = {  
     'Screen':   '1296',  
-    'DotsW':     1637,
+    'DotsW':     1597,
     'ViewW':     1296,  
     'gridSize':    30, 
     'scaleX':   1.123,
@@ -141,12 +141,14 @@ twelve96 = {
 ### ------------------ 1536X864 - 16:9 ---------------------
 fifteen36 = {      
     'Screen':  '1536',   ## think about 1560X878 in 1920X1080
-    'DotsW':     1877, 
+    'DotsW':     1837, 
     'ViewW':     1536,      
     'gridSize':    32,  
     'scaleX':    1.40,
 }
 
+### ---------------------------------------------------------
+###                         verticals
 ### ---------- used by both 600X900px and 620X1102px -------- 
 vert = {  
     'factor':    0.33, 
@@ -156,9 +158,9 @@ vert = {
 }
 
 ### -------------------- 620X1102 - 9:16 --------------------
-six20 = {             ## 1102 - must be a string not a number
+six20 = {   ## 1102 - must be a string not a number
     'Screen':   '1102',  
-    'DotsW':      970,
+    'DotsW':      927,
     'DotsH':     1204, 
     'ViewW':      620, 
     'ViewH':     1102,  
@@ -169,9 +171,9 @@ six20 = {             ## 1102 - must be a string not a number
     'gridSize': 34.43,
 }
 
-six30 = {
+six30 = {  ## 900X600
     'Screen':   '900',  
-    'DotsW':      944,
+    'DotsW':      940,
     'DotsH':     1002,  
     'ViewW':      600, 
     'ViewH':      900,   
@@ -181,9 +183,9 @@ six30 = {
     'gridSize':  30.0,
 }
 
-nine12 = {
+nine12 = {  ## 912X513
     'Screen':    '912',  
-    'DotsW':      885,
+    'DotsW':      838,
     'DotsH':     1015,  
     'ViewW':      513, 
     'ViewH':      912,   
@@ -209,9 +211,8 @@ def getX():  ## adjusted for app size and display
 def getY():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()  
     if common['Screen'] in ('1102','900', '912'):    
-        return 0
+        return 0  ## gets set to 50
     else:
-        # return 50
         return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.45)   
    
 ### -------------------- dotsScreens -----------------------

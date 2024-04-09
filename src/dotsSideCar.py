@@ -27,7 +27,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-                    
+              
         self.gridZ     = common['gridZ']    
         self.gridGroup = None  
         self.menu      = None 
@@ -114,16 +114,16 @@ class SideCar:
                 return True
         return False
                                                                                                                         
-    def pause(self):
+    def pause(self):  ## because showtime wasn't reachable for controlview at the time
         self.canvas.showtime.pause()
     
-    def pageDown(self, key):  ## for sprite scrollPanel
+    def pageDown(self, key):  ## because scrollpanel wasn't reachable for controlview at the time
         self.canvas.scroll.pageDown(key)
       
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
       
-    def dumpBkgs(self):  ## shift-B 
+    def dumpBkgs(self):  ## shift-B - general purpose data dump to stdout
         for p in self.scene.items():
             if p.type == 'pix' and len(p.shadow) > 0:
         #         file, direction, mirror, locked = self.addBkgLabels(p)
@@ -132,7 +132,7 @@ class SideCar:
         # print()
                 print('db', list(p.shadow.values()))
           
-    def addBkgLabels(self, bkg): 
+    def addBkgLabels(self, bkg):  ## used with dumpBkgs for trackers
         file = os.path.basename(bkg.fileName)        
         if bkg.locked == True:
             locked = 'Locked' 
@@ -160,7 +160,7 @@ class SideCar:
         return file.capitalize(), direction, mirror, locked
   
 ### --------------------------------------------------------
-    def toggleMenu(self):
+    def toggleMenu(self):  ## keysPanel
         self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
   
     def toggleOutlines(self):  ## runs from O as in Ohio
@@ -183,13 +183,13 @@ class SideCar:
                 elif key == 'U': 
                     pix.locked = False
                     stub = 'all'
-                    # if pix.type == 'bkg': 
+                    # if pix.type == 'bkg': ## still working on it 
                     #     pix.bkgMaker.unlockBkg(pix)      
                 elif key == 'L' and pix.isSelected() or pix.type == 'bkg': 
                     if pix.type == 'pix':
                         pix.togglelock()  ## wait to toggleTagItems
                     elif pix.type == 'bkg': 
-                        pix.bkgWorks.toggleBkgLocks()  ## toggle bkgItem
+                        pix.bkgWorks.bkgScrollWrks.toggleBkgLocks()  ## toggle bkgItem
                     stub = 'select'
         self.mapper.clearMap()
         self.mapper.toggleTagItems(stub)  
@@ -246,21 +246,24 @@ class SideCar:
   
 ### --------------------------------------------------------                               
     def toggleGrid(self):
-        if self.gridGroup:
-            self.scene.removeItem(self.gridGroup)
+        if self.gridGroup != None:
+            self.removeGrid()
             self.gridGroup = None
         else: 
-            self.gridGroup = QGraphicsItemGroup()  
-            self.gridGroup.setZValue(common['gridZ'])
-            self.scene.addItem(self.gridGroup)         
-            gs = common['gridSize']
-            pen = QPen(QColor(0,0,255))       
-            for y in range(1, int(common['ViewH']/gs)):
-                self.addLines(QGraphicsLineItem(0.0, gs*y,
-                    float(common['ViewW']), gs*y), pen)
-            for x in range(1, int(common['ViewW']/gs)):
-                self.addLines(QGraphicsLineItem(gs*x, 0.0,
-                    gs*x, float(common['ViewH'])), pen)
+            self.addGrid()
+            
+    def addGrid(self):
+        self.gridGroup = QGraphicsItemGroup()  
+        self.gridGroup.setZValue(common['gridZ'])
+        self.scene.addItem(self.gridGroup)         
+        gs = common['gridSize']
+        pen = QPen(QColor(0,0,255))       
+        for y in range(1, int(common['ViewH']/gs)):
+            self.addLines(QGraphicsLineItem(0.0, gs*y,
+                float(common['ViewW']), gs*y), pen)
+        for x in range(1, int(common['ViewW']/gs)):
+            self.addLines(QGraphicsLineItem(gs*x, 0.0,
+                gs*x, float(common['ViewH'])), pen)
         
     def addLines(self, line, pen):
         line.type = 'grid'
@@ -270,6 +273,14 @@ class SideCar:
         line.setFlag(QGraphicsLineItem.GraphicsItemFlag.ItemIsMovable, False)
         self.gridGroup.addToGroup(line)
 
+    def removeGrid(self):
+        try:
+            for pix in self.scene.items():
+                if pix.type == 'grid': self.scene.removeItem(pix)
+            self.scene.removeItem(self.gridGroup)
+        except:
+            return
+        
     def gridCount(self):  
         return sum(pix.type == 'grid' 
             for pix in self.canvas.scene.items())

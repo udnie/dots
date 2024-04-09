@@ -204,7 +204,7 @@ class MapMaker:
             self.tagGroup = None
             self.tagSet = False 
                   
-    def clearPaths(self):  ## used by snakes, showtime, abstractbats, and tagsandspaths
+    def clearPaths(self):  ## used by snakes, showtime, hatsbats, and tagsandspaths
         if self.pathSet:
             for pix in self.scene.items():
                 if isinstance(pix, QGraphicsPathItem):

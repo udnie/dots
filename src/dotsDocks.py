@@ -14,20 +14,20 @@ docks = {
     "spacer":      10,  ## forces buttons closer together
 }
 
-newWidths = {     ## if vertical
+newWidths = {     ## if vertical 1102, 912
     "fixedHgt":     70, 
     "scrollGrp":  265,  
-    "playGrp":    265,
+    "playGrp":    260,
     "canvasGrp":  345,
-    "spacer":      10,  ## forces buttons closer together
+    "spacer":      7,  ## forces buttons closer together
 }
 
-five13 = {
+five13 = {   ## vetical 900
     "fixedHgt":     70, 
-    "scrollGrp":  235,  
+    "scrollGrp":  230,  
     "playGrp":    230,
-    "canvasGrp":  345,
-    "spacer":      8,  ## forces buttons closer together       
+    "canvasGrp":  305,
+    "spacer":       8,  ## forces buttons closer together       
 }
 
 
@@ -107,8 +107,8 @@ def addScrollBtnGroup(self):
     elif common['Screen'] != '912':  
         self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])    
     else:
-        self.scrollGroup.setFixedWidth(five13['scrollGrp'])   
-        
+        self.scrollGroup.setFixedWidth(five13['scrollGrp']) 
+    
     ## sets the position of the title
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
@@ -246,29 +246,33 @@ def addCanvasBtnGroup(self):
         
         self.canvasGroup.setLayout(layout)
     else:
+        layout = QHBoxLayout()  
+        
         btnClrCanvas = QPushButton("Clear")  ## add background, remove pixtext   
         self.btnAddBkg  = QPushButton("BackGround")
-        self.btnPathMaker = QPushButton("PathMaker")  
-        btnSnapShot = QPushButton("Shapshot")  
+        self.btnPathMaker = QPushButton("PathMaker") 
+        
+        if common['Screen'] != '912':
+            btnSnapShot = QPushButton("Shapshot")  
+            layout.addWidget(btnSnapShot) 
+            btnSnapShot.clicked.connect(self.sideCar.snapShot)          
+            
         btnExit = QPushButton("Exit")
-
-        layout = QHBoxLayout()    
 
         layout.addWidget(btnClrCanvas) 
         layout.addWidget(self.btnAddBkg) 
         layout.addWidget(self.btnPathMaker) 
-        layout.addWidget(btnSnapShot)      
         layout.addWidget(btnExit)
         
         canvas = self
         pathMaker = self.pathMaker
         bkg = self.bkgMaker
 
-        btnClrCanvas.clicked.connect(canvas.clear) 
+        btnClrCanvas.clicked.connect(self.clear) 
         self.btnAddBkg.clicked.connect(bkg.openBkgFiles)
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)        
-        btnSnapShot.clicked.connect(canvas.sideCar.snapShot)
-        btnExit.clicked.connect(canvas.exit)
+
+        btnExit.clicked.connect(self.exit)
         
         self.canvasGroup.setLayout(layout)
 

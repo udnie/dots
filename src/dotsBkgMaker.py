@@ -12,7 +12,7 @@ from dotsShared         import common, paths, ControlKeys
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
-from dotsBkgFlatMatte   import Flat
+from dotsBkgScrollWrks  import Flat
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -31,10 +31,13 @@ class BkgMaker(QWidget):
         self.widget  = None
         self.bkgItem = None 
         self.flat     = None
+        self.matte   = None
     
-        self.factor    = 1.0  ## sets the factor and mirroring defaults in bkgItem
-        self.mirroring = False  
-        self.trackers  = []  ## tracks backgrounds and holds state of direction, mirroring  
+        self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
+        self.mirroring = False
+          
+        self.trackers = []  ## tracks backgrounds and holds state of direction, mirroring  
+        self.screenrate = {}
         
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats
@@ -58,14 +61,16 @@ class BkgMaker(QWidget):
                                 
         self.bkgItem = BkgItem(file, self.canvas)
         self.bkgItem.setZValue(common['bkgZ'])  ## always on top
+        self.screenrate = {}
                  
-        self.scene.addItem(self.bkgItem)      
-        self.updateZvals(self.bkgItem)  ## update other bkg zvalues
+        self.scene.addItem(self.bkgItem)    
+          
+        self.updateZvals(self.bkgItem)  ## update other bkg zvalues 
         self.x, self.y = self.setXY(self.bkgItem)
             
-        self.bkgItem.bkgWorks.addTracker(self.bkgItem)  ## always - even if not a scroller 
+        self.bkgItem.bkgWorks.addTracker(self.bkgItem)  ## always - even if not a scroller   
         self.lockBkg()
-                   
+                          
         if self.canvas.pathMakerOn:
             self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
                              
@@ -85,7 +90,7 @@ class BkgMaker(QWidget):
 
     def setBkgColor(self, color, bkz=common['bkgZ']):  ## add a flat color to canvas
         if color.isValid():
-            self.flat = Flat(color, self.canvas, bkz) 
+            self.flat = Flat(color, self, bkz) 
             self.scene.addItem(self.flat)
             self.updateZvals(self.flat)
 
@@ -182,10 +187,8 @@ class BkgMaker(QWidget):
                                                      
     def setLocksText(self):
         if self.bkgItem:  ## shouldn't need this but - could have just started to clear
-            if self.bkgItem.locked == False:
-                self.widget.lockBtn.setText('UnLocked')
-            else:
-                self.widget.lockBtn.setText('Locked')
+            self.widget.lockBtn.setText('UnLocked') if self.bkgItem.locked == False \
+                else self.widget.lockBtn.setText('Locked')
                                       
 ### --------------------------------------------------------                                           
     def deleteBkg(self, bkg):
@@ -213,6 +216,8 @@ class BkgMaker(QWidget):
   
 ### --------------------------------------------------------            
     def showtime(self):  ## 'run' from widget button
+        if self.bkgItem.useThis == '':
+            return   
         self.closeWidget()
         p = QCursor.pos()
         QCursor.setPos(int(p.x()+220), int(p.y()+650.0))  ## works for 720
@@ -230,10 +235,8 @@ class BkgMaker(QWidget):
         self.closeWidget() 
         
     def back(self, bkg): 
-        if bkg.type == 'flat':
-            bkg.setZValue(self.mapper.lastZval('flat')-1)
-        else:
-            bkg.setZValue(self.mapper.lastZval('bkg')-1)  
+        bkg.setZValue(self.mapper.lastZval('flat')-1) if bkg.type == 'flat' \
+            else bkg.setZValue(self.mapper.lastZval('bkg')-1)  
         self.lockBkg()   
         self.closeWidget() 
         

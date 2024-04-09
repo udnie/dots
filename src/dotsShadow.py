@@ -33,8 +33,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         
         self.type = 'shadow' 
         self.fileName = 'shadow'
-        
-        self.dblclk = False                  
+                    
         self.dragCnt = 0
         
         self.save = QPointF()  ## mapToScene - used with updatePath
@@ -54,45 +53,43 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
 
 ### --------------------------------------------------------
-    def mousePressEvent(self, e):  
+    def mousePressEvent(self, e): 
         self.save = self.mapToScene(e.pos())
         if e.button() == Qt.MouseButton.RightButton: 
             self.maker.addWidget(self)  ## only place it's used 
-        self.maker.works.hideOutline() 
-        self.maker.works.hidePoints()
+        elif self.maker.dblclk == False:   
+            self.maker.works.hideOutline()  ## hides points    
         e.accept() 
 
     def mouseMoveEvent(self, e):
         if self.maker.linked == False:
             self.dragCnt += 1
-            if self.dragCnt % 5 == 0:                  
-                self.maker.updatePath(self.mapToScene(e.pos()))         
-        self.maker.works.hidePoints()  
-        e.accept()       
+            if self.dragCnt % 5 == 0:  ## updatePath handles dblclk           
+                self.maker.updatePath(self.mapToScene(e.pos()))  
+            e.accept()       
                           
     def mouseReleaseEvent(self, e): 
         if self.maker.linked == False:  
             self.maker.updatePath(self.mapToScene(e.pos()))          
-            self.updOutline(e)
-            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving   
-            if self.dblclk == False:  
-                self.maker.works.hideOutline() 
-                self.maker.works.hidePoints() 
-            else:
-                self.dblclk == False  ## otherwise it hides the outline from a dlbclk
+            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving       
+            if self.maker.dblclk == False:  
+                self.maker.works.hideOutline()   
             e.accept()
   
     def mouseDoubleClickEvent(self, e):
-        self.dblclk = True
-        self.updOutline(e)
-        e.accept()
+        if self.maker.linked == False:           
+            if self.maker.dblclk == False:
+                self.maker.dblclk = True
+            else:
+                self.maker.dblclk = False
+            self.maker.updatePath(self.mapToScene(e.pos()))
+            self.updOutline()
+            e.accept()
   
-    def updOutline(self, e):  ## so as not to be confused with updateOutline
-        self.save = self.mapToScene(e.pos())    
+    def updOutline(self):  ## so as not to be confused with updateOutline
         self.maker.addPoints() 
         self.maker.works.updateOutline()
-        e.accept()
-  
+    
   ### --------------------------------------------------------                                       
     def linkShadow(self):
         b = self.pos()
@@ -116,10 +113,11 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)         
         self.setPos(self.pixitem.pos()+self.pixitem.offset)
         self.maker.linked = False 
-        self.maker.updatePath(b)  ## ending value   
+        self.maker.updatePath(b)  ## ending value 
+        self.maker.dblclk = False  
         self.maker.updateShadow()  
         self.maker.addPoints() 
-        self.maker.works.showOutline() 
+        self.maker.works.hideOutline()  ## was showOutline()
         if self.maker.widget != None:
             self.maker.widget.linkBtn.setText('Link')  ## keep it open  
             self.maker.works.resetSliders() 
@@ -129,13 +127,14 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.path = []
         self.maker.outline = None
         
-        if self.canvas.openPlayFile == 'abstract':  ## not needed 
-            return      
-        self.maker.setPath(self.boundingRect(), self.pos()) 
-        
-        self.maker.addPoints()         
-        self.maker.works.updateOutline()     
-    
+        if self.canvas.openPlayFile == 'hats':  ## not needed 
+            return    
+          
+        self.maker.setPath(self.boundingRect(), self.pos())  ## sets outline open
+        self.maker.addPoints()      
+        self.maker.works.updateOutline() 
+        self.maker.dblclk = True
+      
         if self.pixitem.scale != 1.0 or self.pixitem.rotation != 0:    
             self.scaleRotateShadow()
             

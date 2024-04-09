@@ -12,7 +12,7 @@ from dotsShowFiles      import ShowFiles
 from dotsShowWorks      import ShowWorks
 from dotsShared         import Types, ControlKeys
 
-Demos = ['snakes', 'bats', 'abstract']
+Demos = ['snakes', 'bats', 'hats']
 
 ### ---------------------- dotsShowTime --------------------
 ''' ShowTime: functions to run .play animations, pause, stop,
@@ -150,7 +150,7 @@ class ShowTime:
                         scrolling.append(pix.tag)    
                                                    
                 if pix.type == 'pix' and pix.opacity() < .2:  ## just in case  
-                    if self.canvas.openPlayFile != 'abstract':            
+                    if self.canvas.openPlayFile != 'hats':            
                         pix.setOpacity(1.0) 
                         pix.alpha2 = pix.opacity()  ## opacity can't be a varibale name   
                                                                                                     

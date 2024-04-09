@@ -48,9 +48,9 @@ class DotsQt(QMainWindow):
     
     def init(self):  
         dir = os.path.basename(os.path.dirname(os.getcwd()))
-        self.setWindowTitle('DotsQt - ' + dir + "/" + os.path.basename(os.getcwd()) + \
-            ' ~ ' + self.screen)  ## or getDate()
-            
+        str = f'{dir}  /{os.path.basename(os.getcwd())} ~ {self.screen}'  ## or getDate()        
+        self.setWindowTitle('DotsQt - ' + str)
+  
         self.setStyleSheet(open('./dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
                                
@@ -61,7 +61,8 @@ class DotsQt(QMainWindow):
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        self.move(getX(), getY()+50)  ## functions in screens 
+        vert = 50 if self.Vertical == True else 110  ## <<---
+        self.move(getX(), getY()+vert)  ## functions in screens 
 
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
@@ -86,7 +87,8 @@ class DotsQt(QMainWindow):
         else:
             self.Vertical = False               
         common = self.saveCommon.copy()  ## copy it back
-        self.screen = setCommon(key)     ## see dotsScreens
+        self.screen = setCommon(key)  ## in dotsScreens
+        
         self.init()
                                                                                             
 ### --------------------------------------------------------
@@ -95,8 +97,9 @@ if __name__ == '__main__':
     app.setStyle('QtCurve')     
     dots = DotsQt(sys.argv)
     sys.exit(app.exec())    
-      
+
 ### ------------------------- dotsQt -----------------------
+
 
 
 

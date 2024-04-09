@@ -19,22 +19,24 @@ from dotsShowFiles      import ShowFiles
 from dotsPixFrameWorks  import Frame
 from dotsTableMaker     import TableView
 
-from dotsMenus          import DemoMenu, ScreenMenu
+from dotsMenus          import DemoMenu, HelpMenu, ScreenMenu
 from dotsSnakes         import Snakes
-from dotsAbstractBats   import Abstract, Bats, Wings
+from dotsBatsAndHats    import *
+from dotsWings          import Wings
 
 ### ---------------------- dotsShowBiz --------------------
-''' functions to load and add both demo and non demo items to the scene/canvas '''    
+''' functions to load and add both demo and non demo items,
+            play files, to the scene/canvas/storyboard '''    
 ### --------------------------------------------------------
 class ShowBiz:  
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
  
-        self.canvas   = parent
-        self.scene    = self.canvas.scene
-        self.dots     = self.canvas.dots
-        self.mapper   = self.canvas.mapper
+        self.canvas = parent
+        self.scene  = self.canvas.scene
+        self.dots   = self.canvas.dots
+        self.mapper = self.canvas.mapper
         
         self.sideCar   = SideCar(self.canvas)         
         self.pathMaker = self.canvas.pathMaker
@@ -45,19 +47,24 @@ class ShowBiz:
         if self.demoAvailable:
             self.bats      = Bats(self.canvas)     
             self.snakes    = Snakes(self.canvas)     
-            self.abstract  = Abstract(self.canvas) 
+            self.hats      = Hats(self.canvas) 
             self.demoMenu  = DemoMenu(self.canvas, self)
  
         self.showtime   = ShowTime(self.canvas)
         self.screenMenu = ScreenMenu(self.canvas)  ## in screens
         self.showFiles  = ShowFiles(self.canvas) 
         
+        self.helpMenu   = None
+        self.helpMenu   = HelpMenu(self.canvas, self)
+        self.help = True
+           
         self.locks = 0
         self.tableView = None 
+     
            
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
-        if self.canvas.pathMakerOn == False:                    
+        if self.canvas.pathMakerOn == False:                
             if len(self.scene.items()) > 0:  ## stuff on screen
                 if key == 'P':  ## always
                     self.mapper.tagsAndPaths.togglePaths()                               
@@ -81,37 +88,50 @@ class ShowBiz:
                 self.RSA(key)
    
     def RSA(self, key):
-        ''' 'A' moved to controlview - either selects all or launches background file dialog '''
-        if key == 'L':
+        self.closeMenus()   
+        if key in ('A', 'B'):
+            self.bkgMaker.openBkgFiles() 
+        elif key == 'L':
             ## use QFileDialog to open a .play json file and load it to the screen
             self.loadPlay()  
-        elif key == 'R':   
-            self.screenMenu.closeScreenMenu()
-            if self.demoAvailable: 
+        elif key in ('D','R'):  ## added 'D' thru deleteSelected if nothing there 
+            self.bkgMaker.screenrate = {}
+            if self.demoAvailable:     
                 self.demoMenu.openDemoMenu()  ## in snakes 
         elif key == 'S':   
             if self.demoAvailable:  
-                self.demoMenu.closeDemoMenu()
                 self.screenMenu.openScreenMenu() ## in screens
         elif key == 'P':  
             self.pathMaker.initPathMaker()
         elif key == 'J':              
-            ## use QFileDialog to open a .play json file but does not load it to the screen
+            ## use QFileDialog to open a .play json file to view the play file contents
             self.loadPlay('table')  
+        elif key == 'H':    
+            if self.help == True:      
+                self.helpMenu.openHelpMenu() 
+                self.help = False
+            else:
+                self.helpMenu.closeHelpMenu() 
+                self.help = True
+                
+    def closeMenus(self):
+        self.screenMenu.closeScreenMenu()
+        self.demoMenu.closeDemoMenu()
+        self.helpMenu.closeHelpMenu()
 
 ### --------------------------------------------------------        
     def runThese(self):      
-        if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'abstract'):
+        if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):
             if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
                 self.snakes.rerun(self.snakes.what)  
-            elif self.canvas.openPlayFile == 'abstract' and self.abstract.direction != '':
-                self.abstract.rerunAbstract(self.abstract.direction)  
+            elif self.canvas.openPlayFile == 'hats' and self.hats.direction != '':
+                self.hats.rerunAbstract(self.hats.direction)  
             elif self.canvas.openPlayFile == 'bats':
                 self.bats.rerun()
         else:
             self.showtime.run()
       
-    def runThis(self, file):  ## doesn't ask - called by demo menu - runs abstracts
+    def runThis(self, file):  ## doesn't ask - called by demo menu - runs hatss
         if len(self.scene.items()) == 0:
             self.openPlay(paths['playPath'] + file)  ## also adds pix to scene
             self.canvas.openPlayFile = file  ## give it time to load 
@@ -198,13 +218,13 @@ class ShowBiz:
                                 
                 ## a flat does not rely on a bkg.file once it's saved to a play.file
                 if tmp['type'] == 'flat' and QColor().isValidColor(tmp['color']):
-                    pix = Flat(tmp['color'], self.canvas, bkgz)  
+                    pix = Flat(tmp['color'], self.bkgMaker, bkgz)  
                               
                 elif tmp['type'] == 'bkg':    
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
                     
                 pix.bkgMaker.lockBkg(pix)                                         
-                self.showFiles.addPixToScene(pix, tmp, bkgz)  ## finish unpacking tmp         
+                self.showFiles.addPixToScene(pix, tmp, bkgz)  ## finish unpacking tmp  
                 bkgz -= 1           
             del tmp              
         ## end for loop   
@@ -244,11 +264,11 @@ class ShowBiz:
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()           
-        self.sideCar.showOutlines()  ## turns them on              
+        self.sideCar.showOutlines()  ## turns them on      
+        QTimer.singleShot(3000, self.sideCar.hideOutlines)          
         str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
         self.dots.statusBar.showMessage(str, 10000)   
-        QTimer.singleShot(5000, self.sideCar.hideOutlines)   
-
+ 
 ### ---------------------- dotsShowBiz --------------------
 
 

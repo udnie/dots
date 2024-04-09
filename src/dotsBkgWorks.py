@@ -1,52 +1,42 @@
 
 import os.path
 import math
-import random
+import json
 
 from PyQt6.QtCore       import Qt, QPoint, QTimer
-from PyQt6.QtGui        import QColor
-from PyQt6.QtWidgets    import QGraphicsSimpleTextItem
                         
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
+from dotsBkgMatte       import Matte
+from dotsBkgScrollWrks  import Tracker, BkgScrollWrks
 
 ### --------------------- dotsBkgWorks --------------------- 
-''' classes: Tracker, BkgWorks, Flat -- mostly scrolling except for Flat'''    
-### --------------------------------------------------------
-class Tracker:  ## should be one for each (scrolling) background 
-### --------------------------------------------------------
-    def __init__(self, file, bkg):
-        super().__init__()
-
-        self.file = file
-        self.direction = bkg.direction
-        self.mirroring = bkg.mirroring
-        self.factor    = bkg.factor
-        self.rate      = bkg.rate
-        self.showtime  = bkg.showtime
-        
-### --------------------------------------------------------  
+''' classes: BkgWorks -- mostly scrolling'''    
+# ### -------------------------------------------------------- 
 class BkgWorks:  
 ### --------------------------------------------------------
     def __init__(self, parent):  
         super().__init__()
 
         self.bkgItem  = parent     
-        self.bkgMaker = self.bkgItem.bkgMaker
         self.canvas   = self.bkgItem.canvas
+        self.bkgMaker = self.bkgItem.bkgMaker
         self.dots     = self.bkgItem.dots
         
+        self.bkgScrollWrks = BkgScrollWrks(self.bkgItem)
+        
 ### -------------------------------------------------------- 
-    def addTracker(self, bkg):  ## when loading a play file and adding from screen
+    ## when loading a play file or adding from the screen - Tracker is in dotsBkgScrollWrks
+    def addTracker(self, bkg): 
         bkg.fileName = bkg.path + os.path.basename(bkg.fileName) 
         file = os.path.basename(bkg.fileName) 
         
         ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
         ## if randomizing speed factor do this 
-        
+
         # fact = float((random.randint(17,30) *5)/100)  ## .85-1.50
         # bkg.factor = fact  ## if using a random screen speed factor 
-          
+    
         if len(self.bkgMaker.trackers) == 0:
             x = Tracker(file, bkg)
             self.bkgMaker.trackers.append(x)
@@ -57,16 +47,12 @@ class BkgWorks:
                 if p.file == file:
                     k += 1
             if k == 0:  ## no others found - add it 
-                x = Tracker(file, bkg)
-                self.bkgMaker.trackers.append(x) 
+                # x = Tracker(file, bkg)
+                self.bkgMaker.trackers.append(Tracker(file, bkg)) 
                 return True
             else:
                 return False  ## must be a duplicate, skip processing 
-            
-    def filePixX(self, file, bkg):  ## also see dumpBkgs - shift 'B'
-        file = os.path.basename(bkg.fileName)
-        print( f'tracker {file}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.factor}\t{bkg.zValue()}')
-           
+                    
     def delTracker(self, bkg):
         file = os.path.basename(bkg.fileName)  
         for item in self.bkgMaker.trackers:  ## see if it's already there
@@ -75,9 +61,9 @@ class BkgWorks:
                 break
                          
 ### --------------------------------------------------------                                                                                
-    def setDirection(self, key):  ## from keybooard or widget - sets 'first'      
+    def setDirection(self, key):  ## from keybooard or widget - sets 'first'    
         if math.fabs(self.bkgItem.runway) < self.bkgItem.showtime:
-            self.notScrollable()   
+            self.bkgScrollWrks.notScrollable()   
             return     
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
             if self.dots.Vertical:   ## no direction equals 'not scrollable'
@@ -86,85 +72,66 @@ class BkgWorks:
                 self.bkgItem.direction = key
             self.bkgItem.tag = 'scroller'    
             self.bkgItem.rate = 0
-            file = os.path.basename(self.bkgItem.fileName) 
-            
+            file = os.path.basename(self.bkgItem.fileName)          
             for p in self.bkgMaker.trackers:
                 if p.file == file:
                     p.direction = self.bkgItem.direction 
-                    p.rate      = self.bkgItem.setRate()
-                    self.bkgItem.showtime  = self.bkgItem.setShowTime()
+                    self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
                     p.showtime  = self.bkgItem.showtime
+                    self.bkgItem.rate = self.getScreenRate()  ## blank it's first
+                    p.rate      = self.bkgItem.rate
+                    p.useThis   = self.bkgItem.useThis
                     break 
-
-            self.bkgMaker.lockBkg(self.bkgItem) 
-            self.bkgMaker.updateWidget()      
-            QTimer.singleShot(200, self.bkgItem.bkgMaker.resetSliders)
+                
+            # print(f'direction {file}\t{p.direction}\t{p.mirroring}\t{p.rate}\t{p.factor}')
+            if p.rate == 0 and self.bkgItem.useThis == '':
+                return
             
-### -------------------------------------------------------- 
-    def setMirroring(self):
-        if self.bkgItem.scrollable:                                  
-            if self.bkgItem.mirroring == True: 
-                self.bkgItem.mirroring = False ## continuous
+            self.bkgMaker.lockBkg(self.bkgItem) 
+            if self.bkgMaker.widget != None:
+                self.bkgMaker.updateWidget()      
+                QTimer.singleShot(200, self.bkgItem.bkgMaker.resetSliders)
+                                                  
+### --------------------------------------------------------  
+    def getScreenRate(self, which =''):  ## only used once by 'first'
+        rate = self.getThisRate(self.bkgItem)  
+        if rate == 0:
+            MsgBox(f'Error Loading Screen Rates File {self.bkgItem.useThis}', 5)
+            self.bkgItem.useThis = ''
+            self.bkgMaker.screenrate = {}
+            return 0        
+        if which == 'first':
+            rate = rate[0]        
+        elif self.bkgItem.rate == 0:  ## needs to be 0
+            if self.bkgItem.direction == 'right':
+                rate = rate[2]
             else:
-                self.bkgItem.mirroring = True  ## mirrored                               
-        file = os.path.basename(self.bkgItem.fileName)  
-        for p in self.bkgMaker.trackers:
-            if p.file == file:
-                p.mirroring = self.bkgItem.mirroring   
-                break                                     
-        self.bkgMaker.setMirrorBtnText() 
-               
-    def setFactorTrackers(self):
-        if self.bkgItem.scrollable:                                                                 
-            file = os.path.basename(self.bkgItem.fileName)
-            for p in self.bkgMaker.trackers:
-                if p.file == file:
-                    p.factor = self.bkgItem.factor
-                    break
-
-    def setRateTrackers(self):
-        if self.bkgItem.scrollable:                                                               
-            file = os.path.basename(self.bkgItem.fileName)  
-            for p in self.bkgMaker.trackers:
-                if p.file == file:
-                    p.direction = self.bkgItem.direction
-                    p.rate = self.bkgItem.rate  ## individual rate saved by direction
-                    break
-
-    def setShowTimeTrackers(self):  ## used by resetSliders
-        if self.bkgItem.scrollable:                                                               
-            file = os.path.basename(self.bkgItem.fileName)  
-            for p in self.bkgMaker.trackers:
-                if p.file == file:
-                    p.direction = self.bkgItem.direction
-                    p.showtime = self.bkgItem.showtime 
-                    break
-
-    def toggleBkgLocks(self):
-        if self.bkgItem:
-            if self.bkgItem.locked == False:
-                self.bkgMaker.lockBkg(self.bkgItem) 
-            else:
-                self.bkgMaker.unlockBkg(self.bkgItem) 
-
-### --------------------------------------------------------                       
-    def getShowtimeFromTrackers(self, bkg):  
-        file = os.path.basename(bkg.fileName)  
-        for p in self.bkgMaker.trackers:
-            if p.file == file:
-                return p.showtime
-                   
-    def getRateFromTrackers(self, bkg):  
-        file = os.path.basename(bkg.fileName)  
-        for p in self.bkgMaker.trackers:
-            if p.file == file:
-                return p.rate
-                     
+                rate = rate[1]      
+            self.bkgItem.rate = rate 
+            self.bkgScrollWrks.setTrackerRate()  ## a useful addition
+        return rate
+    
+### --------------------------------------------------------
+    def getThisRate(self, bkg):
+        bkg.useThis == '' 
+        if common['Screen']  == '1080' and bkg.width  < 1280 or \
+            common['Screen'] == '1215' and bkg.width  < 1440 or \
+            common['Screen'] == '1296' and bkg.width  < 1536 or \
+            common['Screen'] ==  '900' and bkg.height < 1102:  ##dd in this case 2:3  
+            bkg.useThis = 'moretimes'  ## selecting which dictionary to use     
+        else:
+            bkg.useThis = 'screentimes'             
+        try:  
+            with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
+                self.bkgMaker.screenrate = json.load(fp)  
+                return self.bkgMaker.screenrate[bkg.useThis][common['Screen']]        
+        except:
+            return 0
+        
 ### --------------------------------------------------------
     ## rate times screen long side = milliseconds needed to clear the scene end to end
     def setNextPath(self, path, bkg):  
-        fact = bkg.factor  
-        # print(self.bkgMaker.bkgTag(bkg, 'setNxtPath'))      
+        fact = bkg.factor      
         if bkg.direction == 'left':   
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))    
             path.setStartValue(QPoint(common['ViewW'], 0))
@@ -174,8 +141,6 @@ class BkgWorks:
             path.setStartValue(QPoint(-bkg.width, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
         elif bkg.direction == 'vertical':
-            # if 'snakes' in bkg.fileName:  ## early kludge  
-            #     rate_one = rate_one + .2 
             path.setDuration(int(common['ViewH'] * (bkg.rate*fact))) 
             ## current kludge advances background into scene before starting - verticals seem to take longer to start
             path.setStartValue(QPoint(0, common['ViewH']-int(bkg.showtime*.75)))
@@ -197,7 +162,33 @@ class BkgWorks:
             path.setStartValue(QPoint(0, bkg.runway))
             path.setEndValue(QPoint(0, -bkg.height)) 
         return path
-    
+                
+### -------------------------------------------------------- 
+    def centerBkg(self):
+        if self.bkgItem != None and self.bkgItem.type == 'bkg':  
+            width = self.bkgItem.imgFile.width()
+            height = self.bkgItem.imgFile.height()
+            self.bkgItem.x = (common['ViewW']- width)/2
+            self.bkgItem.y = (common['ViewH']- height)/2
+            self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
+
+    def setMirroring(self):
+        if self.bkgItem.scrollable:                                  
+            if self.bkgItem.mirroring == True: 
+                self.bkgItem.mirroring = False ## continuous
+            else:
+                self.bkgItem.mirroring = True  ## mirrored                               
+        file = os.path.basename(self.bkgItem.fileName)  
+        for p in self.bkgMaker.trackers:
+            if p.file == file:
+                p.mirroring = self.bkgItem.mirroring   
+                break                                     
+        self.bkgMaker.setMirrorBtnText() 
+         
+    def setMatte(self):
+        self.bkgMaker.closeWidget()
+        self.bkgMaker.matte = Matte(self.canvas)
+        
 ### -------------------------------------------------------- 
     def restoreFromTrackers(self, bkg, where=''):  ## returns what gets lost on each reincarnation
         file = os.path.basename(bkg.fileName)  ## opposite of setMirroring
@@ -206,22 +197,11 @@ class BkgWorks:
                 bkg.mirroring = p.mirroring   
                 bkg.direction = p.direction 
                 bkg.factor    = p.factor
-                bkg.factor    = p.factor
                 bkg.showtime  = p.showtime
+                bkg.useThis   = p.useThis
+                bkg.rate      = p.rate
                 break
              
-    def setLeft(self):
-        if self.bkgItem.scrollable:
-            self.setDirection('left')      
-        else:
-            self.notScrollable() 
-               
-    def setRight(self):
-        if self.bkgItem.scrollable: 
-            self.setDirection('right')             
-        else:
-            self.notScrollable() 
-
 ### --------------------------------------------------------                                                                                      
     def reset(self):  ## reset both tracker and bkgItem
         file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
@@ -230,8 +210,9 @@ class BkgWorks:
                 p.direction = ''
                 p.mirroring = self.bkgMaker.mirroring
                 p.factor    = self.bkgMaker.factor
-                p.rate      = 0
                 p.showtime  = 0
+                p.useThis   = ''
+                p.rate      = 0
                 break      
         self.bkgItem.tag = ''   
         self.bkgItem.direction = ''             
@@ -239,38 +220,11 @@ class BkgWorks:
         self.bkgItem.factor    = self.bkgMaker.factor
         self.bkgItem.rate      = 0
         self.bkgItem.showtime  = 0
+        self.bkgItem.useThis   = ''
+        self.bkgItem.rate      = 0
         self.bkgMaker.addWidget(self.bkgItem)
                                                                     
-    def tagBkg(self, bkg, pos):
-        self.bkgItem = bkg
-        x, y = pos.x(), pos.y()
-        z = self.bkgItem.zValue()
-        text = QGraphicsSimpleTextItem() 
-        if self.bkgItem.locked == True:
-            text = 'Locked' 
-        else:
-            text = 'Unlocked'
-        file = os.path.basename(bkg.fileName)
-        tag = file + " " + text    
-        if self.bkgItem.direction == ' left':
-            tag = tag + ' Left'
-        elif self.bkgItem.direction == 'right': 
-            tag = tag + ' Right'            
-        self.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
-                                                          
-### --------------------------------------------------------                    
-    def notScrollable(self):
-        MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
-        self.bkgItem.scrollable = False  
-        return  
-           
-    def setStatusBar(self):
-        self.dots.statusBar.showMessage(os.path.basename(self.bkgItem.fileName) + '    ' + \
-            'Width:   '  + '  ' + str(self.bkgItem.width)       + '    ' +\
-            'Runway:   ' + '  ' + str(abs(self.bkgItem.runway)) + '    ' +\
-            'ShowTime: ' + '  ' + str(self.bkgItem.showtime)    + '    ' +\
-            'Ratio: '    + '  ' + str(self.bkgItem.ratio)+ ':9')
-  
+### --------------------------------------------------------                     
     def setWidthHeight(self, img):     
         if img == None:
             return   
@@ -301,4 +255,5 @@ class BkgWorks:
 ### --------------------- dotsBkgWorks ---------------------
 
 
+        
         

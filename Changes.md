@@ -5,6 +5,14 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+ **April 2024**  
+I've added two **help menus**, one to what I call the **'canvas'**, the other to the **'matte'** from the background widget. I've also updated **double-clicking** the **shadow outline** - on and off once again.  Reading over my entries from **March 7th and 10th** makes me wonder if I somehow managed to misplace a bunch of changes, I hadn't - they needed more work. 
+ 
+The biggest change/addition belongs to **'scrolling backgrounds'**.  The slider used to set the **screenrate(duration)** now can update the underlying dictionaries which govern the **'next'** scrolling backgrounds speed required to match the **first**. I suggest running a scrolling demo to get a sense of any differences that may be present with the current screen rates.  The demo's background is duplicated in the backgrounds directory to make it easier to run if it's necessary to update the **screenrate.dict** file.
+
+
+ 
+ ---
  **March 3 2024**   
 Back again roping in Lasso in Paths and trying to find a balance in Shadows between outline vs. no outline and how to manage that. The 'O' key which toggles shadow outlines off and on is the best solution so far.  A few more bug fixes plus updating older string formats to f-strings.
 

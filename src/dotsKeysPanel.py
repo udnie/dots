@@ -27,7 +27,7 @@ class KeysPanel(QWidget):
         self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignVCenter) 
         self.layout.setContentsMargins(0, common['margin1'],0, common['margin2']+3)
         
-        if common['Screen'] == '912':
+        if common['Screen'] == '911':
             self.layout.setContentsMargins(0, common['margin1'],15, common['margin2']+3)
         
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
@@ -52,7 +52,7 @@ class KeysPanel(QWidget):
          
         font = QFont()
         font.setFamily('Arial')
-        font.setPointSize(12)
+        font.setPointSize(11)
         self.tableView.setFont(font)
                 
         ## make it read-only
@@ -65,8 +65,8 @@ class KeysPanel(QWidget):
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-        self.tableView.setColumnWidth(0, 46) 
-        self.tableView.setColumnWidth(1, 108)
+        self.tableView.setColumnWidth(0, 34) 
+        self.tableView.setColumnWidth(1, 94)
         
         return self.tableView
                                 
@@ -82,11 +82,11 @@ class KeysPanel(QWidget):
                 'QHeaderView::section{\n'
                 'background-color: rgb(144,238,144);\n'
                 'border:  1px solid rgb(240,240,240); \n'
-                'font-size: 12px;\n'
+                'font-size: 11px;\n'
                 '}')  
             self.tableView.setStyleSheet('QTableView {\n'
                 'alternate-background-color: rgb(144,238,144);\n'
-                'font-size: 12px;\n'
+                'font-size: 11px;\n'
                 '}')  
         else:
             header[1] = 'StoryBoard '
@@ -94,11 +94,11 @@ class KeysPanel(QWidget):
                 'QHeaderView::section{\n'
                 'background-color: rgb(220,220,220);\n'
                 'border: 1px solid rgb(240,240,240);\n'
-                'font-size: 12px;\n'
+                'font-size: 11px;\n'
                 '}') 
             self.tableView.setStyleSheet('QTableView {\n'
                 'alternate-background-color: rgb(220,220,220);\n'
-                'font-size: 12px;\n'
+                'font-size: 11px;\n'
                 '}') 
                         
         del list 

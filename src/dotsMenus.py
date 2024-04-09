@@ -5,7 +5,7 @@ from PyQt6.QtCore       import QTimer
 from PyQt6.QtWidgets    import QMenu
 
 from dotsSideGig        import *
-from dotsShared         import screens
+from dotsShared         import screens, PlayKeys
 from dotsSideGig        import MsgBox, getCtr
 from dotsMapMaker       import MapMaker
 
@@ -19,12 +19,24 @@ demos = {  ## used by demo menu
     'snakes': 'Snakes Scrolling Background',    
 }
 
+helpKeys = {
+    'A':    'Add a Background', 
+    'B':    'Add a Background', 
+    'D':    'Display the Demo Menu',
+    'H':    'Canvas Help Menu',
+    'J':    'JSON File Viewer',
+    'L':    'Load a play file', 
+    'P':    'Switch to PathMaker', 
+    'R':    'Display the Demo Menu',
+    'S':    'Display the Screen Menu', 
+}
+    
 MaxWidth = 1680  ##  position dock to screen bottom for max default display width
                  ##  on my mac with dock on left side, not on bottom
 MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
 
 ### ---------------------- dotsMenus ----------------------- 
-''' classes: AnimationMenu, DemoMenu, ScreenMenu, '''
+''' classes: AnimationMenu, DemoMenu, HelpMenu, ScreenMenu, '''
 ### --------------------------------------------------------     
 class AnimationMenu:  
 ### --------------------------------------------------------
@@ -32,7 +44,6 @@ class AnimationMenu:
         super().__init__()
  
         self.canvas = parent
-        self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
     
@@ -110,7 +121,7 @@ class AnimationMenu:
             
         if self.mapper.isMapSet(): 
             self.mapper.removeMap()  
-
+                            
 ### --------------------------------------------------------     
 class DemoMenu:  
 ### --------------------------------------------------------
@@ -122,11 +133,10 @@ class DemoMenu:
         
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
-        self.view   = self.canvas.view 
      
         self.snakes   = self.showbiz.snakes   
         self.bats     = self.showbiz.bats
-        self.abstract = self.showbiz.abstract  ## hats and bats
+        self.hats     = self.showbiz.hats  ## hats and bats
        
         self.demoMenu = None
         
@@ -134,7 +144,7 @@ class DemoMenu:
     def openDemoMenu(self):
         self.closeDemoMenu()
         self.demoMenu = QMenu(self.canvas) 
-        self.demoMenu.addAction('Demos Menu'.rjust(20,' '))
+        self.demoMenu.addAction('Demos Menu'.rjust(25,' '))
         self.demoMenu.addSeparator()
         
         for key, demo in demos.items():            
@@ -143,14 +153,16 @@ class DemoMenu:
             else:
                 action = self.demoMenu.addAction(demo)
                 self.demoMenu.addSeparator()
-                action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))         
-           
+                action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))
+               
         if self.dots.Vertical:
             self.demoMenu.setFixedSize(220, 130)
-            self.demoMenu.move(getCtr(-130, -255))     
+            self.demoMenu.move(getCtr(-135, -260))     
         else:
+            ctr = getCtr(0,0)
             self.demoMenu.setFixedSize(220, 190)
-            self.demoMenu.move(getCtr(-130, -225))   
+            self.demoMenu.move(ctr.x()-135, ctr.y()-260)  
+              
         self.demoMenu.show()
 
     def clicked(self, demo):
@@ -182,9 +194,9 @@ class DemoMenu:
                 return            
             self.canvas.bkgMaker.trackers.clear()
             if key == 'left':  ## direction of travel
-                self.abstract.makeAbstracts('left')  ## right to left 
+                self.hats.makeHatsDemo('left')  ## right to left 
             else: 
-                self.abstract.makeAbstracts('right') ## left to right   
+                self.hats.makeHatsDemo('right') ## left to right   
 
     def runSnakes(self, what): 
         if what in ('blue', 'snakes'): 
@@ -194,37 +206,73 @@ class DemoMenu:
         elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
             MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 6, getCtr(-225,-175))
             return 
-          
+      
+### --------------------------------------------------------     
+class HelpMenu:  ## for canvas - one key commands
+### -------------------------------------------------------- 
+    def __init__(self, parent, showbiz):
+        super().__init__()  
+   
+        self.canvas  = parent  ## all these are necessary to clear the screen     
+        self.showbiz = showbiz
+         
+        self.helpMenu = self.showbiz.helpMenu
+         
+### --------------------------------------------------------                     
+    def openHelpMenu(self):
+        self.closeHelpMenu()    
+        self.helpMenu = QMenu(self.canvas)    
+        self.helpMenu.addAction('Canvas KeyBoard Help'.rjust(27,' '))
+        self.helpMenu.addSeparator()
+        
+        for help, demo in helpKeys.items():   
+            action = self.helpMenu.addAction(f'{help:<3}- {demo:<14}')
+            self.helpMenu.addSeparator()
+            action.triggered.connect(lambda chk, help=help: self.clicked(help)) 
+         
+        ctr = getCtr(0,0) ## my x. are 50px off because the dock is on the left
+        self.helpMenu.setFixedSize(250, 315)       
+        self.helpMenu.move(ctr.x()-140, ctr.y()-270)  
+        self.helpMenu.show()
+    
+    def clicked(self, help):
+        if help in PlayKeys:
+            QTimer.singleShot(100, partial(self.showbiz.keysInPlay, help)) 
+
+    def closeHelpMenu(self):   
+        if self.helpMenu:
+            self.helpMenu.close()
+        self.helpMenu = None
+                
  ### --------------------------------------------------------     
 class ScreenMenu:  
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()  
    
-        self.canvas = parent  ## all these are necessary to clear the screen
-        self.dots   = self.canvas.dots
-        self.scene  = self.canvas.scene
-        self.view   = self.canvas.view  
-        
+        self.canvas = parent  ## all these are necessary to clear the screen        
         self.screenMenu = None
  
 ### --------------------------------------------------------                     
     def openScreenMenu(self):
         self.closeScreenMenu()
         self.screenMenu = QMenu(self.canvas)    
-        self.screenMenu.addAction(' Screen Formats')
+        self.screenMenu.addAction('Screen Formats'.rjust(22, ' '))
         self.screenMenu.addSeparator()
-        for screen in screens.values():
-            action = self.screenMenu.addAction(screen)
+        
+        for screen, desc in screens.items():
+            action = self.screenMenu.addAction(f'{screen:>5} - {desc:>12}')
             self.screenMenu.addSeparator()
-            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen)) 
-        self.screenMenu.move(getCtr(-85,-350)) 
-        self.screenMenu.setFixedSize(150, 315)
+            action.triggered.connect(lambda chk, screen=screen: self.clicked(screen))
+         
+        ctr = getCtr(0,0)
+        self.screenMenu.setFixedSize(200, 315)
+        self.screenMenu.move(ctr.x()-110, ctr.y()-270)
         self.screenMenu.show()
     
     def clicked(self, screen):
-        for key, value in screens.items():
-            if value == screen:  ## singleshot needed for menu to clear
+        for key in screens:
+            if key == screen:  ## singleshot needed for menu to clear
                 QTimer.singleShot(200, partial(self.displayChk, self.switchKey(key)))
                 break      
         self.closeScreenMenu()  
@@ -234,7 +282,7 @@ class ScreenMenu:
             self.screenMenu.close()
         self.screenMenu = None
               
-    def switchKey(self, key):                 
+    def switchKey(self, key):                  
         if self.displayChk(key) == True:
             self.canvas.clear()       
             self.canvas.dots.switch(key) 

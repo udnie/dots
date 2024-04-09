@@ -67,7 +67,7 @@ class ShowFiles:
         pix.alpha2 = tmp['alpha2']
         pix.locked = tmp['locked']  
                                                                 
-        if pix.type == 'pix' and 'scalor' in tmp.keys():  ## test pix.shadowMaker.isActive when adding to scene
+        if pix.type == 'pix' and 'scalor' in tmp.keys():  ## just add it whether pix.shadowMaker.shadowMaker.isActive
             pix = self.setShadow(pix, tmp)  
                  
         elif pix.type == 'bkg':  ## adding the rest of it
@@ -78,7 +78,7 @@ class ShowFiles:
                     if pix.direction == 'right':
                         pix.setPos(QPointF(pix.runway, 0))  ## offset to right 
                     elif pix.direction == 'vertical':
-                        pix.setPos(QPointF(0.0, float(pix.runway)))                             
+                        pix.setPos(QPointF(0.0, float(pix.runway)))                                     
         del tmp                                                                                            
         ## adds pix to the scene and performs any transforms - used by other classes
         if pix != None and pix.type == 'pix': 
@@ -137,9 +137,9 @@ class ShowFiles:
         pix.tag     = QColor(tmp['tag'])
         pix.locked  = tmp['locked']  
         return pix
-     
-    def setBackGround(self, bkg, tmp, z):  ## pix is a stand_in for bkg
-        ## doing this only if missing in .play file otherwise gets the default     
+   
+    ## doing this only if missing in .play file otherwise gets the default   
+    def setBackGround(self, bkg, tmp, z):  ## pix is a stand_in for bkg    
         if 'anime' not in tmp.keys(): 
             tmp['anime'] = None     
         if 'scrollable' not in tmp.keys(): 
@@ -166,11 +166,15 @@ class ShowFiles:
              
         result = bkg.bkgWorks.addTracker(bkg)  
         if result == False:  ## must be a dupe
-            del bkg         ## not yet added to scene
+            del bkg  ## not yet added to scene
             return None      
+        else:
+            bkg.bkgWorks.setDirection(bkg.direction)  ## also sets the rate
+                
         return bkg ## return to showbiz
     
-    def setShadow(self, pix, tmp):  ## read by restore shadows - copies one dictionary to another with some possible changes
+    ## read by restore shadows - copies one dictionary to another with some possible changes
+    def setShadow(self, pix, tmp):  
         try:
             pix.shadow = {  ## makes any stmp data available after the .play file is read
                 'alpha':    tmp['alpha'],
@@ -197,7 +201,8 @@ class ShowFiles:
         return pix
     
 ### --------------------------------------------------------
-    def savePix(self, pix):  ## used by showtime when saving scene items
+    ## used by showtime when saving scene items
+    def savePix(self, pix):  
         p = pix.pos() 
         tmp = {
             'fileName':  os.path.basename(pix.fileName),
@@ -212,32 +217,31 @@ class ShowFiles:
             'scale':    float('{0:.2f}'.format(pix.scale)),
             'alpha2':   float('{0:.2f}'.format(pix.alpha2)), 
             'part':     pix.part,
-        }  
-   
-        if len(pix.shadow) > 0:
-            if pix.shadowMaker.isActive == True:
-                try:
-                    shadow = {
-                        'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
-                        'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
-                        'rotate':   pix.shadowMaker.rotate,
-                        'width':    pix.shadowMaker.width,
-                        'height':   pix.shadowMaker.height,
-                        'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
-                                        for k in range(4)],
-                        'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
-                                        for k in range(4)],
-                        'flopped':   pix.shadowMaker.flopped,
-                        'linked':   pix.shadowMaker.linked,
-                    }
-                except:       
-                    shadow = {}
-                    self.errorOnShadows = True   
-            else:
-                 shadow = pix.shadow   
-            tmp.update(shadow)             
-        return tmp 
-
+        }   
+        ## pix.shadowMaker maintains shadow data over shadow updates
+        if pix.shadowMaker.isActive == True and pix.shadowMaker.shadow != None: 
+            try:
+                shadow = {  
+                    'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
+                    'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
+                    'rotate':   pix.shadowMaker.rotate,
+                    'width':    pix.shadowMaker.width,
+                    'height':   pix.shadowMaker.height,
+                    'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
+                                    for k in range(4)],
+                    'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
+                                    for k in range(4)],
+                    'flopped':   pix.shadowMaker.flopped,
+                    'linked':   pix.shadowMaker.linked,
+                }
+                tmp.update(shadow)  
+            except Exception:
+                self.errorOnShadows = True  
+        ## stored shadow data - copied back for future use
+        elif len(pix.shadow) > 0: 
+            tmp.update(pix.shadow) 
+        return tmp
+            
     def saveBkgnd(self, pix):
         p = pix.boundingRect()      
         tmp = {

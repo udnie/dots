@@ -20,7 +20,7 @@ from dotsPathMaker      import PathMaker
 from dotsKeysPanel      import KeysPanel
 from dotsScrollPanel    import ScrollPanel
 from dotsDocks          import *
-from dotsAbstractBats   import Wings
+from dotsWings          import Wings
 from dotsShowWorks      import ShowWorks
 from dotsMenus          import AnimationMenu
 
@@ -73,7 +73,7 @@ class StoryBoard(QWidget):
         
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self)
         self.setMouseTracking(True)
-        
+              
         self.view.viewport().installEventFilter(self)
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)  
     
@@ -96,16 +96,18 @@ class StoryBoard(QWidget):
             else:
                 self.clear()  ## canvas
                 
-        elif not self.pathMakerOn:  ## canvas
-            if self.key in CanvasStr or self.key == '':
-                if self.key in PlayKeys:  ## clear screen canvas hotkeys 
+        elif not self.pathMakerOn:  ## canvas/storyboard
+            if self.key in CanvasStr or self.key == '': 
+                if self.key in PlayKeys:  ## empty canvas hotkeys - let 'A' and 'H' go first
                     if self.key == 'A' and len(self.scene.items()) > 0:
-                        self.canvas.selectAll()
+                        self.selectAll()
+                    elif self.key == 'H' and len(self.scene.items()) > 0:
+                        self.sideCar.hideSelected(),  ## patched to run hep if nothing on screen     
                     else:  ## need to slow it down after changing screen format - single key commands processed in showbiz
                         QTimer.singleShot(100, partial(self.showbiz.keysInPlay, self.key))  
                 else:
-                    self.sendPixKeys()      
-                             
+                    self.sendPixKeys() 
+                                 
         ## send MoveKeys to PathItem selections in PathEdits
         elif self.pathMaker.edits.pointItemsSet() == True and \
             self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
@@ -119,9 +121,13 @@ class StoryBoard(QWidget):
     def eventFilter(self, source, e):  ## used by mapper for selecting
         if not self.pathMakerOn:           
             if e.type() == QEvent.Type.MouseButtonPress:
-                self.origin = QPoint(e.pos())
-                self.mapper.clearTagGroup()  ## chks if set
-                ## 'cmd' also used in pathMaker but for editing
+                if e.button() == Qt.MouseButton.RightButton and len(self.scene.items()) == 0:
+                    self.showbiz.helpMenu.openHelpMenu()   
+                  
+                else:       
+                    self.origin = QPoint(e.pos())
+                    self.mapper.clearTagGroup()  ## chks if set
+                    ## 'cmd' also used in pathMaker but for editing
                 if self.key == 'cmd':  
                     self.mapper.clearMap()   ## set rubberband if mapset
                     self.unSelect()              
@@ -159,13 +165,14 @@ class StoryBoard(QWidget):
                 if p := self.scene.itemAt(QPointF(e.pos()), QTransform()):
                     if p != None and p.type != 'pix' and self.mapper.isMapSet():
                         self.mapper.removeMap()
-                        self.setKeys('noMap')      
+                        self.setKeys('noMap')    
+                                  
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------
     ## set in drag/drop for id and in pixitem to clone itself
     def addPixItem(self, fileName, x, y, clone, mirror):  
-        if 'wings' in fileName:  ## see abstractBats for wings
+        if 'wings' in fileName:  ## makes a bat
             Wings(self, x, y, '')       
         else:
             self.pixCount += 1  
@@ -183,11 +190,11 @@ class StoryBoard(QWidget):
         
     def sendPixKeys(self):  ## update pixitems and pointItems thru setPixKeys
         for itm in self.scene.items():  ## used with lasso to move selections
-            if itm.type in ('pt','pix', 'bkg', 'frame'):   
+            if itm.type in ('pt','pix', 'bkg', 'frame', 'flat'):   
                 if itm.type == 'pt' or itm.type == 'pix' and \
                     itm.part not in ('pivot','left','right'):  ## 06-23-23
                     itm.setPixKeys(self.key)
-                elif itm.type in ('bkg', 'frame'):  
+                elif itm.type in ('bkg', 'frame', 'flat'):  
                     itm.setPixKeys(self.key)     
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
@@ -221,13 +228,14 @@ class StoryBoard(QWidget):
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.bkgMaker.trackers.clear()
+        self.view.grabKeyboard()
          
     def loadSprites(self):
         self.showWorks.enablePlay()
         self.scroll.loadSprites()
  
     def selectAll(self):
-        if len(self.scene.items()) == 0:  ## uses 'A'
+        if len(self.scene.items()) == 0:  ## if 'A' 
             self.bkgMaker.openBkgFiles() 
             return
         for pix in self.scene.items():
@@ -250,9 +258,12 @@ class StoryBoard(QWidget):
                     itm.setBrush(QColor('white'))   
             if itm.zValue() <= common['pathZ']:
                 break          
-         
+      
 ### --------------------------------------------------------
-    def deleteSelected(self):  ## self.pathMakerOn equals false
+    def deleteSelected(self):  ## self.pathMakerOn equals false   
+        if len( self.scene.items()) == 0:
+            self.showbiz.keysInPlay('D')
+        
         self.mapper.clearMap()
         self.mapper.clearTagGroup()
         k = 0

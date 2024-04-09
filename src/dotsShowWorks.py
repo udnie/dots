@@ -11,7 +11,8 @@ from dotsSideGig        import MsgBox
 from dotsPixFrameWorks  import Frame
 
 ### --------------------- dotsShowWorks --------------------
-''' functions for scroller cleanup, saving play files, setting play buttons '''                                  
+''' functions for scroller cleanup, saving play files, setting play buttons 
+    and Lost Files'''                                  
 ### --------------------------------------------------------
 class ShowWorks: 
 ### -------------------------------------------------------- 
@@ -52,6 +53,7 @@ class ShowWorks:
         factor    = p.factor
         showtime  = p.showtime
         rate      = p.rate
+        usethis   = p.useThis
         z = p.zValue()
 
         p.init()  ## just to make sure
@@ -62,6 +64,7 @@ class ShowWorks:
         p.factor    = factor
         p.showtime  = showtime 
         p.rate      = rate
+        p.useThis   = usethis
         
         p.setZValue(z)   
         p.locked == True
@@ -139,7 +142,7 @@ class ShowWorks:
         return pix
      
 ### --------------------------------------------------------
-class LostFiles:
+class LostFiles:  ## not used <<<---------------
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()

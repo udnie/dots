@@ -20,7 +20,7 @@ class ShadowWidget(QWidget):
         self.save = QPointF()
                 
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 235.0
+        self.WidgetW, self.WidgetH = 340.0, 235.0
                 
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())
@@ -113,7 +113,7 @@ class ShadowWidget(QWidget):
         self.rotaryDial.setNotchTarget(15.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
     
-        self.scaleValue = QLabel('1.00')
+        self.scaleValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignRight)
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)   
         self.scaleSlider.setMinimum(25)
         self.scaleSlider.setMaximum(250)
@@ -124,7 +124,7 @@ class ShadowWidget(QWidget):
         self.scaleSlider.setTickInterval(50)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
         
-        self.opacityValue = QLabel('.50')
+        self.opacityValue = QLabel('.50', alignment=Qt.AlignmentFlag.AlignRight)
         self.opacitySlider = QSlider(Qt.Orientation.Vertical)   
         self.opacitySlider.setMinimum(0)
         self.opacitySlider.setMaximum(100)
@@ -167,7 +167,7 @@ class ShadowWidget(QWidget):
     
 ### --------------------------------------------------------   
     def buttonGroup(self):
-        groupBox = QGroupBox(' Shadow')
+        groupBox = QGroupBox(' Shadows')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(103)

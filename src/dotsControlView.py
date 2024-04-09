@@ -1,14 +1,14 @@
 
 import os
 
-from PyQt6.QtCore    import Qt, pyqtSignal
-from PyQt6.QtGui     import QPainter
-from PyQt6.QtWidgets import QGraphicsView
+from PyQt6.QtCore       import Qt, pyqtSignal
+from PyQt6.QtGui        import QPainter
+from PyQt6.QtWidgets    import QGraphicsView
 
-from dotsSideGig     import MsgBox
-from dotsShared      import singleKeys
-from dotsSideCar     import SideCar
-from dotsMapMaker    import MapMaker
+from dotsSideGig        import MsgBox
+from dotsShared         import singleKeys
+from dotsSideCar        import SideCar
+from dotsMapMaker       import MapMaker
 
 ExitKeys  = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 FileTypes = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
@@ -18,6 +18,8 @@ ShiftKeys = (Qt.Key.Key_D, Qt.Key.Key_T, Qt.Key.Key_V, Qt.Key.Key_H, \
             Qt.Key.Key_S)
 UpDownKeys = (Qt.Key.Key_Down, Qt.Key.Key_Up)
 DFTWKeys  = (Qt.Key.Key_D, Qt.Key.Key_F, Qt.Key.Key_T, Qt.Key.Key_W)
+ToggleKeys = (Qt.Key.Key_G, Qt.Key.Key_M, Qt.Key.Key_K)
+DirectKeys = (Qt.Key.Key_A, Qt.Key.Key_U, Qt.Key.Key_O)
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -33,7 +35,7 @@ class ControlView(QGraphicsView):
         self.canvas  = parent         
         self.mapper  = MapMaker(self.canvas)  ## carry mapper to sidecar  
         self.sideCar = SideCar(self.canvas)
-        
+     
         self.setObjectName('ControlView')
         self.setScene(self.canvas.scene)
          
@@ -55,19 +57,6 @@ class ControlView(QGraphicsView):
 
         self.grabKeyboard()  ## happy days
       
-        self.direct = {
-            Qt.Key.Key_A: self.canvas.selectAll,    ## opens background if no sceneitems 
-            Qt.Key.Key_H: self.sideCar.hideSelected,
-            Qt.Key.Key_U: self.canvas.unSelect,     ## shared with pathitems for selections
-            Qt.Key.Key_O: self.sideCar.toggleOutlines,   
-        }
-
-        self.toggleKeys = {
-            Qt.Key.Key_G: self.sideCar.toggleGrid,
-            Qt.Key.Key_M: self.mapper.toggleMap,
-            Qt.Key.Key_K: self.sideCar.toggleMenu,  ## storyboard and pathMaker keys
-        }
-
 ### --------------------------------------------------------
     def dragMoveEvent(self, e):
         pass
@@ -117,9 +106,8 @@ class ControlView(QGraphicsView):
         ##  all the shift keys 
         elif key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier:   
             ## keys - D, T, V, H , O, B, S        
-            if key == Qt.Key.Key_D:   
-                if self.canvas.pathMakerOn:
-                    self.setKey('delPts')  ## send to pathmaker
+            if key == Qt.Key.Key_D and self.canvas.pathMakerOn:
+                self.setKey('delPts')  ## send to pathmaker
             elif key == Qt.Key.Key_W:  ## show waypts
                 if self.canvas.pathMakerOn:  
                     self.canvas.pathMaker.pathWays.addWayPtTags()  
@@ -150,7 +138,7 @@ class ControlView(QGraphicsView):
                     self.sideCar.pageDown('up')          
             else:                  
                 self.setKey(singleKeys[key])  ## broadcast to widgets - bkgWidget
-                                                                                        
+                                                                                           
         elif key in DFTWKeys:  ## set key as well - used by pathMaker
             if key == Qt.Key.Key_D:  
                 self.setKey('D') 
@@ -163,19 +151,29 @@ class ControlView(QGraphicsView):
                     self.mapper.toggleTagItems('all')   
             elif key == Qt.Key.Key_W:
                 self.sideCar.clearWidgets()    
-                
-        elif key == Qt.Key.Key_Space and self.canvas.control != '':
+                        
+        elif key == Qt.Key.Key_Space and self.canvas.control != '':  ## pause/resume
             self.sideCar.pause() 
-                                        
-        elif key in self.direct: 
-            self.direct[key]()  ## dictionary
             
-        elif key in self.toggleKeys:
-            self.toggleKeys[key]()  ## dictionary
-            
+        elif key in ToggleKeys:  ## G,M,K
+            if key == Qt.Key.Key_G:
+                self.sideCar.toggleGrid()
+            elif key == Qt.Key.Key_M: 
+                self.mapper.toggleMap()
+            elif key == Qt.Key.Key_K: 
+                self.sideCar.toggleMenu()  ## skeysPanel storyboard and pathMaker keys
+                                       
+        elif key in DirectKeys:  ## A,U,O
+            if key == Qt.Key.Key_A:  ## opens background if no sceneitems 
+                self.canvas.selectAll()
+            elif key == Qt.Key.Key_U:  ## shared with pathitems for selections
+                self.canvas.unSelect()
+            elif key == Qt.Key.Key_O: 
+                 self.sideCar.toggleOutlines()
+     
         elif key in singleKeys:  ## in dotsShared.py  
             self.setKey(singleKeys[key])
-            
+          
         elif e.key() in ExitKeys:
             self.canvas.exit() 
 
@@ -187,4 +185,6 @@ class ControlView(QGraphicsView):
         self.keysSignal[str].emit('')
         
 ### ------------------ dotsControlView ---------------------
+
+
 

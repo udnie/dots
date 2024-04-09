@@ -43,6 +43,7 @@ class ShadowMaker:
         self.isActive = True   ## lets pixitem know that numpy and openCV are installed
         self.linked   = False
         self.restore  = False
+        self.dblclk   = False
 
         self.alpha  = .50
         self.scalor = 1.0
@@ -98,8 +99,8 @@ class ShadowMaker:
         self.shadow.setOpacity(self.alpha)                                  
         self.scene.addItem(self.shadow)  
    
-        QTimer.singleShot(100, self.shadow.initPoints)  
-                                                                                                                                                                   
+        QTimer.singleShot(100, self.shadow.initPoints)  ## sets outline on open
+                                                                                                                                                    
 ### --------------------------------------------------------                         
     async def restoreShadow(self):  ## reads from pixitem.shadow, a copy of the shadow data from the .play file
         for k in range(4):
@@ -127,7 +128,7 @@ class ShadowMaker:
         self.rotate  = self.pixitem.shadow['rotate']
         self.flopped  = self.pixitem.shadow['flopped']
         self.linked  = self.pixitem.shadow['linked']
-              
+               
         self.tag = ''
         self.type = 'shadow'
         self.fileName = 'shadow'
@@ -135,21 +136,19 @@ class ShadowMaker:
                                             
         self.addPoints() 
         self.updateShadow()
-        
-
-        
-        
+ 
         if self.linked == True: self.shadow.linkShadow()
      
         self.shadow.setOpacity(self.alpha)
-                                                                                                                                                       
+                                                                                                                                         
 ### --------------------------------------------------------
-    def updateShadow(self, what=''):  ## if rotated, scaled or points moved           
+    ## if rotated, scaled or points moved or loaded from a play file   
+    def updateShadow(self, what=''):       
         cpy = self.flopCpy if self.flopped else self.cpy  ## called by shadow and poinitem
         
-        linked = self.linked     ## these 2 aren't carried over and need to be restored
-        save = self.shadow.save  ## used if linked for storing current position
-                          
+        linked = self.linked       ## these 2 aren't carried over and need to be restored
+        save   = self.shadow.save  ## used if linked for storing current position
+                  
         img, width, height, bytesPerLine = setPerspective(
             self.path, 
             self.width, 
@@ -182,9 +181,9 @@ class ShadowMaker:
            
         self.shadow.setOpacity(self.alpha)        
         self.scene.addItem(self.shadow)   
-                        
+                     
         self.works.updateOutline(what)  ## to turn off outline
-                                                                                                
+                                                                                
 ### --------------------------------------------------------    
     def addWidget(self, pix):  ## creates a shadow widget     
         self.works.closeWidget()
@@ -210,7 +209,7 @@ class ShadowMaker:
         self.works.resetSliders() 
                                                 
 ### --------------------------------------------------------
-    def addPoints(self): 
+    def addPoints(self, hide=True): 
         self.works.deletePoints()  ## cleared points
 
         if len(self.path) == 0:
@@ -227,7 +226,7 @@ class ShadowMaker:
         self.points.append(self.botRight )         
         self.points.append(self.botLeft) 
         
-        self.works.addPointsToScene()                   
+        self.works.addPointsToScene(hide)                   
        
     def updatePoints(self, i, x, y):  ## offset for x,y of ellipse    
         if i == 0:
@@ -248,20 +247,25 @@ class ShadowMaker:
         self.path.append(QPointF(p.x(), p.y() + b.height()))
  
     def updatePath(self, val):  ## see shadow for ItemSendsScenePositionChanges
-        dif = val - self.shadow.save  
-                    
+        dif = val - self.shadow.save      
+             
         for i in range(4):
             self.path[i] = self.path[i] + dif
             self.updatePoints(i, self.path[i].x(), self.path[i].y())
-        
+            
         self.shadow.save = val   
+          
         if self.linked == False:    ## updated by shadow
-            self.shadow.setPos(self.shadow.pos()+dif)   
+            self.shadow.setPos(self.shadow.pos()+dif) 
+            if self.dblclk == True: ## turns on outline and points    
+                self.works.updateOutline()    
+            else:
+                self.works.hideOutline()  ## hides points as well
         else:                       ## updated by pixitem
             self.shadow.setPos(self.pixitem.pos()+self.pixitem.offset)
       
 ### -------------------------------------------------------- 
-    def newShadow(self):  ## add shadow from shadow widget
+    def newShadow(self):  ## 'new' from shadow widget
         self.works.cleanUpShadow()
         b = self.pixitem.boundingRect()
         self.addShadow(b.width(), b.height(), self.viewW, self.viewH)      

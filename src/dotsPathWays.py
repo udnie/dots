@@ -69,10 +69,7 @@ class PathWays:
         if self.pathMaker.pathTestSet == True:
             self.pathMaker.pathWorks.stopPathTest()
         tmp = []
-        if full:  ## use all the points
-            lnn = len(self.pathMaker.pts)    
-        else:     ## use half the points
-            lnn = int(len(self.pathMaker.pts)/2) + 1       
+        lnn = len(self.pathMaker.pts) if full else int(len(self.pathMaker.pts)/2) + 1       
         ## using painter path to get the pointAtPercent
         path = self.pathMaker.pathWorks.setPaintPath(True)  ## close subpath, uses self.pts
         vals = [p/lnn for p in range(lnn)]  ## evenly spaced points
@@ -112,10 +109,7 @@ class PathWays:
             self.cleanUp()
             
     def cleanUp(self):
-        if self.tagCount() > 0:
-            self.redrawTagsAndPaths() 
-        else: 
-            self.pathMaker.addPath()    
+        self.redrawTagsAndPaths() if self.tagCount() > 0 else self.pathMaker.addPath()
         self.pathMaker.edits.redrawPoints(self.pathMaker.edits.pointItemsSet())
          
     def editingPtsSet(self):

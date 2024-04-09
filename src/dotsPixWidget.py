@@ -115,7 +115,7 @@ class PixWidget(QWidget):
         self.rotaryDial.setNotchTarget(45.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
      
-        self.scaleValue = QLabel('1.00')
+        self.scaleValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignRight)
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)
         self.scaleSlider.setMinimum(25)
         self.scaleSlider.setMaximum(225)
@@ -126,7 +126,7 @@ class PixWidget(QWidget):
         self.scaleSlider.setTickInterval(25)  
         self.scaleSlider.valueChanged.connect(self.Scale)   
         
-        self.opacityValue = QLabel('1.00')
+        self.opacityValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignRight)
         self.opacitySlider = QSlider(Qt.Orientation.Vertical)
         self.opacitySlider.setMinimum(0)
         self.opacitySlider.setMaximum(100)

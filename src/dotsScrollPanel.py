@@ -137,16 +137,16 @@ class ScrollPanel(QWidget):
 
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(10,0,0,0)
         
         self.widget = QWidget()  
         self.widget.setLayout(self.layout) 
         
-        if common['Screen'] == '912':
+        self.setContentsMargins(0,0,0,0)
+        
+        if common['Screen'] in ('900','912'):
             self.setContentsMargins(10,0,0,0) 
-        else:     
-            self.setContentsMargins(0,0,0,0)
-            
+      
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
              
         self.setLayout(self.addScrollArea())

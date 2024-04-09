@@ -181,15 +181,16 @@ class TableView:  ## formats a json .play file to display missing files or not
 ### --------------------------------------------------------                    
     ## looking for the greatest number of .keys() per type and saving it as the type header
     def setupHdrs(self, dlist):
+        self.cols = 0  ## just to make sure
         for typ in self.typelist: 
             for tmp in dlist:
-                if tmp['type'] == typ.type:
+                if tmp['type'] == typ.type:  ## read them all 
                     if len(tmp.keys()) > typ.len:  ## save it to typelist
                         typ.len = len(tmp.keys())
                         typ.hdr = list(tmp.keys())
-                    if len(tmp.keys()) > self.cols:  ## save most number of columns
+                    if len(tmp.keys()) > self.cols:  ## save the most number of columns
                         self.cols = len(tmp.keys()) 
-                    break      
+                            
         self.unpackIt(dlist)
     
 ### -------------------------------------------------------- 

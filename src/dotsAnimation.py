@@ -92,7 +92,7 @@ class Animation:
             return sidePath.flapper(pix, anime, Node(pix)) 
         elif anime in Spins:
             return spin(pix, anime, Node(pix))
-        elif 'demo' in anime:  ## from AbstractBats
+        elif 'demo' in anime:  ## from BatsAndHats
             return sidePath.demo(pix, anime, Node(pix))
         elif anime in self.canvas.pathList:
             return sidePath.setPaths(anime, Node(pix))
@@ -242,7 +242,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     scale.setDuration(int(sync))
                   
     scale.setStartValue(node.pix.scale)
-    if pix.canvas.openPlayFile == 'abstract' and \
+    if pix.canvas.openPlayFile == 'hats' and \
         pix.shadowMaker.isActive == True:
         scale.setEndValue(1.0)   
     else:    
@@ -252,7 +252,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     opacity.setDuration(int(sync))
     opacity.setStartValue(node.pix.opacity())  ## reset to 1.0
     
-    if pix.canvas.openPlayFile == 'abstract' and \
+    if pix.canvas.openPlayFile == 'hats' and \
         pix.shadowMaker.isActive == True:
         opacity.setEndValue(.001)
     else:
