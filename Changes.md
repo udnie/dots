@@ -10,6 +10,7 @@ I've added two **help menus**, one to what I call the **'canvas'**, the other to
  
 The biggest change/addition belongs to **'scrolling backgrounds'**.  The slider used to set the **screenrate(duration)** now can update the underlying dictionaries which govern the **'next'** scrolling backgrounds speed required to match the **first**. I suggest running a scrolling demo to get a sense of any differences that may be present with the current screen rates.  The demo's background is duplicated in the backgrounds directory to make it easier to run if it's necessary to update the **screenrate.dict** file.
 
+New Video:  <https://youtu.be/1PQwIGpfr0E>
 
  
  ---
