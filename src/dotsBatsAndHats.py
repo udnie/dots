@@ -253,7 +253,7 @@ class Hats:  ## hats - was abstract
         pix.shadowMaker.shadow.setPos(self.setXY(), self.setXY())
         pix.shadowMaker.shadow.setParentItem(pix) 
               
-    def setXY(self):
+    def setXY(self):  ## randomize x, y values
         return random.randint(-7,7)*5
            
  ## --------------------------------------------------------         

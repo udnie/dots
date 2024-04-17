@@ -1,8 +1,6 @@
 
 import sys
 
-# import PyQt6   ## required in pyside for version
-
 from PyQt6.QtCore       import Qt, QPointF, QEvent
 from PyQt6.QtGui        import QColor, QGuiApplication, QPen, QPainterPath, QCursor                             
 from PyQt6.QtWidgets    import QSlider, QWidget, QApplication, QGraphicsView, QGroupBox, \
@@ -11,20 +9,13 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QApplication, QGraphicsView, QG
                        
 from spriteWorks        import Works
 from spriteLoupe        import Loupe
-from spritePoints       import PointItem, constrain, getColorStr, distance, Fixed
+from spritePoints       import PointItem, SaveTxy, constrain, getColorStr, distance, Fixed
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 DispWidth, DispHeight = 720, 720
 Btns = 820
 Width, Height = 860, 840
 
-## change Qt6 to Side6  
-## print("Qt: v", PyQt6.QtCore.__version__, "\tPyQt: v", PyQt6.__version__)
-
-## --> <-- ##
-''' For pyqt5 change gobalPosition() to globalPosition().  
-    See spriteWorks to set paths, currently set for dots demo.
-    For pyside goto line 174 in spriteWorks and remark out '''
 ### ------------------- dotsSpriteMaker --------------------                                                                                                                                                                                                                                                                           
 class SpriteMaker(QWidget):  
 ### -------------------------------------------------------- 
@@ -35,7 +26,7 @@ class SpriteMaker(QWidget):
         self.view = QGraphicsView(self)
         self.scene = QGraphicsScene()
         self.view.setScene(self.scene)
-                 
+                      
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         x = int(((ctr.x() * 2 ) - Width)/2)
         self.setGeometry(x,35,Width,Height)
@@ -55,6 +46,7 @@ class SpriteMaker(QWidget):
                 
         self.works = Works(self)
         self.loupe = Loupe(self)
+        self.saveTxy = SaveTxy(self)
        
         self.buttons = self.setButtons()
         self.sliders = self.setSliders()
@@ -126,7 +118,33 @@ class SpriteMaker(QWidget):
         elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.widget:
             self.loupe.close()                       
         return QWidget.eventFilter(self, source, e)
-                                                  
+
+### --------------------------------------------------------                                                             
+    def keyPressEvent(self, e):
+        if e.key() in ExitKeys:
+            self.aclose()
+        elif e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
+            self.setKey('del')  ## delete a point
+        elif e.key() == Qt.Key.Key_Alt:
+            self.setKey('opt')  ## add a point
+        elif e.key() == Qt.Key.Key_Control:  ## apple command
+            self.works.edit()    
+        elif e.key() == Qt.Key.Key_Shift:  ## lock magnifier
+            self.loupe.holdIt()    
+        elif e.key() == Qt.Key.Key_P:  ## toggle background
+            self.works.background()       
+        elif self.loupe.widget:        ## follow the arrows
+            if e.key() == Qt.Key.Key_Up:
+                self.loupe.nextPoint('up')
+            elif e.key() == Qt.Key.Key_Down:
+                self.loupe.nextPoint('down')
+         
+    def setKey(self, key): 
+        self.key = key
+       
+    def keyReleaseEvent(self,e):  
+        self.key = ''
+                                                         
 ### --------------------------------------------------------
     def addPoints(self, pt): 
         if self.npts == 0:
@@ -245,16 +263,29 @@ class SpriteMaker(QWidget):
             b = self.pixmap.boundingRect()
             op = QPointF(b.width()/2, b.height()/2)
             self.pixmap.setTransformOriginPoint(op)
-            
-    def enableSliders(self, bool=False): 
-        self.rotationSlider.setValue(0)
-        self.scaleSlider.setValue(100)
-        self.sliders.setEnabled(bool)
-           
+                       
     def center(self):
         x = (DispWidth - self.pixmap.width())/2
         y = (DispHeight - self.pixmap.height())/2
         self.pixmap.setPos(x, y)
+  
+    def clear(self):
+        self.scene.clear()
+        self.init() 
+        self.works.init()
+        self.loupe.closeWidget()
+        self.loupe.init()
+          
+    def aclose(self):  ## too many .close()
+        QGuiApplication.restoreOverrideCursor() 
+        self.loupe.close()   
+        self.close()
+
+### -------------------------------------------------------- 
+    def enableSliders(self, bool=False): 
+        self.rotationSlider.setValue(0)
+        self.scaleSlider.setValue(100)
+        self.sliders.setEnabled(bool)
 
     def setRotation(self, val):
         self.setOrigin()
@@ -283,14 +314,7 @@ class SpriteMaker(QWidget):
             op = (val/100)
             self.setScale(op)
             self.scaleValue.setText("{0:.2f}".format(op))  
-        
-    def clear(self):
-        self.scene.clear()
-        self.init() 
-        self.works.init()
-        self.loupe.closeWidget()
-        self.loupe.init()
-          
+
 ### -------------------------------------------------------- 
     def setSliders(self):
         groupBox = QGroupBox()
@@ -386,7 +410,7 @@ class SpriteMaker(QWidget):
         self.clearBtn.clicked.connect(self.clear)
          
         self.saveBtn = QPushButton("Save")
-        self.saveBtn.clicked.connect(self.works.saveSprite)
+        self.saveBtn.clicked.connect(self.saveTxy.saveSprite)
     
         quitBtn = QPushButton("Quit")
         quitBtn.clicked.connect(self.aclose)
@@ -405,38 +429,7 @@ class SpriteMaker(QWidget):
         self.buttonGroup.setLayout(hbox)
   
         return self.buttonGroup
-    
-### --------------------------------------------------------                                                             
-    def keyPressEvent(self, e):
-        if e.key() in ExitKeys:
-            self.aclose()
-        elif e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
-            self.setKey('del')  ## delete a point
-        elif e.key() == Qt.Key.Key_Alt:
-            self.setKey('opt')  ## add a point
-        elif e.key() == Qt.Key.Key_Control:  ## apple command
-            self.works.edit()    
-        elif e.key() == Qt.Key.Key_Shift:
-            self.loupe.holdIt()    
-        elif e.key() == Qt.Key.Key_P:
-            self.works.background()       
-        elif self.loupe.widget:    
-            if e.key() == Qt.Key.Key_Up:
-                self.loupe.nextPoint('up')
-            elif e.key() == Qt.Key.Key_Down:
-                self.loupe.nextPoint('down')
-         
-    def setKey(self, key): 
-        self.key = key
-       
-    def keyReleaseEvent(self,e):  
-        self.key = '' 
-           
-    def aclose(self):
-        QGuiApplication.restoreOverrideCursor() 
-        self.loupe.close()   
-        self.close()
-        
+              
 ### -------------------------------------------------------- 
 if __name__ == '__main__':
     app = QApplication(sys.argv) 
@@ -444,10 +437,5 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ------------------- dotsSpriteMaker --------------------
-
-
-
-
-
 
 

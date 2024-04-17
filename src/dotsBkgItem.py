@@ -151,18 +151,21 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         e.accept()     
 
 ### -------------------------------------------------------- 
-    def itemChange(self, change, value):
+    def itemChange(self, change, value):   ## value equals self.pos()
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
             if self.direction == '':
                 return            
             ## 'first' has already set its setScrollerPath                 
-            elif self.addedScroller == False:  ## check if its showtime                      
+            elif self.addedScroller == False:  ## check if its showtime    
+             
                 if self.direction  == 'left'  and int(value.x()-self.runway) <= self.showtime or\
                     self.direction == 'right' and int(value.x()) >= -self.showtime or\
                     self.direction == 'vertical' and int(value.y())-self.runway <= self.showtime:  
                     self.addNextScroller() 
-                    self.addedScroller = True                                           
+                    self.addedScroller = True        
+                                                       
             elif self.addedScroller == True:  ## test if nolonger in view
+                
                 if self.direction   == 'left'  and abs((value.x())) >= self.width or \
                     self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
                     self.direction  == 'vertical' and int(value.y()) >= self.height:
@@ -187,8 +190,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item.setZValue(self.zValue())  
         item.showtime = self.showtime   
              
-        self.bkgWorks.restoreFromTrackers(item, 'addnxt')  ## gets set to default   
-        item.anime = self.setScrollerPath(item, 'next')  ## txt for debugging      
+        self.bkgWorks.restoreFromTrackers(item, 'addnxt')  ## txt for debugging  
+        item.anime = self.setScrollerPath(item, 'next')  ## first was called earlier, they're all next    
   
         item.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)         
         self.scene.addItem(item)   
@@ -222,9 +225,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         bkg.showtime = bkg.bkgScrollWrks.setShowTime(which)  
         
         if which == 'first':  
-            bkg.rate = bkg.bkgWorks.getScreenRate(which)  ## set tracker for 'next'
+            bkg.rate = bkg.bkgWorks.getScreenRate(which)  ## sets tracker for 'next'
         else:
-            bkg.rate = bkg.bkgScrollWrks.getTrackerRate(bkg)
+            bkg.rate = bkg.bkgScrollWrks.getTrackerRate(bkg) 
            
         if bkg.rate == 0 or bkg.useThis == '':
             return

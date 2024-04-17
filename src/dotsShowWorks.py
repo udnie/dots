@@ -47,7 +47,7 @@ class ShowWorks:
             showbiz.screenMenu.closeScreenMenu()
             
 ### --------------------------------------------------------                                                            
-    def dothis(self, p):    
+    def dothis(self, p):  ##refresh background
         direction = p.direction
         mirroring = p.mirroring
         factor    = p.factor

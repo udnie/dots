@@ -10,11 +10,6 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem, QFileDialog, QWidget
 from spritePoints       import MsgBox, Fixed
 
 DispWidth, DispHeight = 720, 720
-   
-paths = {  ## only place it's used 
-    "spritePath": "./sprites/",
-    "txy":        "./txy/",
-}                
 
 ### --------------------------------------------------------    
 class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
@@ -273,86 +268,7 @@ class Works(QWidget):  ## opens, saves, displays sprites and backgrounds
             del tmp             
         except IOError:
             MsgBox("openTxy: Error reading pts " + file, 5)
-            
-### --------------------------------------------------------    
-    def saveSprite(self):  ## from save button
-        if len(self.spriteMaker.pts) > 0: 
-            img,  w, h = self.makeSprite(True)  ## crop it
-            h, w, ch = img.shape
-            bytesPerLine = ch * w  
-                 
-            file = os.path.basename(self.spriteMaker.file)
-            if "-copy.png" in file.lower():  ## loaded from txy
-                file = file[:-9] + ".png"   
-  
-            Q = QFileDialog()
-            self.openPathFile =  paths['spritePath'] + file
-            f = Q.getSaveFileName(self.spriteMaker,
-                self.openPathFile,
-                self.openPathFile)
-            Q.accept()
-            
-            if not f[0]: 
-                return
-            elif not f[0].lower().endswith('.png'):
-                MsgBox("saveSprite: Wrong file extention - use '.png", 5)  
-                return                        
-            try:                  
-                img = QImage(img.data, w, h, bytesPerLine, QImage.Format.Format_ARGB32)
-                img.save(paths["spritePath"] + file,
-                        format='png',
-                        quality=100)
-            except IOError:
-                MsgBox("saving Sprite: Error saving file", 5) 
-                      
-            self.saveTxy(file)  ## saves txy and original copy
-      
-    def saveTxy(self, file): 
-        try:    
-            file = file[:-4] + ".txy"
-            Q = QFileDialog()
-            self.openPathFile =  paths['txy'] + file
-            f = Q.getSaveFileName(self.spriteMaker,
-                self.openPathFile,
-                self.openPathFile)
-            Q.accept()    
-              
-            if not f[0]: 
-                return        
-            elif not f[0].lower().endswith('.txy'):
-                MsgBox("saveTxy: Wrong file extention - use '.txy", 5)  
-                return    
-            
-            MsgBox("saving sprite copy and points", 5) 
-            self.saveTxyFile()
-          
-            if "-copy.png" in self.spriteMaker.file.lower():  ## no need to save it again
-                return
-            else:
-                file = file[:-4] + "-copy.png"                   
-            self.pixGrab.save(paths["txy"]+ file, "PNG") 
-        except IOError:
-            MsgBox("saveCopy: Error saving file" + "-copy", 5)   
-               
-    def saveTxyFile(self):    
-        try:
-            file = os.path.basename(self.spriteMaker.file)               
-            if "-copy.png" in file.lower():
-                file = file[:-9] 
-            else:
-                file = file[:-4]       
-            file = file + ".txy"               
-            with open(paths["txy"] + file, 'w') as fp:
-                for i in range(0, len(self.spriteMaker.pts)):
-                    p = self.spriteMaker.pts[i]
-                    x = str("{0:.2f}".format(p.x()))
-                    y = str("{0:.2f}".format(p.y()))
-                    fp.write(x + ", " + y + "\n")
-                fp.close()            
-        except IOError:
-            MsgBox("saveTxy: Error saving file", 5)
-        return
-                                                                       
+                                                                                         
 ### ------------------- dotsSpriteWorks --------------------
 
 

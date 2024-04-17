@@ -1,0 +1,108 @@
+{
+
+    "explorer.decorations.colors": false,
+    "editor.renderWhitespace": "none",
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "python.jediEnabled": false,
+    "editor.fontSize": 13,
+    "editor.fontLigatures": true,
+    "debug.console.fontSize": 14,
+    "terminal.integrated.fontSize": 14,
+    "editor.minimap.enabled": false,
+    "problems.decorations.enabled": false,
+    "breadcrumbs.enabled": false,
+    "terminal.integrated.rendererType": "dom",
+    "python.analysis.errors": [
+        "CG_CONTEXT_SHOW_BACKTRACE"
+    ],
+    "python.analysis.information": [
+        "CG_CONTEXT_SHOW_BACKTRACE"
+    ],
+    "python.analysis.logLevel": "Trace",
+    "python.analysis.memory.keepLibraryLocalVariables": true,
+    "workbench.enableExperiments": false,
+    "workbench.colorTheme": "NetBeans Light Theme",
+    "python.linting.maxNumberOfProblems": 0,
+    "python.maxNumberOfProblems": 0,
+    "css.completion.triggerPropertyValueCompletion": false,
+    "json.format.enable": false,
+    "keyboard.touchbar.enabled": false,
+    "workbench.startupEditor": "newUntitledFile",
+    "workbench.commandPalette.preserveInput": true,
+    "workbench.commandPalette.history": 150,
+    "keyboard.dispatch": "keyCode",
+    "editor.renderControlCharacters": false,
+    "window.restoreFullscreen": true,
+    "window.restoreWindows": "all",
+    "editor.autoClosingBrackets": "never",
+    "editor.autoClosingOvertype": "never",
+    "editor.autoClosingQuotes": "never",
+    "editor.autoIndent": "none",
+    "http.proxyStrictSSL": false,
+    "window.openFilesInNewWindow": "default",
+    "workbench.editorAssociations": {
+        "*.ipynb": "jupyter-notebook",
+        "*.mp4": "default",
+        "*.md": "vscode.markdown.preview.editor"
+    },
+    "python.pythonPath": "/usr/local/bin/python3",
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "terminal.integrated.profiles.osx": {
+        "rosetta": {
+        "path": "arch",
+        "args": ["-x86_64", "zsh", "-l"],
+        "overrideName": true      
+        }
+    },
+    "terminal.integrated.defaultProfile.osx": "rosetta",
+
+    "terminal.integrated.profiles.windows": {
+        "PowerShell -NoProfile": {
+        "source": "PowerShell",
+        "args": ["-NoProfile"]
+        }
+    },
+    "terminal.integrated.profiles.linux": {
+        "zsh (login)": {
+        "path": "zsh",
+        "args": ["-l"]
+        }
+    },
+
+    "terminal.integrated.tabs.location": "right",
+    "python.languageServer": "Default",
+    "files.autoSave": "afterDelay",
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "jupyter.interactiveWindow.textEditor.executeSelection": false,
+    "files.associations": {
+        "*.py": "python"
+    },
+    "workbench.editor.empty.hint": "hidden",
+    "window.zoomLevel": 1,
+    "workbench.editor.enablePreview": false,
+
+    "outline.problems.badges": false,
+    "outline.icons": false,
+    "outline.problems.colors": false,
+    "outline.problems.enabled": false,
+    "outline.showArrays": false,
+    "outline.showBooleans": false,
+    "outline.showMethods": false,
+    "outline.showModules": false,
+    "outline.showKeys": false,
+    "git.timeline.showAuthor": false,
+    "terminal.integrated.allowChords": false,
+    "terminal.integrated.altClickMovesCursor": false,
+    "terminal.integrated.fontWeight": "normal",
+    "terminal.integrated.tabs.showActiveTerminal": "singleTerminal",
+    "terminal.integrated.tabs.showActions": "singleTerminal",
+    "terminal.integrated.tabs.enabled": true,
+    "files.insertFinalNewline": true,
+    "python.analysis.autoImportCompletions": false
+}

@@ -3,12 +3,14 @@ from PyQt6.QtCore       import Qt, QPointF,  QPoint
 from PyQt6.QtGui        import QColor, QPen            
 from PyQt6.QtWidgets    import QGraphicsRectItem, QWidget, QGraphicsView
                         
-InitSet = (275, 250)  ## initial x,y settings for spriteWidget
-                           
-### ---------------------- spriteLoupe  --------------------
-''' classes: SpriteWidget, Loupe '''     
+InitSet = (275, 250)  ## initial x,y settings for LoupeWidget
+LW = 475
+
+
+### ---------------------- LoupeWidget  --------------------
+''' classes: LoupeWidget, Loupe '''     
 ### --------------------------------------------------------        
-class SpriteWidget(QWidget):  ## the display
+class LoupeWidget(QWidget):  ## the display
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
@@ -23,8 +25,8 @@ class SpriteWidget(QWidget):  ## the display
         ## qt-warning fix
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)   
         
-        self.view.scale(2.5,2.5)
-        self.view.setGeometry(0,0,350,350)
+        self.view.scale(1.5, 1.5)
+        self.view.setGeometry(0, 0, LW, LW)
         self.setStyleSheet("border: 12px solid lime;")
             
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -39,7 +41,7 @@ class SpriteWidget(QWidget):  ## the display
         self.view.horizontalScrollBar().setDisabled(True)
         self.view.verticalScrollBar().setDisabled(True)
      
-        self.setFixedSize(350,350) 
+        self.setFixedSize(LW, LW) 
                              
         self.show()
                        
@@ -67,7 +69,7 @@ class SpriteWidget(QWidget):  ## the display
         e.accept()
         
 ### --------------------------------------------------------                        
-class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi 
+class Loupe(QWidget):  ## selection square
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
@@ -93,7 +95,7 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
         if self.widget:
             self.removeRect()  ## leave widget up - also toggle for rect
         else:
-            self.widget = SpriteWidget(self.spriteMaker)
+            self.widget = LoupeWidget(self.spriteMaker)
             self.widget.move(self.lastX, self.lastY)           
            
         p = self.spriteMaker.pts[idx]  ## x,y is center of rect - see addRect   
@@ -115,8 +117,9 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
         
         if x+70 >= 720: x = 649
         if y+70 >= 720: y = 649
-      
-        rect = QGraphicsRectItem(x-70, y-70, 140, 140)
+        
+        ## 'no matter where you go, there you are' -- Jim, Taxi 
+        rect = QGraphicsRectItem(x-150, y-150, 300, 300)
         rect.setPen(QPen(QColor('lime'), 2.5, Qt.PenStyle.SolidLine)) 
         rect.setZValue(110)
         return rect
@@ -132,7 +135,7 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
         if self.widget:
             if not self.hold:
                 self.hold = True
-                # self.rect.hide()  
+                self.rect.hide()  
                 self.widget.setStyleSheet("border: 12px solid orangered;")
             else:
                 self.hold = False
@@ -189,5 +192,5 @@ class Loupe(QWidget):  ## 'no matter where you go, there you are' -- Jim, Taxi
         self.spriteMaker.redrawPoints()   
         self.loupeIt(idx)
           
-### ------------------- spriteLoupe.py ---------------------
+### ------------------- LoupeWidget.py ---------------------
 

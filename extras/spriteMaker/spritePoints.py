@@ -1,11 +1,11 @@
 
-
+import os
 import math
 import random
  
-from PyQt6.QtCore       import QPointF, QTimer
-from PyQt6.QtGui        import QColor                         
-from PyQt6.QtWidgets    import QGraphicsEllipseItem, QMessageBox
+from PyQt6.QtCore       import QPointF, QTimer, QRectF
+from PyQt6.QtGui        import QColor, QImage                       
+from PyQt6.QtWidgets    import QGraphicsEllipseItem, QMessageBox, QFileDialog
                         
 pathcolors = (
     "DODGERBLUE", "AQUAMARINE", "CORAL", "CYAN", "DEEPSKYBLUE",   
@@ -15,8 +15,13 @@ pathcolors = (
 
 Fixed = 720 
 
+paths = {   
+    "spritePath": "./",
+    "txy":        "./",
+}   
+
 ### ---------------------- spritePoints --------------------
-''' classes: PointItem, MsgBox '''
+''' classes: PointItem, SaveTxy, MsgBox '''
 ### -------------------------------------------------------- 
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
@@ -53,12 +58,17 @@ class PointItem(QGraphicsEllipseItem):
         self.setBrush(QColor("coral"))
         if self.idx != self.loupe.idx:
             self.loupe.loupeIt(self.idx) 
-        e.accept()
-                   
-    def hoverLeaveEvent(self, e):
-        self.setBrush(QColor(self.saveColor))
+        p = self.rect()      
+        if p.width() < self.V*1.5:
+            self.setRect(QRectF(p.x(), p.y(), self.V*1.5, self.V*1.5))
         e.accept()
         
+    def hoverLeaveEvent(self, e): 
+        self.setBrush(QColor(self.saveColor)) 
+        p = self.rect()
+        self.setRect(QRectF(p.x(), p.y(), self.V, self.V))
+        e.accept()
+    
     def mousePressEvent(self, e): 
         if self.spriteMaker.key in ('del','opt'):   
             if self.spriteMaker.key == 'del':
@@ -98,6 +108,96 @@ class PointItem(QGraphicsEllipseItem):
         y = int(constrain(p.y(), self.V, Fixed, 15))
         return x, y       
                     
+### -------------------------------------------------------- 
+class SaveTxy():  ## functions: saveSprite, saveTxy, saveTxyFile
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+
+        self.spriteMaker = parent
+        self.works = self.spriteMaker.works
+        
+### --------------------------------------------------------
+    def saveSprite(self):  ## from save button
+        if len(self.spriteMaker.pts) > 0: 
+            img,  w, h = self.works.makeSprite(True)  ## crop it
+            h, w, ch = img.shape
+            bytesPerLine = ch * w  
+                 
+            file = os.path.basename(self.spriteMaker.file)
+            if "-copy.png" in file.lower():  ## loaded from txy
+                file = file[:-9] + ".png"   
+            else:
+                file = file[:file.index('.')] + '.png'
+       
+            Q = QFileDialog()
+            self.openPathFile =  paths['spritePath'] + file
+            f = Q.getSaveFileName(self.spriteMaker,
+                self.openPathFile,
+                self.openPathFile)
+            Q.accept()
+   
+            if not f[0]: 
+                return
+            elif not f[0].lower().endswith('.png'):
+                MsgBox("saveSprite: Wrong file extention - use '.png", 5)  
+                return                        
+            try:                  
+                img = QImage(img.data, w, h, bytesPerLine, QImage.Format.Format_ARGB32)
+                img.save(paths["spritePath"] + file,
+                        format='png',
+                        quality=100)
+            except IOError:
+                MsgBox("saving Sprite: Error saving file", 5) 
+                      
+            self.saveTxy(file)  ## saves txy and original copy
+
+    def saveTxy(self, file): 
+        try:    
+            file = file[:-4] + ".txy"
+            Q = QFileDialog()
+            self.openPathFile =  paths['txy'] + file
+            f = Q.getSaveFileName(self.spriteMaker,
+                self.openPathFile,
+                self.openPathFile)
+            Q.accept()    
+              
+            if not f[0]: 
+                return        
+            elif not f[0].lower().endswith('.txy'):
+                MsgBox("saveTxy: Wrong file extention - use '.txy", 5)  
+                return    
+            
+            MsgBox("saving sprite copy and points", 5) 
+            self.saveTxyFile()
+          
+            if "-copy.png" in self.spriteMaker.file.lower():  ## no need to save it again
+                return
+            else:
+                file = file[:-4] + "-copy.png"                   
+            self.works.pixGrab.save(paths["txy"]+ file, "PNG") 
+        except IOError:
+            MsgBox("saveCopy: Error saving file" + "-copy", 5)
+
+    def saveTxyFile(self):    
+        try:
+            file = os.path.basename(self.spriteMaker.file)               
+            if "-copy.png" in file.lower():
+                file = file[:-9] 
+            else:
+                file = file[:-4]       
+            file = file + ".txy"               
+            with open(paths["txy"] + file, 'w') as fp:
+                for i in range(0, len(self.spriteMaker.pts)):
+                    p = self.spriteMaker.pts[i]
+                    x = str("{0:.2f}".format(p.x()))
+                    y = str("{0:.2f}".format(p.y()))
+                    fp.write(x + ", " + y + "\n")
+                fp.close()            
+        except IOError:
+            MsgBox("saveTxy: Error saving file", 5)
+        return
+
 ### --------------------------------------------------------
 class MsgBox(QMessageBox):  
 ### --------------------------------------------------------
@@ -126,7 +226,7 @@ class MsgBox(QMessageBox):
     def closeEvent(self, e):
         self.timer.stop()
         e.accept() 
-    
+
 ### -------------------------------------------------------- 
 def constrain(lastXY, objSize, panelSize, overlap):
     if lastXY + objSize > panelSize - overlap:

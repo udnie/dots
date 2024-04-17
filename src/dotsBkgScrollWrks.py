@@ -137,6 +137,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
 ### -------------------------------------------------------- 
     def setShowTime(self, which=''): 
         ## snakes need more time - the rest vary to build and position and comes before vertical 
+        show = 0
         if 'snakes' in self.bkgItem.fileName and self.bkgItem.direction != 'vertical':
             show = showtime['snakes']   
         elif self.bkgItem.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge

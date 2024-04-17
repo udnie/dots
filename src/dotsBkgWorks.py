@@ -93,7 +93,8 @@ class BkgWorks:
                 QTimer.singleShot(200, self.bkgItem.bkgMaker.resetSliders)
                                                   
 ### --------------------------------------------------------  
-    def getScreenRate(self, which =''):  ## only used once by 'first'
+    ## reads twice - returns 'next' rate first, returns 'first' rate next 
+    def getScreenRate(self, which =''): 
         rate = self.getThisRate(self.bkgItem)  
         if rate == 0:
             MsgBox(f'Error Loading Screen Rates File {self.bkgItem.useThis}', 5)
@@ -124,7 +125,7 @@ class BkgWorks:
         try:  
             with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
                 self.bkgMaker.screenrate = json.load(fp)  
-                return self.bkgMaker.screenrate[bkg.useThis][common['Screen']]        
+            return self.bkgMaker.screenrate[bkg.useThis][common['Screen']]        
         except:
             return 0
         
@@ -190,7 +191,8 @@ class BkgWorks:
         self.bkgMaker.matte = Matte(self.canvas)
         
 ### -------------------------------------------------------- 
-    def restoreFromTrackers(self, bkg, where=''):  ## returns what gets lost on each reincarnation
+    ## returns what gets lost on each reincarnation
+    def restoreFromTrackers(self, bkg, where=''): 
         file = os.path.basename(bkg.fileName)  ## opposite of setMirroring
         for p in self.bkgMaker.trackers:
             if p.file == file:

@@ -1,6 +1,7 @@
 
 import os 
 import os.path
+import json
        
 from PyQt6.QtCore       import Qt, QPoint, QPointF, QRect
 from PyQt6.QtGui        import QColor, QCursor
@@ -38,7 +39,7 @@ class BkgMaker(QWidget):
           
         self.trackers = []  ## tracks backgrounds and holds state of direction, mirroring  
         self.screenrate = {}
-        
+                
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats
         if self.canvas.control in ControlKeys:
@@ -66,14 +67,14 @@ class BkgMaker(QWidget):
         self.scene.addItem(self.bkgItem)    
           
         self.updateZvals(self.bkgItem)  ## update other bkg zvalues 
-        self.x, self.y = self.setXY(self.bkgItem)
+        self.setXY(self.bkgItem)
             
         self.bkgItem.bkgWorks.addTracker(self.bkgItem)  ## always - even if not a scroller   
         self.lockBkg()
                           
         if self.canvas.pathMakerOn:
             self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
-                             
+                               
 ### --------------------------------------------------------
     def openFlatFile(self, file):  ## read from .bkg file - a 'flat'
         try:
@@ -264,7 +265,7 @@ class BkgMaker(QWidget):
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()
         bkg.setPos(p.x() , p.y())
-        return p.x() , p.y()     
+        self.x, self.y = p.x() , p.y()     
                     
     def bkgTag(self, bkg, which=''):
         file = os.path.basename(bkg.fileName) 

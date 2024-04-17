@@ -61,7 +61,7 @@ class DotsQt(QMainWindow):
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        vert = 50 if self.Vertical == True else 110  ## <<---
+        vert = 50 if self.Vertical == True else 30  ## <<---
         self.move(getX(), getY()+vert)  ## functions in screens 
 
         ## can't all happen at once
