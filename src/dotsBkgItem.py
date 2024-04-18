@@ -1,6 +1,7 @@
 
 import os
 import json
+import os.path
 
 from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap
@@ -55,20 +56,26 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
+        self.path = paths['bkgPath']
+        
         self.fileName = fileName  
-           
+
+        if 'demo' in self.fileName: self.path = paths['demo']
+        self.fileName = self.path + os.path.basename(self.fileName) 
+        
+        if not os.path.exists(self.fileName):
+            MsgBox(f'Error - {self.fileName} Not Found', 7)
+            self.fileName = None
+            return
+
         self.setZValue(z)      
         self.init()
                   
 ### --------------------------------------------------------   
     def init(self):    
-        self.path = paths['bkgPath']
         self.imgFile  = None      
         self.scrollable = False
           
-        if 'demo' in self.fileName: self.path = paths['demo']
-        self.fileName = self.path + os.path.basename(self.fileName) 
-        
         try:   ## --- sets if scrollable --- ##
             if not self.dots.Vertical: 
                 self.bkgWorks.setWidthHeight(QImage(self.fileName)) 

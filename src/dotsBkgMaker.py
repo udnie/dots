@@ -59,19 +59,22 @@ class BkgMaker(QWidget):
         if self.canvas.pathMakerOn == False:
             if self.mapper.isMapSet():
                 self.mapper.removeMap()
-                                
-        self.bkgItem = BkgItem(file, self.canvas)
+
+        self.bkgItem = BkgItem(file, self.canvas) 
+        if self.bkgItem.fileName == None:
+            return
+        
         self.bkgItem.setZValue(common['bkgZ'])  ## always on top
         self.screenrate = {}
-                 
+                
         self.scene.addItem(self.bkgItem)    
-          
+        
         self.updateZvals(self.bkgItem)  ## update other bkg zvalues 
         self.setXY(self.bkgItem)
             
         self.bkgItem.bkgWorks.addTracker(self.bkgItem)  ## always - even if not a scroller   
         self.lockBkg()
-                          
+                        
         if self.canvas.pathMakerOn:
             self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
                                
