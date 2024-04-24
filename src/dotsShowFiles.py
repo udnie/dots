@@ -154,6 +154,8 @@ class ShowFiles:
             tmp['rate'] = 0
         if 'showtime' not in tmp.keys(): 
             tmp['showtime'] = 0
+        if 'path' not in tmp.keys(): 
+            tmp['path'] = ''
    
         bkg.locked      = tmp['locked']                 
         bkg.anime       = tmp['anime']
@@ -163,7 +165,8 @@ class ShowFiles:
         bkg.factor      = tmp['factor']
         bkg.rate        = tmp['rate']
         bkg.showtime    = tmp['showtime']
-             
+        bkg.path        = tmp['path']
+                          
         result = bkg.bkgWorks.addTracker(bkg)  
         if result == False:  ## must be a dupe
             del bkg  ## not yet added to scene
@@ -260,7 +263,8 @@ class ShowFiles:
             'mirroring':    pix.mirroring,
             'factor':       pix.factor,
             'rate':         pix.rate,
-            'showtime':     pix.showtime,      
+            'showtime':     pix.showtime,  
+            'path':         pix.path,    
         }     
         return tmp
 

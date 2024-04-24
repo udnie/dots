@@ -54,14 +54,12 @@ class ShowBiz:
         self.screenMenu = ScreenMenu(self.canvas)  ## in screens
         self.showFiles  = ShowFiles(self.canvas) 
         
-        self.helpMenu   = None
         self.helpMenu   = HelpMenu(self.canvas, self)
-        self.help = True
-           
+        
+        self.help = True   
         self.locks = 0
         self.tableView = None 
-     
-           
+              
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
         if self.canvas.pathMakerOn == False:                

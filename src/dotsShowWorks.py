@@ -26,10 +26,10 @@ class ShowWorks:
     def cleanUpScrollers(self, scene):  ## called from showtime  
         self.scene = scene
         for t in self.canvas.bkgMaker.trackers:
-            tracker = t.file  
+            fileName = t.fileName  
             k = 0 
             for p in self.scene.items():  ## delete duplicates
-                if p.type == 'bkg' and tracker in p.fileName: 
+                if p.type == 'bkg' and fileName in p.fileName: 
                     if p.tag == 'scroller' and p.direction == t.direction:
                         if k == 0:
                             self.dothis(p) 
@@ -54,7 +54,8 @@ class ShowWorks:
         showtime  = p.showtime
         rate      = p.rate
         usethis   = p.useThis
-        z = p.zValue()
+        path      = p.path
+        z         = p.zValue()
 
         p.init()  ## just to make sure
         
@@ -65,6 +66,7 @@ class ShowWorks:
         p.showtime  = showtime 
         p.rate      = rate
         p.useThis   = usethis
+        p.path      = path
         
         p.setZValue(z)   
         p.locked == True

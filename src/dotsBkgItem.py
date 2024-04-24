@@ -56,10 +56,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
-        self.path = paths['bkgPath']
+        self.path = paths['bkgPath']  
         
         self.fileName = fileName  
 
+        ## carry over path from demo to test - once valid can 
+        ## drop path from filename as its set in path
         if 'demo' in self.fileName: self.path = paths['demo']
         self.fileName = self.path + os.path.basename(self.fileName) 
         

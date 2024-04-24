@@ -41,7 +41,7 @@ class BkgMaker(QWidget):
         self.screenrate = {}
                 
 ### --------------------------------------------------------
-    def openBkgFiles(self):  ## opens both background and flats
+    def openBkgFiles(self):  ## opens both background and flats - needs to be in /backgrounds
         if self.canvas.control in ControlKeys:
             return
         Q = QFileDialog()

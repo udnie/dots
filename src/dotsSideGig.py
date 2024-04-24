@@ -106,6 +106,11 @@ def DemoAvailable():
         return True
     else:
         return False
+    
+def getVuCtr(self):
+    x,y = int(common['ViewW']/2), int(common['ViewH']/2) 
+    p = self.canvas.mapToGlobal(QPointF(x,y))
+    return int(p.x()), int(p.y())
 
 def getOffSet(pix):
     b = pix.boundingRect()

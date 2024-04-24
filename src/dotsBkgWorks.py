@@ -28,8 +28,8 @@ class BkgWorks:
 ### -------------------------------------------------------- 
     ## when loading a play file or adding from the screen - Tracker is in dotsBkgScrollWrks
     def addTracker(self, bkg): 
-        bkg.fileName = bkg.path + os.path.basename(bkg.fileName) 
-        file = os.path.basename(bkg.fileName) 
+        # bkg.fileName = bkg.path + os.path.basename(bkg.fileName) 
+        fileName = os.path.basename(bkg.fileName) 
         
         ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
         ## if randomizing speed factor do this 
@@ -38,25 +38,25 @@ class BkgWorks:
         # bkg.factor = fact  ## if using a random screen speed factor 
     
         if len(self.bkgMaker.trackers) == 0:
-            x = Tracker(file, bkg)
-            self.bkgMaker.trackers.append(x)
+            # x = Tracker(bkg)
+            self.bkgMaker.trackers.append(Tracker(bkg))
             return True
         else:
             k = 0
             for p in self.bkgMaker.trackers:  ## see if it's already there
-                if p.file == file:
+                if p.fileName == fileName:
                     k += 1
             if k == 0:  ## no others found - add it 
                 # x = Tracker(file, bkg)
-                self.bkgMaker.trackers.append(Tracker(file, bkg)) 
+                self.bkgMaker.trackers.append(Tracker(bkg)) 
                 return True
             else:
                 return False  ## must be a duplicate, skip processing 
                     
     def delTracker(self, bkg):
-        file = os.path.basename(bkg.fileName)  
+        fileName = os.path.basename(bkg.fileName)  
         for item in self.bkgMaker.trackers:  ## see if it's already there
-            if item.file == file:  
+            if item.fileName == fileName:
                 self.bkgMaker.trackers.remove(item)
                 break
                          
@@ -72,9 +72,9 @@ class BkgWorks:
                 self.bkgItem.direction = key
             self.bkgItem.tag = 'scroller'    
             self.bkgItem.rate = 0
-            file = os.path.basename(self.bkgItem.fileName)          
+            fileName = os.path.basename(self.bkgItem.fileName)          
             for p in self.bkgMaker.trackers:
-                if p.file == file:
+                if p.fileName == fileName:
                     p.direction = self.bkgItem.direction 
                     self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
                     p.showtime  = self.bkgItem.showtime
@@ -83,7 +83,7 @@ class BkgWorks:
                     p.useThis   = self.bkgItem.useThis
                     break 
                 
-            # print(f'direction {file}\t{p.direction}\t{p.mirroring}\t{p.rate}\t{p.factor}')
+            # print(f'direction {fileName}\t{p.direction}\t{p.mirroring}\t{p.rate}\t{p.factor}')
             if p.rate == 0 and self.bkgItem.useThis == '':
                 return
             
@@ -108,8 +108,13 @@ class BkgWorks:
                 rate = rate[2]
             else:
                 rate = rate[1]      
+                
+            ## fixes not carrying over rate from a file
+            erat = self.bkgScrollWrks.getTrackerRate(self.bkgItem)
+            if erat > 0: rate = erat
+          
             self.bkgItem.rate = rate 
-            self.bkgScrollWrks.setTrackerRate()  ## a useful addition
+            self.bkgScrollWrks.setTrackerRate()
         return rate
     
 ### --------------------------------------------------------
@@ -118,8 +123,8 @@ class BkgWorks:
         if common['Screen']  == '1080' and bkg.width  < 1280 or \
             common['Screen'] == '1215' and bkg.width  < 1440 or \
             common['Screen'] == '1296' and bkg.width  < 1536 or \
-            common['Screen'] ==  '900' and bkg.height < 1102:  ##dd in this case 2:3  
-            bkg.useThis = 'moretimes'  ## selecting which dictionary to use     
+            common['Screen'] ==  '900' and bkg.height < 1102:  ## in this case 2:3  
+            bkg.useThis = 'moretimes'  ## select which dictionary to use     
         else:
             bkg.useThis = 'screentimes'             
         try:  
@@ -179,9 +184,9 @@ class BkgWorks:
                 self.bkgItem.mirroring = False ## continuous
             else:
                 self.bkgItem.mirroring = True  ## mirrored                               
-        file = os.path.basename(self.bkgItem.fileName)  
+        fileName = os.path.basename(self.bkgItem.fileName)  
         for p in self.bkgMaker.trackers:
-            if p.file == file:
+            if p.fileName == fileName:
                 p.mirroring = self.bkgItem.mirroring   
                 break                                     
         self.bkgMaker.setMirrorBtnText() 
@@ -193,28 +198,30 @@ class BkgWorks:
 ### -------------------------------------------------------- 
     ## returns what gets lost on each reincarnation
     def restoreFromTrackers(self, bkg, where=''): 
-        file = os.path.basename(bkg.fileName)  ## opposite of setMirroring
+        fileName = os.path.basename(bkg.fileName)  ## opposite of setMirroring
         for p in self.bkgMaker.trackers:
-            if p.file == file:
+            if p.fileName == fileName:
                 bkg.mirroring = p.mirroring   
                 bkg.direction = p.direction 
                 bkg.factor    = p.factor
                 bkg.showtime  = p.showtime
                 bkg.useThis   = p.useThis
                 bkg.rate      = p.rate
+                bkg.path      = p.path
                 break
              
 ### --------------------------------------------------------                                                                                      
     def reset(self):  ## reset both tracker and bkgItem
-        file = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
+        fileName = os.path.basename(self.bkgItem.fileName)  ## opposite of setMirroring
         for p in self.bkgMaker.trackers:
-            if p.file == file:
+            if p.fileName == fileName:
                 p.direction = ''
                 p.mirroring = self.bkgMaker.mirroring
                 p.factor    = self.bkgMaker.factor
                 p.showtime  = 0
                 p.useThis   = ''
                 p.rate      = 0
+                p.path      = ''
                 break      
         self.bkgItem.tag = ''   
         self.bkgItem.direction = ''             
@@ -224,6 +231,7 @@ class BkgWorks:
         self.bkgItem.showtime  = 0
         self.bkgItem.useThis   = ''
         self.bkgItem.rate      = 0
+        self.bkgItem.path      = ''
         self.bkgMaker.addWidget(self.bkgItem)
                                                                     
 ### --------------------------------------------------------                     

@@ -1,10 +1,10 @@
 
-from PyQt6.QtCore       import Qt, QPoint, QPointF, pyqtSlot, QTimer
-from PyQt6.QtGui        import QColor, QPixmap, QPainter, QPainterPath, QBrush, QImage
-from PyQt6.QtWidgets    import QWidget, QGraphicsPixmapItem, QMenu
+from PyQt6.QtCore       import Qt, QPoint, QPointF, QTimer
+from PyQt6.QtGui        import QColor, QPainter, QPainterPath, QBrush, QImage
+from PyQt6.QtWidgets    import QWidget, QMenu
    
 from dotsShared         import common, paths
-from dotsSideGig        import getCtr
+from dotsSideGig        import getVuCtr
 
 ## these keys + shift - replace the run, (pause, resume), and stop buttons if covered by the matte 
 ShiftKeys = (Qt.Key.Key_R, Qt.Key.Key_P, Qt.Key.Key_S) 
@@ -20,6 +20,7 @@ helpKeys = {
     'P':    'Photo Background', 
     'Q':    'Close Matte', 
     'R':    'Resize Matte by Height',
+    'W':    'White',
     'X':    'Close Matte', 
 }
   
@@ -153,7 +154,7 @@ class Matte(QWidget):
                 
         elif key == Qt.Key.Key_B:  ## change color  
             self.brush = self.black  
-            
+        
         elif key == Qt.Key.Key_G:  ## change color  
             self.brush = self.grey        
                                 
@@ -163,6 +164,9 @@ class Matte(QWidget):
             else:
                 self.pix = None
                 self.brush = self.grey      
+                
+        elif key == Qt.Key.Key_W:  ## change color  
+            self.brush = self.white  
              
         ## set screen format ratio to around .61 - midway between 16:9 and 3:2         
         elif key == Qt.Key.Key_R: 
@@ -237,9 +241,10 @@ class HelpMenu:  ## for canvas - one key commands
         self.helpMenu.addSeparator()
         self.helpMenu.addAction('Shift-S - Stop Animation')
          
-        ctr = getCtr(0,0) ## my x. may be 50px off because my dock is on the left
+        x, y = getVuCtr(self)
+        
         self.helpMenu.setFixedSize(250, 470)       
-        self.helpMenu.move(ctr.x()-125, ctr.y()-320)  
+        self.helpMenu.move(x-125, y-235)  
         self.helpMenu.show()
         
         self.matte.help = True

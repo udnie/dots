@@ -19,6 +19,8 @@ Moved the non dots directories and files to **extras**. Updated **dropshadow.py*
  **April 21 2024**  
 I've had an interesting week or so as my PyQt setup went south making it difficult to take on any new projects. It could be malware or the result of auto updates.  I think this only may only affect Mac users - the problem occurs even if you run dots from the command line. I have a work around I'm going to do some testing on and so far it appears to be a good band-aid.
 
+ **April 24 2024**    
+Another bug fix to scrollers making sure any saved changes to the scrolling rate are applied. A few tweaks to menus, mainly for placement.
 
  ---
  **March 3 2024**   
