@@ -51,7 +51,7 @@ class Bats:
         self.canvas.openPlayFile = 'bats'
 
         if 'montreaux' in backGrounds[common['Screen']]:
-            bkg = BkgItem(paths['bkgPath'] + backGrounds[common['Screen']], self.canvas)
+            bkg = BkgItem(paths['bkgPath'] + backGrounds[common['Screen']], self.canvas),
         else:  
             bkg = BkgItem(paths['demo'] + backGrounds[common['Screen']], self.canvas) 
          
@@ -163,7 +163,7 @@ class Hats:  ## hats - was abstract
         self.animation = self.canvas.animation
         self.showWorks = ShowWorks(self.canvas)
    
-        self.hats = 7
+        self.hats = 5
         self.shadows = False
         self.direction = ''
         
@@ -190,7 +190,7 @@ class Hats:  ## hats - was abstract
 ### --------------------------------------------------------            
     def setBackGround(self):
         if self.scroller != None:
-            self.scroller.init()
+            self.scroller = BkgItem(paths['demo'] + 'bluestone.jpg', self.canvas, True, self.scroller.imgFile)
         else:
             self.scroller = BkgItem(paths['demo'] + 'bluestone.jpg', self.canvas)
    

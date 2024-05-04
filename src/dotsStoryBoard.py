@@ -227,7 +227,7 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.bkgMaker.trackers.clear()
+        self.bkgMaker.newTracker.clear()
         self.view.grabKeyboard()
          
     def loadSprites(self):

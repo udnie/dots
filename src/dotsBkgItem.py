@@ -3,7 +3,7 @@ import os
 import json
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
+from PyQt6.QtCore       import Qt, QPointF, QPoint, QPropertyAnimation, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
                  
@@ -41,7 +41,7 @@ import dotsAnimation    as Anime
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):  ## background
 ### --------------------------------------------------------
-    def __init__(self, fileName, canvas, z=common['bkgZ'], mirror=False):
+    def __init__(self, fileName, canvas, z=common['bkgZ'], mirror=False, copy=None):
         super().__init__()
 
         self.canvas   = canvas
@@ -71,24 +71,28 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             return
 
         self.setZValue(z)      
-        self.init()
+        self.init(copy)
                   
 ### --------------------------------------------------------   
-    def init(self):    
-        self.imgFile  = None      
+    def init(self, copy):    
+        self.imgFile = None      
         self.scrollable = False
-          
-        try:   ## --- sets if scrollable --- ##
-            if not self.dots.Vertical: 
-                self.bkgWorks.setWidthHeight(QImage(self.fileName)) 
-            else:
-                self.bkgWorks.setVertical(QImage(self.fileName))
-        except Exception:
-            MsgBox('error on loading: ' + self.fileName)
-            return
-                 
-        self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-                                            
+        
+        if copy == None:          
+            try:   ## sets if scrollable and self.imgfile if not already set
+                if not self.dots.Vertical: 
+                    self.bkgWorks.setWidthHeight(QImage(self.fileName)) 
+                else:
+                    self.bkgWorks.setVertical(QImage(self.fileName))
+            except Exception:
+                MsgBox('error on loading: ' + self.fileName)
+                return
+            self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
+        else:
+            self.imgFile = copy
+              
+        self.setPixmap(QPixmap.fromImage(self.imgFile)) 
+                                                
         self.id = 0  ## not used except for conisistency          
         self.flopped = False
         self.locked = False
@@ -106,18 +110,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         
         self.addedScroller = False
            
-        self.direction = ''  ## direction of travel   
+        self.direction = ''  ## direction of travel: left <<--, right -->>
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
         self.factor    = self.bkgMaker.factor    ## sets default 
-        self.showtime  = 0  ## number of pixels before the runway ends and then it's showtime
+        self.showtime  = 0  ## the number of pixels to showtime before the runway goes to zero
         self.useThis   = ''
         self.rate      = 0
         
         self.runway    = 0  ## what's not visible     
         self.bkgScrollWrks.setRunWay()  
-        
-        self.setPixmap(QPixmap.fromImage(self.imgFile)) 
-                              
+                                   
         self.ratio = self.height/9
         self.ratio = int(self.width/self.ratio)
                     
@@ -160,17 +162,19 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         e.accept()     
 
 ### -------------------------------------------------------- 
-    def itemChange(self, change, value):   ## value equals self.pos()
+    ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''
+### -------------------------------------------------------- 
+    def itemChange(self, change, value):   
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
             if self.direction == '':
                 return            
-            ## 'first' has already set its setScrollerPath                 
+                     
             elif self.addedScroller == False:  ## check if its showtime    
-             
+                
                 if self.direction  == 'left'  and int(value.x()-self.runway) <= self.showtime or\
                     self.direction == 'right' and int(value.x()) >= -self.showtime or\
                     self.direction == 'vertical' and int(value.y())-self.runway <= self.showtime:  
-                    self.addNextScroller() 
+                    self.addNextScroller()  ## the scroller factory
                     self.addedScroller = True        
                                                        
             elif self.addedScroller == True:  ## test if nolonger in view
@@ -183,70 +187,64 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                                                     
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
  
-### --------------------------------------------------------                       
-    def addNextScroller(self):  ## add and scroll the next background    
-        self.fileName = self.path + os.path.basename(self.fileName)      
-        item = BkgItem(self.fileName, self.canvas, common['bkgZ']) 
-                   
+### -------------------------------------------------------- 
+    ''' add the 'next' scrolling background - passing on the imgFile means 
+        no longer needing to re-read the .jpg/.png file  '''       
+### -------------------------------------------------------- 
+    def addNextScroller(self): 
+        self.fileName = self.path + os.path.basename(self.fileName)  
+        item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
+            
         if self.mirroring == False:  ## continuous
             item.setMirrored(False)
         elif self.ratio <= 27 or self.dots.Vertical == False:  ## 27:9 = 3:1 
             item.setMirrored(False) if self.flopped else item.setMirrored(True) 
         else:
             item.setMirrored(False)
-                               
+                            
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
-        item.showtime = self.showtime   
-             
+                                    
         self.bkgWorks.restoreFromTrackers(item, 'addnxt')  ## txt for debugging  
-        item.anime = self.setScrollerPath(item, 'next')  ## first was called earlier, they're all next    
-  
-        item.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)         
-        self.scene.addItem(item)   
-           
-        item.anime.start()
-                               
-### --------------------------------------------------------   
-    ''' sets scroller animation - runs directly from demos as well '''
-### --------------------------------------------------------        
-    def setScrollerPath(self, bkg, which): ## which = first/next 
-        if bkg.direction == '':   
-            return      
+        
+        path = self.setNode(item)  ## sets property used in animation        
+        item.anime = self.bkgWorks.setNextPath(path, item) 
 
-        path = self.setNode(bkg)         
+        item.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
+        self.scene.addItem(item)   
+        
+        item.anime.start()
+                           
+### --------------------------------------------------------   
+    ''' used by 'first' to set its path and rates - rates set for 'next' as well '''
+### --------------------------------------------------------   
+    def setScrollerPath(self, bkg, which): ## which = first
+        if bkg.direction == '':   
+            return  
+            
+        path = self.setNode(bkg)  ## bkg property used in animation                      
         if path == None:
-            MsgBox('setScrollerPath: Error setting scroller path...')
-            return
+            MsgBox('setScrollerPath: Error Setting Path ...')
+            return          
                 
-        if bkg.direction in ('left', 'right') and bkg.width < common['ViewW'] or\
+        elif bkg.direction in ('left', 'right') and bkg.width < common['ViewW'] or\
             bkg.direction == 'vertical' and bkg.height < common['ViewH']:
             self.bkgScrollWrks.notScrollable()  
             return 
- 
-        if bkg.direction == 'right':  ## gets it pointed in the right direction
+   
+        self.setStartingPos(bkg)  ## not the scrolling position      
+        bkg.rate = bkg.bkgWorks.getScreenRate(which)  ## also sets tracker rate for 'next' 
+        return self.bkgWorks.setFirstPath(path, bkg) 
+               
+### --------------------------------------------------------  
+    def setStartingPos(self, bkg):
+        if bkg.direction == 'right':  ## gets it pointed in the right direction -->>
             bkg.setPos(QPointF(bkg.runway, 0)) 
-        elif bkg.direction == 'left':  
+        elif bkg.direction == 'left':  ## <<--
             bkg.setPos(QPointF())
         else:
             bkg.setPos(QPointF(0.0, float(bkg.runway)))
-                  
-        bkg.showtime = bkg.bkgScrollWrks.setShowTime(which)  
-        
-        if which == 'first':  
-            bkg.rate = bkg.bkgWorks.getScreenRate(which)  ## sets tracker for 'next'
-        else:
-            bkg.rate = bkg.bkgScrollWrks.getTrackerRate(bkg) 
-           
-        if bkg.rate == 0 or bkg.useThis == '':
-            return
-                                      
-        if which == 'next':            
-            return self.bkgWorks.setNextPath(path, bkg)  
-        else:
-            return self.bkgWorks.setFirstPath(path, bkg) 
 
-### --------------------------------------------------------            
     def updateXY(self, pos):
         dragX = pos.x() - self.dragCnt.x()
         dragY = pos.y() - self.dragCnt.y()      
@@ -273,7 +271,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.flopped = bool  
         if not self.dots.Vertical:
             self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-                # horizontally=self.flopped, vertically=False)))  ## pyside6
                 horizontal=self.flopped, vertical=False)))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
 

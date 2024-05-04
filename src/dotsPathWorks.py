@@ -185,22 +185,16 @@ class PathWorks:
         self.canvas.btnPathMaker.setStyleSheet(
             'background-color: rgb(55,240,140);\n'
             'border:  1px solid rgb(240,240,240); \n'
-            'border-style: outset; \n'
             'border-width: 1px; \n'
-            'border-color: beige; \n'
-            'font-size: 13px;\n'
-            'color:  white;')        
+            'font-size: 13px;')      
         self.canvas.showWorks.disablePlay()
          
     def turnBlue(self):
         self.canvas.btnPathMaker.setStyleSheet(
-            'background-color: rgb(200,128,255);\n'
-            'border:  1px solid rgb(240,240,240); \n'
-            'border-style: outset; \n'
+            'background-color: rgb(165,215,255);\n'
+            'border:  1px solid rgb(80,80,80); \n'
             'border-width: 1px; \n'
-            'border-color: beige; \n'
-            'font-size: 13px;\n'
-            'color:  white;')
+            'font-size: 13px;')
                                        
     def findTop(self):
         ## save

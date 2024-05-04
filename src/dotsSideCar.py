@@ -49,7 +49,7 @@ class SideCar:
         self.scene.addItem(pix)
               
 ### --------------------------------------------------------
-    def pixTest(self):
+    def pixTest(self):  ## randomly places 10 apples on the canvas to play with 
         if not self.canvas.pathMakerOn:  
             self.canvas.pixCount = self.canvas.mapper.toFront()
             for _ in range(10):
@@ -123,17 +123,23 @@ class SideCar:
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
       
-    def dumpBkgs(self):  ## shift-B - general purpose data dump to stdout
+    def dumpBkgs(self):  ## shift-B - dump newtracker and shadow data
         for p in self.scene.items():
-            if p.type == 'pix' and len(p.shadow) > 0:
+            if p.type == 'bkg':
+                fileName = os.path.basename(p.fileName)  ## opposite of setMirroring 
+                if r := self.canvas.bkgMaker.newTracker[fileName]: 
+                    fileName, direction, mirroring, locked = self.addBkgLabels(p)
+                    print(f"{fileName}\t{direction}\t{mirroring}\t{r['rate']}" +
+                        f"\t{r['showtime']}\t{r['factor']}\t{r['useThis']}")
+        print()                 
+        # if p.type == 'pix' and len(p.shadow) > 0:  
         #         file, direction, mirror, locked = self.addBkgLabels(p)
         #         showtime = p.showtime
         #         print(f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
-        # print()
-                print('db', list(p.shadow.values()))
-          
+        # print('dumpbkgs', list(p.shadow.values()))
+
     def addBkgLabels(self, bkg):  ## used with dumpBkgs for trackers
-        file = os.path.basename(bkg.fileName)        
+        fileName = os.path.basename(bkg.fileName)        
         if bkg.locked == True:
             locked = 'Locked' 
         else:
@@ -145,19 +151,17 @@ class SideCar:
         elif self.dots.Vertical:
             direction = 'Vertical'
         else:
-            for item in self.canvas.bkgMaker.trackers:  ## see if it's already there
-                if item.file == file:  
-                    direction = item.direction
-                    break
+            if self.canvas.bkgMaker.newTracker[fileName]:   
+                direction = self.canvas.bkgMaker.newTracker[fileName]['direction']     
             if direction == '':
                 direction = 'NoDirection'
         if bkg.mirroring == False:
             mirror = 'Continuous'
         elif bkg.mirroring == True:
             mirror = 'Mirrored'
-        if bkg.scrollable == False:
+        elif bkg.direction == '' and bkg.scrollable == False:
             mirror = 'Not Scrollable'    
-        return file.capitalize(), direction, mirror, locked
+        return fileName.capitalize(), direction, mirror, locked
   
 ### --------------------------------------------------------
     def toggleMenu(self):  ## keysPanel

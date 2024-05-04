@@ -25,17 +25,19 @@ class ShowWorks:
 ### --------------------------------------------------------  
     def cleanUpScrollers(self, scene):  ## called from showtime  
         self.scene = scene
-        for t in self.canvas.bkgMaker.trackers:
-            fileName = t.fileName  
+        for t, v in self.canvas.bkgMaker.newTracker.items():
+            fileName = t
             k = 0 
             for p in self.scene.items():  ## delete duplicates
                 if p.type == 'bkg' and fileName in p.fileName: 
-                    if p.tag == 'scroller' and p.direction == t.direction:
+                    if p.tag == 'scroller' and p.direction == v['direction']:
                         if k == 0:
                             self.dothis(p) 
+                            p.setStartingPos(p)
                             k = 1
                         elif k > 0:
                             self.scene.removeItem(p)
+                            
   ### --------------------------------------------------------      
     def cleanupMenus(self, showbiz):    
         if showbiz.tableView != None: 
@@ -57,7 +59,7 @@ class ShowWorks:
         path      = p.path
         z         = p.zValue()
 
-        p.init()  ## just to make sure
+        p.init(p.imgFile)  ## just to make sure
         
         p.tag       = 'scroller'
         p.direction = direction 
@@ -67,17 +69,10 @@ class ShowWorks:
         p.rate      = rate
         p.useThis   = usethis
         p.path      = path
-        
+           
         p.setZValue(z)   
         p.locked == True
         p.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)          
-
-        if p.direction == 'right':
-            p.setPos(QPointF(p.runway, 0)) 
-        elif p.direction == 'left':      
-            p.setPos(QPointF())  
-        elif p.direction == 'vertical':
-            p.setPos(QPointF(0.0, float(p.runway)))
    
 ### --------------------------------------------------------      
     def setPauseKey(self):  ## showbiz all the way down    

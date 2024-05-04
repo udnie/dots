@@ -172,7 +172,7 @@ class Snakes:
             self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99
             
         if self.scroller != None:
-            self.scroller.init()  
+            self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
         elif what == 'left':
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
             

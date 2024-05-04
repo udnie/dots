@@ -1,1 +1,1 @@
-[{"fileName": "bluestone.jpg", "type": "bkg", "x": 0.0, "y": 0.0, "z": -99.0, "tag": "scroller", "locked": false, "mirror": false, "width": 1440, "height": 720, "scrollable": true, "direction": "right", "mirroring": false, "factor": 1.0, "rate": 10.0, "showtime": 15}]
+[{"fileName": "bluestone.jpg", "type": "bkg", "x": 0.0, "y": 0.0, "z": -99.0, "tag": "", "locked": true, "mirror": false, "width": 1440, "height": 720, "scrollable": true, "direction": "", "mirroring": false, "factor": 1.0, "rate": 0, "showtime": 0, "path": ""}]

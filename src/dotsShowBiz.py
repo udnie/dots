@@ -54,9 +54,10 @@ class ShowBiz:
         self.screenMenu = ScreenMenu(self.canvas)  ## in screens
         self.showFiles  = ShowFiles(self.canvas) 
         
-        self.helpMenu   = HelpMenu(self.canvas, self)
+        self.helpMenu = None
+        self.helpMenu = HelpMenu(self)
+        self.help = False 
         
-        self.help = True   
         self.locks = 0
         self.tableView = None 
               
@@ -86,7 +87,8 @@ class ShowBiz:
                 self.RSA(key)
    
     def RSA(self, key):
-        self.closeMenus()   
+        if self.demoAvailable: 
+            self.closeMenus()   
         if key in ('A', 'B'):
             self.bkgMaker.openBkgFiles() 
         elif key == 'L':
@@ -94,29 +96,26 @@ class ShowBiz:
             self.loadPlay()  
         elif key in ('D','R'):  ## added 'D' thru deleteSelected if nothing there 
             self.bkgMaker.screenrate = {}
-            if self.demoAvailable:     
+            if self.demoAvailable:   
+                self.helpMenu.closeHelpMenu()  
                 self.demoMenu.openDemoMenu()  ## in snakes 
         elif key == 'S':   
             if self.demoAvailable:  
+                self.helpMenu.closeHelpMenu()
                 self.screenMenu.openScreenMenu() ## in screens
         elif key == 'P':  
             self.pathMaker.initPathMaker()
         elif key == 'J':              
             ## use QFileDialog to open a .play json file to view the play file contents
             self.loadPlay('table')  
-        elif key == 'H':    
-            if self.help == True:      
-                self.helpMenu.openHelpMenu() 
-                self.help = False
-            else:
+        elif key == 'H':  
+            self.helpMenu.openHelpMenu() if self.help == False else \
                 self.helpMenu.closeHelpMenu() 
-                self.help = True
-                
+       
     def closeMenus(self):
         self.screenMenu.closeScreenMenu()
         self.demoMenu.closeDemoMenu()
-        self.helpMenu.closeHelpMenu()
-
+   
 ### --------------------------------------------------------        
     def runThese(self):      
         if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):
@@ -180,7 +179,7 @@ class ShowBiz:
         self.mapper.clearMap() 
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.trackers.clear()          
+        self.canvas.bkgMaker.newTracker.clear()          
         ## number of pixitems, backgrounds zval, number of shadows        
         kix, bkgz, ns = 0, 0, 0
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships

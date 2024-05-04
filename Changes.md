@@ -5,6 +5,18 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**May 2024**  
+On April 17th I updated the **extras** folder, updating **outline** and **dropshadow** to **PyQt6**. Along the way I removed **castshadow** from **extras** as an updated and better version is in **dots shadows**.  I hadn't posted a video as my development setup was having a serious problem and I just had posted one the beginning of April.
+
+The biggest change is to **scrolling backgrounds** having done away with re-reading the same file for each **'next'** background. The other change replaced the list of data classes I was using to track backgrounds with a nested dictionary - a spinoff from the previous changes I had made when I moved the two rate dictionaries to the **screenrates** dictionary.  Good stuff to know if you don't need a database to keep track of things. Much cleaner looking code as well. Also makes it easier to set scrolling rates if you mix backgrounds formatted for 16:9 and 3:2 screen formats. Of course you need to run both in 3:2 for that to work.
+ 
+
+Other than bug-fixes, this may be as far as I go with dots, at least for the present.  No new additions in the works. Also, sad to say, YouTube is using these video for click bait. Just so you know. 
+ 
+New Video: <https://youtu.be/nIOqAWsxI3s>
+
+----
+
 
 **April 8 2024**  
 I've added two **help menus**, one to what I call the **'canvas'**, the other to the **'matte'** from the background widget. I've also updated **double-clicking** the **shadow outline** - on and off once again.  Reading over my entries from **March 7th and 10th** makes me wonder if I somehow managed to misplace a bunch of changes, I hadn't - they needed more work. 

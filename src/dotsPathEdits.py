@@ -57,7 +57,12 @@ class PathEdits(QWidget):
             self.addNewPath()
 
     def addNewPath(self):
-        self.canvas.btnPathMaker.setStyleSheet('background-color: rgb(215,165,255)')
+        self.canvas.btnPathMaker.setStyleSheet( 
+            'background-color: rgb(215,165,255);\n'
+            'border:  1px solid rgb(80,80,80); \n'
+            'border-width: 1px; \n'
+            'font-size: 13px;')
+        
         self.pathMaker.addingNewPath = True
         self.pathMaker.newPath = None
         self.pathMaker.npts = 0

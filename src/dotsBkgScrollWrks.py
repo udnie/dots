@@ -2,7 +2,7 @@
 import os
 import json
 
-from PyQt6.QtCore       import pyqtSlot
+from PyQt6.QtCore       import pyqtSlot,QPointF
 from PyQt6.QtGui        import QColor, QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QMessageBox, QGraphicsPixmapItem
                         
@@ -18,21 +18,6 @@ showtime = {  ## trigger to add a new background based on number of pixels remai
 
 ### ------------------ dotsBkgScrollWrks ------------------- 
 ''' classes: Tracker, Flat, ScrollWrks (functions used for scrolling support) '''    
-### --------------------------------------------------------
-class Tracker:  ## one for each scrolling background - temp memory for 'next' bkgitem
-### --------------------------------------------------------
-    def __init__(self, bkg):
-        super().__init__()
-
-        self.fileName   = os.path.basename(bkg.fileName)
-        self.direction = bkg.direction
-        self.mirroring = bkg.mirroring
-        self.factor    = bkg.factor
-        self.rate      = bkg.rate
-        self.showtime  = bkg.showtime
-        self.useThis   = bkg.useThis
-        self.path      = bkg.path
-       
 ### -------------------------------------------------------- 
 class Flat(QGraphicsPixmapItem):
 ### -------------------------------------------------------- 
@@ -54,14 +39,12 @@ class Flat(QGraphicsPixmapItem):
         
         self.id = 0   
         self.key = ''
-  
         self.x, self.y = 0, 0
 
         p = QPixmap(common['ViewW'],common['ViewH'])
         p.fill(self.color)
         
-        self.setPixmap(p)
-             
+        self.setPixmap(p)      
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         
 ### --------------------------------------------------------
@@ -134,11 +117,12 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             MsgBox(f'Error Updating Rates Dictionary {self.bkgItem.useThis}', 5)
         return 
      
-### -------------------------------------------------------- 
-    def setShowTime(self, which=''): 
-        show = self.getShowtimeFromTrackers(self.bkgItem)
-        if show > 0: return show
-        ## snakes need more time - the rest vary to build and position and comes before vertical 
+### --------------------------------------------------------
+    ## snakes need more time - the rest vary to build and position and comes before vertical  
+    def setShowTime(self): 
+        fileName = os.path.basename(self.bkgItem.fileName)  
+        if show := self.bkgMaker.newTracker[fileName]['showtime']:
+            return show
         show = 0
         if 'snakes' in self.bkgItem.fileName and self.bkgItem.direction != 'vertical':
             show = showtime['snakes']   
@@ -152,45 +136,32 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
 
     def setShowTimeTrackers(self):  ## used by resetSliders
         if self.bkgItem.scrollable:                                                               
-            fileName = os.path.basename(self.bkgItem.fileName)  
-            for p in self.bkgMaker.trackers:
-                if p.fileName == fileName:
-                    p.direction = self.bkgItem.direction
-                    p.showtime = self.bkgItem.showtime 
-                    break
-                    
-    def getShowtimeFromTrackers(self, bkg):  
-        fileName = os.path.basename(bkg.fileName)  
-        for p in self.bkgMaker.trackers:
-            if p.fileName == fileName:
-                return p.showtime
-        return 0
-    
+            fileName = os.path.basename(self.bkgItem.fileName)    
+            if self.bkgMaker.newTracker[fileName]:        
+                self.bkgMaker.newTracker[fileName]['direction'] = self.bkgItem.direction 
+                self.bkgMaker.newTracker[fileName]['showtime']  = self.bkgItem.showtime 
+                             
 ### --------------------------------------------------------   
     def setTrackerFactor(self):
         if self.bkgItem.scrollable:                                                                 
-            fileName = os.path.basename(self.bkgItem.fileName)
-            for p in self.bkgMaker.trackers:
-                if p.fileName == fileName:
-                    p.factor = self.bkgItem.factor
-                    break
- 
+            fileName = os.path.basename(self.bkgItem.fileName)  
+            if self.bkgMaker.newTracker[fileName]:  
+                self.bkgMaker.newTracker[fileName]['factor'] = self.bkgItem.factor          
+
     def setTrackerRate(self):
         if self.bkgItem.scrollable:                                                               
             fileName = os.path.basename(self.bkgItem.fileName)  
-            for p in self.bkgMaker.trackers:
-                if p.fileName == fileName:
-                    p.direction = self.bkgItem.direction
-                    p.rate = self.bkgItem.rate  ## individual rate saved by direction
-                    break
-            
-    def getTrackerRate(self, bkg):  ## saves having to read screenrates again
-        fileName = os.path.basename(bkg.fileName)  
-        for p in self.bkgMaker.trackers:
-            if p.fileName == fileName:
-                return p.rate  
-        return 0 
-                 
+            if self.bkgMaker.newTracker[fileName]:
+                self.bkgMaker.newTracker[fileName]['direction'] = self.bkgItem.direction
+                self.bkgMaker.newTracker[fileName]['rate']      = self.bkgItem.rate 
+                self.bkgMaker.newTracker[fileName]['useThis']   = self.bkgItem.useThis
+                
+    def getTrackerRate(self, bkg):  ## used only once - getScreenRate
+        fileName = os.path.basename(bkg.fileName) 
+        if rate := self.bkgMaker.newTracker[fileName]['rate']:  
+            return rate
+        return 0  
+           
 ### --------------------------------------------------------    
     def setRunWay(self):      
         if not self.dots.Vertical:             
@@ -244,16 +215,22 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         self.bkgItem.scrollable = False  
         return  
  
+### --------------------------------------------------------
+def addNewTracker(bkg):
+    tmp = {
+        "fileName":    os.path.basename(bkg.fileName),
+        "direction":  bkg.direction,
+        "mirroring":  bkg.mirroring,
+        "factor":     bkg.factor,
+        "rate":       bkg.rate,
+        "showtime":   bkg.showtime,
+        "useThis":    bkg.useThis,
+        "path":       bkg.path,
+        "scrollable": bkg.scrollable,
+    }
+    return tmp
+ 
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
-
-    # print(f'tracker {file}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.rate}\t{bkg.factor}\t{bkg.zValue()}')
              
-    # def setStatusBar(self):  ## pretty sure this is no longer being used
-    #     self.dots.statusBar.showMessage(os.path.basename(self.bkgItem.fileName) + '    ' + \
-    #         'Width:   '  + '  ' + str(self.bkgItem.width)       + '    ' +\
-    #         'Runway:   ' + '  ' + str(abs(self.bkgItem.runway)) + '    ' +\
-    #         'ShowTime: ' + '  ' + str(showtime)    + '    ' +\
-    #         'Ratio: '    + '  ' + str(self.bkgItem.ratio)+ ':9')       
-
-
+             
 

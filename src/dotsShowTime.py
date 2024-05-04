@@ -50,7 +50,7 @@ class ShowTime:
             if len(self.canvas.pathList) == 0:
                 MsgBox('getPathList: No Paths Found!', 5)
                 return 
-                 
+                        
         b, k = 0, 0  ## counts bats and pixitems  
         for pix in self.scene.items():  ## main loop - sets and runs animations
             if type(pix) == 'dotsShadowWidget.PointItem' or \
@@ -94,7 +94,7 @@ class ShowTime:
             if "play" in file:
                 self.dots.statusBar.showMessage(file + ' - ' + \
                     'Number of Pixitems: {}'.format(k))  
-           
+                      
 ### --------------------------------------------------------                                 
     def pause(self):
         self.mapper.clearPathsandTags()  
@@ -107,7 +107,7 @@ class ShowTime:
                     continue
                 if pix.type in ('flat', 'frame'):
                     continue             
-                if pix.type in ('pix', 'snake', 'bkg'):
+                if pix.type in ('pix', 'snake', 'bkg'):  
                     if pix.anime != None and pix.anime.state() == \
                         QAbstractAnimation.State.Running:  ## running
                         pix.anime.pause() 

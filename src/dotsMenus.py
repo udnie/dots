@@ -6,7 +6,7 @@ from PyQt6.QtWidgets    import QMenu
 
 from dotsSideGig        import *
 from dotsShared         import screens, PlayKeys
-from dotsSideGig        import MsgBox, getVuCtr
+from dotsSideGig        import MsgBox, getVuCtr, getCtr
 from dotsMapMaker       import MapMaker
 
 from dotsAnimation      import *
@@ -131,12 +131,12 @@ class DemoMenu:
         self.canvas = parent
         self.showbiz = showbiz
         
-        self.dots   = self.canvas.dots
-        self.scene  = self.canvas.scene
+        self.dots  = self.canvas.dots
+        self.scene = self.canvas.scene
      
-        self.snakes   = self.showbiz.snakes   
-        self.bats     = self.showbiz.bats
-        self.hats     = self.showbiz.hats  ## hats and bats
+        self.snakes = self.showbiz.snakes   
+        self.bats   = self.showbiz.bats
+        self.hats   = self.showbiz.hats  ## hats and bats
        
         self.demoMenu = None
         
@@ -153,15 +153,15 @@ class DemoMenu:
             else:
                 action = self.demoMenu.addAction(demo)
                 self.demoMenu.addSeparator()
-                action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))
-                
+                action.triggered.connect(lambda chk, demo=demo: self.clicked(demo))   
+
         self.demoMenu.addAction("Use 'C' to Close Menu  ".rjust(27,' '))
-                
+
         x, y = getVuCtr(self)
             
         if self.dots.Vertical:
             self.demoMenu.setFixedSize(220, 130)
-            self.demoMenu.move(x-110, -160)     
+            self.demoMenu.move(x-110, y-160)     
         else:
             self.demoMenu.setFixedSize(220, 220)
             self.demoMenu.move(x-110, y-100)     
@@ -171,7 +171,7 @@ class DemoMenu:
     def clicked(self, demo):
         for key, value in demos.items():
             if value == demo:  ## singleshot needed for menu to clear
-                QTimer.singleShot(50, partial(self.run, key))
+                QTimer.singleShot(25, partial(self.run, key))
                 break
         self.closeDemoMenu()
         
@@ -186,7 +186,7 @@ class DemoMenu:
         elif key == 'blue':
             self.runSnakes('blue') 
         elif key == 'snakes':
-            self.canvas.bkgMaker.trackers.clear()
+            self.canvas.bkgMaker.newTracker.clear()
             if self.dots.Vertical:   
                 self.runSnakes('vertical') 
             else:
@@ -195,7 +195,7 @@ class DemoMenu:
             if self.dots.Vertical:     
                 MsgBox('Not Implemented for Vertical Format')
                 return            
-            self.canvas.bkgMaker.trackers.clear()
+            self.canvas.bkgMaker.newTracker.clear()
             if key == 'left':  ## direction of travel
                 self.hats.makeHatsDemo('left')  ## right to left 
             else: 
@@ -205,7 +205,7 @@ class DemoMenu:
         if what in ('blue', 'snakes'): 
             self.snakes.delSnakes()    
         if what != '':
-            QTimer.singleShot(50, partial(self.snakes.makeSnakes, what))           
+            QTimer.singleShot(25, partial(self.snakes.makeSnakes, what))           
         elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
             MsgBox('The Screen Needs to be Cleared inorder to Run Snakes', 6, getCtr(-225,-175))
             return 
@@ -213,14 +213,14 @@ class DemoMenu:
 ### --------------------------------------------------------     
 class HelpMenu:  ## for canvas - one key commands
 ### -------------------------------------------------------- 
-    def __init__(self, parent, showbiz):
+    def __init__(self, parent):
         super().__init__()  
    
-        self.canvas  = parent  ## all these are necessary to clear the screen     
-        self.showbiz = showbiz
+        self.showbiz = parent  ## all these are necessary to clear the screen     
+        self.canvas  = self.showbiz.canvas
          
-        self.helpMenu = None
-         
+        self.helpMenu = self.showbiz.helpMenu
+                 
 ### --------------------------------------------------------                     
     def openHelpMenu(self):
         self.closeHelpMenu()    
@@ -237,19 +237,21 @@ class HelpMenu:  ## for canvas - one key commands
          
         x, y = getVuCtr(self)
         
-        self.helpMenu.setFixedSize(250, 340)       
+        self.helpMenu.setFixedSize(250, 343)       
         self.helpMenu.move(x-125, y-170)  
-   
-        self.helpMenu.show()
+        
+        self.helpMenu.show()  
+        self.showbiz.help = True
     
     def clicked(self, help):
         if help in PlayKeys:
-            QTimer.singleShot(50, partial(self.showbiz.keysInPlay, help)) 
+            QTimer.singleShot(25, partial(self.showbiz.keysInPlay, help)) 
 
     def closeHelpMenu(self):   
         if self.helpMenu:
             self.helpMenu.close()
         self.helpMenu = None
+        self.showbiz.help = False
                 
  ### --------------------------------------------------------     
 class ScreenMenu:  
@@ -284,7 +286,7 @@ class ScreenMenu:
     def clicked(self, screen):
         for key in screens:
             if key == screen:  ## singleshot needed for menu to clear
-                QTimer.singleShot(50, partial(self.displayChk, self.switchKey(key)))
+                QTimer.singleShot(25, partial(self.displayChk, self.switchKey(key)))
                 break      
         self.closeScreenMenu()  
                     

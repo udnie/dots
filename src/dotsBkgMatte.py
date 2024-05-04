@@ -118,7 +118,10 @@ class Matte(QWidget):
                 self.canvas.showtime.pause()
             else:
                 self.canvas.showtime.stop()
-
+                
+        elif key == Qt.Key.Key_Space:          
+            self.canvas.showtime.pause() 
+                
         elif key == Qt.Key.Key_Greater:  ## scale up  
             self.scaleThis(key)       
             if self.y-(self.border*self.ratio) <= self.stop:
@@ -240,11 +243,13 @@ class HelpMenu:  ## for canvas - one key commands
         self.helpMenu.addAction('Shift-P - Pause/Resume Animation')
         self.helpMenu.addSeparator()
         self.helpMenu.addAction('Shift-S - Stop Animation')
+        self.helpMenu.addSeparator()
+        self.helpMenu.addAction("Use 'H' to Close Menu  ".rjust(32,' '))
          
         x, y = getVuCtr(self)
         
-        self.helpMenu.setFixedSize(250, 470)       
-        self.helpMenu.move(x-125, y-235)  
+        self.helpMenu.setFixedSize(250, 528)       
+        self.helpMenu.move(x-125, y-250)  
         self.helpMenu.show()
         
         self.matte.help = True

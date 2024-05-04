@@ -107,7 +107,7 @@ def DemoAvailable():
     else:
         return False
     
-def getVuCtr(self):
+def getVuCtr(self):  ## used for menus - seems to work
     x,y = int(common['ViewW']/2), int(common['ViewH']/2) 
     p = self.canvas.mapToGlobal(QPointF(x,y))
     return int(p.x()), int(p.y())

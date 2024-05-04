@@ -7,22 +7,16 @@ from PyQt6.QtWidgets    import QApplication, QWidget
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)  ## '</>'
-Ticks = (100,50,10)  ## how often to draw a line and size
+Ticks    = (100,50,10)  ## how often to draw a line and size
 
-VWidth, VHeight = 600, 70
+VWidth, VHeight = 1000, 70
 
 # from PyQt6.QtCore import QT_VERSION_STR
 # from PyQt6.QtCore import PYQT_VERSION_STR
 
-# print( PySide.__version__ )
 # print("PyQt version:", PYQT_VERSION_STR) 
 # print("Python version:", QT_VERSION_STR)
 
-## this works for pyside - Qt6 to Side6... 
-# print("Qt: v", PyQt6.QtCore.__version__, "\tPyQt: v", PyQt6.__version__)
-
-### --------------------------------------------------------
-''' for PyQt6 change gobalPos() to globalPosition() '''
 ### ------------------------- vhx --------------------------
 class VHX(QWidget):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------
@@ -110,11 +104,11 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         key = e.key()
         if key == Qt.Key.Key_V:
             self.horizontal = False
-            self.resize(70,600)
+            self.resize(VHeight, VWidth)
             self.center()
         elif key == Qt.Key.Key_H:
             self.horizontal = True
-            self.resize(600,70)
+            self.resize(VWidth, VHeight)
             self.center()
         elif key in SizeKeys:
             self.scaleThis(key)

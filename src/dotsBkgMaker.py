@@ -37,9 +37,9 @@ class BkgMaker(QWidget):
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False
           
-        self.trackers = []  ## tracks backgrounds and holds state of direction, mirroring  
         self.screenrate = {}
-                
+        self.newTracker = {}
+   
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats - needs to be in /backgrounds
         if self.canvas.control in ControlKeys:
@@ -64,9 +64,7 @@ class BkgMaker(QWidget):
         if self.bkgItem.fileName == None:
             return
         
-        self.bkgItem.setZValue(common['bkgZ'])  ## always on top
-        self.screenrate = {}
-                
+        self.bkgItem.setZValue(common['bkgZ'])  ## always on top              
         self.scene.addItem(self.bkgItem)    
         
         self.updateZvals(self.bkgItem)  ## update other bkg zvalues 
@@ -164,9 +162,15 @@ class BkgMaker(QWidget):
             self.widget.showtimeValue.setText('{0:3d}'.format(self.bkgItem.showtime))
 
     def setMirrorBtnText(self):  ## if added 
-        if self.bkgItem:  ## shouldn't need this but - could have just started to clear                         
+        if self.bkgItem:  ## shouldn't need this but - could have just started to clear    
+           
+            if self.dots.Vertical == False and self.bkgItem.imgFile.width() >= self.bkgItem.showtime + self.bkgItem.ViewW or \
+                self.dots.Vertical == True and self.bkgItem.imgFile.height() >= self.bkgItem.showtime + self.bkgItem.ViewH:  
+                self.bkgItem.scrollable = True    
+                                   
             if self.bkgItem.scrollable == False:
-                self.widget.mirrorBtn.setText('Not Scrollable')         
+                self.widget.mirrorBtn.setText('Not Scrollable')  
+                self.bkgItem.direction = ''       
             elif self.bkgItem.mirroring == False:
                 self.widget.mirrorBtn.setText('Continuous')         
             elif self.bkgItem.mirroring == True:
@@ -263,7 +267,7 @@ class BkgMaker(QWidget):
     def showZVals(self):
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
             if itm.type == 'bkg':
-                print(itm.zValue())
+                print(itm.zValue())  ## show zvals
                                 
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()
