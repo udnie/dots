@@ -8,10 +8,11 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 **May 2024**  
 On April 17th I updated the **extras** folder, updating **outline** and **dropshadow** to **PyQt6**. Along the way I removed **castshadow** from **extras** as an updated and better version is in **dots shadows**.  I hadn't posted a video as my development setup was having a serious problem and I just had posted one the beginning of April.
 
-The biggest change is to **scrolling backgrounds** having done away with re-reading the same file for each **'next'** background. The other change replaced the list of data classes I was using to track backgrounds with a nested dictionary - a spinoff from the previous changes I had made when I moved the two rate dictionaries to the **screenrates** dictionary.  Good stuff to know if you don't need a database to keep track of things. Much cleaner looking code as well. Also makes it easier to set scrolling rates if you mix backgrounds formatted for 16:9 and 3:2 screen formats. Of course you need to run both in 3:2 for that to work.
- 
+The biggest change is to **scrolling backgrounds** having done away with re-reading the same file for each **'next'** background. The other change replaced the list of data classes I was using to track backgrounds with a **nested dictionary** - a spinoff from the previous changes I had made when I moved the two rate dictionaries to the **screenrates** dictionary. If you're using more than one background these changes could make a difference.
 
-Other than bug-fixes, this may be as far as I go with dots, at least for the present.  No new additions in the works. Also, sad to say, YouTube is using these video for click bait. Just so you know. 
+Also, good stuff to know if you don't need a database to keep track of things, plus it produces cleaner looking code as well and makes it easier to set scrolling rates if you mix 16:9 and 3:2 background screen formats. Of course you need to run both in 3:2 for that to work. 
+
+Other than bug-fixes, this may be as far as I go with **dots**, at least for the present time.  No new additions in the works. Also, sad to say, YouTube is using these videos as click bait. Just so you know, that's not me trying to sell you something but I guess that's how it works.
  
 New Video: <https://youtu.be/nIOqAWsxI3s>
 
