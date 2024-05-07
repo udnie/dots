@@ -114,10 +114,10 @@ class ShowWorks:
         Q.Option.DontUseNativeDialog    
         Q.setDirectory(paths['playPath'])
         f = Q.getSaveFileName(self.canvas, paths['playPath'],  
-            self.canvas.openPlayFile)
+            self.canvas.openPlayFile, 'Files(*.play)')  ## otherwise it's really dumb
         Q.accept()
         if not f[0]: 
-            return
+            return     
         if not f[0].lower().endswith('.play'):
             MsgBox("saveToPlays: Wrong file extention - use '.play'", 5)  
             return
@@ -129,7 +129,7 @@ class ShowWorks:
                 MsgBox('saveToPlays: Error saving file', 5)
         del dlist
         self.canvas.dots.statusBar.showMessage('') 
-                    
+        
 ### --------------------------------------------------------
     def lookForStrays(self, pix):  ## it can happen
         if pix.x < -25 or pix.x > common['ViewW'] -10:

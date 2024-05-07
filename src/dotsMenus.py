@@ -160,7 +160,7 @@ class DemoMenu:
         x, y = getVuCtr(self)
             
         if self.dots.Vertical:
-            self.demoMenu.setFixedSize(220, 130)
+            self.demoMenu.setFixedSize(220, 160)
             self.demoMenu.move(x-110, y-160)     
         else:
             self.demoMenu.setFixedSize(220, 220)

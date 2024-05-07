@@ -145,7 +145,7 @@ class PathWays:
             Q.setDirectory(paths['paths'])
             f = Q.getSaveFileName(self.canvas, paths['paths'],
                 paths['paths'] + self.pathMaker.openPathFile,  
-                'Files(*.path)')  ## <--- note
+                'Files(*.path)')  ## !!!!
             Q.accept()                                                  
             if not f[0]: 
                 return

@@ -31,6 +31,7 @@ class Matte(QWidget):
         super().__init__()
 
         self.canvas   = parent 
+        self.view     = self.canvas.view  
         self.bkgMaker = self.canvas.bkgMaker
             
         self.type = 'widget'       
@@ -133,9 +134,11 @@ class Matte(QWidget):
         elif key in (Qt.Key.Key_Q, Qt.Key.Key_X):
             if self.help == True:      
                 self.helpMenu.closeHelpMenu() 
-            self.bkgMaker.matte = None
-            self.close()         
-            
+                
+            self.bkgMaker.matte = None      
+            self.view.grabKeyboard()       
+            self.close()   
+                 
         elif key == Qt.Key.Key_H: 
             self.helpMenu.openHelpMenu() if self.help == False else \
                 self.helpMenu.closeHelpMenu()

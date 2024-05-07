@@ -2,7 +2,7 @@
 import os
 import json
 
-from PyQt6.QtCore       import pyqtSlot,QPointF
+from PyQt6.QtCore       import pyqtSlot, Qt
 from PyQt6.QtGui        import QColor, QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QMessageBox, QGraphicsPixmapItem
                         
@@ -76,7 +76,8 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
     def __init__(self, parent):  
         super().__init__()
 
-        self.bkgItem  = parent     
+        self.bkgItem  = parent    
+        self.canvas   = self.bkgItem.canvas 
         self.bkgMaker = self.bkgItem.bkgMaker
         self.dots     = self.bkgItem.dots
                                          
@@ -134,28 +135,29 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             show = showtime['right']                                             
         return show
 
-    def setShowTimeTrackers(self):  ## used by resetSliders
-        if self.bkgItem.scrollable:                                                               
-            fileName = os.path.basename(self.bkgItem.fileName)    
-            if self.bkgMaker.newTracker[fileName]:        
-                self.bkgMaker.newTracker[fileName]['direction'] = self.bkgItem.direction 
-                self.bkgMaker.newTracker[fileName]['showtime']  = self.bkgItem.showtime 
-                             
-### --------------------------------------------------------   
-    def setTrackerFactor(self):
-        if self.bkgItem.scrollable:                                                                 
-            fileName = os.path.basename(self.bkgItem.fileName)  
-            if self.bkgMaker.newTracker[fileName]:  
-                self.bkgMaker.newTracker[fileName]['factor'] = self.bkgItem.factor          
-
-    def setTrackerRate(self):
-        if self.bkgItem.scrollable:                                                               
-            fileName = os.path.basename(self.bkgItem.fileName)  
-            if self.bkgMaker.newTracker[fileName]:
-                self.bkgMaker.newTracker[fileName]['direction'] = self.bkgItem.direction
-                self.bkgMaker.newTracker[fileName]['rate']      = self.bkgItem.rate 
-                self.bkgMaker.newTracker[fileName]['useThis']   = self.bkgItem.useThis
+### --------------------------------------------------------
+    def setTrackerRate(self, bkg):
+        if bkg.scrollable:                                                                        
+            fileName = os.path.basename(bkg.fileName)  
+            if self.bkgMaker.newTracker.get(fileName):
+                self.bkgMaker.newTracker[fileName]['direction'] = bkg.direction
+                self.bkgMaker.newTracker[fileName]['rate']      = bkg.rate 
+                self.bkgMaker.newTracker[fileName]['useThis']   = bkg.useThis
                 
+    def setShowTimeTrackers(self, bkg):  ## used by resetSliders
+        if bkg.scrollable:                                                               
+            fileName = os.path.basename(bkg.fileName)    
+            if self.bkgMaker.newTracker.get(fileName):  
+                self.bkgMaker.newTracker[fileName]['direction'] = bkg.direction 
+                self.bkgMaker.newTracker[fileName]['showtime']  = bkg.showtime 
+                               
+    def setTrackerFactor(self, bkg):
+        if bkg.scrollable:                                                                 
+            fileName = os.path.basename(bkg.fileName)  
+            if self.bkgMaker.newTracker.get(fileName):
+                self.bkgMaker.newTracker[fileName]['factor'] = bkg.factor          
+
+### --------------------------------------------------------             
     def getTrackerRate(self, bkg):  ## used only once - getScreenRate
         fileName = os.path.basename(bkg.fileName) 
         if rate := self.bkgMaker.newTracker[fileName]['rate']:  
@@ -180,7 +182,34 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             self.bkgItem.bkgWorks.setDirection('right')             
         else:
             self.notScrollable()
-           
+    
+    def setWidthHeight(self, img):     
+        if img == None:
+            return   
+        imf = img.scaledToHeight(self.bkgItem.ViewH, Qt.TransformationMode.SmoothTransformation) 
+        if imf.width() > self.bkgItem.ViewW:  ## its scrollable enough
+            self.bkgItem.imgFile = imf
+            self.bkgItem.scrollable = True               
+        else:   
+            try:
+                self.bkgItem.imgFile = img.scaled(  ## fill to width or height
+                    self.bkgItem.ViewW, 
+                    self.bkgItem.ViewH,
+                    Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            except:
+                del img
+                del imf
+                 
+    def setVertical(self, img):  
+        if img == None:
+            return
+        imf = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
+        self.bkgItem.imgFile = imf       
+        if imf.height() > self.bkgItem.ViewH:  ## its scrollable enough
+            self.bkgItem.scrollable = True  
+        del img 
+        del imf
+                
 ### --------------------------------------------------------
     def toggleBkgLocks(self):
         if self.bkgItem:
@@ -214,22 +243,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
         self.bkgItem.scrollable = False  
         return  
- 
-### --------------------------------------------------------
-def addNewTracker(bkg):
-    tmp = {
-        "fileName":    os.path.basename(bkg.fileName),
-        "direction":  bkg.direction,
-        "mirroring":  bkg.mirroring,
-        "factor":     bkg.factor,
-        "rate":       bkg.rate,
-        "showtime":   bkg.showtime,
-        "useThis":    bkg.useThis,
-        "path":       bkg.path,
-        "scrollable": bkg.scrollable,
-    }
-    return tmp
- 
+
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
              
              

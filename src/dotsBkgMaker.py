@@ -28,12 +28,14 @@ class BkgMaker(QWidget):
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
-   
-        self.widget  = None
-        self.bkgItem = None 
-        self.flat     = None
-        self.matte   = None
+           
+        self.init()
     
+    def init(self):
+        self.flat    = None
+        self.matte  = None
+        self.widget = None  ## there is only one
+        
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False
           
@@ -60,21 +62,21 @@ class BkgMaker(QWidget):
             if self.mapper.isMapSet():
                 self.mapper.removeMap()
 
-        self.bkgItem = BkgItem(file, self.canvas) 
-        if self.bkgItem.fileName == None:
+        bkg = BkgItem(file, self.canvas) 
+        if bkg.fileName == None:
             return
         
-        self.bkgItem.setZValue(common['bkgZ'])  ## always on top              
-        self.scene.addItem(self.bkgItem)    
+        bkg.setZValue(common['bkgZ'])  ## always on top              
+        self.scene.addItem(bkg)    
         
-        self.updateZvals(self.bkgItem)  ## update other bkg zvalues 
-        self.setXY(self.bkgItem)
+        self.updateZvals(bkg)  ## update other bkg zvalues 
+        self.setXY(bkg)
             
-        self.bkgItem.bkgWorks.addTracker(self.bkgItem)  ## always - even if not a scroller   
-        self.lockBkg()
+        bkg.bkgWorks.addTracker(bkg)  ## always - even if not a scroller   
+        self.lockBkg(bkg)
                         
         if self.canvas.pathMakerOn:
-            self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
+            bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
                                
 ### --------------------------------------------------------
     def openFlatFile(self, file):  ## read from .bkg file - a 'flat'
@@ -123,139 +125,137 @@ class BkgMaker(QWidget):
             self.flat = None
                                                                             
 ### -------------------------------------------------------- 
-    def addWidget(self, item):  ## background widget
-        self.closeWidget()       
-        if item.type == 'flat':
-            return   
-        self.bkgItem = item             
-        self.widget = BkgWidget(self.bkgItem, self) 
-        self.lockBkg(item)
+    def addWidget(self, bkg):  ## background widget
+        self.closeWidget()      
+        if bkg.type == 'flat':
+            return           
+        self.widget = BkgWidget(bkg, self) 
+        self.lockBkg(bkg)
         p = common['widgetXY']
         p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))       
         self.widget.save = QPointF(p.x(), p.y())
         self.widget.setGeometry(p.x(), p.y(), int(self.widget.WidgetW), \
             int(self.widget.WidgetH))
-        self.bkgItem.bkgWorks.restoreFromTrackers(self.bkgItem)
-        self.resetSliders()
-        self.updateWidget()
+        bkg.bkgWorks.restoreFromTrackers(bkg)
+        self.resetSliders(bkg)
+        self.updateWidget(bkg)
                                      
     def closeWidget(self):
         if self.widget != None:
             self.widget.close()
             self.widget = None
+            self.view.grabKeyboard()
 
-    def updateWidget(self):
-        self.setMirrorBtnText()
-        self.setBtns()
-        self.setLocksText() 
+    def updateWidget(self, bkg):
+        self.setMirrorBtnText(bkg)
+        self.setBtns(bkg)
+        self.setLocksText(bkg) 
         
 ### --------------------------------------------------------
-    def resetSliders(self):
-        if self.bkgItem != None and self.bkgItem.type == 'bkg':                                
-            self.widget.factorDial.setValue(int(self.bkgItem.factor*100))
-            self.widget.factorValue.setText('{0:.2f}'.format(self.bkgItem.factor))
+    def resetSliders(self, bkg):
+        if bkg != None and bkg.type == 'bkg':                                
+            self.widget.factorDial.setValue(int(bkg.factor*100))
+            self.widget.factorValue.setText(f'{bkg.factor:.2f}')
             
-            self.widget.rateSlider.setValue(int(self.bkgItem.rate*100))
-            self.widget.rateValue.setText('{0:.2f}'.format(self.bkgItem.rate))
+            self.widget.rateSlider.setValue(int(bkg.rate*100))
+            self.widget.rateValue.setText(f'{bkg.rate:.2f}')
             
-            self.widget.showtimeSlider.setValue(self.bkgItem.showtime)
-            self.widget.showtimeValue.setText('{0:3d}'.format(self.bkgItem.showtime))
+            self.widget.showtimeSlider.setValue(bkg.showtime)
+            self.widget.showtimeValue.setText(f'{bkg.showtime:3}')
 
-    def setMirrorBtnText(self):  ## if added 
-        if self.bkgItem:  ## shouldn't need this but - could have just started to clear    
+    def setMirrorBtnText(self, bkg):  ## if added 
+        if bkg:  ## shouldn't need this but - could have just started to clear    
            
-            if self.dots.Vertical == False and self.bkgItem.imgFile.width() >= self.bkgItem.showtime + self.bkgItem.ViewW or \
-                self.dots.Vertical == True and self.bkgItem.imgFile.height() >= self.bkgItem.showtime + self.bkgItem.ViewH:  
-                self.bkgItem.scrollable = True    
+            if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
+                self.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
+                bkg.scrollable = True    
                                    
-            if self.bkgItem.scrollable == False:
+            if bkg.scrollable == False:
                 self.widget.mirrorBtn.setText('Not Scrollable')  
-                self.bkgItem.direction = ''       
-            elif self.bkgItem.mirroring == False:
+                bkg.direction = ''       
+            elif bkg.mirroring == False:
                 self.widget.mirrorBtn.setText('Continuous')         
-            elif self.bkgItem.mirroring == True:
+            elif bkg.mirroring == True:
                 self.widget.mirrorBtn.setText('Mirrored')
 
-    def setBtns(self):
-        if self.bkgItem:
-            if self.bkgItem.direction == 'right': 
+    def setBtns(self, bkg):
+        if bkg:
+            if bkg.direction == 'right': 
                 self.widget.rightBtn.setStyleSheet(
                     'background-color: LIGHTGREY')
                 self.widget.leftBtn.setStyleSheet(
                     'background-color: None')            
-            elif self.bkgItem.direction == 'left': 
+            elif bkg.direction == 'left': 
                 self.widget.leftBtn.setStyleSheet(
                     'background-color: LIGHTGREY')
                 self.widget.rightBtn.setStyleSheet(
                     'background-color: None')
-            elif self.bkgItem.direction == 'vertical':
+            elif bkg.direction == 'vertical':
                 self.widget.leftBtn.setText('Vertical')   
                 self.widget.leftBtn.setStyleSheet(
                     'background-color: LIGHTGREY')
                                                      
-    def setLocksText(self):
-        if self.bkgItem:  ## shouldn't need this but - could have just started to clear
-            self.widget.lockBtn.setText('UnLocked') if self.bkgItem.locked == False \
+    def setLocksText(self, bkg):
+        if bkg:  ## shouldn't need this but - could have just started to clear
+            self.widget.lockBtn.setText('UnLocked') if bkg.locked == False \
                 else self.widget.lockBtn.setText('Locked')
                                       
 ### --------------------------------------------------------                                           
-    def deleteBkg(self, bkg):
+    def deleteBkg(self, bkg, where=''):  ## delete tracker as well               
+        if where == '':
+            bkg.bkgWorks.delTracker(bkg)
+        if self.widget:
+            self.closeWidget() 
         self.scene.removeItem(bkg)
         bkg = None
-        if self.widget:
-            self.closeWidget()  
         self.canvas.btnAddBkg.setEnabled(True)
                                                      
-    def lockBkg(self, bkg=''):
-        if bkg != '':
-            self.bkgItem = bkg
-        if self.bkgItem and self.bkgItem.type == 'bkg':  
-            self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            self.bkgItem.locked = True
+    def lockBkg(self, bkg):
+        if bkg and bkg.type == 'bkg':  
+            bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+            bkg.locked = True
             if self.widget: self.widget.lockBtn.setText('Locked')
                             
-    def unlockBkg(self, bkg=''):
-        if bkg != '':
-            self.bkgItem = bkg
-        if self.bkgItem and self.bkgItem.type == 'bkg':  
-            self.bkgItem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
-            self.bkgItem.locked = False
+    def unlockBkg(self, bkg):
+        if bkg and bkg.type == 'bkg':  
+            bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+            bkg.locked = False
             if self.widget: self.widget.lockBtn.setText('UnLocked')
   
 ### --------------------------------------------------------            
-    def showtime(self):  ## 'run' from widget button
-        if self.bkgItem.useThis == '':
-            return   
+    def showtime(self, bkg):  ## 'run' from widget button
+        if bkg.useThis == '':
+            return  
         self.closeWidget()
         p = QCursor.pos()
         QCursor.setPos(int(p.x()+220), int(p.y()+650.0))  ## works for 720
         self.canvas.showtime.run()
      
-    def flopIt(self):  ## used by widget 
-        if self.bkgItem and self.bkgItem.type == 'bkg':  
-            self.bkgItem.setMirrored(False) if self.bkgItem.flopped \
-                else self.bkgItem.setMirrored(True)
+    def flopIt(self, bkg):  ## used by widget 
+        if bkg and bkg.type == 'bkg':  
+            bkg.setMirrored(False) if bkg.flopped \
+                else bkg.setMirrored(True)
                                                                              
     def front(self, bkg):
         bkg.setZValue(common['bkgZ'])
         self.updateZvals(bkg)
-        self.lockBkg()  
-        self.closeWidget() 
+        self.lockBkg(bkg)  
+        self.closeWidget()
         
     def back(self, bkg): 
         bkg.setZValue(self.mapper.lastZval('flat')-1) if bkg.type == 'flat' \
             else bkg.setZValue(self.mapper.lastZval('bkg')-1)  
-        self.lockBkg()   
-        self.closeWidget() 
+        self.lockBkg(bkg)   
+        self.closeWidget()
         
     def backOne(self, bkg):    
         bkg.setZValue(bkg.zValue()-1)
-        self.lockBkg()   
+        self.lockBkg(bkg)   
         self.closeWidget()
         
     def upOne(self, bkg):    
         bkg.setZValue(bkg.zValue()+1)
-        self.lockBkg()   
+        self.lockBkg(bkg)   
         self.closeWidget()
                 
     def updateZvals(self, bkg):  ## move the rest back one Z and lock them

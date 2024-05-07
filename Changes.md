@@ -16,6 +16,9 @@ Other than bug-fixes, this may be as far as I go with **dots**, at least for the
  
 New Video: <https://youtu.be/nIOqAWsxI3s>
 
+**May 7 2024**  
+Fixed a bug in scrolling backgrounds and along the way updated most of the **bkg** files as well.  When I wrote **dotsBkgMaker.py** there was one background to consider - now there can be more than one. Plus changes to the tracker dictionary code to make it more consistent.
+
 ----
 
 

@@ -81,9 +81,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if copy == None:          
             try:   ## sets if scrollable and self.imgfile if not already set
                 if not self.dots.Vertical: 
-                    self.bkgWorks.setWidthHeight(QImage(self.fileName)) 
+                    self.bkgScrollWrks.setWidthHeight(QImage(self.fileName)) 
                 else:
-                    self.bkgWorks.setVertical(QImage(self.fileName))
+                    self.bkgScrollWrks.setVertical(QImage(self.fileName))
             except Exception:
                 MsgBox('error on loading: ' + self.fileName)
                 return
@@ -96,7 +96,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.id = 0  ## not used except for conisistency          
         self.flopped = False
         self.locked = False
-                    
+         
         self.width  = self.imgFile.width()
         self.height = self.imgFile.height() 
             
@@ -137,7 +137,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def setPixKeys(self, key):
         self.key = key 
                            
-    def mousePressEvent(self, e):
+    def mousePressEvent(self, e):  ## combination
         if not self.canvas.pathMakerOn:       
             if e.button() == Qt.MouseButton.RightButton:
                 self.bkgMaker.addWidget(self)                    
@@ -183,7 +183,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
                     self.direction  == 'vertical' and int(value.y()) >= self.height:
                     self.anime.stop()
-                    self.bkgMaker.deleteBkg(self) 
+                    self.bkgMaker.deleteBkg(self, 'nope') 
                                                     
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
  
@@ -201,11 +201,11 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             item.setMirrored(False) if self.flopped else item.setMirrored(True) 
         else:
             item.setMirrored(False)
-                            
+                                 
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     
-        self.bkgWorks.restoreFromTrackers(item, 'addnxt')  ## txt for debugging  
+        self.bkgWorks.restoreFromTrackers(item)  ## txt for debugging  
         
         path = self.setNode(item)  ## sets property used in animation        
         item.anime = self.bkgWorks.setNextPath(path, item) 
@@ -233,7 +233,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             return 
    
         self.setStartingPos(bkg)  ## not the scrolling position      
-        bkg.rate = bkg.bkgWorks.getScreenRate(which)  ## also sets tracker rate for 'next' 
+        bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return self.bkgWorks.setFirstPath(path, bkg) 
                
 ### --------------------------------------------------------  

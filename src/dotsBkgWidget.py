@@ -1,13 +1,13 @@
 
 import os.path
 
-from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF, pyqtSlot, QSize
+from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QSlider, QHBoxLayout, QVBoxLayout, QPushButton
                             
 from dotsBkgWorks       import BkgWorks
-                      
+      
 ### ------------------- dotsShadowWidget -------------------                                                                                                                                                            
 class BkgWidget(QWidget):  
 ### -------------------------------------------------------- 
@@ -55,17 +55,26 @@ class BkgWidget(QWidget):
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)    
-           
-        self.view.keysSignal[str].connect(self.setKeys)                                                                                         
+                                                                                                   
         self.show()
+        
+        self.grabKeyboard()  ## note !!!
                    
 ### --------------------------------------------------------
-    @pyqtSlot(str)
-    def setKeys(self, key):  ## managing storyboard and pathMaker          
-        if key == 'up':  ## scale up  
+    def keyPressEvent(self, e):
+        key = e.key()    
+        if key == Qt.Key.Key_Up:  
             self.setBkgRateValue(int(self.bkgItem.rate *100) + 5)
-        elif key == 'down':  ## scale down
+        elif key == Qt.Key.Key_Down: 
             self.setBkgRateValue(int(self.bkgItem.rate *100) - 5)
+        elif key ==Qt.Key.Key_S and self.canvas.control != '':
+            self.canvas.showtime.stop()     
+        elif key == Qt.Key.Key_Space:          
+            self.canvas.showtime.pause()
+        elif key == Qt.Key.Key_R:          
+            self.bkgMaker.showtime(self.bkgItem)  ## make sure a rates been set
+        else:
+            key = ''
                      
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -98,26 +107,26 @@ class BkgWidget(QWidget):
         e.accept()
  
 ### --------------------------------------------------------                                             
-    def setBkgRateValue(self, val):
+    def setBkgRateValue(self, val): 
         if self.bkgItem != None and self.bkgItem.type == 'bkg':                         
             self.bkgItem.rate = val/100  
             self.rateSlider.setValue(val)    
             self.rateValue.setText(f'{val/100:.2f}')   
-            self.bkgScrollWrks.setTrackerRate()
+            self.bkgScrollWrks.setTrackerRate(self.bkgItem)
                        
     def setBkgShowtimeValue(self, val):
         if self.bkgItem != None and self.bkgItem.type == 'bkg':  
             self.bkgItem.showtime = val   
             self.showtimeSlider.setValue(val)   
             self.showtimeValue.setText(f'{val:2d}')
-            self.bkgScrollWrks.setShowTimeTrackers()
+            self.bkgScrollWrks.setShowTimeTrackers(self.bkgItem)
             
     def setBkgFactorValue(self, val):
         if self.bkgItem != None and self.bkgItem.type == 'bkg':  
             self.bkgItem.factor = val/100
             self.factorDial.setValue(val)
             self.factorValue.setText(f'{val/100:.2f}')
-            self.bkgScrollWrks.setTrackerFactor()
+            self.bkgScrollWrks.setTrackerFactor(self.bkgItem)
      
 ### --------------------------------------------------------
     def sliderGroup(self):
@@ -223,14 +232,14 @@ class BkgWidget(QWidget):
         centerBtn = QPushButton('Center')
         quitBtn   = QPushButton('Close')
               
-        resetBtn.clicked.connect(self.bkgWorks.reset)
-        runBtn.clicked.connect(self.bkgMaker.showtime)    
+        resetBtn.clicked.connect(lambda: self.bkgWorks.reset(self.bkgItem))
+        runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))    
         self.lockBtn.clicked.connect(self.bkgScrollWrks.toggleBkgLocks)   
-        flopBtn.clicked.connect(self.bkgMaker.flopIt)
+        flopBtn.clicked.connect(lambda: self.bkgMaker.flopIt(self.bkgItem))  
         matteBtn.clicked.connect(self.bkgWorks.setMatte)
         centerBtn.clicked.connect(self.bkgWorks.centerBkg)    
         deleteBtn.clicked.connect(lambda: self.bkgMaker.deleteBkg(self.bkgItem))  
-        quitBtn.clicked.connect(self.bkgMaker.closeWidget)
+        quitBtn.clicked.connect(self.bkgMaker.closeWidget) 
     
         vbox = QVBoxLayout(self)
         vbox.addWidget(resetBtn)
@@ -276,10 +285,4 @@ class BkgWidget(QWidget):
 ### ------------------- dotsDotsWidget ---------------------
   
 
-    # cursor: QCursor = QCursor()  ## ----->>  leaving this in as it works as well
-    # QGuiApplication.setOverrideCursor(cursor)
-    # p = self.mapFromGlobal(cursor.pos())  
-    # cursor.setPos(p.x()+420, int(p.y()+850.0))  ## worked for 720 
-    # QGuiApplication.changeOverrideCursor(cursor)      
-
-
+    

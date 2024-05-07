@@ -219,15 +219,15 @@ class StoryBoard(QWidget):
         self.sideCar.clearWidgets()    
         self.showtime.stop('clear')   
         self.showWorks.cleanupMenus(self.showbiz)     
-        self.clearSceneItems() 
-        self.scene.clear()          
-        self.mapper.clearMap()          
+        self.clearSceneItems()          
+        self.mapper.clearMap()    
+        self.scene.clear()       
         self.btnAddBkg.setEnabled(True)                  
         self.dots.statusBar.clearMessage()
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.bkgMaker.newTracker.clear()
+        self.bkgMaker.init()
         self.view.grabKeyboard()
          
     def loadSprites(self):

@@ -128,7 +128,7 @@ class ShowBiz:
         else:
             self.showtime.run()
       
-    def runThis(self, file):  ## doesn't ask - called by demo menu - runs hatss
+    def runThis(self, file):  ## doesn't ask - called by demo menu - runs hats
         if len(self.scene.items()) == 0:
             self.openPlay(paths['playPath'] + file)  ## also adds pix to scene
             self.canvas.openPlayFile = file  ## give it time to load 
@@ -179,7 +179,7 @@ class ShowBiz:
         self.mapper.clearMap() 
         self.locks = 0
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.newTracker.clear()          
+        self.canvas.bkgMaker.newTracker.clear()        
         ## number of pixitems, backgrounds zval, number of shadows        
         kix, bkgz, ns = 0, 0, 0
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
