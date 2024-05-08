@@ -19,6 +19,11 @@ New Video: <https://youtu.be/nIOqAWsxI3s>
 **May 7 2024**  
 Fixed a bug in scrolling backgrounds and along the way updated most of the **bkg** files as well.  When I wrote **dotsBkgMaker.py** there was one background to consider - now there can be more than one. Plus changes to the tracker dictionary code to make it more consistent.
 
+**May 8 2024**  
+Discovered I had a variable that wasn't getting saved which could cause some problems if you tried to run a scrolling background and it wouldn't. If that's a problem do a reset.  Once you've a background running, save it - that should take care of it.  A small change to VHX, set the opening horizontal width to 1200px and 
+the opening vertical to 900px.
+
+
 ----
 
 
