@@ -117,7 +117,7 @@ class ShowBiz:
         self.demoMenu.closeDemoMenu()
    
 ### --------------------------------------------------------        
-    def runThese(self):      
+    def runThese(self):     
         if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):
             if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
                 self.snakes.rerun(self.snakes.what)  

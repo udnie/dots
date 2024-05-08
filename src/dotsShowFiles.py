@@ -156,6 +156,8 @@ class ShowFiles:
             tmp['showtime'] = 0
         if 'path' not in tmp.keys(): 
             tmp['path'] = ''
+        if 'useThis' not in tmp.keys(): 
+            tmp['useThis'] = ''
    
         bkg.locked      = tmp['locked']                 
         bkg.anime       = tmp['anime']
@@ -166,6 +168,7 @@ class ShowFiles:
         bkg.rate        = tmp['rate']
         bkg.showtime    = tmp['showtime']
         bkg.path        = tmp['path']
+        bkg.useThis     = tmp['useThis']
                           
         result = bkg.bkgWorks.addTracker(bkg)  
         if result == False:  ## must be a dupe
@@ -265,6 +268,7 @@ class ShowFiles:
             'rate':         pix.rate,
             'showtime':     pix.showtime,  
             'path':         pix.path,    
+            'useThis':      pix.useThis,  
         }     
         return tmp
 

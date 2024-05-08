@@ -183,7 +183,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
                     self.direction  == 'vertical' and int(value.y()) >= self.height:
                     self.anime.stop()
-                    self.bkgMaker.deleteBkg(self, 'nope') 
+                    self.bkgMaker.deleteBkg(self, 'nope')  ## don't delete tracker
                                                     
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
  

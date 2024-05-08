@@ -93,13 +93,17 @@ class BkgWorks:
             return 0  
 
         if which == 'first':
-            rate = rate[0]        
+            rate = rate[0]   ## same for 'first'       
         elif bkg.rate == 0:  ## sets tracker rate for 'next'
+            
+            if bkg.useThis == '':  ## shouldn't happen - wasn't getting carried over
+                rate = self.getThisRate(bkg)  
+            
             if bkg.direction == 'right':
                 rate = rate[2]
             else:
                 rate = rate[1]     
-                    
+                
             erat = self.bkgScrollWrks.getTrackerRate(bkg)
             if erat > 0: rate = erat  ## fixes not carrying over rate from a file
      

@@ -9,7 +9,7 @@ ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
 SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)  ## '</>'
 Ticks    = (100,50,10)  ## how often to draw a line and size
 
-VWidth, VHeight = 1000, 70
+VWidth, VHeight, BHeight = 1200, 70, 900  
 
 # from PyQt6.QtCore import QT_VERSION_STR
 # from PyQt6.QtCore import PYQT_VERSION_STR
@@ -104,7 +104,7 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         key = e.key()
         if key == Qt.Key.Key_V:
             self.horizontal = False
-            self.resize(VHeight, VWidth)
+            self.resize(VHeight, BHeight)
             self.center()
         elif key == Qt.Key.Key_H:
             self.horizontal = True
@@ -172,7 +172,7 @@ class VHX(QWidget):  ## yet another screen pixel ruler
             x = int(((ctr.x() * 2 ) - VWidth)/2)
             self.move(x, ctr.y()-100)
         else:
-            y = int((((ctr.y() * 2 ) - VWidth)/2))
+            y = int((((ctr.y() * 2 ) - BHeight)/2))
             x = int(ctr.x()-self.width()/2)
             self.move(x, y-50)
 

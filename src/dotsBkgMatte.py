@@ -243,7 +243,7 @@ class HelpMenu:  ## for canvas - one key commands
         self.helpMenu.addSeparator()
         self.helpMenu.addAction('Shift-R - Run Animation')
         self.helpMenu.addSeparator()
-        self.helpMenu.addAction('Shift-P - Pause/Resume Animation')
+        self.helpMenu.addAction('Space   - Pause/Resume')
         self.helpMenu.addSeparator()
         self.helpMenu.addAction('Shift-S - Stop Animation')
         self.helpMenu.addSeparator()
