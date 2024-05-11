@@ -3,7 +3,7 @@ import os
 
 from PyQt6.QtCore       import Qt
 from PyQt6.QtGui        import QFont, QKeySequence, QShortcut
-from PyQt6.QtWidgets    import QTableView, QAbstractItemView
+from PyQt6.QtWidgets    import QTableView, QAbstractItemView, QHeaderView
 
 
 from dotsScreens        import getCtr
@@ -19,7 +19,9 @@ MaxCols = 15
 MinCols = 7
 
 ColWidth  = 100  ## seems to be the default sizes on my mac 
-RowHeight = 30   
+RowHeight = 30  
+
+ColWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
 
 ### --------------------------------------------------------
 class TableView:  ## formats a json .play file to display missing files or not
@@ -47,6 +49,7 @@ class TableView:  ## formats a json .play file to display missing files or not
              
         self.Missingfiles = []  ## copy of missing files
                 
+### --------------------------------------------------------              
         self.tableView = QTableView()        
         self.tableView.horizontalHeader().setStretchLastSection(True)
     
@@ -68,7 +71,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         
         self.tableView.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
-                 
+                    
         ## dbl-click on any row to close the tableview except the header or white space
         self.tableView.doubleClicked.connect(self.bye)
         
@@ -88,7 +91,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.shortcut.activated.connect(self.deleteSelectedRows) 
  
         self.tableView.setAlternatingRowColors(True) 
-                
+               
         self.makeTable(self.data)  ## which calls addTable further down - lots of fussy stuff in between     
                     
 ### --------------------------------------------------------
@@ -104,6 +107,9 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.model = TableModel(data, self.cols, self.hdr)   
         self.tableView.setModel(self.model)
       
+        for i in ColWidths:  ## why doesn't anyone know this
+            self.tableView.setColumnWidth(i, 85)     
+      
         ## make changes to the table layout by row - good to know - thanks Martin
         for i in save: 
             self.model.setHdrColor(i, '#e2e2e2')  ## make it look like a header
@@ -113,7 +119,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.model.setHdrColor(i, 'yellow')  ## missing files 
             self.model.setMisses(i, font)
             
-        self.tableView.resize(width, height)
+        self.tableView.resize(width-20, height)
         self.tableView.show()
    
         p, g = self.tableView.pos(), getCtr()  ## move it up a bit higher                  

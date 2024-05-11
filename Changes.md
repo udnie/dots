@@ -24,7 +24,7 @@ Fixed a bug in scrolling backgrounds and along the way updated most of the **bkg
 Discovered I had a variable that wasn't getting saved which could cause some problems if you tried to run a scrolling background and it wouldn't. If that's a problem do a reset.  Once you've a background running, save it and reload it - that should take care of it.  A small change to VHX, set the opening horizontal width to 1200px and the opening vertical to 900px.
 
 **May 10 2024**   
-Replaced .format(s) with f-strings - makes a better read. Added a **'\'** key to trigger an info tag for either sprites or backgrounds.  It's already in backgrounds but now one key works for either. The 'opt' was oversubscribed in **Pixitems**.
+Replaced .format(s) with f-strings - makes a better read. Added a **'\'** key to trigger an info tag for either sprites or backgrounds.  It's already in backgrounds but now one key works for either. The 'opt' was oversubscribed in **Pixitems**.  Reduced many of the column widths in the Json viewer.
 
 ----
 
