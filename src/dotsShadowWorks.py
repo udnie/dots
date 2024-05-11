@@ -25,13 +25,13 @@ class Works:  ## small functions that were in ShadowMaker
 ### --------------------------------------------------------
     def resetSliders(self): 
         self.maker.widget.opacitySlider.setValue(int(self.maker.alpha*100))
-        self.maker.widget.opacityValue.setText('{0:.2f}'.format((self.maker.alpha)))
+        self.maker.widget.opacityValue.setText(f'{self.maker.alpha:.2f}')
         
         self.maker.widget.scaleSlider.setValue(int(self.maker.scalor*100))
-        self.maker.widget.scaleValue.setText('{0:.2f}'.format(self.maker.scalor))
+        self.maker.widget.scaleValue.setText(f'{self.maker.scalor:.2f}')
         
         self.maker.widget.rotaryDial.setValue(int(self.maker.rotate))
-        self.maker.widget.rotateValue.setText('{:3d}'.format(int(self.maker.rotate)))
+        self.maker.widget.rotateValue.setText(f'{self.maker.rotate:3d}')
          
     def closeWidget(self):
         if self.maker.widget != None:

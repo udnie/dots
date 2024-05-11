@@ -256,7 +256,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
         pix.shadowMaker.isActive == True:
         opacity.setEndValue(.001)
     else:
-        opacity.setEndValue(1)
+        opacity.setEndValue(node.pix.opacity())
         
     group = QParallelAnimationGroup()
 

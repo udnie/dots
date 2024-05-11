@@ -58,10 +58,12 @@ class BkgWorks:
             self.bkgScrollWrks.notScrollable()   
             return     
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
+            
             if self.dots.Vertical:   ## no direction equals 'not scrollable'
                 self.bkgItem.direction = 'vertical'
             else:
                 self.bkgItem.direction = key
+                
             self.bkgItem.tag = 'scroller'    
             self.bkgItem.rate = 0     
                    
@@ -85,20 +87,22 @@ class BkgWorks:
         but only once per scrolling background - rates can vary '''
 ### --------------------------------------------------------  
     def getScreenRate(self, bkg, which =''): 
-        rate = self.getThisRate(bkg)  
+        rate = self.getThisRate(bkg) 
+         
         if rate == 0:
             MsgBox(f'Error Loading Screen Rates File {bkg.useThis}', 5)
             bkg.useThis = ''
-            self.bkgMaker.screenrate = {}
+            self.bkgMaker.screenrate.clear()
             return 0  
 
         if which == 'first':
-            rate = rate[0]   ## same for 'first'       
+            rate = rate[0]   ## same for 'first'   
+                
         elif bkg.rate == 0:  ## sets tracker rate for 'next'
             
             if bkg.useThis == '':  ## shouldn't happen - wasn't getting carried over
                 rate = self.getThisRate(bkg)  
-            
+                 
             if bkg.direction == 'right':
                 rate = rate[2]
             else:
@@ -109,10 +113,12 @@ class BkgWorks:
      
             bkg.rate = rate 
             self.bkgScrollWrks.setTrackerRate(bkg)
+            
         return rate
     
 ### --------------------------------------------------------
-    def getThisRate(self, bkg):
+    ## rate can vary within a scene by background width
+    def getThisRate(self, bkg): 
         bkg.useThis == '' 
         if common['Screen']  == '1080' and bkg.width  < 1280 or \
             common['Screen'] == '1215' and bkg.width  < 1440 or \
@@ -148,7 +154,7 @@ class BkgWorks:
             path.setEndValue(QPoint(0, -bkg.height))
         return path
            
-    def setFirstPath(self, path, bkg):       
+    def setFirstPath(self, path, bkg):  ## 'first' is already filling the scene  
         fact = bkg.factor  
         if bkg.direction == 'left':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact))) 
@@ -216,7 +222,7 @@ class BkgWorks:
             tmp['path']       = ''
             tmp['scrollable'] = False
              
-        bkg.tag        = ''
+        bkg.tag        = ''  ## no longer a scroller
         bkg.direction  = ''             
         bkg.mirroring  = False
         bkg.factor     = 1.0

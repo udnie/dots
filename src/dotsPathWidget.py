@@ -104,7 +104,7 @@ class PathWidget(QWidget):
     def Scale(self, val):
         op = (val/100)
         self.scalePath(op)
-        self.scaleValue.setText(f'{op:.2f}')  ## .format(op))
+        self.scaleValue.setText(f'{op:.2f}') 
                                
     def scalePath(self, val): 
         per = (val - self.scale) / self.scale    

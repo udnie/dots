@@ -7,8 +7,9 @@ from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
 from dotsPixFrameWorks  import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
+from dotsBkgScrollWrks  import tagBkg
 
-## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 import dotsAnimation  as Anime
@@ -94,6 +95,7 @@ class PixItem(QGraphicsPixmapItem):
     @pyqtSlot(str)  ## actually updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
+ 
         if self.isHidden or self.isSelected() and self.locked == False:
             if key in RotateKeys:
                 self.works.rotateThis(key)
@@ -161,11 +163,11 @@ class PixItem(QGraphicsPixmapItem):
                 elif self.key == ',':
                     p = self.zValue()-1  
                 elif self.key == '.':
-                    p = self.zValue()+1  
-                self.setZValue(p)
-                self.toggleThisTag(self.id) 
-            elif self.key == 'tag':
-                self.mapper.toggleTagItems(self.id)
+                    p = self.zValue()+1   
+                self.setZValue(p)               
+                tagBkg(self, self.pos())  ## works better for single item
+            elif self.key == 'tag':  ## back-slash '\'
+                tagBkg(self, self.pos())
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
         e.accept()

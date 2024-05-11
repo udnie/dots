@@ -78,14 +78,14 @@ class PixWidget(QWidget):
         self.pix.setOriginPt() 
         self.pix.setRotation(val) 
         self.pix.rotation = val    
-        self.rotateValue.setText('{:3d}'.format(val))
+        self.rotateValue.setText(f'{val:3d}')
   
     def Scale(self,val):
         self.pix.setOriginPt() 
         op = (val/100)
         self.pix.setScale(op)
         self.pix.scale = op
-        self.scaleValue.setText('{0:.2f}'.format(op))
+        self.scaleValue.setText(f'{op:.2f}')
   
     def Opacity(self, val):
         op = (val/100)
@@ -93,7 +93,7 @@ class PixWidget(QWidget):
             op = 0.001
         self.pix.setOpacity(op)
         self.pix.alpha2 = op
-        self.opacityValue.setText('{0:.2f}'.format(op)) 
+        self.opacityValue.setText(f'{op:.2f}') 
                                     
 ### -------------------------------------------------------- 
     def sliderGroup(self):

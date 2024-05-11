@@ -163,12 +163,12 @@ class TagsAndPaths:
           
         self.TagItTwo(token, tag, color, x, y, pix.zValue())
         
+    ## this way I can stretch it for backgrounds and pixitems
     def TagItTwo(self, token, tag, color, x, y, z, src=''):
-        ## this way I can stretch it for backgrounds
         tag = TagIt(token, tag, color, z)
         tag.setZValue(self.mapper.toFront(45.0))
-        if src == 'bkg':
-            tag.setPos(x-50.0, y-30.0)  ## position it near cursor
+        if src in ('bkg', 'pix'):  ## single selections
+            tag.setPos(x-50.0, y-10.0)  ## position it near cursor
             self.scene.addItem(tag)
         else:
             tag.setPos(x,y)

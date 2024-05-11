@@ -85,12 +85,14 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
     def updateDictionary(self):
         if self.bkgItem.useThis == '':
             return  
+        
         test = False
         rate = self.bkgMaker.screenrate[self.bkgItem.useThis][common['Screen']]  
          
         if self.bkgItem.direction == 'right' and rate[2] != self.bkgItem.rate:
             rate[2] = self.bkgItem.rate
             test = True
+            
         elif self.bkgItem.direction == 'left' and rate[1] != self.bkgItem.rate:
             rate[1] = self.bkgItem.rate
             test = True 
@@ -99,7 +101,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             MsgBox("Screen Rates Haven't Changed", 5)
             return   
     
-        img = QImage(paths['spritePath'] + "doral.png")
+        img = QImage(paths['spritePath'] + "doral.png")  ## icon .png
         pixmap = QPixmap(img)    
    
         msgbox = QMessageBox()
@@ -124,6 +126,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         fileName = os.path.basename(self.bkgItem.fileName)  
         if show := self.bkgMaker.newTracker[fileName]['showtime']:
             return show
+        
         show = 0
         if 'snakes' in self.bkgItem.fileName and self.bkgItem.direction != 'vertical':
             show = showtime['snakes']   
@@ -217,24 +220,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
                 self.bkgMaker.lockBkg(self.bkgItem) 
             else:
                 self.bkgMaker.unlockBkg(self.bkgItem) 
-                                                                                  
-    def tagBkg(self, bkg, pos):
-        self.bkgItem = bkg
-        x, y = pos.x(), pos.y()
-        z = self.bkgItem.zValue()
-        text = QGraphicsSimpleTextItem() 
-        if self.bkgItem.locked == True:
-            text = 'Locked' 
-        else:
-            text = 'Unlocked'
-        fileName = os.path.basename(bkg.fileName)
-        tag = fileName + " " + text    
-        if self.bkgItem.direction == ' left':
-            tag = tag + ' Left'
-        elif self.bkgItem.direction == 'right': 
-            tag = tag + ' Right'            
-        self.bkgItem.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor('orange'), x, y, z, 'bkg')
-             
+                                                                                               
     def filePixX(self, file, bkg):  ## also see dumpBkgs - shift 'B'
         fileName = os.path.basename(bkg.fileName)
         print(f'tracker {fileName}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.rate}\t{bkg.factor}\t{bkg.zValue()}')
@@ -244,6 +230,36 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         self.bkgItem.scrollable = False  
         return  
 
+## press the 'opt' key and click on the background or 
+## the '\' backslash and click on pixitem - sharing it 
+def tagBkg(bkg, pos):  
+    x, y, z = pos.x(), pos.y(), bkg.zValue()   
+    text = QGraphicsSimpleTextItem() 
+        
+    if bkg.locked == True:
+        text = 'Locked' 
+    else:
+        text = 'Unlocked'
+      
+    src = 'bkg'  
+    color = 'orange'
+    
+    fileName = os.path.basename(bkg.fileName)
+    tag = fileName + " " + text  
+       
+    if bkg.type == 'bkg':
+        if bkg.direction == ' left':
+            tag = tag + ' Left'
+        elif bkg.direction == 'right': 
+            tag = tag + ' Right'
+        tag = tag + ' ' + bkg.useThis    
+   
+    elif bkg.type == 'pix' and z == bkg.canvas.mapper.toFront():
+        color = 'yellow' 
+        src = 'pix'
+        
+    bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
+        
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
              
              

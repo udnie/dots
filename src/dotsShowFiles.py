@@ -53,7 +53,7 @@ class ShowFiles:
             self.scene.addItem(pix) 
         
         if pix.type == 'pix': 
-            pix = self.setPixitem(pix, tmp)
+            pix = self.setPixitem(pix, tmp) 
             pix.setZValue(z)
 
         if 'tag' not in tmp.keys():     ## pix and bkg
@@ -101,9 +101,9 @@ class ShowFiles:
             tmp['y'] = 0     
         if 'z' not in tmp.keys():
             tmp['z'] = 0 
-    
-        pix.x    = float('{0:.2f}'.format(tmp['x']))
-        pix.y    = float('{0:.2f}'.format(tmp['y']))   
+  
+        pix.x   = float(f"{tmp['x']:.2f}")
+        pix.y   = float(f"{tmp['y']:.2f}")    
         pix.setZValue(tmp['z']),  ## use the new one
              
         if pix.type not in ('flat', 'frame'):   
@@ -167,8 +167,8 @@ class ShowFiles:
         bkg.factor      = tmp['factor']
         bkg.rate        = tmp['rate']
         bkg.showtime    = tmp['showtime']
-        bkg.path        = tmp['path']
         bkg.useThis     = tmp['useThis']
+        bkg.path        = tmp['path']
                           
         result = bkg.bkgWorks.addTracker(bkg)  
         if result == False:  ## must be a dupe
@@ -211,34 +211,34 @@ class ShowFiles:
     def savePix(self, pix):  
         p = pix.pos() 
         tmp = {
-            'fileName':  os.path.basename(pix.fileName),
-            'type':     'pix',
-            'x':        float('{0:.2f}'.format(p.x())),
-            'y':        float('{0:.2f}'.format(p.y())),
-            'z':        pix.zValue(),
-            'tag':      pix.tag,
-            'locked':   pix.locked,
-            'mirror':   pix.flopped,
-            'rotation': pix.rotation,
-            'scale':    float('{0:.2f}'.format(pix.scale)),
-            'alpha2':   float('{0:.2f}'.format(pix.alpha2)), 
-            'part':     pix.part,
+            'fileName':      os.path.basename(pix.fileName),
+            'type':         'pix',
+            'x':            float(f'{pix.x:.2f}'),
+            'y':            float(f'{pix.y:.2f}'),   
+            'z':            pix.zValue(),
+            'tag':          pix.tag,
+            'locked':       pix.locked,
+            'mirror':       pix.flopped,
+            'rotation':     pix.rotation,
+            'scale':        float(f'{pix.scale:.2f}'),
+            'alpha2':       float(f'{pix.alpha2:.2f}'),
+            'part':         pix.part,
         }   
         ## pix.shadowMaker maintains shadow data over shadow updates
         if pix.shadowMaker.isActive == True and pix.shadowMaker.shadow != None: 
             try:
                 shadow = {  
-                    'alpha':    float('{0:.2f}'.format(pix.shadowMaker.alpha)),
-                    'scalor':   float('{0:.2f}'.format(pix.shadowMaker.scalor)),
+                    'alpha':    float(f'{pix.shadowMaker.alpha:.2f}'),
+                    'scalor':   float(f'{pix.shadowMaker.scalor:.2f}'),
                     'rotate':   pix.shadowMaker.rotate,
                     'width':    pix.shadowMaker.width,
                     'height':   pix.shadowMaker.height,
-                    'pathX':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].x()))
-                                    for k in range(4)],
-                    'pathY':    [float('{0:.2f}'.format(pix.shadowMaker.path[k].y()))
-                                    for k in range(4)],
                     'flopped':   pix.shadowMaker.flopped,
-                    'linked':   pix.shadowMaker.linked,
+                    'linked':   pix.shadowMaker.linked,            
+                    'pathX':    [float(f'{pix.shadowMaker.path[k].x():.2f}')
+                                    for k in range(4)],
+                    'pathY':    [float(f'{pix.shadowMaker.path[k].y():.2f}')
+                                    for k in range(4)],
                 }
                 tmp.update(shadow)  
             except Exception:
@@ -251,49 +251,49 @@ class ShowFiles:
     def saveBkgnd(self, pix):
         p = pix.boundingRect()      
         tmp = {
-            'fileName':  os.path.basename(pix.fileName),
-            'type':     'bkg',
-            'x':        float('{0:.2f}'.format(pix.x)),
-            'y':        float('{0:.2f}'.format(pix.y)),
-            'z':        pix.zValue(),
-            'tag':      pix.tag,
-            'locked':   pix.locked,
-            'mirror':   pix.flopped,
-            'width':    int(p.width()),
-            'height':   int(p.height()),
+            'fileName':     os.path.basename(pix.fileName),
+            'type':         'bkg',
+            'x':            float(f'{pix.x:.2f}'),
+            'y':            float(f'{pix.y:.2f}'),
+            'z':            pix.zValue(),
+            'tag':          pix.tag,
+            'locked':       pix.locked,
+            'mirror':       pix.flopped,
+            'width':        int(p.width()),
+            'height':       int(p.height()),
             'scrollable':   pix.scrollable,
             'direction':    pix.direction,
             'mirroring':    pix.mirroring,
             'factor':       pix.factor,
             'rate':         pix.rate,
             'showtime':     pix.showtime,  
-            'path':         pix.path,    
             'useThis':      pix.useThis,  
+            'path':         pix.path,    
         }     
         return tmp
 
     def saveFrame(pix):       
         tmp = {
-            'fileName':  os.path.basename(pix.fileName),
-            'type':     'frame',
-            'x':        float('{0:.2f}'.format(pix.x)),
-            'y':        float('{0:.2f}'.format(pix.y)),
-            'z':        pix.zValue(),   
-            'tag':      '',
-            'locked':   pix.locked,
+            'fileName':     os.path.basename(pix.fileName),
+            'type':         'frame',
+            'x':            float(f'{pix.x:.2f}'),
+            'y':            float(f'{pix.y:.2f}'), 
+            'z':            pix.zValue(),   
+            'tag':          '',
+            'locked':       pix.locked,
         }
         return tmp
 
     def saveFlat(self, pix):       
         tmp = {
-            'fileName':  'flat',
-            'type':     'flat',
-            'x':        float('{0:.2f}'.format(pix.x)),
-            'y':        float('{0:.2f}'.format(pix.y)),   
-            'z':        pix.zValue(),
-            'tag':      pix.color.name(),
-            'locked':   pix.locked,
-            'color':    pix.color.name(),
+            'fileName':     'flat',
+            'type':         'flat',
+            'x':            float(f'{pix.x:.2f}'),
+            'y':            float(f'{pix.y:.2f}'),
+            'z':            pix.zValue(),
+            'tag':          pix.color.name(),
+            'locked':       pix.locked,
+            'color':        pix.color.name(),
         }  
         return tmp
    

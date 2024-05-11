@@ -156,8 +156,8 @@ class PathWays:
                 with open(f[0], 'w') as fp:
                     for i in range(len(self.pathMaker.pts)):
                         p = self.pathMaker.pts[i]
-                        x = '{0:.2f}'.format(p.x())
-                        y = '{0:.2f}'.format(p.y())
+                        x = f'{p.x():.2f}'
+                        y = f'{p.y():.2f}'
                         fp.write(x + ', ' + y + '\n')
                     fp.close()
             except IOError:

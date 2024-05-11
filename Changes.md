@@ -16,13 +16,15 @@ Other than bug-fixes, this may be as far as I go with **dots**, at least for the
  
 New Video: <https://youtu.be/nIOqAWsxI3s>
 
+---
 **May 7 2024**  
 Fixed a bug in scrolling backgrounds and along the way updated most of the **bkg** files as well.  When I wrote **dotsBkgMaker.py** there was one background to consider - now there can be more than one. Plus changes to the tracker dictionary code to make it more consistent.
 
 **May 8 2024**  
-Discovered I had a variable that wasn't getting saved which could cause some problems if you tried to run a scrolling background and it wouldn't. If that's a problem do a reset.  Once you've a background running, save it - that should take care of it.  A small change to VHX, set the opening horizontal width to 1200px and 
-the opening vertical to 900px.
+Discovered I had a variable that wasn't getting saved which could cause some problems if you tried to run a scrolling background and it wouldn't. If that's a problem do a reset.  Once you've a background running, save it and reload it - that should take care of it.  A small change to VHX, set the opening horizontal width to 1200px and the opening vertical to 900px.
 
+**May 10 2024**   
+Replaced .format(s) with f-strings - makes a better read. Added a **'\'** key to trigger an info tag for either sprites or backgrounds.  It's already in backgrounds but now one key works for either. The 'opt' was oversubscribed in **Pixitems**.
 
 ----
 
@@ -33,6 +35,8 @@ I've added two **help menus**, one to what I call the **'canvas'**, the other to
 The biggest change/addition belongs to **'scrolling backgrounds'**.  The slider used to set the **screenrate(duration)** now can update the underlying dictionaries which govern the **'next'** scrolling backgrounds speed required to match the **first**. I suggest running a scrolling demo to get a sense of any differences that may be present with the current screen rates.  The demo's background is duplicated in the backgrounds directory to make it easier to run if it's necessary to update the **screenrate.dict** file.
 
 New Video:  <https://youtu.be/1PQwIGpfr0E>
+
+---
 
 **April 17 2024**  
 Moved the non dots directories and files to **extras**. Updated **dropshadow.py** and **outline.py** to PyQt6 and increased the coverage of the **loupeWidget** to make it easier to use. I also dropped the castShadow directory as a better version, Shadows, is in dots. Some commands for the loupeWidget: **shift** locks the widgets position or sets it off making it easier to edit with.  **Double-click** closes the widget.
@@ -65,6 +69,7 @@ As a reminder, **'J'** is the command that launches the **json .play file viewer
 
 New Video: <https://youtu.be/DoCMdEPZi8E>
 
+---
 
 **February 23** - Added **'S'** to **save** the **.play file** in **StoryBoard** if there are no animations running. Why I didn't do that two years ago is a good question.  Made sure typing **'J'** to launch the file viewer won't work if an animation is running.   
 
@@ -131,10 +136,6 @@ Last, here's the url for where I found the scrolling background I used, <https:/
 
 ---
 
-**September 30 2023**   
-Fixed a few embarrassing bugs which caused some keys and key combinations
-to fail as well as a sure kill lurking in PathWays code. I've also turned off most of the garbage collection as it seems to be connected to an emergent problem when running on the desktop.
-
 **September 21 2023**  
 About two hours after I posted my last effort to GitHub and YouTube I had a moment of clarity and decided I should try using something like the translate transformation rather than the parent/child method I was currently using in order to link the shadow. I replaced it by using an **offset** variable located in **pixItem**. It seems to be the right choice and without any of the previous issues.
 
@@ -147,6 +148,10 @@ Lastly, changes to the **scrolling background** making it possible to have two r
 There are three problems I've encountered recently. The first was with **QMessageBox** not displaying correctly in PyQt5.  The second, a known Apple/Python bug [:] **+[CATransaction synchronize] called within transaction**, can cause dots to end abruptly, at least on my M1 Mac running Ventura. The third one, a shell error when running dots on the desktop. They all seem to have started with Ventura.
 
 New video: <https://youtu.be/FZTsYaU3Eiw>
+
+**September 30 2023**   
+Fixed a few embarrassing bugs which caused some keys and key combinations
+to fail as well as a sure kill lurking in PathWays code. I've also turned off most of the garbage collection as it seems to be connected to an emergent problem when running on the desktop.
 
 ---
 

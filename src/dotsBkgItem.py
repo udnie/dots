@@ -10,7 +10,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox, point
 from dotsBkgWorks       import BkgWorks
-from dotsBkgScrollWrks  import BkgScrollWrks
+from dotsBkgScrollWrks  import BkgScrollWrks, tagBkg
 
 import dotsAnimation    as Anime
 
@@ -154,8 +154,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 self.bkgMaker.backOne(self)  
             elif self.key == '.': 
                 self.bkgMaker.upOne(self)  
-            elif self.key == 'opt':  ## show background tag
-                self.bkgScrollWrks.tagBkg(self, e.scenePos())
+            elif self.key in('opt', 'tag'):  ## show background tag
+                tagBkg(self, e.scenePos())
             self.initX, self.initY = self.x, self.y  
             self.dragCnt = self.mapToScene(e.pos())
             self.canvas.key = ''

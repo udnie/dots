@@ -107,13 +107,13 @@ class Works:  ## extends pixitem and pixwidget
                     
     def resetSliders(self):
         self.pix.widget.opacitySlider.setValue(int(self.pix.alpha2*100))
-        self.pix.widget.opacityValue.setText('{0:.2f}'.format((self.pix.alpha2)))
+        self.pix.widget.opacityValue.setText(f'{self.pix.alpha2:.2f}')
         
         self.pix.widget.scaleSlider.setValue(int(self.pix.scale*100))
-        self.pix.widget.scaleValue.setText('{0:.2f}'.format(self.pix.scale))
+        self.pix.widget.scaleValue.setText(f'{self.pix.scale:.2f}')
         
         self.pix.widget.rotaryDial.setValue(int(self.pix.rotation))
-        self.pix.widget.rotateValue.setText('{:3d}'.format(int(self.pix.rotation)))
+        self.pix.widget.rotateValue.setText(f'{self.pix.rotation:3d}')
               
     def removeThis(self):
         self.pix.clearFocus() 
