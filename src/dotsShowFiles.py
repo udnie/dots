@@ -272,7 +272,7 @@ class ShowFiles:
         }     
         return tmp
 
-    def saveFrame(pix):       
+    def saveFrame(self, pix):       
         tmp = {
             'fileName':     os.path.basename(pix.fileName),
             'type':         'frame',

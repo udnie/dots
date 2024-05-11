@@ -26,6 +26,9 @@ Discovered I had a variable that wasn't getting saved which could cause some pro
 **May 10 2024**   
 Replaced .format(s) with f-strings - makes a better read. Added a **'\'** key to trigger an info tag for either sprites or backgrounds.  It's already in backgrounds but now one key works for either. The 'opt' was oversubscribed in **Pixitems**.  Reduced many of the column widths in the Json viewer.
 
+**May 11 2024**  
+A bug fix to Flats.   
+
 ----
 
 

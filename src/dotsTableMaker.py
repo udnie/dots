@@ -15,7 +15,7 @@ from dotsShowWorks      import ShowWorks
 MinRows = 5
 MaxRows = 25
 
-MaxCols = 15
+MaxCols = 15  ## shown
 MinCols = 7
 
 ColWidth  = 100  ## seems to be the default sizes on my mac 
@@ -107,9 +107,8 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.model = TableModel(data, self.cols, self.hdr)   
         self.tableView.setModel(self.model)
       
-        for i in ColWidths:  ## why doesn't anyone know this
-            self.tableView.setColumnWidth(i, 85)     
-      
+        width = self.resetColumnWidths(width)
+       
         ## make changes to the table layout by row - good to know - thanks Martin
         for i in save: 
             self.model.setHdrColor(i, '#e2e2e2')  ## make it look like a header
@@ -119,7 +118,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.model.setHdrColor(i, 'yellow')  ## missing files 
             self.model.setMisses(i, font)
             
-        self.tableView.resize(width-20, height)
+        self.tableView.resize(width, height)
         self.tableView.show()
    
         p, g = self.tableView.pos(), getCtr()  ## move it up a bit higher                  
@@ -128,6 +127,18 @@ class TableView:  ## formats a json .play file to display missing files or not
         del data
  
 ### --------------------------------------------------------
+    def resetColumnWidths(self, width):  
+        for i in range(0, self.cols):  
+            if i in ColWidths:  ## reduce column widths for these
+                self.tableView.setColumnWidth(i, 85)  ## why is this so hard to find?
+        if self.cols == 12:  ## minor ajustment so the last column isn't too wide
+            width = 1065
+        elif self.cols == 8:
+            width = 715
+        elif self.cols == 7:
+            width = 630
+        return width
+
     def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
         self.selected.clear() 
         if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    

@@ -202,7 +202,7 @@ class BkgMaker(QWidget):
                                       
 ### --------------------------------------------------------                                           
     def deleteBkg(self, bkg, where=''):  ## delete tracker as well               
-        if where == '':
+        if where == '' and bkg.type == 'bkg':
             bkg.bkgWorks.delTracker(bkg)
         if self.widget:
             self.closeWidget() 
