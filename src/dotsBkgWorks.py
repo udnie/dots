@@ -219,7 +219,6 @@ class BkgWorks:
             tmp['showtime']   = 0
             tmp['useThis']    = ''
             tmp['rate']       = 0
-            tmp['path']       = ''
             tmp['scrollable'] = False
              
         bkg.tag        = ''  ## no longer a scroller
@@ -230,7 +229,6 @@ class BkgWorks:
         bkg.showtime   = 0
         bkg.useThis    = ''
         bkg.rate       = 0
-        bkg.path       = ''
         bkg.scrollable = False
         
         self.bkgMaker.addWidget(bkg)

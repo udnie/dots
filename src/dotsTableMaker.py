@@ -21,7 +21,15 @@ MinCols = 7
 ColWidth  = 100  ## seems to be the default sizes on my mac 
 RowHeight = 30  
 
-ColWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
+ColumnWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
+
+Columns = {  ## set widths by number of columns
+    21:  1605,
+    18:  1505,
+    12:  1065,
+     8:   715,
+     7:   630,
+}
 
 ### --------------------------------------------------------
 class TableView:  ## formats a json .play file to display missing files or not
@@ -52,6 +60,7 @@ class TableView:  ## formats a json .play file to display missing files or not
 ### --------------------------------------------------------              
         self.tableView = QTableView()        
         self.tableView.horizontalHeader().setStretchLastSection(True)
+        self.tableView.horizontalHeader().setSectionsMovable(True)
     
         self.tableView.horizontalScrollBar().setStyleSheet('QScrollBar:horizontal{\n' 
             'background-color: rgb(225,225,225)}'); 
@@ -129,16 +138,13 @@ class TableView:  ## formats a json .play file to display missing files or not
 ### --------------------------------------------------------
     def resetColumnWidths(self, width):  
         for i in range(0, self.cols):  
-            if i in ColWidths:  ## reduce column widths for these
-                self.tableView.setColumnWidth(i, 85)  ## why is this so hard to find?
-        if self.cols == 12:  ## minor ajustment so the last column isn't too wide
-            width = 1065
-        elif self.cols == 8:
-            width = 715
-        elif self.cols == 7:
-            width = 630
-        return width
-
+            if i in ColumnWidths:  ## reduce column widths for these
+                self.tableView.setColumnWidth(i, 85)  ## why is this so hard to find?      
+        if Columns.get(self.cols):
+            return Columns[self.cols]
+        else:
+            return width + 10
+ 
     def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
         self.selected.clear() 
         if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    

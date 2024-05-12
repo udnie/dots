@@ -129,9 +129,14 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = ''    
         self.dragCnt = 0
         self.save = QPointF()  
+        
+        if 'demo' in self.fileName:  ## was dropping path
+            self.path = paths['demo']
+        else:
+            self.path = paths['bkgPath']  
                   
         self.canvas.dots.statusBar.showMessage(os.path.basename(self.fileName), 5000) 
-             
+               
 ### -------------------------------------------------------- 
     @pyqtSlot(str)
     def setPixKeys(self, key):
@@ -139,8 +144,11 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                            
     def mousePressEvent(self, e):  ## combination
         if not self.canvas.pathMakerOn:       
-            if e.button() == Qt.MouseButton.RightButton:
-                self.bkgMaker.addWidget(self)                    
+            if e.button() == Qt.MouseButton.RightButton:   
+                self.bkgMaker.addWidget(self)   
+                if self.direction == '' or self.useThis == '':   
+                    self.bkgWorks.reset(self)
+                    self.bkgMaker.resetSliders(self)              
             elif self.canvas.key == 'del':    
                 self.bkgMaker.deleteBkg(self)          
             elif self.canvas.key == '/':  ## to back
@@ -194,7 +202,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def addNextScroller(self): 
         self.fileName = self.path + os.path.basename(self.fileName)  
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
-            
+     
         if self.mirroring == False:  ## continuous
             item.setMirrored(False)
         elif self.ratio <= 27 or self.dots.Vertical == False:  ## 27:9 = 3:1 
@@ -206,9 +214,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item.setZValue(self.zValue())  
                                     
         self.bkgWorks.restoreFromTrackers(item)  ## txt for debugging  
-        
-        path = self.setNode(item)  ## sets property used in animation        
-        item.anime = self.bkgWorks.setNextPath(path, item) 
+    
+        node = self.setNode(item)  ## sets property used in animation        
+        item.anime = self.bkgWorks.setNextPath(node, item) 
 
         item.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
         self.scene.addItem(item)   
@@ -222,8 +230,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if bkg.direction == '':   
             return  
             
-        path = self.setNode(bkg)  ## bkg property used in animation                      
-        if path == None:
+        node = self.setNode(bkg)  ## bkg property used in animation                      
+        if node == None:
             MsgBox('setScrollerPath: Error Setting Path ...')
             return          
                 
@@ -234,7 +242,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
    
         self.setStartingPos(bkg)  ## not the scrolling position      
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
-        return self.bkgWorks.setFirstPath(path, bkg) 
+        return self.bkgWorks.setFirstPath(node, bkg) 
                
 ### --------------------------------------------------------  
     def setStartingPos(self, bkg):

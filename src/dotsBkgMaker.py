@@ -68,7 +68,7 @@ class BkgMaker(QWidget):
         
         bkg.setZValue(common['bkgZ'])  ## always on top              
         self.scene.addItem(bkg)    
-        
+   
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.setXY(bkg)
             
