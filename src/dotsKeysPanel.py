@@ -59,9 +59,9 @@ class KeysPanel(QWidget):
         self.tableView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableView.setSelectionMode(self.tableView.SelectionMode.NoSelection)
         
-        self.tableView.verticalHeader().setVisible(False)
-        self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Fixed)
-        
+        self.tableView.verticalHeader().setVisible(False)        
+        self.tableView.horizontalHeader().setSectionsMovable(True)
+          
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
@@ -169,10 +169,9 @@ def storyBoard():
         ('Shift', '+S UnLinks All'),
         ('Shift', '+T TagSelected'),
         ('Shift', '+U Unlocks All'),  
-        ('\'', 'Toggle this lock'),
         ('/', 'Clk to Back'),
-        (',', 'Clk Back One Z'),
-        ('.', 'Clk Up One Z'),
+        (',', 'Back 1 ZValue'),
+        ('.', 'Up 1 ZValue'),
         ('_/+', 'Rotate 1 deg'),  
         ('-/=', 'Rotate 15 deg'),
         ('[/]', 'Rotate 45 deg'),

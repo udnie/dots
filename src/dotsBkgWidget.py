@@ -24,7 +24,7 @@ class BkgWidget(QWidget):
            
         self.type = 'widget'
         self.save = QPointF()
-                
+                      
         self.setAccessibleName('widget')
         self.WidgetW, self.WidgetH = 385.0, 305.0
                     
@@ -42,10 +42,11 @@ class BkgWidget(QWidget):
         vbox.addLayout(sbox) 
         
         self.setLayout(vbox)
+    
+        self.label.setText(self.bkgItem.fileName)
         
-        self.label.setText(os.path.basename(self.bkgItem.fileName))
         self.label.setStyleSheet('QLabel{font-size: 14pt;}')
-        self.canvas.dots.statusBar.showMessage(os.path.basename(self.bkgItem.fileName) )  
+        self.canvas.dots.statusBar.showMessage(self.bkgItem.fileName)  
         
         self.setFixedHeight(int(self.WidgetH)) 
         self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners

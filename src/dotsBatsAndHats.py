@@ -195,6 +195,7 @@ class Hats:  ## hats - was abstract
             self.scroller = BkgItem(paths['demo'] + 'bluestone.jpg', self.canvas)
    
         self.scroller.direction = self.direction       
+        self.scroller.path = paths['demo']
         self.scroller.tag = 'scroller'
         self.scroller.mirroring = True      
         self.scroller.bkgWorks.addTracker(self.scroller)  

@@ -1,14 +1,13 @@
 
 import os
-import json
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF, QPoint, QPropertyAnimation, pyqtSlot
+from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
                  
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox, point
+from dotsSideGig        import MsgBox
 from dotsBkgWorks       import BkgWorks
 from dotsBkgScrollWrks  import BkgScrollWrks, tagBkg
 
@@ -56,17 +55,14 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
-        self.path = paths['bkgPath']  
+        self.path = paths['bkgPath']    
+        self.fileName = os.path.basename(fileName)  ## new
         
-        self.fileName = fileName  
-
-        ## carry over path from demo to test - once valid can 
-        ## drop path from filename as its set in path
-        if 'demo' in self.fileName: self.path = paths['demo']
-        self.fileName = self.path + os.path.basename(self.fileName) 
-        
-        if not os.path.exists(self.fileName):
-            MsgBox(f'Error - {self.fileName} Not Found', 7)
+        if self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):      
+            self.path = paths['demo']
+ 
+        if not os.path.exists(self.path + self.fileName):
+            MsgBox(f'BkgItem Error: {self.fileName} Not Found', 7)
             self.fileName = None
             return
 
@@ -81,16 +77,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if copy == None:          
             try:   ## sets if scrollable and self.imgfile if not already set
                 if not self.dots.Vertical: 
-                    self.bkgScrollWrks.setWidthHeight(QImage(self.fileName)) 
+                    self.bkgScrollWrks.setWidthHeight(QImage(self.path + self.fileName)) 
                 else:
-                    self.bkgScrollWrks.setVertical(QImage(self.fileName))
+                    self.bkgScrollWrks.setVertical(QImage(self.path + self.fileName))
             except Exception:
-                MsgBox('error on loading: ' + self.fileName)
+                MsgBox('BkgItem Error on loading: ' + self.fileName)
                 return
             self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         else:
             self.imgFile = copy
-              
+                    
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
                                                 
         self.id = 0  ## not used except for conisistency          
@@ -130,12 +126,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.dragCnt = 0
         self.save = QPointF()  
         
-        if 'demo' in self.fileName:  ## was dropping path
+        if self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):
             self.path = paths['demo']
         else:
             self.path = paths['bkgPath']  
-                  
-        self.canvas.dots.statusBar.showMessage(os.path.basename(self.fileName), 5000) 
+         
+        self.canvas.dots.statusBar.showMessage(self.fileName, 5000) 
                
 ### -------------------------------------------------------- 
     @pyqtSlot(str)
@@ -200,7 +196,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         no longer needing to re-read the .jpg/.png file  '''       
 ### -------------------------------------------------------- 
     def addNextScroller(self): 
-        self.fileName = self.path + os.path.basename(self.fileName)  
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
      
         if self.mirroring == False:  ## continuous

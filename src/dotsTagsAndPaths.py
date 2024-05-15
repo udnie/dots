@@ -105,11 +105,11 @@ class TagsAndPaths:
         self.dots   = self.canvas.dots
 
 ### --------------------------------------------------------  
-    def tagWorks(self, pid):
+    def tagWorks(self, pid):  ## this if more than one
         k = 0
         topZVal = self.mapper.toFront()  ## only once
         self.mapper.tagSet = False
-        if pid == '':  ## pid can also equal the pixItem.id
+        if pid == '':  ## pid can also equal the pixItem.id - using scrollwrks tagBkg for singles
             pid = 'all'
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
@@ -146,8 +146,7 @@ class TagsAndPaths:
   
         if 'frame' in pix.fileName: 
             x, y = common['ViewW']*.47, common['ViewH']-35
-            pix.tag = topZVal
-
+    
         if pix.type in ('pix','bkg','frame') and pix.locked == True:
             tag = 'Locked ' + tag 
 

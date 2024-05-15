@@ -112,11 +112,6 @@ class PixItem(QGraphicsPixmapItem):
             pen.setWidth(2)
             painter.setPen(pen)
             painter.drawRect(self.boundingRect())
-     
-    def hoverEnterEvent(self, e):
-        if self.locked: 
-            self.toggleThisTag(self.id)   
-        e.accept()
                    
     def hoverLeaveEvent(self, e):
         if self.locked:
@@ -170,6 +165,7 @@ class PixItem(QGraphicsPixmapItem):
                 tagBkg(self, self.pos())
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
+            self.canvas.key = ''
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -186,8 +182,6 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
             
     def mouseReleaseEvent(self, e): 
-        if self.key in TagKeys or self.mapper.tagSet:
-            self.works.clearTag()
         self.dragCnt = 0   
         self.works.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)  
@@ -281,11 +275,10 @@ class PixItem(QGraphicsPixmapItem):
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         else:
             self.locked = False
-            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)      
-        self.toggleThisTag(self.id) 
-        QTimer.singleShot(1000, self.mapper.clearTagGroup)
-        self.setLockBtnText()
-            
+            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True) 
+        tagBkg(self, self.pos())
+        QTimer.singleShot(3000, self.mapper.clearTagGroup)
+   
     def deletePix(self):
         if self.shadowMaker.isActive == True:
             self.shadowMaker.works.deleteShadow()

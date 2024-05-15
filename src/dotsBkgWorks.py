@@ -29,7 +29,7 @@ class BkgWorks:
 ### -------------------------------------------------------- 
     ## when loading a play file or adding from the screen - Tracker is in dotsBkgScrollWrks
     def addTracker(self, bkg): 
-        fileName = os.path.basename(bkg.fileName) 
+        fileName = bkg.fileName
    
         ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
         ## if randomizing speed factor do this 
@@ -47,10 +47,9 @@ class BkgWorks:
             else:   
                 return False
                 
-    def delTracker(self, bkg):
-        fileName = os.path.basename(bkg.fileName)  
-        if self.bkgMaker.newTracker.get(fileName):
-            del self.bkgMaker.newTracker[fileName]
+    def delTracker(self, bkg):  
+        if self.bkgMaker.newTracker.get(bkg.fileName):
+            del self.bkgMaker.newTracker[bkg.fileName]
    
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):  ## from keybooard or widget - sets 'first'    
@@ -66,8 +65,13 @@ class BkgWorks:
                 
             self.bkgItem.tag = 'scroller'    
             self.bkgItem.rate = 0     
-                   
-            fileName = os.path.basename(self.bkgItem.fileName)  ## initial settings                 
+            
+            if self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):  
+                self.bkgItem.path = paths['demo']
+            else:
+                self.bkgItem.path = paths['bkgPath']
+                      
+            fileName = self.bkgItem.fileName               
             if self.bkgMaker.newTracker[fileName]: 
                 self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
                 self.bkgItem.rate = self.getScreenRate(self.bkgItem)  ## blank it's first  
@@ -77,14 +81,15 @@ class BkgWorks:
             if self.bkgItem.rate == 0 and self.bkgItem.useThis == '':
                 return
             
-            self.bkgMaker.lockBkg(self.bkgItem) 
+            self.bkgMaker.lockBkg(self.bkgItem)  ## locks the background to begin 
+     
             if self.bkgMaker.widget != None:
                 self.bkgMaker.updateWidget(self.bkgItem)      
                 QTimer.singleShot(100, partial(self.bkgItem.bkgMaker.resetSliders, self.bkgItem))
                                                   
 ### --------------------------------------------------------  
     ''' reads twice - returns 'next' rate first, returns 'first' rate next, 
-        but only once per scrolling background - rates can vary '''
+        but only once per scrolling background - rates can vary in a scene '''
 ### --------------------------------------------------------  
     def getScreenRate(self, bkg, which =''): 
         rate = self.getThisRate(bkg) 
@@ -112,21 +117,20 @@ class BkgWorks:
             if erat > 0: rate = erat  ## fixes not carrying over rate from a file
      
             bkg.rate = rate 
-            self.bkgScrollWrks.setTrackerRate(bkg)
-            
+            self.bkgScrollWrks.setTrackerRate(bkg)          
         return rate
     
 ### --------------------------------------------------------
-    ## rate can vary within a scene by background width
+    ## rates can vary within a scene by background width
     def getThisRate(self, bkg): 
-        bkg.useThis == '' 
+        bkg.useThis == ''  ## set which dictionary to use  
         if common['Screen']  == '1080' and bkg.width  < 1280 or \
             common['Screen'] == '1215' and bkg.width  < 1440 or \
             common['Screen'] == '1296' and bkg.width  < 1536 or \
-            common['Screen'] ==  '900' and bkg.height < 1102:  ## in this case 2:3  
-            bkg.useThis = 'moretimes'  ## select which dictionary to use     
+            common['Screen'] ==  '900' and bkg.height < 1102: 
+            bkg.useThis = 'moretimes'  ## in this case 2:3 
         else:
-            bkg.useThis = 'screentimes'             
+            bkg.useThis = 'screentimes'  ## 16:9 or larger         
         try:  
             if len(self.bkgMaker.screenrate) == 0:  ## fewer reads
                 with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
@@ -184,8 +188,9 @@ class BkgWorks:
             if self.bkgItem.mirroring == True: 
                 self.bkgItem.mirroring = False ## continuous
             else:
-                self.bkgItem.mirroring = True  ## mirrored                               
-        fileName = os.path.basename(self.bkgItem.fileName)               
+                self.bkgItem.mirroring = True  ## mirrored  
+                                       
+        fileName = self.bkgItem.fileName              
         if self.bkgMaker.newTracker[fileName]:  
             self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
             self.bkgMaker.setMirrorBtnText(self.bkgItem) 
@@ -197,8 +202,7 @@ class BkgWorks:
 ### -------------------------------------------------------- 
     ## returns what gets lost on each reincarnation
     def restoreFromTrackers(self, bkg): 
-        fileName = os.path.basename(bkg.fileName)  ## opposite of setMirroring
-        if tmp := self.bkgMaker.newTracker.get(fileName):
+        if tmp := self.bkgMaker.newTracker.get(bkg.fileName):
             bkg.direction  = tmp['direction']           
             bkg.mirroring  = tmp['mirroring']
             bkg.factor     = tmp['factor']
@@ -210,9 +214,8 @@ class BkgWorks:
             
 ### --------------------------------------------------------                                                                                      
     def reset(self, bkg):  ## reset both tracker and bkgItem
-        fileName = os.path.basename(bkg.fileName)  ## opposite of setMirroring 
-        if tmp := self.bkgMaker.newTracker.get(fileName):  
-            tmp['fileName']    = fileName 
+        if tmp := self.bkgMaker.newTracker.get(bkg.fileName):  
+            tmp['fileName']    = bkg.fileName 
             tmp['direction']  = ''
             tmp['mirroring']  = False
             tmp['factor']     = 1.0
@@ -220,6 +223,7 @@ class BkgWorks:
             tmp['useThis']    = ''
             tmp['rate']       = 0
             tmp['scrollable'] = False
+            tmp['path']       = bkg.path
              
         bkg.tag        = ''  ## no longer a scroller
         bkg.direction  = ''             

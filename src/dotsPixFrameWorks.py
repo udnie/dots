@@ -9,6 +9,7 @@ from dotsSideGig        import constrain
 from dotsShared         import common, RotateKeys
 from dotsMenus          import AnimationMenu
 from dotsTagsAndPaths   import TagsAndPaths
+from dotsBkgScrollWrks  import tagBkg
 
 import dotsAnimation    as Anime
 
@@ -80,8 +81,8 @@ class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's he
                     self.locked = False
                 self.setZValue(self.canvas.mapper.toFront(1)) 
                 self.locked = True
-            elif self.key == 'opt': 
-                self.mapper.toggleTagItems(self.id)
+            elif self.key in ('opt', 'tag'): 
+                tagBkg(self, self.pos())
             e.accept()
       
     def mouseReleaseEvent(self, e):

@@ -130,7 +130,7 @@ class SideCar:
                 if r := self.canvas.bkgMaker.newTracker[fileName]: 
                     fileName, direction, mirroring, locked = self.addBkgLabels(p)
                     print(f"{fileName}\t{direction}\t{mirroring}\t{r['rate']}" +
-                        f"\t{r['showtime']}\t{r['factor']}\t{r['useThis']}")
+                        f"\t{r['showtime']}\t{r['path']}\t{r['useThis']}")
         print()                 
         # if p.type == 'pix' and len(p.shadow) > 0:  
         #         file, direction, mirror, locked = self.addBkgLabels(p)
@@ -138,8 +138,8 @@ class SideCar:
         #         print(f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
         # print('dumpbkgs', list(p.shadow.values()))
 
-    def addBkgLabels(self, bkg):  ## used with dumpBkgs for trackers
-        fileName = os.path.basename(bkg.fileName)        
+    def addBkgLabels(self, bkg):  ## used with dumpBkgs for trackers 
+        fileName = bkg.fileName       
         if bkg.locked == True:
             locked = 'Locked' 
         else:

@@ -29,6 +29,9 @@ Replaced .format(s) with f-strings - makes a better read. Added a **'\'** key to
 **May 11 2024**  
 A bug fix to Flats. A little more work on the Json Viewer, added back moveable columns and set the width based on the number of columns as the column widths now vary.
 
+**May 14 2024**  
+Replaced **'os.path.basename'** throughout the **.Bkg files** wherever it made the most sense with the **fileName**. Added a tag to the pixitem and background widgets to display their status when the **Locked** button is pressed.
+
 ----
 
 

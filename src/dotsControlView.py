@@ -82,8 +82,7 @@ class ControlView(QGraphicsView):
             fileName = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
             self.canvas.pixCount = self.mapper.toFront(0)
-            # self.canvas.addPixItem(fileName, e.pos().x(), e.pos().y(), ### Qt5 uses pos
-            self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  ### Qt6 takes position
+            self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  
                 None, False)
             
     def dragLeaveEvent(self, e):
@@ -124,7 +123,7 @@ class ControlView(QGraphicsView):
             elif key == Qt.Key.Key_S:
                 self.sideCar.unlinkShadows()
                         
-        # keys used in locking screen items - L, R, U
+        # keys used in locking screen items - L, R, U + shift
         elif key in LockKeys and mod & Qt.KeyboardModifier.ShiftModifier: 
             self.sideCar.togglePixLocks(singleKeys[key]) 
     

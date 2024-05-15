@@ -164,16 +164,16 @@ class BkgMaker(QWidget):
             self.widget.showtimeValue.setText(f'{bkg.showtime:3}')
 
     def setMirrorBtnText(self, bkg):  ## if added 
-        if bkg:  ## shouldn't need this but - could have just started to clear    
-           
+        if bkg:  ## shouldn't need this but - could have just started to clear        
             if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
                 self.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
-                bkg.scrollable = True    
-                                   
+                bkg.scrollable = True     
+                                          
             if bkg.scrollable == False:
                 self.widget.mirrorBtn.setText('Not Scrollable')  
-                bkg.direction = ''       
-            elif bkg.mirroring == False:
+                bkg.direction = ''
+                       
+            if bkg.mirroring == False:
                 self.widget.mirrorBtn.setText('Continuous')         
             elif bkg.mirroring == True:
                 self.widget.mirrorBtn.setText('Mirrored')
@@ -196,10 +196,11 @@ class BkgMaker(QWidget):
                     'background-color: LIGHTGREY')
                                                      
     def setLocksText(self, bkg):
-        if bkg:  ## shouldn't need this but - could have just started to clear
-            self.widget.lockBtn.setText('UnLocked') if bkg.locked == False \
-                else self.widget.lockBtn.setText('Locked')
-                                      
+        if bkg == None:
+            return
+        self.widget.lockBtn.setText('UnLocked') if bkg.locked == False \
+            else self.widget.lockBtn.setText('Locked')         
+                                     
 ### --------------------------------------------------------                                           
     def deleteBkg(self, bkg, where=''):  ## delete tracker as well               
         if where == '' and bkg.type == 'bkg':
@@ -274,11 +275,11 @@ class BkgMaker(QWidget):
         bkg.setPos(p.x() , p.y())
         self.x, self.y = p.x() , p.y()     
                     
-    def bkgTag(self, bkg, which=''):
-        file = os.path.basename(bkg.fileName) 
-        if which != '':
-            file = which + ': ' + file
-        return f'{file}\t{bkg.direction}\t{bkg.rate}\t{bkg.factor}\t{bkg.showtime}'
+    # def bkgTag(self, bkg, which=''):
+    #     file = bkg.fileName
+    #     if which != '':
+    #         file = which + ': ' + file
+    #     return f'{file}\t{bkg.direction}\t{bkg.rate}\t{bkg.factor}\t{bkg.showtime}'
                              
 ### --------------------- dotsBkgMaker ---------------------
                                     

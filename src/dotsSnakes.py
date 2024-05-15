@@ -1,6 +1,7 @@
 
 import os
 import random
+import random
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtGui        import QColor, QImage, QPixmap
@@ -177,8 +178,10 @@ class Snakes:
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
             
             self.scroller.direction = 'left' 
+            self.scroller.path = paths['demo']  
             self.scroller.tag = 'scroller'
             self.scroller.mirroring = True  
+        
             self.scroller.bkgWorks.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
@@ -191,6 +194,7 @@ class Snakes:
                 self.scroller =  BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)
                 
             self.scroller.direction = 'vertical'   
+            self.scroller.path = paths['demo'] 
             self.scroller.tag = 'scroller'
             
             if common['Screen'] in ('900', '912'):
@@ -224,7 +228,8 @@ class Snakes:
              
         pix.setPos(pix.x, pix.y)                                                   
         node = Anime.Node(pix)  ## get pix pos property    
-        pix.tag = fileName        
+        pix.tag = fileName      
+        pix.path = paths['demo']   
         pix.anime = pathAnimator(node, sync, waypts)  ## set path animation      
         return pix
         

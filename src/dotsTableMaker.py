@@ -3,7 +3,7 @@ import os
 
 from PyQt6.QtCore       import Qt
 from PyQt6.QtGui        import QFont, QKeySequence, QShortcut
-from PyQt6.QtWidgets    import QTableView, QAbstractItemView, QHeaderView
+from PyQt6.QtWidgets    import QTableView, QAbstractItemView
 
 
 from dotsScreens        import getCtr
