@@ -32,8 +32,10 @@ A bug fix to Flats. A little more work on the Json Viewer, added back moveable c
 **May 14 2024**  
 Replaced **'os.path.basename'** throughout the **.Bkg files** wherever it made the most sense with the **fileName**. Added a tag to the pixitem and background widgets to display their status when the **Locked** button is pressed.
 
-----
+**May 17 2024**  
+Added **'path'** to the **newTracker** dictionary.  
 
+----
 
 **April 8 2024**  
 I've added two **help menus**, one to what I call the **'canvas'**, the other to the **'matte'** from the background widget. I've also updated **double-clicking** the **shadow outline** - on and off once again.  Reading over my entries from **March 7th and 10th** makes me wonder if I somehow managed to misplace a bunch of changes, I hadn't - they needed more work. 
