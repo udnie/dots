@@ -77,6 +77,7 @@ class BkgWorks:
                 self.bkgItem.rate = self.getScreenRate(self.bkgItem)  ## blank it's first  
                 self.bkgMaker.newTracker[fileName]['showtime'] = self.bkgItem.showtime
                 self.bkgMaker.newTracker[fileName]['rate'] = self.bkgItem.rate
+                self.bkgMaker.newTracker[fileName]['path'] = self.bkgItem.path 
          
             if self.bkgItem.rate == 0 and self.bkgItem.useThis == '':
                 return

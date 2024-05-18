@@ -150,11 +150,10 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.canvas.key == '/':  ## to back
                 self.bkgMaker.back(self)     
             elif self.canvas.key == 'shift':  ## flop it
-                self.flopped = not self.flopped 
-                self.setMirrored(self.flopped)     
+                self.setMirrored(False) if self.flopped else self.setMirrored(True)       
             elif self.canvas.key in ('enter','return'):  ## to front  
                 self.bkgMaker.front(self)             
-            elif self.key == ',':  ## probably will only work on background with transparent spaces
+            elif self.key == ',':  ## may only work on background with transparent spaces
                 self.bkgMaker.backOne(self)  
             elif self.key == '.': 
                 self.bkgMaker.upOne(self)  
@@ -208,7 +207,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     
-        self.bkgWorks.restoreFromTrackers(item)  ## txt for debugging  
+        self.bkgWorks.restoreFromTrackers(item)  
     
         node = self.setNode(item)  ## sets property used in animation        
         item.anime = self.bkgWorks.setNextPath(node, item) 
@@ -237,7 +236,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
    
         self.setStartingPos(bkg)  ## not the scrolling position      
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
-        return self.bkgWorks.setFirstPath(node, bkg) 
+        return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
                
 ### --------------------------------------------------------  
     def setStartingPos(self, bkg):

@@ -240,7 +240,7 @@ class BkgMaker(QWidget):
     def front(self, bkg):
         bkg.setZValue(common['bkgZ'])
         self.updateZvals(bkg)
-        self.lockBkg(bkg)  
+        self.lockBkg(bkg) 
         self.closeWidget()
         
     def back(self, bkg): 

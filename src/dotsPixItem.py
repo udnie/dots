@@ -92,7 +92,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlags(True)
                                        
 ### --------------------------------------------------------
-    @pyqtSlot(str)  ## actually updated by storyboard
+    @pyqtSlot(str)  ## updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
  
@@ -160,8 +160,7 @@ class PixItem(QGraphicsPixmapItem):
                 elif self.key == '.':
                     p = self.zValue()+1   
                 self.setZValue(p)               
-                tagBkg(self, self.pos())  ## works better for single item
-            elif self.key == 'tag':  ## back-slash '\'
+            if self.key == 'tag' or self.key in TagKeys: 
                 tagBkg(self, self.pos())
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
@@ -182,6 +181,7 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
             
     def mouseReleaseEvent(self, e): 
+        self.key = ''
         self.dragCnt = 0   
         self.works.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)  
@@ -243,7 +243,6 @@ class PixItem(QGraphicsPixmapItem):
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-            # horizontally=self.flopped, vertically=False)))  ## pyside6
             horizontal=self.flopped, vertical=False)))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
 
