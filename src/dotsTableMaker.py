@@ -63,18 +63,21 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.tableView.horizontalHeader().setSectionsMovable(True)
     
         self.tableView.horizontalScrollBar().setStyleSheet('QScrollBar:horizontal{\n' 
-            'background-color: rgb(225,225,225)}'); 
-           
-        self.tableView.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
-            'background: rgb(245,245,245) ; \n'                                  
-            'background-color: rgb(225,225,225)}');
-        
+            'border:  9px solid rgb(185,185,185);\n'    
+            'height: 18px;\n'  ## couldn't style the scroll handle so did this instead     
+            'background-color: rgb(220,220,220)}')     
+         
+        self.tableView.verticalScrollBar().setStyleSheet('QScrollBar:vertical{\n' 
+            'border: 9px solid rgb(185,185,185);\n'    
+            'width: 18px;\n'          
+            'background-color: rgb(220,220,220)}')
+      
         self.tableView.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
-            'background-color: rgb(225,225,225);\n'
-            'border:  1px solid rgb(240,240,240); \n'
-            'text-align: center; \n' 
-            'font-size: 14px;}')  
-                 
+            'border: 1px solid rgb(240,240,240);\n'
+            'text-align: center;\n' 
+            'font-size: 14px;\n' 
+            'background-color: rgb(225,225,225)}')  
+           
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         
@@ -101,10 +104,11 @@ class TableView:  ## formats a json .play file to display missing files or not
  
         self.tableView.setAlternatingRowColors(True) 
                
-        self.makeTable(self.data)  ## which calls addTable further down - lots of fussy stuff in between     
-                    
+        ## unpackit calls addTable which creates the display
+        self.unpackIt(self.setupHdrs(self.makeTable(self.data))) 
+                                                 
 ### --------------------------------------------------------
-    def addTable(self, data, miss, save):  ## called by self.unpackIt(data)       
+    def addTable(self, data, miss, save):      
         font = QFont("Arial", 14)    
         width, height = self.widthHeight(data)
         
@@ -198,7 +202,9 @@ class TableView:  ## formats a json .play file to display missing files or not
                         typ.append(tmp['type'])  ## there can be only one   
                     save.append(tmp)  ## saving them by type                        
         dlist = save
-        del save      
+        del save    
+        
+        return dlist  
         self.setupHdrs(dlist)
  
 ### --------------------------------------------------------                    
@@ -213,8 +219,9 @@ class TableView:  ## formats a json .play file to display missing files or not
                         typ.hdr = list(tmp.keys())
                     if len(tmp.keys()) > self.cols:  ## save the most number of columns
                         self.cols = len(tmp.keys()) 
-                            
-        self.unpackIt(dlist)
+        
+        return dlist             
+        # self.unpackIt(dlist)
     
 ### -------------------------------------------------------- 
     def unpackIt(self, dlist):
@@ -241,8 +248,8 @@ class TableView:  ## formats a json .play file to display missing files or not
                           
         if self.deleteKey == True or self.src in('view', 'table') or len(self.Missingfiles) > 0:
             self.addTable(data, miss, save) 
-            self.deleteKey == False     
-            
+            self.deleteKey == False    
+             
         elif len(self.Missingfiles) == 0 and self.src != 'table':  ## nothing to show 
             return
                  

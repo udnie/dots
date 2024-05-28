@@ -49,9 +49,9 @@ class Bats:
 ### -------------------------------------------------------- 
     def makeBats(self):  ## makes aliens and bats                 
         self.canvas.openPlayFile = 'bats'
-
+        
         if 'montreaux' in backGrounds[common['Screen']]:
-            bkg = BkgItem(paths['bkgPath'] + backGrounds[common['Screen']], self.canvas),
+            bkg = BkgItem(paths['bkgPath'] + backGrounds[common['Screen']], self.canvas)
         else:  
             bkg = BkgItem(paths['demo'] + backGrounds[common['Screen']], self.canvas) 
          
