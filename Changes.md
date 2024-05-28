@@ -35,6 +35,9 @@ Replaced **'os.path.basename'** throughout the **.Bkg files** wherever it made t
 **May 17 2024**  
 Added **'path'** to the **newTracker** dictionary.  
 
+**May 27 2024**  
+Discovered a file used in the bats demo went missing and an unauthorized comma added itself where it shouldn't have.  
+
 ----
 
 **April 8 2024**  
