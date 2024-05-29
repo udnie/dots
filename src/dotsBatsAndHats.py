@@ -64,7 +64,7 @@ class Bats:
    
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         self.scene.addItem(bkg)
-     
+        
         self.batWings()       
         self.greys()
         self.run()
