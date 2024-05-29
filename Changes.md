@@ -36,7 +36,10 @@ Replaced **'os.path.basename'** throughout the **.Bkg files** wherever it made t
 Added **'path'** to the **newTracker** dictionary.  
 
 **May 27 2024**  
-Discovered a file used in the bats demo went missing and an unauthorized comma added itself where it shouldn't have.  
+Discovered a file used in the bats demo went missing and an unauthorized comma added itself where it shouldn't have. 
+
+**May 28 2024**  
+The file wasn't missing after all but it did uncover a 'bug'.  I've also posted an update to **Start Here** to catch up on changes from its last update. Decided after the missing file to do away with the .jpg's in the demo directory already in the background directory leaving the verticals and the blue woody scroller. 
 
 ----
 

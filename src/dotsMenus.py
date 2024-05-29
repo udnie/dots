@@ -180,9 +180,10 @@ class DemoMenu:
             self.demoMenu.close()           
         self.demoMenu = None
            
-    def run(self, key):                         
+    def run(self, key):                          
         if key == 'bats':
-            self.bats.makeBats()
+            if self.bats.makeBats() == None:
+                self.closeDemoMenu()   
         elif key == 'blue':
             self.runSnakes('blue') 
         elif key == 'snakes':

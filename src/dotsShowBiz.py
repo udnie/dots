@@ -127,12 +127,6 @@ class ShowBiz:
                 self.bats.rerun()
         else:
             self.showtime.run()
-      
-    def runThis(self, file):  ## doesn't ask - called by demo menu - runs hats
-        if len(self.scene.items()) == 0:
-            self.openPlay(paths['playPath'] + file)  ## also adds pix to scene
-            self.canvas.openPlayFile = file  ## give it time to load 
-            QTimer.singleShot(200, self.showtime.run)
    
     def makeTableView(self, dlist, src=''):  ## called if missing files     
         if self.tableView != None:
@@ -219,7 +213,7 @@ class ShowBiz:
                               
                 elif tmp['type'] == 'bkg':    
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
-                    
+            
                 pix.bkgMaker.lockBkg(pix)                                         
                 self.showFiles.addPixToScene(pix, tmp, bkgz)  ## finish unpacking tmp  
                 bkgz -= 1           

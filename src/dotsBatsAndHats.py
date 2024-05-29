@@ -49,12 +49,19 @@ class Bats:
 ### -------------------------------------------------------- 
     def makeBats(self):  ## makes aliens and bats                 
         self.canvas.openPlayFile = 'bats'
+        pick = backGrounds[common['Screen']]
         
-        if 'montreaux' in backGrounds[common['Screen']]:
-            bkg = BkgItem(paths['bkgPath'] + backGrounds[common['Screen']], self.canvas)
-        else:  
-            bkg = BkgItem(paths['demo'] + backGrounds[common['Screen']], self.canvas) 
-         
+        if 'montreaux' in pick:  ## use the ones in background
+            path = paths['bkgPath']
+        else:
+            path = paths['demo']  ## not everything is in demo
+            
+        if not os.path.exists(path + backGrounds[common['Screen']]):
+            MsgBox(f'BkgItem Error: {pick} Not Found', 6)
+            return None
+            
+        bkg = BkgItem(path + backGrounds[common['Screen']], self.canvas)  
+   
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         self.scene.addItem(bkg)
      
@@ -175,8 +182,8 @@ class Hats:  ## hats - was abstract
     def makeHatsDemo(self, direction):
         self.direction = direction
         self.canvas.openPlayFile = 'hats'     
-                       
-        self.setBackGround()
+                                      
+        self.setBackGround()  
         self.setHats()        
         
         if self.shadows:
@@ -189,13 +196,13 @@ class Hats:  ## hats - was abstract
 
 ### --------------------------------------------------------            
     def setBackGround(self):
-        if self.scroller != None:
-            self.scroller = BkgItem(paths['demo'] + 'bluestone.jpg', self.canvas, True, self.scroller.imgFile)
+        if self.scroller != None:  ## uses imgFile rather than reading the file again
+            self.scroller = BkgItem(paths['bkgPath'] + 'bluestone.jpg', self.canvas, True, self.scroller.imgFile)
         else:
-            self.scroller = BkgItem(paths['demo'] + 'bluestone.jpg', self.canvas)
+            self.scroller = BkgItem(paths['bkgPath'] + 'bluestone.jpg', self.canvas)
    
         self.scroller.direction = self.direction       
-        self.scroller.path = paths['demo']
+        self.scroller.path = paths['bkgPath']  
         self.scroller.tag = 'scroller'
         self.scroller.mirroring = True      
         self.scroller.bkgWorks.addTracker(self.scroller)  

@@ -66,7 +66,7 @@ class BkgWorks:
             self.bkgItem.tag = 'scroller'    
             self.bkgItem.rate = 0     
             
-            if self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):  
+            if self.canvas.openPlayFile in ('snakes'):  
                 self.bkgItem.path = paths['demo']
             else:
                 self.bkgItem.path = paths['bkgPath']
