@@ -1,5 +1,5 @@
 
-### Last Update: 05/28/2024
+### Last Update: 05/30/2024
        
 ---
 **To Begin**  
@@ -100,7 +100,21 @@ I've moved the really gnarly stuff concerning scrolling backgrounds to the **scr
 
 **Screentimes** and **moretimes** still provide the defaults for the **scrolling backgrounds screen rates** even though they're no longer tied to the code in **BkgItem.py**. By adding the **ScreenRate** slider to the **background widget** you're now able to adjust the rate and if the new rate is a better fit you can save it as the new default to **screenrates.dict** using the **update button**. The current **screen rate** value as well as the **factor** and **showtime** values are carried over if the **background** is saved to a **.play** file.
 
-Running a demo with a scrolling background will immediately inform you as to whether my best guess on **screenrates** was correct or not.  Probably not, which is why the demo background, **bluestone.jpg**, is in the **backgrounds** directory. It's there to aid in zeroing in on a new default value for that screen format or any of the other 12 screen formats.
+Running a demo with a scrolling background will immediately inform you as to whether my best guess on **screenrates** was correct or not.  Probably not, which is why the demo background, **bluestone.jpg**, is in the **backgrounds** directory. As it's the same background used in the demos - once you've got the background to scroll smoothly the demo will do the same. Some of the bat demo backgrounds are also now read from the backgrounds directory as I've deleted the three same named files from the demo directory.
+
+**Scrolling Backgrounds** are constantly being deleted and created and the data necessary to maintain the scrolling rate is lost between the two which is why I added the **newTracker** dictionary in **dotsBkgMaker.py**. Tracker data doesn't change unless there's a change in direction or to a control and it's saved between sessions when saving to a **.play** file.
+
+    tmp = {
+        "fileName":   os.path.basename(bkg.fileName),
+        "direction":  bkg.direction,
+        "mirroring":  bkg.mirroring,
+        "factor":     bkg.factor,
+        "rate":       bkg.rate,
+        "showtime":   bkg.showtime,
+        "useThis":    bkg.useThis,
+        "path":       bkg.path,
+        "scrollable": bkg.scrollable,
+    }
 
 ---
 
