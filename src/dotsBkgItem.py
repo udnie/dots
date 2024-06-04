@@ -58,7 +58,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.path = paths['bkgPath']    
         self.fileName = os.path.basename(fileName)  ## new
         
-        if self.canvas.openPlayFile in ('snakes'):      
+        
+        if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':      
             self.path = paths['demo']
  
         if not os.path.exists(self.path + self.fileName):
@@ -125,7 +126,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.dragCnt = 0
         self.save = QPointF()  
         
-        if self.canvas.openPlayFile in ('snakes'):
+        if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':   
             self.path = paths['demo']
         else:
             self.path = paths['bkgPath']  

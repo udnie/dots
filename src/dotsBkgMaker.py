@@ -63,7 +63,7 @@ class BkgMaker(QWidget):
                 self.mapper.removeMap()
 
         bkg = BkgItem(file, self.canvas) 
-        if bkg.fileName == None:
+        if bkg == None:
             return
         
         bkg.setZValue(common['bkgZ'])  ## always on top              
@@ -274,13 +274,15 @@ class BkgMaker(QWidget):
         p = bkg.sceneBoundingRect()
         bkg.setPos(p.x() , p.y())
         self.x, self.y = p.x() , p.y()     
-                    
+                                                 
+### --------------------- dotsBkgMaker ---------------------
+
     # def bkgTag(self, bkg, which=''):
     #     file = bkg.fileName
     #     if which != '':
     #         file = which + ': ' + file
     #     return f'{file}\t{bkg.direction}\t{bkg.rate}\t{bkg.factor}\t{bkg.showtime}'
-                             
-### --------------------- dotsBkgMaker ---------------------
+                                    
+                                    
                                     
                                     

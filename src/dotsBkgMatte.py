@@ -199,23 +199,25 @@ class Matte(QWidget):
                 self.border = 5
             elif self.border > self.step:
                 self.border -= self.step - 2
-                    
-    def mousePressEvent(self, e):
+        
+    ## stops the matte from losing focus by trapping the mouse clicks            
+    def mousePressEvent(self, e):   
         self.save = e.globalPosition()
         e.accept()
 
-    def mouseMoveEvent(self, e):
-        self.moveThis(e)
-        e.accept()
+    ## only needed to move the matte if you needed more room headspace          
+    # def mouseMoveEvent(self, e):  
+    #     self.moveThis(e)
+    #     e.accept()
         
-    def mouseReleaseEvent(self, e):
-        self.moveThis(e)
-        e.accept()
+    # def mouseReleaseEvent(self, e):
+    #     self.moveThis(e)
+    #     e.accept()
                       
-    def moveThis(self, e):
-        dif = e.globalPosition() - self.save      
-        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-        self.save = e.globalPosition()
+    # def moveThis(self, e):
+    #     dif = e.globalPosition() - self.save      
+    #     self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
+    #     self.save = e.globalPosition()
       
 ### --------------------------------------------------------     
 class HelpMenu:  ## for canvas - one key commands

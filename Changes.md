@@ -5,6 +5,27 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**June 2024**  
+**Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to **scrolling backgrounds** and running some **animations** but that isn't surprising as it's **PyQt5**.  I'd be real surprised if it were faster. **QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 
+
+**Some things that might help with the setup:** I first made sure I set the shell to **arm** and pip installed **PyQt5** and then **PyQt5-Qt5**. I then uninstalled **pygame**, **opencv-python** and **numpy** and with the shell set to  **arm** reinstalled them, though **opencv-python** is supposed to have numpy as part of the package. 
+
+I use vscode so I needed to edited the **.json settings** file and set the mac terminal to **arm** followed by adding the folder to the appropriate workspace as the **Qt5** code was in another directory.
+
+This may eliminate being able to use **pygame**, **opencv-python** and **numpy** with **PyQt6** if it's running in **x86** unless you have a way to maintain two separate installs - possibly with a virtual environment.
+    
+I've included an abbreviated diff between **PyQt6** and **PyQt5** in the **PyQt5 Diffs.txt** file. There's not a lot to deal with once you've changed **PyQt6** to **PyQt5** and **globalPosition()** to **globalPos()**.  Also included are the diffs from **extras**.
+
+Last to report - it's back in **PyQt5**:
+
+     Python[4447:75880] WARNING: Secure coding is not enabled for restorable state! 
+     Enable secure coding by implementing
+     NSApplicationDelegate.applicationSupportsSecureRestorableState: and returning YES.
+  
+and may cause an unexpected shutdown - it was showing up in **PyQt6** but haven't seen it lately.   
+    
+---
+
 **May 2024**  
 On April 17th I updated the **extras** folder, updating **outline** and **dropshadow** to **PyQt6**. Along the way I removed **castshadow** from **extras** as an updated and better version is in **dots shadows**.  I hadn't posted a video as my development setup was having a serious problem and I just had posted one the beginning of April.
 

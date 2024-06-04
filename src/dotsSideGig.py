@@ -109,7 +109,7 @@ def DemoAvailable():
     
 def getVuCtr(self):  ## used for menus - seems to work
     x,y = int(common['ViewW']/2), int(common['ViewH']/2) 
-    p = self.canvas.mapToGlobal(QPointF(x,y))
+    p = self.canvas.mapToGlobal(QPoint(x,y))
     return int(p.x()), int(p.y())
 
 def getOffSet(pix):

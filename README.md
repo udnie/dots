@@ -1,9 +1,9 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations with scrolling backgrounds and create sprites. 
 
-As of **February** dots has been updated to **PyQt 6.6**, **Python 3.12** and **Sonoma 14.2.1** on a M1 MacBook running in X86 mode, **Rosetta**. You will need to install **numpy** and **open-cv** as well if planning to use **SpriteMaker**, **ShadowMaker** or **Shadows**.
+In **February** **dots** was updated to **PyQt 6.6**, **Python 3.12** and **Sonoma 14.2.1** on a M1 MacBook running in **X86 mode**. As of **June 2024** you can now run **dots** on **Apple Silicon** using **PyQt5**. 
 
-**StartHere.md** has been updated as well as **Changes.md** and **keys.pdf** .  See **Changes** for the latest documentation and links to videos - the earlier ones best watched with closed captions as I was very intimated by having to speak into a very visible microphone.
+Definitely read the **June 2024** entry in **Changes.md**. You will need to install **numpy** and **open-cv** as well if planning to use **SpriteMaker**, **ShadowMaker** or **Shadows**.  **StartHere.md** has also been updated to cover the latest on **scrolling backgrounds** and fills in more on **shadows** as well.
 	  
 ## Stuff to know
 The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. 400 lines now seems to the current average. I also use camel case after many years of coding in snake.
@@ -24,7 +24,7 @@ The **star** in scrollPanel isn't currently designed to be dragged to the canvas
 
 
 ## Requirements
-* PyQt5 though you can probably still run PyQt5 with some edits 
+* PyQt6 though you can probably still run PyQt5 with some edits 
 * functools, though I'm sure it's built-in
 * cv2 and numpy for Sprites and Shadows
 * Your favorite program for creating transparent pngs if you have one or try **ShadowMaker**, it works and requires cv2 and numpy.
