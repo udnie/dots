@@ -23,6 +23,12 @@ Last to report - it's back in **PyQt5**:
      NSApplicationDelegate.applicationSupportsSecureRestorableState: and returning YES.
   
 and may cause an unexpected shutdown - it was showing up in **PyQt6** but haven't seen it lately.   
+
+---
+
+**June 4 2024**  
+Made a few changes to the above and a fix for the message box icon problem in **PyQt5**. See **BkgScrollWrks** and **SideGig** in **PyQt5 Diffs.txt**.
+
     
 ---
 

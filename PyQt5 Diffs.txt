@@ -15,8 +15,17 @@ dotsBkgMatte.py  ## should see this
 >       self.save = e.globalPos()
 
 dotsBkgScrollWrks.py   ## need to do this
-<   msgbox.setIconPixmap(pixmap)
->   # msgbox.setIconPixmap(pixmap)  ## takes up most of the scene otherwise
+
+	change to this  - fixes wild size
+
+        img = QImage(paths['spritePath'] + "doral.png")
+        img = img.scaled(60, 60,  ## keep it small
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+
+  	pixmap = QPixmap(img)   
+        msgbox.setIconPixmap(pixmap)
+
 
 dotsBkgWidget.py  (3)
 90c90
@@ -51,13 +60,17 @@ dotsShadowWidget.py  (3)
 
 dotsSideGig.py  ## need to do this
 22,24c23,25
-<         img = QImage(paths['spritePath'] + "doral.png")
-<         pixmap = QPixmap(img)   
-<         self.msg.setIconPixmap(pixmap)
----
->         # img = QImage(paths['spritePath'] + "doral.png")
->         # pixmap = QPixmap(img)   
->         # self.msg.setIconPixmap(pixmap)
+
+	change to this - fixes wild size
+
+        img = QImage(paths['spritePath'] + "doral.png")
+        img = img.scaled(60, 60,  ## keep it small
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+
+        pixmap = QPixmap(img)   
+        self.msg.setIconPixmap(pixmap)
+
 
 dotsTableMaker.py
 5,6c5,6
