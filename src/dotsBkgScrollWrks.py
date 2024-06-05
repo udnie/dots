@@ -102,6 +102,10 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             return   
     
         img = QImage(paths['spritePath'] + "doral.png")  ## icon .png
+
+        img = img.scaled(60, 60,  ## keep it small
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)  
         pixmap = QPixmap(img)    
    
         msgbox = QMessageBox()

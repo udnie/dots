@@ -23,6 +23,7 @@ from dotsDocks          import *
 from dotsWings          import Wings
 from dotsShowWorks      import ShowWorks
 from dotsMenus          import AnimationMenu
+from dotsSideGig        import MsgBox
 
 ### -------------------- dotsStoryBoard --------------------
 ''' class StoryBoard: program hub/canvas, includes context menu and 

@@ -3,7 +3,7 @@ import random
 import os
 import math
 
-from PyQt6.QtCore       import QTimer, QPointF, QRectF, QPoint
+from PyQt6.QtCore       import QTimer, QPointF, QRectF, QPoint, Qt
 from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap
 from PyQt6.QtWidgets    import QMessageBox
          
@@ -20,7 +20,12 @@ class MsgBox:  ## always use getCtr for setting point
         self.msg = QMessageBox()
                         
         img = QImage(paths['spritePath'] + "doral.png")
-        pixmap = QPixmap(img)   
+           
+        img = img.scaled(60, 60,  ## keep it small
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)  
+        pixmap = QPixmap(img) 
+        
         self.msg.setIconPixmap(pixmap)
         self.msg.setText('\n' + text)
         

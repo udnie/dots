@@ -14,9 +14,8 @@ dotsBkgMatte.py  ## should see this
 <       self.save = e.globalPosition()
 >       self.save = e.globalPos()
 
-dotsBkgScrollWrks.py   ## need to do this
 
-	change to this  - fixes wild size
+dotsBkgScrollWrks.py  ### been taken care of
 
         img = QImage(paths['spritePath'] + "doral.png")
         img = img.scaled(60, 60,  ## keep it small
@@ -58,10 +57,9 @@ dotsShadowWidget.py  (3)
 <   self.save = e.globalPosition()
 >   self.save = e.globalPos()
 
-dotsSideGig.py  ## need to do this
-22,24c23,25
 
-	change to this - fixes wild size
+dotsSideGig.py  ### been taken care of
+22,24c23,25
 
         img = QImage(paths['spritePath'] + "doral.png")
         img = img.scaled(60, 60,  ## keep it small
