@@ -1,20 +1,17 @@
 
 import os
   
-from PyQt6.QtCore       import Qt, QPoint, QPointF, pyqtSlot
-from PyQt6.QtGui        import QPixmap, QImage, QCursor
-from PyQt6.QtWidgets    import QGraphicsPixmapItem
+from PyQt6.QtCore       import QPoint, QPointF
+from PyQt6.QtGui        import QCursor
 
 from dotsSideGig        import constrain
 from dotsShared         import common, RotateKeys
 from dotsMenus          import AnimationMenu
-from dotsTagsAndPaths   import TagsAndPaths
-from dotsBkgScrollWrks  import tagBkg
 
 import dotsAnimation    as Anime
 
-### ------------------- dotsPixFrameWorks ------------------
-''' classes: Frame and Works(functions moved from Pixitem and PixWidget) '''                                                                                           
+### ---------------------- dotsPixWorks --------------------
+''' classes: Works(functions moved from Pixitem and PixWidget) '''                                                                                           
 ### --------------------------------------------------------
 Pct = -0.50   ## used by constrain - percent allowable off screen
 
@@ -22,74 +19,7 @@ PixSizes = {  ## match up on base filename using 5 characters - sometimes called
     # "apple": (650, 450),  ## see setPixSizes below
     'doral': (215, 215),
 }
- 
-### --------------------------------------------------------
-class Frame(QGraphicsPixmapItem):  ## stripped down pixItem - that's why it's here, sort of
-### --------------------------------------------------------
-    def __init__(self, fileName, parent, z):  
-        super().__init__()
-
-        self.canvas = parent  
-        self.mapper = self.canvas.mapper
-        
-        self.tagsAndPaths = TagsAndPaths(self)
-              
-        self.fileName = fileName  ## needs to contain 'frame'
-        self.type = 'frame'  
-          
-        self.x, self.y = 0, 0  
-        self.setZValue(z)
-        
-        self.tag = ''  
-        self.locked = True
-        
-        self.id = self.canvas.pixCount ## used by mapper
-        self.key = ''
-    
-        img = QImage(fileName)
-        
-        w = common["ViewW"]  ## from screens
-        h = common["ViewH"] 
-
-        img = img.scaled(int(w), int(h),
-            Qt.AspectRatioMode.KeepAspectRatio,
-        Qt.TransformationMode.SmoothTransformation)
-        
-        self.setPixmap(QPixmap(img))
-        self.setPos(QPointF(0,0))
-        
-        del img
-        
-        self.setAcceptHoverEvents(True)
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
-         
-  ### --------------------------------------------------------
-    @pyqtSlot(str)  ## updated by storyboard
-    def setPixKeys(self, key):
-        self.key = key  
-            
-    def hoverLeaveEvent(self, e):
-        self.mapper.clearTagGroup()
-        e.accept()
-           
-    def mousePressEvent(self, e):     
-        if self.canvas.pathMakerOn == False:      
-            if self.key == 'del':     
-                self.canvas.showWorks.deleteFrame(self)  
-            elif self.key in ('enter','return'):  
-                if self.locked:
-                    self.locked = False
-                self.setZValue(self.canvas.mapper.toFront(1)) 
-                self.locked = True
-            elif self.key in ('opt', 'tag'): 
-                tagBkg(self, self.pos())
-            e.accept()
-      
-    def mouseReleaseEvent(self, e):
-        if self.canvas.pathMakerOn == False:
-            self.key = '' 
-            e.accept()
-                                                                                 
+                                                                               
 ### --------------------------------------------------------
 class Works:  ## extends pixitem and pixwidget
 ### --------------------------------------------------------
@@ -205,8 +135,7 @@ class Works:  ## extends pixitem and pixwidget
                                                                                        
     def flopIt(self):
         self.pix.setMirrored(False) if self.pix.flopped else self.pix.setMirrored(True)
-                                                                                                          
-### ------------------- dotsPixFrameWorks ------------------
 
+### ---------------------- dotsPixWorks --------------------
 
 

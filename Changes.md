@@ -26,10 +26,9 @@ and may cause an unexpected shutdown - it was showing up in **PyQt6** but haven'
 
 ---
 
-**June 4 2024**  
-Made a few changes to the above and a fix for the message box icon problem in **PyQt5**. See **BkgScrollWrks** and **SideGig** in **PyQt5 Diffs.txt**.
+**June 9 2024**  
+Made a few changes to the above and a fix for the message box icon problem in **PyQt5**. 
 
-    
 ---
 
 **May 2024**  

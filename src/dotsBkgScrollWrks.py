@@ -16,61 +16,7 @@ showtime = {  ## trigger to add a new background based on number of pixels remai
     'vertical': 17,  ## trying this out 
 }
 
-### ------------------ dotsBkgScrollWrks ------------------- 
-''' classes: Tracker, Flat, ScrollWrks (functions used for scrolling support) '''    
-### -------------------------------------------------------- 
-class Flat(QGraphicsPixmapItem):
-### -------------------------------------------------------- 
-    def __init__(self, color, parent, z=common['bkgZ']):
-        super().__init__()
-
-        self.bkgMaker = parent
-        self.canvas   = self.bkgMaker.canvas 
-        self.scene    = self.bkgMaker.scene
-            
-        self.fileName = 'flat'
-        self.type    = 'flat'
-        
-        self.color = QColor(color)
-        self.tag   = QColor(color)
-      
-        self.locked = True
-        self.setZValue(z)
-        
-        self.id = 0   
-        self.key = ''
-        self.x, self.y = 0, 0
-
-        p = QPixmap(common['ViewW'],common['ViewH'])
-        p.fill(self.color)
-        
-        self.setPixmap(p)      
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-        
-### --------------------------------------------------------
-    @pyqtSlot(str)  ## updated by storyboard
-    def setPixKeys(self, key):
-        self.key = key  
-
-    def mousePressEvent(self, e):      
-        if not self.canvas.pathMakerOn:     
-            if self.key == 'del':     
-                self.delete()
-            elif self.key == '/':  ## to back
-                self.bkgMaker.back(self)
-            elif self.key in ('enter','return'):  
-                self.setZValue(self.canvas.mapper.toFront())                       
-        e.accept()
-      
-    def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
-            self.key = ''       
-        e.accept()
-     
-    def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
-             
-### --------------------------------------------------------  
+### ------------------ dotsBkgScrollWrks -------------------           
 class BkgScrollWrks:  ## mainly functions used for scrolling 
 ### --------------------------------------------------------
     def __init__(self, parent):  

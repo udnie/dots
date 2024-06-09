@@ -4,7 +4,7 @@ from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
-from dotsPixFrameWorks  import Works
+from dotsPixWorks       import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 from dotsBkgScrollWrks  import tagBkg

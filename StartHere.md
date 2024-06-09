@@ -73,8 +73,7 @@ The menus for **Animations and Paths**, **Demo Menu**, **HelpMenu** and the **Sc
 **Widgets and Keys**  
 A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMaker** from a blank canvas, will pop up a widget that provides access to the most often used functions such as scaling, rotation or scrolling controls.
 
-
-There are also a number of **keyboard** controls that either match the functions provided by the widgets or add additional functions, especially if more than one **sprite** has been selected.  The right hand panel displays a set of allowable keys and their function. There's one set for the start screen, the **canvas**,  and another for **pathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active.
+There are also a number of **keyboard** controls that either match the functions provided by the widgets or add additional functions, especially if more than one **sprite** has been selected.  The right hand panel is a scrolling list of the keys, key combinations and their actions. The key assignments will change as you switch between **StoryBoard/Canvas** and **PathMaker** or by entering **'K'** from the keyboard . **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active.
 
 ---
 

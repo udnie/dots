@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem
 
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
-from dotsPixFrameWorks  import Frame
+from dotsFrameAndFlats  import Frame
 
 ### --------------------- dotsShowWorks --------------------
 ''' functions for scroller cleanup, saving play files, setting play buttons 

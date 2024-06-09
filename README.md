@@ -1,20 +1,18 @@
 ## DotsQt  
-**DotsQt** provides a canvas for creating photo-collage and 2D animations using transparent .pngs as sprites/clip-art, think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, run animations with scrolling backgrounds and create sprites. 
+**DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds.
 
-In **February** **dots** was updated to **PyQt 6.6**, **Python 3.12** and **Sonoma 14.2.1** on a M1 MacBook running in **X86 mode**. As of **June 2024** you can now run **dots** on **Apple Silicon** using **PyQt5**. 
+Currently **dots** is running on **PyQt 6.6.1**, **Python 3.11.7** and **Sonoma 14.5** on a M1 MacBook in **X86 mode.** As of **June 2024** you can now run **dots** on **Apple Silicon** using **PyQt5**. Definitely read the **June 2024** entry in **Changes.md** - it's not difficult.
 
-Definitely read the **June 2024** entry in **Changes.md**. You will need to install **numpy** and **open-cv** as well if planning to use **SpriteMaker**, **ShadowMaker** or **Shadows**.  **StartHere.md** has also been updated to cover the latest on **scrolling backgrounds** and fills in more on **shadows** as well.
+You'll need to install **opencv-python** if you plan to use **SpriteMaker**, **ShadowMaker** or **Shadows** - **numpy** is included in **opencv**.  **StartHere.md** has also been updated to cover the latest on **scrolling backgrounds** and **shadows** as well as whatever else I thought might be useful.  
 	  
 ## Stuff to know
-The code can change over time.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. 400 lines now seems to the current average. I also use camel case after many years of coding in snake.
+The code can change over time and it does.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. I also use camel case after many years of coding in snake.
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %30-%40 of its original size when displaying it. You can also set the starting width and height for any Sprite, see **dotsPixItem**.
 
-The right hand panel is a scrolling list of the keys, key combinations and their actions. The key assignments will change as you switch between StoryBoard and PathMaker or by entering **'K'**.
+The **background** image needs to reside in the **backgrounds** folder as **dots** only looks in the **background** and **demo** folders for backgrounds. I'd recommend making any changes, mainly sizing and orientation, prior to deploying it. 
 
-The **background** image should reside in the backgrounds folder if you're planning to reuse it. You can also save a copy of it to the backgrounds folder using the save button in the button dock or widget. The copy will have the first 15 characters of the file name plus **'-bkg'** and will set itself as the background image replacing the original. Mainly used if you cropped the original and don't want to save it cropped.
-
-An alternative is to have a formatted photo in the backgrounds folder that doesn't need cropping. Adding it as a background and saving it with **play** will set it to the background when reloaded.  Once a background image has been **set** it can deleted, flopped, or sent to the back if more than one background was set.
+Flat colors will be saved to the backgrounds folder using the save button in the backgrounds button dock. The file name is up to you with **'.bkg'** as the file extension.  Saving a **background** to a **'.play'** file will preserve any settings you might have made, such as for scrolling.
 
 If you plan to run it on a Windows machine you'll need to edit the **paths** dictionary in **dotsShared.py**.   
 

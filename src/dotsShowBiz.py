@@ -16,7 +16,7 @@ from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
 from dotsShowFiles      import ShowFiles   
-from dotsPixFrameWorks  import Frame
+from dotsFrameAndFlats  import Frame
 from dotsTableMaker     import TableView
 
 from dotsMenus          import DemoMenu, HelpMenu, ScreenMenu

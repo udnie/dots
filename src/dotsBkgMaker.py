@@ -13,7 +13,7 @@ from dotsShared         import common, paths, ControlKeys
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
-from dotsBkgScrollWrks  import Flat
+from dotsFrameAndFlats  import Flat
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
