@@ -27,7 +27,10 @@ and may cause an unexpected shutdown - it was showing up in **PyQt6** but haven'
 ---
 
 **June 9 2024**  
-Made a few changes to the above and a fix for the message box icon problem in **PyQt5**. 
+Made a few changes to the above and a fix to the message box icon problem in **PyQt5** I had earlier. 
+
+**June 11 2024**  
+Added a **'shift-arrowUp/arrowDown'**  key combination to the **background widget** that moves the **screenrate** slider **.01** rather than the **.05** without the shift.  In **dotsBkgMatte.py** added a message box to let you know there's no more room to scale up to and a **double-click** to the border to quit.
 
 ---
 

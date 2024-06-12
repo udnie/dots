@@ -4,7 +4,7 @@ from PyQt6.QtGui        import QColor, QPainter, QPainterPath, QBrush, QImage
 from PyQt6.QtWidgets    import QWidget, QMenu
    
 from dotsShared         import common, paths
-from dotsSideGig        import getVuCtr
+from dotsSideGig        import getVuCtr, MsgBox
 
 ## these keys + shift - replace the run, (pause, resume), and stop buttons if covered by the matte 
 ShiftKeys = (Qt.Key.Key_R, Qt.Key.Key_P, Qt.Key.Key_S) 
@@ -56,9 +56,9 @@ class Matte(QWidget):
         self.white = QBrush(QColor(250,250,250))
         self.pix   = None
         
-        self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## photo matte
+        self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## photo used by matte
     
-        self.border = 100  ## inital
+        self.border = 30  ## inital
         self.step   = 27
         self.stop   = 50  ## min y.() - Max Headroom
         self.brush  = self.white  ## default   
@@ -67,7 +67,7 @@ class Matte(QWidget):
         self.altRatio = .77 ##.55 = 16:9 # .77  
         self.resize(common['ViewW']+100, common['ViewH']+100) 
         
-        self.move(self.x, self.y) 
+        self.move(self.x, self.y)  ## 0,0 for canvas relative to actual screen format
         
         self.helpMenu = None
         self.helpMenu = HelpMenu(self)
@@ -86,7 +86,7 @@ class Matte(QWidget):
  
         path = QPainterPath() 
     
-        viewW = int(common['ViewW']+(self.border*2))
+        viewW = int(common['ViewW']+(self.border*2))  ## inner
         viewH = int(common['ViewH']+(self.border*2)*self.ratio)
     
         self.resize(viewW, viewH) 
@@ -124,20 +124,13 @@ class Matte(QWidget):
             self.canvas.showtime.pause() 
                 
         elif key == Qt.Key.Key_Greater:  ## scale up  
-            self.scaleThis(key)       
-            if self.y-(self.border*self.ratio) <= self.stop:
-                self.border -= self.step ## back it off - top of screen display
+            self.scaleUp()       
                 
         elif key == Qt.Key.Key_Less:  ## scale down
-            self.scaleThis(key)   
+            self.scaleDown()   
                    
         elif key in (Qt.Key.Key_Q, Qt.Key.Key_X):
-            if self.help == True:      
-                self.helpMenu.closeHelpMenu() 
-                
-            self.bkgMaker.matte = None      
-            self.view.grabKeyboard()       
-            self.close()   
+            self.bye()
                  
         elif key == Qt.Key.Key_H: 
             self.helpMenu.openHelpMenu() if self.help == False else \
@@ -182,43 +175,44 @@ class Matte(QWidget):
         e.accept()
         
 ### --------------------------------------------------------   
-    def scaleThis(self, key):
-        if key == Qt.Key.Key_Greater:
-            wuf = self.border
-            if self.border == 5:
-                self.border = 12     
-            elif self.border == 12: 
-                self.border = self.step  
-            elif self.border >= self.step:
-                self.border += self.step + 2
-            if self.border == wuf: self.border = 12  ## stuck, next size up      
-        else:    
-            if self.border == self.step: 
-                self.border = 12  
-            elif self.border == 12:
-                self.border = 5
-            elif self.border > self.step:
-                self.border -= self.step - 2
+    def scaleUp(self):      
+        wuf = self.border
+        if self.border == 5:
+            self.border = 12     
+        elif self.border == 12: 
+            self.border = self.step  
+        elif self.border >= self.step:
+            self.border += self.step + 2
+        if self.border == wuf: 
+            self.border = 12  ## stuck, next size up            
+        if self.y-(self.border*self.ratio) < self.stop:
+            self.border = wuf  ## back it off - top of screen display
+            MsgBox('  Max Headroom  ', 5)  ## can vary 
+                   
+    def scaleDown(self):           
+        if self.border == self.step: 
+            self.border = 12  
+        elif self.border == 12:
+            self.border = 5
+        elif self.border > self.step:
+            self.border -= self.step - 2
         
-    ## stops the matte from losing focus by trapping the mouse clicks            
+    ## stops the matte from losing focus by trapping mouse clicks           
     def mousePressEvent(self, e):   
         self.save = e.globalPosition()
         e.accept()
-
-    ## only needed to move the matte if you needed more room headspace          
-    # def mouseMoveEvent(self, e):  
-    #     self.moveThis(e)
-    #     e.accept()
-        
-    # def mouseReleaseEvent(self, e):
-    #     self.moveThis(e)
-    #     e.accept()
-                      
-    # def moveThis(self, e):
-    #     dif = e.globalPosition() - self.save      
-    #     self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-    #     self.save = e.globalPosition()
-      
+            
+    def mouseDoubleClickEvent(self, e): 
+        self.bye()
+        e.accept()   
+            
+    def bye(self):
+        if self.help == True:      
+            self.helpMenu.closeHelpMenu()     
+        self.bkgMaker.matte = None   
+        self.view.grabKeyboard()     
+        self.close()       
+            
 ### --------------------------------------------------------     
 class HelpMenu:  ## for canvas - one key commands
 ### -------------------------------------------------------- 

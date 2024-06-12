@@ -1,5 +1,6 @@
 
 import os.path
+import math
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter
@@ -7,6 +8,8 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QSlider, QHBoxLayout, QVBoxLayout, QPushButton
                             
 from dotsBkgWorks       import BkgWorks
+
+ShiftKeys = (Qt.Key.Key_Up, Qt.Key.Key_Down) 
       
 ### ------------------- dotsShadowWidget -------------------                                                                                                                                                            
 class BkgWidget(QWidget):  
@@ -27,7 +30,7 @@ class BkgWidget(QWidget):
                       
         self.setAccessibleName('widget')
         self.WidgetW, self.WidgetH = 385.0, 305.0
-                    
+                  
         vbox = QVBoxLayout()  
           
         hbox = QHBoxLayout()
@@ -63,11 +66,18 @@ class BkgWidget(QWidget):
                    
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
-        key = e.key()    
+        key = e.key()     
+        mod = e.modifiers()
+   
+        if key in ShiftKeys and mod & Qt.KeyboardModifier.ShiftModifier: 
+            points = .01    
+        else:
+            points = .05
+            
         if key == Qt.Key.Key_Up:  
-            self.setBkgRateValue(int(self.bkgItem.rate *100) + 5)
+            self.setBkgRateValue(int((self.bkgItem.rate + points) *100))
         elif key == Qt.Key.Key_Down: 
-            self.setBkgRateValue(int(self.bkgItem.rate *100) - 5)
+            self.setBkgRateValue(int((self.bkgItem.rate - points) *100))
         elif key ==Qt.Key.Key_S and self.canvas.control != '':
             self.canvas.showtime.stop()     
         elif key == Qt.Key.Key_Space:          

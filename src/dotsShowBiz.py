@@ -225,10 +225,10 @@ class ShowBiz:
   
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
-        file = os.path.basename(self.canvas.openPlayFile) 
-        if 'play' in file:  ## could be something else
+        fileName = os.path.basename(self.canvas.openPlayFile) 
+        if 'play' in fileName:  ## could be something else
             if ns == 0 and self.locks == 0:
-                self.dots.statusBar.showMessage(f"{file} - Number of Pixitems: {kix}")
+                self.dots.statusBar.showMessage(f"{fileName} - Number of Pixitems: {kix}")
             elif ns > 0:  ## there must be shadows
                 QTimer.singleShot(200, self.addShadows)
                 t = int(1 + (ns * .25))
@@ -240,7 +240,7 @@ class ShowBiz:
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
                 self.canvas.mapper.toggleTagItems('all')                                                  
-        QTimer.singleShot(12000, partial(self.dots.statusBar.showMessage, file)) 
+        QTimer.singleShot(12000, partial(self.dots.statusBar.showMessage, fileName)) 
 
 ### --------------------------------------------------------                                                  
     def addShadows(self):  ## add shadows after adding pixitems     

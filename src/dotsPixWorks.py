@@ -10,17 +10,14 @@ from dotsMenus          import AnimationMenu
 
 import dotsAnimation    as Anime
 
-### ---------------------- dotsPixWorks --------------------
-''' classes: Works(functions moved from Pixitem and PixWidget) '''                                                                                           
-### --------------------------------------------------------
 Pct = -0.50   ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
     # "apple": (650, 450),  ## see setPixSizes below
     'doral': (215, 215),
 }
-                                                                               
-### --------------------------------------------------------
+
+### ---------------------- dotsPixWorks --------------------                                                                            
 class Works:  ## extends pixitem and pixwidget
 ### --------------------------------------------------------
     def __init__(self, parent):
