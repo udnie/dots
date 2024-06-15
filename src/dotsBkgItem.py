@@ -58,7 +58,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.path = paths['bkgPath']    
         self.fileName = os.path.basename(fileName)  ## new
         
-        
         if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':      
             self.path = paths['demo']
  
@@ -125,13 +124,22 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = ''    
         self.dragCnt = 0
         self.save = QPointF()  
+          
+        play, rot = '', 0
         
         if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':   
             self.path = paths['demo']
         else:
             self.path = paths['bkgPath']  
+            play = os.path.basename(self.canvas.openPlayFile)
          
-        self.canvas.dots.statusBar.showMessage(self.fileName, 5000) 
+        if  self.width > self.height:
+            rot = self.width/self.height
+        else:
+            rot = self.height/self.width
+            
+        fn = f'{play}   {self.fileName}   {self.width}   {self.height}   {rot:.2f}'
+        self.canvas.dots.statusBar.showMessage(fn, 12000) 
                
 ### -------------------------------------------------------- 
     @pyqtSlot(str)
@@ -196,14 +204,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 ### -------------------------------------------------------- 
     def addNextScroller(self): 
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
-     
-        if self.mirroring == False:  ## continuous
-            item.setMirrored(False)
-        elif self.ratio <= 27 or self.dots.Vertical == False:  ## 27:9 = 3:1 
+                                      
+        if self.mirroring == True or self.dots.Vertical == False:
             item.setMirrored(False) if self.flopped else item.setMirrored(True) 
         else:
             item.setMirrored(False)
-                                 
+                                      
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     
