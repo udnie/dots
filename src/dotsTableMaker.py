@@ -56,7 +56,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.selected = []  ## fileName and zValue used to delete selected rows rather than just by filename
         self.typelist = []  ## stores type, hdr, col
              
-        self.Missingfiles = []  ## copy of missing files
+        self.Missingfiles = []  ## copy of missing files - showWorks has MissingFiles
          
 ### --------------------------------------------------------              
         self.tableView = QTableView()        
@@ -140,43 +140,45 @@ class TableView:  ## formats a json .play file to display missing files or not
         del data
  
 ### --------------------------------------------------------
-    def reposition(self, height):
-        g = getCtr()  ## reposition viewer if column number changes
-        x = int(g.x() - Columns[self.cols]/2)
-        y = int(g.y() - int(height/2)-100)
-        return QPoint(x, y)
-
     def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
-        if len(self.selected) > 0:  self.selected.clear() 
-        if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
-            for indexes in sorted(self.tableView.selectionModel().selectedRows()):
-                ## print(self.model.data[indexes.row()][:5])
-                self.updateSelected(self.model.data[indexes.row()])
-        else:
-            for tmp in self.Missingfiles:  ## delete all 
-                self.selected.append((tmp['fileName'], tmp['z']))    
+        if len(self.selected) > 0: 
+            self.selected.clear() 
+            
+        if len(self.Missingfiles) > 0: 
+            if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
+                for indexes in sorted(self.tableView.selectionModel().selectedRows()):
+                    if self.isMissing(self.model.data[indexes.row()]) == True:
+                        self.updateSelected(self.model.data[indexes.row()])
+            else:
+                for tmp in self.Missingfiles:  ## delete all missing files
+                    self.selected.append((tmp['fileName'], tmp['z'])) 
+                       
         if len(self.selected) > 0:  
             self.deleteKey = True  
             sorted(self.selected, key=lambda x: x[1], reverse=True)     
             self.deleteFromTable() 
             self.makeTable(self.data)  ## writes a new tmp file if there's anything to write
-     
+            
+### --------------------------------------------------------   
+    def isMissing(self, row):
+        for tmp in self.Missingfiles:
+            if row[0] == tmp['fileName'] and row[4] == tmp['z']:
+                return True
+        return False
+       
     def updateSelected(self, tmp):  ## make a list of fileName and zValue 
-        file  = tmp[0]  ## fileName
-        zval = tmp[4]  ## the zValue
-        if 'fileName' in file:  ## it's a hdr
+        if 'fileName' in tmp[0]:  ## it's a hdr
             return
-        self.selected.append((file, zval))  
+        self.selected.append((tmp[0], tmp[4]))  
          
-    def deleteFromTable(self):  ## doesn't effect actual file unless saved 
-        # print('del', list(self.selected))     
+    def deleteFromTable(self):  ## doesn't effect actual file unless saved    
         for s in self.selected:  
             for tmp in self.data:
-                if s[0] == tmp['fileName'] and s[1] == tmp['z']:
-                    # print('bb', s[0] ,tmp['fileName'], s[1], tmp['z'])        
+                if s[0] == tmp['fileName'] and s[1] == tmp['z']:    
                     self.data.remove(tmp) 
                     break
-                              
+                
+### --------------------------------------------------------                            
     def resetColumnWidths(self, width):  
         for i in range(0, self.cols):  
             if i in ColumnWidths:  ## reduce column widths for these
@@ -191,7 +193,13 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.showtime.savePlay()  ## drops any missing files
         else:
             self.showWorks.saveToPlays(self.data)  ## retains remaining missing files when saved
-      
+ 
+    def reposition(self, height):
+        g = getCtr()  ## reposition viewer if column number changes
+        x = int(g.x() - Columns[self.cols]/2)
+        y = int(g.y() - int(height/2)-100)
+        return QPoint(x, y)
+ 
     def bye(self): 
         self.tableView.setModel(None)  ## clears the table - a must do
         self.tableView.close() 

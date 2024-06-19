@@ -62,8 +62,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.path = paths['demo']
  
         if not os.path.exists(self.path + self.fileName):
-            MsgBox(f'BkgItem Error: {self.fileName} Not Found', 6)
-            return None
+            self.type = None        
+            MsgBox(f'BkgItem Error: {self.fileName} Not Found', 5)
+            return
 
         self.setZValue(z)      
         self.init(copy)

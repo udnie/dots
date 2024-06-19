@@ -63,9 +63,9 @@ class BkgMaker(QWidget):
                 self.mapper.removeMap()
 
         bkg = BkgItem(file, self.canvas) 
-        if bkg == None:
+        if bkg.type == None:
             return
-        
+ 
         bkg.setZValue(common['bkgZ'])  ## always on top              
         self.scene.addItem(bkg)    
    
