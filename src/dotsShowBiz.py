@@ -240,7 +240,7 @@ class ShowBiz:
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
                 self.canvas.mapper.toggleTagItems('all')                                                  
-        QTimer.singleShot(12000, partial(self.dots.statusBar.showMessage, fileName)) 
+        QTimer.singleShot(17000, partial(self.dots.statusBar.showMessage, fileName)) 
 
 ### --------------------------------------------------------                                                  
     def addShadows(self):  ## add shadows after adding pixitems     

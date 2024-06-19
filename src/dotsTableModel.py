@@ -113,7 +113,7 @@ class TableModel(QAbstractTableModel):
                     return self.header[col]
         except:
             return  ## because the header may not match longest set of values
-            
+      
 ### --------------------- dotsTableModel ------------------- 
  
         

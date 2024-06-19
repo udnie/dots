@@ -96,7 +96,6 @@ class Flat(QGraphicsPixmapItem):
         self.locked = True
         self.setZValue(z)
         
-        self.id = 0   
         self.key = ''
         self.x, self.y = 0, 0
 

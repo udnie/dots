@@ -124,7 +124,7 @@ class TagsAndPaths:
                         alltags = pix.tag
                         self.tagThis('',pix, topZVal)         
                 elif pix.isSelected():
-                    self.tagThis('',pix, topZVal)
+                    self.tagThis('', pix, topZVal)
                     k += 1
                 elif pix.type == 'frame':  ## single tag  
                     self.tagThis('',pix, topZVal) 

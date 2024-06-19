@@ -1,7 +1,8 @@
 
 import os
+from functools          import partial
 
-from PyQt6.QtCore       import Qt
+from PyQt6.QtCore       import Qt, QTimer, QPoint
 from PyQt6.QtGui        import QFont, QKeySequence, QShortcut
 from PyQt6.QtWidgets    import QTableView, QAbstractItemView
 
@@ -56,7 +57,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.typelist = []  ## stores type, hdr, col
              
         self.Missingfiles = []  ## copy of missing files
-                
+         
 ### --------------------------------------------------------              
         self.tableView = QTableView()        
         self.tableView.horizontalHeader().setStretchLastSection(True)
@@ -103,26 +104,26 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.shortcut.activated.connect(self.deleteSelectedRows) 
  
         self.tableView.setAlternatingRowColors(True) 
-               
-        ## unpackit calls addTable which creates the display
-        self.unpackIt(self.setupHdrs(self.makeTable(self.data))) 
-                                                 
+          
+        self.makeTable(self.data)  ## eventually calls addTable
+                                                              
 ### --------------------------------------------------------
-    def addTable(self, data, miss, save):      
-        font = QFont("Arial", 14)    
+    def addTable(self, data, miss, save):        
         width, height = self.widthHeight(data)
         
         file = os.path.basename(self.canvas.openPlayFile)
-        
-        self.dots.statusBar.showMessage(file) 
-        self.tableView.setWindowTitle(f"{file} - {len(data)} rows") 
-        
+        self.dots.statusBar.showMessage(file)      
+          
+        self.tableView.setWindowTitle(f"C: to Close -- D: to Delete -- J: Toggles Viewer -- S: to Save")
+        QTimer.singleShot(10000, partial(self.tableView.setWindowTitle, f"{file} - {len(data)} rows"))  
+   
         self.model = TableModel(data, self.cols, self.hdr)   
         self.tableView.setModel(self.model)
       
         width = self.resetColumnWidths(width)
        
         ## make changes to the table layout by row - good to know - thanks Martin
+        font = QFont("Arial", 14)  
         for i in save: 
             self.model.setHdrColor(i, '#e2e2e2')  ## make it look like a header
             self.model.setHdrFonts(i, font)  ## type instructions
@@ -132,14 +133,50 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.model.setMisses(i, font)
             
         self.tableView.resize(width, height)
+        self.tableView.move(self.reposition(height))  ## uses both width(self.cols) & height
+        
         self.tableView.show()
-   
-        p, g = self.tableView.pos(), getCtr()  ## move it up a bit higher                  
-        self.tableView.move(p.x(), g.y() - int(height/2)-100) 
         
         del data
  
 ### --------------------------------------------------------
+    def reposition(self, height):
+        g = getCtr()  ## reposition viewer if column number changes
+        x = int(g.x() - Columns[self.cols]/2)
+        y = int(g.y() - int(height/2)-100)
+        return QPoint(x, y)
+
+    def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
+        if len(self.selected) > 0:  self.selected.clear() 
+        if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
+            for indexes in sorted(self.tableView.selectionModel().selectedRows()):
+                ## print(self.model.data[indexes.row()][:5])
+                self.updateSelected(self.model.data[indexes.row()])
+        else:
+            for tmp in self.Missingfiles:  ## delete all 
+                self.selected.append((tmp['fileName'], tmp['z']))    
+        if len(self.selected) > 0:  
+            self.deleteKey = True  
+            sorted(self.selected, key=lambda x: x[1], reverse=True)     
+            self.deleteFromTable() 
+            self.makeTable(self.data)  ## writes a new tmp file if there's anything to write
+     
+    def updateSelected(self, tmp):  ## make a list of fileName and zValue 
+        file  = tmp[0]  ## fileName
+        zval = tmp[4]  ## the zValue
+        if 'fileName' in file:  ## it's a hdr
+            return
+        self.selected.append((file, zval))  
+         
+    def deleteFromTable(self):  ## doesn't effect actual file unless saved 
+        # print('del', list(self.selected))     
+        for s in self.selected:  
+            for tmp in self.data:
+                if s[0] == tmp['fileName'] and s[1] == tmp['z']:
+                    # print('bb', s[0] ,tmp['fileName'], s[1], tmp['z'])        
+                    self.data.remove(tmp) 
+                    break
+                              
     def resetColumnWidths(self, width):  
         for i in range(0, self.cols):  
             if i in ColumnWidths:  ## reduce column widths for these
@@ -149,45 +186,18 @@ class TableView:  ## formats a json .play file to display missing files or not
         else:
             return width + 10
  
-    def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
-        self.selected.clear() 
-        if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
-            for indexes in sorted(self.tableView.selectionModel().selectedRows()):
-                # print(self.model.data[indexes.row()][:5])
-                self.updateSelected(self.model.data[indexes.row()])
-        else:
-            for tmp in self.Missingfiles:  ## delete all 
-                self.selected.append((tmp['fileName'], tmp['z']))
-            self.deleteKey = True
-        if len(self.selected) > 0:             
-            self.updateTables()   
-            # print('make', list(self.selected))    
-            self.makeTable(self.data)  ## writes a new tmp file if there's anything to write
-     
-    def updateSelected(self, tmp):  ## make a list of fileName and zValue  
-        file  = tmp[0]  ## fileName
-        zval = tmp[4]  ## the zValue
-        if 'fileName' in file:  ## it's a hdr
-            return
-        self.selected.append((file, zval))
-         
-    def updateTables(self):  ## delete rows from view display and model data
-        sorted(self.selected, key=lambda x: x[1], reverse=True)  
-        self.deleteFromTable()  
-                          
-    def deleteFromTable(self):  ## doesn't effect actual file 
-        for s in self.selected:
-            for tmp in self.data:
-                if s[0] == tmp['fileName'] and s[1] == tmp['z']:
-                    self.data.remove(tmp) 
-                    break   
-
     def shuffle(self):  ## the save key
         if self.src != 'table':  
-            self.showtime.savePlay()  ## drops missing files if any
+            self.showtime.savePlay()  ## drops any missing files
         else:
-            self.showWorks.saveToPlays(self.data)  ## doesn't filter out missing
-                        
+            self.showWorks.saveToPlays(self.data)  ## retains remaining missing files when saved
+      
+    def bye(self): 
+        self.tableView.setModel(None)  ## clears the table - a must do
+        self.tableView.close() 
+        self.tableView.src = ''  
+        self.dots.statusBar.showMessage('')
+                          
 ### --------------------------------------------------------          
     def makeTable(self, dlist):  ## first make the typelist 
         ## order .play file by Types = ['frame', 'pix', 'bkg', 'flat'] - see common
@@ -203,8 +213,7 @@ class TableView:  ## formats a json .play file to display missing files or not
                     save.append(tmp)  ## saving them by type                        
         dlist = save
         del save    
-        
-        return dlist  
+ 
         self.setupHdrs(dlist)
  
 ### --------------------------------------------------------                    
@@ -219,9 +228,8 @@ class TableView:  ## formats a json .play file to display missing files or not
                         typ.hdr = list(tmp.keys())
                     if len(tmp.keys()) > self.cols:  ## save the most number of columns
                         self.cols = len(tmp.keys()) 
-        
-        return dlist             
-        # self.unpackIt(dlist)
+            
+        self.unpackIt(dlist)
     
 ### -------------------------------------------------------- 
     def unpackIt(self, dlist):
@@ -272,12 +280,6 @@ class TableView:  ## formats a json .play file to display missing files or not
             width = MinCols * ColWidth
         width += 20         
         return width, height
-
-    def bye(self): 
-        self.tableView.setModel(None)  ## clears the table - a must do
-        self.tableView.close() 
-        self.tableView.src = ''
-        self.dots.statusBar.showMessage('') 
            
 ### --------------------- dotsTableMaker -------------------
   

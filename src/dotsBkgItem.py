@@ -87,16 +87,14 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.imgFile = copy
                     
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
-                                                
-        self.id = 0  ## not used except for conisistency          
+                                                       
         self.flopped = False
         self.locked = False
          
         self.width  = self.imgFile.width()
         self.height = self.imgFile.height() 
             
-        if not self.dots.Vertical: 
-            self.setMirrored(False)
+        self.setMirrored(False)
                                                  
         self.x, self.y = 0.0, 0.0
         
@@ -182,6 +180,10 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                      
             elif self.addedScroller == False:  ## check if its showtime    
                 
+                # if self.direction  == 'left'  and int(value.x()) == int(common['ViewW']/2):
+                #     print(f"{int(value.x())} {int(common['ViewW']/2)}")
+                #     self.canvas.showtime.pause()
+                
                 if self.direction  == 'left'  and int(value.x()-self.runway) <= self.showtime or\
                     self.direction == 'right' and int(value.x()) >= -self.showtime or\
                     self.direction == 'vertical' and int(value.y())-self.runway <= self.showtime:  
@@ -204,12 +206,10 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 ### -------------------------------------------------------- 
     def addNextScroller(self): 
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
-                                      
-        if self.mirroring == True or self.dots.Vertical == False:
-            item.setMirrored(False) if self.flopped else item.setMirrored(True) 
-        else:
-            item.setMirrored(False)
-                                      
+                                         
+        if self.mirroring == True:
+            item.setMirrored(False) if self.flopped else item.setMirrored(True)   
+                               
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     

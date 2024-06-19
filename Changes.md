@@ -6,7 +6,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **June 2024**  
-**Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to **scrolling backgrounds** and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  **QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 
+**Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to **scrolling backgrounds** and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  ~~**QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but~~ everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 
 
 **Some things that might help with the setup:** I first made sure I set the shell to **arm** and pip installed **PyQt5** and then **PyQt5-Qt5**. I then uninstalled **pygame**, **opencv-python** and **numpy** and with the shell set to  **arm** reinstalled them, though **opencv-python** includes **numpy** as part of the package so you can skip reinstalling it. 
 
@@ -27,10 +27,13 @@ and may cause an unexpected shutdown - it was showing up in **PyQt6** but haven'
 ---
 
 **June 9 2024**  
-Made a few changes to the above and a fix to the message box icon problem in **PyQt5** I had earlier. 
+Made a few changes to the above and a fix to the QMessageBox icon problem in **PyQt5** I had earlier. 
 
 **June 11 2024**  
-Added a **'shift-arrowUp/arrowDown'**  key combination to the **background widget** that moves the **screenrate** slider **.01** rather than the **.05** without the shift.  In **dotsBkgMatte.py** added a message box to let you know there's no more room to scale up to and a **double-click** to the border to quit.
+Added a **'shift-arrowUp/arrowDown'**  key combination to the **background widget** that moves the **screenrate** slider **.01** rather than the **.05** without the shift.  In **dotsBkgMatte.py** added a message to let you know there's no more room to scale up to and a **double-click** to the border to quit.
+
+**June 18 2024**  
+Fixed a few cosmetic bugs that came about from my last additions.  I was planning to add a help menu to the **Json TableViewer** but there were enough complications that I went with a more direct approach and displayed the four single key commands in the tableview window title: **"C: to Close -- D: to Delete -- J: Toggles Viewer -- S: to Save"**. It's replaced after 10 seconds with the previous title, the filename and number of rows. Along with that I now center the viewer if after deleting a row it shrinks in width otherwise it will skew to the left.
 
 ---
 

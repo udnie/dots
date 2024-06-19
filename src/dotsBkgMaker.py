@@ -261,7 +261,7 @@ class BkgMaker(QWidget):
                 
     def updateZvals(self, bkg):  ## move the rest back one Z and lock them
         for itm in self.scene.items():
-            if itm.type == 'bkg' and itm.zValue() <= bkg.zValue():
+            if itm.type in ('bkg', 'flat') and itm.zValue() <= bkg.zValue():
                 if itm != bkg:
                     itm.setZValue(itm.zValue()-1) 
      
