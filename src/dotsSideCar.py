@@ -210,18 +210,18 @@ class SideCar:
      
     def unlinkShadows(self):
         for pix in self.scene.items():
-            if pix.type == 'pix'and pix.shadowMaker.linked == True:
+            if pix.type == 'pix'and pix.shadowMaker != None and pix.shadowMaker.linked == True:
                 pix.shadowMaker.shadow.unLinkShadow()
                 pix.shadowMaker.works.hideOutline()
                                                                                                               
     def hideOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
-            if pix.type == 'pix'and pix.shadowMaker.isActive == True:
+            if pix.type == 'pix'and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
                 pix.shadowMaker.works.hideOutline()
          
     def showOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
-            if pix.type == 'pix'and pix.shadowMaker.isActive == True:
+            if pix.type == 'pix' and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
                 pix.shadowMaker.works.showOutline()
                  
     ## added dlbclk if hidden to re-select ##
@@ -241,7 +241,7 @@ class SideCar:
                                                                                                                                                                                            
     def hideSelectedShadows(self):  ## runs from shift-H
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadowMaker.isActive == True:
+            if pix.type == 'pix' and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
                 if pix.isSelected():
                     pix.hide() 
                 elif pix.isVisible() == False:

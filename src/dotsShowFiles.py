@@ -225,7 +225,7 @@ class ShowFiles:
             'part':         pix.part,
         }   
         ## pix.shadowMaker maintains shadow data over shadow updates
-        if pix.shadowMaker.isActive == True and pix.shadowMaker.shadow != None: 
+        if pix.shadowMaker != None and pix.shadowMaker.isActive == True and pix.shadowMaker.shadow != None: 
             try:
                 shadow = {  
                     'alpha':    float(f'{pix.shadowMaker.alpha:.2f}'),
@@ -244,7 +244,7 @@ class ShowFiles:
             except Exception:
                 self.errorOnShadows = True  
         ## stored shadow data - copied back for future use
-        elif len(pix.shadow) > 0: 
+        elif pix.shadow != None and len(pix.shadow) > 0: 
             tmp.update(pix.shadow) 
         return tmp
             

@@ -19,8 +19,9 @@ class Works:  ## small functions that were in ShadowMaker
     def __init__(self, parent):
         super().__init__()
  
-        self.maker = parent
-        self.scene = self.maker.scene
+        self.maker   = parent
+        self.scene   = self.maker.scene
+        self.pixitem = self.maker.pixitem 
         
 ### --------------------------------------------------------
     def resetSliders(self): 
@@ -42,6 +43,8 @@ class Works:  ## small functions that were in ShadowMaker
         if self.maker.shadow != None:
             self.cleanUpShadow()
         self.maker.shadow = None
+        self.pixitem.shadow = None
+        self.pixitem.shadowMaker = None
                                                       
     def cleanUpShadow(self):  
         self.closeWidget()

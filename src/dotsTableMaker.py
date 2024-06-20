@@ -157,7 +157,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.deleteKey = True  
             sorted(self.selected, key=lambda x: x[1], reverse=True)     
             self.deleteFromTable() 
-            self.makeTable(self.data)  ## writes a new tmp file if there's anything to write
+        self.makeTable(self.data)  ## refreshes tableview if anything was selected and possibly deleted
             
 ### --------------------------------------------------------   
     def isMissing(self, row):
