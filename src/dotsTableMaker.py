@@ -195,8 +195,8 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.showWorks.saveToPlays(self.data)  ## retains remaining missing files when saved
  
     def reposition(self, height):
-        g = getCtr()  ## reposition viewer if column number changes
-        x = int(g.x() - Columns[self.cols]/2)
+        g = getCtr()  ## reposition viewer if column number changes 
+        x = int(g.x() - int(Columns[self.cols]/2))
         y = int(g.y() - int(height/2)-100)
         return QPoint(x, y)
  
