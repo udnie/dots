@@ -35,6 +35,9 @@ Added a **'shift-arrowUp/arrowDown'**  key combination to the **background widge
 **June 18 2024**  
 Fixed a few cosmetic bugs that came about from my last additions.  I was planning to add a help menu to the **Json TableViewer** but there were enough complications that I went with a more direct approach and displayed the four single key commands in the tableview window title: **"C: to Close -- D: to Delete -- J: Toggles Viewer -- S: to Save"**. It's replaced after 10 seconds with the previous title, the filename and number of rows. Along with that I now center the viewer if after deleting a row it shrinks in width otherwise it will skew to the left.
 
+**June 19 2024**  
+A bug fix on Shadows - wasn't deleting itself as it should. 
+
 ---
 
 **May 2024**  
