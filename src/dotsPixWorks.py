@@ -41,7 +41,7 @@ class Works:  ## extends pixitem and pixwidget
         self.pix.widget.scaleValue.setText(f'{self.pix.scale:.2f}')
         
         self.pix.widget.rotaryDial.setValue(int(self.pix.rotation))
-        self.pix.widget.rotateValue.setText(f'{self.pix.rotation:3d}')
+        self.pix.widget.rotateValue.setText(f'{self.pix.rotation:3}')
               
     def removeThis(self):
         self.pix.clearFocus() 

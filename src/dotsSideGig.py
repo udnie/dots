@@ -45,6 +45,9 @@ class MsgBox:  ## always use getCtr for setting point
         self.timer.timeout.connect(self.changeContent)
         self.timer.start()
 
+        # pt = getCtr(-200,-245)  ## pyqt-five
+        pt = getCtr(-200,-50)  ## pyqt-six
+
         if isinstance(pt, QPoint) and pt.x() > 0 and pt.y() > 0: 
             self.msg.move(pt)
                

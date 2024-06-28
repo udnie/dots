@@ -194,7 +194,7 @@ def fin(pix):            ## delete pixitem
     rotate.setStartValue(node.pix.rotation)
     rotate.setEndValue(rot+node.pix.rotation)
 
-    opacity = QPropertyAnimation(node, b'opacity')
+    opacity = QPropertyAnimation(node, b'opacity')  ## fade out
     opacity.setDuration(int(sync))
     opacity.setStartValue(node.pix.opacity())
     opacity.setEndValue(0)
@@ -256,7 +256,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
         pix.shadowMaker.isActive == True:
         opacity.setEndValue(.001)
     else:
-        opacity.setEndValue(node.pix.opacity())
+        opacity.setEndValue(pix.opacity())
         
     group = QParallelAnimationGroup()
 

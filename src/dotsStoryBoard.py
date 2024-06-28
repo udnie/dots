@@ -295,7 +295,7 @@ class StoryBoard(QWidget):
     def contextMenuEvent(self, e):  ## needs to stay here - pix popup menu for animations and paths
         if len(self.scene.selectedItems()) > 0:
             menu = AnimationMenu(self)
-            menu.animeMenu(e.globalPos())
+            menu.animeMenu(e.globalPos())  ## only place its used
         
 ### -------------------- dotsStoryBoard --------------------
 

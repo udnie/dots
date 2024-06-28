@@ -25,7 +25,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1440':  'montreaux-1280.jpg',
     '1296':  'montreaux.jpg',    
     '1536':  'montreaux-1280.jpg',
-     '900':  'bats_vertical.jpg',  ## blue night photo
+     '900':  'bats_900.jpg',  ## blue night photo
      '912':  'bats_vertical.jpg', 
     '1102':  'bats_vertical.jpg',
 }
@@ -49,19 +49,11 @@ class Bats:
 ### -------------------------------------------------------- 
     def makeBats(self):  ## makes aliens and bats                 
         self.canvas.openPlayFile = 'bats'
-        pick = backGrounds[common['Screen']]
+ 
+        bkg = BkgItem(backGrounds[common['Screen']], self.canvas) 
+        if bkg.type == None:
+            return
         
-        if 'montreaux' in pick:  ## use the ones in background
-            path = paths['bkgPath']
-        else:
-            path = paths['demo']  ## not everything is in demo
-            
-        if not os.path.exists(path + backGrounds[common['Screen']]):
-            MsgBox(f'BkgItem Error: {pick} Not Found', 6)
-            return None
-            
-        bkg = BkgItem(path + backGrounds[common['Screen']], self.canvas)  
-   
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         self.scene.addItem(bkg)
         

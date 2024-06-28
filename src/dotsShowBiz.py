@@ -175,7 +175,7 @@ class ShowBiz:
         self.canvas.pixCount = self.mapper.toFront(0) 
         self.canvas.bkgMaker.newTracker.clear()        
         ## number of pixitems, backgrounds zval, number of shadows        
-        kix, bkgz, ns = 0, 0, 0
+        kix, ns, bkgz = 0, 0, common['bkgZ'] 
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
         lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top  for sprites and frames                               
       
@@ -204,19 +204,18 @@ class ShowBiz:
                 continue        
                    
             ## can be more than one background or flat                    
-            elif tmp['type'] in ('bkg', 'flat'): 
-                if bkgz == 0: bkgz = common['bkgZ']  ## starts at -99.0, decrements zval 
-                                
+            elif tmp['type'] in ('bkg', 'flat'):                          
                 ## a flat does not rely on a bkg.file once it's saved to a play.file
                 if tmp['type'] == 'flat' and QColor().isValidColor(tmp['color']):
                     pix = Flat(tmp['color'], self.bkgMaker, bkgz)  
+                    self.showFiles.addPixToScene(pix, tmp, bkgz )  
                               
                 elif tmp['type'] == 'bkg':    
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
-            
+                    self.showFiles.addPixToScene(pix, tmp, bkgz )  
+             
                 pix.bkgMaker.lockBkg(pix)                                         
-                self.showFiles.addPixToScene(pix, tmp, bkgz)  ## finish unpacking tmp  
-                bkgz -= 1           
+                bkgz -= 1     
             del tmp              
         ## end for loop   
                          
@@ -249,9 +248,9 @@ class ShowBiz:
         loop  = asyncio.new_event_loop() 
         ## thanks to a dev community post - it took some work to find a useful example
         for pix in self.scene.items(): 
-            if pix.type == 'pix' and pix.shadowMaker.isActive == True and len(pix.shadow) > 0:
-                pix.fileName = paths['spritePath'] + pix.fileName      
-                tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
+            if pix.type == 'pix' and pix.shadowMaker != None and pix.shadow != None:
+                    pix.fileName = paths['spritePath'] + pix.fileName      
+                    tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()           

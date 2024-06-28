@@ -123,17 +123,23 @@ class PixItem(QGraphicsPixmapItem):
     def setFlags(self, bool):
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, bool)  
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, bool)
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)         
+        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
+        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)   
+        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, False)      
         if self.locked:
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
      
 ### --------------------------------------------------------
     def itemChange(self, change, value):  ## continue to updatePath when animated
-        if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
-            if self.shadowMaker.isActive and self.shadowMaker.linked == True:
-                if self.shadowMaker.shadow != None:
-                    self.shadowMaker.shadow.setPos(self.pos()+ self.offset)
+        if self.shadowMaker != None and self.shadowMaker.isActive and self.shadowMaker.linked == True:
+            if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
+                self.shadowMaker.shadow.setPos(self.pos()+ self.offset)
+            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemRotationChange:
+            #     self.shadowMaker.shadow.setRotation(value)
+            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemScaleChange:
+            #     self.shadowMaker.shadow.setScale(value)      
+            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemOpacityChange:
+            #     self.shadowMaker.shadow.setOpacity(value-.50)       
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
             
     def mousePressEvent(self, e):    
@@ -211,7 +217,7 @@ class PixItem(QGraphicsPixmapItem):
             
 ### --------------------------------------------------------
     def addShadow(self):  ## from pixwidget 
-        if self.shadowMaker.isActive == True:
+        if self.shadowMaker != None and self.shadowMaker.isActive == True:
             if 'bat-pivot' in self.fileName:
                 self.works.closeWidget()
                 MsgBox("No Shadows for BatWings", 4)
@@ -279,7 +285,7 @@ class PixItem(QGraphicsPixmapItem):
         QTimer.singleShot(3000, self.mapper.clearTagGroup)
    
     def deletePix(self):
-        if self.shadowMaker.isActive == True:
+        if self.shadowMaker != None and self.shadowMaker.isActive == True:
             self.shadowMaker.works.deleteShadow()
         self.works.closeWidget()
         self.anime 

@@ -32,7 +32,7 @@ class Works:  ## small functions that were in ShadowMaker
         self.maker.widget.scaleValue.setText(f'{self.maker.scalor:.2f}')
         
         self.maker.widget.rotaryDial.setValue(int(self.maker.rotate))
-        self.maker.widget.rotateValue.setText(f'{self.maker.rotate:3d}')
+        self.maker.widget.rotateValue.setText(f'{self.maker.rotate:3}')
          
     def closeWidget(self):
         if self.maker.widget != None:
@@ -43,15 +43,14 @@ class Works:  ## small functions that were in ShadowMaker
         if self.maker.shadow != None:
             self.cleanUpShadow()
         self.maker.shadow = None
-        self.pixitem.shadow = None
-        self.pixitem.shadowMaker = None
+        self.pixitem.shadow = None  ## using it throughout
                                                       
     def cleanUpShadow(self):  
         self.closeWidget()
         self.deletePoints()  
         self.deleteOutline()
         self.removeShadow()
-         
+   
     def removeShadow(self):
         if self.maker.shadow != None:
             self.scene.removeItem(self.maker.shadow)

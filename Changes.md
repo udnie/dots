@@ -6,15 +6,27 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **June 2024**  
-**Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to **scrolling backgrounds** and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  ~~**QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but~~ everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 
+**Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to ~~**scrolling backgrounds**~~ and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  ~~**QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but~~ everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 
 
-**Some things that might help with the setup:** I first made sure I set the shell to **arm** and pip installed **PyQt5** and then **PyQt5-Qt5**. I then uninstalled **pygame**, **opencv-python** and **numpy** and with the shell set to  **arm** reinstalled them, though **opencv-python** includes **numpy** as part of the package so you can skip reinstalling it. 
+**Some things that might help with the setup:** ~~I first made sure I set the shell to **arm** and pip installed **PyQt5** and then **PyQt5-Qt5**. I then uninstalled **pygame**, **opencv-python** and **numpy** and with the shell set to  **arm** reinstalled them, though~~ **opencv-python** includes **numpy** as part of the package so you can skip reinstalling it. **See June 27, missed a step.**  
 
 I use vscode so I needed to edited the **.json settings** file and set the mac terminal to **arm** followed by adding the folder to the appropriate workspace as the **Qt5** code was in another directory.  Make sure you understand how a workspace works as I didn't - I deleted it later and just went with the **.json settings**.
 
 This may eliminate being able to use **pygame**, **opencv-python** and **numpy** with **PyQt6** if **dots** is running in **x86** unless you have a way to maintain two separate installs - possibly with a virtual environment.  
-    
-The **PyQt5 Diffs.txt** file contains an abbreviated diff between **PyQt6** and **PyQt5**. There's not a lot to do once you've replaced **PyQt6** with **PyQt5** and **globalPosition()** with **globalPos()** but there still are a few changes left to make after that - though not too many.  Also included are the diffs from **extras**.
+  
+---  
+
+The **PyQt5 Diffs.txt** file contains an abbreviated diff between **PyQt6** and **PyQt5**. There's not a lot to do once you've replaced **PyQt6** with **PyQt5** and **globalPosition()** with **globalPos()** ~~but there still are a few changes left to make after that - though not too many.~~  Also included are the diffs from **extras**.  
+
+#### Edits for Converting Dots from PyQt6 to PyQt5
+    1. Replace PyQt6 with PyQt5 
+    2. Replace globalPosition() with globalPos()
+    3. Replace e.position() with e.pos() in dotsControlView.py
+    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets. 
+    5. Optional: Change QMessageBox height in dotsSideGig.py
+    .
+
+----
 
 Last to report - it's back in **PyQt5**:
 
@@ -37,6 +49,13 @@ Fixed a few cosmetic bugs that came about from my last additions.  I was plannin
 
 **June 19 2024**  
 A bug fix on Shadows - wasn't deleting itself as it should. 
+
+**June 27 2024**  
+This highlights the last few changes plus a an addition to **sprites and shadows** - implemented but turned off. My setup instructions from the beginning of June left out an important step. I forgot to mention unchecking the **Rosetta** box in the **Terminal.App Get Info** pop-up if that's how your terminal is set. Setting the shell to **arm** wasn't the reason why installing an **arm** version of **opencv** and **numpy** worked. I rediscovered this as I had to install **numpy** again in **PyQt5**.  Rechecking the **Rosetta** box works in reverse when switching back to **PyQt6** as the **arm** install of **opencv** and **numpy** aren't shareable making it necessary to reinstall **opencv-python** again for **X86**.  Sorry for the confusion.
+
+One other thing, I added another edit going from PyQt6 to PyQt5.  In **dotsSideGig.py** there's a setting to position **MsgBox** based on the PyQt version you're using. Additionally, see **dotsShadow.py** and **dotsPixitem.py** for the commented out code mentioned in the video.
+
+New Video:  <https://youtu.be/djzudzdEv8Q>
 
 ---
 
@@ -281,7 +300,7 @@ abstract = {  ## used by abstract.jpg and snakes.jpg - based on 1280X640 2:1 - u
     '1440':  (10.0,  18.9,  18.95),
     '1296':  (10.0,  17.45, 17.55),  
     '1536':  (10.0,  18.95, 18.95),
-    '620':   (10.0,  20.9,   0.0),
+    ' 620':  (10.0,  20.90,   0.0),
     }    
 ```     
 This dictionary is located in **dotsBkgItem.py**, the background screen item.  There are two other dictionaries, one for wider formats, only one entry so far, and one that acts to trigger a new background.  

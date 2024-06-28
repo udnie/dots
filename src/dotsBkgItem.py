@@ -58,12 +58,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.path = paths['bkgPath']    
         self.fileName = os.path.basename(fileName)  ## new
         
-        if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':      
-            self.path = paths['demo']
- 
+        if self.canvas.openPlayFile != '':
+            if self.canvas.openPlayFile == 'snakes':      
+                self.path = paths['demo']
+            elif self.dots.Vertical and self.canvas.openPlayFile == 'bats':
+                self.path = paths['demo']
+                
         if not os.path.exists(self.path + self.fileName):
             self.type = None        
             MsgBox(f'BkgItem Error: {self.fileName} Not Found', 5)
+            self.type = None
             return
 
         self.setZValue(z)      

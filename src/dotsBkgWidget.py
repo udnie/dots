@@ -129,7 +129,7 @@ class BkgWidget(QWidget):
         if self.bkgItem != None and self.bkgItem.type == 'bkg':  
             self.bkgItem.showtime = val   
             self.showtimeSlider.setValue(val)   
-            self.showtimeValue.setText(f'{val:2d}')
+            self.showtimeValue.setText(f'{val:2}')
             self.bkgScrollWrks.setShowTimeTrackers(self.bkgItem)
             
     def setBkgFactorValue(self, val):

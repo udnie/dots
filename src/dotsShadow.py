@@ -26,21 +26,27 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.pixitem = self.maker.pixitem
         self.path    = self.maker.path
        
-        self.anime = None 
         self.setZValue(self.pixitem.zValue()-1) 
         
-        self.tag = ''
-        
+        self.tag = ''     
         self.type = 'shadow' 
         self.fileName = 'shadow'
                     
-        self.dragCnt = 0
-        
+        self.dragCnt = 0 
         self.save = QPointF()  ## mapToScene - used with updatePath
-                             
-        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+        
+        self.scale    = self.pixitem.scale
+        self.rotation = self.pixitem.rotation
+        
+        self.width  = self.pixitem.width
+        self.height = self.pixitem.height 
+                            
+        ## not linked
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False) 
-     
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+        
+        self.setOriginPt()
+         
 ### --------------------------------------------------------
     def itemChange(self, change, value):  ## continue to updatePath when animated
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
@@ -49,7 +55,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                     self.maker.works.hideOutline()
                 self.dragCnt += 1
                 if self.dragCnt % 5 == 0:  
-                    self.maker.updatePath(value)  ## and sets shadows position       
+                    self.maker.updatePath(value)  ## and sets shadows position      
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
 
 ### --------------------------------------------------------
@@ -90,16 +96,19 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.maker.addPoints() 
         self.maker.works.updateOutline()
     
-  ### --------------------------------------------------------                                       
+  ### --------------------------------------------------------                    
     def linkShadow(self):
         b = self.pos()
         if self.maker.widget != None:
             self.maker.widget.linkBtn.setText('Link') 
-        self.maker.linked = True          
-        self.pixitem.offset = -self.pixitem.pos()+self.pos()  ## may change
+        self.maker.linked = True         
+        self.pixitem.offset = self.pos()-self.pixitem.pos()  ## may change
         self.setZValue(self.pixitem.zValue()-1)  
+        self.setOriginPt()
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)  
-        self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)  
+        # self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)  
+        # self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, True) 
+        # self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, False)    
         self.maker.works.hideOutline()
         self.maker.hidden = True    
         if self.maker.widget != None:
@@ -108,9 +117,10 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                    
     def unLinkShadow(self):  
         b = self.save    
-        self.anime = None     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)
-        self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)         
+        # self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False) 
+        # self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, False)  
+        # self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)   
         self.setPos(self.pixitem.pos()+self.pixitem.offset)
         self.maker.linked = False 
         self.maker.updatePath(b)  ## ending value 
@@ -139,6 +149,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
             self.scaleRotateShadow()
             
     def scaleRotateShadow(self):  ## only if new    
+        self.setOriginPt()
         self.maker.shadow.setRotation(self.pixitem.rotation)
         self.maker.setPath(self.pixitem.boundingRect(), self.pixitem.pos() + QPointF(-50,-15))
      

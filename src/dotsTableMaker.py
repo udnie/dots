@@ -196,7 +196,8 @@ class TableView:  ## formats a json .play file to display missing files or not
  
     def reposition(self, height):
         g = getCtr()  ## reposition viewer if column number changes 
-        x = int(g.x() - int(Columns[self.cols]/2))
+        c = Columns[self.cols]  ## replacing dictionary value prior to math
+        x = int(g.x() - int(c/2))
         y = int(g.y() - int(height/2)-100)
         return QPoint(x, y)
  

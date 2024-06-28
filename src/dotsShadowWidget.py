@@ -79,7 +79,7 @@ class ShadowWidget(QWidget):
         if self.maker.linked == False:
             self.maker.shadow.setOriginPt()
             self.works.rotateShadow(val)
-            self.rotateValue.setText(f'{val:3d}') 
+            self.rotateValue.setText(f'{val:3}') 
              
     def Scale(self, val):  
         if self.maker.linked == False:

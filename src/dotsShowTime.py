@@ -45,6 +45,10 @@ class ShowTime:
         self.canvas.unSelect()
         self.sideCar.hideOutlines()
                        
+        if self.canvas.showbiz.tableView != None:
+            if self.canvas.showbiz.tableView != None:
+                self.canvas.showbiz.tableView.bye()    
+                                  
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = getPathList(True) 
             if len(self.canvas.pathList) == 0:

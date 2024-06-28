@@ -71,7 +71,7 @@ class ShowFiles:
             pix = self.setShadow(pix, tmp)  
                  
         elif pix.type == 'bkg':  ## adding the rest of it
-            pix = self.setBackGround(pix, tmp, z)  ## checking if a dupe
+            pix = self.setBackGround(pix, tmp)  ## checking if a dupe
             if pix != None:
                 self.scene.addItem(pix)     
                 if pix.tag == 'scroller':  ## replace transformPix.. action
@@ -103,9 +103,8 @@ class ShowFiles:
             tmp['z'] = 0 
   
         pix.x   = float(f"{tmp['x']:.2f}")
-        pix.y   = float(f"{tmp['y']:.2f}")    
-        pix.setZValue(tmp['z']),  ## use the new one
-             
+        pix.y   = float(f"{tmp['y']:.2f}")  
+                     
         if pix.type not in ('flat', 'frame'):   
             pix.setMirrored(tmp['mirror']),             
        
@@ -132,14 +131,14 @@ class ShowFiles:
             tmp['tag'] = ''      
         if 'locked' not in tmp.keys(): 
             tmp['locked'] = False   
-        
+ 
         pix.color   = QColor(tmp['color'])
         pix.tag     = QColor(tmp['tag'])
         pix.locked  = tmp['locked']  
         return pix
    
     ## doing this only if missing in .play file otherwise gets the default   
-    def setBackGround(self, bkg, tmp, z):  ## pix is a stand_in for bkg    
+    def setBackGround(self, bkg, tmp):  ## pix is a stand_in for bkg   
         if 'anime' not in tmp.keys(): 
             tmp['anime'] = None     
         if 'scrollable' not in tmp.keys(): 
@@ -284,7 +283,7 @@ class ShowFiles:
         }
         return tmp
 
-    def saveFlat(self, pix):       
+    def saveFlat(self, pix):  
         tmp = {
             'fileName':     'flat',
             'type':         'flat',

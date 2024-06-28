@@ -1,7 +1,7 @@
 
 
 from PyQt6.QtCore       import Qt, QPointF, pyqtSlot
-from PyQt6.QtGui        import QColor, QPixmap, QImage
+from PyQt6.QtGui        import QColor, QPixmap, QImage, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common
@@ -92,7 +92,7 @@ class Flat(QGraphicsPixmapItem):
         
         self.color = QColor(color)
         self.tag   = QColor(color)
-      
+
         self.locked = True
         self.setZValue(z)
         
@@ -117,7 +117,14 @@ class Flat(QGraphicsPixmapItem):
             elif self.key == '/':  ## to back
                 self.bkgMaker.back(self)
             elif self.key in ('enter','return'):  
-                self.setZValue(self.canvas.mapper.toFront())                       
+                self.setZValue(self.canvas.mapper.toFront()) 
+            elif self.key in ('opt', 'tag'): 
+                p = self.canvas.mapFromGlobal(QPointF(QCursor.pos()))
+                tagBkg(self, QPointF(p.x(), p.y()-20 )  )
+            elif self.key == ',':
+                self.setZValue(self.zValue()-1)
+            elif self.key == '.':
+                self.setZValue(self.zValue()+1 )                       
         e.accept()
       
     def mouseReleaseEvent(self, e):

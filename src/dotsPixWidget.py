@@ -78,7 +78,7 @@ class PixWidget(QWidget):
         self.pix.setOriginPt() 
         self.pix.setRotation(val) 
         self.pix.rotation = val    
-        self.rotateValue.setText(f'{val:3d}')
+        self.rotateValue.setText(f'{val:3}')
   
     def Scale(self,val):
         self.pix.setOriginPt() 
