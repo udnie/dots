@@ -57,6 +57,9 @@ One other thing, I added another edit going from PyQt6 to PyQt5.  In **dotsSideG
 
 New Video:  <https://youtu.be/djzudzdEv8Q>
 
+**June 28 2024**  
+As a test I just uninstalled PyQt5 and then reinstalled it using **pip3 install PyQt5** after making sure my terminal/shell was now in arm by unchecking the Rosetta box in the terminal app as I run PyQt6 in x86.
+
 ---
 
 **May 2024**  
