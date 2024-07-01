@@ -3,9 +3,9 @@ import os
 import os.path
 
 from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
-from PyQt6.QtGui        import QImage, QPixmap
+from PyQt6.QtGui        import QImage, QPixmap, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
-                 
+
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgWorks       import BkgWorks
@@ -170,11 +170,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 self.bkgMaker.upOne(self)  
             elif self.key in('opt', 'tag'):  ## show background tag
                 tagBkg(self, e.scenePos())
+            elif self.key == ']':   
+                self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QPointF(QCursor.pos())))    
             self.initX, self.initY = self.x, self.y  
             self.dragCnt = self.mapToScene(e.pos())
-            self.canvas.key = ''
+            self.key = ''
         e.accept()     
-
+    
 ### -------------------------------------------------------- 
     ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''
 ### -------------------------------------------------------- 

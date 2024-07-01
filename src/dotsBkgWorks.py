@@ -4,8 +4,11 @@ import math
 import json
 
 from functools          import partial
+
 from PyQt6.QtCore       import QPoint, QTimer
-                        
+from PyQt6.QtGui        import QColor, QPen
+from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
+                       
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgMatte       import Matte
@@ -23,6 +26,9 @@ class BkgWorks:
         self.canvas   = self.bkgItem.canvas
         self.bkgMaker = self.bkgItem.bkgMaker
         self.dots     = self.bkgItem.dots
+        
+        self.point = None 
+        self.target = None
         
         self.bkgScrollWrks = BkgScrollWrks(self.bkgItem)
         
@@ -176,6 +182,30 @@ class BkgWorks:
         return path
                 
 ### -------------------------------------------------------- 
+    def spotColor(self, p):
+        x, y = int(p.x()), int(p.y())                   
+             
+        self.target = QGraphicsEllipseItem()
+        self.target.setPen(QPen(QColor('white'), 2))
+   
+        self.target.setRect(x-25, y-25, 50, 50) 
+        self.bkgItem.scene.addItem(self.target) 
+        
+        dialog = QColorDialog()  
+        color = dialog.getColor() 
+         
+        if color.isValid():
+            self.point = QGraphicsEllipseItem()
+            self.point.setPen(QPen(QColor('white'), 1))
+            self.point.setBrush(QColor(color)) 
+            self.point.setRect(x+30, y-20, 30, 30) 
+            self.point.setZValue(300)
+            self.bkgItem.scene.addItem(self.point)   
+            QTimer.singleShot(4000, partial(self.bkgItem.scene.removeItem, self.point))
+             
+        self.bkgItem.scene.removeItem(self.target)
+        dialog.close()
+  
     def centerBkg(self):
         if self.bkgItem != None and self.bkgItem.type == 'bkg':  
             width = self.bkgItem.imgFile.width()
@@ -189,8 +219,7 @@ class BkgWorks:
             if self.bkgItem.mirroring == True: 
                 self.bkgItem.mirroring = False ## continuous
             else:
-                self.bkgItem.mirroring = True  ## mirrored  
-                                       
+                self.bkgItem.mirroring = True  ## mirrored                                    
         fileName = self.bkgItem.fileName              
         if self.bkgMaker.newTracker[fileName]:  
             self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
@@ -199,6 +228,7 @@ class BkgWorks:
     def setMatte(self):
         self.bkgMaker.closeWidget()
         self.bkgMaker.matte = Matte(self.canvas)
+        
   
 ### -------------------------------------------------------- 
     ## returns what gets lost on each reincarnation

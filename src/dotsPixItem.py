@@ -1,6 +1,6 @@
 
 from PyQt6.QtCore       import Qt, QTimer, QPoint, pyqtSlot, QPointF
-from PyQt6.QtGui        import QImage, QColor, QPen, QPixmap
+from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
@@ -9,8 +9,8 @@ from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 from dotsBkgScrollWrks  import tagBkg
 
-##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
-from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
+from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+##from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 import dotsAnimation  as Anime
 
@@ -34,7 +34,7 @@ class PixItem(QGraphicsPixmapItem):
         
         self.flopped = mirror
         self.id = int(id)  ## used by mapper
-        
+              
         self.x = x 
         self.y = y
         
@@ -76,11 +76,11 @@ class PixItem(QGraphicsPixmapItem):
         self.tag = ''
         
         self.anime  = None   
-        self.shadow = {} ## a dictionary to maintain shadow data if there is one
+        self.shadow = {}  ## a dictionary to maintain shadow data if there is one
         self.widget = None
  
         self.dragAnchor = QPoint()
-        self.offset = QPointF()  ## difference in x,y between pixitem and shadow
+        self.offset = QPointF()  ## difference in x,y between pixitem and shadow when linked
         
         self.initX = 0
         self.initY = 0
@@ -123,8 +123,8 @@ class PixItem(QGraphicsPixmapItem):
     def setFlags(self, bool):
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, bool)  
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, bool)
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)          
         # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
-        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)   
         # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, False)      
         if self.locked:
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
@@ -141,7 +141,7 @@ class PixItem(QGraphicsPixmapItem):
             # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemOpacityChange:
             #     self.shadowMaker.shadow.setOpacity(value-.50)       
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
-            
+                            
     def mousePressEvent(self, e):    
         if self.canvas.control not in ControlKeys:  ## ('resume', 'pause') - animation running
             ## right mouse clk triggers Animation menu on selected screen items 
@@ -165,12 +165,12 @@ class PixItem(QGraphicsPixmapItem):
                     p = self.zValue()-1  
                 elif self.key == '.':
                     p = self.zValue()+1   
-                self.setZValue(p)               
+                self.setZValue(p)                       
             if self.key == 'tag' or self.key in TagKeys: 
                 tagBkg(self, self.pos())
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
-            self.canvas.key = ''
+            self.key = ''
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -214,7 +214,7 @@ class PixItem(QGraphicsPixmapItem):
                     self.setSelected(False)
                 self.isHidden = False 
         e.accept()
-            
+
 ### --------------------------------------------------------
     def addShadow(self):  ## from pixwidget 
         if self.shadowMaker != None and self.shadowMaker.isActive == True:

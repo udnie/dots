@@ -1,6 +1,5 @@
 
 import os.path
-from posix import lchown
 
 from PyQt6.QtCore       import Qt, QPoint, QRectF, QPointF
 from PyQt6.QtGui        import QColor, QPen, QPainter, QPen
