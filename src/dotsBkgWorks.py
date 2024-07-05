@@ -198,7 +198,7 @@ class BkgWorks:
             self.point = QGraphicsEllipseItem()
             self.point.setPen(QPen(QColor('white'), 1))
             self.point.setBrush(QColor(color)) 
-            self.point.setRect(x+30, y-20, 30, 30) 
+            self.point.setRect(x-15, y-15, 30, 30) 
             self.point.setZValue(300)
             self.bkgItem.scene.addItem(self.point)   
             QTimer.singleShot(4000, partial(self.bkgItem.scene.removeItem, self.point))

@@ -223,8 +223,8 @@ class StoryBoard(QWidget):
         self.clearSceneItems()          
         self.mapper.clearMap()    
         self.scene.clear()       
-        self.btnAddBkg.setEnabled(True)                  
-        self.dots.statusBar.clearMessage()
+        self.btnAddBkg.setEnabled(True)   
+        if self.dots.statusBar: self.dots.statusBar.clearMessage()
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''

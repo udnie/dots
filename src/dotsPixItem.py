@@ -1,4 +1,5 @@
 
+
 from PyQt6.QtCore       import Qt, QTimer, QPoint, pyqtSlot, QPointF
 from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
@@ -124,8 +125,8 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsSelectable, bool)  
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, bool)
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)          
-        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
-        # self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, False)      
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemDoesntPropagateOpacityToChildren, True)
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, False)      
         if self.locked:
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
      

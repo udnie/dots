@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF ##, QRectF
+from PyQt6.QtCore       import Qt, QPointF
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
                                
 from dotsShared         import common, paths
