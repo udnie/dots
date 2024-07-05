@@ -5,6 +5,9 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
+**July 2024** 
+Uncommented something that I had over-zealously commented out. Affected only shadows in the demos. 
+
 **June 2024**  
 **Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to ~~**scrolling backgrounds**~~ and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  ~~**QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but~~ everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 
 
