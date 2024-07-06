@@ -1,4 +1,3 @@
-
 import sys
 import platform
 import os
@@ -39,11 +38,9 @@ class DotsQt(QMainWindow):
         else:
             self.screen = setCommon()  ## default - 1080X720 
            
-        # print('\n' + 'version', platform.version())
-        # print('\nPython Version:\t', platform.python_version())
-        # print("Qt Version:\t", QT_VERSION_STR)
-        # print('PyQt Version\t', PYQT_VERSION_STR, '\n')
-        
+        self.statusBar = QStatusBar()
+        self.setStatusBar(self.statusBar) 
+                  
         self.init()
     
     def init(self):  
@@ -54,14 +51,11 @@ class DotsQt(QMainWindow):
         self.setStyleSheet(open('./dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
                                
-        self.statusBar = QStatusBar()
-        self.setStatusBar(self.statusBar) 
-                
         self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        vert = 50 if self.Vertical == True else 30  ## <<---
+        vert = 50 if self.Vertical == True else 0  ## was 50
         self.move(getX(), getY()+vert)  ## functions in screens 
 
         ## can't all happen at once
@@ -87,10 +81,9 @@ class DotsQt(QMainWindow):
         else:
             self.Vertical = False               
         common = self.saveCommon.copy()  ## copy it back
-        self.screen = setCommon(key)  ## in dotsScreens
-        
+        self.screen = setCommon(key)  ## in dotsScreens   
         self.init()
-                                                                                            
+                                                                                                 
 ### --------------------------------------------------------
 if __name__ == '__main__':
     app = QApplication(sys.argv)

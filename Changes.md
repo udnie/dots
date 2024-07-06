@@ -6,7 +6,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **July 2024** 
-Uncommented something that I had over-zealously commented out. Affected only shadows in the demos. 
+Uncommented something that I had over-zealously commented out - affected only shadows in the demos. Plus, a few other bug fixes and lots of testing.
 
 **June 2024**  
 **Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to ~~**scrolling backgrounds**~~ and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  ~~**QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but~~ everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 

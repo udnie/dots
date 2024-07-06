@@ -27,6 +27,7 @@ ColumnWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width t
 Columns = {  ## set widths by number of columns
     21:  1605,
     18:  1505,
+    16:  1415,
     12:  1065,
      8:   715,
      7:   630,
@@ -171,7 +172,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             return
         self.selected.append((tmp[0], tmp[4]))  
          
-    def deleteFromTable(self):  ## doesn't effect actual file unless saved    
+    def deleteFromTable(self):  ## doesn't affect the .play file unless saved    
         for s in self.selected:  
             for tmp in self.data:
                 if s[0] == tmp['fileName'] and s[1] == tmp['z']:    

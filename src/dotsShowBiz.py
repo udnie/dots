@@ -95,7 +95,7 @@ class ShowBiz:
             ## use QFileDialog to open a .play json file and load it to the screen
             self.loadPlay()  
         elif key in ('D','R'):  ## added 'D' thru deleteSelected if nothing there 
-            self.bkgMaker.screenrate = {}
+            self.bkgMaker.screenrate.clear()
             if self.demoAvailable:   
                 self.helpMenu.closeHelpMenu()  
                 self.demoMenu.openDemoMenu()  ## in snakes 

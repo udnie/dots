@@ -201,7 +201,7 @@ class ShowFiles:
             else:
                 pix.shadow['linked'] = tmp['linked']  
         except:
-            pix.shadow = {} 
+            pix.shadow = None
             self.errorOnShadows = True               
         return pix
     

@@ -39,7 +39,9 @@ class PixItem(QGraphicsPixmapItem):
         self.x = x 
         self.y = y
         
+        self.shadow = None  ## a dictionary to maintain shadow data if there is one
         self.shadowMaker = ShadowMaker(self)  ## returns isActive equals False if from shadow_dummy
+        
         self.works = Works(self)  ## functions and PixSizes moved from here
         
         img = None
@@ -77,7 +79,6 @@ class PixItem(QGraphicsPixmapItem):
         self.tag = ''
         
         self.anime  = None   
-        self.shadow = {}  ## a dictionary to maintain shadow data if there is one
         self.widget = None
  
         self.dragAnchor = QPoint()
