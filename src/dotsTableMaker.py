@@ -14,13 +14,13 @@ from dotsShowFiles      import ShowFiles
 from dotsShowWorks      import ShowWorks 
 
 MinRows = 5
-MaxRows = 25
+MaxRows = 17
 
 MaxCols = 15  ## shown
 MinCols = 7
 
 ColWidth  = 100  ## seems to be the default sizes on my mac 
-RowHeight = 30  
+RowHeight = 30
 
 ColumnWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
 
@@ -133,7 +133,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.model.setHdrColor(i, 'yellow')  ## missing files 
             self.model.setMisses(i, font)
             
-        self.tableView.resize(width, height)
+        self.tableView.resize(width, height-18)
         self.tableView.move(self.reposition(height))  ## uses both width(self.cols) & height
         
         self.tableView.show()
@@ -265,6 +265,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             k += 1  ## tracking the row number       
                           
         if self.deleteKey == True or self.src in('view', 'table') or len(self.Missingfiles) > 0:
+            data.append('\t')  ## last line fix
             self.addTable(data, miss, save) 
             self.deleteKey == False    
              
@@ -273,7 +274,7 @@ class TableView:  ## formats a json .play file to display missing files or not
                  
 ### --------------------------------------------------------
     def widthHeight(self, data):
-        rows   = len(data)  
+        rows   = len(data)
         width  = self.cols * ColWidth       
         height = (rows + 1) * RowHeight   
               
