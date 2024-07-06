@@ -133,7 +133,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.model.setHdrColor(i, 'yellow')  ## missing files 
             self.model.setMisses(i, font)
             
-        self.tableView.resize(width, height-18)
+        self.tableView.resize(width, height)
         self.tableView.move(self.reposition(height))  ## uses both width(self.cols) & height
         
         self.tableView.show()
@@ -265,7 +265,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             k += 1  ## tracking the row number       
                           
         if self.deleteKey == True or self.src in('view', 'table') or len(self.Missingfiles) > 0:
-            data.append('\t')  ## last line fix
+            data.append(' ')  ## last line fix
             self.addTable(data, miss, save) 
             self.deleteKey == False    
              
@@ -282,7 +282,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             height = MaxRows * RowHeight   
         elif height < MinRows * RowHeight:
             height = MinRows * RowHeight
-        height += 20  ## header is roughly 20px
+        height += 10  ## add for header 
        
         width = self.cols * ColWidth 
         if self.cols > MaxCols: 
