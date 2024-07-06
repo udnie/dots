@@ -168,7 +168,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             else:
                 self.bkgMaker.unlockBkg(self.bkgItem)  
             if self.bkgMaker.widget != None:     
-                p = self.canvas.mapFromGlobal(QPointF(QCursor.pos()))   
+                p = self.canvas.mapFromGlobal(QCursor.pos())  
                 tagBkg(self.bkgItem, QPoint(int(p.x())+200,int(p.y())+50))
                 QTimer.singleShot(3000, self.canvas.mapper.clearTagGroup)
                                                                                                
