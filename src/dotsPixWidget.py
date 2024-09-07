@@ -6,20 +6,31 @@ from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, \
                                QLabel, QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
    
+from dotsSideGig        import getVuCtr
+
 ### -------------------- dotsPixWidget ---------------------       
 class PixWidget(QWidget):  
 ### -------------------------------------------------------- 
-    def __init__(self, parent):
+    def __init__(self, parent, switch=''):
         super().__init__()
-                                        
-        self.pix   = parent
-        self.works = self.pix.works
+           
+        self.fileName = ''
         
-        self.type = 'widget'
+        self.switch = switch
+                       
+        if self.switch == '':              
+            self.pix   = parent
+            self.works = self.pix.works
+            self.pix.widgetOn = True 
+            self.fileName = os.path.basename(self.pix.fileName)
+        else:    
+            self.canvas = parent
+     
+        self.type = 'widget' 
+        self.setAccessibleName('widget')
+        
         self.save = QPointF()
-                
-        self.setAccessibleName('widget')  
-        self.WidgetW, self.WidgetH = 340.0, 235.0
+        self.WidgetW, self.WidgetH = 340.0, 265.0
                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
@@ -27,10 +38,8 @@ class PixWidget(QWidget):
         hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignBottom)
         self.setLayout(hbox)
         
-        file = os.path.basename(self.pix.fileName)
-        self.label.setText(file)
-        self.label.setStyleSheet("QLabel{font-size: 15pt;}")
-        
+        self.label.setText(self.fileName)
+   
         self.setFixedHeight(int(self.WidgetH))  
         self.setStyleSheet('background-color: rgba(0,0,0,0)')
         self.setContentsMargins(0,15,0,-15) 
@@ -41,7 +50,12 @@ class PixWidget(QWidget):
             Qt.WindowType.WindowStaysOnTopHint)
                                                      
         self.show()
-                
+           
+        if self.switch == 'on':
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName goes Here')
+            self.move(x-405,y-305)
+                      
 ### --------------------------------------------------------              
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -70,7 +84,8 @@ class PixWidget(QWidget):
         self.save = e.globalPosition()
             
     def mouseDoubleClickEvent(self, e):
-        self.works.closeWidget()
+        switch = self.switch
+        self.works.closeWidget(switch)
         e.accept()
      
 ### -------------------------------------------------------- 
@@ -94,7 +109,7 @@ class PixWidget(QWidget):
         self.pix.setOpacity(op)
         self.pix.alpha2 = op
         self.opacityValue.setText(f'{op:.2f}') 
-                                    
+                                        
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')
@@ -180,24 +195,31 @@ class PixWidget(QWidget):
         cloneBtn  = QPushButton('Clone')
         animeBtn  = QPushButton('Animations')
         delBtn    = QPushButton('Delete')
+        helpBtn   = QPushButton('Help')
         self.lockBtn = QPushButton('Un/Lock')
         quitBtn   = QPushButton('Close')
     
-        shadowBtn.clicked.connect(self.pix.addShadow)
-        flopBtn.clicked.connect(self.works.flopIt)
-        cloneBtn.clicked.connect(self.works.cloneThis)
-        animeBtn.clicked.connect(self.works.animeMenu)
-        delBtn.clicked.connect(self.pix.deletePix)
-        self.lockBtn.clicked.connect(self.pix.togglelock)
-        quitBtn.clicked.connect(self.works.closeWidget)
-    
+        if self.switch == '':
+            shadowBtn.clicked.connect(self.pix.addShadow)
+            helpBtn.clicked.connect(self.pix.openMenu)
+            flopBtn.clicked.connect(self.works.flopIt)
+            cloneBtn.clicked.connect(self.works.cloneThis)
+            animeBtn.clicked.connect(self.works.animeMenu)
+            delBtn.clicked.connect(self.pix.deletePix)
+            self.lockBtn.clicked.connect(self.pix.togglelock)
+            quitBtn.clicked.connect(self.works.closeWidget)
+        else: 
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
+                
         vbox = QVBoxLayout(self)
+        
+        vbox.addWidget(helpBtn)
         vbox.addWidget(shadowBtn)
         vbox.addWidget(self.lockBtn)
         vbox.addWidget(flopBtn)
-        vbox.addWidget(animeBtn)
         vbox.addWidget(cloneBtn)
         vbox.addWidget(delBtn)
+        vbox.addWidget(animeBtn)
         vbox.addWidget(quitBtn)
                 
         groupBox.setLayout(vbox)

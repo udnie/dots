@@ -2,21 +2,98 @@
 import os
 import math
 
-from PyQt6.QtCore       import QRect, QPointF, QPoint
+from PyQt6.QtCore       import QRect, QPointF, QPoint, QPropertyAnimation
 from PyQt6.QtGui        import QPixmap, QPainterPath
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-from dotsAnimation      import *  
-from dotsShared         import RotateKeys, paths
-from dotsSideGig        import distance, getColorStr
+from dotsAnimation      import Node 
+from dotsShared         import RotateKeys, paths, common
+from dotsSideGig        import distance, getColorStr, getVuCtr
 from dotsPathWidget     import PathWidget
+from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 
 ScaleRotate = ('<', '>', '+', '-')  ## sent from keyboard
 ScaleUpKeys = ('>','\"','\'')
 ScaleDnKeys = ('<',':',';')
+SharedKeys =  ('C','E','D','N','P','R','S','T','X')  
+                 
+pathKeys = {
+    'C':    'Center Path',
+    'D':    'Clears/Deletes Scene',
+    'E':    'Edit Path Points', 
+    'N':    'New Path and Close Path',
+    'P':    'Path Chooser',
+    'R':    'Reverse Path',
+    'S':    'Save Path',
+    'T':    'Test w/Mr.Ball',
+    'X':    'X, Q, Escape to Quit',
+    'L':    '**Lasso Points**',
+    'U':    ' **UnSelect Points**',   
+    'del':    '**Delete a Point**',     
+    'opt':    '**Add a Point**', 
+    'shift':  '**D Deletes Selected Pts**',  
+}
+             
+### --------------------------------------------------------     
+class PathHelp:  
+### --------------------------------------------------------
+    def __init__(self, parent, canvas, off=0, str=''):
+        super().__init__()  
+          
+        self.helpButton = parent  ## canvas
+        self.helpButton.pathFlag = True
+        
+        self.canvas = canvas
+        self.switch = str
      
-### -------------------- dotsPathWorks ---------------------
-''' no class: functions: scaleRotate, pathTest  '''                                                                                         
+        self.table = TableWidgetSetUp(50, 200, len(pathKeys)+5)
+        self.table.itemClicked.connect(self.clicked)    
+    
+        width, height = 256, 577
+        self.table.setFixedSize(width, height)
+  
+        self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}','',True, True, 2)
+    
+        row = 1
+        for k, val in pathKeys.items():
+            if row < 10:
+                self.table.setRow(row, 0, k)
+                self.table.setRow(row, 1, "  " + val,'','',True)
+                row += 1
+            else:
+                if row == 10:
+                    self.table.setRow(row, 0, f'{"These Keys Only Work when Editing    ":<20}', QC,True, True, 2)  
+                    self.table.setRow(row+1, 0, f'{" and Require a Mouse and Keyboard ":<12}', QC,True, True, 2) 
+                    row = 12
+                self.table.setRow(row, 0, k, QL)  ## highlight
+                self.table.setRow(row, 1, "  " + val, QL,'','')                
+                row += 1
+   
+        self.table.setRow(row,  0,    f'{"Enter Key or Select From Above   "}',QH,True,True, 2)
+        self.table.setRow(row + 1, 0, f'{"Click Here to Close  ":<20}','',True, True, 2)
+  
+        x, y = getVuCtr(self.canvas)   
+        if off != 0: x += off 
+        
+        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.show() 
+              
+    def clicked(self):
+        if self.switch == '':
+            try:
+                help = self.table.item(self.table.currentRow(), 0).text().strip()
+                if help in SharedKeys:
+                    self.canvas.pathMaker.pathKeys(help)
+            except:
+                None
+        self.closeMenu()
+
+    def closeMenu(self):
+        self.helpButton.pathFlag = False 
+        self.table.close()
+        if self.switch !='':
+            self.canvas.setKeys('M')
+                                                                                             
 ### --------------------------------------------------------
 class PathWorks:
 ### --------------------------------------------------------
@@ -26,13 +103,14 @@ class PathWorks:
         self.pathMaker = parent
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.canvas.scene
+        self.sideCar   = self.canvas.sideCar
          
         self.widget = self.pathMaker.widget
-                
+   
 ### -------------------------------------------------------- 
-    def addWidget(self):  ## split code
+    def addWidget(self, str=''):  ## split code
         self.closeWidget()
-        self.widget = PathWidget(self.pathMaker)       
+        self.widget = PathWidget(self.pathMaker, self.sideCar, str)    
         p = common['widgetXY']
         p = self.canvas.mapToGlobal(QPoint(p[0], p[1]))       
         self.widget.save = QPointF(p.x(), p.y())                          
@@ -44,11 +122,12 @@ class PathWorks:
             self.widget.label.setText(self.pathMaker.openPathFile)
         self.pathMaker.editingPts == False
         self.pathMaker.edits.deleteLasso()
+        return self.widget
             
     def closeWidget(self):
         if self.widget != None:
             self.widget.close()
-            self.widget = None
+            self.widget = None  
   
     def deleteDoodle(self, this):  ## remove doodle and path from pathChooser widget
         os.remove(this.file)
@@ -56,6 +135,10 @@ class PathWorks:
         self.pathMaker.pathChooserOff()
         self.pathMaker.pathChooser()
  
+    def openMenu(self):
+        self.closeWidget()
+        self.help = PathHelp(self, self.canvas)  
+    
  ### --------------------------------------------------------    
     def scaleRotate(self, key, per=0, inc=0):  ## also used by pathWidget
         if len(self.pathMaker.pts) == 0: 

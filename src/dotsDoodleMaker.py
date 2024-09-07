@@ -14,16 +14,18 @@ class DoodleMaker(QWidget): ## my file display of path files
     def __init__(self, parent, where=''):  ## can come from 'Path Menu'
         super().__init__()
 
-        self.pathMaker = parent
+        self.canvas = parent
+        self.pathMaker = self.canvas.pathMaker
                          
-        self.type = 'widget'
+        self.type = 'widget'              
+        self.setAccessibleName('widget')
+        
         self.save = QPointF()
                 
         self.rotate = 0
         self.scale  = 0
         self.where  = where
                  
-        self.setAccessibleName('widget')
         self.WidgetW, self.WidgetH = 530, 400
         
         self.setFixedSize(self.WidgetW, self.WidgetH)
@@ -104,17 +106,18 @@ class DoodleMaker(QWidget): ## my file display of path files
       
     def updateGrid(self):
         for file in getPathList():    
-            df = Doddle(self, self.pathMaker, file)
+            df = Doddle(self.canvas, self, file)
             self.gLayout.addWidget(df)   
                     
 ### --------------------------------------------------------
 class Doddle(QLabel):  ## small drawing of path file content with filename
 ### --------------------------------------------------------
-    def __init__(self, parent, path, file):
+    def __init__(self, parent, doodle, file):
         super().__init__()
 
-        self.doodle = parent
-        self.pathMaker = path
+        self.canvas = parent
+        self.doodle = doodle
+        self.pathMaker = self.canvas.pathMaker
         
         self.file = file
         scalor = .10
@@ -145,13 +148,11 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
             return      
         ## from animation menu - see menus
         if self.doodle.where == 'Path Menu': 
-            for pix in self.pathMaker.canvas.scene.selectedItems(): 
-                if pix.type != 'pix':
-                    continue
-                else:
+            for pix in self.canvas.scene.selectedItems(): 
+                if pix.type == 'pix':
                     pix.tag = os.path.basename(self.file) 
                     pix.anime = None        ## set by play
-                    pix.setSelected(False)  ## when tagged 
+                    pix.setSelected(False)  ## when tagged     
             self.pathMaker.pathChooserOff() 
             return
         elif self.pathMaker.key == 'del':

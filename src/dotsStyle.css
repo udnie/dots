@@ -79,7 +79,7 @@ QMainWindowTitle  {
 QMenu {
     background-color: rgb(245,245,245); 
     border: 3px solid dodgerblue;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 QMenu::item { 
@@ -87,6 +87,7 @@ QMenu::item {
 }
 
 QMenu::item:selected { 
-    background-color: rgba(30,144,255,200);
+  background-color: rgba(30,144,255,200);
 }
+
 

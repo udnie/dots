@@ -3,35 +3,42 @@ import cv2
 import numpy as np
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtCore       import Qt, QPoint, QPointF, pyqtSlot
+from PyQt6.QtGui        import QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
-                               
-from dotsShared         import common, paths
-from dotsSideGig        import point
+                              
+from dotsShared         import common, paths, ControlKeys
+from dotsBkgScrollWrks  import tagBkg
+from dotsHelpMonkey     import SharedKeys
 
+## SharedKeys =  ('H','T','/','del','tag','shift','enter','return') 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
 
 ### ---------------------- dotsShadow ----------------------
 ''' classes: Shadow and cv2 functions... 
     Shadow doesn't hold state as it's constantly being updated - 
-    ShadowMaker's shadow is where to look '''                                                    
-### --------------------------------------------------------
+    shadowMaker.shadow is where to look. pixitem.shadow is storage ''' 
+### ---------------------- dotsShadow ----------------------  
 class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
        
-        self.maker   = parent
+        self.maker   = parent  ## shadowMaker
         self.canvas  = self.maker.canvas
         self.pixitem = self.maker.pixitem
         self.path    = self.maker.path
+        self.mapper  = self.canvas.mapper
        
         self.setZValue(self.pixitem.zValue()-1) 
         
         self.tag = ''     
         self.type = 'shadow' 
         self.fileName = 'shadow'
-                    
+     
+        self.key = ''          
+        self.sharedKeys = SharedKeys   
+                                
         self.dragCnt = 0 
         self.save = QPointF()  ## mapToScene - used with updatePath
         
@@ -59,14 +66,41 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
 
 ### --------------------------------------------------------
+    @pyqtSlot(str)  ## updated by storyboard
+    def setPixKeys(self, key):
+        self.key = key  
+        
     def mousePressEvent(self, e): 
         self.save = self.mapToScene(e.pos())
         if e.button() == Qt.MouseButton.RightButton: 
             self.maker.addWidget(self)  ## only place it's used 
-        elif self.maker.dblclk == False:   
-            self.maker.works.hideOutline()  ## hides points    
+        elif self.key in self.sharedKeys:
+            self.shared(self.key)  
         e.accept() 
 
+    def shared(self, key):  ## with help menuu
+        self.key = key 
+        if self.key == 'del':    
+            self.delete()      
+        elif self.key == 'shift':  ## send back  
+            self.setZValue(self.zValue()-1)
+        elif self.key in('enter','return'): # send to front
+            self.setZValue(self.mapper.toFront(1))  
+        elif self.key == 'tag':  ## '\' backslash
+            self.tagThis()
+        elif self.key == 'H':  
+            self.maker.openMenu()      
+        elif self.key == 'T':     
+            self.linkShadow() if self.maker.linked == False \
+                else self.unLinkShadow()
+            self.tagThis() 
+        elif self.key == '/':  ## cuts off shadow if partial offscreen and points tweaked
+            self.maker.updateShadow()  
+          
+    def tagThis(self):  
+        p = QCursor.pos()
+        tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
+         
     def mouseMoveEvent(self, e):
         if self.maker.linked == False:
             self.dragCnt += 1
@@ -76,21 +110,28 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                           
     def mouseReleaseEvent(self, e): 
         if self.maker.linked == False:  
-            self.maker.updatePath(self.mapToScene(e.pos()))          
-            self.maker.updateShadow()  ## cuts off shadow at 0.0y of scene if not moving       
+            self.maker.updatePath(self.mapToScene(e.pos()))            
             if self.maker.dblclk == False:  
                 self.maker.works.hideOutline()   
             e.accept()
+        self.key = '' 
   
-    def mouseDoubleClickEvent(self, e):
-        if self.maker.linked == False:           
-            if self.maker.dblclk == False:
-                self.maker.dblclk = True
+    def mouseDoubleClickEvent(self, e):  ## if 'resume', 'pause', animation running
+        if self.canvas.control not in ControlKeys and \
+            self.key not in self.sharedKeys:  
+            if self.maker.linked == False:
+                if self.maker.dblclk == False:
+                    self.maker.dblclk = True
+                else:
+                    self.maker.dblclk = False
+                self.maker.updatePath(self.mapToScene(e.pos()))
+                self.updOutline()
             else:
-                self.maker.dblclk = False
-            self.maker.updatePath(self.mapToScene(e.pos()))
-            self.updOutline()
+                self.tagThis()
             e.accept()
+    
+    def delete(self):  
+        self.maker.works.deleteShadow()
   
     def updOutline(self):  ## so as not to be confused with updateOutline
         self.maker.addPoints() 
@@ -112,7 +153,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.maker.works.hideOutline()
         self.maker.hidden = True    
         if self.maker.widget != None:
-            self.maker.works.closeWidget()
+            self.maker.works.closeWidget()      
         self.save = b
                    
     def unLinkShadow(self):  
@@ -131,7 +172,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.maker.widget != None:
             self.maker.widget.linkBtn.setText('Link')  ## keep it open  
             self.maker.works.resetSliders() 
-       
+        
 ### --------------------------------------------------------        
     def initPoints(self):  ## initial path and points setting from maker.addShadow         
         self.path = []
@@ -169,7 +210,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-                                                                                                
+                                                                                                  
 ### --------------------------------------------------------        
 def initShadow(file, w, h, flop):  ## replace all colors with grey  
     file = paths['spritePath'] + os.path.basename(file)         

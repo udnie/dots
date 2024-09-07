@@ -10,7 +10,9 @@ from dotsSideGig        import *
 from dotsSideCar        import SideCar
 from dotsShowFiles      import ShowFiles
 from dotsShowWorks      import ShowWorks
-from dotsShared         import Types, ControlKeys
+from dotsShared         import ControlKeys
+from dotsAnimation      import Animation
+from dotsTableModel     import Types
 
 Demos = ['snakes', 'bats', 'hats']
 
@@ -31,8 +33,8 @@ class ShowTime:
         self.sideCar   = SideCar(self.canvas) 
         self.showWorks = ShowWorks(self.canvas)
         self.showFiles = ShowFiles(self.canvas) 
+        self.animation = Animation(self.canvas)
         
-        self.animation = self.canvas.animation
         self.pathMaker = self.canvas.pathMaker
      
 ### --------------------------------------------------------        

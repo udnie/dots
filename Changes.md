@@ -5,8 +5,25 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**July 2024** 
+**September 2024**  
+I've added help menus to just about everything I could add a menu to - it should make dots a bit more user friendly. As part of the update there's now a help button that triggers help for the three main screens, the first being the Canvas, that's what you see when dots opens up.  The next screen StoryBoard, that's the Canvas with sprites, backgrounds and shadows. And the third, PathMaker.
+
+Neither the canvas or storyboard have widgets associated with them and the help button takes care of that. 'H' for help still works in Canvas but nowhere else.  To start, clicking on the help button brings up the Canvas Help Menu, from here you can select Help Menus or simply type in 'M'. This brings up a table of help menus and widgets for you to view and catalogs most of the commands needed to make dots work. These are the same menus and widgets you would use, just not currently active, also - Help Menus only work in Canvas.
+
+Last month, August, I installed dots on a Windows 11 computer and can report it was able to run shadows with a minimum amount of effort once the path was configured. Some of the text didn't look quite the way it does on my Mac, otherwise, the performance was good.  I also learned I wouldn't need to change my predefined paths to windows style from unix as it was just taken care of. 
+
+You may notice some differences in the video to the actual menus.  I made some small changes after I had pretty much finished the video and decided it wasn't worth the effort to capture and edit them over again.  I should also mention that commands shown on a menu that take modifiers, such as a shift key, may not necessarily work if clicked on.
+
+Last, a new vertical screen format, 576X1024, that makes good use of a 1200 pixel vertical display. 
+
+
+
+---
+
+**July 2024**   
 Uncommented something that I had over-zealously commented out - affected only shadows in the demos. Plus, a few other bug fixes and lots of testing.
+
+Forgot to mention spotColor().  It returns a color code using the **eye-dropper widget** from **QColorDialog** and displays a more visible version of what was selected. Works only with backgrounds. Hold down the **'']''** key and click on a image background, the **QColorDialog** should appear, click on the **eye-dropper** icon and select a color and then click OK - the more visible selection appears and will go away in a few seconds. No plans on when or how to use it - was just looking into how I might read the color of a pixel(s) and this turned out to be the best solution with the least amount of effort and the most accurate results.
 
 **June 2024**  
 **Dots** can now run on a **M1 Mac** on **Apple Silicon** using **PyQt5**.  It's slightly slower when it comes to ~~**scrolling backgrounds**~~ and running some **animations** are a little choppy but that isn't surprising as it's **PyQt5**.  ~~**QMessageBox** in **PyQt5** still can't display an icon without filling up the scene but~~ everything else appears to be working about the same as it does in **PyQt6** running in **Rosetta**. 

@@ -2,61 +2,51 @@
 import os
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF, QPropertyAnimation, pyqtSlot
+from PyQt6.QtCore       import Qt, QPointF, QPoint, QPropertyAnimation, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgWorks       import BkgWorks
-from dotsBkgScrollWrks  import BkgScrollWrks, tagBkg
+from dotsBkgScrollWrks  import BkgScrollWrks, tagBkg, Trackers
+from dotsHelpMonkey     import BkgHelp
+from dotsAnimation      import Node
 
-import dotsAnimation    as Anime
+SharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
 
 ### ---------------------- dotsBkgItem ---------------------                   
 ''' Background Class - there can be more than one background in a scene '''
 ### --------------------------------------------------------
-''' screentimes and moretimes are now screenrates.dict in the play directory
-            also direction refers to the direction of travel
-# screentimes = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
-#         ##   first, next-rt<lft, next-lft>right --- there are always two backgrounds once started
-#     '1080':  [10.0,  17.50,  17.45],     ## 1440px actual size when scaled 1280X640 for 16:9
-#     '1280':  [10.0,  18.75,  18.85],  
-#     '1215':  [10.0,  17.35,  17.4],     ## 1620px actual size when scaled 1280X640 for 16:9
-#     '1440':  [10.0,  18.7,   18.85],
-#     '1296':  [10.0,  17.50,  17.45],     ## 1728px actual size when scaled 1280X640 for 16:9
-#     '1536':  [10.0,  18.65,  18.60],  
-#     '1102':  [10.0,  20.9,    0.0],
-#     '900':   [10.0,  23.2,    0.0],
-#     '912':   [10.0,  20.9,   0.0],
-# }
-# moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
-#     '1080':  [10.0,   19.05, 19.05],   ## 1215px actual size when scaled 1080X640 for 3:2
-#     '1215':  [10.0,   18.88, 18.89],   ## 1367px actual size when scaled 1080X640 for 3:2
-#     '1296':  [10.0,   18.88, 18.87],   ## 1458px actual size when scaled 1080X640 for 3:2
-#     '900':   [10.0,   21.4,   0.0]     ## 1013px actual size when scaled 640X1080 for 2:3
-# } '''
-    
+''' The screentimes and moretimes dictionaries have been moved to screenrates.dict
+    in the play directory. See 'Rates and Background Widget Controls' in Start Here
+    for details. '''
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):  ## background
 ### --------------------------------------------------------
-    def __init__(self, fileName, canvas, z=common['bkgZ'], mirror=False, copy=None):
+    def __init__(self, fileName, parent, z=common['bkgZ'], mirror=False, copy=None):
         super().__init__()
 
-        self.canvas   = canvas
+        self.canvas   = parent
         self.dots     = self.canvas.dots
         self.scene    = self.canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
-        
+
         self.bkgWorks = BkgWorks(self)
         self.bkgScrollWrks = BkgScrollWrks(self)
-    
+      
+        self.tracker = None  
+        self.widgetOn = False  
+       
         self.ViewW = common['ViewW']
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
-        self.path = paths['bkgPath']    
-        self.fileName = os.path.basename(fileName)  ## new
+        self.path = paths['bkgPath']  
+          
+        self.fileName = os.path.basename(fileName) 
+        
+        self.sharedKeys = SharedKeys  ## shared with bkgMenu
         
         if self.canvas.openPlayFile != '':
             if self.canvas.openPlayFile == 'snakes':      
@@ -72,7 +62,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
         self.setZValue(z)      
         self.init(copy)
-                  
+                   
 ### --------------------------------------------------------   
     def init(self, copy):    
         self.imgFile = None      
@@ -143,40 +133,70 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             
         fn = f'{play}   {self.fileName}   {self.width}   {self.height}   {rot:.2f}'
         self.canvas.dots.statusBar.showMessage(fn, 12000) 
-               
-### -------------------------------------------------------- 
+             
+### --------------------------------------------------------
     @pyqtSlot(str)
-    def setPixKeys(self, key):
+    def setPixKeys(self, key):  
         self.key = key 
-                           
-    def mousePressEvent(self, e):  ## combination
+        try:  ## doesn't appear that the widget can get input other than thru this
+            if self.key in ('up', 'down','right','left') and self.bkgMaker.widget != None:
+                if self.scene.selectedItems(): 
+                    self.canvas.unSelect()
+                self.bkgMaker.widget.setKeys(key)
+        except AttributeError:
+            pass
+        
+    def mousePressEvent(self, e): 
         if not self.canvas.pathMakerOn:       
             if e.button() == Qt.MouseButton.RightButton:   
                 self.bkgMaker.addWidget(self)   
                 if self.direction == '' or self.useThis == '':   
                     self.bkgWorks.reset(self)
-                    self.bkgMaker.resetSliders(self)              
-            elif self.canvas.key == 'del':    
-                self.bkgMaker.deleteBkg(self)          
-            elif self.canvas.key == '/':  ## to back
-                self.bkgMaker.back(self)     
-            elif self.canvas.key == 'shift':  ## flop it
-                self.setMirrored(False) if self.flopped else self.setMirrored(True)       
-            elif self.canvas.key in ('enter','return'):  ## to front  
-                self.bkgMaker.front(self)             
-            elif self.key == ',':  ## may only work on background with transparent spaces
-                self.bkgMaker.backOne(self)  
-            elif self.key == '.': 
-                self.bkgMaker.upOne(self)  
-            elif self.key in('opt', 'tag'):  ## show background tag
-                tagBkg(self, e.scenePos())
-            elif self.key == ']':   
-                self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QPointF(QCursor.pos())))    
+                    self.bkgMaker.resetSliders(self)                                       
+            elif self.key in self.sharedKeys:
+                self.shared(self.key) 
+                self.key = ''
+                e.accept()  
             self.initX, self.initY = self.x, self.y  
             self.dragCnt = self.mapToScene(e.pos())
             self.key = ''
         e.accept()     
-    
+
+    def shared(self, key):  ## from helpMenu and keyboard
+        if not self.canvas.pathMakerOn: 
+            self.key = key
+            if self.key == 'del':    
+                self.bkgMaker.deleteBkg(self)    
+            elif self.key == 'shift':  ## to back
+                self.setZValue(self.canvas.mapper.lastZval('bkg')-1)      
+            elif self.key in ('enter','return'):  ## to front     
+                self.bkgMaker.front(self)    
+            elif self.key == 'tag': ## '\' <- tagKey
+                self.tagThis()
+            elif self.key == 'B':   
+                self.tracker = Trackers(self.canvas, self.canvas.sideCar.dumpTrackers())
+                if self.tracker != None:
+                    self.tracker.show()    
+            elif self.key == 'E':   
+                self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
+            elif self.key == 'F':  ## flop it
+                self.setMirrored(False) if self.flopped else self.setMirrored(True)  
+            elif self.key == 'H':  
+                self.openMenu()
+            elif self.key == 'T':     
+                self.bkgMaker.lockBkg(self) if self.locked == False \
+                    else self.bkgMaker.unlockBkg(self)
+                self.tagThis()
+            key = ''
+                 
+    def tagThis(self):
+        p = QCursor.pos()
+        tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
+          
+    def openMenu(self):
+        self.bkgMaker.closeWidget()    
+        self.help = BkgHelp(self) 
+
 ### -------------------------------------------------------- 
     ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''
 ### -------------------------------------------------------- 
@@ -186,10 +206,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 return            
                      
             elif self.addedScroller == False:  ## check if its showtime    
-                
-                # if self.direction  == 'left'  and int(value.x()) == int(common['ViewW']/2):
-                #     print(f"{int(value.x())} {int(common['ViewW']/2)}")
-                #     self.canvas.showtime.pause()
                 
                 if self.direction  == 'left'  and int(value.x()-self.runway) <= self.showtime or\
                     self.direction == 'right' and int(value.x()) >= -self.showtime or\
@@ -251,7 +267,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
                
-### --------------------------------------------------------  
+### --------------------------------------------------------   
     def setStartingPos(self, bkg):
         if bkg.direction == 'right':  ## gets it pointed in the right direction -->>
             bkg.setPos(QPointF(bkg.runway, 0)) 
@@ -277,7 +293,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     
     def setNode(self, bkg):     
         try:  
-            node = Anime.Node(bkg)       
+            node = Node(bkg)       
             return QPropertyAnimation(node, b'pos') 
         except RuntimeError:
             return None
@@ -298,4 +314,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 ### ---------------------- dotsBkgItem ---------------------
 
 
+
+
+        # if self.direction  == 'left'  and int(value.x()) == int(common['ViewW']/2):
+        #     print(f"{int(value.x())} {int(common['ViewW']/2)}")
+        #     self.canvas.showtime.pause()
         

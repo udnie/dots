@@ -4,13 +4,13 @@ import os
 import math
 
 from PyQt6.QtCore       import QTimer, QPointF, QRectF, QPoint, Qt
-from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap
-from PyQt6.QtWidgets    import QMessageBox
+from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap, QPen, QColor
+from PyQt6.QtWidgets    import QMessageBox, QGraphicsItemGroup, QGraphicsLineItem
          
 from dotsShared         import common, paths, pathcolors
 
 ### ---------------------- dotsSideGig ---------------------
-''' class: MsgBox plus misc  ...'''
+''' class: MsgBox, Grid, and misc  ...'''
 ### --------------------------------------------------------
 class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------
@@ -64,7 +64,60 @@ class MsgBox:  ## always use getCtr for setting point
     def closeEvent(self, e):
         self.timer.stop()
         e.accept() 
+ 
+### --------------------------------------------------------
+class Grid:  ## moved from sideCar
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+ 
+        self.canvas = parent
+        self.scene  = self.canvas.scene
+        
+        self.gridZ     = common['gridZ']    
+        self.gridGroup = None  
+        
+### -------------------------------------------------------                                        
+    def toggleGrid(self):
+        if self.gridGroup != None:
+            self.removeGrid()
+            self.gridGroup = None
+        else: 
+            self.addGrid()
+            
+    def addGrid(self):
+        self.gridGroup = QGraphicsItemGroup()  
+        self.gridGroup.setZValue(common['gridZ'])
+        self.scene.addItem(self.gridGroup)         
+        gs = common['gridSize']
+        pen = QPen(QColor(0,0,255))       
+        for y in range(1, int(common['ViewH']/gs)):
+            self.addLines(QGraphicsLineItem(0.0, gs*y,
+                float(common['ViewW']), gs*y), pen)
+        for x in range(1, int(common['ViewW']/gs)):
+            self.addLines(QGraphicsLineItem(gs*x, 0.0,
+                gs*x, float(common['ViewH'])), pen)
+        
+    def addLines(self, line, pen):
+        line.type = 'grid'
+        line.setPen(pen)
+        line.setOpacity(.30)
+        line.setZValue(common['gridZ'])
+        line.setFlag(QGraphicsLineItem.GraphicsItemFlag.ItemIsMovable, False)
+        self.gridGroup.addToGroup(line)
 
+    def removeGrid(self):
+        try:
+            for pix in self.scene.items():
+                if pix.type == 'grid': self.scene.removeItem(pix)
+            self.scene.removeItem(self.gridGroup)
+        except:
+            return
+        
+    def gridCount(self):  
+        return sum(pix.type == 'grid' 
+            for pix in self.canvas.scene.items())
+                 
 ### --------------------------------------------------------
 ''' functions that mostly return values follow '''
 ### --------------------------------------------------------

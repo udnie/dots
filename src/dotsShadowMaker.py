@@ -6,28 +6,32 @@ from PyQt6.QtCore       import QPoint, QPointF, QTimer
 from PyQt6.QtGui        import QImage, QPixmap
 
 from dotsShared         import common, paths
-from dotsShadow         import *                      
+from dotsShadow         import *                  
 from dotsShadowWidget   import ShadowWidget
 from dotsShadowWorks    import Works, PointItem
-from dotsSideGig        import getCrop, point
+from dotsSideGig        import getCrop
+from dotsHelpMonkey     import ShadowHelp
 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
-       
+
 ### ------------------- dotsShadowMaker --------------------
 ''' class: ShadowMaker - handles shadow, widget and points'''                                                                                                                    
 ### -------------------------------------------------------- 
 class ShadowMaker:  
 ### --------------------------------------------------------    
-    def __init__(self, parent):
+    def __init__(self, parent, switch=''):
         super().__init__()
-                  
+            
+        self.switch = switch          
+        
         self.pixitem = parent
         self.canvas  = self.pixitem.canvas
-        self.scene   = self.pixitem.scene
-        
-        self.init()    
-        self.works = Works(self)  ## small functions and pointItem
+        self.scene   = self.pixitem.scene                          
 
+        self.works = Works(self, self.switch)  ## small functions and pointItem
+
+        self.init()    
+ 
 ### --------------------------------------------------------
     def init(self):
         self.topLeft  = None
@@ -90,7 +94,7 @@ class ShadowMaker:
         
         pos = self.pixitem.pos()
         x, y = pos.x(), pos.y()
-                                  
+                                                                                          
         self.shadow.setZValue(self.pixitem.zValue()-1) 
                                                                
         self.shadow.setX(x-50)  ## same as pixitem, add offset
@@ -191,9 +195,10 @@ class ShadowMaker:
         self.works.updateOutline(what)  ## to turn off outline
                                                                                 
 ### --------------------------------------------------------    
-    def addWidget(self, pix):  ## creates a shadow widget     
-        self.works.closeWidget()
-        self.widget = ShadowWidget(self)  
+    def addWidget(self, shadow, switch=''):  ## creates a shadow widget   
+        if switch == '':  
+            self.works.closeWidget()
+        self.widget = ShadowWidget(self, self.shadow, self.switch)  
         
         if self.linked == False:  ## not linked
             self.widget.linkBtn.setText('Link') 
@@ -201,7 +206,7 @@ class ShadowMaker:
             self.widget.linkBtn.setText('UnLink')  ## link == True
                
         if self.path != None and len(self.path) > 0:       
-            p = pix.sceneBoundingRect()     
+            p = self.shadow.sceneBoundingRect()     
                                            
             x, y = int(p.x()), int(p.y())  
             self.last = QPointF(x,y)  ## last position   
@@ -214,7 +219,8 @@ class ShadowMaker:
             self.widget.save = QPointF(x,y)  
             self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))   
             
-            self.works.resetSliders() 
+        self.works.resetSliders()
+        return self.widget 
                                                 
 ### --------------------------------------------------------
     def addPoints(self, hide=True): 
@@ -256,31 +262,32 @@ class ShadowMaker:
  
     def updatePath(self, val):  ## see shadow for ItemSendsScenePositionChanges 
         if self.path != None and len(self.path) > 0:    
-            dif = val - self.shadow.save    
-                   
+            dif = val - self.shadow.save          
             for i in range(4):
                 self.path[i] = self.path[i] + dif
-                self.updatePoints(i, self.path[i].x(), self.path[i].y())
-                
-            self.shadow.save = val   
-            
+                self.updatePoints(i, self.path[i].x(), self.path[i].y())              
+            self.shadow.save = val      
             if self.linked == False:    ## updated by shadow
                 self.shadow.setPos(self.shadow.pos()+dif) 
                 if self.dblclk == True: ## turns on outline and points    
                     self.works.updateOutline()    
                 else:
                     self.works.hideOutline()  ## hides points as well
-            else:                       ## updated by pixitem
+            else:                             ## updated by pixitem
                 self.shadow.setPos(self.pixitem.pos()+self.pixitem.offset)
       
-### -------------------------------------------------------- 
+### --------------------------------------------------------   
+    def openMenu(self):
+        self.works.closeWidget()
+        self.help = ShadowHelp(self)
+    
     def newShadow(self):  ## 'new' from shadow widget
         self.works.cleanUpShadow()
         b = self.pixitem.boundingRect()
         self.addShadow(b.width(), b.height(), self.viewW, self.viewH)      
         self.alpha, self.scalor, self.rotate = .50, 1.0, 0
                          
-    def toggleLink(self): 
+    def toggleWidgetLink(self): 
         if self.shadow != None:
             if self.linked == False and self.widget.linkBtn.text() == 'Link': 
                 self.shadow.linkShadow()   

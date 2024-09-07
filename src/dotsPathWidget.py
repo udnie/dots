@@ -6,21 +6,30 @@ from PyQt6.QtGui        import QColor, QPen, QPainter, QPen
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                QHBoxLayout, QVBoxLayout, QPushButton, QVBoxLayout
 
+from dotsSideGig        import getVuCtr
+
 ### -------------------- dotsPathWidget---------------------       
 class PathWidget(QWidget): 
 ### -------------------------------------------------------- 
-    def __init__(self, parent):
+    def __init__(self, parent, side='', switch=''):
         super().__init__()
-                                        
-        self.pathMaker = parent
-        self.pathWays  = self.pathMaker.pathWays 
-             
-        self.type  = 'widget'
+                             
+        self.switch = switch           
+
+        if self.switch == '':
+            self.pathMaker = parent
+            self.pathWays  = self.pathMaker.pathWays
+            self.sideCar = side
+        else:
+            self.canvas = parent
+        
+        self.type = 'widget' 
+        self.setAccessibleName('widget')
+          
         self.save  = QPointF()
         self.label = QLabel('', alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 330.0, 250.0
+              
+        self.WidgetW, self.WidgetH = 330.0, 285.0
         
         self.rotate = 0
         self.scale  = 1.0
@@ -44,6 +53,11 @@ class PathWidget(QWidget):
                                          
         self.show()
                 
+        if self.switch == 'on':
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName goes Here')
+            self.move(x+75, y+5)      
+                            
 ### -------------------------------------------------------- 
     def paintEvent(self, e):
         painter = QPainter(self)
@@ -72,14 +86,16 @@ class PathWidget(QWidget):
         self.save = e.globalPosition()
         
     def mouseDoubleClickEvent(self, e):
-        self.pathMaker.pathWorks.closeWidget()
-        e.accept()
+        if self.switch == '':
+            self.pathMaker.pathWorks.closeWidget()
+            e.accept()
   
  ### --------------------------------------------------------    
     def resetSliders(self):
         self.rotate = 0
         self.scale  = 1.0 
-        self.pathMaker.seconds = 10
+        if self.switch == '':
+            self.pathMaker.seconds = 10
         
         self.rotaryDial.setValue(0)
         self.rotateValue.setText(f'{0:3}') 
@@ -87,8 +103,9 @@ class PathWidget(QWidget):
         self.scaleSlider.setValue(int(100))
         self.scaleValue.setText(f'{1:.2f}') 
                
-    def Seconds(self, val):  
-        self.pathMaker.seconds = val    
+    def Seconds(self, val): 
+        if self.switch == '': 
+            self.pathMaker.seconds = val    
         self.secondsValue.setText(f'{val:2}') 
    
     def Rotate(self, val): 
@@ -111,8 +128,9 @@ class PathWidget(QWidget):
         self.scale = val
  
     def rotateScale(self, per, inc):  ## handles both rotation and scaling 
-        if len(self.pathMaker.pts) > 0: 
-            self.pathMaker.pathWorks.scaleRotate('A', per, inc)  ## used by other classes as well
+        if self.switch == '':
+            if len(self.pathMaker.pts) > 0: 
+                self.pathMaker.pathWorks.scaleRotate('A', per, inc)  ## used by other classes as well
               
 ### -------------------------------------------------------- 
     def sliderGroup(self):
@@ -131,7 +149,8 @@ class PathWidget(QWidget):
         self.rotaryDial.setWrapping(False)
         self.rotaryDial.setNotchesVisible(True)
         self.rotaryDial.setNotchTarget(15.0)
-        self.rotaryDial.valueChanged.connect(self.Rotate)
+        if self.switch == '':
+            self.rotaryDial.valueChanged.connect(self.Rotate)
     
         self.scaleValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignCenter)
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)   
@@ -142,18 +161,23 @@ class PathWidget(QWidget):
         self.scaleSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSlider.setTickInterval(25)  
-        self.scaleSlider.valueChanged.connect(self.Scale)   
+        if self.switch == '':
+            self.scaleSlider.valueChanged.connect(self.Scale)   
      
-        self.secondsValue = QLabel(str(self.pathMaker.seconds), alignment=Qt.AlignmentFlag.AlignCenter)
+        if self.switch == '':
+            self.secondsValue = QLabel(str(self.pathMaker.seconds), alignment=Qt.AlignmentFlag.AlignCenter)
+        
         self.secondsSlider = QSlider(Qt.Orientation.Vertical)
         self.secondsSlider.setMinimum(10)
         self.secondsSlider.setMaximum(60)
         self.secondsSlider.setSingleStep(1)
-        self.secondsSlider.setValue(self.pathMaker.seconds)
+        if self.switch == '':
+            self.secondsSlider.setValue(self.pathMaker.seconds)
         self.secondsSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.secondsSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.secondsSlider.setTickInterval(10)  
-        self.secondsSlider.valueChanged.connect(self.Seconds) 
+        if self.switch == '':
+            self.secondsSlider.valueChanged.connect(self.Seconds) 
                          
         sbox = QHBoxLayout()  ## sliders  
         sbox.addSpacing(-10)    
@@ -169,7 +193,8 @@ class PathWidget(QWidget):
         vabox.addSpacing(10) 
         vabox.addWidget(self.scaleValue)  
         vabox.addSpacing(10) 
-        vabox.addWidget(self.secondsValue)      
+        if self.switch == '':
+            vabox.addWidget(self.secondsValue)      
         vabox.setAlignment(Qt.AlignmentFlag.AlignBottom)
                  
         vbox = QVBoxLayout()  
@@ -194,32 +219,39 @@ class PathWidget(QWidget):
         groupBox.setFixedWidth(103)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
-        waysBtn = QPushButton('WayPts')                 
+        waysBtn = QPushButton('WayPts') 
+        helpBtn = QPushButton('Help')                      
         saveBtn = QPushButton('Save')
         editBtn = QPushButton('Edit')
         centerBtn = QPushButton('Center')
         self.newBtn = QPushButton('New')
-        filesBtn = QPushButton('Path Files')     
+        filesBtn = QPushButton('Path Files')  
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
-    
-        waysBtn.clicked.connect(self.pathWays.addWayPtTags)
-        saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
-        editBtn.clicked.connect(self.pathMaker.edits.editPoints)
-        centerBtn.clicked.connect(self.pathMaker.pathWays.centerPath)
-        self.newBtn.clicked.connect(self.pathMaker.edits.toggleNewPath)
-        filesBtn.clicked.connect(self.pathMaker.pathChooser)
-        delBtn.clicked.connect(self.pathMaker.delete)
-        quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)
-    
+        
+        if self.switch == '':
+            waysBtn.clicked.connect(self.pathWays.addWayPtTags)
+            helpBtn.clicked.connect(self.pathMaker.pathWorks.openMenu) 
+            saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
+            editBtn.clicked.connect(self.pathMaker.edits.editPoints)
+            centerBtn.clicked.connect(self.pathMaker.pathWays.centerPath)
+            self.newBtn.clicked.connect(self.pathMaker.edits.toggleNewPath)
+            filesBtn.clicked.connect(self.pathMaker.pathChooser)
+            delBtn.clicked.connect(self.pathMaker.delete)
+            quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)
+        else:
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
+        
         hbox = QVBoxLayout(self)
-        hbox.addWidget(saveBtn)    
+
+        hbox.addWidget(helpBtn)         
+        hbox.addWidget(saveBtn)   
         hbox.addWidget(waysBtn)
         hbox.addWidget(editBtn)
+        hbox.addWidget(self.newBtn)     
         hbox.addWidget(centerBtn)
-        hbox.addWidget(self.newBtn)
-        hbox.addWidget(filesBtn)      
         hbox.addWidget(delBtn)
+        hbox.addWidget(filesBtn) 
         hbox.addWidget(quitBtn)
                 
         groupBox.setLayout(hbox)

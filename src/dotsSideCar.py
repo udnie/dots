@@ -3,20 +3,17 @@ import os
 import os.path
 import random
 
-
 from PyQt6.QtCore       import QAbstractAnimation, Qt, QPointF, QPoint, QSize, QRect
-from PyQt6.QtGui        import QPen, QColor
-from PyQt6.QtWidgets    import QFileDialog, QGraphicsItemGroup, QGraphicsLineItem, \
-                                QApplication
+from PyQt6.QtWidgets    import QFileDialog, QApplication
                                                     
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
-from dotsSideGig        import MsgBox, constrain
+from dotsSideGig        import MsgBox, constrain, Grid
 from dotsMapMaker       import MapMaker
 
 ### ---------------------- dotsSideCar ---------------------
-''' no class: just stuff - pixTest, transFormPixitem, snapShot, toggleGrid, 
-    assorted small functions and a few from showbiz '''   
+''' no class: just stuff - pixTest, transFormPixitem, snapShot,
+    help menu switch, small functions and a few from showbiz '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -27,10 +24,8 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-              
-        self.gridZ     = common['gridZ']    
-        self.gridGroup = None  
-        self.menu      = None 
+ 
+        self.grid = Grid(self.canvas)
      
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
@@ -47,7 +42,7 @@ class SideCar:
         pix.setOpacity(pix.alpha2)
                                                               
         self.scene.addItem(pix)
-              
+                              
 ### --------------------------------------------------------
     def pixTest(self):  ## randomly places 10 apples on the canvas to play with 
         if not self.canvas.pathMakerOn:  
@@ -101,7 +96,7 @@ class SideCar:
                 quality=100)        
             MsgBox('Saved as ' + snap, 3)
   
-### --------------------------------------------------------
+### --------------------------------------------------------   
     def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
@@ -113,7 +108,7 @@ class SideCar:
             if itm.type == 'bkg':
                 return True
         return False
-                                                                                                                        
+                                                                                                                 
     def pause(self):  ## because showtime wasn't reachable for controlview at the time
         self.canvas.showtime.pause()
     
@@ -123,22 +118,27 @@ class SideCar:
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
       
-    def dumpBkgs(self):  ## shift-B - dump newtracker and shadow data
+    def dumpTrackers(self):  ## used by bkgItem - 'B' in BkgHelp menu
+        dump = []  
         for p in self.scene.items():
             if p.type == 'bkg':
                 fileName = os.path.basename(p.fileName)  ## opposite of setMirroring 
-                if r := self.canvas.bkgMaker.newTracker[fileName]: 
-                    fileName, direction, mirroring, locked = self.addBkgLabels(p)
-                    print(f"{fileName}\t{direction}\t{mirroring}\t{r['rate']}" +
-                        f"\t{r['showtime']}\t{r['path']}\t{r['useThis']}")
-        print()                 
-        # if p.type == 'pix' and len(p.shadow) > 0:  
-        #         file, direction, mirror, locked = self.addBkgLabels(p)
-        #         showtime = p.showtime
-        #         print(f'{file}\t{direction}\t{mirror}\t{locked}\t{p.zValue()}\t{p.rate}\t{showtime}\t{p.factor}')
-        # print('dumpbkgs', list(p.shadow.values()))
+                try:            
+                    if r := self.canvas.bkgMaker.newTracker[fileName]: 
+                        zval = p.zValue()
+                        fileName, direction, mirroring, locked = self.addBkgLabels(p)
+                        rate, showtime, path = str(r['rate']), str(r['showtime']), r['path']
+                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {r['useThis']} {path[5:-1]}"
+                        dump.append(s.split())
+                except:
+                    None            
+        if len(dump) > 0:
+            return dump
+        else:
+            MsgBox('Error in dumpTrackers - SideCar')
+            return None
 
-    def addBkgLabels(self, bkg):  ## used with dumpBkgs for trackers 
+    def addBkgLabels(self, bkg):  ## used by dumpTrackers
         fileName = bkg.fileName       
         if bkg.locked == True:
             locked = 'Locked' 
@@ -164,13 +164,14 @@ class SideCar:
         return fileName.capitalize(), direction, mirror, locked
   
 ### --------------------------------------------------------
-    def toggleMenu(self):  ## keysPanel
-        self.canvas.keysPanel.toggleMenu()  ## no direct path from controlView
+    def toggleKeysMenu(self):  ## keysPanel
+        self.canvas.keysPanel.toggleKeysMenu()  ## no direct path from controlView
   
     def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadowMaker.isActive == True:
-                pix.shadowMaker.works.toggleOutline()
+            if pix.type == 'pix' and pix.shadowMaker != None and \
+                pix.shadowMaker.isActive == True:
+                    pix.shadowMaker.works.toggleOutline()
                   
     def togglePixLocks(self, key):
         if self.canvas.control != '':  ## animation running
@@ -189,15 +190,26 @@ class SideCar:
                     stub = 'all'
                     # if pix.type == 'bkg': ## still working on it 
                     #     pix.bkgMaker.unlockBkg(pix)      
-                elif key == 'L' and pix.isSelected() or pix.type == 'bkg': 
+                elif key == 'L' and pix.isSelected(): ## or pix.type == 'bkg': 
                     if pix.type == 'pix':
                         pix.togglelock()  ## wait to toggleTagItems
                     elif pix.type == 'bkg': 
                         pix.bkgWorks.bkgScrollWrks.toggleBkgLocks()  ## toggle bkgItem
                     stub = 'select'
-        self.mapper.clearMap()
         self.mapper.toggleTagItems(stub)  
-                                                                                                                                                                          
+                                        
+    def resetAll(self):
+        for itm in self.scene.items():
+            if itm.type == 'pix':
+                if itm.locked: itm.locked == False
+                if itm.isSelected(): itm.setSelected(False) 
+                if itm.isHidden == True: itm.isHidden = False
+                if itm.shadowMaker != None and itm.shadowMaker.isActive == True:
+                    if itm.shadowMaker.linked == True:
+                        itm.shadowMaker.shadow.unLinkShadow()
+                        itm.shadowMaker.works.hideOutline()
+        self.mapper.toggleTagItems('all') 
+                                                                                                                                                                      
 ### --------------------------------------------------------                                                
     def hasHiddenPix(self):
         for pix in self.scene.items():
@@ -208,37 +220,50 @@ class SideCar:
                 break
         return False                                              
      
-    def unlinkShadows(self):
+    def toggleShadows(self):
         for pix in self.scene.items():
-            if pix.type == 'pix'and pix.shadowMaker != None and pix.shadowMaker.linked == True:
-                pix.shadowMaker.shadow.unLinkShadow()
-                pix.shadowMaker.works.hideOutline()
-                                                                                                              
+            if pix.type == 'pix'and pix.shadowMaker != None and \
+                pix.shadowMaker.isActive == True:
+                    if pix.shadowMaker.linked == True:
+                        pix.shadowMaker.shadow.unLinkShadow()
+                        pix.shadowMaker.works.hideOutline()
+                    else:
+                        pix.shadowMaker.shadow.linkShadow()
+                        pix.shadowMaker.works.hideOutline()
+                                                                                         
     def hideOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
-            if pix.type == 'pix'and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
-                pix.shadowMaker.works.hideOutline()
+            if pix.type == 'pix'and pix.shadowMaker != None and \
+                pix.shadowMaker.isActive == True:
+                    pix.shadowMaker.works.hideOutline()
          
     def showOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
-                pix.shadowMaker.works.showOutline()
+            if pix.type == 'pix' and pix.shadowMaker != None and \
+                pix.shadowMaker.isActive == True:
+                    pix.shadowMaker.works.showOutline()
                  
-    ## added dlbclk if hidden to re-select ##
-    def hideSelected(self): 
-        ## if self.mapper.mapSet and self.hasHiddenPix():  
-        self.mapper.removeMap()  ## also updates pix.pos()
-        for pix in self.scene.items():
-            if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
-                if pix.isSelected():
-                    pix.setSelected(False)
-                    pix.isHidden = True
-                elif pix.isHidden:
-                    pix.setSelected(True)
-                    pix.isHidden = False
-            elif pix.zValue() <= common['pathZ']:
-                break
-                                                                                                                                                                                           
+    def hideSelected(self):  
+        if len(self.scene.items()) > 0 and self.scene.selectedItems():
+            self.mapper.removeMap()  ## also updates pix.pos()
+            for pix in self.scene.items():
+                if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
+                    if pix.isSelected():
+                        pix.setSelected(False)
+                        pix.isHidden = True
+                elif pix.zValue() <= common['pathZ']:
+                    break
+                                  
+    def showSelected(self):  
+        if len(self.scene.items()) > 0:
+            for pix in self.scene.items():
+                if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
+                    if pix.isHidden == True:
+                        pix.setSelected(True)
+                        pix.isHidden = False
+                elif pix.zValue() <= common['pathZ']:
+                    break
+                                                                                                                                                                                                                           
     def hideSelectedShadows(self):  ## runs from shift-H
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
@@ -248,47 +273,6 @@ class SideCar:
                     pix.show()       
                     pix.setSelected(True)
   
-### --------------------------------------------------------                               
-    def toggleGrid(self):
-        if self.gridGroup != None:
-            self.removeGrid()
-            self.gridGroup = None
-        else: 
-            self.addGrid()
-            
-    def addGrid(self):
-        self.gridGroup = QGraphicsItemGroup()  
-        self.gridGroup.setZValue(common['gridZ'])
-        self.scene.addItem(self.gridGroup)         
-        gs = common['gridSize']
-        pen = QPen(QColor(0,0,255))       
-        for y in range(1, int(common['ViewH']/gs)):
-            self.addLines(QGraphicsLineItem(0.0, gs*y,
-                float(common['ViewW']), gs*y), pen)
-        for x in range(1, int(common['ViewW']/gs)):
-            self.addLines(QGraphicsLineItem(gs*x, 0.0,
-                gs*x, float(common['ViewH'])), pen)
-        
-    def addLines(self, line, pen):
-        line.type = 'grid'
-        line.setPen(pen)
-        line.setOpacity(.30)
-        line.setZValue(common['gridZ'])
-        line.setFlag(QGraphicsLineItem.GraphicsItemFlag.ItemIsMovable, False)
-        self.gridGroup.addToGroup(line)
-
-    def removeGrid(self):
-        try:
-            for pix in self.scene.items():
-                if pix.type == 'grid': self.scene.removeItem(pix)
-            self.scene.removeItem(self.gridGroup)
-        except:
-            return
-        
-    def gridCount(self):  
-        return sum(pix.type == 'grid' 
-            for pix in self.canvas.scene.items())
-              
 ### ---------------------- dotsSideCar ---------------------
 
 

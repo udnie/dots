@@ -7,7 +7,7 @@ from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtGui        import QColor, QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-import dotsAnimation    as Anime
+from dotsAnimation      import reprise, Node
 
 from dotsSidePath       import pathLoader, pathAnimator
 from dotsShared         import paths, common
@@ -19,7 +19,7 @@ from dotsBatsAndHats    import getPath
 ### --------------------- dotsSnakes ----------------------- 
 ''' classes: Snake, Snakes '''               
 ### --------------------------------------------------------
-class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
+class Snake(QGraphicsPixmapItem):  ## stripped down pixitem
 ### --------------------------------------------------------
     def __init__(self, fileName, id, x, y, parent):
         super().__init__()
@@ -68,7 +68,7 @@ class Snake(QGraphicsPixmapItem):  ## stripped down pixItem
      
     def reprise(self):  
         self.anime = None
-        self.anime = Anime.reprise(self)
+        self.anime = reprise(self)
         self.anime.start()
         self.anime.finished.connect(self.anime.stop)
         self.clearFocus()
@@ -227,7 +227,7 @@ class Snakes:
                 pix.height * -common['factor'])) 
              
         pix.setPos(pix.x, pix.y)                                                   
-        node = Anime.Node(pix)  ## get pix pos property    
+        node = Node(pix)  ## get pix pos property    
         pix.tag = fileName      
         pix.path = paths['demo']   
         pix.anime = pathAnimator(node, sync, waypts)  ## set path animation      
@@ -245,7 +245,8 @@ class Snakes:
     def rerun(self, what): 
         self.mapper.clearTagGroup()
         self.mapper.clearPaths()
-        self.scroller.bkgWorks.delTracker(self.scroller) 
+        if what != 'blue':
+            self.scroller.bkgWorks.delTracker(self.scroller) 
         self.delSnakes()        
         self.makeSnakes(what)
               

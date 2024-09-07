@@ -185,7 +185,7 @@ class MapMaker:
     def toggleTagItems(self, pid): 
         if self.canvas.pathMakerOn:  ## doesn't work here
             return  
-        elif self.tagCount() > 0:  ## clear tags     
+        if self.tagCount() > 0:  ## clear tags     
             self.clearTagGroup()
             self.clearPaths() 
             self.tagGroup = None
@@ -237,7 +237,7 @@ class MapMaker:
     def toFront(self, inc=0):  ## finds the highest pixitem zValue
         first = 0               ## returns it plus the increment
         for pix in self.scene.items():
-            if pix.type in ('flat', 'pix', 'snake', 'frame', 'bat'): 
+            if pix.type in ('flat', 'pix', 'shadow','snake', 'frame', 'bat'): 
                 first = pix.zValue()
                 break
             elif pix.zValue() <= common['pathZ']:

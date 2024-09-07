@@ -1,6 +1,3 @@
-# .gitignore
-_pycache__/
-dots*.pyc
 
 dots_9556U.jpg
 dots_9556U.jpg
@@ -10,7 +7,8 @@ plays/original-demo.play
 paths/tmp.path
 plays/tmp.play
 plays/tmp.play
-__pycache__/spriteLoupe.cpython-310.pyc
+_pycache__
+/spriteLoupe.cpython-310.pyc
 *.pyc
 backgrounds/tma.bkg
 plays/tmp.play
@@ -26,7 +24,14 @@ paths/demo-1320.path
 paths/demo-1502.path
 plays/demo-1350.play
 paths/demo-1320.path
+src
 paths/demo-1502.path
 plays/demo-1350.play
 dotsBkgWrks.py
 src/.vscode/settings.json
+src/_pycache__*
+dots/.gitignore
+
+
+
+

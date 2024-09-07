@@ -1,3 +1,4 @@
+
 import sys
 import platform
 import os
@@ -7,7 +8,7 @@ from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *
 from dotsShared         import common
-from dotsMenus          import MaxScreens, MaxWidth
+from dotsHelpMenus      import MaxScreens, MaxWidth  ## as screenMenu is there 
 
 import dotsStoryBoard   as canvas
 
@@ -42,6 +43,10 @@ class DotsQt(QMainWindow):
         self.setStatusBar(self.statusBar) 
                   
         self.init()
+        
+        # print("PyQt version:", PYQT_VERSION_STR) 
+        # print("Python version:", QT_VERSION_STR)
+        
     
     def init(self):  
         dir = os.path.basename(os.path.dirname(os.getcwd()))
@@ -55,7 +60,7 @@ class DotsQt(QMainWindow):
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        vert = 50 if self.Vertical == True else 0  ## was 50
+        vert = 50 if self.Vertical == True else 50  ## was 50
         self.move(getX(), getY()+vert)  ## functions in screens 
 
         ## can't all happen at once
@@ -76,22 +81,25 @@ class DotsQt(QMainWindow):
     def switch(self, key):  ## from screenMenu in screens
         QApplication.setQuitOnLastWindowClosed(False)
         self.closeAll()
-        if key in ('1102', '900', '912'): 
+        if key in ('1102', '1024', '900', '912'): 
             self.Vertical = True
         else:
             self.Vertical = False               
         common = self.saveCommon.copy()  ## copy it back
         self.screen = setCommon(key)  ## in dotsScreens   
         self.init()
-                                                                                                 
+                                                                                               
 ### --------------------------------------------------------
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    app.setStyle('QtCurve')     
+    app = QApplication(sys.argv)  
     dots = DotsQt(sys.argv)
     sys.exit(app.exec())    
 
-### ------------------------- dotsQt -----------------------
+### ------------------------- dotsQt ----------------------
+
+
+
+
 
 
 

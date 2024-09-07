@@ -1,7 +1,6 @@
 
-
 from PyQt6.QtCore       import Qt, QTimer, QPoint, pyqtSlot, QPointF
-from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor
+from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
@@ -9,21 +8,23 @@ from dotsPixWorks       import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
 from dotsBkgScrollWrks  import tagBkg
+from dotsHelpMonkey     import PixHelp
 
-##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
-from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
+from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+##from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
-import dotsAnimation  as Anime
+from dotsAnimation      import fin
 
-ScaleKeys  = ("<",">")
-TagKeys = (',','.','/','enter','return') 
+TagKeys = ('/','enter','return') 
+SharedKeys = ('F','H','T','del','tag','shift','enter','return')
 
 ### --------------------- dotsPixItem ----------------------
-''' dotsPixItem: primary dots screen object - like a sprite '''
+''' dotsPixItem: primary dots screen object - like a sprite 
+                    helpMenu in HelpDeck '''
 ### --------------------------------------------------------
 class PixItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
-    def __init__(self, fileName, id, x, y, parent, mirror=False):
+    def __init__(self, fileName, id, x, y, parent, mirror=False, str=''):
         super().__init__()
 
         self.canvas = parent
@@ -32,25 +33,27 @@ class PixItem(QGraphicsPixmapItem):
     
         self.type = 'pix'
         self.fileName = fileName
-        
+  
+        self.widgetOn = False   
         self.flopped = mirror
         self.id = int(id)  ## used by mapper
-              
+
         self.x = x 
         self.y = y
         
         self.shadow = None  ## a dictionary to maintain shadow data if there is one
         self.shadowMaker = ShadowMaker(self)  ## returns isActive equals False if from shadow_dummy
         
-        self.works = Works(self)  ## functions and PixSizes moved from here
-        
+        self.works = Works(self.canvas, self)  ## functions and PixSizes moved from here
+        self.help = None
+          
         img = None
         img = QImage(self.fileName)
 
         ## see pixSizes dictionary to make changes - moved to pixWorks
         newW, newH = self.works.setPixSizes(  
-        img.width() * common["factor"],  ## from screens
-        img.height() * common["factor"])
+            img.width() * common["factor"],  ## from screens
+            img.height() * common["factor"])
    
         ## don't change
         img = img.scaled(int(newW), int(newH),
@@ -67,6 +70,7 @@ class PixItem(QGraphicsPixmapItem):
         self.dragCnt = 0
         
         self.part = ""  ## used by wings 
+        self.sharedKeys = SharedKeys
   
         self.alpha2  = 1.0  ## alpha was already being used and opacity can be a function
         self.scale   = 1.0
@@ -92,20 +96,7 @@ class PixItem(QGraphicsPixmapItem):
         
         self.setAcceptHoverEvents(True)
         self.setFlags(True)
-                                       
-### --------------------------------------------------------
-    @pyqtSlot(str)  ## updated by storyboard
-    def setPixKeys(self, key):
-        self.key = key  
- 
-        if self.isHidden or self.isSelected() and self.locked == False:
-            if key in RotateKeys:
-                self.works.rotateThis(key)
-            elif key in ScaleKeys:
-                self.works.scaleThis(key)  
-            elif key in MoveKeys:
-                self.moveThis(MoveKeys[key])
- 
+    
 ### --------------------------------------------------------
     def paint(self, painter, option, widget=None):  ## this may be the source of a type error in pyside
         super().paint(painter, option, widget)  ## why is this necessary??
@@ -130,61 +121,70 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsGeometryChanges, False)      
         if self.locked:
             self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-     
+                                         
 ### --------------------------------------------------------
-    def itemChange(self, change, value):  ## continue to updatePath when animated
-        if self.shadowMaker != None and self.shadowMaker.isActive and self.shadowMaker.linked == True:
-            if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
-                self.shadowMaker.shadow.setPos(self.pos()+ self.offset)
-            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemRotationChange:
-            #     self.shadowMaker.shadow.setRotation(value)
-            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemScaleChange:
-            #     self.shadowMaker.shadow.setScale(value)      
-            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemOpacityChange:
-            #     self.shadowMaker.shadow.setOpacity(value-.50)       
-        return super(QGraphicsPixmapItem, self).itemChange(change, value)
-                            
+    @pyqtSlot(str)  ## updated by storyboard directly 
+    def setPixKeys(self, key):  ## the decorator is suppose to get a better response
+        self.key = key  
+ 
+        if self.isHidden or self.isSelected():
+            if self.locked == False:
+                if key in RotateKeys:
+                    self.works.rotateThis(key)
+                elif key in ("<",">"):
+                    self.works.scaleThis(key)  
+                elif key in MoveKeys:
+                    self.moveThis(MoveKeys[key])
+                    
     def mousePressEvent(self, e):    
-        if self.canvas.control not in ControlKeys:  ## ('resume', 'pause') - animation running
-            ## right mouse clk triggers Animation menu on selected screen items 
+        if self.canvas.control not in ControlKeys:  ## 'resume', 'pause' - animation running
+            ## right mouse clk triggers Animation menu (context menu) on selected screen items
             if e.button() == Qt.MouseButton.RightButton:
-                ## if 'pivot' in self.fileName or 'frame' in self.fileName or \                
-                if 'frame' not in self.fileName and not self.scene.selectedItems():
-                    self.addWidget()  ## nothing selected - ok to add
+                if len(self.scene.selectedItems()) == 0:
+                    self.addWidget()  ## nothing selected - add pixWidget
                     e.accept()
-            elif self.key in RotateKeys: 
-                self.works.rotateThis(self.key)
-            elif self.key == 'del':  # delete
-                self.deletePix()     
-            elif self.key == 'shift':  ## flop if selected or hidden        
-                self.setMirrored(False) if self.flopped else self.setMirrored(True)                                      
-            elif self.key in TagKeys: 
-                if self.key == '/':  ## send to back of pixItems
-                    p = self.mapper.lastZval('pix')-1
-                elif self.key in('enter','return'): # send to front
-                    p = self.mapper.toFront(1)
-                elif self.key == ',':
-                    p = self.zValue()-1  
-                elif self.key == '.':
-                    p = self.zValue()+1   
-                self.setZValue(p)                       
-            if self.key == 'tag' or self.key in TagKeys: 
-                tagBkg(self, self.pos())
+            elif self.key in self.sharedKeys:
+                self.shared(self.key)                  
             self.initX, self.initY = self.x, self.y  
             self.dragAnchor = self.mapToScene(e.pos())
-            self.key = ''
         e.accept()
 
+    def shared(self, key):  ## with help menu
+        self.key = key
+        if self.key == 'del':    
+            self.deletePix()        
+        elif self.key == 'shift': 
+            self.setZValue(self.mapper.lastZval('pix')-1)      
+        elif self.key in('enter','return'): # send to front
+            self.setZValue(self.mapper.toFront(1))
+        elif self.key == 'tag': ## '\' backslash
+            self.tagThis()            
+        elif self.key == 'F':  ## flop it
+            self.setMirrored(False) if self.flopped else self.setMirrored(True)  
+        elif self.key == 'H':  
+            self.openMenu()     
+        elif self.key == 'T':     
+            self.togglelock()
+      
+    def tagThis(self):
+        p = QCursor.pos()
+        tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))
+    
+    def openMenu(self):
+        self.works.closeWidget()
+        self.help = PixHelp(self)
+            
+### --------------------------------------------------------
     def mouseMoveEvent(self, e):
         if 'frame' in self.fileName or self.locked:
             return
-        if self.canvas.control not in ControlKeys:
+        if self.canvas.control not in ControlKeys:  ## 'resume', 'pause' - animation running
             if self.key in TagKeys or self.mapper.tagSet:
                 self.works.clearTag() 
             self.works.updateXY(self.mapToScene(e.pos()))
             self.setPos(self.x, self.y)
             self.dragCnt +=1
-            if self.key == 'opt' and self.dragCnt % 5 == 0:  
+            if self.key == 'opt' and self.dragCnt % 10 == 0:  
                 self.works.cloneThis() 
         e.accept()
             
@@ -196,26 +196,31 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
         
     def mouseDoubleClickEvent(self, e):
-        if 'frame' in self.fileName or self.key in TagKeys:
-            return 
-        if self.canvas.control not in ControlKeys:  ##  (',', '.', '/', 'enter', 'return')
-            if self.key == 'opt':  
-                self.works.cloneThis()
-            elif self.canvas.key == 'noMap':   ## consumed map's dblclk need to set it back 
+        if self.canvas.control not in ControlKeys:  ## 'resume', 'pause' - animation running
+            if self.canvas.key == 'noMap':   ## consumed map's dblclk need to set it back 
                 self.canvas.setKeys('')      
                 if self.isHidden == False or self.isSelected():
                     self.setSelected(True) 
-                    return            
-            elif self.isHidden:  ## otherwise you're stuck if others are selected as the others will become hidden
+                    return      
+            if self.locked == True:
+                self.tagThis()      
+            if self.isHidden:  ## otherwise you're stuck if others are selected as the others will become hidden
                 self.setSelected(True) 
                 self.isHidden = False  
-            elif self.canvas.key not in ('opt','cmd','shift'):
+            elif self.canvas.key not in self.sharedKeys:
                 if self.isSelected() == False:
                     self.setSelected(True)  
                 elif self.isSelected():
                     self.setSelected(False)
                 self.isHidden = False 
         e.accept()
+
+### --------------------------------------------------------
+    def itemChange(self, change, value):  ## continue to updatePath when animated
+        if self.shadowMaker != None and self.shadowMaker.isActive and self.shadowMaker.linked == True:
+            if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
+                self.shadowMaker.shadow.setPos(self.pos()+ self.offset)      
+        return super(QGraphicsPixmapItem, self).itemChange(change, value)
 
 ### --------------------------------------------------------
     def addShadow(self):  ## from pixwidget 
@@ -291,11 +296,18 @@ class PixItem(QGraphicsPixmapItem):
             self.shadowMaker.works.deleteShadow()
         self.works.closeWidget()
         self.anime 
-        self.anime = Anime.fin(self)
+        self.anime = fin(self)
         self.anime.start()
         self.anime.finished.connect(self.works.removeThis)
                 
 ### -------------------- dotsPixItem -----------------------
 
 
+     # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemRotationChange:  ## experiment
+            #     self.shadowMaker.shadow.setRotation(value)
+            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemScaleChange:
+            #     self.shadowMaker.shadow.setScale(value)      
+            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemOpacityChange:
+            #     self.shadowMaker.shadow.setOpacity(value-.50) 
+            
          

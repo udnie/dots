@@ -45,7 +45,10 @@ class TagIt(QGraphicsSimpleTextItem):
                     tag = tag[0:13] 
                 elif 'Random' in tag:
                     tag = tag[0:6] 
-                
+                     
+        if color in ('orange', 'yellow') and tag[0] == 'd':
+            tag = tag[2:]
+                    
         if color:
             self.color = QColor(color)
 
@@ -109,12 +112,12 @@ class TagsAndPaths:
         k = 0
         topZVal = self.mapper.toFront()  ## only once
         self.mapper.tagSet = False
-        if pid == '':  ## pid can also equal the pixItem.id - using scrollwrks tagBkg for singles
+        if pid == '':  ## pid can also equal the pixitem.id - using scrollwrks tagBkg for singles
             pid = 'all'
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if pix.type in ( 'frame', 'pix', 'snake', 'bkg'):
+            if pix.type in ( 'frame', 'pix', 'snake', 'bkg', 'shadow'):
                 if type(pix.tag) == str and 'path' in pix.tag and pid == 'paths':
                     self.tagThis('paths', pix, topZVal) 
                     k += 1
@@ -123,7 +126,7 @@ class TagsAndPaths:
                     if alltags != pix.tag:  ## only one per snake
                         alltags = pix.tag
                         self.tagThis('',pix, topZVal)         
-                elif pix.isSelected():
+                elif pid == 'select' and pix.isSelected():
                     self.tagThis('', pix, topZVal)
                     k += 1
                 elif pix.type == 'frame':  ## single tag  
@@ -143,13 +146,26 @@ class TagsAndPaths:
 
         tag = pix.tag
         color = ''
-  
+
         if 'frame' in pix.fileName: 
             x, y = common['ViewW']*.47, common['ViewH']-35
     
-        if pix.type in ('pix','bkg','frame') and pix.locked == True:
-            tag = 'Locked ' + tag 
-
+        if pix.type in ('pix','bkg','frame'):
+            if pix.locked == True:
+                tag = 'Locked ' + tag 
+            else:
+                tag = 'UnLocked ' + tag 
+            color = 'orange'
+            zval = pix.zValue()
+                
+        elif pix.type == 'shadow':
+            if pix.maker.linked == True:
+                tag = 'Linked ' + tag
+            else:
+                 tag = 'UnLinked ' + tag
+            color = 'lightgreen'
+            zval = pix.zValue()
+            
         if pix.zValue() == topZVal:  ## set to front ZValue
             color = 'yellow'
 
@@ -157,10 +173,8 @@ class TagsAndPaths:
             y = y - 20
         else:
             token = self.canvas.control
-            
-        if tag == 'UnLocked': color = 'orange'
-          
-        self.TagItTwo(token, tag, color, x, y, pix.zValue())
+                  
+        self.TagItTwo(token, tag, color, x, y, zval)
         
     ## this way I can stretch it for backgrounds and pixitems
     def TagItTwo(self, token, tag, color, x, y, z, src=''):

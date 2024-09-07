@@ -7,7 +7,7 @@ from PyQt6.QtWidgets    import QGraphicsEllipseItem, QGraphicsPolygonItem
     
 from dotsShared         import common    
 from dotsSideGig        import distance, getCrop
-   
+
 PathStr = ['topLeft','topRight','botRight','botLeft'] 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget       
                                             
@@ -16,13 +16,15 @@ V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
 ### --------------------------------------------------------
 class Works:  ## small functions that were in ShadowMaker
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, switch=''):
         super().__init__()
  
         self.maker   = parent
+        self.canvas  = self.maker.canvas
         self.scene   = self.maker.scene
-        self.pixitem = self.maker.pixitem 
         
+        self.switch = switch
+             
 ### --------------------------------------------------------
     def resetSliders(self): 
         self.maker.widget.opacitySlider.setValue(int(self.maker.alpha*100))
@@ -37,14 +39,16 @@ class Works:  ## small functions that were in ShadowMaker
     def closeWidget(self):
         if self.maker.widget != None:
             self.maker.widget.close()     
-        self.maker.widget = None  
+            self.maker.widget = None  
+            if self.switch == 'on':
+                self.canvas.setKeys('M')
         
     def deleteShadow(self): 
         if self.maker.shadow != None:
             self.cleanUpShadow()
         self.maker.shadow = None
-        self.pixitem.shadow = None  ## using it throughout
-                                                      
+        self.maker.pixitem.shadow = None  ## using it throughout
+                                                          
     def cleanUpShadow(self):  
         self.closeWidget()
         self.deletePoints()  
@@ -70,7 +74,7 @@ class Works:  ## small functions that were in ShadowMaker
             self.scene.removeItem(p) 
             del p
         self.maker.points.clear()
- 
+
 ### --------------------------------------------------------
     def updateOutline(self, hide=''): 
         self.deleteOutline()

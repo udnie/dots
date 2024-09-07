@@ -4,17 +4,17 @@ import os.path
 from PyQt6.QtCore       import Qt, QEvent, QPoint, pyqtSlot
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QWidget, QGraphicsPolygonItem, QGraphicsPathItem
+               
+from dotsSideGig        import MsgBox, distance, getCtr, getVuCtr, getPathList
+from dotsShared         import common, MoveKeys
 
-from dotsAnimation      import *       
-from dotsSideGig        import getPathList                   
-from dotsSideGig        import MsgBox, distance, getCtr
-from dotsShared         import common, MoveKeys, ScaleRotateKeys
-from dotsSideCar        import SideCar
 from dotsPathWays       import PathWays
 from dotsPathEdits      import PathEdits
-
 from dotsPathWorks      import PathWorks
+
 from dotsDoodleMaker    import DoodleMaker
+
+ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
 
 ### -------------------- dotsPathMaker ---------------------
 ''' dotsPathMaker: contains load, save, addPath, pathChooser,
@@ -23,7 +23,7 @@ from dotsDoodleMaker    import DoodleMaker
 ### --------------------------------------------------------
 class PathMaker(QWidget):
 ### --------------------------------------------------------
-    def __init__(self, parent):  
+    def __init__(self, parent, str=''):  
         super().__init__()
 
         self.canvas    = parent  
@@ -32,26 +32,23 @@ class PathMaker(QWidget):
         self.keysPanel = self.canvas.keysPanel
         self.dots      = self.canvas.dots  
          
-        self.animation = Animation(self.canvas) 
-        self.sideCar   = SideCar(self.canvas) 
-       
         self.widget  = None
         self.seconds = 10  ## set how long it takes mr.ball to complete a path
      
         self.pathWorks  = PathWorks(self)             
         self.pathWays   = PathWays(self)  
         self.edits      = PathEdits(self) 
-        
+         
         self.initThis()  
-             
+               
         self.doFirst = {
-            'D':   self.delete,
-            '/':   self.pathWorks.changePathColor,
-            'cmd': self.edits.closeNewPath,
+            'D': self.delete,
+            '/': self.pathWorks.changePathColor,
+            'N': self.edits.toggleNewPath,
+            'X': self.canvas.exit,
         }
 
         self.direct = {
-            'F': self.pathWays.openFiles,
             'P': self.pathChooser,
             'E': self.edits.editPoints,
             '{': self.pathWays.flipPath,
@@ -79,7 +76,6 @@ class PathMaker(QWidget):
         self.WayPtsKeys = {
             '!': self.pathWays.halfPath,
             '@': self.pathWays.fullPath,
-            'V': self.edits.togglePathItems,
             '<': self.pathWays.shiftWayPtsLeft,
             '>': self.pathWays.shiftWayPtsRight,
         }
@@ -115,11 +111,12 @@ class PathMaker(QWidget):
         self.chooser = None
         self.newPath = None 
         self.pathTestNode = None
-                     
+                         
 ### ---------------------- key handler ---------------------
     @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
     def pathKeys(self, key):
         self.key = key
+   
         if key in self.doFirst:
             self.doFirst[key]()  ## run the function, value
                     
@@ -134,11 +131,9 @@ class PathMaker(QWidget):
                 self.edits.editPoints()
             
         elif self.key == 'L' and self.editingPts == True:  ## turn lasso on/off
-            if self.lassoOn == False:
-                self.edits.newLasso()
-            else:
-                self.edits.deleteLasso()
-                                                                  
+            self.edits.newLasso()if self.lassoOn == False \
+                else self.edits.deleteLasso()
+                                                               
         elif self.key in self.editKeys and self.editingPts == True:
             self.editKeys[self.key]()  
 
@@ -148,7 +143,7 @@ class PathMaker(QWidget):
                 self.edits.updatePath()
 
         elif self.pathWays.tagCount() == 0 and self.addingNewPath == False:
-            if self.key in self.direct: 
+            if self.key in self.direct:
                 self.direct[self.key]() 
 
             elif len(self.pts) > 0:  ## works with edit - no points selected
@@ -179,6 +174,7 @@ class PathMaker(QWidget):
                     self.addNewPathPts(QPoint(e.pos()))
                     self.updateNewPath() 
                
+            ## add pathWidget - right mouse click
             if e.type() == QEvent.Type.MouseButtonPress and \
                 e.button() == Qt.MouseButton.RightButton:
                 self.pathWorks.addWidget()
@@ -195,8 +191,8 @@ class PathMaker(QWidget):
         else:
             self.canvas.pathMakerOn = True 
             self.initThis()
-            if not self.keysPanel.pathMenuSet:
-                self.keysPanel.toggleMenu()
+            if not self.keysPanel.pathKeysSet:
+                self.keysPanel.toggleKeysMenu()
             self.pathWorks.turnGreen()
             self.pathWorks.addWidget()  ## on start up 
                                                                        
@@ -220,10 +216,11 @@ class PathMaker(QWidget):
             self.delete()   
             self.canvas.pathMakerOn = False
             self.canvas.sideCar.clearWidgets()
-            if self.keysPanel.pathMenuSet:
-                self.keysPanel.toggleMenu()
+            if self.keysPanel.pathKeysSet:
+                self.keysPanel.toggleKeysMenu()
             self.canvas.btnPathMaker.setStyleSheet('background-color: white')
             self.canvas.showWorks.enablePlay()
+        self.canvas.setFocus()
          
     def addNewPathPts(self, pt):
         if self.npts == 0:
@@ -254,7 +251,7 @@ class PathMaker(QWidget):
                 if len(paths) == 0:
                     MsgBox('getPathList: No Paths Found!', 5)
                     return None
-                self.chooser = DoodleMaker(self, where) 
+                self.chooser = DoodleMaker(self.canvas, where) 
                 if where == 'Path Menu':  ## from animation menu
                     b = getCtr(-270,-385) 
                 else:
@@ -276,7 +273,6 @@ class PathMaker(QWidget):
                 self.pathWorks.widget.resetSliders()
                 file = os.path.basename(self.openPathFile)
                 self.pathWorks.widget.label.setText(file)
-                self.pathWorks.widget.label.setStyleSheet("QLabel{font-size: 14pt;}") 
                            
 ### -------------------- path stuff ------------------------
     def addPath(self):

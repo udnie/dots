@@ -1,5 +1,6 @@
 
-from PyQt6.QtCore    import Qt
+from PyQt6.QtCore   import Qt
+from PyQt6.QtGui    import QColor
 
 ### --------------------- dotsShared.py --------------------
 ''' no class: common data shared across classes and files '''
@@ -15,33 +16,32 @@ common = {  ## wherever it's needed
     'points':    40.0,    ## Zvalue for points in shadows
     'outline':   30.0,    ## Zvalue for outline in shadows
     
-    'ScrollW':      118,  ## used by both 1080 and 1280X720 px
-    'SliderW':      127,  ## used by both 1080 and 1280X720 px
+    'SliderW':      127,  ## used by keysPanel
     'OffSet':         0,  ## keysPanel width, used to set fixed size 
     'fix':            23,  ## keysPanel height, used to set fixed size 
     'V':           12.0,  ## diameter of pointItems in shadows
     'widgetXY': (25,25),  ## position pathWidget and BkgWidget 
 } 
 
-screens = {  
-    '1080': '1080X720 -  3:2',
-    '1280': '1280X720 - 16:9',
-    '1215': ' 1215X810 -  3:2',
-    '1440': '1440X810 - 16:9',
-    '1296': '1296X864 -  3:2',
-    '1536': '1536X864 - 16:9',
-    '900':  '   600X900 -  2:3',    
-    '912':  '    513X912 -  9:16',
-    '1102': '  620X1102 -  9:16',
+screens = {  ## used by helpmenus and dots
+    '1080': ('1080X720',  '3:2'),
+    '1280': ('1280X720', '16:9'),
+    '1215': ('1215X810',  '3:2'),
+    '1440': ('1440X810', '16:9'),
+    '1296': ('1296X864',  '3:2'),
+    '1536': ('1536X864', '16:9'),
+     '900':  ('600X900',  '2:3'),    
+     '912':  ('513X912', '9:16'),
+    '1024': ('576X1024', '9:16'),
+    '1102': ('620X1102', '9:16'),
 }
        
 ### --------------------------------------------------------
-             
-CanvasStr = "A,B,C,D,G,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
-PathStr = "C,D,E,F,K,L,M,N,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
 
-ScaleRotateKeys = ('+','_','<','>',':','\"','=','-',';','\'','[',']')
-Types = ['frame', 'pix', 'bkg', 'flat']
+PathStr = "B,C,D,E,F,H,L,N,M,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+
+PlayKeys = ('A','C','D','J','L','M','O','P','R','S','U','V','W','Y','X','Space') 
 
 ## use this and make sure your editor points to the right directory
 paths = {        
@@ -65,10 +65,6 @@ MoveKeys = {
     'up':    (0.0, -Tick),
     'down':  (0.0, Tick),
 }
-
-''' 'L' load a play file, 'D' and 'R' display the Demo Menu, 'P' switch to PathMaker, 
-    'S' display the Screen Menu, 'A' and 'B' add a Background, 'J' json file viewer '''
-PlayKeys = ('L', 'R', 'P', 'S', 'A', 'J', 'D', 'B', 'H')  ## empty canvas - nothing displayed
 
 RotateKeys = {  ## works in reverse
     '+':  -1.0,
@@ -137,6 +133,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_U: 'U',
     Qt.Key.Key_V: 'V', 
     Qt.Key.Key_W: 'W',  
+    Qt.Key.Key_Y: 'Y',  
     Qt.Key.Key_Comma:  ',', 
     Qt.Key.Key_Period: '.',     
     Qt.Key.Key_Plus:   '+',         

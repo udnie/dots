@@ -117,8 +117,8 @@ class PathWays:
             self.pathMaker.edits.updatePath()
                             
 ### ----------------- load and save paths ------------------
-    def openFiles(self):
-        if self.pathMaker.pts:
+    def openFiles(self):   ## no longer being used - replaced by pathChooser
+        if self.pathMaker.pts: 
             MsgBox('openFiles: Clear Scene First', 5)
             return
         Q = QFileDialog()

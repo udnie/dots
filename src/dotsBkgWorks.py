@@ -225,11 +225,11 @@ class BkgWorks:
             self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
             self.bkgMaker.setMirrorBtnText(self.bkgItem) 
          
-    def setMatte(self):
+    def openMatte(self):  ## runs from bkgWidget - starts here
+        self.bkgItem.widget = False
         self.bkgMaker.closeWidget()
-        self.bkgMaker.matte = Matte(self.canvas)
+        self.matte = Matte(self.canvas)
         
-  
 ### -------------------------------------------------------- 
     ## returns what gets lost on each reincarnation
     def restoreFromTrackers(self, bkg): 

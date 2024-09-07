@@ -20,52 +20,54 @@ from dotsFrameAndFlats  import Flat
 ### --------------------------------------------------------
 class BkgMaker(QWidget):  
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, file =''):
         super().__init__()
-        
-        self.canvas = parent
+           
+        self.canvas = parent 
+        self.fileName = file
+
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
-           
+        
         self.init()
-    
+      
     def init(self):
         self.flat    = None
         self.matte  = None
         self.widget = None  ## there is only one
-        
+                
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False
           
         self.screenrate = {}
         self.newTracker = {}
-   
+        
 ### --------------------------------------------------------
-    def openBkgFiles(self):  ## opens both background and flats - needs to be in /backgrounds
-        if self.canvas.control in ControlKeys:
+    def openBkgFiles(self):  ## opens both background and flats 
+        if self.canvas.control in ControlKeys and \
+            self.canvas.pathMakerOn == False:  ## animation
             return
-        Q = QFileDialog()
+        Q = QFileDialog()   ## open only background  
         Q.Option.DontUseNativeDialog
         file, _ = Q.getOpenFileName(self.canvas,
             'Choose an image file to open', paths['bkgPath'],
             'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG)')
         if file:  ## it's either a flat or an jpg/png
-            file = paths['bkgPath'] + os.path.basename(file) 
+            file = paths['bkgPath'] + os.path.basename(file)  
             self.openFlatFile(file) if file.endswith('.bkg') else self.addBkg(file)
         Q.accept()
-          
+
 ### --------------------------------------------------------              
     def addBkg(self, file, flopped=False):  ## background from jpg/png
-        if self.canvas.pathMakerOn == False:
-            if self.mapper.isMapSet():
-                self.mapper.removeMap()
+        if self.mapper.isMapSet():
+            self.mapper.removeMap()
 
-        bkg = BkgItem(file, self.canvas) 
+        bkg = BkgItem(file, self.canvas)  ## the real deal
         if bkg.type == None:
             return
- 
+            
         bkg.setZValue(common['bkgZ'])  ## always on top              
         self.scene.addItem(bkg)    
    
@@ -73,19 +75,19 @@ class BkgMaker(QWidget):
         self.setXY(bkg)
             
         bkg.bkgWorks.addTracker(bkg)  ## always - even if not a scroller   
-        self.lockBkg(bkg)
+        self.lockBkg(bkg)  ## always lock it
                         
-        if self.canvas.pathMakerOn:
-            bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
+        bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
                                
 ### --------------------------------------------------------
     def openFlatFile(self, file):  ## read from .bkg file - a 'flat'
-        try:
-            with open(file, 'r') as fp:
-                self.setBkgColor(QColor(fp.readline()))
-        except IOError:
-            MsgBox('openFlatFile: Error reading file', 5)
-            return
+        if self.canvas.pathMakerOn == False:
+            try:
+                with open(file, 'r') as fp:
+                    self.setBkgColor(QColor(fp.readline()))
+            except IOError:
+                MsgBox('openFlatFile: Error reading file', 5)
+                return
 
     def bkgColor(self):  ## from button or widget   
         if self.canvas.control in ControlKeys:  ## running animation
@@ -105,30 +107,32 @@ class BkgMaker(QWidget):
                 return  
 
     def saveBkgColor(self):  ## write to .bkg file
-        Q = QFileDialog()
-        Q.Option.DontUseNativeDialog
-        Q.setDirectory(paths['bkgPath'])
-        f = Q.getSaveFileName(self.canvas, paths['bkgPath'],  
-            paths['bkgPath'] + 'tmp.bkg')  
-        Q.accept()       
-        if not f[0]: 
-            return
-        if not f[0].lower().endswith('.bkg'):
-            MsgBox("Save Background Color: Wrong file extention - use '.bkg'", 5)  
-            return
-        else:
-            try:
-                with open(f[0], 'w') as fp:
-                    fp.write(self.flat.color.name())
-            except IOError:
-                MsgBox('saveBkgColor: Error saving file', 5)
-            self.flat = None
-                                                                            
+        if self.canvas.pathMakerOn == False:
+            Q = QFileDialog()
+            Q.Option.DontUseNativeDialog
+            Q.setDirectory(paths['bkgPath'])
+            f = Q.getSaveFileName(self.canvas, paths['bkgPath'],  
+                paths['bkgPath'] + 'tmp.bkg')  
+            Q.accept()       
+            if not f[0]: 
+                return
+            if not f[0].lower().endswith('.bkg'):
+                MsgBox("Save Background Color: Wrong file extention - use '.bkg'", 5)  
+                return
+            else:
+                try:
+                    with open(f[0], 'w') as fp:
+                        fp.write(self.flat.color.name())
+                except IOError:
+                    MsgBox('saveBkgColor: Error saving file', 5)
+                self.flat = None
+                                                                        
 ### -------------------------------------------------------- 
     def addWidget(self, bkg):  ## background widget
-        self.closeWidget()      
+   
+        self.closeWidget()  
         if bkg.type == 'flat':
-            return           
+            return          
         self.widget = BkgWidget(bkg, self) 
         self.lockBkg(bkg)
         p = common['widgetXY']
@@ -136,16 +140,16 @@ class BkgMaker(QWidget):
         self.widget.save = QPointF(p.x(), p.y())
         self.widget.setGeometry(p.x(), p.y(), int(self.widget.WidgetW), \
             int(self.widget.WidgetH))
-        bkg.bkgWorks.restoreFromTrackers(bkg)
         self.resetSliders(bkg)
+        bkg.bkgWorks.restoreFromTrackers(bkg)
         self.updateWidget(bkg)
-                                     
+                           
     def closeWidget(self):
         if self.widget != None:
             self.widget.close()
             self.widget = None
             self.view.grabKeyboard()
-
+  
     def updateWidget(self, bkg):
         self.setMirrorBtnText(bkg)
         self.setBtns(bkg)
@@ -277,14 +281,8 @@ class BkgMaker(QWidget):
                                                  
 ### --------------------- dotsBkgMaker ---------------------
 
-    # def bkgTag(self, bkg, which=''):
-    #     file = bkg.fileName
-    #     if which != '':
-    #         file = which + ': ' + file
-    #     return f'{file}\t{bkg.direction}\t{bkg.rate}\t{bkg.factor}\t{bkg.showtime}'
+   
                                     
                                     
                                     
                                     
-
-

@@ -2,12 +2,13 @@
 import os
 import json
 
-from PyQt6.QtCore       import pyqtSlot, Qt, QPoint, QTimer, QPointF
+from PyQt6.QtCore       import Qt, QPoint, QTimer, QPointF
 from PyQt6.QtGui        import QColor, QImage, QPixmap, QCursor
-from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QMessageBox, QGraphicsPixmapItem
+from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QMessageBox, QWidget, QAbstractItemView, \
+                                QTableWidget, QPushButton, QVBoxLayout, QTableWidgetItem
                         
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox
+from dotsSideGig        import MsgBox, getCtr, getVuCtr
 
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
     'snakes':   15,  ## also used by vertical 
@@ -16,6 +17,64 @@ showtime = {  ## trigger to add a new background based on number of pixels remai
     'vertical': 17,  ## trying this out 
 }
 
+RowHt = 30
+### -------------------------------------------------------- 
+class Trackers(QWidget): 
+### -------------------------------------------------------- 
+    def __init__(self, parent, dump): 
+        super().__init__() 
+
+        self.canvas = parent
+        self.setWindowTitle('trackers') 
+        
+        self.type = 'widget'
+        self.setAccessibleName('widget')
+
+        self.tableWidget = QTableWidget() 
+        self.tableWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers) 
+
+        self.tableWidget.setColumnCount(len(dump[0]))
+        self.tableWidget.setRowCount(len(dump))
+
+        self.width, self.height = 820, (len(dump)+1) * RowHt
+        self.tableWidget.setFixedSize(self.width, self.height)
+
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+   
+        self.tableWidget.setHorizontalHeaderLabels(
+            ["filename", "zvalue",  "direction", "mirrored", "rate", "showtime", "screenrate", "directory"]) 
+        self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
+            'background-color: rgb(115,225,225)}')	 
+            
+        self.closeBtn = QPushButton("Close")
+        self.closeBtn.clicked.connect(self.bye)
+        self.closeBtn.setMinimumWidth(200)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.tableWidget)
+        self.layout.addWidget(self.closeBtn, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.setLayout(self.layout)
+        
+        x, y = getVuCtr(self.canvas)
+        pos = QPoint(x, int(y - (self.height/2)))
+        
+        self.move(int(pos.x()-self.width/2), int(pos.y())-50)
+
+        self.createTable(dump)
+
+    def createTable(self, dump): 
+        for row, val in enumerate(dump):
+            for col, v in enumerate(val):
+                item = QTableWidgetItem(v)
+                if col in (1,4,5):
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  
+                self.tableWidget.setItem(row, col, item)
+		
+    def bye(self):
+        self.tableWidget.close()
+        self.close() 
+  
 ### ------------------ dotsBkgScrollWrks -------------------           
 class BkgScrollWrks:  ## mainly functions used for scrolling 
 ### --------------------------------------------------------
@@ -40,6 +99,10 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             test = True
             
         elif self.bkgItem.direction == 'left' and rate[1] != self.bkgItem.rate:
+            rate[1] = self.bkgItem.rate
+            test = True 
+              
+        elif self.bkgItem.direction == 'vertical' and rate[1] != self.bkgItem.rate:
             rate[1] = self.bkgItem.rate
             test = True 
               
@@ -172,7 +235,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
                 tagBkg(self.bkgItem, QPoint(int(p.x())+200,int(p.y())+50))
                 QTimer.singleShot(3000, self.canvas.mapper.clearTagGroup)
                                                                                                
-    def filePixX(self, file, bkg):  ## also see dumpBkgs - shift 'B'   
+    def filePixX(self, file, bkg):  ## also see dumpTrackerss - shift 'B'   
         print(f'tracker {bkg.fileName}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.rate}\t{bkg.factor}\t{bkg.zValue()}')
                                                                        
     def notScrollable(self):
@@ -184,31 +247,34 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
 def tagBkg(bkg, pos):  
     x, y, z = pos.x(), pos.y(), bkg.zValue()   
     text = QGraphicsSimpleTextItem() 
-        
-    if bkg.locked == True:
-        text = 'Locked' 
-    else:
-        text = 'Unlocked'
-      
+              
     src = 'bkg'  
     color = 'orange'
-
-    fileName = os.path.basename(bkg.fileName)  ## other than backgrounds
-    tag = fileName + " " + text  
        
-    if bkg.type == 'bkg':
-        if bkg.direction == ' left':
-            tag = tag + ' Left'
-        elif bkg.direction == 'right': 
-            tag = tag + ' Right'
-        tag = tag + ' ' + bkg.useThis    
-   
-    elif bkg.type in ('pix', 'frame') and z == bkg.canvas.mapper.toFront():
-        color = 'yellow' 
-        src = 'pix'
+    if bkg.type == 'shadow':
+        if bkg.maker.linked == True:
+            tag = 'Linked' 
+        else: 
+            tag = 'Unlinked'    
+    else:      
+        if bkg.locked == True:
+            text = 'Locked' 
+        else:
+            text = 'Unlocked'
+        fileName = os.path.basename(bkg.fileName)  ## other than backgrounds
+        tag = fileName + " " + text     
         
-    if 'frame' in bkg.fileName: 
-        x, y = common['ViewW']*.47, common['ViewH']-35
+        if bkg.type == 'bkg':
+            if bkg.direction == ' left':
+                tag = tag + ' Left'
+            elif bkg.direction == 'right': 
+                tag = tag + ' Right'
+            tag = tag + ' ' + bkg.useThis    
+        elif bkg.type in ('pix', 'frame') and z == bkg.canvas.mapper.toFront():
+            color = 'yellow' 
+            src = 'pix'      
+        if 'frame' in bkg.fileName: 
+            x, y = common['ViewW']*.47, common['ViewH']-35
    
     bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
         

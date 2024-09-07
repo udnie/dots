@@ -19,7 +19,7 @@ class ShowFiles:
         self.scene   = self.canvas.scene
  
         self.errorOnShadows = False
-
+       
 ### -------------------------------------------------------- 
     def fileNotFound(self, tmp):  ## look in the paths set by types - used by dictionaries
         if 'fname' in list(tmp.keys()):  ## just to make sure

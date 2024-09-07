@@ -4,11 +4,10 @@ from PyQt6.QtGui        import QFont
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QTableView, QHeaderView, \
                                 QAbstractItemView
                                 
-from dotsShared         import common                           
+from dotsShared         import common    
 
-### ---------------------- dotskeysPanel -------------------
-''' dotskeysPanel contains TableGroup and TableModel class 
-    used by the TableView '''       
+### --------------------- dotsKeysAndHelp ------------------
+''' classes:  KeysPanel and TableModel '''              
 ### --------------------------------------------------------
 class KeysPanel(QWidget):
 ### --------------------------------------------------------
@@ -16,11 +15,12 @@ class KeysPanel(QWidget):
         super().__init__()
         
         self.canvas = parent
+        self.scene  = self.canvas.scene
                                                         
-        self.keyMenu     = storyBoard()
-        self.pathMenu    = pathMaker()
-        self.pathMenuSet = False
-                        
+        self.storyKeys   = storyBoard()  ## keyspanel
+        self.pathKeys    = pathMaker()
+        self.pathKeysSet = False
+                                                 
         self.setFixedSize(common['SliderW'], common['SliderH']) 
         
         self.layout = QVBoxLayout(self)        
@@ -33,20 +33,22 @@ class KeysPanel(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
             
 ### --------------------------------------------------------
-    def toggleMenu(self):  ## called thru sideCar 'K' key
-        if self.pathMenuSet:
-            self.setTableModel(self.keyMenu)
-            self.pathMenuSet = False
+    def toggleKeysMenu(self):  ## called thru sideCar 'K' key
+        if self.pathKeysSet:
+            self.setTableModel(self.storyKeys)
+            self.pathKeysSet = False
         else:
-            self.setTableModel(self.pathMenu)
-            self.pathMenuSet = True 
+            self.setTableModel(self.pathKeys)
+            self.pathKeysSet = True 
 
     def addTableGroup(self):                   
         self.tableView = QTableView()
-        self.setTableModel(self.keyMenu)  ## initial menu
+        self.setTableModel(self.storyKeys)  ## initial menu
          
-        self.tableView.setFixedSize(common['SliderW']-common['OffSet'], \
-            common['SliderH']-common['fix'])        
+        if not self.canvas.dots.Vertical:
+            self.tableView.setFixedSize(common['SliderW']-common['OffSet'], \
+                common['SliderH']-common['fix'])       
+        
         self.tableView.setAlternatingRowColors(True) 
         self.tableView.setStyleSheet('border: 1px solid rgb(180,180,180)')
          
@@ -66,7 +68,7 @@ class KeysPanel(QWidget):
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.tableView.setColumnWidth(0, 34) 
-        self.tableView.setColumnWidth(1, 94)
+        self.tableView.setColumnWidth(1, 90)
         
         return self.tableView
                                 
@@ -76,7 +78,7 @@ class KeysPanel(QWidget):
         model = TableModel(list, header)
         self.tableView.setModel(model)
         
-        if list != self.keyMenu:
+        if list != self.storyKeys:
             header[1] = 'PathMaker '
             self.tableView.horizontalHeader().setStyleSheet(
                 'QHeaderView::section{\n'
@@ -105,6 +107,7 @@ class KeysPanel(QWidget):
             
 ### --------------------------------------------------------    
 class TableModel(QAbstractTableModel):  
+### -------------------------------------------------------- 
     def __init__(self, data, hdr):   
         super().__init__()
         
@@ -132,35 +135,22 @@ class TableModel(QAbstractTableModel):
   
 ### --------------------------------------------------------      
 def storyBoard():
-    menu = ( ## pixitems and bkgitems
-        ('A', 'Select All'),   
-        ('C', 'Clear Canvas'),        
-        ('D', 'Delete Selected'),
+    menu = (       ## a mix of canvas, storyboard, pixitems and bkgItems    
         ('F', 'Flop Selected'),
         ('G', 'Add/Hide Grid'),
-        ('H', 'Hide/UnHide'),
-        ('J', 'JSON Viewer'),
-        ('K', 'Toggle KeyList'),
-        ('L', 'Load Play'),
+        ('H', '+Shift Hide/UnHide'),
         ('M', 'Map Selected'),
-        ('O', 'Toggle Outlines'),
+        ('O', '+ShiftToggle Outlines'),
         ('P', 'Toggle Paths'),
-        ('R', 'Run/DemoMenu'),
-        ('S', 'Stop/SceenMenu'),
         ('T', 'Toggle Tags'),
-        ('U', 'UnSelect All'),
-        ('W', 'Clear Widgets'),   
         ('L/R', 'Arrow Keys'),
         ('U/D', 'Arrow Keys'),
-        ('X, Q', 'Escape to Quit'),
         ('Cmd', 'Drag to Select'),
         ('Del', 'Clk to Delete'),
         ('Opt', 'DbClk to Clone'),
         ('Opt', 'Drag Clones'), 
-        ('Opt', 'Show this Tag'),
         ('Rtn', 'Enter to Front'),
-        ('Shift', 'Clk to Flop'),   
-        ('Shift', '+B Dump Bkgs'),   
+        ('Shift', 'Clk to Flop'),     
         ('Shift', '+H Hide Selected'), 
         ('Shift', '+J Play Table'), 
         ('Shift', '+L ToggleLocks'),
@@ -170,33 +160,29 @@ def storyBoard():
         ('Shift', '+T TagSelected'),
         ('Shift', '+U Unlocks All'),  
         ('/', 'Clk to Back'),
-        (',', 'Back 1 ZValue'),
-        ('.', 'Up 1 ZValue'),
         ('_/+', 'Rotate 1 deg'),  
         ('-/=', 'Rotate 15 deg'),
         ('[/]', 'Rotate 45 deg'),
-        ('</>', 'Toggle Size'),
+        ('</>', 'Toggle Size'),     
+        ('\\',  'Show this Tag'),
+        ('A', 'Add a Background'), 
+        ('A', 'Select All'),  
+        ('C', 'Clear Canvas'),
+        ('D', 'Display the Demo Menu'),
+        ('D', 'Delete Selected'),
+        ('J', 'JSON Viewer'),
+        ('L', 'Load Play'), 
+        ('P', 'Switch to PathMaker'), 
+        ('R', 'Run/DemoHelp'),
+        ('S', 'Stop/SceenMenu'),   
+        ('U', 'UnSelect All'),
+        ('W', 'Clear Widgets'),  
+        ('X, Q', 'Escape to Quit'),     
     )
     return menu
       
 def pathMaker():
     menu = (
-        ('C', 'Center Path'),
-        ('D', 'Delete Screen'), 
-        ('E', 'Edit Points'),
-        ('F', 'Files'),
-        ('L', 'Lasso'),
-        ('N', 'New Path'),
-        ('P', 'Path Chooser'),
-        ('R', 'Reverse Path'),
-        ('S', 'Save Path'),
-        ('T', 'Test'),
-        ('U', 'UnSelect Points'),
-        ('V', 'View Points'),
-        ('cmd',   'Closes Path'),   
-        ('del',   'Delete a Point'),     
-        ('opt',   'Add a Point'),
-        ('Shift', '+D Delete Pts'),
         ('Shift', '+W Way Pts'),
         ('>',   'Shift WayPts +5%'),
         ('<',   'Shift WayPts -5%'),
@@ -206,16 +192,29 @@ def pathMaker():
         ('/',   'Path Color'),    
         ('} ',  'Flop Path'),
         ('{ ',  'Flip Path'),     
-        (':/\'', 'Scale X'),
-        (';/\'', 'Scale Y'),    
-        ('U/D',  'Arrow Keys'),
-        ('L/R',  'Arrow Keys'), 
-        ('_/+',  'Rotate 1 deg'),  
-        ('-/=',  'Rotate 15 deg'),
-        ('[/]',  'Rotate 45 deg'),
+        (':/\'',  'Scale X'),
+        (';/\'',  'Scale Y'),    
+        ('U/D',   'Arrow Keys'),
+        ('L/R',   'Arrow Keys'), 
+        ('_/+', 'Rotate 1 deg'),  
+        ('-/=', 'Rotate 15 deg'),
+        ('[/]', 'Rotate 45 deg'),
+        ('E',   'Edit Points'),
+        ('del', 'Delete a Point'),     
+        ('opt', 'Add a Point'), 
+        ('shift',   'D Deletes Selected Pts'),
+        ('L',   'Lasso'), 
+        ('U',   'UnSelect Points'), 
+        ('C',   'Center Path'),
+        ('D',   'Delete Screen'), 
+        ('N',   'New Path'),
+        ('N',   'Closes Path'),   
+        ('P',   'PathChooser'),
+        ('R',   'Reverse Path'),
+        ('S',   'Save Path'),
+        ('T',   'Test'),
     )
     return menu
 
-### --------------------- dotsKeysPanel --------------------
-
+### --------------------- dotsKeysAndHelp ------------------
 

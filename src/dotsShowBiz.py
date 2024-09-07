@@ -6,23 +6,23 @@ import os
 
 from functools          import partial
 
-from PyQt6.QtCore       import QTimer, QPointF
+from PyQt6.QtCore       import QTimer
 
-from dotsShared         import common, paths, PlayKeys
+from dotsShared         import common, paths
 from dotsPixItem        import PixItem
 from dotsBkgMaker       import *
+from dotsFrameAndFlats  import Frame
 
-from dotsShowTime       import ShowTime
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
 from dotsShowFiles      import ShowFiles   
-from dotsFrameAndFlats  import Frame
-from dotsTableMaker     import TableView
+from dotsShowTime       import ShowTime
 
-from dotsMenus          import DemoMenu, HelpMenu, ScreenMenu
-from dotsSnakes         import Snakes
-from dotsBatsAndHats    import *
+from dotsTableMaker     import TableView
 from dotsWings          import Wings
+
+from dotsHelpMenus      import HelpMenus
+from dotsHelpMaker      import HelpMaker
 
 ### ---------------------- dotsShowBiz --------------------
 ''' functions to load and add both demo and non demo items,
@@ -43,88 +43,112 @@ class ShowBiz:
         self.bkgMaker  = self.canvas.bkgMaker
             
         self.demoAvailable = DemoAvailable()
-       
-        if self.demoAvailable:
-            self.bats      = Bats(self.canvas)     
-            self.snakes    = Snakes(self.canvas)     
-            self.hats      = Hats(self.canvas) 
-            self.demoMenu  = DemoMenu(self.canvas, self)
- 
+
         self.showtime   = ShowTime(self.canvas)
-        self.screenMenu = ScreenMenu(self.canvas)  ## in screens
         self.showFiles  = ShowFiles(self.canvas) 
-        
-        self.helpMenu = None
-        self.helpMenu = HelpMenu(self)
-        self.help = False 
-        
+   
+        self.helpMaker  = HelpMaker(self.canvas)
+        self.helpMenus  = HelpMenus(self.canvas)
+         
         self.locks = 0
         self.tableView = None 
               
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
-        if self.canvas.pathMakerOn == False:                
-            if len(self.scene.items()) > 0:  ## stuff on screen
-                if key == 'P':  ## always
-                    self.mapper.tagsAndPaths.togglePaths()                               
-                elif key == 'R':    
-                    if self.canvas.control != '':
-                        return
-                    else:
-                        self.runThese()                                        
-                elif key == 'S':
-                    if self.canvas.control != '':
-                        self.showtime.stop() 
-                    else:
-                        self.showtime.savePlay()
-                elif key == 'J':  ## view the layout of the currently opened play file 
-                    if self.canvas.control == '':
+        if key == 'X':  ## from help menus
+            self.canvas.exit()
+
+        elif key == 'C':
+            self.canvas.clear()    
+
+        if self.canvas.pathMakerOn == False:  
+                    
+            if len(self.scene.items()) > 0:  ## storyboard single key commands
+                
+                if self.canvas.control == '':  ## no animations
+        
+                    if key == 'A':  
+                        self.canvas.selectAll()
+               
+                    elif key == 'D':
+                        self.canvas.deleteSelected()
+                    
+                    elif key == 'J':  ## view the layout of the currently opened play file 
                         dlist = self.openPlay(self.canvas.openPlayFile)  
                         if len(dlist) > 0:  
-                            self.makeTableView(dlist, 'view')    
-            ## single key command - no sceneItems
-            elif self.canvas.control == '' and key in PlayKeys: 
-                self.RSA(key)
-   
-    def RSA(self, key):
-        if self.demoAvailable: 
-            self.closeMenus()   
-        if key in ('A', 'B'):
-            self.bkgMaker.openBkgFiles() 
-        elif key == 'L':
-            ## use QFileDialog to open a .play json file and load it to the screen
-            self.loadPlay()  
-        elif key in ('D','R'):  ## added 'D' thru deleteSelected if nothing there 
-            self.bkgMaker.screenrate.clear()
-            if self.demoAvailable:   
-                self.helpMenu.closeHelpMenu()  
-                self.demoMenu.openDemoMenu()  ## in snakes 
-        elif key == 'S':   
-            if self.demoAvailable:  
-                self.helpMenu.closeHelpMenu()
-                self.screenMenu.openScreenMenu() ## in screens
-        elif key == 'P':  
-            self.pathMaker.initPathMaker()
-        elif key == 'J':              
-            ## use QFileDialog to open a .play json file to view the play file contents
-            self.loadPlay('table')  
-        elif key == 'H':  
-            self.helpMenu.openHelpMenu() if self.help == False else \
-                self.helpMenu.closeHelpMenu() 
-       
-    def closeMenus(self):
-        self.screenMenu.closeScreenMenu()
-        self.demoMenu.closeDemoMenu()
-   
+                            self.makeTableView(dlist, 'view') 
+                          
+                    elif key == 'L':  ## uses QFileDialog to open a .play file
+                        self.loadPlay()         
+                      
+                    elif key == 'M':
+                        if self.scene.selectedItems() or self.canvas.sideCar.hasHiddenPix():
+                            self.mapper.toggleMap()  
+                                    
+                        elif self.canvas.gotFlats() and len(self.scene.items()) == 1:
+                            self.helpMaker.menuHelp()  ## show help menus
+                            
+                    elif key == 'O':
+                        self.sideCar.toggleOutlines()   
+                            
+                    elif key == 'R':    
+                        if self.canvas.control != '':  ## something's running
+                            return
+                        else:
+                            self.runThese()    
+                            
+                    elif key == 'U':    
+                        self.canvas.unSelect()
+                            
+                    elif key == 'W':
+                        self.canvas.sideCar.clearWidgets()
+                      
+                elif self.canvas.control != '':  ## animation running
+                  
+                    if key == 'P': 
+                        self.mapper.tagsAndPaths.togglePaths() 
+                                                                                                       
+                    elif key == 'S':
+                        if self.canvas.control != '':
+                            self.showtime.stop() 
+                        else:
+                            self.showtime.savePlay()   
+                                        
+                    elif key == 'Space' and self.canvas.control != '':  ## pause/resume
+                        self.canvas.sideCar.pause()
+                                               
+            ## single key commands continued - nothing on screen
+            elif len(self.scene.items()) == 0: 
+                
+                if self.demoAvailable:  ## always clear unless deleted
+                    self.canvas.clear()
+                    
+                if key == 'A':
+                    self.bkgMaker.openBkgFiles() 
+                    
+                elif key == 'D':   ## deleteSelected if something there else run demo
+                    if self.demoAvailable:   
+                        self.helpMenus.setMenu(key)
+    
+                elif key == 'J':  ##  use QFileDialog to launch a .play file viewer 
+                    self.loadPlay('table')  
+                    
+                elif key == 'L':  ## use QFileDialog to open and display a .play file
+                    self.loadPlay()  
+                    
+                elif key == 'M':
+                    self.helpMaker.menuHelp()  ## show help menus
+                    
+                elif key == 'P':  
+                    self.pathMaker.initPathMaker() 
+                    
+                elif key == 'S':   
+                    self.helpMenus.setMenu(key)
+                     
 ### --------------------------------------------------------        
-    def runThese(self):     
+    def runThese(self):   
         if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):
-            if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
-                self.snakes.rerun(self.snakes.what)  
-            elif self.canvas.openPlayFile == 'hats' and self.hats.direction != '':
-                self.hats.rerunAbstract(self.hats.direction)  
-            elif self.canvas.openPlayFile == 'bats':
-                self.bats.rerun()
+            self.helpMenus.demoMenu.runThese() 
         else:
             self.showtime.run()
    

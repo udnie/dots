@@ -12,9 +12,10 @@ from dotsShared      import paths, Star, common
 from functools       import partial
 from dotsSideGig     import MsgBox
 
-panel = {   ## used throughout
+panel = {   
     'LabelW':   100,  
     'LabelH':    95,  
+    'ScrollW':  120,   ## only place it's used
     'MaxW':      70,
     'MaxH':      70,  
     'Star':     .50,
@@ -131,13 +132,13 @@ class ScrollPanel(QWidget):
         self.view   = self.canvas.view  
         self.dots   = self.canvas.dots
 
-        self.setFixedSize(common['ScrollW'],common['ScrollH'])     
+        self.setFixedSize(panel['ScrollW'],common['ScrollH']) ## scrollw used elsewhere 
         self.layout = QVBoxLayout(self)    
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
 
         self.layout.setSpacing(0)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.layout.setContentsMargins(10,0,0,0)
+        self.layout.setContentsMargins(0,0,0,0)
         
         self.widget = QWidget()  
         self.widget.setLayout(self.layout) 

@@ -1,11 +1,17 @@
 
-### Last Update: 05/30/2024
+### Last Update: 09/07/2024
        
 ---
 **To Begin**  
 This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. 
 
 ---
+       
+**Screens**  
+I use 'screens' to refer to both the screen format, number of pixels and its ratio, and the three screens that make up dots, Canvas, Storyboard and PathMaker. 
+
+**Help**
+As of September 2024 I've added help menus that catalog what I feel are the most useful commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know.
        
 **Files and Directories**   
 There are four directories that you should be aware of - **sprites** and **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to do something other than play with the **sprites** and **backgrounds** already there. 
@@ -24,11 +30,12 @@ I would suggest looking into **Changes** to get an idea of how **dots** works. T
 
 ---
     
-**Three Important Files**   
-There are three files I'd suggest looking into - **dotsControlView.py**, **dotsShared**, and **dotsScreens.py**. **ControlView** handles **drag** and **drop** and most of the key stroke entries - except where it doesn't such as in **Matte**.  **Shared** is made up of lists and dictionaries that are shared throughout dots and **Screens** contains all or most of the code and data used in reformatting and resizing **dots**.
+**Four Important Files**   
+There are four files I'd suggest looking into - **dotsControlView.py**, **dotsShowBiz.py**, **dotsShared**, and **dotsScreens.py**. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles most of the multi-key function requests.  **dotsShowBiz** handles most of the single key requests from **Canvas** and **Storyboard** thru the **PlayFile** list.  **Shared** is made up of lists and dictionaries that are shared throughout dots and **Screens** contains all or most of the code and data used in reformatting and resizing **dots**.
 
 
-If you're in **Windows** you'll probably need to edit the **paths** dictionary in **dotsShared.py**.
+If you're in **Windows** you won't need to edit the **paths** dictionary in **dotsShared.py**. That was my experience recently when installing and running dots on a windows 11 laptop. It just worked.
+
 
 
     paths = {        
@@ -53,7 +60,7 @@ I've recently changed the directory layout for **dots** by moving the **dots\*.p
 **Menus and Their Locations**   
 The menus for **Animations and Paths**, **Demo Menu**, **HelpMenu** and the **Screen Menu** are in **dotsMenus.py**.   
 
-**From a blank canvas screen** you can trigger the **helpMenu** by entering **H**.  These single-key commands will work if the **screen/canvas** is blank.
+**From a blank canvas screen** you can trigger the **helpMenu** by entering **H** or clicking on the help button. These single-key commands will work if the **screen/canvas** is blank.  This menu has been updated and there are now 12 menus including this one.
 
     'A':    'Add a Background', 
     'B':    'Add a Background', 
@@ -83,7 +90,7 @@ There are also a number of **keyboard** controls that either match the functions
 ---
 
 **Shadows**   
-If you would like to try out **shadows**, besides downloading and installing **numpy** and **opencv**, you'll need to make a small edit in **dotsPixItem.py** to comment out an import and uncomment another.
+If you would like to try out **shadows**, besides downloading and installing **opencv-python**, you'll need to make a small edit in **dotsPixItem.py** to comment out an import and uncomment another.
 
     from dotsShadowMaker    import ShadowMaker  ## add shadows
     ##from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
@@ -120,23 +127,33 @@ Running a demo with a scrolling background will immediately inform you as to whe
 **Rates and Background Widget Controls**  
 The **rate** is a list of three values each of which I also refer to as a rate.  The first value, **10.0**, is the **first screen rate**, the other two values are the rates for **next-left** and **next-right**.  The **first** background doesn't have to travel as far to exit while the second background, **next** has to wait its turn till it's **showtime** and then match the speed the **first** is traveling without gapping or overrunning it. Once **first** has exited the screen the backgrounds that follow are now all **next** and shouldn't require further adjustments.
 
+**You can use the arrow keys** to make small adjustments, 5 points or 1, plus or minus, to the **screenrate slider**.
+
+
 Moving the **background widgets screenrate slider** to a higher value slows the backgrounds speed and a smaller value will speed it up. Once the **next screenrate** has been established and the background is scrolling smoothly you can use the **factor** dial - it's a multiplier - to speed up or slow down the backgrounds travel without changing the sliders rate or needing to edit **screenrates.dict**.  The **factor** value is saved to the **.play** file as well.
 
 These values were established based on a fixed size which isn't as important as it once was as you now have more flexibility in setting a rate that best fits your background.  Scaling the short side to 640 pixels still helps.
    
     screentimes = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
-        ##   first, next-rt<lft, next-lft>right --- there are always two backgrounds once started
-        '1080':  [10.0,  17.50,  17.45],     ## 1440px actual size when scaled 1280X640 for 16:9
-        '1280':  [10.0,  18.75,  18.85],  
-        '1215':  [10.0,  17.35,  17.4],     ## 1620px actual size when scaled 1280X640 for 16:9
-        '1440':  [10.0,  18.7,   18.85],
-        '1296':  [10.0,  17.50,  17.45],     ## 1728px actual size when scaled 1280X640 for 16:9
-        '1536':  [10.0,  18.65,  18.60],  
-        '1102':  [10.0,  20.9,    0.0],
-         '900':  [10.0,  23.2,    0.0],
-         '912':  [10.0,  20.9,    0.0],
-    }
-       
+      ##   first, next-rt<lft, next-lft>right --- there are always two backgrounds once started
+     '1080':  [10.0,  17.50,  17.45],   ## 1440px actual size when scaled 1280X640 for 16:9
+     '1280':  [10.0,  18.75,  18.85],  
+     '1215':  [10.0,  17.35,  17.4],    ## 1620px actual size when scaled 1280X640 for 16:9
+     '1440':  [10.0,  18.7,   18.85],
+     '1296':  [10.0,  17.50,  17.45],   ## 1728px actual size when scaled 1280X640 for 16:9
+     '1536':  [10.0,  18.65,  18.60],  
+     '1102':  [10.0,  20.9,    0.0],
+      '900':  [10.0,  23.2,    0.0],
+      '912':  [10.0,  20.9,    0.0],
+     }
+     
+     moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
+        '1080':  [10.0,   19.05, 19.05],   ## 1215px actual size when scaled 1080X640 for 3:2
+        '1215':  [10.0,   18.88, 18.89],   ## 1367px actual size when scaled 1080X640 for 3:2
+        '1296':  [10.0,   18.88, 18.87],   ## 1458px actual size when scaled 1080X640 for 3:2
+         '900':  [10.0,    21.4,   0.0]    ## 1013px actual size when scaled 640X1080 for 2:3
+     } 
+  
 I use 10.0 for the **'first'** value as the background is already visible and needs to travel less of a distance to **clear the screen**. The **'first'** value 10.0 translates to 10 times the screen width and is used to set the duration, time in milliseconds, required to move the backgrounds scaled width from one side of the screen to completely off the other.  A 1080 pixel screen format for the **'first'** background translates to 10.0 X 1080 = 10,800 milliseconds to clear the screen.  A **'next'** background has to cover more distance and therefore its rate would be higher and results in a longer duration, more travel time, while also matching the **first** rate of travel.   
       
 The **background widgets 'showtime'** slider value represents the number of pixels remaining before the background appears in the scene.  When reached it triggers the **'next'** background process. This will vary depending on which direction the background is traveling and if it's a snake. It's set once you choose a direction. Hopefully you'll never need to edit showtime, but if you do it's in **dotsScrollWrks.py**.
@@ -145,6 +162,8 @@ The **background widgets 'showtime'** slider value represents the number of pixe
 
 **Background Matte Widget**  
 Selected from the **background widget** the **matte widget** draws a mat/matte around the background. Its help menu pops up when first selected and can also be triggered by entering **H** from the keyboard which toggles it on or off.  The menu should be pretty much self-explanatory and there are videos that illustrate the commands as well.
+
+This has been changed as well but marginally.
 
  
     helpKeys = {

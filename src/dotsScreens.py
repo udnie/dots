@@ -38,6 +38,7 @@ def setCommon(format=''):
         common.update(eight64) 
         return screens['1536']   
          
+    ## verticals
     elif format == '1102':       ## 620X1102 - 9:16
         common.update(vert)
         common.update(six20)              
@@ -52,6 +53,11 @@ def setCommon(format=''):
         common.update(vert)
         common.update(nine12)              
         return screens['912'] 
+    
+    elif format == '1024':       ## 576X1024 - 9:16
+        common.update(vert)
+        common.update(ten24)              
+        return screens['1024']
      
     else:
         common.update(ten80)  ## 1080X720 - 3:2 - default
@@ -171,8 +177,8 @@ six20 = {   ## 1102 - must be a string not a number
     'gridSize': 34.43,
 }
 
-six30 = {  ## 900X600
-    'Screen':   '900',  
+six30 = {  ## 600X900
+    'Screen':    '900',  
     'DotsW':      940,
     'DotsH':     1002,  
     'ViewW':      600, 
@@ -183,7 +189,7 @@ six30 = {  ## 900X600
     'gridSize':  30.0,
 }
 
-nine12 = {  ## 912X513
+nine12 = {  ## 513X912
     'Screen':    '912',  
     'DotsW':      838,
     'DotsH':     1015,  
@@ -193,6 +199,18 @@ nine12 = {  ## 912X513
     'ScrollH':    867,
     'SliderH':    862, 
     'gridSize':  28.5,
+}
+
+ten24 = {  ## 576X1024
+   'Screen':    '1024',  
+    'DotsW':      885,
+    'DotsH':     1126,  
+    'ViewW':      576, 
+    'ViewH':     1024,   
+    'margin1':     10,    
+    'ScrollH':    965,
+    'SliderH':    972, 
+    'gridSize':  32.0,
 }
 
 ### -----------------------------------------------------        
@@ -210,7 +228,7 @@ def getX():  ## adjusted for app size and display
 
 def getY():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()  
-    if common['Screen'] in ('1102','900', '912'):    
+    if common['Screen'] in ('1102','1024', '900', '912'):    
         return 0  ## gets set to 50
     else:
         return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.45)   

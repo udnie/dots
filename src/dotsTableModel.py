@@ -1,11 +1,72 @@
 
 from PyQt6.QtCore       import Qt, QAbstractTableModel
-from PyQt6.QtGui        import QColor
+from PyQt6.QtGui        import QColor, QFont
+from PyQt6.QtWidgets    import QTableWidget, QTableWidgetItem, QAbstractItemView
 
-from dotsShared         import Types
+CTR = True
+
+QL = QColor(230,230,230)  ## 10% gray
+QC = QColor(210,210,210)  ## 18% gray
+QH = QColor(220,220,220)  ## 14% gray
+
+RH = 30
+
+Types = ['frame', 'pix', 'bkg', 'flat']  ## used by tableMaker
 
 ### --------------------- dotsTableModel -------------------
-''' classses: Typelist and TableModel '''  
+''' classes: TableWidgetSetUp, Typelist and TableModel '''  
+### -------------------------------------------------------- 
+class TableWidgetSetUp(QTableWidget):  
+### -------------------------------------------------------- 
+    def __init__(self, a, b, c, d=0):
+        super().__init__()   
+        
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+                      
+        self.horizontalHeader().setVisible(False)
+        self.verticalHeader().setVisible(False)
+        
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        
+        if d == 0:
+            self.setRowCount(c) 
+            self.setColumnCount(2)
+            
+            self.setColumnWidth(0, a) 
+            self.setColumnWidth(1, b)
+        elif d > 0:
+            self.setRowCount(d) 
+            self.setColumnCount(3)
+            
+            self.setColumnWidth(0, a) 
+            self.setColumnWidth(1, b)
+            self.setColumnWidth(2, c) 
+      
+        self.setStyleSheet('QTableWidget{\n'   
+            'background-color: rgb(250,250,250);\n'                 
+            'font-size: 13pt;\n' 
+            'font-family: Arial;\n' 
+            'border: 3px solid dodgerblue;\n'
+            'gridline-color: silver;}')  
+          
+        self.type = 'widget'
+        self.setAccessibleName('widget')
+        
+    def setRow(self, row, col, str, color='', ctr=bool, bold=False, span=0):
+        self.setRowHeight(row, RH)
+        item = QTableWidgetItem(str)
+        if color != '': item.setBackground(QColor(color))
+        if ctr: item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+        if bold: item.setFont( QFont("Arial", 14, 58))
+        if span == 2: 
+            self.setSpan(row, 0, 1, 2) 
+        elif span == 3:
+            self.setSpan(row, 0, 1, 3) 
+        self.setItem(row, col, item)
+                             
 ### --------------------------------------------------------  
 class Typelist:  ## for type header 
 ### --------------------------------------------------------
@@ -15,7 +76,7 @@ class Typelist:  ## for type header
         self.type = type    
         self.len  = 0
         self.hdr  = ''
-        
+
 ### --------------------------------------------------------
 class TableModel(QAbstractTableModel):
 ### --------------------------------------------------------
@@ -43,6 +104,8 @@ class TableModel(QAbstractTableModel):
                         return 'mirrored'
                     else:
                         return 'continuous' 
+                elif isinstance(val, str) and val[-1] == '/':
+                    return val[5:-1]
                 return self.data[index.row()][index.column()]
             
             if role == Qt.ItemDataRole.BackgroundRole:  ## background color for hdrs

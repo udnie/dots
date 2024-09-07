@@ -4,23 +4,30 @@ import os
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QLabel, QDial, \
-                               QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
-                                                   
+                                QSlider, QHBoxLayout,  QVBoxLayout, QPushButton
+                                                
+from dotsSideGig        import getVuCtr   
+     
 ### ------------------- dotsShadowWidget -------------------                                                                                                                                                        
 class ShadowWidget(QWidget): 
 ### -------------------------------------------------------- 
-    def __init__(self, parent):
+    def __init__(self, parent, shadow, switch=''):
         super().__init__()
-                                        
-        self.maker = parent                          
-        self.works = self.maker.works
-        self.pix   = self.maker.pixitem
-        
+                  
+        self.switch = switch          
+              
+        if self.switch == '':                     
+            self.maker  = parent       
+            self.canvas = self.maker.canvas                   
+            self.works  = self.maker.works
+     
+        self.canvas = parent
+     
         self.type = 'widget'
-        self.save = QPointF()
-                
         self.setAccessibleName('widget')
-        self.WidgetW, self.WidgetH = 340.0, 235.0
+         
+        self.save = QPointF()
+        self.WidgetW, self.WidgetH = 330.0, 245.0
                 
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())
@@ -28,9 +35,12 @@ class ShadowWidget(QWidget):
         hbox.addWidget(self.buttonGroup())
         self.setLayout(hbox)
         
-        file = os.path.basename(self.pix.fileName)
+        if self.switch == '':
+            file = os.path.basename(self.maker.pixitem.fileName)
+        else:
+            file = 'Shadow Widget'
+            
         self.label.setText(file)
-        self.label.setStyleSheet("QLabel{font-size: 15pt;}")
         
         self.setFixedHeight(int(self.WidgetH))
         self.setStyleSheet('background-color: rgba(0,0,0,0)')
@@ -42,7 +52,12 @@ class ShadowWidget(QWidget):
             Qt.WindowType.WindowStaysOnTopHint)
                                 
         self.show()
-                
+        
+        if self.switch == 'on':
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName goes Here')
+            self.move(x+75, y-303)
+        
 ### --------------------------------------------------------                                   
     def paintEvent(self, e):
         painter = QPainter(self)
@@ -111,7 +126,8 @@ class ShadowWidget(QWidget):
         self.rotaryDial.setWrapping(False)
         self.rotaryDial.setNotchesVisible(True)
         self.rotaryDial.setNotchTarget(15.0)
-        self.rotaryDial.valueChanged.connect(self.Rotate)
+        if self.switch == '':
+            self.rotaryDial.valueChanged.connect(self.Rotate)
     
         self.scaleValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignRight)
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)   
@@ -122,7 +138,8 @@ class ShadowWidget(QWidget):
         self.scaleSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.scaleSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.scaleSlider.setTickInterval(50)  
-        self.scaleSlider.valueChanged.connect(self.Scale)   
+        if self.switch == '':
+            self.scaleSlider.valueChanged.connect(self.Scale)   
         
         self.opacityValue = QLabel('.50', alignment=Qt.AlignmentFlag.AlignRight)
         self.opacitySlider = QSlider(Qt.Orientation.Vertical)   
@@ -133,7 +150,8 @@ class ShadowWidget(QWidget):
         self.opacitySlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.opacitySlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.opacitySlider.setTickInterval(16)  
-        self.opacitySlider.valueChanged.connect(self.Opacity)
+        if self.switch == '':
+            self.opacitySlider.valueChanged.connect(self.Opacity)
                   
         sbox = QHBoxLayout()  ## sliders  
         sbox.addSpacing(-10)    
@@ -174,6 +192,7 @@ class ShadowWidget(QWidget):
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
                      
         hideBtn = QPushButton('Outline')
+        helpBtn   = QPushButton('Help')
         flipBtn  = QPushButton('Flip')
         flopBtn  = QPushButton('Flop')
         self.linkBtn = QPushButton('Link')
@@ -181,21 +200,27 @@ class ShadowWidget(QWidget):
         delBtn  = QPushButton('Delete')
         quitBtn = QPushButton('Close')
     
-        hideBtn.clicked.connect(self.works.toggleOutline)  
-        flipBtn.clicked.connect(self.works.flip)
-        flopBtn.clicked.connect(self.maker.flop)
-        self.linkBtn.clicked.connect(self.maker.toggleLink)
-        newBtn.clicked.connect(self.maker.newShadow)
-        delBtn.clicked.connect(self.works.deleteShadow)
-        quitBtn.clicked.connect(self.works.closeWidget)
+        if self.switch == '':
+            hideBtn.clicked.connect(self.works.toggleOutline)  
+            helpBtn.clicked.connect(self.maker.openMenu)
+            flipBtn.clicked.connect(self.works.flip)
+            flopBtn.clicked.connect(self.maker.flop)
+            self.linkBtn.clicked.connect(self.maker.toggleWidgetLink)
+            newBtn.clicked.connect(self.maker.newShadow)
+            delBtn.clicked.connect(self.works.deleteShadow)
+            quitBtn.clicked.connect(self.works.closeWidget)
+        else: 
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
     
         hbox = QVBoxLayout(self)
-        hbox.addWidget(hideBtn)
+        
+        hbox.addWidget(helpBtn)
         hbox.addWidget(flipBtn)
         hbox.addWidget(flopBtn)
         hbox.addWidget(self.linkBtn)
         hbox.addWidget(newBtn)
         hbox.addWidget(delBtn)
+        hbox.addWidget(hideBtn)
         hbox.addWidget(quitBtn)
                 
         groupBox.setLayout(hbox)

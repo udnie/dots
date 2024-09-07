@@ -8,7 +8,7 @@ import time
 from PyQt6.QtCore       import QTimer
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-import dotsAnimation    as Anime
+from dotsAnimation      import Animation, Node
 
 from dotsSidePath       import pathLoader, pathAnimator
 from dotsShared         import paths, common
@@ -27,6 +27,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1536':  'montreaux-1280.jpg',
      '900':  'bats_900.jpg',  ## blue night photo
      '912':  'bats_vertical.jpg', 
+    '1024':  'bats_vertical.jpg', 
     '1102':  'bats_vertical.jpg',
 }
     
@@ -42,18 +43,19 @@ class Bats:
         self.mapper = self.canvas.mapper  
                                          
         self.sideCar   = self.canvas.sideCar
-        self.animation = self.canvas.animation
+        self.animation = Animation(self.canvas)
        
         self.showWorks = ShowWorks(self.canvas)
                                                    
-### -------------------------------------------------------- 
-    def makeBats(self):  ## makes aliens and bats                 
+### --------------------------------------------------------
+    def makeBats(self):  ## makes aliens and bats                             
         self.canvas.openPlayFile = 'bats'
- 
         bkg = BkgItem(backGrounds[common['Screen']], self.canvas) 
         if bkg.type == None:
+            self.canvas.openPlayFile = ''
+            MsgBox('Error on makeBats')
             return
-        
+
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
         self.scene.addItem(bkg)
         
@@ -80,7 +82,7 @@ class Bats:
      
     def runBat(self, pix, n, t):  ## run by run
         if pix.part == 'pivot':   ## adds path to follow
-            node = Anime.Node(pix)  ## gets pix pos property 
+            node = Node(pix)  ## gets pix pos property 
             sync = random.randint(11,16) * 1000  ## sets duration 
             waypts = pathLoader(pix.tag)  ## get the path        
             pix.anime = pathAnimator(node, sync, waypts)  ## sets a path to follow     
@@ -159,7 +161,7 @@ class Hats:  ## hats - was abstract
         self.mapper = self.canvas.mapper
         
         self.sideCar   = self.canvas.sideCar                                          
-        self.animation = self.canvas.animation
+        self.animation = Animation(self.canvas)
         self.showWorks = ShowWorks(self.canvas)
    
         self.hats = 5
@@ -261,7 +263,7 @@ class Hats:  ## hats - was abstract
         k = 0  
         for pix in self.scene.items():
             if pix.type =='pix' and 'doral' in pix.fileName:
-                node = Anime.Node(pix)  ## get pix pos property 
+                node = Node(pix)  ## get pix pos property 
                 sync   = random.randint(11,16) * 1000  ## duration   
                 waypts = pathLoader(pix.tag)
                 pix.anime = pathAnimator(node, sync, waypts)  ## set path animation 

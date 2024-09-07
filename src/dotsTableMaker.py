@@ -8,8 +8,7 @@ from PyQt6.QtWidgets    import QTableView, QAbstractItemView
 
 
 from dotsScreens        import getCtr
-from dotsShared         import Types
-from dotsTableModel     import TableModel, Typelist
+from dotsTableModel     import TableModel, Typelist, Types
 from dotsShowFiles      import ShowFiles 
 from dotsShowWorks      import ShowWorks 
 
@@ -77,7 +76,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.tableView.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
             'border: 1px solid rgb(240,240,240);\n'
             'text-align: center;\n' 
-            'font-size: 14px;\n' 
+            'font-size: 13px;\n' 
             'background-color: rgb(225,225,225)}')  
            
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
@@ -87,8 +86,9 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.tableView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
                     
         ## dbl-click on any row to close the tableview except the header or white space
+        self.tableView.clicked.connect(self.bye)   
         self.tableView.doubleClicked.connect(self.bye)
-        
+     
         ##  or use 'C' to clear the tableview and not what it's in back of it
         self.shortcut = QShortcut(QKeySequence("C"), self.tableView)
         self.shortcut.activated.connect(self.bye)
@@ -116,7 +116,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.dots.statusBar.showMessage(file)      
           
         self.tableView.setWindowTitle(f"C: to Close -- D: to Delete -- J: Toggles Viewer -- S: to Save")
-        QTimer.singleShot(10000, partial(self.tableView.setWindowTitle, f"{file} - {len(data)} rows"))  
+        QTimer.singleShot(10000, partial(self.tableView.setWindowTitle, f"{file} - {len(data)-1} rows"))  
    
         self.model = TableModel(data, self.cols, self.hdr)   
         self.tableView.setModel(self.model)

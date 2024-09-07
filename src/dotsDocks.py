@@ -7,29 +7,28 @@ from dotsShared         import common
    
 docks = {
     "fixedHgt":     82, 
-    "scrollGrp":  350,  
-    "playGrp":    345,
-    "backGrp":    250,
-    "canvasGrp":  355,
+    "scrollGrp":  320,  
+    "playGrp":    320,
+    "backGrp":    195,
+    "canvasGrp":  325,
     "spacer":      10,  ## forces buttons closer together
 }
 
-newWidths = {     ## if vertical 1102, 912
+newWidths = {     ## if vertical 1102, 912, 1024
     "fixedHgt":     70, 
-    "scrollGrp":  265,  
-    "playGrp":    260,
-    "canvasGrp":  345,
+    "scrollGrp":  200,  
+    "playGrp":    350,
+    "canvasGrp":  300,
     "spacer":      7,  ## forces buttons closer together
 }
 
-five13 = {   ## vetical 900
+vert900 = {   ## vertical 900
     "fixedHgt":     70, 
-    "scrollGrp":  230,  
-    "playGrp":    230,
-    "canvasGrp":  305,
-    "spacer":       8,  ## forces buttons closer together       
+    "scrollGrp":   85,  
+    "playGrp":    175,
+    "canvasGrp":  275,
+    "spacer":       5,  ## forces buttons closer together       
 }
-
 
 ### ---------------------- dotsDocks -----------------------
 ''' no classes: dockwidgets and buttons groups '''
@@ -101,63 +100,78 @@ def addKeysDock(self):
 ### --------------------------------------------------------  
 def addScrollBtnGroup(self):  
     self.scrollGroup = QGroupBox("Scroll Panel")
-
-    if not self.dots.Vertical:  ## set in dotsQt
-        self.scrollGroup.setFixedWidth(docks['scrollGrp'])
-    elif common['Screen'] != '912':  
-        self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])    
-    else:
-        self.scrollGroup.setFixedWidth(five13['scrollGrp']) 
     
-    ## sets the position of the title
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-        
-    btnTop = QPushButton("Top")
-    btnBottom = QPushButton("Bottom")
-    btnClear = QPushButton("Clear")
-    btnLoad = QPushButton("Sprites")
+    self.scrollGroup.setFixedWidth(docks['scrollGrp']) 
 
-    layout = QHBoxLayout()
-        
-    layout.addWidget(btnTop)
-    layout.addWidget(btnBottom)
-    layout.addWidget(btnClear)
-    layout.addWidget(btnLoad)
-    
-    panel = self.scroll  ## make it easier to type
-
-    if common['Screen'] != '912':
+    if self.dots.Vertical == False:  ## set in dotsQt    
+        btnTop = QPushButton("Top")
+        btnBottom = QPushButton("Bottom")
+        btnClear = QPushButton("Clear")
+        btnLoad = QPushButton("Sprites")
         btnStar = QPushButton("Star")
-        layout.addWidget(btnStar)
-        btnStar.clicked.connect(panel.Star)
-       
-    btnTop.clicked.connect(panel.top)
-    btnBottom.clicked.connect(panel.bottom)
-    btnClear.clicked.connect(panel.clear)
-    btnLoad.clicked.connect(panel.loadSprites)
- 
-    self.scrollGroup.setLayout(layout)
 
+        layout = QHBoxLayout()
+            
+        layout.addWidget(btnTop)
+        layout.addWidget(btnBottom)
+        layout.addWidget(btnClear)
+        layout.addWidget(btnLoad)
+        layout.addWidget(btnStar)
+        
+        panel = self.scroll  ## make it easier to type
+            
+        btnTop.clicked.connect(panel.top)
+        btnBottom.clicked.connect(panel.bottom)
+        btnClear.clicked.connect(panel.clear)
+        btnLoad.clicked.connect(panel.loadSprites)
+        btnStar.clicked.connect(panel.Star)
+    
+        self.scrollGroup.setLayout(layout)
+    else:
+        if common['Screen'] != '912': 
+            self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])  ## 1024,1102 ... 
+        else:
+            self.scrollGroup.setFixedWidth(vert900['scrollGrp']) 
+ 
+        btnTop = QPushButton("Top")
+        btnBottom = QPushButton("Bottom")
+        btnStar = QPushButton("Star")
+
+        layout = QHBoxLayout()
+            
+        layout.addWidget(btnTop)
+        layout.addWidget(btnBottom)
+        layout.addWidget(btnStar)
+        
+        panel = self.scroll  ## make it easier to type
+            
+        btnTop.clicked.connect(panel.top)
+        btnBottom.clicked.connect(panel.bottom)
+        btnStar.clicked.connect(panel.Star)
+    
+        self.scrollGroup.setLayout(layout)
+ 
     return  self.scrollGroup
 
 ### -----------------------------------------------------
 def addPlayBtnGroup(self):
     self.playGroup = QGroupBox("Play")
+    self.playGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
     if not self.dots.Vertical:  ## nothing changes but the width
         self.playGroup.setFixedWidth(docks['playGrp'])
     elif common['Screen'] != '912':
         self.playGroup.setFixedWidth(newWidths['playGrp'])
     else:
-        self.scrollGroup.setFixedWidth(five13['playGrp']) 
+        self.scrollGroup.setFixedWidth(vert900['playGrp']) 
                
-    self.playGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-
     btnLoad  = QPushButton("Load")
     self.btnRun = QPushButton("Run")  
     self.btnPause = QPushButton("Pause")
     self.btnStop = QPushButton("Stop")
     self.btnSave = QPushButton("Save")
+    btnHelp = QPushButton("Help") 
 
     layout = QHBoxLayout()    
 
@@ -166,20 +180,23 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnPause)
     layout.addWidget(self.btnStop)
     layout.addWidget(self.btnSave)
+    layout.addWidget(btnHelp)
 
-    showbiz = self.showbiz
+    showbiz  = self.showbiz
     showtime = self.showtime
-
+    helpBtn  = self.helpButton
+  
+    btnHelp.clicked.connect(helpBtn.openMenus) 
     btnLoad.clicked.connect(showbiz.loadPlay)
-    self.btnSave.clicked.connect(showtime.savePlay) 
     self.btnRun.clicked.connect(lambda: showbiz.keysInPlay('R'))
     self.btnPause.clicked.connect(showtime.pause)
     self.btnStop.clicked.connect(showtime.stop)
-
+    self.btnSave.clicked.connect(showtime.savePlay) 
+  
     self.playGroup.setLayout(layout)
 
     return self.playGroup
-        
+                   
 ### -----------------------------------------------------
 def addBkgBtnGroup(self):
     bkgGroup = QGroupBox("Background")  ## skipped if vertical
@@ -210,17 +227,15 @@ def addBkgBtnGroup(self):
 ### -----------------------------------------------------
 def addCanvasBtnGroup(self):
     self.canvasGroup = QGroupBox("Canvas")
-    
-    if not self.dots.Vertical:
-        self.canvasGroup.setFixedWidth(docks['canvasGrp'])
-    elif common['Screen'] != '912':
-        self.canvasGroup.setFixedWidth(newWidths['canvasGrp'])
-    else:
-        self.canvasGroup.setFixedWidth(five13['canvasGrp'])
-           
+        
+    self.canvasGroup.setFixedWidth(docks['canvasGrp'])     
     self.canvasGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+    
+    canvas = self
+    bkg = self.bkgMaker
+    pathMaker = self.pathMaker
 
-    if not self.dots.Vertical:
+    if self.dots.Vertical == False:
         btnClrCanvas = QPushButton("Clear")
         self.btnPathMaker = QPushButton("PathMaker")
         btnSnapShot = QPushButton("Shapshot")  
@@ -234,44 +249,35 @@ def addCanvasBtnGroup(self):
         layout.addWidget(btnSnapShot)      
         layout.addWidget(btnPixTest)
         layout.addWidget(btnExit)
-        
-        canvas = self
-        pathMaker = self.pathMaker
-
+  
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
         btnClrCanvas.clicked.connect(canvas.clear)   
         btnSnapShot.clicked.connect(canvas.sideCar.snapShot)
         btnPixTest.clicked.connect(canvas.sideCar.pixTest)
         btnExit.clicked.connect(canvas.exit)
         
-        self.canvasGroup.setLayout(layout)
+        self.canvasGroup.setLayout(layout)         
     else:
-        layout = QHBoxLayout()  
+        if common['Screen'] != '912' and common['Screen'] != '1024':
+            self.canvasGroup.setFixedWidth(newWidths['canvasGrp'])
+        else:
+            self.canvasGroup.setFixedWidth(vert900['canvasGrp'])
         
         btnClrCanvas = QPushButton("Clear")  ## add background, remove pixtext   
         self.btnAddBkg  = QPushButton("BackGround")
         self.btnPathMaker = QPushButton("PathMaker") 
-        
-        if common['Screen'] != '912':
-            btnSnapShot = QPushButton("Shapshot")  
-            layout.addWidget(btnSnapShot) 
-            btnSnapShot.clicked.connect(self.sideCar.snapShot)          
-            
         btnExit = QPushButton("Exit")
-
+         
+        layout = QHBoxLayout()  
+    
         layout.addWidget(btnClrCanvas) 
         layout.addWidget(self.btnAddBkg) 
         layout.addWidget(self.btnPathMaker) 
         layout.addWidget(btnExit)
         
-        canvas = self
-        pathMaker = self.pathMaker
-        bkg = self.bkgMaker
-
         btnClrCanvas.clicked.connect(self.clear) 
         self.btnAddBkg.clicked.connect(bkg.openBkgFiles)
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)        
-
         btnExit.clicked.connect(self.exit)
         
         self.canvasGroup.setLayout(layout)

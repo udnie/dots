@@ -48,11 +48,11 @@ class PathEdits(QWidget):
      
 ### ---------------------- new path ------------------------  
     def toggleNewPath(self):  ## changed - use delete instead or 'N'
-        if self.pathMaker.addingNewPath: 
-            if len(self.pathMaker.pts) == 0:
+        if self.pathMaker.addingNewPath == True:
+            if len(self.pathMaker.pts) == 0:  ## nothing there - delete it
                 self.deleteNewPath()
             else:
-                self.closeNewPath()  ## if there's not a path on display or waypt tags
+                self.closeNewPath()  ## must be something there
         elif not self.pathMaker.pathSet:
             self.addNewPath()
 
@@ -125,7 +125,7 @@ class PathEdits(QWidget):
         self.pathMaker.poly.setZValue(common['pathZ']) 
         self.pathMaker.scene.addItem(self.pathMaker.poly)
                     
-    def finalizeSelections(self, pt): 
+    def finalizeSelections(self, pt):
         self.lasso.append(QPointF(pt))
         poly = self.drawPoly(self.lasso)  ## required to match selected points
         for i in range(len(self.pathMaker.pts)):  
@@ -156,12 +156,13 @@ class PathEdits(QWidget):
     def editPoints(self):
         if len(self.pathMaker.pts) > 0:
             if self.pathMaker.editingPts == False:
+                self.pathWorks.closeWidget()
                 self.pathMaker.editingPts = True
                 self.pathMaker.selections.clear() 
                 self.lasso.clear()
                 self.addPathItems()
                 self.pathWorks.turnBlue()
-                self.pathWorks.closeWidget()
+                self.newLasso()   
             else:
                 self.editPointsOff()
 

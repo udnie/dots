@@ -3,12 +3,12 @@ import os
 import json
 import random
 
-from PyQt6.QtCore       import QPointF
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem
 
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsFrameAndFlats  import Frame
+from dotsHelpButtons    import ButtonHelp
 
 ### --------------------- dotsShowWorks --------------------
 ''' functions for scroller cleanup, saving play files, setting play buttons 
@@ -21,7 +21,9 @@ class ShowWorks:
 
         self.canvas = parent
         self.scene  = self.canvas.scene
-          
+        
+        self.helpButton = ButtonHelp(self.canvas)
+             
 ### --------------------------------------------------------  
     def cleanUpScrollers(self, scene):  ## called from showtime  
         self.scene = scene
@@ -39,15 +41,15 @@ class ShowWorks:
                             self.scene.removeItem(p)
                             
   ### --------------------------------------------------------      
-    def cleanupMenus(self, showbiz):    
-        if showbiz.tableView != None: 
-            showbiz.tableView.bye()      
-        if showbiz.demoAvailable != None:  
-            showbiz.snakes.delSnakes()                     
-            showbiz.demoMenu.closeDemoMenu()     
-        if showbiz.screenMenu != None:   
-            showbiz.screenMenu.closeScreenMenu()
-            
+    def cleanUpMenus(self, showbiz):  
+        self.helpButton.closeMenus()  ## not demo or screen  
+        # if showbiz.tableView != None: 
+        #     showbiz.tableView.bye()      
+        # # if showbiz.demoAvailable != None:  
+        # #     showbiz.snakes.delSnakes()                    
+        # else:   
+        #     showbiz.helpMenus.closeMenus()
+     
 ### --------------------------------------------------------                                                            
     def dothis(self, p):  ##refresh background
         direction = p.direction
@@ -91,7 +93,7 @@ class ShowWorks:
         self.canvas.btnSave.setEnabled(True) 
  
     def disablePlay(self):
-        self.canvas.control = 'pause'
+        self.canvas.control = 'pause'  ## blocks adding background
         self.canvas.btnRun.setEnabled(False)
         self.canvas.btnPause.setEnabled(True)
         self.canvas.btnStop.setEnabled(True)  

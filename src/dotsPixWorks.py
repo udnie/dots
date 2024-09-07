@@ -1,14 +1,17 @@
 
 import os
-  
-from PyQt6.QtCore       import QPoint, QPointF
+
+from functools          import partial
+ 
+from PyQt6.QtCore       import QPoint, QTimer
 from PyQt6.QtGui        import QCursor
 
-from dotsSideGig        import constrain
+from dotsSideGig        import constrain, MsgBox, getPathList, getVuCtr
 from dotsShared         import common, RotateKeys
-from dotsMenus          import AnimationMenu
-
-import dotsAnimation    as Anime
+from dotsMapMaker       import MapMaker
+from dotsAnimation      import AnimeList
+from dotsAnimation      import reprise
+from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 
 Pct = -0.50   ## used by constrain - percent allowable off screen
 
@@ -16,23 +19,116 @@ PixSizes = {  ## match up on base filename using 5 characters - sometimes called
     # "apple": (650, 450),  ## see setPixSizes below
     'doral': (215, 215),
 }
-
-### ---------------------- dotsPixWorks --------------------                                                                            
-class Works:  ## extends pixitem and pixwidget
+                  
+### --------------------------------------------------------  
+''' shared with canvas.contextMenu and with pixitem thru pixwidget '''
+### --------------------------------------------------------    
+class AnimationHelp:  
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, pos, token='', off=0):
         super().__init__()
  
-        self.pix = parent
-        self.scene  = self.pix.scene
-        self.canvas = self.pix.canvas
+        self.pixitem = parent
+        self.canvas = self.pixitem.canvas
+        self.scene  = self.canvas.scene
+        self.mapper = MapMaker(self.canvas)
+       
+        self.token = token  
+                     
+        alst = sorted(AnimeList)  
+        ## basing pathlist on what's in the directory
+        self.canvas.pathList = getPathList(True)  ## names only
+        if len(self.canvas.pathList) == 0:
+            MsgBox('getPathList: No Paths Found!', 5)
+            return 
+    
+        alst.extend(['Random']) ## add random to lst
+        
+        self.table = TableWidgetSetUp(0, 185, len(alst)+4)
+        self.table.itemClicked.connect(self.clicked)   
+        
+        width, height = 191, 426
+        self.table.setFixedSize(width, height)
+       
+        if self.token == 'pix':
+            b = self.pixitem.boundingRect()
+            width = b.width() + 20
+            
+        elif self.token != 'on':
+            width = width * .50   
+            
+        elif self.token == 'on':    
+            x, y = getVuCtr(self.pixitem.canvas)
+            pos = QPoint(x + off, int(y - (height/2)) + 50)
+            width = 0
+                         
+        self.table.setRow(0, 0, f"{'Animations and Paths':<17}",'',True,True,2)  
+        
+        row = 1
+        for anime in alst: 
+            self.table.setRow(row, 0,  "  " + anime,'', False, True, 2) 
+            row += 1
 
+        self.table.setRow(row,  0,f'{"Path Chooser":<15}',QC,True,True, 2)  ## these are tags
+        self.table.setRow(row + 1, 0,f'{"Clear Tags":<14}',QL,True,True, 2)       
+        self.table.setRow(row + 2, 0,f'{"Click Here to Close Menu":<23}','',True,True, 2)
+
+        self.table.move(int(pos.x()) + int(width), int(pos.y())-50)
+        self.table.show() 
+                
+    def clicked(self):   
+        if self.token != 'on':
+            try:
+                tag = self.table.item(self.table.currentRow(), 0).text().strip()   
+                if self.token == 'pix' and tag == 'Path Chooser': 
+                    QTimer.singleShot(25, partial(self.canvas.pathMaker.pathChooser, 'Path Menu')) 
+                    self.closeMenu()
+            except:
+                None
+                self.closeMenu()
+            else:
+                self.setTag(tag)
+        else:
+            self.closeMenu()
+      
+    def closeMenu(self):   
+        self.table.close()
+        if self.token == 'on':
+            self.canvas.setKeys('M')
+            
+    def setTag(self, tag):
+        if self.mapper.tagSet and tag == 'Clear Tags':
+            self.mapper.clearTagGroup()  
+             
+        for pix in self.scene.selectedItems(): 
+            if pix.type == 'pix':       
+                if tag == 'Clear Tags':
+                    pix.tag = ''
+                else:
+                    pix.tag = tag
+                pix.anime = None  ## set by play
+                pix.setSelected(False)  ## when tagged
+                    
+        if self.mapper.isMapSet(): 
+            self.mapper.removeMap()
+                
+        self.closeMenu()
+                                                       
+### ---------------------- dotsPixWorks -------------------- 
+class Works:  ## extends pixitem and pixwidget
+### --------------------------------------------------------
+    def __init__(self, parent, pix):
+        super().__init__()
+ 
+        self.canvas  = parent
+        self.pix = pix
+             
 ### --------------------------------------------------------
     def closeWidget(self):
         if self.pix.widget != None:
             self.pix.widget.close()
             self.pix.widget = None
-                    
+              
     def resetSliders(self):
         self.pix.widget.opacitySlider.setValue(int(self.pix.alpha2*100))
         self.pix.widget.opacityValue.setText(f'{self.pix.alpha2:.2f}')
@@ -42,12 +138,23 @@ class Works:  ## extends pixitem and pixwidget
         
         self.pix.widget.rotaryDial.setValue(int(self.pix.rotation))
         self.pix.widget.rotateValue.setText(f'{self.pix.rotation:3}')
-              
+                           
     def removeThis(self):
         self.pix.clearFocus() 
         self.pix.setEnabled(False)
-        self.scene.removeItem(self.pix)
+        self.pix.scene.removeItem(self.pix)
       
+    def animeMenu(self):
+        self.closeWidget()
+        self.pix.setSelected(True)
+        x, y = self.makeXY()
+        self.help = AnimationHelp(self.pix, QPoint(x,y), 'pix')
+   
+    def makeXY(self):  
+        p = self.pix.pos()
+        p = self.pix.canvas.mapToGlobal(QPoint(int(p.x()), int(p.y())))
+        return int(p.x()), int(p.y())
+ 
     def clearTag(self):  ## reset canvas key to '' 
         self.pix.mapper.clearTagGroup()
         self.pix.canvas.setKeys('') 
@@ -92,32 +199,20 @@ class Works:  ## extends pixitem and pixwidget
         self.pix.setRotation(self.pix.rotation) 
  
     def newTag(self):  ## hold on to this - position tag above cursor
-        p = self.canvas.mapFromGlobal(QPointF(QCursor.pos()))  
+        p = self.pix.canvas.mapFromGlobal(QCursor.pos()) 
         x = p.x()+ 20 
         y = p.y()-20
-        return x, y        
-
-    def animeMenu(self):
-        x, y = self.makeXY()  
-        self.pix.setSelected(True)  ## needs to be selected for menu to work   
-        menu = AnimationMenu(self.canvas)     
-        self.closeWidget()   
-        menu.animeMenu(QPoint(x+50, y+50), 'pix')
-
+        return x, y    
+ 
     def reprise(self):  ## return pixitem to its original position
         if self.pix.tag == '':  ## you're done
             return
         self.pix.anime = None
-        self.pix.anime = Anime.reprise(self.pix)
+        self.pix.anime = reprise(self.pix)
         self.pix.anime.start()
         self.pix.anime.finished.connect(self.pix.anime.stop)
         self.pix.clearFocus()
-                
-    def makeXY(self):  
-        p = self.pix.pos()
-        p = self.pix.canvas.mapToGlobal(QPoint(int(p.x()), int(p.y())))
-        return int(p.x()), int(p.y())
-    
+                   
     def updateXY(self, pos):
         dragX = pos.x() - self.pix.dragAnchor.x()
         dragY = pos.y() - self.pix.dragAnchor.y()     
