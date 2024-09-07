@@ -17,6 +17,10 @@ You may notice some differences in the video to the actual menus.  I made some s
 Last, a new vertical screen format, 576X1024, that makes good use of a 1200 pixel vertical display. 
 
 
+Latest Video:  <https://youtu.be/sU7oEhzCCB4>   
+
+That's not me in the green jumpsuit trying to sell you something if you've switched for that penny a view.  
+  
 
 ---
 
