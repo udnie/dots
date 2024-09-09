@@ -10,8 +10,8 @@ from dotsSideGig        import MsgBox
 from dotsBkgScrollWrks  import tagBkg
 from dotsHelpMonkey     import PixHelp
 
-from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
-##from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
+##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 from dotsAnimation      import fin
 
