@@ -33,7 +33,7 @@ MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
     ## Frame, Flats and Matte Help in flat and frames and bkgMatte
     ## Widgets for Pixitems, Backgrounds.,  in helpMaker
 ### --------------------------------------------------------    
-class HelpMenus:  
+class HelpMenus:  ## demos and snakes
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()

@@ -30,7 +30,7 @@ switchKeys = {
 ### -------------------- dotsHelpMaker --------------------- 
 ''' Home for the help menus - uses switch, either '' or 'on' '''
 ### --------------------------------------------------------     
-class HelpMaker:  
+class HelpMaker:  ## the help menus
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()

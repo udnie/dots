@@ -26,7 +26,7 @@ flatKeys = {
 sharedKeys =  ('H','T','del','tag','shift','enter','return')
         
  ### --------------------------------------------------------     
-class FlatHelp:  ## flat and frame keyboard help
+class FlatHelp:  ## flat and frame keyboard help for both
 ### --------------------------------------------------------
     def __init__(self, parent, canvas, off=0, str='', switch=''):
         super().__init__()  
@@ -261,6 +261,7 @@ class Frame(QGraphicsPixmapItem):
         self.canvas.showWorks.deleteFrame(self)  
                            
 ### ------------------ dotsFrameAndFlats.py ---------------- 
+
 
 
 

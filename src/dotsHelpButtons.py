@@ -46,7 +46,7 @@ storyKeys = {
     ## Frame, Flats and Matte Help,      in flat and frames and bkgMatte
     ## Widgets for Pixitems, Backgrounds.,  in helpMaker
 ### --------------------------------------------------------
-class ButtonHelp:  ## includes pathMaker as well
+class ButtonHelp:  ## includes pathMaker as well - see pathWorks
 ### --------------------------------------------------------    
     def __init__(self, parent):
         super().__init__()
@@ -208,4 +208,6 @@ class StoryHelp:
 ### ------------------- dotsHelpButtons -------------------- 
   
         
+
+
 

@@ -56,7 +56,7 @@ SharedKeys =  ('H','T','/','del','tag','shift','enter','return')
     ## Frame, Flats and Matte Help,      in flat and frames and bkgMatte
     ## Widgets for Pixitems, Backgrounds.,  in helpMaker
 ### --------------------------------------------------------
-class HelpMonkey:  
+class HelpMonkey:  ## the three scene items
 ### --------------------------------------------------------    
     def __init__(self, parent):
         super().__init__()
