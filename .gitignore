@@ -7,7 +7,7 @@ plays/original-demo.play
 paths/tmp.path
 plays/tmp.play
 plays/tmp.play
-_pycache__
+__pycache__
 /spriteLoupe.cpython-310.pyc
 *.pyc
 backgrounds/tma.bkg
@@ -24,12 +24,10 @@ paths/demo-1320.path
 paths/demo-1502.path
 plays/demo-1350.play
 paths/demo-1320.path
-src
 paths/demo-1502.path
 plays/demo-1350.play
 dotsBkgWrks.py
-src/.vscode/settings.json
-src/_pycache__*
+src/__pycache__*
 dots/.gitignore
 
 
