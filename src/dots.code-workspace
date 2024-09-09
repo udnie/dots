@@ -1,0 +1,83 @@
+{
+	"folders": [
+		{
+			"name": "src",
+			"path": "../../dots/src"
+		},
+		{
+			"name": "dots",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"explorer.decorations.colors": false,
+		"debug.console.fontSize": 14,
+		"terminal.integrated.fontSize": 14,
+		"problems.decorations.enabled": false,
+		"breadcrumbs.enabled": false,
+		"python.analysis.logLevel": "Trace",
+		"workbench.colorTheme": "NetBeans Light Theme",
+		"json.format.enable": false,
+		"keyboard.touchbar.enabled": false,
+		"workbench.commandPalette.preserveInput": true,
+		"workbench.commandPalette.history": 150,
+		"workbench.editorAssociations": {
+			"*.ipynb": "jupyter-notebook",
+			"*.mp4": "default",
+			"*.md": "vscode.markdown.preview.editor"
+		},
+		"notebook.cellToolbarLocation": {
+			"default": "right",
+			"jupyter-notebook": "left"
+		},
+		"terminal.integrated.profiles.osx": {
+			"rosetta": {
+				"path": "arch",
+				"args": [
+					"-x86_64",
+					"zsh",
+					"-l"
+				],
+				"overrideName": true
+			}
+		},
+		"terminal.integrated.defaultProfile.osx": "rosetta",
+		"terminal.integrated.profiles.windows": {
+			"PowerShell -NoProfile": {
+				"source": "PowerShell",
+				"args": [
+					"-NoProfile"
+				]
+			}
+		},
+		"terminal.integrated.profiles.linux": {
+			"zsh (login)": {
+				"path": "zsh",
+				"args": [
+					"-l"
+				]
+			}
+		},
+		"terminal.integrated.tabs.location": "right",
+		"python.languageServer": "Default",
+		"files.associations": {
+			"*.py": "python"
+		},
+		"workbench.editor.empty.hint": "hidden",
+		"window.zoomLevel": 1,
+		"workbench.editor.enablePreview": false,
+		"outline.problems.badges": false,
+		"outline.icons": false,
+		"outline.problems.colors": false,
+		"outline.problems.enabled": false,
+		"git.timeline.showAuthor": false,
+		"terminal.integrated.allowChords": false,
+		"terminal.integrated.altClickMovesCursor": false,
+		"terminal.integrated.fontWeight": "normal",
+		"terminal.integrated.tabs.showActiveTerminal": "singleTerminal",
+		"terminal.integrated.tabs.showActions": "singleTerminal",
+		"terminal.integrated.tabs.enabled": true,
+		"search.useIgnoreFiles": false,
+		"search.useGlobalIgnoreFiles": false
+	}
+}
