@@ -5,7 +5,7 @@
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
 ---
-**September 2024** 
+**September 2024**   
 I've added help menus to just about everything I could add a menu to - it should make **dots** a bit more user friendly. As part of the update there's now a **help button** that triggers help for the three main screens, the first being the **Canvas**, that's what you see when **dots** opens up.  The next screen **StoryBoard**, that's the **Canvas** with sprites, backgrounds and shadows. And the third, **PathMaker**.
 
 Neither the canvas or storyboard have widgets associated with them and the help button takes care of that. **'H'** for help still works in **Canvas** but nowhere else.  To start, clicking on the **help button** brings up the **Canvas Help Menu**, from here you can select **Help Menus** or simply type in **'M'**. This brings up a table of help menus and widgets for you to view and catalogs most of the commands needed to make **dots** work. These are the same menus and widgets you would use, just not currently active, also - Help Menus only work in Canvas.
