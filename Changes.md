@@ -24,7 +24,7 @@ Latest Video:  <https://youtu.be/sU7oEhzCCB4>
 
 That's not me in the green jumpsuit trying to sell you something if you've switched for that penny a view.  
 
-**September 9 2024**  
+**September 8 2024**  
 Discovered a problem with the dots help files not making it to github. It appears to have been a problem with .gitignore for some reason. They're there now. Sorry for any difficulties it may have caused.
   
 
