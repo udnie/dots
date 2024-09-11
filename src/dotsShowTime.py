@@ -1,8 +1,6 @@
 
 from os import path
 
-import gc
-
 from PyQt6.QtCore       import QAbstractAnimation
 from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
 

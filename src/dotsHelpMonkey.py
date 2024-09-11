@@ -4,15 +4,13 @@ from functools          import partial
 from PyQt6.QtCore       import QTimer
 
 from dotsSideGig        import *
-from dotsTableModel     import TableWidgetSetUp, QL, QC, QH
-from dotsHelpButtons    import CanvasHelp, StoryHelp
-from dotsPathWorks      import PathHelp
+from dotsTableModel     import TableWidgetSetUp, QL, QC
 
 pixKeys = {
     ' F ':      'Flop It',   
     ' H ':      'Help Menu',
     ' T ':      'Toggle Lock',
-    ' \ ':      'Background Tag',
+    ' \\ ':      'Background Tag',
     'del':      'delete from screen', 
     'enter':    'move to the front',
     'return':   'move to the front',   
@@ -26,7 +24,7 @@ bkgHelpKeys = {
     ' F ':      'Flop It', 
     ' H ':      'Help Menu',
     ' T ':      'Toggle Lock',
-    ' \ ':      'Background Tag',
+    ' \\ ':      'Background Tag',
     'del':      'delete from screen',  
     'enter':    'move to the front',
     'return':   'move to the front',    
@@ -38,7 +36,7 @@ shadowKeys = {
     ' H ':      'Help Menu',
     ' T ':      'Toggles Link', 
     ' / ':      'Update Shadow',
-    ' \ ':      'Background Tag',
+    ' \\ ':      'Background Tag',
     'del':      'delete from screen', 
     'enter':    'move to the front',
     'return':   'move to the front',   
@@ -49,38 +47,12 @@ shadowKeys = {
 SharedKeys =  ('H','T','/','del','tag','shift','enter','return') 
 
 ### --------------------- dotsHelpMonkey ------------------- 
-''' classes: HelpMonkey, PixHelp, BkgHelp and ShadowHelp '''
+''' classes: PixHelp, BkgHelp and ShadowHelp '''
 ### --------------------------------------------------------
     ## Canvas, StoryBoard and PathMaker, in helpButtons and pathWorks
     ## Demos, Screens and Animation Help,in helpMenus and pixWorks
     ## Frame, Flats and Matte Help,      in flat and frames and bkgMatte
-    ## Widgets for Pixitems, Backgrounds.,  in helpMaker
-### --------------------------------------------------------
-class HelpMonkey:  ## the three scene items
-### --------------------------------------------------------    
-    def __init__(self, parent):
-        super().__init__()
-        
-        self.canvas = parent 
-        self.scene  = self.canvas.scene
-        self.switch = str
-        
-    def buttonHelp(self, str=''):
-        self.canvas.clear()
-        self.canvas.bkgMaker.openFlatFile(paths['bkgPath'] + 'spin.bkg')
-        
-        self.canvasHelp = CanvasHelp(self, self.canvas, -350, str)
-        self.storyHelp  = StoryHelp(self, self.canvas, 0, str)
-        self.pathHelp   = PathHelp(self, self.canvas, 350, str)
-    
-    def screenitems(self, str=''): 
-        self.canvas.clear()
-        self.canvas.bkgMaker.openFlatFile(paths['bkgPath'] + 'spin.bkg')
-        
-        self.bkgHelp    = BkgHelp(self.canvas,0, str)
-        self.shadowHelp = ShadowHelp(self.canvas, 350, str)
-        self.pixHelp    = PixHelp(self.canvas, -350, str)
-        
+    ## Widgets for Pixitems, Backgrounds.,  in helpMaker       
 ### --------------------------------------------------------     
 class PixHelp: 
 ### -------------------------------------------------------- 

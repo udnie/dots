@@ -16,7 +16,7 @@ from dotsTableModel     import TableWidgetSetUp, QL
 flatKeys = {  
     ' H ':     'Help Menu',
     ' T ':     'Toggle Lock',
-    ' \ ':     'Background Tag',
+    ' \\ ':     'Background Tag',
     'del':     'delete from screen', 
     'enter':   'move to the front',
     'return':  'move to the front',   

@@ -26,6 +26,9 @@ That's not me in the green jumpsuit trying to sell you something if you've switc
 **September 8 2024**  
 Discovered a problem with the dots help files not making it to github. It appears to have been a problem with .gitignore for some reason. They're there now. Sorry for any difficulties it may have caused.
   
+**September 11 2024**  
+Missed an escape character in a menu and moved some code around.  Updated to Python 3.12.6 and Qt 6.7.1.  
+
 ---
 
 **July 2024**   

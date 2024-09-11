@@ -1,7 +1,8 @@
 
 import sys
+import platform
 
-from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtCore       import Qt, QPointF, PYQT_VERSION_STR
 from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
 from PyQt6.QtWidgets    import QApplication, QWidget
 
@@ -11,11 +12,8 @@ Ticks    = (100,50,10)  ## how often to draw a line and size
 
 VWidth, VHeight, BHeight = 1200, 70, 900  
 
-# from PyQt6.QtCore import QT_VERSION_STR
-# from PyQt6.QtCore import PYQT_VERSION_STR
-
-# print("PyQt version:", PYQT_VERSION_STR) 
-# print("Python version:", QT_VERSION_STR)
+# print("\n" + "PyQt version:", PYQT_VERSION_STR) 
+# print(f'Python: {platform.python_version()}'+ "\n")
 
 ### ------------------------- vhx --------------------------
 class VHX(QWidget):  ## yet another screen pixel ruler 

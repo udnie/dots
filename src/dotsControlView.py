@@ -98,8 +98,8 @@ class ControlView(QGraphicsView):
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
                   
-        elif key == Qt.Key.Key_Space and self.canvas.control != '':  ## pause/resume
-            self.sideCar.pause()  ## from keyboard 
+        elif key == Qt.Key.Key_Space and self.canvas.control != '': 
+            self.sideCar.pause()  ## SpaceBar - pause/resume
                     
         elif key == Qt.Key.Key_G:
             self.grid.toggleGrid()           

@@ -3,7 +3,7 @@ import sys
 import platform
 import os
 
-from PyQt6.QtCore       import QTimer, QT_VERSION_STR, PYQT_VERSION_STR
+from PyQt6.QtCore       import QTimer, PYQT_VERSION_STR
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *
@@ -44,10 +44,9 @@ class DotsQt(QMainWindow):
                   
         self.init()
         
-        # print("PyQt version:", PYQT_VERSION_STR) 
-        # print("Python version:", QT_VERSION_STR)
+        # print("\n" + "PyQt version:", PYQT_VERSION_STR) 
+        # print(f'Python: {platform.python_version()}'+ "\n")
         
-    
     def init(self):  
         dir = os.path.basename(os.path.dirname(os.getcwd()))
         str = f'{dir}  /{os.path.basename(os.getcwd())} ~ {self.screen}'  ## or getDate()        
@@ -61,8 +60,9 @@ class DotsQt(QMainWindow):
 
         ## adjusted for app size and display, see getY() for '900' screen
         vert = 50 if self.Vertical == True else 50  ## was 50
-        self.move(getX(), getY()+vert)  ## functions in screens 
-
+        # self.move(getX(), getY()+vert)  ## functions in screens 
+        self.move(getX(), getY()-int(vert/4))  ## functions in screens 
+        
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always
