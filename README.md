@@ -23,7 +23,7 @@ The **star** in scrollPanel isn't currently designed to be dragged to the canvas
 
 
 ## Requirements
-* **PyQt6** and you can also run **PyQt5** with some edits 
+* **PyQt6** and you can also run **PyQt5** with some easy edits to the **PyQt6** source 
 * functools, though I'm sure it's built-in
 * **opencv-python** if you're planning to use **Shadows** or **ShadowMaker**, it includes **numpy**
 * Your favorite program for creating transparent pngs if you have one or try **ShadowMaker** 
