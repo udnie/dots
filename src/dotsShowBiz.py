@@ -59,7 +59,7 @@ class ShowBiz:
             self.canvas.exit()
 
         elif key == 'C':
-            self.canvas.clear()    
+            self.canvas.clear() 
 
         if self.canvas.pathMakerOn == False:  
                     
@@ -86,7 +86,7 @@ class ShowBiz:
                             self.mapper.toggleMap()  
                                     
                         elif self.canvas.gotFlats() and len(self.scene.items()) == 1:
-                            self.helpMaker.menuHelp()  ## show help menus
+                            self.helpMaker.menuHelp()  ## show help menus - it's only a flat
                             
                     elif key == 'O':
                         self.sideCar.toggleOutlines()   
@@ -96,25 +96,25 @@ class ShowBiz:
                             return
                         else:
                             self.runThese()    
-                            
-                    elif key == 'U':    
+                       
+                    elif key == 'S':
+                        self.showtime.savePlay()
+                                           
+                    elif key == 'U':
                         self.canvas.unSelect()
-                            
+
                     elif key == 'W':
                         self.canvas.sideCar.clearWidgets()
                       
                 elif self.canvas.control != '':  ## animation running
-                  
+                    
                     if key == 'P': 
                         self.mapper.tagsAndPaths.togglePaths() 
                                                                                                        
                     elif key == 'S':
-                        if self.canvas.control != '':
-                            self.showtime.stop() 
-                        else:
-                            self.showtime.savePlay()   
+                        self.showtime.stop() 
                                         
-                    elif key == 'Space' and self.canvas.control != '':  ## pause/resume
+                    elif key == 'space': ## pause/resume
                         self.canvas.sideCar.pause()
                                                
             ## single key commands continued - nothing on screen
@@ -143,7 +143,7 @@ class ShowBiz:
                     self.pathMaker.initPathMaker() 
                     
                 elif key == 'S':   
-                    self.helpMenus.setMenu(key)
+                    self.helpMenus.setMenu(key)  ## screen menu
                      
 ### --------------------------------------------------------        
     def runThese(self):   

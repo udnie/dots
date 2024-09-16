@@ -223,6 +223,17 @@ class PixItem(QGraphicsPixmapItem):
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
 
 ### --------------------------------------------------------
+    def addWidget(self):  ## won't work in works 
+        self.works.closeWidget()
+        self.widget = PixWidget(self)      
+        x, y = self.works.makeXY()     
+        x = int(x - int(self.widget.WidgetW)-20)
+        y = int(y - int(self.widget.WidgetH)*.20)
+        self.widget.save = QPointF(x,y)
+        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        self.works.resetSliders()
+        self.setLockBtnText()
+
     def addShadow(self):  ## from pixwidget 
         if self.shadowMaker != None and self.shadowMaker.isActive == True:
             if 'bat-pivot' in self.fileName:
@@ -240,19 +251,8 @@ class PixItem(QGraphicsPixmapItem):
         if self.shadowMaker.shadow != None and self.shadowMaker.linked:
             return
         else:
-            self.mapper.toggleTagItems(id)
-                
-    def addWidget(self):  ## won't work in works 
-        self.works.closeWidget()
-        self.widget = PixWidget(self)      
-        x, y = self.works.makeXY()     
-        x = int(x - int(self.widget.WidgetW)-20)
-        y = int(y - int(self.widget.WidgetH)*.20)
-        self.widget.save = QPointF(x,y)
-        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
-        self.works.resetSliders()
-        self.setLockBtnText()
-                         
+            self.mapper.toggleTagItems(id)  ## display
+                                         
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
@@ -283,13 +283,19 @@ class PixItem(QGraphicsPixmapItem):
                 
     def togglelock(self):
         if self.locked == False:
-            self.locked = True     
-            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+            self.lockSprite()
         else:
-            self.locked = False
-            self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True) 
+            self.unlockSprite()
         tagBkg(self, self.pos())
         QTimer.singleShot(3000, self.mapper.clearTagGroup)
+        
+    def lockSprite(self):
+        self.locked = True     
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        
+    def unlockSprite(self):
+        self.locked = False
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True) 
    
     def deletePix(self):
         if self.shadowMaker != None and self.shadowMaker.isActive == True:

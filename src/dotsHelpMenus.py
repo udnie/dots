@@ -27,11 +27,14 @@ MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
 ### ---------------------- dotsMenus ----------------------- 
 ''' classes: HelpMenus, DemoHelp, ScreenHelp '''
 ### --------------------------------------------------------
-    ## Canvas, StoryBoard and PathMaker in helpButtons and pathWorks
-    ## Sprites, Backgrounds and Shadows in helpMonkey
-    ## Animation Help in pixWorks
-    ## Frame, Flats and Matte Help in flat and frames and bkgMatte
-    ## Widgets for Pixitems, Backgrounds.,  in helpMaker
+    ## Canvas and StoryBoard Menus in helpButtons
+    ## Demos, Screens Menus in helpMenus
+    ## Sprites, Background and Shadow Menus in helpMonkey
+    ## Widgets for Pixitems, Backgrounds., in helpMaker
+    ## Animation Menu in pixWork
+    ## Frames and Flats Menu in frames and flats
+    ## Matte Menu in bkgMatte    
+    ## PathMaker Menu in pathWorks
 ### --------------------------------------------------------    
 class HelpMenus:  ## demos and snakes
 ### --------------------------------------------------------

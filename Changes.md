@@ -27,7 +27,10 @@ That's not me in the green jumpsuit trying to sell you something if you've switc
 Discovered a problem with the dots help files not making it to github. It appears to have been a problem with .gitignore for some reason. They're there now. Sorry for any difficulties it may have caused.
   
 **September 11 2024**  
-Missed an escape character in a menu and moved some code around.  Updated to Python 3.12.6 and Qt 6.7.1.  
+Missed an escape character in a menu and moved some code around.  Updated to Python **3.12.6** and **Qt6.7.1**.  
+
+**September 16 2024**  
+Updates to the StoryBoard Help Menu, the **'Shift-T'** is also now clickable. It displays tags for sprites locked and unlocked and for shadows linked and unlinked.  
 
 ---
 

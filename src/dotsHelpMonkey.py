@@ -49,10 +49,14 @@ SharedKeys =  ('H','T','/','del','tag','shift','enter','return')
 ### --------------------- dotsHelpMonkey ------------------- 
 ''' classes: PixHelp, BkgHelp and ShadowHelp '''
 ### --------------------------------------------------------
-    ## Canvas, StoryBoard and PathMaker, in helpButtons and pathWorks
-    ## Demos, Screens and Animation Help,in helpMenus and pixWorks
-    ## Frame, Flats and Matte Help,      in flat and frames and bkgMatte
-    ## Widgets for Pixitems, Backgrounds.,  in helpMaker       
+    ## Canvas and StoryBoard Menus in helpButtons
+    ## Demos, Screens Menus in helpMenus
+    ## Sprites, Background and Shadow Menus in helpMonkey
+    ## Widgets for Pixitems, Backgrounds., in helpMaker
+    ## Animation Menu in pixWork
+    ## Frames and Flats Menu in frames and flats
+    ## Matte Menu in bkgMatte    
+    ## PathMaker Menu in pathWorks       
 ### --------------------------------------------------------     
 class PixHelp: 
 ### -------------------------------------------------------- 

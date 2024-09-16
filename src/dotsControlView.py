@@ -110,64 +110,60 @@ class ControlView(QGraphicsView):
 ### -------- keys with modifiers or pathMaker flags ----------                             
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
-                self.setKey('delPts')  ## delete selcted pts in pathmaker
+                self.setKey('delPts')  ## delete selected pts in pathmaker
             else: 
                 self.setKey('D')
                           
         elif key == Qt.Key.Key_F:
             if self.canvas.pathMakerOn == False:  
-                self.canvas.flopSelected()
+                self.canvas.flopSelected()  ## yep
             else:
                 self.setKey('F')
                                      
-        elif key == Qt.Key.Key_H:    
+        elif key == Qt.Key.Key_H:  ## toggles hides/unhides selections 
             if mod & Qt.KeyboardModifier.ShiftModifier:
-                if self.sideCar.hasHiddenPix():
-                    self.sideCar.showSelected()  ## hide selector frame     
-                else:
-                    self.sideCar.hideSelected()         
+                self.sideCar.toggleSelections()      
             else:
-                 self.setKey('H')  ## used by bkgItem and pixitem - help 
+                 self.setKey('H')  ## help 
                  
         elif key == Qt.Key.Key_L and \
-            mod & Qt.KeyboardModifier.ShiftModifier:  ## keys used in locking screen items
-                self.sideCar.togglePixLocks(singleKeys[key]) 
+            mod & Qt.KeyboardModifier.ShiftModifier:  ##  ## toggles sprites locked on/off
+                self.sideCar.toggleSprites()  ## this lets 'L' pass
                                      
         elif key == Qt.Key.Key_O:                
             if mod & Qt.KeyboardModifier.ShiftModifier:   
                 self.sideCar.clearWidgets()            
-                self.sideCar.hideSelectedShadows()
+                self.sideCar.hideSelectedShadows()  ## toggles display on/off if pix is selected
                 self.sideCar.toggleOutlines()
             else:
                 self.setKey('O')
                    
-        elif key == Qt.Key.Key_R:
-            if mod & Qt.KeyboardModifier.ShiftModifier: 
-                return
-                self.sideCar.resetAll()   ## unlink. unlock, unselect
+        elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect
+            if mod & Qt.KeyboardModifier.ShiftModifier:  ## sprites and shadows
+                self.sideCar.resetAll()  
             else:
                 self.setKey('R')
                                                        
-        elif key == Qt.Key.Key_S:
+        elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off
             if mod & Qt.KeyboardModifier.ShiftModifier and \
-                self.canvas.control not in ControlKeys:
+                self.canvas.control == '':
                     self.sideCar.toggleShadows()  ## does them all                            
             else:
-                 self.setKey('S')  
+                self.setKey('S')  
                                                           
-        elif key == Qt.Key.Key_T:  ## toggles tags on and off for pix and shadows
+        elif key == Qt.Key.Key_T:  ## toggles tags display on/off both link and lock
             if mod & Qt.KeyboardModifier.ShiftModifier:      
-                self.mapper.toggleTagItems('all')   ## the display
+                self.mapper.toggleTagItems('all') 
             else:
-                self.setKey('T')   ## can toggle individual lock/unlock linl/unlink
-            
-        elif key == Qt.Key.Key_U:
-            if mod & Qt.KeyboardModifier.ShiftModifier: 
-                self.sideCar.togglePixLocks(singleKeys[key]) 
-            else:
+                self.setKey('T')  
+             
+        elif key == Qt.Key.Key_U:  ## unselect for storyBoard and pathMaker
+            if self.canvas.pathMakerOn:
                 self.canvas.unSelect()
-                  
-        elif key == Qt.Key.Key_W:
+            else:
+                self.setKey('U')  
+               
+        elif key == Qt.Key.Key_W:  ## yes - that's what it does
             if self.canvas.pathMakerOn:
                 self.canvas.pathMaker.pathWays.addWayPtTags()   
             else:       

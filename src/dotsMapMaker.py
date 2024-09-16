@@ -177,6 +177,7 @@ class MapMaker:
         self.clearPaths()  ## clears tags as well
 
     def addTagGroup(self):
+        self.clearTagGroup()
         self.tagZ = self.toFront(45.0)   ## otherwise it can be hidden 
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue(self.tagZ)     
@@ -188,7 +189,6 @@ class MapMaker:
         if self.tagCount() > 0:  ## clear tags     
             self.clearTagGroup()
             self.clearPaths() 
-            self.tagGroup = None
             return
         if self.isMapSet():
             self.clearMap()
@@ -197,7 +197,7 @@ class MapMaker:
                 QTimer.singleShot(200, self.clearPaths)
             self.addTagGroup()
             self.tagsAndPaths.tagWorks(pid)
-
+        
     def clearTagGroup(self):     
         if self.tagCount() > 0: 
             self.removeTags()

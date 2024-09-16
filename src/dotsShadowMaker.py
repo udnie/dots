@@ -292,7 +292,7 @@ class ShadowMaker:
             if self.linked == False and self.widget.linkBtn.text() == 'Link': 
                 self.shadow.linkShadow()   
             elif self.linked == True and self.widget.linkBtn.text() == 'UnLink':
-                self.shadow.unLinkShadow()  
+                self.shadow.unlinkShadow()  
                                                                                                              
 ### --------------------------------------------------------                                                              
     def flop(self):

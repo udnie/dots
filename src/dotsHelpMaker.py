@@ -30,6 +30,15 @@ SpinDrift = QColor('#73fcd6')
 
 ### -------------------- dotsHelpMaker --------------------- 
 ''' Home for the help menus - uses switch, either '' or 'on' '''
+### --------------------------------------------------------
+    ## Canvas and StoryBoard Menus in helpButtons
+    ## Demos, Screens Menus in helpMenus
+    ## Sprites, Background and Shadow Menus in helpMonkey
+    ## Widgets for Pixitems, Backgrounds., in helpMaker
+    ## Animation Menu in pixWorks
+    ## Frames and Flats Menu in frames and flats
+    ## Matte Menu in bkgMatte    
+    ## PathMaker Menu in pathWorks
 ### --------------------------------------------------------     
 class HelpMaker:  ## the help menus
 ### --------------------------------------------------------

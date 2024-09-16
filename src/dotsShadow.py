@@ -92,7 +92,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
             self.maker.openMenu()      
         elif self.key == 'T':     
             self.linkShadow() if self.maker.linked == False \
-                else self.unLinkShadow()
+                else self.unlinkShadow()
             self.tagThis() 
         elif self.key == '/':  ## cuts off shadow if partial offscreen and points tweaked
             self.maker.updateShadow()  
@@ -155,8 +155,8 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.maker.widget != None:
             self.maker.works.closeWidget()      
         self.save = b
-                   
-    def unLinkShadow(self):  
+               
+    def unlinkShadow(self):  
         b = self.save    
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)
         self.pixitem.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False) 
@@ -172,7 +172,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         if self.maker.widget != None:
             self.maker.widget.linkBtn.setText('Link')  ## keep it open  
             self.maker.works.resetSliders() 
-        
+  
 ### --------------------------------------------------------        
     def initPoints(self):  ## initial path and points setting from maker.addShadow         
         self.path = []

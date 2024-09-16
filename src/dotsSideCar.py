@@ -10,6 +10,7 @@ from dotsShared         import common, paths
 from dotsPixItem        import PixItem
 from dotsSideGig        import MsgBox, constrain, Grid
 from dotsMapMaker       import MapMaker
+from dotsBkgScrollWrks  import tagBkg
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: just stuff - pixTest, transFormPixitem, snapShot,
@@ -172,43 +173,38 @@ class SideCar:
             if pix.type == 'pix' and pix.shadowMaker != None and \
                 pix.shadowMaker.isActive == True:
                     pix.shadowMaker.works.toggleOutline()
-                  
-    def togglePixLocks(self, key):
-        if self.canvas.control != '':  ## animation running
-            return 
-        stub = '' 
-        for pix in self.scene.items(): 
-            if pix.type in ('pix', 'bkg'):
-                if pix.anime != None and \
-                    pix.anime.state() == QAbstractAnimation.State.Running:
-                    return    
-                if key == 'R': 
-                    pix.locked = True
-                    stub = 'all'
-                elif key == 'U': 
-                    pix.locked = False
-                    stub = 'all'
-                    # if pix.type == 'bkg': ## still working on it 
-                    #     pix.bkgMaker.unlockBkg(pix)      
-                elif key == 'L' and pix.isSelected(): ## or pix.type == 'bkg': 
-                    if pix.type == 'pix':
-                        pix.togglelock()  ## wait to toggleTagItems
-                    elif pix.type == 'bkg': 
-                        pix.bkgWorks.bkgScrollWrks.toggleBkgLocks()  ## toggle bkgItem
-                    stub = 'select'
-        self.mapper.toggleTagItems(stub)  
-                                        
+                                  
+    def toggleSprites(self):  ## lock/unlock sprites
+        self.mapper.addTagGroup()
+        for pix in self.scene.items():
+            if pix.type == 'pix':
+                pix.lockSprite() if pix.locked == False \
+                    else pix.unlockSprite()    
+                self.mapper.tagsAndPaths.tagThis('', pix, '')
+                                         
+    def toggleShadows(self):  ## link/unlink shadows
+        self.mapper.addTagGroup()
+        for pix in self.scene.items():
+            if pix.type == 'shadow':
+                pix.linkShadow() if pix.maker.linked == False \
+                    else pix.unlinkShadow()    
+                self.mapper.tagsAndPaths.tagThis('', pix, '')
+                                                                                                    
     def resetAll(self):
-        for itm in self.scene.items():
-            if itm.type == 'pix':
-                if itm.locked: itm.locked == False
-                if itm.isSelected(): itm.setSelected(False) 
-                if itm.isHidden == True: itm.isHidden = False
-                if itm.shadowMaker != None and itm.shadowMaker.isActive == True:
-                    if itm.shadowMaker.linked == True:
-                        itm.shadowMaker.shadow.unLinkShadow()
-                        itm.shadowMaker.works.hideOutline()
-        self.mapper.toggleTagItems('all') 
+        self.mapper.addTagGroup()
+        for pix in self.scene.items():
+            if pix.type == 'pix':
+                pix.unlockSprite()
+                pix.setSelected(False) 
+                pix.isHidden = False   
+                self.mapper.tagsAndPaths.tagThis('', pix, '')          
+            elif pix.type == 'shadow':
+                pix.unlinkShadow()
+                pix.maker.works.hideOutline()
+                self.mapper.tagsAndPaths.tagThis('', pix, '')
+            elif pix.type == 'bkg': 
+                pix.bkgMaker.unlockBkg(pix)  
+                tagBkg(pix, QPoint(350, 200))
                                                                                                                                                                       
 ### --------------------------------------------------------                                                
     def hasHiddenPix(self):
@@ -219,18 +215,7 @@ class SideCar:
             elif pix.zValue() <= common['pathZ']:
                 break
         return False                                              
-     
-    def toggleShadows(self):
-        for pix in self.scene.items():
-            if pix.type == 'pix'and pix.shadowMaker != None and \
-                pix.shadowMaker.isActive == True:
-                    if pix.shadowMaker.linked == True:
-                        pix.shadowMaker.shadow.unLinkShadow()
-                        pix.shadowMaker.works.hideOutline()
-                    else:
-                        pix.shadowMaker.shadow.linkShadow()
-                        pix.shadowMaker.works.hideOutline()
-                                                                                         
+                                                         
     def hideOutlines(self):  ## runs from shift-O
         for pix in self.scene.items():
             if pix.type == 'pix'and pix.shadowMaker != None and \
@@ -242,7 +227,13 @@ class SideCar:
             if pix.type == 'pix' and pix.shadowMaker != None and \
                 pix.shadowMaker.isActive == True:
                     pix.shadowMaker.works.showOutline()
-                 
+                                  
+    def toggleSelections(self):
+        if self.hasHiddenPix():
+            self.showSelected()  ## hide selector frame - that's it     
+        else:
+            self.hideSelected()   
+     
     def hideSelected(self):  
         if len(self.scene.items()) > 0 and self.scene.selectedItems():
             self.mapper.removeMap()  ## also updates pix.pos()
@@ -264,13 +255,13 @@ class SideCar:
                 elif pix.zValue() <= common['pathZ']:
                     break
                                                                                                                                                                                                                            
-    def hideSelectedShadows(self):  ## runs from shift-H
+    def hideSelectedShadows(self):  ## runs from shift-O
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker != None and pix.shadowMaker.isActive == True:
                 if pix.isSelected():
-                    pix.hide() 
-                elif pix.isVisible() == False:
-                    pix.show()       
+                    pix.shadowMaker.shadow.hide() 
+                elif pix.shadowMaker.shadow.isVisible() == False:
+                    pix.shadowMaker.shadow.show()       
                     pix.setSelected(True)
   
 ### ---------------------- dotsSideCar ---------------------

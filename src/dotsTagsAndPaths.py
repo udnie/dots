@@ -139,10 +139,17 @@ class TagsAndPaths:
         else:
             self.mapper.clearTagGroup()
         
-    def tagThis(self, token, pix, topZVal):  
-        p = pix.sceneBoundingRect()
-        x = p.x() + p.width()*.45
-        y = p.y() + p.height()*.45
+    def tagThis(self, token, pix, topZVal): 
+        if pix.type != 'shadow': 
+            p = pix.sceneBoundingRect()
+            x = p.x() + p.width()*.45
+            y = p.y() + p.height()*.45
+        else:
+            p = pix.maker.shadow.sceneBoundingRect()
+            x = p.x() + 50.0
+            y = p.y() + 50.0
+            
+        topZVal = self.mapper.toFront()
 
         tag = pix.tag
         color = ''
@@ -151,10 +158,12 @@ class TagsAndPaths:
             x, y = common['ViewW']*.47, common['ViewH']-35
     
         if pix.type in ('pix','bkg','frame'):
+
             if pix.locked == True:
                 tag = 'Locked ' + tag 
             else:
                 tag = 'UnLocked ' + tag 
+    
             color = 'orange'
             zval = pix.zValue()
                 
@@ -163,6 +172,7 @@ class TagsAndPaths:
                 tag = 'Linked ' + tag
             else:
                  tag = 'UnLinked ' + tag
+      
             color = 'lightgreen'
             zval = pix.zValue()
             
@@ -173,12 +183,16 @@ class TagsAndPaths:
             y = y - 20
         else:
             token = self.canvas.control
+            
+            
+       
                   
         self.TagItTwo(token, tag, color, x, y, zval)
         
     ## this way I can stretch it for backgrounds and pixitems
     def TagItTwo(self, token, tag, color, x, y, z, src=''):
         tag = TagIt(token, tag, color, z)
+                
         tag.setZValue(self.mapper.toFront(45.0))
         if src in ('bkg', 'pix'):  ## single selections
             tag.setPos(x-50.0, y-10.0)  ## position it near cursor
