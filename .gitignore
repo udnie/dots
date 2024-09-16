@@ -1,7 +1,0 @@
-##09-11-24
-src/__pycache__/*.pyc
-src/__pycache__/dots*.pyc
-src/.vscode
-src/dots.code-workspace
-src/.gitignore
-.gitignore
