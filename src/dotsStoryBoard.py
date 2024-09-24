@@ -8,7 +8,6 @@ from PyQt6.QtGui        import QTransform, QCursor
 from PyQt6.QtWidgets    import QWidget, QRubberBand, QGraphicsScene
                                         
 from dotsShared         import common, CanvasStr, PathStr, MoveKeys, ControlKeys, PlayKeys
-from dotsAnimation      import *
 from dotsSideCar        import SideCar
 from dotsControlView    import ControlView
 from dotsPixItem        import PixItem
@@ -56,13 +55,12 @@ class StoryBoard(QWidget):
 
         self.mapper    = MapMaker(self) 
         self.bkgMaker  = BkgMaker(self)
-        # self.animation = Animation(self)    
-                
-        self.showbiz    = ShowBiz(self)   ## reads .play files    
-        self.showtime   = ShowTime(self)  ## runs anything tagged as an animation 
-        self.showWorks  = ShowWorks(self)   
+                   
+        self.showbiz   = ShowBiz(self)   ## reads .play files    
+        self.showtime  = ShowTime(self)  ## runs anything tagged as an animation 
+        self.showWorks = ShowWorks(self)   
         
-        self.helpButton = ButtonHelp(self)  ## from help button
+        self.helpButton = ButtonHelp(self.canvas)  ## from help button
      
         addScrollDock(self) 
         addKeysDock(self)
@@ -111,7 +109,10 @@ class StoryBoard(QWidget):
                 self.sendPixKeys()  ## pointItems get messaged                   
         ## send the rest to pathMaker
         elif self.key in PathStr: 
-            self.pathMaker.pathKeys(self.key)
+            if self.key == 'M':
+                self.helpButton.openMenus() 
+            else:    
+                self.pathMaker.pathKeys(self.key)
   
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e):  ## used by mapper for selecting sprites 
@@ -211,6 +212,7 @@ class StoryBoard(QWidget):
         self.mapper.clearMap()    
         self.scene.clear()       
         self.btnAddBkg.setEnabled(True)   
+        self.btnHelp.setEnabled(True)  
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''

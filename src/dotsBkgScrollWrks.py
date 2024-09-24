@@ -1,6 +1,7 @@
 
 import os
 import json
+import random
 
 from PyQt6.QtCore       import Qt, QPoint, QTimer, QPointF
 from PyQt6.QtGui        import QColor, QImage, QPixmap, QCursor
@@ -8,7 +9,7 @@ from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QMessageBox, QWidget, QA
                                 QTableWidget, QPushButton, QVBoxLayout, QTableWidgetItem
                         
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox, getCtr, getVuCtr
+from dotsSideGig        import MsgBox, getColorStr, getVuCtr
 
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
     'snakes':   15,  ## also used by vertical 
@@ -275,6 +276,9 @@ def tagBkg(bkg, pos):
             src = 'pix'      
         if 'frame' in bkg.fileName: 
             x, y = common['ViewW']*.47, common['ViewH']-35
+   
+    if bkg.type == 'bkg':
+        color =     'LIGHTSKYBLUE'
    
     bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
         

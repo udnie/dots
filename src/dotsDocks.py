@@ -171,7 +171,7 @@ def addPlayBtnGroup(self):
     self.btnPause = QPushButton("Pause")
     self.btnStop = QPushButton("Stop")
     self.btnSave = QPushButton("Save")
-    btnHelp = QPushButton("Help") 
+    self.btnHelp = QPushButton("Help") 
 
     layout = QHBoxLayout()    
 
@@ -180,13 +180,13 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnPause)
     layout.addWidget(self.btnStop)
     layout.addWidget(self.btnSave)
-    layout.addWidget(btnHelp)
+    layout.addWidget(self.btnHelp)
 
     showbiz  = self.showbiz
     showtime = self.showtime
     helpBtn  = self.helpButton
   
-    btnHelp.clicked.connect(helpBtn.openMenus) 
+    self.btnHelp.clicked.connect(helpBtn.openMenus) 
     btnLoad.clicked.connect(showbiz.loadPlay)
     self.btnRun.clicked.connect(lambda: showbiz.keysInPlay('R'))
     self.btnPause.clicked.connect(showtime.pause)

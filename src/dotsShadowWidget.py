@@ -53,10 +53,13 @@ class ShadowWidget(QWidget):
                                 
         self.show()
         
-        if self.switch == 'on':
+        if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')
-            self.move(x+75, y-303)
+            if self.switch == 'on':
+                self.move(x+75, y-303)
+            else:
+                self.move(x-360,y-160)
         
 ### --------------------------------------------------------                                   
     def paintEvent(self, e):
@@ -210,7 +213,7 @@ class ShadowWidget(QWidget):
             delBtn.clicked.connect(self.works.deleteShadow)
             quitBtn.clicked.connect(self.works.closeWidget)
         else: 
-            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
     
         hbox = QVBoxLayout(self)
         

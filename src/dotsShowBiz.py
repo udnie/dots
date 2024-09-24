@@ -23,6 +23,7 @@ from dotsWings          import Wings
 
 from dotsHelpMenus      import HelpMenus
 from dotsHelpMaker      import HelpMaker
+from dotsHelpButtons    import ButtonHelp
 
 ### ---------------------- dotsShowBiz --------------------
 ''' functions to load and add both demo and non demo items,
@@ -49,6 +50,7 @@ class ShowBiz:
    
         self.helpMaker  = HelpMaker(self.canvas)
         self.helpMenus  = HelpMenus(self.canvas)
+        self.helpButtons = ButtonHelp(self.canvas)
          
         self.locks = 0
         self.tableView = None 
@@ -60,12 +62,12 @@ class ShowBiz:
 
         elif key == 'C':
             self.canvas.clear() 
-
+            
         if self.canvas.pathMakerOn == False:  
                     
             if len(self.scene.items()) > 0:  ## storyboard single key commands
                 
-                if self.canvas.control == '':  ## no animations
+                if self.canvas.control == '':  ## no animations running
         
                     if key == 'A':  
                         self.canvas.selectAll()
@@ -74,8 +76,7 @@ class ShowBiz:
                         self.canvas.deleteSelected()
                     
                     elif key == 'J':  ## view the layout of the currently opened play file 
-                        dlist = self.openPlay(self.canvas.openPlayFile)  
-                        if len(dlist) > 0:  
+                        if dlist := self.openPlay(self.canvas.openPlayFile):  
                             self.makeTableView(dlist, 'view') 
                           
                     elif key == 'L':  ## uses QFileDialog to open a .play file
@@ -84,11 +85,14 @@ class ShowBiz:
                     elif key == 'M':
                         if self.scene.selectedItems() or self.canvas.sideCar.hasHiddenPix():
                             self.mapper.toggleMap()  
-                                    
-                        elif self.canvas.gotFlats() and len(self.scene.items()) == 1:
-                            self.helpMaker.menuHelp()  ## show help menus - it's only a flat
-                            
+                        else:
+                            self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
+                      
+                    elif key == 'N':
+                        self.helpMaker.menuHelp()  ## help menus - no 'M' conflicts
+                    
                     elif key == 'O':
+                        self.sideCar.clearWidgets()  
                         self.sideCar.toggleOutlines()   
                             
                     elif key == 'R':    
@@ -144,7 +148,11 @@ class ShowBiz:
                     
                 elif key == 'S':   
                     self.helpMenus.setMenu(key)  ## screen menu
-                     
+                              
+        elif self.canvas.pathMakerOn == True:    
+            if key == 'M':
+                self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
+       
 ### --------------------------------------------------------        
     def runThese(self):   
         if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):

@@ -174,7 +174,7 @@ class SideCar:
                 pix.shadowMaker.isActive == True:
                     pix.shadowMaker.works.toggleOutline()
                                   
-    def toggleSprites(self):  ## lock/unlock sprites
+    def toggleSpriteLocks(self):  ## lock/unlock sprites
         self.mapper.addTagGroup()
         for pix in self.scene.items():
             if pix.type == 'pix':
@@ -182,14 +182,24 @@ class SideCar:
                     else pix.unlockSprite()    
                 self.mapper.tagsAndPaths.tagThis('', pix, '')
                                          
-    def toggleShadows(self):  ## link/unlink shadows
+    def toggleShadowLinks(self):  ## link/unlink shadows
         self.mapper.addTagGroup()
         for pix in self.scene.items():
             if pix.type == 'shadow':
                 pix.linkShadow() if pix.maker.linked == False \
                     else pix.unlinkShadow()    
                 self.mapper.tagsAndPaths.tagThis('', pix, '')
-                                                                                                    
+       
+    def toggleTagItems(self, all=''):  ##  standin for mapper version
+        if self.mapper.tagCount() > 0:      
+            self.mapper.clearTagGroup()
+            self.mapper.clearPaths() 
+            return
+        self.mapper.addTagGroup()
+        for pix in self.scene.items():
+            if pix.type in ('pix', 'shadow'):   
+                self.mapper.tagsAndPaths.tagThis('', pix, '')
+                                                                                                  
     def resetAll(self):
         self.mapper.addTagGroup()
         for pix in self.scene.items():
@@ -204,8 +214,8 @@ class SideCar:
                 self.mapper.tagsAndPaths.tagThis('', pix, '')
             elif pix.type == 'bkg': 
                 pix.bkgMaker.unlockBkg(pix)  
-                tagBkg(pix, QPoint(350, 200))
-                                                                                                                                                                      
+                tagBkg(pix, QPoint(random.randint(200, 500), random.randint(150,400)))
+                                                                                                                                      
 ### --------------------------------------------------------                                                
     def hasHiddenPix(self):
         for pix in self.scene.items():

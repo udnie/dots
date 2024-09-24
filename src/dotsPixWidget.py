@@ -51,10 +51,13 @@ class PixWidget(QWidget):
                                                      
         self.show()
            
-        if self.switch == 'on':
+        if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
-            self.label.setText('FileName goes Here')
-            self.move(x-405,y-305)
+            self.label.setText('FileName goes Here')      
+            if self.switch == 'on':
+                self.move(x-405,y-305)
+            else:
+                self.move(x-375,y-130)
                       
 ### --------------------------------------------------------              
     def paintEvent(self, e): 
@@ -116,7 +119,7 @@ class PixWidget(QWidget):
         
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
+        groupBox.setStyleSheet('background: rgb(240, 240, 240)')
    
         self.rotateValue = QLabel('0', alignment=Qt.AlignmentFlag.AlignCenter)
         self.rotaryDial = QDial()
@@ -188,7 +191,7 @@ class PixWidget(QWidget):
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
         
         groupBox.setFixedWidth(110)
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
+        groupBox.setStyleSheet('background: rgb(240, 240, 240)')
                      
         shadowBtn = QPushButton('Shadow')
         flopBtn    = QPushButton('Flop')
@@ -209,7 +212,7 @@ class PixWidget(QWidget):
             self.lockBtn.clicked.connect(self.pix.togglelock)
             quitBtn.clicked.connect(self.works.closeWidget)
         else: 
-            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
                 
         vbox = QVBoxLayout(self)
         

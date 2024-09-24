@@ -38,7 +38,7 @@ class PathMaker(QWidget):
         self.pathWorks  = PathWorks(self)             
         self.pathWays   = PathWays(self)  
         self.edits      = PathEdits(self) 
-         
+  
         self.initThis()  
                
         self.doFirst = {
@@ -46,6 +46,7 @@ class PathMaker(QWidget):
             '/': self.pathWorks.changePathColor,
             'N': self.edits.toggleNewPath,
             'X': self.canvas.exit,
+            'M': 'special case',
         }
 
         self.direct = {
@@ -118,7 +119,10 @@ class PathMaker(QWidget):
         self.key = key
    
         if key in self.doFirst:
-            self.doFirst[key]()  ## run the function, value
+            if key == 'M':
+                self.canvas.setKeys('M') 
+            else:
+                self.doFirst[key]()  ## run the function, value
                     
         elif self.key == 'E' and self.pathWays.tagCount() > 0:
             self.pathWays.removeWayPtTags()

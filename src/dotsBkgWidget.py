@@ -68,11 +68,14 @@ class BkgWidget(QWidget):
                                                                                                    
         self.show()
         
-        if self.switch == 'on':
+        if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName  goes Here')
-            self.move(x-425, y-5)
-                   
+            if self.switch == 'on':
+                self.move(x-425, y-5)
+            else:
+                self.move(x-400,y-150)
+                
 ### --------------------------------------------------------
     def setKeys(self, key):  ## updated thru bkgItem - did use grabkey - not good idea
         self.key = key 
@@ -264,7 +267,7 @@ class BkgWidget(QWidget):
             deleteBtn.clicked.connect(lambda: self.bkgMaker.deleteBkg(self.bkgItem))  
             quitBtn.clicked.connect(self.bkgMaker.closeWidget) 
         else: 
-            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
         
         vbox = QVBoxLayout(self)
         

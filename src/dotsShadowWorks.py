@@ -41,7 +41,7 @@ class Works:  ## small functions that were in ShadowMaker
             self.maker.widget.close()     
             self.maker.widget = None  
             if self.switch == 'on':
-                self.canvas.setKeys('M')
+                self.canvas.setKeys('N')
         
     def deleteShadow(self): 
         if self.maker.shadow != None:

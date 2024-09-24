@@ -74,17 +74,17 @@ class DemoHelp:
         
         self.table.setRow(0, 0, f'{"Demos Menu":<13}','',True,True,2)
 
-        row = 1; self.fix = [] 
+        row = 1; self.lst = [] 
         for k, val in demoKeys.items():
             if self.dots.Vertical and k in ('left', 'right'):  ## wings follow pivots
                 continue
             else:
-                self.fix.append(k)
+                self.lst.append(k)
                 self.table.setRow(row, 0, "  " + val,'',False,True, 2)
             row += 1
    
-        self.table.setRow(row, 0,f'{"Select From Above":<23}',QL,True,True, 2)
-        self.table.setRow(row + 1, 0,f'{"Click Here to Close Menu":<27}','',True,True, 2)
+        self.table.setRow(row,      0,f'{"Select From Above":<23}',QL,True,True, 2)
+        self.table.setRow(row + 1,  0,f'{"Click Here to Close Menu":<27}','',True,True, 2)
     
         x, y = getVuCtr(self.canvas)  
         if off != 0: x += off
@@ -100,9 +100,9 @@ class DemoHelp:
     def clicked(self):
         if self.switch == '':
             try:
-                p = self.table.currentRow() - 1 
+                p = self.table.currentRow() - 1  ## position in lst to key
                 if p+1 <= len(demoKeys): 
-                    QTimer.singleShot(25, partial(self.run, self.fix[p]))
+                    QTimer.singleShot(25, partial(self.run, self.lst[p]))
             except:
                 None
         self.closeMenu()
@@ -110,7 +110,7 @@ class DemoHelp:
     def closeMenu(self):
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('M')
+            self.canvas.setKeys('N')
     
     def run(self, key):                           
         if key == 'blue':
@@ -173,6 +173,7 @@ class ScreenHelp:
         self.table.setFixedSize(width, height)
         
         self.table.setRow(0, 0, f'{"Screen Formats":<14}','',True,True,3)
+        
         row = 1
         for k , val in screens.items():
             self.table.setRow(row, 0, f'{k}'.rjust(7),'',True, True)
@@ -202,7 +203,7 @@ class ScreenHelp:
     def closeMenu(self):
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('M')
+            self.canvas.setKeys('N')
       
     def switchKey(self, key):           
         if self.displayChk(key) == True:

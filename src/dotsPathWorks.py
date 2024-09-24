@@ -11,6 +11,7 @@ from dotsShared         import RotateKeys, paths, common
 from dotsSideGig        import distance, getColorStr, getVuCtr
 from dotsPathWidget     import PathWidget
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
+from dotsHelpDesk       import PathHelp2
 
 ScaleRotate = ('<', '>', '+', '-')  ## sent from keyboard
 ScaleUpKeys = ('>','\"','\'')
@@ -21,6 +22,8 @@ pathKeys = {
     'C':    'Center Path',
     'D':    'Clears/Deletes Scene',
     'E':    'Edit Path Points', 
+    'M':    'This Help Menu',
+    'Menu': 'PathMakerHelp Menu 2',
     'N':    'New Path and Close Path',
     'P':    'Path Chooser',
     'R':    'Reverse Path',
@@ -31,46 +34,49 @@ pathKeys = {
     'U':    ' **UnSelect Points**',   
     'del':    '**Delete a Point**',     
     'opt':    '**Add a Point**', 
-    'shift':  '**D Deletes Selected Pts**',  
+    'Shift-D':  '**Deletes Selected Pts**',  
 }
              
 ### --------------------------------------------------------     
 class PathHelp:  
 ### --------------------------------------------------------
-    def __init__(self, parent, canvas, off=0, str=''):
+    def __init__(self, parent, canvas, off=0, switch=''):
         super().__init__()  
           
         self.helpButton = parent  ## canvas
         self.helpButton.pathFlag = True
         
         self.canvas = canvas
-        self.switch = str
-     
-        self.table = TableWidgetSetUp(50, 200, len(pathKeys)+5)
+        self.switch = switch
+        
+        self.pathHelp2 = None
+        
+        self.table = TableWidgetSetUp(55, 185, len(pathKeys)+6, 0, 28)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 256, 577
+        width, height = 246, 623
         self.table.setFixedSize(width, height)
   
         self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}','',True, True, 2)
     
         row = 1
         for k, val in pathKeys.items():
-            if row < 10:
-                self.table.setRow(row, 0, k)
+            if row < 12:
+                self.table.setRow(row, 0, k,'',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)
                 row += 1
             else:
-                if row == 10:
-                    self.table.setRow(row, 0, f'{"These Keys Only Work when Editing    ":<20}', QC,True, True, 2)  
+                if row == 12:
+                    self.table.setRow(row, 0, f'{" These Keys Only Work when Editing ":<20}', QC,True, True, 2)  
                     self.table.setRow(row+1, 0, f'{" and Require a Mouse and Keyboard ":<12}', QC,True, True, 2) 
-                    row = 12
-                self.table.setRow(row, 0, k, QL)  ## highlight
+                    row = 14
+                self.table.setRow(row, 0, k, QL,True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL,'','')                
                 row += 1
-   
-        self.table.setRow(row,  0,    f'{"Enter Key or Select From Above   "}',QH,True,True, 2)
-        self.table.setRow(row + 1, 0, f'{"Click Here to Close  ":<20}','',True, True, 2)
+
+        self.table.setRow(row,      0, f"{'Use Arrow Keys to Move Path':<12}",QC,True,True, 2)
+        self.table.setRow(row + 1,  0, f'{"  Enter Key or Select From Above "}',QH,True,True, 2)
+        self.table.setRow(row + 2,  0, f'{"Click Here to Close  ":<20}','',True, True, 2)
   
         x, y = getVuCtr(self.canvas)   
         if off != 0: x += off 
@@ -84,6 +90,9 @@ class PathHelp:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help in SharedKeys:
                     self.canvas.pathMaker.pathKeys(help)
+                elif help == 'Menu':   
+                    self.table.close()
+                    self.pathHelp2 = PathHelp2(self.canvas)
             except:
                 None
         self.closeMenu()
@@ -92,7 +101,7 @@ class PathHelp:
         self.helpButton.pathFlag = False 
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('M')
+            self.canvas.setKeys('N')
                                                                                              
 ### --------------------------------------------------------
 class PathWorks:

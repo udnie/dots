@@ -154,7 +154,7 @@ class PixItem(QGraphicsPixmapItem):
         if self.key == 'del':    
             self.deletePix()        
         elif self.key == 'shift': 
-            self.setZValue(self.mapper.lastZval('pix')-1)      
+            self.setZValue(self.pix.zValue()-1)      
         elif self.key in('enter','return'): # send to front
             self.setZValue(self.mapper.toFront(1))
         elif self.key == 'tag': ## '\' backslash
@@ -172,7 +172,8 @@ class PixItem(QGraphicsPixmapItem):
     
     def openMenu(self):
         self.works.closeWidget()
-        self.help = PixHelp(self)
+        x, y = self.works.makeXY()  
+        self.help = PixHelp(self, x, 'pix')
             
 ### --------------------------------------------------------
     def mouseMoveEvent(self, e):

@@ -18,7 +18,7 @@ Types = ['frame', 'pix', 'bkg', 'flat']  ## used by tableMaker
 ### -------------------------------------------------------- 
 class TableWidgetSetUp(QTableWidget):  
 ### -------------------------------------------------------- 
-    def __init__(self, a, b, c, d=0):
+    def __init__(self, a, b, c, cols3=0, fontSize=0):
         super().__init__()   
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -31,14 +31,14 @@ class TableWidgetSetUp(QTableWidget):
         
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         
-        if d == 0:
+        if cols3 == 0:
             self.setRowCount(c) 
             self.setColumnCount(2)
             
             self.setColumnWidth(0, a) 
             self.setColumnWidth(1, b)
-        elif d > 0:
-            self.setRowCount(d) 
+        elif cols3 > 0:
+            self.setRowCount(cols3) 
             self.setColumnCount(3)
             
             self.setColumnWidth(0, a) 
@@ -47,24 +47,34 @@ class TableWidgetSetUp(QTableWidget):
       
         self.setStyleSheet('QTableWidget{\n'   
             'background-color: rgb(250,250,250);\n'                 
-            'font-size: 13pt;\n' 
+            'font-size: 12pt;\n' 
             'font-family: Arial;\n' 
             'border: 3px solid dodgerblue;\n'
             'gridline-color: silver;}')  
           
         self.type = 'widget'
         self.setAccessibleName('widget')
+        self.height = fontSize
         
     def setRow(self, row, col, str, color='', ctr=bool, bold=False, span=0):
-        self.setRowHeight(row, RH)
+        self.setRowHeight(row, self.height) if self.height > 0 else self.setRowHeight(row, RH)
         item = QTableWidgetItem(str)
+        
         if color != '': item.setBackground(QColor(color))
         if ctr: item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        if bold: item.setFont( QFont("Arial", 14, 58))
+        
+        if bold: 
+            item.setFont( QFont("Arial", 13, 58))
+        elif span == 7:
+            item.setFont(QFont("Arial", 14, bold))
+        else:
+            item.setFont(QFont("Arial", 12))
+                            
         if span == 2: 
             self.setSpan(row, 0, 1, 2) 
         elif span == 3:
             self.setSpan(row, 0, 1, 3) 
+     
         self.setItem(row, col, item)
                              
 ### --------------------------------------------------------  

@@ -10,7 +10,6 @@ from dotsShared         import singleKeys
 from dotsSideCar        import SideCar
 from dotsMapMaker       import MapMaker
 from dotsSideGig        import Grid
-from dotsShared         import ControlKeys
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -83,8 +82,11 @@ class ControlView(QGraphicsView):
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
         key = e.key() 
-        mod = e.modifiers()
-     
+        mod = e.modifiers()     
+        self.sendIt(key, mod)
+        
+    def sendIt(self, key, mod):
+
 ### ------------- single keys without modifiers -------------     
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
@@ -116,7 +118,7 @@ class ControlView(QGraphicsView):
                           
         elif key == Qt.Key.Key_F:
             if self.canvas.pathMakerOn == False:  
-                self.canvas.flopSelected()  ## yep
+                self.canvas.flopSelected() 
             else:
                 self.setKey('F')
                                      
@@ -126,18 +128,12 @@ class ControlView(QGraphicsView):
             else:
                  self.setKey('H')  ## help 
                  
-        elif key == Qt.Key.Key_L and \
-            mod & Qt.KeyboardModifier.ShiftModifier:  ##  ## toggles sprites locked on/off
-                self.sideCar.toggleSprites()  ## this lets 'L' pass
-                                     
-        elif key == Qt.Key.Key_O:                
-            if mod & Qt.KeyboardModifier.ShiftModifier:   
-                self.sideCar.clearWidgets()            
-                self.sideCar.hideSelectedShadows()  ## toggles display on/off if pix is selected
-                self.sideCar.toggleOutlines()
+        elif key == Qt.Key.Key_L:
+            if mod & Qt.KeyboardModifier.ShiftModifier:  ##  ## toggles sprites locked on/off
+                self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass
             else:
-                self.setKey('O')
-                   
+                 self.setKey('L')  ## help 
+                     
         elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect
             if mod & Qt.KeyboardModifier.ShiftModifier:  ## sprites and shadows
                 self.sideCar.resetAll()  
@@ -147,13 +143,13 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off
             if mod & Qt.KeyboardModifier.ShiftModifier and \
                 self.canvas.control == '':
-                    self.sideCar.toggleShadows()  ## does them all                            
+                    self.sideCar.toggleShadowLinks()  ## does them all                            
             else:
                 self.setKey('S')  
                                                           
         elif key == Qt.Key.Key_T:  ## toggles tags display on/off both link and lock
             if mod & Qt.KeyboardModifier.ShiftModifier:      
-                self.mapper.toggleTagItems('all') 
+                self.sideCar.toggleTagItems('all') 
             else:
                 self.setKey('T')  
              

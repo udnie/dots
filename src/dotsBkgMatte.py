@@ -9,7 +9,7 @@ from PyQt6.QtWidgets    import QWidget
    
 from dotsShared         import common, paths
 from dotsSideGig        import getVuCtr, MsgBox
-from dotsTableModel     import TableWidgetSetUp, QC, QL
+from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 
 matteKeys = {
     'B':    'Black Matte Color',  
@@ -242,10 +242,10 @@ class MatteHelp:
         if self.switch == '':
             self.matte.help = True  ## let's the widget know the help menu is open
 
-        self.table = TableWidgetSetUp(75, 180, len(matteKeys)+3)
+        self.table = TableWidgetSetUp(75, 170, len(matteKeys)+4,0,28)
         self.table.itemClicked.connect(self.clicked)         
   
-        width, height = 262, 517
+        width, height = 252, 511
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f"{' Matte KeyBoard Help ':<23}",'',True,True,2)
@@ -264,13 +264,14 @@ class MatteHelp:
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1
      
-        self.table.setRow(row, 0, f'{"Click Here to Close Menu  ":<26}' ,'',True,True, 2)
+        self.table.setRow(row,      0, f'{"Enter Key or Select From Above "}',QH,True,True, 2) 
+        self.table.setRow(row + 1,  0, f'{"Click Here to Close Menu  ":<26}' ,'',True,True, 2)
    
         x, y = getVuCtr(self.canvas)    
         
         self.table.move(int(x - width /2), int(y - height /2))
         self.table.show()
-         
+            
     def clicked(self):
         if self.switch == '':
             try:
@@ -286,7 +287,7 @@ class MatteHelp:
             self.matte.help = False
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('M')
+            self.canvas.setKeys('N')
     
     
 ### -------------------- dotsBkgMatte ----------------------        

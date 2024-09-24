@@ -8,6 +8,8 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
 
 from dotsSideGig        import getVuCtr
 
+SpinDrift = QColor('#70fad3')
+
 ### -------------------- dotsPathWidget---------------------       
 class PathWidget(QWidget): 
 ### -------------------------------------------------------- 
@@ -53,10 +55,13 @@ class PathWidget(QWidget):
                                          
         self.show()
                 
-        if self.switch == 'on':
+        if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')
-            self.move(x+75, y+5)      
+            if self.switch == 'on':
+                self.move(x+75, y+5)                  
+            else:
+                self.move(x-500,y-130)
                             
 ### -------------------------------------------------------- 
     def paintEvent(self, e):
@@ -65,7 +70,7 @@ class PathWidget(QWidget):
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
         painter.setPen(QPen(QColor(0,65,255), 5, Qt.PenStyle.SolidLine,            
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
-        painter.setBrush(QColor(144,238,144))
+        painter.setBrush(SpinDrift)
         painter.drawRoundedRect(rect, 15, 15)
               
     def mousePressEvent(self, e):
@@ -240,7 +245,7 @@ class PathWidget(QWidget):
             delBtn.clicked.connect(self.pathMaker.delete)
             quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)
         else:
-            quitBtn.clicked.connect(lambda: self.canvas.setKeys('M'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
         
         hbox = QVBoxLayout(self)
 

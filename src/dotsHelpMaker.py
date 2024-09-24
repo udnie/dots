@@ -1,5 +1,5 @@
 
-from dotsShared         import paths  ## for background flat
+
 from dotsSideGig        import *
 from dotsTableModel     import TableWidgetSetUp, QL, QC, QH
 
@@ -8,13 +8,13 @@ from dotsPathWidget     import PathWidget
 from dotsPixWidget      import PixWidget
 from dotsShadowWidget   import ShadowWidget
 
-from dotsBkgMatte       import MatteHelp
-from dotsFrameAndFlats  import FlatHelp
-
 from dotsHelpButtons    import CanvasHelp, StoryHelp
 from dotsHelpMenus      import DemoHelp, ScreenHelp
 from dotsHelpMonkey     import BkgHelp, PixHelp, ShadowHelp
+from dotsHelpDesk       import StoryHelp2, PathHelp2
 
+from dotsBkgMatte       import MatteHelp
+from dotsFrameAndFlats  import FlatHelp
 from dotsPathWorks      import PathHelp
 from dotsPixWorks       import AnimationHelp
 
@@ -24,6 +24,11 @@ switchKeys = {
     'demos':    'Demos, Screens and Animation Help',    ## helpMenus and pixWorks    
     'sprites':  'Sprites, Backgrounds and Shadows',     ## helpMonkey
     'flats':     'Frame, Flats and Matte Help',          ## in flat and frames and bkgMatte
+    'story':    'StoryBoard Menus',  
+    'pix':      'Sprite/PixItem Widget and Menu', 
+    'bkg':      'Background Widget and Menu', 
+    'path':     'PathMaker Widget and Menus',
+    'shadow':   'Shadow Widget and Menu',
 }
 
 SpinDrift = QColor('#73fcd6')
@@ -51,6 +56,9 @@ class HelpMaker:  ## the help menus
         self.canvas.clear()
         self.canvas.bkgMaker.setBkgColor(SpinDrift)
         self.switchHelp =  MainMenu(self.canvas)
+        
+        self.canvas.openPlayFile = 'menu'  ## blocks helpbutton and 'H' and 'M' keys
+        self.canvas.btnHelp.setEnabled(False)  
 
 ### --------------------------------------------------------     
 class  MainMenu: 
@@ -60,90 +68,89 @@ class  MainMenu:
    
         self.canvas = canvas  
         self.scene = self.canvas.scene
+        self.sideCar = self.canvas.sideCar
              
-        self.bkg = None
-
         self.table = TableWidgetSetUp(0, 260, len(switchKeys)+3)
         self.table.itemClicked.connect(self.clicked)                                      
         self.table.setRow(0, 0, f'{"Help Menus":<15}','',True,True,2) 
         
-        row = 1;  self.fix = []
+        row = 1; self.lst = []
         for k, val in switchKeys.items():
-            self.fix.append(k)
+            self.lst.append(k)
             self.table.setRow(row, 0, val,'', True, True, 2)
             row += 1
    
         self.table.setRow(row, 0,f'{"Select From Above":<20}',QL,True,True, 2)
         self.table.setRow(row + 1, 0,f'{"Click Here to Close":<20}','',True,True, 2)
      
-        self.table.setFixedSize(266, 247)    
+        self.table.setFixedSize(266, 395)    
         x, y = getVuCtr(self.canvas)  
          
         if self.canvas.dots.Vertical:
             y = y - 60          
       
-        self.table.move(x-137, y-100)                
+        self.table.move(x-135, y-180)                
         self.table.show() 
            
     def clicked(self):  
-        p = self.table.currentRow() - 1 
-        if p+1 <= len(switchKeys): 
-            help = self.fix[p].strip()    
+        p = self.table.currentRow() - 1  ## position in lst to key   
+        if p+1 <= len(switchKeys):       ## is it valid           
+            help = self.lst[p].strip()    
+            
+            self.sideCar.clearWidgets()
+            self.canvas.bkgMaker.setBkgColor(SpinDrift)  
+            
             if help == 'buttons':
-                self.buttonHelp('on')
-            elif help == 'sprites':
-                self.screenitems('on') 
+                self.canvasHelp = CanvasHelp(self, self.canvas, -350, 'on')
+                self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on')
+                self.pathHelp   = PathHelp(self, self.canvas, 350, 'on')
+                
+            elif help == 'sprites': 
+                self.bkgHelp    = BkgHelp(self.canvas,0, 'on')
+                self.shadowHelp = ShadowHelp(self.canvas, 350, 'on')
+                self.pixHelp    = PixHelp(self.canvas, -350, 'on')  
+                
             elif help == 'demos':  
-                self.makeDemoMenu()
+                self.demoHelp   = DemoHelp(self.canvas, -325, 'on')
+                self.screenHelp = ScreenHelp(self.canvas, 0, 'on')
+                self.animeHelp  = AnimationHelp(self.canvas, QPoint(), 'on', 225)
+                
             elif help == 'flats':  
-                self.makeFlatMenu()
-            elif help == 'widgets':  
-                self.widgetsHelp()     
+                self.flatHelp   = FlatHelp(self, self.canvas, -350, 'flat', 'on')
+                self.matteHelp = MatteHelp(self.canvas, None, 0, 'on')
+                self.frameHelp = FlatHelp(self, self.canvas, 350, 'frame', 'on')
+                
+            elif help == 'widgets': 
+                bkg    = BkgWidget(self.canvas, None, 'on')
+                pix    = PixWidget(self.canvas, 'on')
+                path   = PathWidget(self.canvas, None, 'on')
+                shadow = ShadowWidget(self.canvas, None, 'on')
+  
+            elif help == 'story':  
+                self.storyHelp  = StoryHelp(self, self.canvas, -200, 'on') 
+                self.storyHelp2 = StoryHelp2(self.canvas, 215, 'on')
+        
+            elif help == 'pix':  
+                self.pixWidget = PixWidget(self.canvas, 'all')
+                self.pixHelp   = PixHelp(self.canvas, 215, 'all')   
+                
+            elif help == 'path':
+                self.pathWidget = PathWidget(self.canvas, '', 'all')
+                self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
+                self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')  
+                
+            elif help == 'bkg':   
+                bkg = BkgWidget(self.canvas, 0, 'all')
+                self.bkgHelp = BkgHelp(self.canvas, 250, 'all')
+                
+            elif help == 'shadow':   
+                shadow = ShadowWidget(self.canvas, 0, 'all')
+                self.shadowHelp = ShadowHelp(self.canvas, 200, 'all')
+                
         else:
             self.table.close() 
             self.canvas.clear()   
                  
-    def buttonHelp(self, str=''):
-        self.canvas.clear()
-        self.canvas.bkgMaker.setBkgColor(SpinDrift)
-    
-        self.canvasHelp = CanvasHelp(self, self.canvas, -350, str)
-        self.storyHelp  = StoryHelp(self, self.canvas, 0, str)
-        self.pathHelp   = PathHelp(self, self.canvas, 350, str)
- 
-    def widgetsHelp(self):
-        self.canvas.clear()
-        self.canvas.bkgMaker.setBkgColor(SpinDrift)
- 
-        bkg    = BkgWidget(self.canvas, None, 'on')
-        pix    = PixWidget(self.canvas, 'on')
-        path   = PathWidget(self.canvas, None, 'on')
-        shadow = ShadowWidget(self.canvas, None, 'on')
-               
-    def makeDemoMenu(self):
-        self.canvas.clear()
-        self.canvas.bkgMaker.setBkgColor(SpinDrift)
-      
-        self.demoHelp   = DemoHelp(self.canvas, -325, 'on')
-        self.screenHelp = ScreenHelp(self.canvas, 0, 'on')
-        self.animeHelp  = AnimationHelp(self.canvas, QPoint(), 'on', 225)
-             
-    def screenitems(self, str=''): 
-        self.canvas.clear()
-        self.canvas.bkgMaker.setBkgColor(SpinDrift)
-   
-        self.bkgHelp    = BkgHelp(self.canvas,0, str)
-        self.shadowHelp = ShadowHelp(self.canvas, 350, str)
-        self.pixHelp    = PixHelp(self.canvas, -350, str)                
- 
-    def makeFlatMenu(self):
-        self.canvas.clear()
-        self.canvas.bkgMaker.setBkgColor(SpinDrift)
-        
-        self.flatHelp    = FlatHelp(self, self.canvas, -350, 'flat', 'on')
-        self.matteHelp  = MatteHelp(self.canvas, None, 0, 'on')
-        self.frameHelp  = FlatHelp(self, self.canvas, 350, 'frame', 'on')
-    
 ### -------------------- dotsHelpMaker --------------------- 
 
 

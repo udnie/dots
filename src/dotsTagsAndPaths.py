@@ -166,16 +166,16 @@ class TagsAndPaths:
     
             color = 'orange'
             zval = pix.zValue()
-                
+          
         elif pix.type == 'shadow':
             if pix.maker.linked == True:
                 tag = 'Linked ' + tag
             else:
-                 tag = 'UnLinked ' + tag
+                tag = 'UnLinked ' + tag
       
             color = 'lightgreen'
             zval = pix.zValue()
-            
+   
         if pix.zValue() == topZVal:  ## set to front ZValue
             color = 'yellow'
 
@@ -183,10 +183,7 @@ class TagsAndPaths:
             y = y - 20
         else:
             token = self.canvas.control
-            
-            
-       
-                  
+          
         self.TagItTwo(token, tag, color, x, y, zval)
         
     ## this way I can stretch it for backgrounds and pixitems

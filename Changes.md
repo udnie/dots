@@ -32,6 +32,9 @@ Missed an escape character in a menu and moved some code around.  Updated to Pyt
 **September 16 2024**  
 Updates to the StoryBoard Help Menu, the **'Shift-T'** is also now clickable. It displays tags for sprites locked and unlocked and for shadows linked and unlinked.  
 
+**September 23 2024**  
+Fixed a bug with the **Canvas** help button not toggling off/on. Added two more help menus that extend  **StoryBoard** and **PathMaker** as well as five additional help menus that paired the widget and it's menu(s), or in the case of **StoryBoard**, its two menus.
+
 ---
 
 **July 2024**   

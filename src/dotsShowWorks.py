@@ -21,7 +21,8 @@ class ShowWorks:
 
         self.canvas = parent
         self.scene  = self.canvas.scene
-        
+        self.pathMaker = self.canvas.pathMaker
+                
         self.helpButton = ButtonHelp(self.canvas)
              
 ### --------------------------------------------------------  

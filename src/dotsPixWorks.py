@@ -53,10 +53,7 @@ class AnimationHelp:
         if self.token == 'pix':
             b = self.pixitem.boundingRect()
             width = b.width() + 20
-            
-        elif self.token != 'on':
-            width = width * .50   
-            
+             
         elif self.token == 'on':    
             x, y = getVuCtr(self.pixitem.canvas)
             pos = QPoint(x + off, int(y - (height/2)) + 50)
@@ -94,14 +91,14 @@ class AnimationHelp:
     def closeMenu(self):   
         self.table.close()
         if self.token == 'on':
-            self.canvas.setKeys('M')
+            self.canvas.setKeys('N')
             
     def setTag(self, tag):
         if self.mapper.tagSet and tag == 'Clear Tags':
             self.mapper.clearTagGroup()  
              
         for pix in self.scene.selectedItems(): 
-            if pix.type == 'pix':       
+            if pix.type in( 'pix', 'shadow'):     
                 if tag == 'Clear Tags':
                     pix.tag = ''
                 else:

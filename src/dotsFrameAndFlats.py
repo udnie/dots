@@ -35,10 +35,10 @@ class FlatHelp:  ## flat and frame keyboard help for both
         self.canvas = canvas
         self.switch = switch
     
-        self.table = TableWidgetSetUp(60, 170, len(flatKeys)+3)
+        self.table = TableWidgetSetUp(55, 155, len(flatKeys)+3)
         self.table.itemClicked.connect(self.clicked)         
   
-        width, height = 236, 306
+        width, height = 216, 306
         self.table.setFixedSize(width, height)
  
         if str == 'flat':
@@ -48,14 +48,14 @@ class FlatHelp:  ## flat and frame keyboard help for both
         
         row = 1
         for k , val in flatKeys.items():
-            self.table.setRow(row, 0, k, '',True, True)
+            self.table.setRow(row, 0, k, '',True, True, 7)
             self.table.setRow(row, 1, "  " + val, '',False, True)
             row += 1
         
         if str == 'flat':
-            self.table.setRow(row, 0, f"{'Hold Down Key - Click on Flat':<38}",QL,True,True,2)
+            self.table.setRow(row, 0, f"{'Hold Down Key - Click on Flat':<25}",QL,True,True,2)
         else:
-            self.table.setRow(row, 0, f"{'Hold Down Key - Click on Frame':<35}",QL,True,True,2)
+            self.table.setRow(row, 0, f"{'Hold Down Key - Click on Frame':<25}",QL,True,True,2)
               
         self.table.setRow(row+1, 0,f'{"Click Here to Close Menu  ":<20}' ,'',True,True, 2)
           
@@ -79,7 +79,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
     def closeMenu(self):   
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('M')
+            self.canvas.setKeys('N')
                                                                               
 ### -------------------------------------------------------- 
 class Flat(QGraphicsPixmapItem):
