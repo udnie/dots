@@ -6,7 +6,7 @@ from PyQt6.QtCore       import QTimer
 from dotsSideGig        import *
 from dotsTableModel     import TableWidgetSetUp, QL, QC, QH
 
-pixKeys = {
+pixKeys = {  ## sprites
     ' F ':      'Flop It',   
     ' H ':      'This Help Menu',
     ' T ':      'Toggle Lock',
@@ -36,7 +36,6 @@ bkgHelpKeys = {
 }
 
 shadowKeys = {
-    ' ** ':     'DblClick Toggles Outline',
     ' H ':      'This Help Menu',
     ' T ':      'Toggles Link', 
     ' / ':      'Update Shadow',
@@ -44,7 +43,8 @@ shadowKeys = {
     'del':      'delete from screen', 
     'enter':    'move to the front',
     'return':   'move to the front',   
-    'shift':    'move back one ZValue',      
+    'shift':    'move back one ZValue',  
+    'dlbclk':   'DblClick Toggles Outline',    
 }
 
 ## avoids a circular reference
@@ -120,7 +120,10 @@ class PixHelp:
         if self.switch == '' or self.switch == 'pix':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help == '\\': help = 'tag'
+                if help == '\\': 
+                    help = 'tag'
+                elif help == 'dlbclk':
+                    self.closeMenu()
                 if help != 'H' and help in self.pixitem.sharedKeys:
                     QTimer.singleShot(25, partial(self.pixitem.shared, help))  
             except:
@@ -129,7 +132,7 @@ class PixHelp:
 
     def closeMenu(self): 
         self.table.close()
-        if self.switch !='' and self.switch != 'pix':
+        if self.switch != '' and self.switch != 'pix':
             self.pixitem.canvas.setKeys('N')
     
 ### --------------------- dotsBkgHelp ----------------------       
@@ -178,7 +181,7 @@ class BkgHelp:
        
     def closeMenu(self):
         self.table.close()
-        if self.switch !='':
+        if self.switch != '':
             self.bkgItem.canvas.setKeys('N')  
      
 ### ------------------- dotsShadowHelp ---------------------    
@@ -200,10 +203,14 @@ class ShadowHelp:
 
         row = 1
         for k , val in shadowKeys.items():
-            self.table.setRow(row, 0, k,'',True,True)
-            self.table.setRow(row, 1, "  " + val,'','',True)
+            if k == 'dlbclk':
+                self.table.setRow(row, 0, k,QC,True,True)
+                self.table.setRow(row, 1, "  " + val,QC,'',True)      
+            else:
+                self.table.setRow(row, 0, k,'',True,True)
+                self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
-        
+   
         self.table.setRow(row,     0, f'{"Hold Down Key and Click on Shadow   ":<35}',QL,True, True,2)       
         self.table.setRow(row + 1, 0, f'{"Click Here to Close  ":<22}','',True, True, 2)
     
@@ -236,7 +243,7 @@ class ShadowHelp:
 
     def closeMenu(self):   
         self.table.close()  
-        if self.switch !='' and self.switch != 'pix':
+        if self.switch != '' and self.switch != 'pix':
             self.maker.canvas.setKeys('N')  
              
 ### -------------------- dotsHelpMonkey -------------------- 

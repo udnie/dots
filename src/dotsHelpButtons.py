@@ -13,11 +13,11 @@ canvasKeys = {
     'A':    'Add a Background', 
     'D':    'Display the Demo Menu',
     'G':    'Toggle Grid',
-    'H':    'THis Help Menu',
+    'H':    'This Help Menu',
     'J':    'JSON File Viewer',
     'K':    'Toggle KeysPanel',
     'L':    'Load a play file', 
-    'M':    'Help Menus',
+    'Menu': 'Help Menus',
     'P':    'Switch to PathMaker', 
     'S':    'Display the Screen Menu',
     'X':    'X, Q, Escape to Quit',
@@ -149,6 +149,7 @@ class CanvasHelp:
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help in canvasKeys.keys():
+                    if help == 'Menu': help = 'M'
                     if help in PlayKeys:
                         QTimer.singleShot(25, partial(self.canvas.showbiz.keysInPlay, help)) 
                     elif help == 'K':

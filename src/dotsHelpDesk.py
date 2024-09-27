@@ -14,7 +14,8 @@ storyKeys = {
     'Shift-S': 'Toggle Shadow Links',  
     'Shift-T': 'Toggle Tag Display',   
     'Cmd':  'Drag to Select',
-    'M':    'Map Selected',     
+    'M':    'Move Selected off/on',
+    'U':    'UnSelect - End',     
 }
 
 pathKeys = {             
@@ -59,7 +60,7 @@ class StoryHelp2:
         self.table = TableWidgetSetUp(65, 170, len(storyKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 242, 396
+        width, height = 242, 426
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}','',True,True,2)

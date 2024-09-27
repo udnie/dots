@@ -49,15 +49,6 @@ class AnimationHelp:
         
         width, height = 191, 426
         self.table.setFixedSize(width, height)
-       
-        if self.token == 'pix':
-            b = self.pixitem.boundingRect()
-            width = b.width() + 20
-             
-        elif self.token == 'on':    
-            x, y = getVuCtr(self.pixitem.canvas)
-            pos = QPoint(x + off, int(y - (height/2)) + 50)
-            width = 0
                          
         self.table.setRow(0, 0, f"{'Animations and Paths':<17}",'',True,True,2)  
         
@@ -70,7 +61,21 @@ class AnimationHelp:
         self.table.setRow(row + 1, 0,f'{"Clear Tags":<14}',QL,True,True, 2)       
         self.table.setRow(row + 2, 0,f'{"Click Here to Close Menu":<23}','',True,True, 2)
 
-        self.table.move(int(pos.x()) + int(width), int(pos.y())-50)
+        x, y = getVuCtr(self.pixitem.canvas)
+        z = 50
+        
+        if self.token == 'pix':  ## from the sprite
+             b = self.pixitem.boundingRect()
+             width = b.width() + 20      
+        elif self.token == 'on':  ## from menus 
+             x, y = getVuCtr(self.pixitem.canvas)
+             pos = QPoint(x + off, int(y - (height/2)) + 50)
+             width = 0           
+        else:
+            width, z = width/2, 100  ## from storyboard
+                     
+        self.table.move(int(pos.x()) + int(width), int(pos.y())-z)
+
         self.table.show() 
                 
     def clicked(self):   

@@ -288,7 +288,7 @@ class StoryBoard(QWidget):
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):  ## works if sprites are selected
         if len(self.scene.selectedItems()) > 0:  ## don't remove e
-            self.nowhere = AnimationHelp(self, QCursor.pos(),'',0)
+            self.nowhere = AnimationHelp(self, QCursor.pos(),'')
       
 ### -------------------- dotsStoryBoard --------------------
 

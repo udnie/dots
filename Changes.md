@@ -35,8 +35,10 @@ Updates to the StoryBoard Help Menu, the **'Shift-T'** is also now clickable. It
 **September 23 2024**  
 Fixed a bug with the **Canvas** help button not toggling off/on. Added two more help menus that extend  **StoryBoard** and **PathMaker** as well as five additional help menus that paired the widget and it's menu(s), or in the case of **StoryBoard**, its two menus.
 
----
+**September 27 2024**
+Fixed a typo in menus.
 
+---
 **July 2024**   
 Uncommented something that I had over-zealously commented out - affected only shadows in the demos. Plus, a few other bug fixes and lots of testing.
 

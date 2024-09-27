@@ -81,13 +81,12 @@ class BkgMaker(QWidget):
                                
 ### --------------------------------------------------------
     def openFlatFile(self, file):  ## read from .bkg file - a 'flat'
-        if self.canvas.pathMakerOn == False:
-            try:
-                with open(file, 'r') as fp:
-                    self.setBkgColor(QColor(fp.readline()))
-            except IOError:
-                MsgBox('openFlatFile: Error reading file', 5)
-                return
+        try:
+            with open(file, 'r') as fp:
+                self.setBkgColor(QColor(fp.readline()))
+        except IOError:
+            MsgBox('openFlatFile: Error reading file', 5)
+            return
 
     def bkgColor(self):  ## from button or widget   
         if self.canvas.control in ControlKeys:  ## running animation

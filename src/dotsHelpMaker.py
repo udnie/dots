@@ -24,11 +24,11 @@ switchKeys = {
     'demos':    'Demos, Screens and Animation Help',    ## helpMenus and pixWorks    
     'sprites':  'Sprites, Backgrounds and Shadows',     ## helpMonkey
     'flats':     'Frame, Flats and Matte Help',          ## in flat and frames and bkgMatte
-    'story':    'StoryBoard Menus',  
-    'pix':      'Sprite/PixItem Widget and Menu', 
     'bkg':      'Background Widget and Menu', 
-    'path':     'PathMaker Widget and Menus',
     'shadow':   'Shadow Widget and Menu',
+    'pix':      'Sprite/PixItem Widget and Menu',   
+    'story':    'StoryBoard Menus',  
+    'path':     'PathMaker Widget and Menus',
 }
 
 SpinDrift = QColor('#73fcd6')
@@ -89,7 +89,7 @@ class  MainMenu:
         if self.canvas.dots.Vertical:
             y = y - 60          
       
-        self.table.move(x-135, y-180)                
+        self.table.move(x-135, y-210)                
         self.table.show() 
            
     def clicked(self):  
@@ -125,20 +125,7 @@ class  MainMenu:
                 pix    = PixWidget(self.canvas, 'on')
                 path   = PathWidget(self.canvas, None, 'on')
                 shadow = ShadowWidget(self.canvas, None, 'on')
-  
-            elif help == 'story':  
-                self.storyHelp  = StoryHelp(self, self.canvas, -200, 'on') 
-                self.storyHelp2 = StoryHelp2(self.canvas, 215, 'on')
-        
-            elif help == 'pix':  
-                self.pixWidget = PixWidget(self.canvas, 'all')
-                self.pixHelp   = PixHelp(self.canvas, 215, 'all')   
-                
-            elif help == 'path':
-                self.pathWidget = PathWidget(self.canvas, '', 'all')
-                self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
-                self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')  
-                
+                             
             elif help == 'bkg':   
                 bkg = BkgWidget(self.canvas, 0, 'all')
                 self.bkgHelp = BkgHelp(self.canvas, 250, 'all')
@@ -146,7 +133,19 @@ class  MainMenu:
             elif help == 'shadow':   
                 shadow = ShadowWidget(self.canvas, 0, 'all')
                 self.shadowHelp = ShadowHelp(self.canvas, 200, 'all')
-                
+                    
+            elif help == 'pix':  
+                self.pixWidget = PixWidget(self.canvas, 'all')
+                self.pixHelp   = PixHelp(self.canvas, 215, 'all') 
+  
+            elif help == 'story':  
+                self.storyHelp  = StoryHelp(self, self.canvas, -200, 'on') 
+                self.storyHelp2 = StoryHelp2(self.canvas, 215, 'on')
+                  
+            elif help == 'path':
+                self.pathWidget = PathWidget(self.canvas, '', 'all')
+                self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
+                self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')          
         else:
             self.table.close() 
             self.canvas.clear()   
