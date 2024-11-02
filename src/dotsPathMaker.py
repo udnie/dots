@@ -5,7 +5,7 @@ from PyQt6.QtCore       import Qt, QEvent, QPoint, pyqtSlot
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QWidget, QGraphicsPolygonItem, QGraphicsPathItem
                
-from dotsSideGig        import MsgBox, distance, getCtr, getVuCtr, getPathList
+from dotsSideGig        import MsgBox, distance, getCtr, getPathList
 from dotsShared         import common, MoveKeys
 
 from dotsPathWays       import PathWays
@@ -29,7 +29,6 @@ class PathMaker(QWidget):
         self.canvas    = parent  
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
-        self.keysPanel = self.canvas.keysPanel
         self.dots      = self.canvas.dots  
          
         self.widget  = None
@@ -195,13 +194,19 @@ class PathMaker(QWidget):
         else:
             self.canvas.pathMakerOn = True 
             self.initThis()
-            if not self.keysPanel.pathKeysSet:
-                self.keysPanel.toggleKeysMenu()
+            if not self.canvas.keysPanel.pathKeysSet:
+                self.canvas.sideCar.toggleKeysMenu()
             self.pathWorks.turnGreen()
             self.pathWorks.addWidget()  ## on start up 
                                                                        
     def delete(self):
         self.pathWorks.stopPathTest()
+        
+        if self.canvas.animation == True:  ## turns off video as well
+            self.canvas.showbiz.showtime.stop('clear') 
+        elif self.canvas.video != None:  ## make sure it's stopped
+            self.canvas.video.stopVideo()
+
         self.editingPts == False
         self.edits.deleteLasso()    ## reset cursor
         self.edits.deleteNewPath()  ## turns green if nothing else
@@ -220,8 +225,8 @@ class PathMaker(QWidget):
             self.delete()   
             self.canvas.pathMakerOn = False
             self.canvas.sideCar.clearWidgets()
-            if self.keysPanel.pathKeysSet:
-                self.keysPanel.toggleKeysMenu()
+            if self.canvas.keysPanel.pathKeysSet:
+                self.canvas.sideCar.toggleKeysMenu()
             self.canvas.btnPathMaker.setStyleSheet('background-color: white')
             self.canvas.showWorks.enablePlay()
         self.canvas.setFocus()

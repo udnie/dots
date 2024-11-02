@@ -279,7 +279,7 @@ class ShadowMaker:
 ### --------------------------------------------------------   
     def openMenu(self):
         self.works.closeWidget()  
-        self.help = ShadowHelp(self,0,'pix')  
+        self.help = ShadowHelp(self, 0,'pix')  
     
     def getXY(self):  ## there's a makeXY in pixworks but this one is for shadows
         p = self.shadow.pos()

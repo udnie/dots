@@ -2,6 +2,8 @@
 from functools          import partial
 
 from PyQt6.QtCore       import QTimer
+from dotsHelpDesk       import StoryHelp2
+from PyQt6.QtGui        import QKeySequence
 
 from dotsSideGig        import getVuCtr, Grid
 from dotsShared         import PlayKeys 
@@ -61,7 +63,6 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
         self.canvas = parent 
         self.scene  = self.canvas.scene
        
- 
         self.canvasFlag = False
         self.storyFlag  = False
         self.pathFlag   = False
@@ -152,10 +153,8 @@ class CanvasHelp:
                     if help == 'Menu': help = 'M'
                     if help in PlayKeys:
                         QTimer.singleShot(25, partial(self.canvas.showbiz.keysInPlay, help)) 
-                    elif help == 'K':
-                        self.canvas.sideCar.toggleKeysMenu()  
-                    elif help == 'G':
-                        self.grid.toggleGrid()
+                    elif help in ('G','K'):
+                        self.canvas.view.sendIt(QKeySequence(help), None)  
             except:
                 None          
         self.closeMenu()
@@ -164,7 +163,7 @@ class CanvasHelp:
         self.helpButton.canvasFlag = False 
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('N')
+            self.canvas.showbiz.keysInPlay('N')
     
 ### --------------------------------------------------------     
 class StoryHelp: 
@@ -231,7 +230,7 @@ class StoryHelp:
         self.helpButton.storyFlag = False  
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('N')
+            self.canvas.showbiz.keysInPlay('N')
                 
 ### ------------------- dotsHelpButtons -------------------- 
   

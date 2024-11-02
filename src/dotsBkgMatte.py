@@ -190,18 +190,18 @@ class Matte(QWidget):  ## opens itself
             
         self.update()
   
-### --------------------------------------------------------   
+### --------------------------------------------------------  
     def scaleUp(self):      
-        wuf = self.border
+        wuf = self.border    ## self.border = 30  
         if self.border == 5:
             self.border = 12     
         elif self.border == 12: 
-            self.border = self.step  
+            self.border = self.step    ## self.step = 27
         elif self.border >= self.step:
             self.border += self.step + 2
         if self.border == wuf: 
             self.border = 12  ## stuck, next size up            
-        if self.y-(self.border*self.ratio) < self.stop:
+        if self.y-(self.border*self.ratio) < self.stop:  ## self.stop = 50 = (min y.() - Max Headroom) 
             self.border = wuf  ## back it off - top of screen display
             MsgBox('  Max Headroom  ', 5)  ## can vary 
                    
@@ -287,9 +287,8 @@ class MatteHelp:
             self.matte.help = False
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('N')
-    
-    
+            self.canvas.showbiz.keysInPlay('N')
+  
 ### -------------------- dotsBkgMatte ----------------------        
 
         

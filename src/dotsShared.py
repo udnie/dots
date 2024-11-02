@@ -22,20 +22,7 @@ common = {  ## wherever it's needed
     'V':           12.0,  ## diameter of pointItems in shadows
     'widgetXY': (25,25),  ## position pathWidget and BkgWidget 
 } 
-
-screens = {  ## used by helpmenus and dots
-    '1080': ('1080X720',  '3:2'),
-    '1280': ('1280X720', '16:9'),
-    '1215': ('1215X810',  '3:2'),
-    '1440': ('1440X810', '16:9'),
-    '1296': ('1296X864',  '3:2'),
-    '1536': ('1536X864', '16:9'),
-     '900':  ('600X900',  '2:3'),    
-     '912':  ('513X912', '9:16'),
-    '1024': ('576X1024', '9:16'),
-    '1102': ('620X1102', '9:16'),
-}
-       
+ 
 ### --------------------------------------------------------
 CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
 
@@ -55,7 +42,7 @@ paths = {
     'demo':         './../demo/',
 }
 
-Tick = 2.0
+Tick = 3.0
 
 ControlKeys = ('resume','pause')
 
@@ -119,6 +106,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_B: 'B',     
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
+    Qt.Key.Key_F: 'F',
     Qt.Key.Key_H: 'H', 
     Qt.Key.Key_J: 'J', 
     Qt.Key.Key_K: 'K',  

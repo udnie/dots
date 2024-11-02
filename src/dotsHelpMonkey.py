@@ -15,10 +15,11 @@ pixKeys = {  ## sprites
     'enter':    'move to the front',
     'return':   'move to the front',   
     'shift':    'move back one ZValue', 
-    'opt':      'Drag using Mouse to Clone', 
+    'opt':      'drag Mouse to Clone', 
      '_/+':  'Rotate 1 deg',  
     '-/=':  'Rotate 15 deg',
     '[/]':  'Rotate 45 deg',
+    '{/}':  'Rotate 90 deg',
     '</>':  'Toggle Size',  
 }
           
@@ -68,50 +69,48 @@ class PixHelp:
     def __init__(self, parent, off=0, switch=''):
         super().__init__()  
    
-        self.pixitem = parent ## pixitem   
+        self.pixitem = parent  ## pixitem   
         self.canvas = self.pixitem.canvas
         
         self.switch = switch
                       
-        self.table = TableWidgetSetUp(50, 190, len(pixKeys)+6)
+        self.table = TableWidgetSetUp(50, 165, len(pixKeys)+6)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 246, 577
+        width, height = 221, 607
         self.table.setFixedSize(width, height)
                           
         self.table.setRow(0, 0, f'{"Sprite/PixItem Help Menu":<25}','',True, True, 2)
         
         row = 1
-        for k , val in pixKeys.items():    
+        for k, val in pixKeys.items():    
             if row == 10:
-                self.table.setRow(row,      0, f'{"These Commands Require A Keyboard     "}',QC,True,True, 2) 
-                self.table.setRow(row + 1,  0, f'{"And Sprites Are Selected "}',QC,True,True, 2) 
-                row = 12  
-                
+                self.table.setRow(row,      0, f'{"Additional KeyBoard Commands  "}',QC,True,True, 2) 
+                self.table.setRow(row + 1,  0, f'{"if Sprites Are Selected "}',QC,True,True, 2) 
+                row = 12          
+            if row < 10:                 
+                self.table.setRow(row, 0, k, '',True,True)
+                self.table.setRow(row, 1, "  " + val,'','',True)    
             if row >= 12:
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val, QL,'',True)
-            else:                  
-                self.table.setRow(row, 0, k, '',True,True)
-                self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
         
-        self.table.setRow(row,      0, f'{"Hold Down Key and Click on Sprite   ":<35}',QC,True, True,2) 
-        self.table.setRow(row + 1,  0, f'{"Enter Key or Select From Above   "}',QH,True,True, 2)     
+        self.table.setRow(row,      0, f'{"Hold Down Key - Click on Sprite ":<25}',QC,True, True,2) 
+        self.table.setRow(row + 1,  0, f'{"Enter Key or Select From Above "}',QH,True,True, 2)     
         self.table.setRow(row + 2,  0,  f"{'Click Here to Close':<22}",'',True,True, 2)
     
-        x, y = getVuCtr(self.pixitem.canvas)  ## need the 'y'
-    
+        x, y = getVuCtr(self.pixitem.canvas)  ## need the 'y'        
+                
         if self.switch != 'pix':
             if off != 0: x += off
-            x = int(x - width /2)  
-            y = int(y - height /2) 
+            x = int(x - width/2)  
         else: 
-            x, y = self.pixitem.works.makeXY()  ## for 'y'
-            y = int(y - 100)
             b = self.pixitem.boundingRect()
             width = int(b.width() + 20)
             x = int(off + width)
+     
+        y = int(y - height/2)  ## default
      
         self.table.move(x, y)     
         self.table.show()  
@@ -133,8 +132,8 @@ class PixHelp:
     def closeMenu(self): 
         self.table.close()
         if self.switch != '' and self.switch != 'pix':
-            self.pixitem.canvas.setKeys('N')
-    
+            self.canvas.setKeys('N')
+  
 ### --------------------- dotsBkgHelp ----------------------       
 class BkgHelp: 
 ### -------------------------------------------------------- 
@@ -142,12 +141,13 @@ class BkgHelp:
         super().__init__()  
         
         self.bkgItem = parent 
+        self.canvas = self.bkgItem.canvas
         self.switch = switch 
 
-        self.table = TableWidgetSetUp(50, 200, len(bkgHelpKeys)+4)
+        self.table = TableWidgetSetUp(50, 185, len(bkgHelpKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 256, 427
+        width, height = 241, 427
         
         self.table.setFixedSize(width, height)  
         self.table.setRow(0, 0, f'{"Background Help Menu":<22}','',True,True,2)
@@ -159,7 +159,7 @@ class BkgHelp:
             row += 1
 
         self.table.setRow(row, 0, f"{'Arrow Keys Can Modify ScreenRates ':<15}",QC,True,True, 2)
-        self.table.setRow(row + 1, 0, f'{"Hold Down Key and Click on Background   ":<15}', QL,True, True, 2) 
+        self.table.setRow(row + 1, 0, f'{" Hold Down Key - Click on Background ":<11}', QL,True, True, 2) 
         self.table.setRow(row + 2, 0, f"{'Click Here to Close':<22}",'',True,True, 2)
 
         x, y = getVuCtr(self.bkgItem.canvas)  
@@ -182,8 +182,8 @@ class BkgHelp:
     def closeMenu(self):
         self.table.close()
         if self.switch != '':
-            self.bkgItem.canvas.setKeys('N')  
-     
+            self.canvas.setKeys('N')
+  
 ### ------------------- dotsShadowHelp ---------------------    
 class ShadowHelp:  
 ### --------------------------------------------------------
@@ -191,12 +191,13 @@ class ShadowHelp:
         super().__init__()  
         
         self.maker = parent  
+        self.canvas = self.maker.canvas
         self.switch = switch 
                          
-        self.table = TableWidgetSetUp(50, 180, len(SharedKeys)+4)
+        self.table = TableWidgetSetUp(50, 165, len(SharedKeys)+4)
         self.table.itemClicked.connect(self.clicked)   
  
-        width, height = 236, 366
+        width, height = 221, 366
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f'{" Shadow Help Menu":<20}','',True,True, 2)
@@ -211,21 +212,21 @@ class ShadowHelp:
                 self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
    
-        self.table.setRow(row,     0, f'{"Hold Down Key and Click on Shadow   ":<35}',QL,True, True,2)       
-        self.table.setRow(row + 1, 0, f'{"Click Here to Close  ":<22}','',True, True, 2)
+        self.table.setRow(row,     0, f'{"Hold Down - Click on Shadow ":<21}',QL,True, True,2)       
+        self.table.setRow(row + 1, 0, f'{"Click Here to Close  ":<19}','',True, True, 2)
     
         x, y = getVuCtr(self.maker.canvas) 
 
         if self.switch != 'pix':
             if off != 0: x += off
             x = int(x - width /2)  
-            y = int(y - height /2) 
         else: 
-            x, y = self.maker.getXY() 
-            y = int(y - 80)     
+            x, _ = self.maker.getXY()   
             b = self.maker.shadow.boundingRect()
             width = int(b.width() + 20)
             x = int(x + width)       
+    
+        y = int(y - height /2) 
     
         self.table.move(x, y)          
         self.table.show() 
@@ -244,8 +245,8 @@ class ShadowHelp:
     def closeMenu(self):   
         self.table.close()  
         if self.switch != '' and self.switch != 'pix':
-            self.maker.canvas.setKeys('N')  
-             
+            self.canvas.setKeys('N')
+         
 ### -------------------- dotsHelpMonkey -------------------- 
 
                 

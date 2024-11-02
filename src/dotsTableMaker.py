@@ -22,6 +22,7 @@ ColWidth  = 100  ## seems to be the default sizes on my mac
 RowHeight = 27
 
 ColumnWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
+##                      5,16...
 
 Columns = {  ## set widths by number of columns
     21:  1605,

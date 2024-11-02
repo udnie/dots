@@ -93,7 +93,7 @@ def addKeysDock(self):
     self.dockedWidget.setLayout(layout)
 
     keysDock = self.dockedWidget.layout() 
-    keysDock.addWidget(self.keysPanel)
+    keysDock.addWidget(self.canvas.keysPanel)
     
     return keysDock
 
@@ -183,7 +183,7 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnHelp)
 
     showbiz  = self.showbiz
-    showtime = self.showtime
+    showtime = self.showbiz.showtime
     helpBtn  = self.helpButton
   
     self.btnHelp.clicked.connect(helpBtn.openMenus) 
@@ -252,7 +252,7 @@ def addCanvasBtnGroup(self):
   
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
         btnClrCanvas.clicked.connect(canvas.clear)   
-        btnSnapShot.clicked.connect(canvas.sideCar.snapShot)
+        btnSnapShot.clicked.connect(canvas.sideCar2.snapShot)
         btnPixTest.clicked.connect(canvas.sideCar.pixTest)
         btnExit.clicked.connect(canvas.exit)
         

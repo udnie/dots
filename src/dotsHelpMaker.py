@@ -23,11 +23,8 @@ switchKeys = {
     'widgets':  'Widgets for Pixitems, Backgrounds...', ## helpMaker
     'demos':    'Demos, Screens and Animation Help',    ## helpMenus and pixWorks    
     'sprites':  'Sprites, Backgrounds and Shadows',     ## helpMonkey
-    'flats':     'Frame, Flats and Matte Help',          ## in flat and frames and bkgMatte
-    'bkg':      'Background Widget and Menu', 
-    'shadow':   'Shadow Widget and Menu',
-    'pix':      'Sprite/PixItem Widget and Menu',   
-    'story':    'StoryBoard Menus',  
+    'flats':     'Frame, Flats and Matte Help',          ## in flat and frames and bkgMatte   
+    'story':    'Sprite and StoryBoard Menus',  
     'path':     'PathMaker Widget and Menus',
 }
 
@@ -53,7 +50,7 @@ class HelpMaker:  ## the help menus
         self.canvas = parent
    
     def menuHelp(self):
-        self.canvas.clear()
+        self.canvas.sideCar.clearWidgets()
         self.canvas.bkgMaker.setBkgColor(SpinDrift)
         self.switchHelp =  MainMenu(self.canvas)
         
@@ -83,7 +80,7 @@ class  MainMenu:
         self.table.setRow(row, 0,f'{"Select From Above":<20}',QL,True,True, 2)
         self.table.setRow(row + 1, 0,f'{"Click Here to Close":<20}','',True,True, 2)
      
-        self.table.setFixedSize(266, 395)    
+        self.table.setFixedSize(266, 305)    
         x, y = getVuCtr(self.canvas)  
          
         if self.canvas.dots.Vertical:
@@ -139,8 +136,9 @@ class  MainMenu:
                 self.pixHelp   = PixHelp(self.canvas, 215, 'all') 
   
             elif help == 'story':  
-                self.storyHelp  = StoryHelp(self, self.canvas, -200, 'on') 
-                self.storyHelp2 = StoryHelp2(self.canvas, 215, 'on')
+                self.pixHelp    = PixHelp(self.canvas, -355, 'all') 
+                self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on') 
+                self.storyHelp2 = StoryHelp2(self.canvas, 355, 'on')
                   
             elif help == 'path':
                 self.pathWidget = PathWidget(self.canvas, '', 'all')

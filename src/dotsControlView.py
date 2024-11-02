@@ -8,6 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsView
 from dotsSideGig        import MsgBox
 from dotsShared         import singleKeys
 from dotsSideCar        import SideCar
+from dotsSideCar2       import SideCar2
 from dotsMapMaker       import MapMaker
 from dotsSideGig        import Grid
 
@@ -22,11 +23,12 @@ class ControlView(QGraphicsView):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.canvas  = parent         
-        self.mapper  = MapMaker(self.canvas)  ## carry mapper to sidecar  
-        self.sideCar = SideCar(self.canvas)
-        self.grid    = Grid(self.canvas)
-     
+        self.canvas   = parent         
+        self.mapper   = MapMaker(self.canvas)  ## carry mapper to sidecar  
+        self.sideCar  = SideCar(self.canvas)
+        self.sideCar2 = SideCar2(self.canvas)
+        self.grid     = Grid(self.canvas)
+        
         self.setObjectName('ControlView')
         self.setScene(self.canvas.scene)
          
@@ -53,22 +55,24 @@ class ControlView(QGraphicsView):
         pass
 
     def dragEnterEvent(self, e):
-        if self.canvas.pathMakerOn:  ## added for pathmaker
-            e.setAccepted(False)
-            MsgBox("Can't add sprites to PathMaker", 5)
-            return
-        ext = ('.png', '.jpg', '.jpeg', '.bmp', '.gif')
         if e.mimeData().hasUrls():
             m = e.mimeData()
-            fileName = m.urls()[0].toLocalFile()
-            if fileName != 'star' and fileName.lower().endswith(ext): 
+            fileName = m.urls()[0].toLocalFile()       
+            ext = fileName[fileName.rfind('.'):].lower()     
+            if ext in ('.mov', '.mp4', '.caf', '.mp3', '.m4a', '.ogg', '.wav'):
+                self.sideCar.videoPlayer(fileName)         
+            elif self.canvas.pathMakerOn:  ## added for pathmaker
+                e.setAccepted(False)
+                MsgBox("Can't add sprites to PathMaker", 5)
+                return     
+            elif fileName != 'star' and ext in ('.png', '.jpg', '.jpeg', '.bmp', '.gif'):
                 e.setAccepted(True)
                 self.dragOver = True
             else:
                 e.setAccepted(False)
 
     def dropEvent(self, e):
-        m = e.mimeData()
+        m = e.mimeData()  ## works for sprites
         if m.hasUrls():
             fileName = m.urls()[0].toLocalFile()
             ## None = clone source, False = mirror right/left
@@ -86,7 +90,6 @@ class ControlView(QGraphicsView):
         self.sendIt(key, mod)
         
     def sendIt(self, key, mod):
-
 ### ------------- single keys without modifiers -------------     
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
@@ -96,7 +99,13 @@ class ControlView(QGraphicsView):
               
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.canvas.exit() 
-            
+               
+        elif key == Qt.Key.Key_C:
+            if self.canvas.pathMakerOn == False:
+                self.canvas.clear()  ## canvas and storyboard
+            else:
+                self.setKey('C')  ## push to pathMaker
+ 
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
                   
@@ -107,8 +116,11 @@ class ControlView(QGraphicsView):
             self.grid.toggleGrid()           
                      
         elif key == Qt.Key.Key_K:  ## keysMenu for storyboard and pathMaker  
-            self.sideCar.toggleKeysMenu()           
- 
+            self.sideCar.toggleKeysMenu()        
+            
+        # elif key == Qt.Key.Key_V:  ## requires a default video or mp3
+        #     self.sideCar.videoPlayer() 
+                                      
 ### -------- keys with modifiers or pathMaker flags ----------                             
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
@@ -118,7 +130,7 @@ class ControlView(QGraphicsView):
                           
         elif key == Qt.Key.Key_F:
             if self.canvas.pathMakerOn == False:  
-                self.canvas.flopSelected() 
+                self.sideCar2.flopSelected() 
             else:
                 self.setKey('F')
                                      
@@ -158,7 +170,7 @@ class ControlView(QGraphicsView):
                 self.canvas.unSelect()
             else:
                 self.setKey('U')  
-               
+          
         elif key == Qt.Key.Key_W:  ## yes - that's what it does
             if self.canvas.pathMakerOn:
                 self.canvas.pathMaker.pathWays.addWayPtTags()   
@@ -175,7 +187,7 @@ class ControlView(QGraphicsView):
                     self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1       
             else:                  
                 self.setKey(singleKeys[key])  ## everyone else 
-                            
+                                           
         elif key in singleKeys:  ## in dotsShared.py  
             self.setKey(singleKeys[key])
    

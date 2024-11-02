@@ -32,7 +32,7 @@ class AnimationHelp:
         self.canvas = self.pixitem.canvas
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-       
+     
         self.token = token  
                      
         alst = sorted(AnimeList)  
@@ -97,7 +97,7 @@ class AnimationHelp:
         self.table.close()
         if self.token == 'on':
             self.canvas.setKeys('N')
-            
+      
     def setTag(self, tag):
         if self.mapper.tagSet and tag == 'Clear Tags':
             self.mapper.clearTagGroup()  

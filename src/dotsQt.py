@@ -2,13 +2,12 @@
 import sys
 import platform
 import os
-
-from PyQt6.QtCore       import QTimer, PYQT_VERSION_STR
+     
+from PyQt6.QtCore       import QTimer, QT_VERSION_STR, PYQT_VERSION_STR
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *
 from dotsShared         import common
-from dotsHelpMenus      import MaxScreens, MaxWidth  ## as screenMenu is there 
 
 import dotsStoryBoard   as canvas
 
@@ -46,11 +45,9 @@ class DotsQt(QMainWindow):
         
         # print("\n" + "PyQt version:", PYQT_VERSION_STR) 
         # print(f'Python: {platform.python_version()}'+ "\n")
-        
+     
     def init(self):  
-        dir = os.path.basename(os.path.dirname(os.getcwd()))
-        str = f'{dir}  /{os.path.basename(os.getcwd())} ~ {self.screen}'  ## or getDate()        
-        self.setWindowTitle('DotsQt - ' + str)
+        self.setWindowTitle('DotsQt:  ' +  f'{pathMod((os.getcwd()))} ~ {self.screen}')
   
         self.setStyleSheet(open('./dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
@@ -59,10 +56,9 @@ class DotsQt(QMainWindow):
         self.setCentralWidget(self.canvas)
 
         ## adjusted for app size and display, see getY() for '900' screen
-        vert = 50 if self.Vertical == True else 50  ## was 50
-        # self.move(getX(), getY()+vert)  ## functions in screens 
-        self.move(getX(), getY()-int(vert/4))  ## functions in screens 
-        
+        vert = 50 if self.Vertical == True else 150  ## was 50
+        self.move(getX(), vert)   ###getY()-int(vert/4))  ## functions in screens 
+
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always
@@ -73,7 +69,7 @@ class DotsQt(QMainWindow):
     def closeAll(self):  ## close all app widgets
         self.canvas.close()   
         self.canvas.keysPanel.close()
-        self.canvas.scroll.close()
+        self.canvas.scroll.close()     
         self.canvas.keysDock.close()
         self.canvas.scrollDock.close()
         self.canvas.buttonDock.close()    
@@ -88,7 +84,7 @@ class DotsQt(QMainWindow):
         common = self.saveCommon.copy()  ## copy it back
         self.screen = setCommon(key)  ## in dotsScreens   
         self.init()
-                                                                                               
+                                                                                                 
 ### --------------------------------------------------------
 if __name__ == '__main__':
     app = QApplication(sys.argv)  

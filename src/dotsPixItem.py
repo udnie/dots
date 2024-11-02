@@ -30,7 +30,7 @@ class PixItem(QGraphicsPixmapItem):
         self.canvas = parent
         self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
-    
+        
         self.type = 'pix'
         self.fileName = fileName
   
@@ -137,7 +137,7 @@ class PixItem(QGraphicsPixmapItem):
                     self.moveThis(MoveKeys[key])
                     
     def mousePressEvent(self, e):    
-        if self.canvas.control not in ControlKeys:  ## 'resume', 'pause' - animation running
+        if self.canvas.animation == False:  ## 'resume', 'pause' - animation running
             ## right mouse clk triggers Animation menu (context menu) on selected screen items
             if e.button() == Qt.MouseButton.RightButton:
                 if len(self.scene.selectedItems()) == 0:
@@ -165,7 +165,7 @@ class PixItem(QGraphicsPixmapItem):
             self.openMenu()     
         elif self.key == 'T':     
             self.togglelock()
-      
+  
     def tagThis(self):
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))

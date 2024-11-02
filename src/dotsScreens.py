@@ -2,8 +2,25 @@
 from datetime           import datetime
 from PyQt6.QtGui        import QGuiApplication
 
-from dotsShared         import common, screens
+from dotsShared         import common
 
+MaxWidth = 1680  ##  position dock to screen bottom for max default display width
+                 ##  on my mac with dock on left side, not on bottom
+MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
+
+screens = {  ## used by helpmenus and dots
+    '1080': ('1080X720',  '3:2'),
+    '1280': ('1280X720', '16:9'),
+    '1215': ('1215X810',  '3:2'),
+    '1440': ('1440X810', '16:9'),
+    '1296': ('1296X864',  '3:2'),
+    '1536': ('1536X864', '16:9'),
+     '900':  ('600X900',  '2:3'),    
+     '912':  ('513X912', '9:16'),
+    '1024': ('576X1024', '9:16'),
+    '1102': ('620X1102', '9:16'),
+}
+      
 ### -------------------- dotsScreens -----------------------
 ''' no class: screen formats and functions '''     
 ### -------------------------------------------------------- 
@@ -213,7 +230,13 @@ ten24 = {  ## 576X1024
     'gridSize':  32.0,
 }
 
-### -----------------------------------------------------        
+### ----------------------------------------------------- 
+def pathMod(fileName):
+    fileName = fileName[-24:]
+    if fileName.find('/') > 0:
+        fileName = '..' + fileName[fileName.find('/'):]
+    return fileName
+       
 def getDate():  ## these 3 used by DotsQt.py - piggie-backing on screens
     d = datetime.now()
     return d.strftime('%m-%d-%Y')

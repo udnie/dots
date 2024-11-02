@@ -3,14 +3,13 @@ import os
 import os.path
 import random
 
-from PyQt6.QtCore       import QAbstractAnimation, Qt, QPointF, QPoint, QSize, QRect
-from PyQt6.QtWidgets    import QFileDialog, QApplication
+from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtWidgets    import QApplication
                                                     
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
-from dotsSideGig        import MsgBox, constrain, Grid
+from dotsSideGig        import constrain, VideoPlayer
 from dotsMapMaker       import MapMaker
-from dotsBkgScrollWrks  import tagBkg
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: just stuff - pixTest, transFormPixitem, snapShot,
@@ -25,9 +24,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
- 
-        self.grid = Grid(self.canvas)
-     
+        
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
@@ -65,105 +62,33 @@ class SideCar:
     def xy(self, max):
         return random.randrange(-40, max+40)
                                     
-### --------------------------------------------------------      
-    def snapShot(self):  ## screen capture
-        if self.hasBackGround() or self.scene.items():
-            self.canvas.unSelect()  ## turn off any select borders
-            if self.canvas.pathMakerOn == False:
-                if self.canvas.mapper.isMapSet():
-                    self.canvas.mapper.removeMap()
-                    
-            if self.canvas.openPlayFile == '':
-                snap = 'dots_' + self.snapTag() + '.jpg'
-            else:
-                snap = os.path.basename(self.canvas.openPlayFile)
-                snap = snap[:-5] + '.jpg'
-                
-            if snap[:4] != 'dots':  ## always ask unless                      
-                Q = QFileDialog()
-                Q.Option.DontUseNativeDialog
-                Q.setDirectory(paths['snapShot'])
-                f = Q.getSaveFileName(self.canvas, paths['snapShot'],
-                    paths['snapShot'] + snap)
-                Q.accept()
-                if not f[0]:
-                    return
-                elif not f[0].lower().endswith('.jpg'):
-                    MsgBox("Wrong file extention - use '.jpg'", 5)
-                    return
-                snap = os.path.basename(f[0])
-            pix = self.canvas.view.grab(QRect(QPoint(0,0), QSize()))
-            pix.save(paths['snapShot'] + snap, format='jpg',
-                quality=100)        
-            MsgBox('Saved as ' + snap, 3)
-  
 ### --------------------------------------------------------   
     def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
-  
-    def hasBackGround(self):
-        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if itm.type == 'bkg':
-                return True
-        return False
                                                                                                                  
-    def pause(self):  ## because showtime wasn't reachable for controlview at the time
-        self.canvas.showtime.pause()
-    
     def pageDown(self, key):  ## because scrollpanel wasn't reachable for controlview at the time
         self.canvas.scroll.pageDown(key)
-      
-    def snapTag(self):
-        return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
-      
-    def dumpTrackers(self):  ## used by bkgItem - 'B' in BkgHelp menu
-        dump = []  
-        for p in self.scene.items():
-            if p.type == 'bkg':
-                fileName = os.path.basename(p.fileName)  ## opposite of setMirroring 
-                try:            
-                    if r := self.canvas.bkgMaker.newTracker[fileName]: 
-                        zval = p.zValue()
-                        fileName, direction, mirroring, locked = self.addBkgLabels(p)
-                        rate, showtime, path = str(r['rate']), str(r['showtime']), r['path']
-                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {r['useThis']} {path[5:-1]}"
-                        dump.append(s.split())
-                except:
-                    None            
-        if len(dump) > 0:
-            return dump
-        else:
-            MsgBox('Error in dumpTrackers - SideCar')
-            return None
 
-    def addBkgLabels(self, bkg):  ## used by dumpTrackers
-        fileName = bkg.fileName       
-        if bkg.locked == True:
-            locked = 'Locked' 
-        else:
-            locked = 'UnLocked' 
-        if bkg.direction == 'left':
-            direction = 'Left'
-        elif bkg.direction == 'right': 
-            direction = 'Right'     
-        elif self.dots.Vertical:
-            direction = 'Vertical'
-        else:
-            if self.canvas.bkgMaker.newTracker[fileName]:   
-                direction = self.canvas.bkgMaker.newTracker[fileName]['direction']     
-            if direction == '':
-                direction = 'NoDirection'
-        if bkg.mirroring == False:
-            mirror = 'Continuous'
-        elif bkg.mirroring == True:
-            mirror = 'Mirrored'
-        elif bkg.direction == '' and bkg.scrollable == False:
-            mirror = 'Not Scrollable'    
-        return fileName.capitalize(), direction, mirror, locked
-  
+    def pause(self):  ## called thru controlview spacebar as well
+        self.canvas.showbiz.showtime.pause() 
+              
+    def videoPlayer(self, fileName=""):
+        if self.canvas.video == None:
+            self.canvas.video = VideoPlayer(self.canvas, fileName)
+            if self.canvas.control == '':  ## no animation, disables run, enables 
+                self.canvas.showWorks.disablePlay()  ## pause/resume/stop
+                
+    def videoOff(self):
+        if self.canvas.video != None:
+            self.canvas.video = None
+        if self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):  ## leave 'stop' alone
+            return
+        elif self.canvas.animation == False:  ## only place it's used
+            self.canvas.showWorks.enablePlay()  ## enable run, disable pause/resume/stop
+            
 ### --------------------------------------------------------
     def toggleKeysMenu(self):  ## keysPanel
         self.canvas.keysPanel.toggleKeysMenu()  ## no direct path from controlView
@@ -212,10 +137,16 @@ class SideCar:
                 pix.unlinkShadow()
                 pix.maker.works.hideOutline()
                 self.mapper.tagsAndPaths.tagThis('', pix, '')
-            elif pix.type == 'bkg': 
-                pix.bkgMaker.unlockBkg(pix)  
-                tagBkg(pix, QPoint(random.randint(200, 500), random.randint(150,400)))
-                                                                                                                                      
+    
+    def clearSceneItems(self):
+        for p in self.scene.items():      
+            if p.type == 'pix' and p.part in ('left', 'right'):
+                continue
+            try:
+                self.scene.removeItem(p) 
+            except Exception:
+                continue
+                                                                                                                                  
 ### --------------------------------------------------------                                                
     def hasHiddenPix(self):
         for pix in self.scene.items():

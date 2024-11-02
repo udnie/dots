@@ -21,7 +21,7 @@ class ShowWorks:
 
         self.canvas = parent
         self.scene  = self.canvas.scene
-        self.pathMaker = self.canvas.pathMaker
+        # self.pathMaker = self.canvas.pathMaker  ## ???
                 
         self.helpButton = ButtonHelp(self.canvas)
              
@@ -40,17 +40,7 @@ class ShowWorks:
                             k = 1
                         elif k > 0:
                             self.scene.removeItem(p)
-                            
-  ### --------------------------------------------------------      
-    def cleanUpMenus(self, showbiz):  
-        self.helpButton.closeMenus()  ## not demo or screen  
-        # if showbiz.tableView != None: 
-        #     showbiz.tableView.bye()      
-        # # if showbiz.demoAvailable != None:  
-        # #     showbiz.snakes.delSnakes()                    
-        # else:   
-        #     showbiz.helpMenus.closeMenus()
-     
+
 ### --------------------------------------------------------                                                            
     def dothis(self, p):  ##refresh background
         direction = p.direction
@@ -84,16 +74,19 @@ class ShowWorks:
             self.canvas.control = 'resume'
         elif self.canvas.control == 'resume':
             self.canvas.btnPause.setText( 'Pause' );
-            self.canvas.control = 'pause'
-
-    def enablePlay(self):
+            self.canvas.control = 'pause' 
+        if self.canvas.video != None:
+            self.canvas.video.pause()  
+  
+    def enablePlay(self):  ## turns play on - disables the rest
         self.canvas.control = ''
         self.canvas.btnRun.setEnabled(True)
         self.canvas.btnPause.setEnabled(False)
         self.canvas.btnStop.setEnabled(False) 
         self.canvas.btnSave.setEnabled(True) 
- 
-    def disablePlay(self):
+        
+
+    def disablePlay(self): ## turns play off - enables the rest
         self.canvas.control = 'pause'  ## blocks adding background
         self.canvas.btnRun.setEnabled(False)
         self.canvas.btnPause.setEnabled(True)

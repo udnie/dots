@@ -101,8 +101,8 @@ class PathHelp:
         self.helpButton.pathFlag = False 
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('N')
-                                                                                             
+            self.canvas.showbiz.keysInPlay('N')
+                                                                                          
 ### --------------------------------------------------------
 class PathWorks:
 ### --------------------------------------------------------

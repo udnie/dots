@@ -2,28 +2,99 @@
 import random
 import os
 import math
+import time
 
-from PyQt6.QtCore       import QTimer, QPointF, QRectF, QPoint, Qt
+from PyQt6.QtCore       import Qt, QUrl, QSizeF, QTimer, QPointF, QRectF, QPoint
 from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap, QPen, QColor
 from PyQt6.QtWidgets    import QMessageBox, QGraphicsItemGroup, QGraphicsLineItem
+  
+from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
+from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
+
+# from PyQt6.QtMultimedia   import QMediaContent  ## common out for 6, uncomment for 5 <<<--------
          
 from dotsShared         import common, paths, pathcolors
 
 ### ---------------------- dotsSideGig ---------------------
 ''' class: MsgBox, Grid, and misc  ...'''
+### ------------------ dotsVideoPlayer ---------------------        
+class VideoPlayer(QMediaPlayer):
+### --------------------------------------------------------
+    def __init__(self, parent, fileName=''):
+        super().__init__()
+
+        self.canvas = parent 
+        self.scene  = self.canvas.scene
+
+        self.player = QMediaPlayer(self)   
+        self.videoWidget = QGraphicsVideoItem()   
+        
+        self.videoWidget.setSize(QSizeF(common['ViewW']+2, common['ViewH']+2))  
+        self.player.setVideoOutput(self.videoWidget) 
+           
+        self.player.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStatusChanged)
+
+        self.scene.addItem(self.videoWidget)  
+        self.videoWidget.setZValue(-99)
+
+### ------------ comment out for 5, uncomment for 6 -----------------
+        self.audioOut = QAudioOutput()  
+        self.player.setAudioOutput(self.audioOut)     
+        self.player.setSource((QUrl.fromLocalFile(fileName))) 
+        
+### ------------ uncomment for 5, comment out for 6 -----------------     
+        # self.player.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))  ## uncomment for 5
+        
+        self.playVideo()
+        
+### ------------ uncomment for 5 ... comment out for 6 -----------------
+    # def playVideo(self):
+    #     if self.player.state() == QMediaPlayer.PlayingState:
+    #         self.player.pause()
+    #     else:
+    #         self.player.play()   
+           
+    # def mediaStatusChanged(self, status):
+    #     if status == QMediaPlayer.MediaStatus.EndOfMedia:
+    #         while not (self.player.state() == QMediaPlayer.StoppedState):
+    #             time.sleep(.01)
+    #         self.stopVideo()
+ 
+### ------------ uncomment for 6 ... comment out for 5 -----------------           
+    def playVideo(self):  
+        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
+            self.player.pause()
+        else:
+            self.player.play()
+ 
+    def mediaStatusChanged(self, status):
+        if status == QMediaPlayer.MediaStatus.EndOfMedia:
+            while not (self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState):
+                time.sleep(.05)
+            self.stopVideo()
+### ---------------------------- end -----------------------------------  
+             
+    def stopVideo(self):
+        self.player.stop() 
+        try:
+            self.scene.removeItem(self.videoWidget)  ## solved a problem
+        except():
+            None
+        QTimer.singleShot(100, self.canvas.sideCar.videoOff) 
+                                            
 ### --------------------------------------------------------
 class MsgBox:  ## always use getCtr for setting point
 ### --------------------------------------------------------
     def __init__(self, text, pause=3, pt=None):
         super().__init__()
                  
-        self.msg = QMessageBox()
-                        
-        img = QImage(paths['spritePath'] + "doral.png")
-           
+        self.msg = QMessageBox()     
+                     
+        img = QImage(paths['spritePath'] + "doral.png")         
         img = img.scaled(60, 60,  ## keep it small
             Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation)  
+            Qt.TransformationMode.SmoothTransformation) 
+        
         pixmap = QPixmap(img) 
         
         self.msg.setIconPixmap(pixmap)

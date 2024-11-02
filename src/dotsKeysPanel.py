@@ -17,8 +17,8 @@ class KeysPanel(QWidget):
         self.canvas = parent
         self.scene  = self.canvas.scene
                                                         
-        self.storyKeys   = storyBoard()  ## keyspanel
-        self.pathKeys    = pathMaker()
+        self.storyKeys   = storyBoard()  ## list of storybroad keys
+        self.pathKeys    = pathMaker()   ## list of path keys
         self.pathKeysSet = False
                                                  
         self.setFixedSize(common['SliderW'], common['SliderH']) 

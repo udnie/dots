@@ -4,9 +4,8 @@ from functools          import partial
 from PyQt6.QtCore       import QTimer
 from PyQt6.QtGui        import QGuiApplication
 
-from dotsShared         import screens
 from dotsSideGig        import MsgBox, getVuCtr, getCtr
-
+from dotsScreens        import MaxWidth, MaxScreens, screens
 from dotsTableModel     import TableWidgetSetUp, QL, QC
 
 from dotsSnakes         import Snakes
@@ -20,9 +19,9 @@ demoKeys = {
     'snakes': 'Snakes Scrolling Background',    
 }
 
-MaxWidth = 1680  ##  position dock to screen bottom for max default display width
-                 ##  on my mac with dock on left side, not on bottom
-MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
+# MaxWidth = 1680  ##  position dock to screen bottom for max default display width
+#                  ##  on my mac with dock on left side, not on bottom
+# MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
 
 ### ---------------------- dotsMenus ----------------------- 
 ''' classes: HelpMenus, DemoHelp, ScreenHelp '''

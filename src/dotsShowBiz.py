@@ -15,6 +15,8 @@ from dotsFrameAndFlats  import Frame
 
 from dotsSideGig        import *
 from dotsSideCar        import SideCar 
+from dotsSideCar2       import SideCar2
+
 from dotsShowFiles      import ShowFiles   
 from dotsShowTime       import ShowTime
 
@@ -39,19 +41,21 @@ class ShowBiz:
         self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper
         
-        self.sideCar   = SideCar(self.canvas)         
+        self.sideCar   = SideCar(self.canvas)  
+        self.sideCar2  = SideCar2(self.canvas) 
+               
         self.pathMaker = self.canvas.pathMaker
         self.bkgMaker  = self.canvas.bkgMaker
             
         self.demoAvailable = DemoAvailable()
 
-        self.showtime   = ShowTime(self.canvas)
-        self.showFiles  = ShowFiles(self.canvas) 
+        self.showtime  = ShowTime(self.canvas)
+        self.showFiles = ShowFiles(self.canvas) 
    
-        self.helpMaker  = HelpMaker(self.canvas)
-        self.helpMenus  = HelpMenus(self.canvas)
+        self.helpMaker   = HelpMaker(self.canvas)
+        self.helpMenus   = HelpMenus(self.canvas)
         self.helpButtons = ButtonHelp(self.canvas)
-         
+          
         self.locks = 0
         self.tableView = None 
               
@@ -62,18 +66,29 @@ class ShowBiz:
 
         elif key == 'C':
             self.canvas.clear() 
-            
-        if self.canvas.pathMakerOn == False:  
-                    
+    
+        elif self.canvas.pathMakerOn == False:  
+                                     
             if len(self.scene.items()) > 0:  ## storyboard single key commands
                 
-                if self.canvas.control == '':  ## no animations running
+                if self.canvas.control != '' or self.canvas.animation == True:  ## animation running
+                    
+                    if key == 'P': 
+                        self.mapper.tagsAndPaths.togglePaths() 
+                                                                                                       
+                    elif key == 'S':
+                        self.showtime.stop() 
+                                        
+                    elif key == 'space': ## pause/resume
+                        self.canvas.sideCar.pause()
+                  
+                elif self.canvas.control == '':  ## no animations running
         
                     if key == 'A':  
-                        self.canvas.selectAll()
+                        self.sideCar2.selectAll()
                
                     elif key == 'D':
-                        self.canvas.deleteSelected()
+                        self.sideCar2.deleteSelected()
                     
                     elif key == 'J':  ## view the layout of the currently opened play file 
                         if dlist := self.openPlay(self.canvas.openPlayFile):  
@@ -106,21 +121,10 @@ class ShowBiz:
                                            
                     elif key == 'U':
                         self.canvas.unSelect()
-
+       
                     elif key == 'W':
                         self.canvas.sideCar.clearWidgets()
-                      
-                elif self.canvas.control != '':  ## animation running
-                    
-                    if key == 'P': 
-                        self.mapper.tagsAndPaths.togglePaths() 
-                                                                                                       
-                    elif key == 'S':
-                        self.showtime.stop() 
-                                        
-                    elif key == 'space': ## pause/resume
-                        self.canvas.sideCar.pause()
-                                               
+                                                                   
             ## single key commands continued - nothing on screen
             elif len(self.scene.items()) == 0: 
                 
@@ -130,7 +134,7 @@ class ShowBiz:
                 if key == 'A':
                     self.bkgMaker.openBkgFiles() 
                     
-                elif key == 'D':   ## deleteSelected if something there else run demo
+                elif key == 'D':   ## runs demo menu in canvas
                     if self.demoAvailable:   
                         self.helpMenus.setMenu(key)
     
@@ -258,6 +262,7 @@ class ShowBiz:
     def cleanup(self, ns, kix):
         fileName = os.path.basename(self.canvas.openPlayFile) 
         if 'play' in fileName:  ## could be something else
+            self.canvas.showWorks.enablePlay() 
             if ns == 0 and self.locks == 0:
                 self.dots.statusBar.showMessage(f"{fileName} - Number of Pixitems: {kix}")
             elif ns > 0:  ## there must be shadows
@@ -270,7 +275,7 @@ class ShowBiz:
                     MsgBox('Adding Shadows, please wait...', t)              
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
-                self.canvas.mapper.toggleTagItems('all')                                                  
+                self.mapper.toggleTagItems('all')                                                      
         QTimer.singleShot(17000, partial(self.dots.statusBar.showMessage, fileName)) 
 
 ### --------------------------------------------------------                                                  
@@ -278,19 +283,18 @@ class ShowBiz:
         tasks = []         
         start = time.time()
         loop  = asyncio.new_event_loop() 
-        ## thanks to a dev community post - it took some work to find a useful example
-        for pix in self.scene.items(): 
+        for pix in self.scene.items():  ## thanks to a dev community post - it took some work to find a useful example
             if pix.type == 'pix' and pix.shadowMaker != None and pix.shadow != None:
                     pix.fileName = paths['spritePath'] + pix.fileName      
                     tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
         if len(tasks) > 0:
-            loop.run_until_complete(asyncio.wait(tasks))
-        loop.close()           
+            loop.run_until_complete(asyncio.wait(tasks))        
+        loop.close()              
         self.sideCar.showOutlines()  ## turns them on      
-        QTimer.singleShot(3000, self.sideCar.hideOutlines)          
+        QTimer.singleShot(2000, self.sideCar.hideOutlines)          
         str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
         self.dots.statusBar.showMessage(str, 10000)   
- 
+
 ### ---------------------- dotsShowBiz --------------------
 
 

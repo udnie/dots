@@ -12,6 +12,7 @@ from dotsBkgWorks       import BkgWorks
 from dotsBkgScrollWrks  import BkgScrollWrks, tagBkg, Trackers
 from dotsHelpMonkey     import BkgHelp
 from dotsAnimation      import Node
+from dotsSideCar2       import SideCar2
 
 SharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
 
@@ -32,9 +33,11 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.scene    = self.canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
 
+        self.sideCar2 = SideCar2(self.canvas) 
         self.bkgWorks = BkgWorks(self)
+        
         self.bkgScrollWrks = BkgScrollWrks(self)
-      
+       
         self.tracker = None  
         self.widgetOn = False  
        
@@ -45,7 +48,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.path = paths['bkgPath']  
           
         self.fileName = os.path.basename(fileName) 
-        
         self.sharedKeys = SharedKeys  ## shared with bkgMenu
         
         if self.canvas.openPlayFile != '':
@@ -61,7 +63,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             return
 
         self.setZValue(z)      
-        self.init(copy)
+        self.init(copy)  ## reuse QImage for 'next' backgrounds - self.imgFile
                    
 ### --------------------------------------------------------   
     def init(self, copy):    
@@ -140,7 +142,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = key 
         try:  ## doesn't appear that the widget can get input other than thru this
             if self.key in ('up', 'down','right','left') and self.bkgMaker.widget != None:
-                if self.scene.selectedItems(): 
+                if self.scene.selectedItems():  ## widget uses arrow keys to adjust screenrate 
                     self.canvas.unSelect()
                 self.bkgMaker.widget.setKeys(key)
         except AttributeError:
@@ -174,7 +176,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.key == 'tag': ## '\' <- tagKey
                 self.tagThis()
             elif self.key == 'B':   
-                self.tracker = Trackers(self.canvas, self.canvas.sideCar.dumpTrackers())
+                self.tracker = Trackers(self.canvas, self.sideCar2.dumpTrackers())
                 if self.tracker != None:
                     self.tracker.show()    
             elif self.key == 'E':   

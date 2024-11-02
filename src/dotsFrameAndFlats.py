@@ -79,8 +79,8 @@ class FlatHelp:  ## flat and frame keyboard help for both
     def closeMenu(self):   
         self.table.close()
         if self.switch !='':
-            self.canvas.setKeys('N')
-                                                                              
+            self.canvas.showbiz.keysInPlay('N')
+                                                                            
 ### -------------------------------------------------------- 
 class Flat(QGraphicsPixmapItem):
 ### -------------------------------------------------------- 
@@ -246,7 +246,7 @@ class Frame(QGraphicsPixmapItem):
         self.key = ''
     
     def openMenu(self):
-        self.help = FlatHelp(self, 0,'frame')
+        self.help = FlatHelp(self, self.canvas, 0,'frame')
                 
     def tagThis(self):
         p = QCursor.pos()

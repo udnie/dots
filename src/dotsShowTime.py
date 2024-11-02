@@ -6,6 +6,7 @@ from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
 
 from dotsSideGig        import *
 from dotsSideCar        import SideCar
+from dotsSideCar2       import SideCar2
 from dotsShowFiles      import ShowFiles
 from dotsShowWorks      import ShowWorks
 from dotsShared         import ControlKeys
@@ -29,6 +30,8 @@ class ShowTime:
         self.mapper   = self.canvas.mapper
         
         self.sideCar   = SideCar(self.canvas) 
+        self.sideCar2  = SideCar2(self.canvas)  ## ???
+        
         self.showWorks = ShowWorks(self.canvas)
         self.showFiles = ShowFiles(self.canvas) 
         self.animation = Animation(self.canvas)
@@ -98,6 +101,7 @@ class ShowTime:
             if "play" in file:
                 self.dots.statusBar.showMessage(file + ' - ' + \
                     'Number of Pixitems: {}'.format(k))  
+            self.canvas.animation = True
                       
 ### --------------------------------------------------------                                 
     def pause(self):
@@ -116,7 +120,9 @@ class ShowTime:
                         QAbstractAnimation.State.Running:  ## running
                         pix.anime.pause() 
             self.showWorks.setPauseKey()
-
+            if self.canvas.video != None:
+                self.canvas.video.playVideo()  ## toggles pause and play
+            
     def resume(self):   
         for pix in self.scene.items():  
             if type(pix) == 'dotsShadowWidget.PointItem' or \
@@ -128,13 +134,18 @@ class ShowTime:
                 if pix.anime != None and pix.anime.state() == \
                     QAbstractAnimation.State.Paused:
                     pix.anime.resume()                   
-        self.showWorks.setPauseKey()
+        self.showWorks.setPauseKey()  
+        if self.canvas.video != None:  ## toggles pause and play
+            self.canvas.video.playVideo()
         
 ### --------------------------------------------------------
     def stop(self, action=''):  ## action used by clear               
         self.mapper.clearPathsandTags()     
         scrolling = []  ## used by tracker to remove the 'next' bkg 
         
+        if self.canvas.video != None:
+            self.canvas.video.stopVideo()
+            
         for pix in self.scene.items():                          
             if type(pix) == 'dotsShadowWidget.PointItem' or \
                 isinstance(pix, QGraphicsPolygonItem):
@@ -170,10 +181,11 @@ class ShowTime:
         if len(scrolling) > 0:  ## used by tracker to remove the 'next' bkg 
             self.showWorks.cleanUpScrollers(self.canvas.scene)
             
+        self.canvas.animation = False
         self.showWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  
-                         
+                          
 ### --------------------------------------------------------
     def savePlay(self):   
         if self.canvas.control in ControlKeys:  ## there's an animation running - needs to be stopped first

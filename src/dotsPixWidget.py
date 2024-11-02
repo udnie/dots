@@ -212,7 +212,7 @@ class PixWidget(QWidget):
             self.lockBtn.clicked.connect(self.pix.togglelock)
             quitBtn.clicked.connect(self.works.closeWidget)
         else: 
-            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
+            quitBtn.clicked.connect(lambda: self.canvas.showbiz.keysInPlay('N'))
                 
         vbox = QVBoxLayout(self)
         

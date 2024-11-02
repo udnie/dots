@@ -245,7 +245,7 @@ class PathWidget(QWidget):
             delBtn.clicked.connect(self.pathMaker.delete)
             quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)
         else:
-            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
+            quitBtn.clicked.connect(lambda: self.canvas.showbiz.keysInPlay('N'))
         
         hbox = QVBoxLayout(self)
 
