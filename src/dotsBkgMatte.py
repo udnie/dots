@@ -134,13 +134,13 @@ class Matte(QWidget):  ## opens itself
          
     def shared(self, key):  ## used with help menu  
         if key == 'R': 
-            self.canvas.showtime.run()
+            self.canvas.showbiz.showtime.run()
      
         elif key == 'Space':          
-            self.canvas.showtime.pause() 
+            self.canvas.showbiz.showtime.pause() 
          
         elif key == 'S':  
-            self.canvas.showtime.stop() 
+            self.canvas.showbiz.showtime.stop() 
             
         elif key == '>':  ## scale up  
             self.scaleUp()       
