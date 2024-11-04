@@ -233,7 +233,7 @@ class BkgMaker(QWidget):
         self.closeWidget()
         p = QCursor.pos()
         QCursor.setPos(int(p.x()+220), int(p.y()+650.0))  ## works for 720
-        self.canvas.showtime.run()
+        self.canvas.showbiz.showtime.run()
      
     def flopIt(self, bkg):  ## used by widget 
         if bkg and bkg.type == 'bkg':  
