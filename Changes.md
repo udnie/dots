@@ -12,7 +12,7 @@ Updated the Help Menus once again by eliminating three menus that were already r
 
 Also added is the ability to play a video file, either a .mov or .mp4, and use it as the  background with an animation running.  Along with that I added a video-player widget to the extras directory. It requires installing opencv-python to provide the code necessary to get a files aspect ratio used in setting the right screen format for viewing.  Dots and the video-player both run in PyQt6 and PyQt5 with some edits.
 
-The only issue I've run into with PyQt5 was running a video and the blue snake background demo together. The last frame stayed on the screen rather than disapperaing as well as making it difficult to quit at times. Running animations with fewer moving parts, not 150 sprites - 4 snakes at once, had no such problems.  PyQt6 on my M1 Mac was very chatty once I had the video and audio running. I don't think Apple likes the QtAudioWidget.  This is visible in a terminal session but not on the desktop and doesn't seem be a problem though certain media formats may be. This may only be an issue on a M1 Mac in X86 mode.
+The only issue I've run into with PyQt5 was running a video and the blue snake background demo together. The last frame stayed on the screen rather than disappearing as well as making it difficult to quit at times. Running animations with fewer moving parts, not 150 sprites - 4 snakes at once, had no such problems.  PyQt6 on my M1 Mac was very chatty once I had the video and audio running. I don't think Apple likes the QtAudioWidget.  This is visible in a terminal session but not on the desktop and doesn't seem be a problem though certain media formats may be. This may only be an issue on a M1 Mac in X86 mode.
 
     mov,mp4,m4a,3gp,3g2,mj2 @ 0x7f8c15976780] stream 0, timescale not set
     [aac @ 0x7f8c05b6dec0] Could not update timestamps for skipped samples.
@@ -34,6 +34,10 @@ You'll now need to edit **VideoPlayer** in **dotsSideGig** to go from PyQt6 to P
     6. Optional: Change QMessageBox height in dotsSideGig.py
     .
 
+
+**November 4 2024**     
+A few bug fixes.
+ 
 ---
 **October 2024**  
 Rolled back a change I made to the Sprite Help Menu to keep it in the scene.  
