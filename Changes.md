@@ -23,6 +23,17 @@ The three jelly fish videos formatted for 3:2, 16:9, and 9:16 all were cropped f
 
 New video:  <https://youtu.be/4afjwpiISlM>
 
+You'll now need to edit **VideoPlayer** in **dotsSideGig** to go from PyQt6 to PyQt5 along with the rest of the edits.  
+
+#### Edits for Converting Dots from PyQt6 to PyQt5
+    1. Replace PyQt6 with PyQt5 
+    2. Replace globalPosition() with globalPos()
+    3. Replace e.position() with e.pos() in dotsControlView.py
+    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets. 
+    5. Make required edits to dotsSideGig.py
+    6. Optional: Change QMessageBox height in dotsSideGig.py
+    .
+
 ---
 **October 2024**  
 Rolled back a change I made to the Sprite Help Menu to keep it in the scene.  
