@@ -154,7 +154,7 @@ class PixItem(QGraphicsPixmapItem):
         if self.key == 'del':    
             self.deletePix()        
         elif self.key == 'shift': 
-            self.setZValue(self.pix.zValue()-1)      
+            self.setZValue(self.zValue()-1)      
         elif self.key in('enter','return'): # send to front
             self.setZValue(self.mapper.toFront(1))
         elif self.key == 'tag': ## '\' backslash
