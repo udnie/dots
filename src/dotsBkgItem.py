@@ -176,7 +176,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.key == 'tag': ## '\' <- tagKey
                 self.tagThis()
             elif self.key == 'B':   
-                self.tracker = Trackers(self.canvas, self.sideCar2.dumpTrackers())
+                self.tracker = Trackers(self.canvas, self.canvas.sideCar2.dumpTrackers())
                 if self.tracker != None:
                     self.tracker.show()    
             elif self.key == 'E':   
