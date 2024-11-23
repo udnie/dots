@@ -46,7 +46,7 @@ I moved the VideoPlayer I had originally added to **dotsSideGig.py** to **dotsVi
     
 Also, I removed the **keys.pdf** as the help menus have replaced it. Looking into the **videoplayer** and **videoWidget** code may be a bit confusing as there are two videoWidgets. One is the graphics scene item that provides the video to the screen while the other is the pop-up widget that handles loops and deletes.  You may also notice '## 5', '## 6' stuck on the end of some lines - that's used to by a python script to comment out the '## 6' lines and uncomment the '## 5' lines so I no longer have to inorder for me to test the code in Qt5.
 
-
+Video at: <https://youtu.be/SR47SMG_eXs>
  
 ---
 **October 2024**  
