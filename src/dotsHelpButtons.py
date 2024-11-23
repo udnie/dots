@@ -26,7 +26,8 @@ canvasKeys = {
 }
 
 storyKeys = {
-    'A':    'Select All',   
+    'A':    'Select All',  
+    'B':    'Background Mirrored', 
     'C':    'Clear Canvas',
     'D':    'Delete Selected',
     'J':    'JSON Play File Viewer',
@@ -36,6 +37,7 @@ storyKeys = {
     'O':    'Toggle Shadow Outlines', 
     'S':    'Save Play File',    
     'U':    'UnSelect All',
+    'V':    'Video Widget',
     'W':    'Clear Widgets',
     'X':    'X, Q, Escape to Quit',
     'R':    'Run What\'s There',
@@ -179,24 +181,24 @@ class StoryHelp:
         
         self.storyHelp2 = None
     
-        self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5)
+        self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 267, 607
+        width, height = 267, 600
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}','',True,True,2)
     
         row = 1
         for k, val in storyKeys.items():
-            if row < 13:
+            if row < 15:
                 self.table.setRow(row, 0, k, '', True,True)
                 self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
-                if row == 13:
+                if row == 15:
                     self.table.setRow(row, 0, f"{' Keys for Running an Animation':<32}",QC,True,True,2)
-                    row = 14
+                    row = 16
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1

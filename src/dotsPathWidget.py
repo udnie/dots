@@ -235,7 +235,7 @@ class PathWidget(QWidget):
         quitBtn = QPushButton('Close')
         
         if self.switch == '':
-            waysBtn.clicked.connect(self.pathWays.addWayPtTags)
+            waysBtn.clicked.connect(self.pathWays.addWayPtTags)  ## called from controlview
             helpBtn.clicked.connect(self.pathMaker.pathWorks.openMenu) 
             saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
             editBtn.clicked.connect(self.pathMaker.edits.editPoints)

@@ -21,7 +21,6 @@ class ShowWorks:
 
         self.canvas = parent
         self.scene  = self.canvas.scene
-        # self.pathMaker = self.canvas.pathMaker  ## ???
                 
         self.helpButton = ButtonHelp(self.canvas)
              
@@ -75,8 +74,8 @@ class ShowWorks:
         elif self.canvas.control == 'resume':
             self.canvas.btnPause.setText( 'Pause' );
             self.canvas.control = 'pause' 
-        if self.canvas.video != None:
-            self.canvas.video.pause()  
+        if self.canvas.videoPlayer != None:
+            self.canvas.videoPlayer.pause()  
   
     def enablePlay(self):  ## turns play on - disables the rest
         self.canvas.control = ''

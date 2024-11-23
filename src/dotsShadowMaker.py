@@ -154,7 +154,7 @@ class ShadowMaker:
         if self.path != None and len(self.path) == 0:
             return
                     
-        cpy = self.flopCpy if self.flopped else self.cpy  ## called by shadow and poinitem
+        cpy = self.flopCpy if self.flopped else self.cpy  ## called by shadow and pointitem
         
         linked = self.linked       ## these 2 aren't carried over and need to be restored
         save   = self.shadow.save  ## used if linked for storing current position

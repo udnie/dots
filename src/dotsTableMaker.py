@@ -46,9 +46,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.src = src  ## if it's 'table' then it's from the canvas - typed in 'J'
         self.data = data
     
-        self.showtime  = self.showbiz.showtime   
         self.showWorks = ShowWorks(self.canvas)
-     
         self.showFiles = ShowFiles(self.canvas) 
   
         self.hdr, self.cols = '', 0
@@ -157,8 +155,9 @@ class TableView:  ## formats a json .play file to display missing files or not
                        
         if len(self.selected) > 0:  
             self.deleteKey = True  
-            sorted(self.selected, key=lambda x: x[1], reverse=True)     
+            sorted(self.selected, key=lambda x: x[1], reverse=True)  
             self.deleteFromTable() 
+            
         self.makeTable(self.data)  ## refreshes tableview if anything was selected and possibly deleted
             
 ### --------------------------------------------------------   
@@ -176,7 +175,7 @@ class TableView:  ## formats a json .play file to display missing files or not
     def deleteFromTable(self):  ## doesn't affect the .play file unless saved    
         for s in self.selected:  
             for tmp in self.data:
-                if s[0] == tmp['fileName'] and s[1] == tmp['z']:    
+                if s[0] == tmp['fileName'] and s[1] == tmp['z']:          
                     self.data.remove(tmp) 
                     break
                 
@@ -224,7 +223,6 @@ class TableView:  ## formats a json .play file to display missing files or not
                     save.append(tmp)  ## saving them by type                        
         dlist = save
         del save    
- 
         self.setupHdrs(dlist)
  
 ### --------------------------------------------------------                    
@@ -277,7 +275,7 @@ class TableView:  ## formats a json .play file to display missing files or not
     def widthHeight(self, data):
         rows   = len(data)
         width  = self.cols * ColWidth       
-        height = (rows + 1) * RowHeight   
+        height = (rows + 2) * RowHeight   
               
         if height > MaxRows * RowHeight:  
             height = MaxRows * RowHeight   

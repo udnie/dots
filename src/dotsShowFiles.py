@@ -38,6 +38,9 @@ class ShowFiles:
         elif tmp['type'] == 'bkg' and not os.path.exists(paths['bkgPath'] + \
             tmp['fileName']):
             return True     
+        elif tmp['type'] == 'video' and not os.path.exists(paths['bkgPath'] + \
+            tmp['fileName']):
+            return True  
         else:
             return False  ## flats ride free
                                

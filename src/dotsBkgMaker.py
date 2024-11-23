@@ -14,6 +14,7 @@ from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
+from dotsSideCar        import SideCar
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -30,6 +31,8 @@ class BkgMaker(QWidget):
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
+        
+        self.sideCar = SideCar(self.canvas)
         
         self.init()
       
@@ -53,10 +56,13 @@ class BkgMaker(QWidget):
         Q.Option.DontUseNativeDialog
         file, _ = Q.getOpenFileName(self.canvas,
             'Choose an image file to open', paths['bkgPath'],
-            'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG)')
+            'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG *.mov *.mp4)')
         if file:  ## it's either a flat or an jpg/png
-            file = paths['bkgPath'] + os.path.basename(file)  
-            self.openFlatFile(file) if file.endswith('.bkg') else self.addBkg(file)
+            if file.endswith('.mov') or file.endswith('.mp4'):
+                self.sideCar.addVideo(file, 'open') 
+            else:
+                file = paths['bkgPath'] + os.path.basename(file)  
+                self.openFlatFile(file) if file.endswith('.bkg') else self.addBkg(file)
         Q.accept()
 
 ### --------------------------------------------------------              
@@ -78,7 +84,7 @@ class BkgMaker(QWidget):
         self.lockBkg(bkg)  ## always lock it
                         
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
-                               
+                      
 ### --------------------------------------------------------
     def openFlatFile(self, file):  ## read from .bkg file - a 'flat'
         try:
@@ -114,7 +120,7 @@ class BkgMaker(QWidget):
                 paths['bkgPath'] + 'tmp.bkg')  
             Q.accept()       
             if not f[0]: 
-                return
+                return                 
             if not f[0].lower().endswith('.bkg'):
                 MsgBox("Save Background Color: Wrong file extention - use '.bkg'", 5)  
                 return
@@ -125,10 +131,26 @@ class BkgMaker(QWidget):
                 except IOError:
                     MsgBox('saveBkgColor: Error saving file', 5)
                 self.flat = None
-                                                                        
+           
+    def mirror(self):  ## very basic
+        wuf = None
+        for bkg in self.scene.items():  
+            if bkg.type == 'bkg':
+                wuf = bkg
+                break  
+        if wuf != None:
+            bkg = wuf
+            x = int(common['ViewW']/2- bkg.width)   
+            bkg.setPos(x , 0)    
+            akg = BkgItem(bkg.fileName, self.canvas, common['bkgZ'], True, bkg.imgFile)
+            if akg == None:
+                return
+            self.scene.addItem(akg)  
+            akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
+            akg.setPos(int(common['ViewW']/2), 0)  
+                        
 ### -------------------------------------------------------- 
     def addWidget(self, bkg):  ## background widget
-   
         self.closeWidget()  
         if bkg.type == 'flat':
             return          
@@ -151,7 +173,7 @@ class BkgMaker(QWidget):
   
     def updateWidget(self, bkg):
         self.setMirrorBtnText(bkg)
-        self.setBtns(bkg)
+        bkg.bkgScrollWrks.setBtns(bkg, self.widget)
         self.setLocksText(bkg) 
         
 ### --------------------------------------------------------
@@ -180,24 +202,7 @@ class BkgMaker(QWidget):
                 self.widget.mirrorBtn.setText('Continuous')         
             elif bkg.mirroring == True:
                 self.widget.mirrorBtn.setText('Mirrored')
-
-    def setBtns(self, bkg):
-        if bkg:
-            if bkg.direction == 'right': 
-                self.widget.rightBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                self.widget.leftBtn.setStyleSheet(
-                    'background-color: None')            
-            elif bkg.direction == 'left': 
-                self.widget.leftBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                self.widget.rightBtn.setStyleSheet(
-                    'background-color: None')
-            elif bkg.direction == 'vertical':
-                self.widget.leftBtn.setText('Vertical')   
-                self.widget.leftBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                                                     
+                                                                   
     def setLocksText(self, bkg):
         if bkg == None:
             return
@@ -280,8 +285,5 @@ class BkgMaker(QWidget):
                                                  
 ### --------------------- dotsBkgMaker ---------------------
 
-   
-                                    
-                                    
-                                    
-                                    
+
+

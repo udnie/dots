@@ -204,8 +204,8 @@ class PathMaker(QWidget):
         
         if self.canvas.animation == True:  ## turns off video as well
             self.canvas.showbiz.showtime.stop('clear') 
-        elif self.canvas.video != None:  ## make sure it's stopped
-            self.canvas.video.stopVideo()
+        elif self.canvas.videoPlayer != None:  ## make sure it's stopped
+            self.canvas.videoPlayer.stopVideo()
 
         self.editingPts == False
         self.edits.deleteLasso()    ## reset cursor

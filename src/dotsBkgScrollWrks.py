@@ -3,13 +3,14 @@ import os
 import json
 import random
 
-from PyQt6.QtCore       import Qt, QPoint, QTimer, QPointF
-from PyQt6.QtGui        import QColor, QImage, QPixmap, QCursor
-from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QMessageBox, QWidget, QAbstractItemView, \
+from PyQt6.QtCore       import Qt, QPoint, QTimer
+from PyQt6.QtGui        import QImage, QPixmap, QCursor
+from PyQt6.QtWidgets    import QMessageBox, QWidget, QAbstractItemView, \
                                 QTableWidget, QPushButton, QVBoxLayout, QTableWidgetItem
                         
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox, getColorStr, getVuCtr
+from dotsSideGig        import MsgBox, getVuCtr
+from dotsSideCar2       import tagBkg
 
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
     'snakes':   15,  ## also used by vertical 
@@ -86,7 +87,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         self.canvas   = self.bkgItem.canvas 
         self.bkgMaker = self.bkgItem.bkgMaker
         self.dots     = self.bkgItem.dots
-                                         
+                                                                                                                 
 ### -------------------------------------------------------- 
     def updateDictionary(self):
         if self.bkgItem.useThis == '':
@@ -243,45 +244,23 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
         self.bkgItem.scrollable = False  
         return  
- 
-## press the '\' backslash first then click - works with pixitems and backgrounds 
-def tagBkg(bkg, pos):  
-    x, y, z = pos.x(), pos.y(), bkg.zValue()   
-    text = QGraphicsSimpleTextItem() 
-              
-    src = 'bkg'  
-    color = 'orange'
-       
-    if bkg.type == 'shadow':
-        if bkg.maker.linked == True:
-            tag = 'Linked' 
-        else: 
-            tag = 'Unlinked'    
-    else:      
-        if bkg.locked == True:
-            text = 'Locked' 
-        else:
-            text = 'Unlocked'
-        fileName = os.path.basename(bkg.fileName)  ## other than backgrounds
-        tag = fileName + " " + text     
-        
-        if bkg.type == 'bkg':
-            if bkg.direction == ' left':
-                tag = tag + ' Left'
-            elif bkg.direction == 'right': 
-                tag = tag + ' Right'
-            tag = tag + ' ' + bkg.useThis    
-        elif bkg.type in ('pix', 'frame') and z == bkg.canvas.mapper.toFront():
-            color = 'yellow' 
-            src = 'pix'      
-        if 'frame' in bkg.fileName: 
-            x, y = common['ViewW']*.47, common['ViewH']-35
-   
-    if bkg.type == 'bkg':
-        color =     'LIGHTSKYBLUE'
-   
-    bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
-        
+      
+    def setBtns(self, bkg, widget):
+        if bkg.direction == 'right': 
+            widget.rightBtn.setStyleSheet(
+                'background-color: LIGHTGREY')
+            widget.leftBtn.setStyleSheet(
+                'background-color: None')            
+        elif bkg.direction == 'left': 
+            widget.leftBtn.setStyleSheet(
+                'background-color: LIGHTGREY')
+            widget.rightBtn.setStyleSheet(
+                'background-color: None')
+        elif bkg.direction == 'vertical':
+            widget.leftBtn.setText('Vertical')   
+            widget.leftBtn.setStyleSheet(
+                'background-color: LIGHTGREY')
+            
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
              
              

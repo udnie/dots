@@ -5,8 +5,6 @@ from PyQt6.QtCore       import QAbstractAnimation
 from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
 
 from dotsSideGig        import *
-from dotsSideCar        import SideCar
-from dotsSideCar2       import SideCar2
 from dotsShowFiles      import ShowFiles
 from dotsShowWorks      import ShowWorks
 from dotsShared         import ControlKeys
@@ -28,10 +26,7 @@ class ShowTime:
         self.scene    = self.canvas.scene
         self.dots     = self.canvas.dots
         self.mapper   = self.canvas.mapper
-        
-        self.sideCar   = SideCar(self.canvas) 
-        self.sideCar2  = SideCar2(self.canvas)  ## ???
-        
+
         self.showWorks = ShowWorks(self.canvas)
         self.showFiles = ShowFiles(self.canvas) 
         self.animation = Animation(self.canvas)
@@ -46,12 +41,12 @@ class ShowTime:
         self.mapper.clearMap()
         self.mapper.clearPathsandTags()  
         self.canvas.unSelect()
-        self.sideCar.hideOutlines()
+        self.canvas.sideCar.hideOutlines()
                        
         if self.canvas.showbiz.tableView != None:
             if self.canvas.showbiz.tableView != None:
                 self.canvas.showbiz.tableView.bye()    
-                                  
+                               
         if not self.canvas.pathList:  ## should already exist - moved from animations
             self.canvas.pathList = getPathList(True) 
             if len(self.canvas.pathList) == 0:
@@ -102,7 +97,11 @@ class ShowTime:
                 self.dots.statusBar.showMessage(file + ' - ' + \
                     'Number of Pixitems: {}'.format(k))  
             self.canvas.animation = True
-                      
+            
+        if self.canvas.videoPlayer != None: 
+            self.canvas.videoPlayer.playVideo()
+            if k == 0: self.showWorks.disablePlay()
+                
 ### --------------------------------------------------------                                 
     def pause(self):
         self.mapper.clearPathsandTags()  
@@ -120,8 +119,8 @@ class ShowTime:
                         QAbstractAnimation.State.Running:  ## running
                         pix.anime.pause() 
             self.showWorks.setPauseKey()
-            if self.canvas.video != None:
-                self.canvas.video.playVideo()  ## toggles pause and play
+            if self.canvas.videoPlayer != None:
+                self.canvas.videoPlayer.playVideo()  ## toggles pause and play
             
     def resume(self):   
         for pix in self.scene.items():  
@@ -135,16 +134,16 @@ class ShowTime:
                     QAbstractAnimation.State.Paused:
                     pix.anime.resume()                   
         self.showWorks.setPauseKey()  
-        if self.canvas.video != None:  ## toggles pause and play
-            self.canvas.video.playVideo()
+        if self.canvas.videoPlayer != None:  ## toggles pause and play
+            self.canvas.videoPlayer.playVideo()
         
 ### --------------------------------------------------------
     def stop(self, action=''):  ## action used by clear               
         self.mapper.clearPathsandTags()     
         scrolling = []  ## used by tracker to remove the 'next' bkg 
         
-        if self.canvas.video != None:
-            self.canvas.video.stopVideo()
+        if self.canvas.videoPlayer != None:
+            self.canvas.videoPlayer.stopVideo()
             
         for pix in self.scene.items():                          
             if type(pix) == 'dotsShadowWidget.PointItem' or \
@@ -200,11 +199,11 @@ class ShowTime:
             return                   
         if len(self.scene.items()) == 0:
             MsgBox("Nothing on Screen to Save", 5)
-            return    
+            return  
         self.reallySaveIt()
             
     def reallySaveIt(self):                                    
-        dlist = self.updlist()                                                                                 
+        dlist = self.updlist()                                                                      
         if dlist:                    
             try:
                 self.showWorks.saveToPlays(dlist)
@@ -216,8 +215,8 @@ class ShowTime:
                             
     def updlist(self):
         dlist = []
-        for pix in self.scene.items():  ## bag what's left                             
-            if pix.type in Types:              ## let 'pivot' thru
+        for pix in self.scene.items():  ## bag what's left     
+            if pix.type in Types:  ## let 'pivot' thru
                 if pix.type == 'pix' and pix.part in ('left','right'): 
                     continue    
                 if pix.type == 'frame': 
@@ -227,9 +226,13 @@ class ShowTime:
                 elif pix.type == 'bkg':    
                     dlist.append(self.showFiles.saveBkgnd(pix)) 
                 elif pix.type == 'flat': 
-                    dlist.append(self.showFiles.saveFlat(pix)) 
+                    dlist.append(self.showFiles.saveFlat(pix))
+                elif pix.type == 'video' and self.canvas.videoPlayer != None:
+                    dlist.append(self.canvas.videoPlayer.saveVideo())
+            elif 'VideoItem' in str(type(pix)) and self.canvas.videoPlayer != None:
+                dlist.append(self.canvas.videoPlayer.saveVideo())
         return dlist           
-   
+
 ### ---------------------- dotsShowTime --------------------
 
     ### --->> optional drop shadow <<-- ###

@@ -4,13 +4,14 @@ import os.path
 import random
 
 from PyQt6.QtCore       import Qt,  QAbstractAnimation, QPoint, QSize, QRect
-from PyQt6.QtWidgets    import QFileDialog
+from PyQt6.QtGui        import QColor
+from PyQt6.QtWidgets    import QFileDialog, QGraphicsSimpleTextItem
                                                     
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsMapMaker       import MapMaker
 
-### ---------------------- dotsSideCar ---------------------
+### --------------------- dotsSideCar2 ---------------------
 ''' no class: just snapShot,dumptrackers, addBkgLabels and small functions '''   
 ### --------------------------------------------------------
 class SideCar2:
@@ -170,7 +171,45 @@ class SideCar2:
                         break
             else:
                 self.canvas.setKeys('F')
-                             
+      
+      ## press the '\' backslash first then click - works with pixitems and backgrounds 
+def tagBkg(bkg, pos):  
+    x, y, z = pos.x(), pos.y(), bkg.zValue()   
+    text = QGraphicsSimpleTextItem() 
+              
+    src = 'bkg'  
+    color = 'orange'
+       
+    if bkg.type == 'shadow':
+        if bkg.maker.linked == True:
+            tag = 'Linked' 
+        else: 
+            tag = 'Unlinked'    
+    else:      
+        if bkg.locked == True:
+            text = 'Locked' 
+        else:
+            text = 'Unlocked'
+        fileName = os.path.basename(bkg.fileName)  ## other than backgrounds
+        tag = fileName + " " + text     
+        
+        if bkg.type == 'bkg':
+            if bkg.direction == ' left':
+                tag = tag + ' Left'
+            elif bkg.direction == 'right': 
+                tag = tag + ' Right'
+            tag = tag + ' ' + bkg.useThis    
+        elif bkg.type in ('pix', 'frame') and z == bkg.canvas.mapper.toFront():
+            color = 'yellow' 
+            src = 'pix'      
+        if 'frame' in bkg.fileName: 
+            x, y = common['ViewW']*.47, common['ViewH']-35
+   
+    if bkg.type == 'bkg':
+        color =     'LIGHTSKYBLUE'
+   
+    bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
+                       
 ### --------------------- dotsSideCar2 ---------------------
 
 

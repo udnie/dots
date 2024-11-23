@@ -80,13 +80,17 @@ class ShowBiz:
                         self.showtime.stop() 
                                         
                     elif key == 'space': ## pause/resume
-                        self.canvas.sideCar.pause()
+                        self.sideCar.pause()
                   
                 elif self.canvas.control == '':  ## no animations running
         
                     if key == 'A':  
                         self.sideCar2.selectAll()
-               
+                                 
+                    elif key == 'B':
+                        if self.canvas.openPlayFile == '':  ## only backgrounds
+                            self.bkgMaker.mirror() 
+                        
                     elif key == 'D':
                         self.sideCar2.deleteSelected()
                     
@@ -98,7 +102,7 @@ class ShowBiz:
                         self.loadPlay()         
                       
                     elif key == 'M':
-                        if self.scene.selectedItems() or self.canvas.sideCar.hasHiddenPix():
+                        if self.scene.selectedItems() or self.sideCar.hasHiddenPix():
                             self.mapper.toggleMap()  
                         else:
                             self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
@@ -121,9 +125,15 @@ class ShowBiz:
                                            
                     elif key == 'U':
                         self.canvas.unSelect()
-       
+                        
+                    elif key == 'V' and self.canvas.videoPlayer != None:
+                        if self.canvas.videoPlayer.widget == None:
+                            self.sideCar.addVideoWidget()
+                        else:
+                            self.sideCar.closeVideoWidget()
+                 
                     elif key == 'W':
-                        self.canvas.sideCar.clearWidgets()
+                        self.sideCar.clearWidgets()
                                                                    
             ## single key commands continued - nothing on screen
             elif len(self.scene.items()) == 0: 
@@ -133,7 +143,7 @@ class ShowBiz:
                     
                 if key == 'A':
                     self.bkgMaker.openBkgFiles() 
-                    
+         
                 elif key == 'D':   ## runs demo menu in canvas
                     if self.demoAvailable:   
                         self.helpMenus.setMenu(key)
@@ -156,14 +166,22 @@ class ShowBiz:
         elif self.canvas.pathMakerOn == True:    
             if key == 'M':
                 self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
+                
+            elif key == 'R':    
+                if self.canvas.control != '':  ## something's running
+                    return
+                else:
+                    self.runThese()         
        
 ### --------------------------------------------------------        
     def runThese(self):   
         if self.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):
             self.helpMenus.demoMenu.runThese() 
         else:
+            if self.canvas.videoPlayer != None:
+                self.canvas.sideCar.closeVideoWidget()    
             self.showtime.run()
-   
+        
     def makeTableView(self, dlist, src=''):  ## called if missing files     
         if self.tableView != None:
             self.tableView.bye()                      
@@ -215,11 +233,11 @@ class ShowBiz:
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
         lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top  for sprites and frames                               
       
-        for tmp in dlist:                                 
+        for tmp in dlist:                                    
             if self.showFiles.fileNotFound(tmp):  ## the reason missing files don't get saved - works with dictionaries
-                continue                
-     
-            if tmp['type'] == 'frame' or 'frame' in tmp['fileName']:        
+                continue  
+   
+            elif tmp['type'] == 'frame' or 'frame' in tmp['fileName']:        
                 frame = Frame(paths['spritePath'] + tmp['fileName'], self.canvas, lnn)
                 self.showFiles.addPixToScene(frame, tmp, lnn)  ## finish unpacking tmp                 
                 lnn -= 1 
@@ -239,6 +257,10 @@ class ShowBiz:
                 lnn -= 1  
                 continue        
                    
+            elif tmp['type'] == 'video': 
+                self.sideCar.addVideo(paths['bkgPath'] + tmp['fileName'], 'open', tmp['loops'])
+                bkgz = -100 
+                   
             ## can be more than one background or flat                    
             elif tmp['type'] in ('bkg', 'flat'):                          
                 ## a flat does not rely on a bkg.file once it's saved to a play.file
@@ -246,12 +268,13 @@ class ShowBiz:
                     pix = Flat(tmp['color'], self.bkgMaker, bkgz)  
                     self.showFiles.addPixToScene(pix, tmp, bkgz )  
                               
-                elif tmp['type'] == 'bkg':    
+                elif tmp['type'] == 'bkg':       
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
                     self.showFiles.addPixToScene(pix, tmp, bkgz )  
              
                 pix.bkgMaker.lockBkg(pix)                                         
-                bkgz -= 1     
+                bkgz -= 1   
+                                  
             del tmp              
         ## end for loop   
                          

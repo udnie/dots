@@ -11,12 +11,12 @@ QH = QColor(220,220,220)  ## 14% gray
 
 RH = 30
 
-Types = ['frame', 'pix', 'bkg', 'flat']  ## used by tableMaker
+Types = ['frame', 'pix', 'video', 'bkg', 'flat']  ## used by tableMaker
 
 ### --------------------- dotsTableModel -------------------
 ''' classes: TableWidgetSetUp, Typelist and TableModel '''  
 ### -------------------------------------------------------- 
-class TableWidgetSetUp(QTableWidget):  
+class TableWidgetSetUp(QTableWidget):  ## used by help menus 
 ### -------------------------------------------------------- 
     def __init__(self, a, b, c, cols3=0, fontSize=0):
         super().__init__()   
@@ -88,7 +88,7 @@ class Typelist:  ## for type header
         self.hdr  = ''
 
 ### --------------------------------------------------------
-class TableModel(QAbstractTableModel):
+class TableModel(QAbstractTableModel):  ## used by tableMaker
 ### --------------------------------------------------------
     def __init__(self, data, cols, hdr):
         super(TableModel, self).__init__()

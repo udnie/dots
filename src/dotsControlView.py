@@ -60,7 +60,7 @@ class ControlView(QGraphicsView):
             fileName = m.urls()[0].toLocalFile()       
             ext = fileName[fileName.rfind('.'):].lower()     
             if ext in ('.mov', '.mp4', '.caf', '.mp3', '.m4a', '.ogg', '.wav'):
-                self.sideCar.videoPlayer(fileName)         
+                self.sideCar.addVideo(fileName, 'dnd')     
             elif self.canvas.pathMakerOn:  ## added for pathmaker
                 e.setAccepted(False)
                 MsgBox("Can't add sprites to PathMaker", 5)
@@ -111,15 +111,12 @@ class ControlView(QGraphicsView):
                   
         elif key == Qt.Key.Key_Space and self.canvas.control != '': 
             self.sideCar.pause()  ## SpaceBar - pause/resume
-                    
+                     
         elif key == Qt.Key.Key_G:
             self.grid.toggleGrid()           
                      
         elif key == Qt.Key.Key_K:  ## keysMenu for storyboard and pathMaker  
             self.sideCar.toggleKeysMenu()        
-            
-        # elif key == Qt.Key.Key_V:  ## requires a default video or mp3
-        #     self.sideCar.videoPlayer() 
                                       
 ### -------- keys with modifiers or pathMaker flags ----------                             
         elif key == Qt.Key.Key_D:

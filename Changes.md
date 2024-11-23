@@ -23,20 +23,30 @@ The three jelly fish videos formatted for 3:2, 16:9, and 9:16 all were cropped f
 
 New video:  <https://youtu.be/4afjwpiISlM>
 
-You'll now need to edit **VideoPlayer** in **dotsSideGig** to go from PyQt6 to PyQt5 along with the rest of the edits.  
+You'll need to edit **VideoPlayer** in **dotsSideGig** inorder to go from PyQt6 to PyQt5 along with the rest of the edits.  
 
 #### Edits for Converting Dots from PyQt6 to PyQt5
     1. Replace PyQt6 with PyQt5 
     2. Replace globalPosition() with globalPos()
     3. Replace e.position() with e.pos() in dotsControlView.py
-    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets. 
-    5. Make required edits to dotsSideGig.py
-    6. Optional: Change QMessageBox height in dotsSideGig.py
+    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
+    5. Make required edits to dotsVideoPlayer.py and videoPlayerOne.py 
+    6. Make any edits involving cv2 if adding opencv-python
+    7. Optional: Change QMessageBox height in dotsSideGig.py
     .
-
 
 **November 4 2024**     
 A few bug fixes.
+
+**November 22 2024**    
+I moved the VideoPlayer I had originally added to **dotsSideGig.py** to **dotsVideoPlayer.py** and added a  **VideoWidget** to that file as well. Once you've added a video typing in **'V'** will open the videoWidget and typing **'V"** when it's displayed will close it as well. This only works if there's a video present. The addition of the videoWidget and the changes required to incorporate a video into dots accomplished three things. First, it eliminated needing to drag a drop the video on to the screen as you can now load a video from the background directory and save a reference to it to in a **.play** file. Second, it provided a means to add looping to the video through the **videoPlayer** and last, a means to delete/remove a video added to a **.play** file. Saving a video to a **.play** file treats the video as just another **.play** file record though it does require saving the file and clearing the screen once the video is deleted if there is more than one item in the file.  Looping isn't available in Qt5 as it isn't in **QMediaPlayer** for that version. This message may appear in the terminal while running **dots** in Qt5  when a video finishes.  
+
+    updateVideoFrame called without AVPlayerLayer (which shouldn't happen
+    updateVideoFrame called without AVPlayerLayer (which shouldn't happen
+    
+Also, I removed the **keys.pdf** as the help menus have replaced it. Looking into the **videoplayer** and **videoWidget** code may be a bit confusing as there are two videoWidgets. One is the graphics scene item that provides the video to the screen while the other is the pop-up widget that handles loops and deletes.  You may also notice '## 5', '## 6' stuck on the end of some lines - that's used to by a python script to comment out the '## 6' lines and uncomment the '## 5' lines so I no longer have to inorder for me to test the code in Qt5.
+
+
  
 ---
 **October 2024**  

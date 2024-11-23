@@ -1,6 +1,4 @@
 
-import os
-import os.path
 import random
 
 from PyQt6.QtCore       import Qt, QPointF
@@ -8,12 +6,13 @@ from PyQt6.QtWidgets    import QApplication
                                                     
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
-from dotsSideGig        import constrain, VideoPlayer
+from dotsSideGig        import constrain
 from dotsMapMaker       import MapMaker
+from dotsVideoPlayer    import VideoPlayer, VideoWidget
 
 ### ---------------------- dotsSideCar ---------------------
-''' no class: just stuff - pixTest, transFormPixitem, snapShot,
-    help menu switch, small functions and a few from showbiz '''   
+''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
+    videoWidget, toggles, small functions and a few from showbiz '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -24,7 +23,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-        
+           
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
@@ -58,38 +57,70 @@ class SideCar:
                 rotation = random.randrange(-5, 5) * 5
                 scale = random.randrange(90, 110)/100.0
                 self.transFormPixItem(pix, rotation, scale, 1.0)
-                             
-    def xy(self, max):
-        return random.randrange(-40, max+40)
-                                    
-### --------------------------------------------------------   
+                                                                 
     def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
-                                                                                                                 
+        
+### --------------------------------------------------------         
+    def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd')
+        if self.canvas.videoPlayer != None: 
+            self.canvas.videoPlayer = None
+            self.videoOff()  ## calls closeVideoWidget as well
+        self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops) 
+        for itm in self.scene.items():
+            if itm.type in ('bkg', 'flat'):
+                itm.setZValue(itm.zValue()-1) 
+        self.canvas.videoPlayer.videoWidget.setZValue(-99)
+        self.canvas.scene.addItem(self.canvas.videoPlayer.videoWidget)  
+        if src == 'dnd' and self.canvas.control == '':
+            self.canvas.showWorks.disablePlay()  ## enables pause/resume/stop
+        elif self.canvas.pathMakerOn == True:  ## no animation
+             self.canvas.showWorks.enablePlay()
+       
+    def videoOff(self):  ## also called from storyboard in clear()
+        for itm in self.scene.items():
+            if 'VideoItem' in str(type(itm)) and self.canvas.videoPlayer != None:
+                self.canvas.scene.removeItem(itm); itm = None
+                self.closeVideoWidget() 
+                self.canvas.videoPlayer = None
+                self.fin()
+                break
+      
+    def fin(self):
+        if self.canvas.control == '' and \
+            self.canvas.animation == False or  \
+            self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):  
+            if len(self.scene.items()) > 0:                         
+                self.canvas.showWorks.enablePlay() 
+        else:
+            self.canvas.showWorks.disablePlay()    
+            
+    def addVideoWidget(self):
+        self.canvas.videoPlayer.widget = VideoWidget(self.canvas)
+                    
+    def closeVideoWidget(self):
+        if self.canvas.videoPlayer.widget != None:
+            self.canvas.videoPlayer.widget.close()     
+            self.canvas.videoPlayer.widget = None  
+                                   
+### -------------------------------------------------------- 
+    def loopit(self):
+        print('ff')
+
+
+       
+    def xy(self, max):
+        return random.randrange(-40, max+40)
+                                                                                                   
     def pageDown(self, key):  ## because scrollpanel wasn't reachable for controlview at the time
         self.canvas.scroll.pageDown(key)
 
     def pause(self):  ## called thru controlview spacebar as well
         self.canvas.showbiz.showtime.pause() 
-              
-    def videoPlayer(self, fileName=""):
-        if self.canvas.video == None:
-            self.canvas.video = VideoPlayer(self.canvas, fileName)
-            if self.canvas.control == '':  ## no animation, disables run, enables 
-                self.canvas.showWorks.disablePlay()  ## pause/resume/stop
-                
-    def videoOff(self):
-        if self.canvas.video != None:
-            self.canvas.video = None
-        if self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):  ## leave 'stop' alone
-            return
-        elif self.canvas.animation == False:  ## only place it's used
-            self.canvas.showWorks.enablePlay()  ## enable run, disable pause/resume/stop
-            
-### --------------------------------------------------------
+        
     def toggleKeysMenu(self):  ## keysPanel
         self.canvas.keysPanel.toggleKeysMenu()  ## no direct path from controlView
   

@@ -8,8 +8,8 @@ from PyQt6.QtGui        import QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
                               
 from dotsShared         import common, paths, ControlKeys
-from dotsBkgScrollWrks  import tagBkg
 from dotsHelpMonkey     import SharedKeys
+from dotsSideCar2       import tagBkg
 
 ## SharedKeys =  ('H','T','/','del','tag','shift','enter','return') 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget

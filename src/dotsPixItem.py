@@ -7,8 +7,8 @@ from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
 from dotsPixWorks       import Works
 from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox
-from dotsBkgScrollWrks  import tagBkg
 from dotsHelpMonkey     import PixHelp
+from dotsSideCar2       import tagBkg
 
 ##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
@@ -30,7 +30,7 @@ class PixItem(QGraphicsPixmapItem):
         self.canvas = parent
         self.scene  = self.canvas.scene
         self.mapper = self.canvas.mapper
-        
+    
         self.type = 'pix'
         self.fileName = fileName
   

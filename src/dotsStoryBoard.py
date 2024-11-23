@@ -49,7 +49,7 @@ class StoryBoard(QWidget):
         self.pathMakerOn = False    ## shared
         self.openPlayFile = ''      ## shared 
         self.pathList = []          ## used by animations and animation menu
-        self.video = None           ## holds mediaplayer reference
+        self.videoPlayer = None     ## holds mediaplayer reference
         self.animation = False      ## set by showtime
     
         self.canvas = self
@@ -185,11 +185,11 @@ class StoryBoard(QWidget):
         QTimer.singleShot(300, self.dots.close)   
                            
     def clear(self):  ## do this before exiting app as well 
-        if self.animation == True:  ## turns off video as well
+        if self.animation == True:
             self.showbiz.showtime.stop('clear') 
-        elif self.canvas.video != None:  ## make sure it's stopped
-            self.canvas.video.stopVideo()
-        time.sleep(.20)  ## otherwise an error report and lockup
+        if self.videoPlayer != None:  ## make sure it's stopped
+            self.sideCar.videoOff()
+        time.sleep(.10)  ## otherwise an error report and lockup
         if self.canvas.pathMakerOn:
             self.pathMaker.pathMakerOff()                   
         self.sideCar.clearWidgets()   
@@ -203,10 +203,10 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.video = None
+        self.videoPlayer = None
         self.animation = False  
         self.view.grabKeyboard()
-        self.setFocus()
+        self.canvas.setFocus()
      
     def loadSprites(self):
         self.showWorks.enablePlay()

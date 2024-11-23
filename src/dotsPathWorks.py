@@ -29,6 +29,7 @@ pathKeys = {
     'R':    'Reverse Path',
     'S':    'Save Path',
     'T':    'Test w/Mr.Ball',
+    'W':    'Toggle WayPoints',
     'X':    'X, Q, Escape to Quit',
     'L':    '**Lasso Points**',
     'U':    ' **UnSelect Points**',   
@@ -36,7 +37,8 @@ pathKeys = {
     'opt':    '**Add a Point**', 
     'Shift-D':  '**Deletes Selected Pts**',  
 }
-             
+
+NS = 27  ## row height override
 ### --------------------------------------------------------     
 class PathHelp:  
 ### --------------------------------------------------------
@@ -51,25 +53,25 @@ class PathHelp:
         
         self.pathHelp2 = None
         
-        self.table = TableWidgetSetUp(55, 185, len(pathKeys)+6, 0, 28)
+        self.table = TableWidgetSetUp(55, 185, len(pathKeys)+6, 0, NS)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 246, 623
+        width, height = 246, 628
         self.table.setFixedSize(width, height)
   
         self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}','',True, True, 2)
     
         row = 1
         for k, val in pathKeys.items():
-            if row < 12:
+            if row < 13:
                 self.table.setRow(row, 0, k,'',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)
                 row += 1
             else:
-                if row == 12:
+                if row == 13:
                     self.table.setRow(row, 0, f'{" These Keys Only Work when Editing ":<20}', QC,True, True, 2)  
                     self.table.setRow(row+1, 0, f'{" and Require a Mouse and Keyboard ":<12}', QC,True, True, 2) 
-                    row = 14
+                    row = 15
                 self.table.setRow(row, 0, k, QL,True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL,'','')                
                 row += 1
@@ -90,9 +92,11 @@ class PathHelp:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help in SharedKeys:
                     self.canvas.pathMaker.pathKeys(help)
+                elif help == 'W':
+                    self.canvas.pathMaker.pathWays.addWayPtTags()   
                 elif help == 'Menu':   
                     self.table.close()
-                    self.pathHelp2 = PathHelp2(self.canvas)
+                    self.pathHelp2 = PathHelp2(self.canvas)  ## dotsHelpDesk
             except:
                 None
         self.closeMenu()

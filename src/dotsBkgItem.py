@@ -9,10 +9,10 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgWorks       import BkgWorks
-from dotsBkgScrollWrks  import BkgScrollWrks, tagBkg, Trackers
+from dotsBkgScrollWrks  import BkgScrollWrks, Trackers
 from dotsHelpMonkey     import BkgHelp
 from dotsAnimation      import Node
-from dotsSideCar2       import SideCar2
+from dotsSideCar2       import tagBkg
 
 SharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
 
@@ -33,9 +33,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.scene    = self.canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
 
-        self.sideCar2 = SideCar2(self.canvas) 
-        self.bkgWorks = BkgWorks(self)
-        
+        self.bkgWorks = BkgWorks(self)  
         self.bkgScrollWrks = BkgScrollWrks(self)
        
         self.tracker = None  
@@ -96,8 +94,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.x, self.y = 0.0, 0.0
         
         self.tag = ''  
-        self.anime = None
-        
+        self.anime = None 
         self.addedScroller = False
            
         self.direction = ''  ## direction of travel: left <<--, right -->>
@@ -106,7 +103,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.showtime  = 0  ## the number of pixels to showtime before the runway goes to zero
         self.useThis   = ''
         self.rate      = 0
-        
         self.runway    = 0  ## what's not visible     
         self.bkgScrollWrks.setRunWay()  
                                    
@@ -176,7 +172,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.key == 'tag': ## '\' <- tagKey
                 self.tagThis()
             elif self.key == 'B':   
-                self.tracker = Trackers(self.canvas, self.sideCar2.dumpTrackers())
+                self.tracker = Trackers(self.canvas, self.canvas.sideCar2.dumpTrackers())
                 if self.tracker != None:
                     self.tracker.show()    
             elif self.key == 'E':   
