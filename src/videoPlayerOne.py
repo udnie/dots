@@ -5,13 +5,15 @@ import time
 import math  
 
 ### --------------------------------------------------------
-''' used in getting the aspect-ratio (width/height) of a video file
-        need to uncomment setScreenFormat as well  '''
+''' You will need to install opencv-python and uncomment the cv2 import
+    and this line # self.setScreenFormat(fileName) inorder to have the 
+    videoPlayer set the screen format on drag and drop. cv2 is used
+    in setting the aspect-ratio (width/height) of a video file '''
 ### --------------------------------------------------------              
 # import cv2 
 ### --------------------------------------------------------
 
-from PyQt6.QtCore       import Qt, QUrl, QSize
+from PyQt6.QtCore       import Qt, QUrl
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QSlider, QHBoxLayout, QVBoxLayout, \
                                 QFileDialog, QLabel, QPushButton, QFrame, QApplication
@@ -31,10 +33,6 @@ Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
 Widths  =  (550,  615,  720,  395)  ## default widget widths
 WID, HGT = 40, 114  ## for opening without discovery
 
-### --------------------------------------------------------
-''' You will need to install opencv-python and uncomment the cv2 import
-    and this line # self.setScreenFormat(fileName) inorder to have the 
-    videoPlayer set the screen format on drag and drop. '''
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
@@ -187,18 +185,17 @@ class VideoPlayer(QWidget):
         return int((newWidth - oldWidth )/2)  ## center qwidget
     
     def setScreenFormat(self, video_path):  ## optional - requires opencv-python
-        pass
-        # cap = cv2.VideoCapture(video_path)  ## plus edits - reads video file
-        # if not cap.isOpened():
-        #     return None
-        # width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        # height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        # cap.release()
-        # asp = math.floor(width/height * 100)/100.0  
-        # try: 
-        #     self.resizeAndMove(Chars[Asps.index(asp)])
-        # except:
-        #     None
+        cap = cv2.VideoCapture(video_path)  ## plus edits - reads video file
+        if not cap.isOpened():
+            return None
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        cap.release()
+        asp = math.floor(width/height * 100)/100.0  
+        try: 
+            self.resizeAndMove(Chars[Asps.index(asp)])
+        except:
+            None
    
     def framing(self):  ## the differences between widget size and videoWidget
         s, v = self.size(), self.videoWidget.size()   
@@ -227,7 +224,7 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-        self.setScreenFormat(fileName)  ## uses cv2 to get aspect ratio screen format on start of video
+       ## self.setScreenFormat(fileName)  ## uses cv2 to get aspect ratio screen format on start of video
 ### ---------------------------- end ----------------------------------- 
 
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              

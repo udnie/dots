@@ -313,8 +313,3 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
 
 
-
-        # if self.direction  == 'left'  and int(value.x()) == int(common['ViewW']/2):
-        #     print(f"{int(value.x())} {int(common['ViewW']/2)}")
-        #     self.canvas.showtime.pause()
-        
