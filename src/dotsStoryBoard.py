@@ -49,7 +49,7 @@ class StoryBoard(QWidget):
         self.pathMakerOn = False    ## shared
         self.openPlayFile = ''      ## shared 
         self.pathList = []          ## used by animations and animation menu
-        self.videoPlayer = None     ## holds mediaplayer reference
+        self.videoPlayer = None           ## holds mediaplayer reference
         self.animation = False      ## set by showtime
     
         self.canvas = self
@@ -93,9 +93,11 @@ class StoryBoard(QWidget):
     ## sends keys to canvas, storyboard, pathMaker and sceneItems
     def setKeys(self, key): 
         self.key = key    
-        if not self.pathMakerOn:  ## 'C' is handled by controlview
-            if self.key in PlayKeys: 
-                QTimer.singleShot(100, partial(self.showbiz.keysInPlay, self.key))  
+        if self.key in PlayKeys:  ## absolutely necessary for help menus !!!
+            QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key))  
+        elif not self.pathMakerOn: 
+            if self.key == 'C':
+                self.clear()        
             elif self.key == 'H' and len(self.scene.items()) == 0:
                 self.helpButton.openMenus()  ## opens canvas help menu
             else:
@@ -187,7 +189,7 @@ class StoryBoard(QWidget):
     def clear(self):  ## do this before exiting app as well 
         if self.animation == True:
             self.showbiz.showtime.stop('clear') 
-        if self.videoPlayer != None:  ## make sure it's stopped
+        if self.canvas.videoPlayer != None:  ## make sure it's stopped
             self.sideCar.videoOff()
         time.sleep(.10)  ## otherwise an error report and lockup
         if self.canvas.pathMakerOn:
@@ -203,7 +205,7 @@ class StoryBoard(QWidget):
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
-        self.videoPlayer = None
+        self.video = None
         self.animation = False  
         self.view.grabKeyboard()
         self.canvas.setFocus()
@@ -222,10 +224,10 @@ class StoryBoard(QWidget):
                 itm.idx in self.pathMaker.selections:
                     idx = self.pathMaker.selections.index(itm.idx)  ## use the index        
                     self.pathMaker.selections.pop(idx)  
-                    itm.setBrush(QColor('white'))   
+                    itm.setBrush(QColor('white'))  
             if itm.zValue() <= common['pathZ']:
-                break        
-
+                break       
+            
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):  ## if sprites are selected and right-mouse click
         if len(self.scene.selectedItems()) > 0:  ## don't remove e

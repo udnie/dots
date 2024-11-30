@@ -6,8 +6,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 
 ---
-**November 2024** 
-
+**November 2024**   
 Updated the Help Menus once again by eliminating three menus that were already represented in some form.  The video covers many of the new menus keyboard commands and functions, most of which have been present in Dots for some time now, but probably not as visible.  
 
 Also added is the ability to play a video file, either a .mov or .mp4, and use it as the  background with an animation running.  Along with that I added a video-player widget to the extras directory. It requires installing opencv-python to provide the code necessary to get a files aspect ratio used in setting the right screen format for viewing.  Dots and the video-player both run in PyQt6 and PyQt5 with some edits.
@@ -33,7 +32,11 @@ You'll need to edit **VideoPlayer** in **dotsSideGig** inorder to go from PyQt6 
     5. Make required edits to dotsVideoPlayer.py and videoPlayerOne.py 
     6. Make any edits involving cv2 if adding opencv-python
     7. Optional: Change QMessageBox height in dotsSideGig.py
-    .
+
+    
+There's now a python script that takes care of steps 4-6 called **script-qt5.py**.
+
+---
 
 **November 4 2024**     
 A few bug fixes.
@@ -51,7 +54,11 @@ Video at: <https://youtu.be/SR47SMG_eXs>
 **November 23 2024**  
 Backed out an edit on videoPlayerOne. It's now both in the source directory as well as in extras as it's easier to test that way.
   
+**November 30 2024**  
+I've added a python script, **script-qt5.py**, to finish the last few steps converting dots from PyQt6 to PyQt5.  It does the commenting/uncommenting in the two videoPlayer files, moves QShortcut to QWidgets in dotsTableMaker and comments out the three lines in PixItem and videoPlayerOne that reference open-cv in case you haven't installed it. It also leaves behind the files dotsPixItem.py--, dotsTableMaker.py--, dotsVideoPlayer.py-- and videoPlayerOne.py--, the original files renamed the way sed does it so the shell script I use can easily delete them once it's finished. Plus a number of changes to consolidate single keys commands in **dotShowBiz.py**.
+
 ---
+
 **October 2024**  
 Rolled back a change I made to the Sprite Help Menu to keep it in the scene.  
 

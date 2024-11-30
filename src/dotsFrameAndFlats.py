@@ -20,7 +20,8 @@ flatKeys = {
     'del':     'delete from screen', 
     'enter':   'move to the front',
     'return':  'move to the front',   
-    'shift':   'move back one ZValue',       
+    'shift':   'move back one ZValue',
+    'dbl-clk': 'delete from screen',   
 }
 
 sharedKeys =  ('H','T','del','tag','shift','enter','return')
@@ -38,7 +39,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
         self.table = TableWidgetSetUp(55, 155, len(flatKeys)+3)
         self.table.itemClicked.connect(self.clicked)         
   
-        width, height = 216, 306
+        width, height = 216, 336
         self.table.setFixedSize(width, height)
  
         if str == 'flat':
@@ -79,7 +80,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
     def closeMenu(self):   
         self.table.close()
         if self.switch !='':
-            self.canvas.showbiz.keysInPlay('N')
+            self.canvas.setKeys('N')
                                                                             
 ### -------------------------------------------------------- 
 class Flat(QGraphicsPixmapItem):

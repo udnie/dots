@@ -145,6 +145,8 @@ class ShowTime:
         if self.canvas.videoPlayer != None:
             self.canvas.videoPlayer.stopVideo()
             
+        self.canvas.control = ''
+            
         for pix in self.scene.items():                          
             if type(pix) == 'dotsShadowWidget.PointItem' or \
                 isinstance(pix, QGraphicsPolygonItem):

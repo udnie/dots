@@ -102,7 +102,7 @@ class StoryHelp2:
     def closeMenu(self):  
         self.table.close()
         if self.switch != '':
-            self.canvas.showbiz.keysInPlay('N')
+            self.canvas.setKeys('N')
      
   ### --------------------------------------------------------     
 class PathHelp2: 
@@ -157,7 +157,7 @@ class PathHelp2:
     def closeMenu(self):  
         self.table.close()
         if self.switch != '':
-            self.canvas.showbiz.keysInPlay('N')
+            self.canvas.setKeys('N')
                       
 ### --------------------- dotsHelpDesk --------------------- 
 

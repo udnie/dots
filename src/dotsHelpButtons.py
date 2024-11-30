@@ -3,9 +3,8 @@ from functools          import partial
 
 from PyQt6.QtCore       import QTimer
 from dotsHelpDesk       import StoryHelp2
-from PyQt6.QtGui        import QKeySequence
 
-from dotsSideGig        import getVuCtr, Grid
+from dotsSideGig        import getVuCtr
 from dotsShared         import PlayKeys 
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 from dotsPathWorks      import PathHelp
@@ -114,10 +113,8 @@ class CanvasHelp:
         self.helpButton.canvasFlag = True
             
         self.canvas = canvas
-    
         self.scene = self.canvas.scene
-        self.grid = Grid(self.canvas)     
-  
+    
         self.switch = switch
 
         self.table = TableWidgetSetUp(50, 190, len(canvasKeys)+5)
@@ -154,9 +151,7 @@ class CanvasHelp:
                 if help in canvasKeys.keys():
                     if help == 'Menu': help = 'M'
                     if help in PlayKeys:
-                        QTimer.singleShot(25, partial(self.canvas.showbiz.keysInPlay, help)) 
-                    elif help in ('G','K'):
-                        self.canvas.view.sendIt(QKeySequence(help), None)  
+                        QTimer.singleShot(10, partial(self.canvas.setKeys, help))   
             except:
                 None          
         self.closeMenu()
@@ -164,8 +159,8 @@ class CanvasHelp:
     def closeMenu(self):
         self.helpButton.canvasFlag = False 
         self.table.close()
-        if self.switch !='':
-            self.canvas.showbiz.keysInPlay('N')
+        if self.switch != '':
+            self.canvas.setKeys('N')
     
 ### --------------------------------------------------------     
 class StoryHelp: 
@@ -220,7 +215,7 @@ class StoryHelp:
                 if help == 'SpaceBar': 
                     help = 'space'
                 if help in PlayKeys:
-                    QTimer.singleShot(25, partial(self.canvas.showbiz.keysInPlay, help))
+                    QTimer.singleShot(10, partial(self.canvas.setKeys, help))
                 elif help == 'Menu':   
                     self.table.close()
                     self.storyHelp2 = StoryHelp2(self.canvas)
@@ -231,8 +226,8 @@ class StoryHelp:
     def closeMenu(self):
         self.helpButton.storyFlag = False  
         self.table.close()
-        if self.switch !='':
-            self.canvas.showbiz.keysInPlay('N')
+        if self.switch != '':
+            self.canvas.setKeys('N')
                 
 ### ------------------- dotsHelpButtons -------------------- 
   

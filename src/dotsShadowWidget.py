@@ -213,7 +213,7 @@ class ShadowWidget(QWidget):
             delBtn.clicked.connect(self.works.deleteShadow)
             quitBtn.clicked.connect(self.works.closeWidget)
         else: 
-            quitBtn.clicked.connect(lambda: self.canvas.showbiz.keysInPlay('N'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
     
         hbox = QVBoxLayout(self)
         

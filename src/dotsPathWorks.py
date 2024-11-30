@@ -93,7 +93,7 @@ class PathHelp:
                 if help in SharedKeys:
                     self.canvas.pathMaker.pathKeys(help)
                 elif help == 'W':
-                    self.canvas.pathMaker.pathWays.addWayPtTags()   
+                    self.canvas.pathMaker.pathWays.toggleWayPtTags()   
                 elif help == 'Menu':   
                     self.table.close()
                     self.pathHelp2 = PathHelp2(self.canvas)  ## dotsHelpDesk
@@ -105,7 +105,7 @@ class PathHelp:
         self.helpButton.pathFlag = False 
         self.table.close()
         if self.switch !='':
-            self.canvas.showbiz.keysInPlay('N')
+            self.canvas.setKeys('N')
                                                                                           
 ### --------------------------------------------------------
 class PathWorks:

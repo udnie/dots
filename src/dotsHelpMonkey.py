@@ -45,7 +45,7 @@ shadowKeys = {
     'enter':    'move to the front',
     'return':   'move to the front',   
     'shift':    'move back one ZValue',  
-    'dlbclk':   'DblClick Toggles Outline',    
+    'dlb-clk':   'Dbl-Click Toggles Outline',    
 }
 
 ## avoids a circular reference

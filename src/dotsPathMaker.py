@@ -116,13 +116,12 @@ class PathMaker(QWidget):
     @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
     def pathKeys(self, key):
         self.key = key
-   
         if key in self.doFirst:
-            if key == 'M':
+            if self.key == 'M':
                 self.canvas.setKeys('M') 
             else:
                 self.doFirst[key]()  ## run the function, value
-                    
+       
         elif self.key == 'E' and self.pathWays.tagCount() > 0:
             self.pathWays.removeWayPtTags()
             if len(self.selections) > 0:
@@ -134,7 +133,7 @@ class PathMaker(QWidget):
                 self.edits.editPoints()
             
         elif self.key == 'L' and self.editingPts == True:  ## turn lasso on/off
-            self.edits.newLasso()if self.lassoOn == False \
+            self.edits.newLasso() if self.lassoOn == False \
                 else self.edits.deleteLasso()
                                                                
         elif self.key in self.editKeys and self.editingPts == True:

@@ -267,7 +267,7 @@ class BkgWidget(QWidget):
             deleteBtn.clicked.connect(lambda: self.bkgMaker.deleteBkg(self.bkgItem))  
             quitBtn.clicked.connect(self.bkgMaker.closeWidget) 
         else: 
-            quitBtn.clicked.connect(lambda: self.canvas.showbiz.keysInPlay('N'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
         
         vbox = QVBoxLayout(self)
         

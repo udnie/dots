@@ -235,7 +235,7 @@ class PathWidget(QWidget):
         quitBtn = QPushButton('Close')
         
         if self.switch == '':
-            waysBtn.clicked.connect(self.pathWays.addWayPtTags)  ## called from controlview
+            waysBtn.clicked.connect(self.pathWays.toggleWayPtTags)  ## called from controlview
             helpBtn.clicked.connect(self.pathMaker.pathWorks.openMenu) 
             saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
             editBtn.clicked.connect(self.pathMaker.edits.editPoints)
@@ -245,7 +245,7 @@ class PathWidget(QWidget):
             delBtn.clicked.connect(self.pathMaker.delete)
             quitBtn.clicked.connect(self.pathMaker.pathWorks.closeWidget)
         else:
-            quitBtn.clicked.connect(lambda: self.canvas.showbiz.keysInPlay('N'))
+            quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
         
         hbox = QVBoxLayout(self)
 

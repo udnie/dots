@@ -41,21 +41,23 @@ class HelpMenus:  ## demos and snakes
         super().__init__()
  
         self.canvas = parent
+        self.demoHelp = None
+        self.screenHelp = None
 
     def setMenu(self, key):
         if key == 'D':
-            self.demoMenu = DemoHelp(self.canvas) 
+            self.demoHelp = DemoHelp(self.canvas) 
         elif key == 'S':
-             self.screenMenu = ScreenHelp(self.canvas)  ## in screens 
+             self.screenHelp = ScreenHelp(self.canvas)  ## in screens 
           
 ### --------------------------------------------------------     
 class DemoHelp:  
 ### --------------------------------------------------------
-    def __init__(self, parent, off=0, str=''):
+    def __init__(self, parent, off=0, switch=''):
         super().__init__()  
    
         self.canvas = parent
-        self.switch = str
+        self.switch = switch
 
         self.dots  = self.canvas.dots
         self.scene = self.canvas.scene
@@ -108,7 +110,7 @@ class DemoHelp:
         
     def closeMenu(self):
         self.table.close()
-        if self.switch !='':
+        if self.switch != '':
             self.canvas.setKeys('N')
     
     def run(self, key):                           
@@ -158,11 +160,11 @@ class DemoHelp:
 ### --------------------------------------------------------     
 class ScreenHelp:  
 ### -------------------------------------------------------- 
-    def __init__(self, parent, off=0, str=''):
+    def __init__(self, parent, off=0, switch=''):
         super().__init__()  
    
         self.canvas = parent  
-        self.switch = str
+        self.switch = switch
        
   ### --------------------------------------------------------   
         self.table = TableWidgetSetUp(60, 95, 60, len(screens)+3)
@@ -201,7 +203,7 @@ class ScreenHelp:
  
     def closeMenu(self):
         self.table.close()
-        if self.switch !='':
+        if self.switch != '':
             self.canvas.setKeys('N')
       
     def switchKey(self, key):           

@@ -287,7 +287,7 @@ class MatteHelp:
             self.matte.help = False
         self.table.close()
         if self.switch !='':
-            self.canvas.showbiz.keysInPlay('N')
+            self.canvas.setKeys('N')
   
 ### -------------------- dotsBkgMatte ----------------------        
 

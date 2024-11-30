@@ -10,6 +10,7 @@ from dotsSideGig        import constrain
 from dotsMapMaker       import MapMaker
 from dotsVideoPlayer    import VideoPlayer, VideoWidget
 
+
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
     videoWidget, toggles, small functions and a few from showbiz '''   
@@ -109,9 +110,7 @@ class SideCar:
 ### -------------------------------------------------------- 
     def loopit(self):
         print('ff')
-
-
-       
+        
     def xy(self, max):
         return random.randrange(-40, max+40)
                                                                                                    

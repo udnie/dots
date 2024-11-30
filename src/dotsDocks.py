@@ -182,13 +182,13 @@ def addPlayBtnGroup(self):
     layout.addWidget(self.btnSave)
     layout.addWidget(self.btnHelp)
 
-    showbiz  = self.showbiz
+    showbiz  = self.canvas.showbiz
     showtime = self.showbiz.showtime
     helpBtn  = self.helpButton
   
     self.btnHelp.clicked.connect(helpBtn.openMenus) 
-    btnLoad.clicked.connect(showbiz.loadPlay)
-    self.btnRun.clicked.connect(lambda: showbiz.keysInPlay('R'))
+    btnLoad.clicked.connect(showbiz.showRunner.loadPlay)
+    self.btnRun.clicked.connect(lambda: self.canvas.setKeys('R'))
     self.btnPause.clicked.connect(showtime.pause)
     self.btnStop.clicked.connect(showtime.stop)
     self.btnSave.clicked.connect(showtime.savePlay) 

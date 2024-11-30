@@ -10,7 +10,6 @@ from dotsShared         import singleKeys
 from dotsSideCar        import SideCar
 from dotsSideCar2       import SideCar2
 from dotsMapMaker       import MapMaker
-from dotsSideGig        import Grid
 
 ### ------------------ dotsControlView ---------------------
 ''' dotsControlView: Base class to create the control view adds drag and 
@@ -27,8 +26,7 @@ class ControlView(QGraphicsView):
         self.mapper   = MapMaker(self.canvas)  ## carry mapper to sidecar  
         self.sideCar  = SideCar(self.canvas)
         self.sideCar2 = SideCar2(self.canvas)
-        self.grid     = Grid(self.canvas)
-        
+
         self.setObjectName('ControlView')
         self.setScene(self.canvas.scene)
          
@@ -90,6 +88,7 @@ class ControlView(QGraphicsView):
         self.sendIt(key, mod)
         
     def sendIt(self, key, mod):
+
 ### ------------- single keys without modifiers -------------     
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
@@ -99,57 +98,46 @@ class ControlView(QGraphicsView):
               
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.canvas.exit() 
-               
-        elif key == Qt.Key.Key_C:
-            if self.canvas.pathMakerOn == False:
-                self.canvas.clear()  ## canvas and storyboard
-            else:
-                self.setKey('C')  ## push to pathMaker
- 
+                
+        elif key == Qt.Key.Key_C: 
+            self.setKey('C')  ## clear canvas and storyboard, pathmaker if no edits
+                   
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
                   
-        elif key == Qt.Key.Key_Space and self.canvas.control != '': 
-            self.sideCar.pause()  ## SpaceBar - pause/resume
-                     
-        elif key == Qt.Key.Key_G:
-            self.grid.toggleGrid()           
-                     
-        elif key == Qt.Key.Key_K:  ## keysMenu for storyboard and pathMaker  
-            self.sideCar.toggleKeysMenu()        
-                                      
-### -------- keys with modifiers or pathMaker flags ----------                             
+        elif key == Qt.Key.Key_Space:
+            if self.canvas.control != '' or self.canvas.animation == True:
+                self.sideCar.pause()  ## SpaceBar - pause/resume
+                                                         
+### ---- keys with modifiers, are conditional or both -------                             
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
                 self.setKey('delPts')  ## delete selected pts in pathmaker
             else: 
                 self.setKey('D')
-                          
-        elif key == Qt.Key.Key_F:
-            if self.canvas.pathMakerOn == False:  
-                self.sideCar2.flopSelected() 
-            else:
-                self.setKey('F')
-                                     
+                                                    
         elif key == Qt.Key.Key_H:  ## toggles hides/unhides selections 
             if mod & Qt.KeyboardModifier.ShiftModifier:
                 self.sideCar.toggleSelections()      
             else:
-                 self.setKey('H')  ## help 
+                self.setKey('H')  ## help 
                  
         elif key == Qt.Key.Key_L:
             if mod & Qt.KeyboardModifier.ShiftModifier:  ##  ## toggles sprites locked on/off
                 self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass
             else:
-                 self.setKey('L')  ## help 
-                     
+                self.setKey('L')  ## used by pathmaker to toggle lasso 
+    
+        elif key == Qt.Key.Key_P and mod & Qt.KeyboardModifier.AltModifier:
+            self.sideCar.loopit()
+
         elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect
             if mod & Qt.KeyboardModifier.ShiftModifier:  ## sprites and shadows
                 self.sideCar.resetAll()  
             else:
                 self.setKey('R')
                                                        
-        elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off
+        elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off        
             if mod & Qt.KeyboardModifier.ShiftModifier and \
                 self.canvas.control == '':
                     self.sideCar.toggleShadowLinks()  ## does them all                            
@@ -161,27 +149,18 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleTagItems('all') 
             else:
                 self.setKey('T')  
-             
-        elif key == Qt.Key.Key_U:  ## unselect for storyBoard and pathMaker
-            if self.canvas.pathMakerOn:
-                self.canvas.unSelect()
-            else:
-                self.setKey('U')  
-          
-        elif key == Qt.Key.Key_W:  ## yes - that's what it does
-            if self.canvas.pathMakerOn:
-                self.canvas.pathMaker.pathWays.addWayPtTags()   
-            else:       
-                self.sideCar.clearWidgets()   
-
+  
         ## apple option key and cmd key - used by scroll panel to scroll tiles
-        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and self.canvas.pathMakerOn == False:      
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and self.canvas.pathMakerOn == False: 
+                 
             if mod & Qt.KeyboardModifier.AltModifier:  
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('-1')  ## scroll one tile         
+                    self.sideCar.pageDown('-1')  ## scroll one tile   
+                          
             elif mod & Qt.KeyboardModifier.ControlModifier:  
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1       
+                    self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1 
+                          
             else:                  
                 self.setKey(singleKeys[key])  ## everyone else 
                                            

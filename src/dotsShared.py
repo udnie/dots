@@ -28,7 +28,7 @@ CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,sp
 
 PathStr = "B,C,D,E,F,H,L,N,M,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
-PlayKeys = ('A','B','C','D','J','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
+PlayKeys = ('A','B','D','F','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
 
 ## use this and make sure your editor points to the right directory
 paths = {        
@@ -107,6 +107,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_C: 'C',
     Qt.Key.Key_E: 'E',  
     Qt.Key.Key_F: 'F',
+    Qt.Key.Key_G: 'G',
     Qt.Key.Key_H: 'H', 
     Qt.Key.Key_J: 'J', 
     Qt.Key.Key_K: 'K',  

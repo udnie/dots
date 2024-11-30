@@ -117,7 +117,7 @@ class VideoPlayer(QWidget):
                     self.playVideo()
                 else:
                     self.stopVideo(); self.started = False
-            elif key == 'Q':
+            elif key in ('Q', 'X'):
                 self.bye()
             e.accept()
         
@@ -224,7 +224,7 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-       ## self.setScreenFormat(fileName)  ## uses cv2 to get aspect ratio screen format on start of video
+        # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
 ### ---------------------------- end ----------------------------------- 
 
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              

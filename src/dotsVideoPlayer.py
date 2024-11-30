@@ -11,7 +11,7 @@ from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
 
 ### ------------ comment out for 6, uncomment for 5 -----------------
-# from PyQt6.QtMultimedia   import QMediaContent  ## 5 
+# from PyQt5.QtMultimedia   import QMediaContent  ## 5 
 ### ---------------------------- end --------------------------------
 
 from dotsSideGig        import getVuCtr
@@ -230,7 +230,7 @@ class VideoWidget(QWidget):
         quitBtn   = QPushButton('Close') 
                                 
         deleteBtn.clicked.connect(self.delete)
-        runBtn.clicked.connect(lambda: self.canvas.showbiz.keysInPlay('R'))
+        runBtn.clicked.connect(lambda: self.canvas.setKeys('R'))
         saveBtn.clicked.connect(self.save)
         quitBtn.clicked.connect(self.bye)
           
@@ -251,7 +251,7 @@ class VideoWidget(QWidget):
         name, fsize = '', 0
         name = os.path.basename(self.canvas.openPlayFile) 
         if name != '':
-            fsize = len(self.canvas.showbiz.openPlay(self.canvas.openPlayFile))   
+            fsize = len(self.canvas.showbiz.showRunner.openPlay(self.canvas.openPlayFile))   
         if fsize == 1:
             try:
                 os.remove(self.canvas.openPlayFile)     

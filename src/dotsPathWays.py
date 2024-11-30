@@ -191,7 +191,7 @@ class PathWays:
         self.cleanUp()
         
 ### --------------------- wayPtTags ------------------------
-    def addWayPtTags(self):
+    def toggleWayPtTags(self):
         if self.pathMaker.addingNewPath:
             return
         if not self.pathMaker.pts:
@@ -204,7 +204,7 @@ class PathWays:
             self.makeTags(lnn)
             
     def makeTags(self, lnn):
-        self.addWayPtTagsGroup()
+        self.toggleWayPtTagsGroup()
         inc = int(lnn/10)  ## approximate a 10% increment
         list = (x*inc for x in range(10))  ## get the indexes
         for idx in list:
@@ -222,7 +222,7 @@ class PathWays:
         self.tag.setZValue((common['pathZ'])+35) 
         self.tagGroup.addToGroup(self.tag)
            
-    def addWayPtTagsGroup(self):
+    def toggleWayPtTagsGroup(self):
         self.tagGroup = QGraphicsItemGroup()
         self.tagGroup.setZValue((common['pathZ'])+35)
         self.scene.addItem(self.tagGroup)
@@ -231,7 +231,7 @@ class PathWays:
         self.removeWayPtTags()
         self.pathMaker.removePath()
         self.pathMaker.addPath()
-        self.addWayPtTags()
+        self.toggleWayPtTags()
              
     def removeWayPtTags(self):   
         if self.tagCount() > 0:  ## don't change

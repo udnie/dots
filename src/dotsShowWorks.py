@@ -67,15 +67,16 @@ class ShowWorks:
         p.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)          
    
 ### --------------------------------------------------------      
-    def setPauseKey(self):  ## showbiz all the way down    
+    def setPauseKey(self):  ## showbiz all the way down   
         if self.canvas.control == 'pause': 
             self.canvas.btnPause.setText( 'Resume' );
             self.canvas.control = 'resume'
         elif self.canvas.control == 'resume':
             self.canvas.btnPause.setText( 'Pause' );
             self.canvas.control = 'pause' 
-        if self.canvas.videoPlayer != None:
-            self.canvas.videoPlayer.pause()  
+        elif self.canvas.control != '':
+            if self.canvas.videoPlayer != None:
+                self.canvas.videoPlayer.pause()  
   
     def enablePlay(self):  ## turns play on - disables the rest
         self.canvas.control = ''
