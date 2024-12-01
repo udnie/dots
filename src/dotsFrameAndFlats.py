@@ -79,7 +79,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
     
     def closeMenu(self):   
         self.table.close()
-        if self.switch !='':
+        if self.switch != '':
             self.canvas.setKeys('N')
                                                                             
 ### -------------------------------------------------------- 

@@ -122,74 +122,71 @@ class Matte(QWidget):  ## opens itself
         if mod & Qt.KeyboardModifier.ShiftModifier:
             if key == Qt.Key.Key_Greater:
                 self.shared('>')
+                
             elif key == Qt.Key.Key_Less:
                 self.shared('<')
+                
         elif key in ('E',  Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.matteHelp.closeMenu()
+            
         elif key == Qt.Key.Key_Space:
             self.shared('Space')
+            
         else: 
             key = chr(key) 
             self.shared(key)   
          
-    def shared(self, key):  ## used with help menu  
-        if key == 'R': 
-            self.canvas.showbiz.showtime.run()
-     
-        elif key == 'Space':          
-            self.canvas.showbiz.showtime.pause() 
-         
-        elif key == 'S':  
-            self.canvas.showbiz.showtime.stop() 
+    def shared(self, key):  
+        if key != 'P' and self.pix != None:
+            self.pix = None 
+
+        if key == 'W':  ## change color  
+            self.brush = self.white    
+                
+        elif key == 'G':  ## change color  
+            self.brush = self.grey       
+                    
+        elif key == 'B':  ## change color  
+            self.brush = self.black    
             
+        elif key == 'C':  ## change color
+            self.brush = self.lst[random.randint(0,2)] 
+                
+        elif key == 'P' and self.pix == None:    
+            self.pix = self.img  ## something to initialize it  
+            
+        elif key == 'P' and self.pix != None: 
+            self.pix = None
+            self.brush = self.lst[random.randint(0,2)]
+                            
+        ## set screen format ratio to around .61 - midway between 16:9 and 3:2 
+        elif key == 'V': 
+            self.ratio = self.altRatio if self.ratio == 1.0 else 1.0    
+        
         elif key == '>':  ## scale up  
             self.scaleUp()       
                 
         elif key == '<':  ## scale down
             self.scaleDown()   
-                   
-        elif key in ('Q','X'):
-            self.bye()
-                     
-        elif key == 'B':  ## change color  
-            self.brush = self.black    
-             
-        elif key == 'C':  ## change color
-            if self.pix != None:
-                self.pix = None
-                self.brush = self.white
-            elif self.brush == self.white:
-                self.brush = self.grey
-            elif self.brush == self.grey:
-                self.brush = self.black
-            elif self.brush == self.black:
-                self.brush = self.white 
-                                                 
-        elif key == 'G':  ## change color  
-            self.brush = self.grey        
-                                
+                                                                                     
         elif key == 'H': 
             if self.help == False:  
-                self.matteHelp = MatteHelp(self.canvas, self)      
+                self.matteHelp = MatteHelp(self.canvas, self) 
+                     
             elif self.help == True:   
                 self.matteHelp.closeMenu()
-                 
-        elif key == 'P':  ## use pix 
-            if self.pix == None:    
-                self.pix = self.img  ## something to initialize it  
-            else:
-                self.pix = None
-                self.brush = self.lst[random.randint(0,2)] 
-                
-        ## set screen format ratio to around .61 - midway between 16:9 and 3:2 
-        elif key == 'V': 
-            self.ratio = self.altRatio if self.ratio == 1.0 else 1.0    
-                            
-        elif key == 'W':  ## change color  
-            self.brush = self.white  
+                                                                          
+        elif key == 'R': 
+                self.canvas.showbiz.showtime.run()
+        
+        elif key == 'Space':          
+            self.canvas.showbiz.showtime.pause() 
+        
+        elif key == 'S':  
+            self.canvas.showbiz.showtime.stop() 
+                  
+        self.update() if key not in ('Q','X') else self.bye()
             
-        self.update()
-  
 ### --------------------------------------------------------  
     def scaleUp(self):      
         wuf = self.border    ## self.border = 30  
@@ -230,17 +227,17 @@ class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------     
 class MatteHelp:  
 ### -------------------------------------------------------- 
-    def __init__(self, parent, mat, off=0, str = ''):  ## decided to center it 
+    def __init__(self, parent, mat, off=0, switch = ''):  ## decided to center it 
         super().__init__()  
    
         self.canvas = parent
         self.matte = mat
         
-        self.switch = str
+        self.switch = switch
         self.off = off
         
         if self.switch == '':
-            self.matte.help = True  ## let's the widget know the help menu is open
+            self.matte.help = True  ## lets the widget know the help menu is open
 
         self.table = TableWidgetSetUp(75, 170, len(matteKeys)+4,0,28)
         self.table.itemClicked.connect(self.clicked)         
@@ -286,7 +283,7 @@ class MatteHelp:
         if self.switch == '': 
             self.matte.help = False
         self.table.close()
-        if self.switch !='':
+        if self.switch != '':
             self.canvas.setKeys('N')
   
 ### -------------------- dotsBkgMatte ----------------------        

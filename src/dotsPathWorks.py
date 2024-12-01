@@ -104,7 +104,7 @@ class PathHelp:
     def closeMenu(self):
         self.helpButton.pathFlag = False 
         self.table.close()
-        if self.switch !='':
+        if self.switch != '':
             self.canvas.setKeys('N')
                                                                                           
 ### --------------------------------------------------------
