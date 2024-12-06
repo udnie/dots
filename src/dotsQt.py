@@ -60,7 +60,7 @@ class DotsQt(QMainWindow):
         self.move(getX(), vert)   ###getY()-int(vert/4))  ## functions in screens 
 
         ## can't all happen at once
-        QTimer.singleShot(100, self.canvas.loadSprites)
+        QTimer.singleShot(100, self.canvas.scroll.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always
                          
         QTimer.singleShot(100, self.show)

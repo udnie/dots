@@ -5,7 +5,7 @@ import time
 from functools          import partial
 
 from PyQt6.QtCore       import QTimer, QEvent, QPointF, pyqtSlot, QRect, QPoint
-from PyQt6.QtGui        import QTransform, QCursor, QColor
+from PyQt6.QtGui        import QTransform, QCursor
 from PyQt6.QtWidgets    import QWidget, QRubberBand, QGraphicsScene
                                         
 from dotsShared         import common, CanvasStr, PathStr, MoveKeys, PlayKeys
@@ -28,8 +28,8 @@ from dotsPixWorks       import AnimationHelp
 from dotsWings          import Wings
 
 ### -------------------- dotsStoryBoard --------------------
-''' class StoryBoard: program hub/canvas, includes context menu and 
-    screen handling for selecting screen objects '''
+''' class StoryBoard: program hub/canvas, setKeys, includes 
+            addPixitem, clear and context menu '''
 ### --------------------------------------------------------
 class StoryBoard(QWidget):
 ### --------------------------------------------------------
@@ -43,8 +43,6 @@ class StoryBoard(QWidget):
         self.view.setGeometry(QRect(0,0,common['ViewW']+2, common['ViewH']+2))
         self.setFixedSize(common['ViewW']+2, common['ViewH']+2)
         
-        # self.setStyleSheet('background-color: 250,250,250')
-     
         self.control = ''           ## variables are shared across some classes
         self.pathMakerOn = False    ## shared
         self.openPlayFile = ''      ## shared 
@@ -64,9 +62,9 @@ class StoryBoard(QWidget):
         self.mapper    = MapMaker(self) 
         self.bkgMaker  = BkgMaker(self)
                    
-        self.showbiz    = ShowBiz(self)   ## reads .play files   
+        self.showbiz    = ShowBiz(self)   ## reads .play files from showRunner
         self.showWorks  = ShowWorks(self) 
-        self.helpButton = ButtonHelp(self)  ## from help button
+        self.helpButton = ButtonHelp(self)  
      
         addScrollDock(self) 
         addKeysDock(self)
@@ -92,17 +90,16 @@ class StoryBoard(QWidget):
     @pyqtSlot(str)
     ## sends keys to canvas, storyboard, pathMaker and sceneItems
     def setKeys(self, key): 
-        self.key = key    
-        if self.key in PlayKeys:  ## absolutely necessary for help menus !!!
-            QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key))  
-        elif not self.pathMakerOn: 
-            if self.key == 'C':
+        self.key = key     
+        if not self.pathMakerOn: 
+            if self.key in PlayKeys:  ## absolutely necessary for help menus !!!
+                QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key)) 
+            elif self.key == 'C':
                 self.clear()        
             elif self.key == 'H' and len(self.scene.items()) == 0:
                 self.helpButton.openMenus()  ## opens canvas help menu
-            else:
-                if self.key in CanvasStr or self.key == '':
-                    self.sideCar2.sendPixKeys(self.key) 
+            elif self.key in CanvasStr or self.key == '':
+                self.sideCar2.sendPixKeys(self.key) 
         elif self.pathMakerOn:                            
             ## send MoveKeys to PathItem selections in PathEdits
             if self.pathMaker.edits.pointItemsSet() == True and \
@@ -112,8 +109,10 @@ class StoryBoard(QWidget):
             elif self.key in PathStr: 
                 if self.key == 'C' and len(self.scene.items()) == 0: 
                     self.clear()  ## really does it and returns to canvas
-                elif self.key == 'M':
+                elif self.key in ('H', 'M'):
                     self.helpButton.openMenus() 
+                elif self.key == 'U':  ## uses unSelect in sideCar2 
+                    QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key)) 
                 else:    
                     self.pathMaker.pathKeys(self.key)
                 
@@ -126,7 +125,7 @@ class StoryBoard(QWidget):
                 
                 if self.key == 'cmd':   ## start rubberband 
                     self.mapper.clearMap() 
-                    self.unSelect()              
+                    self.sideCar2.unSelect(self.pathMaker)              
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
                     if self.animation == False:
                         self.mapper.updatePixItemPos()   
@@ -154,7 +153,7 @@ class StoryBoard(QWidget):
                 self.mapper.updatePixItemPos()    
                        
             if e.type() == QEvent.Type.MouseButtonDblClick:
-                ## to preseve selections dblclk on an selection otherwise it 
+                ## to preseve selections dbl-clk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the same as 
                 ## single click outside the map area do this if nothing at location
                 if p := self.scene.itemAt(QPointF(e.pos()), QTransform()):
@@ -183,8 +182,8 @@ class StoryBoard(QWidget):
               
     def exit(self):
         QTimer.singleShot(0, self.clear) 
-        QTimer.singleShot(200, self.dots.closeAll)
-        QTimer.singleShot(300, self.dots.close)   
+        QTimer.singleShot(100, self.dots.closeAll)
+        QTimer.singleShot(200, self.dots.close)   
                            
     def clear(self):  ## do this before exiting app as well 
         if self.animation == True:
@@ -193,7 +192,9 @@ class StoryBoard(QWidget):
             self.sideCar.videoOff()
         time.sleep(.10)  ## otherwise an error report and lockup
         if self.canvas.pathMakerOn:
-            self.pathMaker.pathMakerOff()                   
+            self.pathMaker.pathMakerOff() 
+        if self.showbiz.tableView != None:
+            self.showbiz.tableView.bye()                     
         self.sideCar.clearWidgets()   
         self.sideCar.clearSceneItems()    
         self.scene.clear() 
@@ -209,25 +210,7 @@ class StoryBoard(QWidget):
         self.animation = False  
         self.view.grabKeyboard()
         self.canvas.setFocus()
-     
-    def loadSprites(self):
-        self.showWorks.enablePlay()
-        self.scroll.loadSprites()
- 
-    def unSelect(self):  ## sharing the 'U' with pathMaker for unselect
-        self.mapper.clearMap()  
-        for itm in self.scene.items():  
-            if itm.type == 'pix':
-                itm.isHidden = False 
-                itm.setSelected(False)  
-            elif itm.type == 'pt' and self.pathMaker.selections and \
-                itm.idx in self.pathMaker.selections:
-                    idx = self.pathMaker.selections.index(itm.idx)  ## use the index        
-                    self.pathMaker.selections.pop(idx)  
-                    itm.setBrush(QColor('white'))  
-            if itm.zValue() <= common['pathZ']:
-                break       
-            
+
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):  ## if sprites are selected and right-mouse click
         if len(self.scene.selectedItems()) > 0:  ## don't remove e

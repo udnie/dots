@@ -138,7 +138,8 @@ class Matte(QWidget):  ## opens itself
          
     def shared(self, key):  
         if key != 'P' and self.pix != None:
-            self.pix = None 
+            if key in ('W', 'B', 'G', 'C', 'V', '<', '>'):
+                self.pix = None 
 
         if key == 'W':  ## change color  
             self.brush = self.white    
@@ -195,21 +196,20 @@ class Matte(QWidget):  ## opens itself
         elif self.border == 12: 
             self.border = self.step    ## self.step = 27
         elif self.border >= self.step:
-            self.border += self.step + 2
-        if self.border == wuf: 
-            self.border = 12  ## stuck, next size up            
+            self.border += (self.step + 2)               
         if self.y-(self.border*self.ratio) < self.stop:  ## self.stop = 50 = (min y.() - Max Headroom) 
             self.border = wuf  ## back it off - top of screen display
             MsgBox('  Max Headroom  ', 5)  ## can vary 
                    
-    def scaleDown(self):           
-        if self.border == self.step: 
-            self.border = 12  
-        elif self.border == 12:
-            self.border = 5
-        elif self.border > self.step:
-            self.border -= self.step - 2
-        
+    def scaleDown(self):     
+        border = (self.border - self.step) - 2          
+        if self.border == self.step or border < self.step and \
+            border > 5 or border == 1:  ## 30-2-27
+                border = 12        
+        elif border <= 5:
+            border = 5
+        self.border = border
+ 
     ## stops the matte from losing focus by trapping mouse clicks           
     def mousePressEvent(self, e):   
         self.save = e.globalPosition()

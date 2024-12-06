@@ -190,7 +190,7 @@ six20 = {   ## 1102 - must be a string not a number
     'margin1':     22,   
     'margin2':     -5,       
     'ScrollH':    977,
-    'SliderH':    977, 
+    'SliderH':    985, 
     'gridSize': 34.43,
 }
 

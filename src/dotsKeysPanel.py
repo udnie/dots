@@ -82,12 +82,12 @@ class KeysPanel(QWidget):
             header[1] = 'PathMaker '
             self.tableView.horizontalHeader().setStyleSheet(
                 'QHeaderView::section{\n'
-                'background-color: rgb(144,238,144);\n'
+                'background-color: rgb(115,252,214);\n'
                 'border:  1px solid rgb(240,240,240); \n'
                 'font-size: 11px;\n'
                 '}')  
             self.tableView.setStyleSheet('QTableView {\n'
-                'alternate-background-color: rgb(144,238,144);\n'
+                'alternate-background-color: rgb(115,252,214);\n'
                 'font-size: 11px;\n'
                 '}')  
         else:

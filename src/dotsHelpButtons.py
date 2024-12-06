@@ -2,7 +2,6 @@
 from functools          import partial
 
 from PyQt6.QtCore       import QTimer
-from dotsHelpDesk       import StoryHelp2
 
 from dotsSideGig        import getVuCtr
 from dotsShared         import PlayKeys 
@@ -18,7 +17,7 @@ canvasKeys = {
     'J':    'JSON File Viewer',
     'K':    'Toggle KeysPanel',
     'L':    'Load a play file', 
-    'Menu': 'Help Menus',
+    'Menus':'Help Menus',
     'P':    'Switch to PathMaker', 
     'S':    'Display the Screen Menu',
     'X':    'X, Q, Escape to Quit',
@@ -26,13 +25,14 @@ canvasKeys = {
 
 storyKeys = {
     'A':    'Select All',  
-    'B':    'Background Mirrored', 
+    'B':    'Background Add or Mirrored', 
     'C':    'Clear Canvas',
     'D':    'Delete Selected',
     'J':    'JSON Play File Viewer',
     'L':    'Load Play File',
     'M':    'This Help Menu',
     'Menu': 'StoryBoard Help Menu 2',
+    'Menus':'Help Menus',
     'O':    'Toggle Shadow Outlines', 
     'S':    'Save Play File',    
     'U':    'UnSelect All',
@@ -149,7 +149,7 @@ class CanvasHelp:
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help in canvasKeys.keys():
-                    if help == 'Menu': help = 'M'
+                    if help == 'Menus': help = 'M'
                     if help in PlayKeys:
                         QTimer.singleShot(10, partial(self.canvas.setKeys, help))   
             except:
@@ -179,21 +179,21 @@ class StoryHelp:
         self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 267, 600
+        width, height = 267, 630
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}','',True,True,2)
     
         row = 1
         for k, val in storyKeys.items():
-            if row < 15:
+            if row < 16:
                 self.table.setRow(row, 0, k, '', True,True)
                 self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
-                if row == 15:
+                if row == 16:
                     self.table.setRow(row, 0, f"{' Keys for Running an Animation':<32}",QC,True,True,2)
-                    row = 16
+                    row = 17
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1
@@ -212,13 +212,16 @@ class StoryHelp:
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help == 'SpaceBar': 
-                    help = 'space'
-                if help in PlayKeys:
-                    QTimer.singleShot(10, partial(self.canvas.setKeys, help))
+                if help == 'Menus': 
+                    QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
+                    self.canvas.clear()
                 elif help == 'Menu':   
-                    self.table.close()
-                    self.storyHelp2 = StoryHelp2(self.canvas)
+                    self.storyHelp2 = StoryHelp2(self.canvas)      
+                elif help == 'SpaceBar': 
+                    help = 'space'                 
+                if help in PlayKeys: 
+                    QTimer.singleShot(10, partial(self.canvas.setKeys, help))
+                self.table.close()  
             except:
                 None    
         self.closeMenu()

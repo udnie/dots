@@ -1,9 +1,10 @@
 
 import os
 import math
+from functools          import partial
 
-from PyQt6.QtCore       import QRect, QPointF, QPoint, QPropertyAnimation
-from PyQt6.QtGui        import QPixmap, QPainterPath
+from PyQt6.QtCore       import QTimer, QRect, QPointF, QPoint, QPropertyAnimation
+from PyQt6.QtGui        import QPixmap, QPainterPath, QColor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsAnimation      import Node 
@@ -16,14 +17,17 @@ from dotsHelpDesk       import PathHelp2
 ScaleRotate = ('<', '>', '+', '-')  ## sent from keyboard
 ScaleUpKeys = ('>','\"','\'')
 ScaleDnKeys = ('<',':',';')
-SharedKeys =  ('C','E','D','N','P','R','S','T','X')  
-                 
+SharedKeys =  ('C','E','D','N','P','R','S','T','W','X')  
+  
+SpinDrift = QColor('#73fcd6')
+                      
 pathKeys = {
     'C':    'Center Path',
     'D':    'Clears/Deletes Scene',
     'E':    'Edit Path Points', 
     'M':    'This Help Menu',
     'Menu': 'PathMakerHelp Menu 2',
+    'Menus':'Help Menus',
     'N':    'New Path and Close Path',
     'P':    'Path Chooser',
     'R':    'Reverse Path',
@@ -56,22 +60,22 @@ class PathHelp:
         self.table = TableWidgetSetUp(55, 185, len(pathKeys)+6, 0, NS)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 246, 628
+        width, height = 246, 656
         self.table.setFixedSize(width, height)
   
         self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}','',True, True, 2)
     
         row = 1
         for k, val in pathKeys.items():
-            if row < 13:
+            if row < 14:
                 self.table.setRow(row, 0, k,'',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)
                 row += 1
             else:
-                if row == 13:
+                if row == 14:
                     self.table.setRow(row, 0, f'{" These Keys Only Work when Editing ":<20}', QC,True, True, 2)  
                     self.table.setRow(row+1, 0, f'{" and Require a Mouse and Keyboard ":<12}', QC,True, True, 2) 
-                    row = 15
+                    row = 16
                 self.table.setRow(row, 0, k, QL,True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL,'','')                
                 row += 1
@@ -89,14 +93,16 @@ class PathHelp:
     def clicked(self):
         if self.switch == '':
             try:
-                help = self.table.item(self.table.currentRow(), 0).text().strip()
+                help = self.table.item(self.table.currentRow(), 0).text().strip() 
                 if help in SharedKeys:
-                    self.canvas.pathMaker.pathKeys(help)
-                elif help == 'W':
-                    self.canvas.pathMaker.pathWays.toggleWayPtTags()   
+                    self.canvas.pathMaker.pathKeys(help)    
+                elif help == 'Menus': 
+                    QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
+                    self.canvas.pathMaker.pathMakerOff()
+                 ## show help menus  
                 elif help == 'Menu':   
-                    self.table.close()
                     self.pathHelp2 = PathHelp2(self.canvas)  ## dotsHelpDesk
+                self.table.close()
             except:
                 None
         self.closeMenu()
@@ -279,7 +285,7 @@ class PathWorks:
             
     def turnGreen(self):
         self.canvas.btnPathMaker.setStyleSheet(
-            'background-color: rgb(55,240,140);\n'
+            'background-color: rgb(115,252,214);\n'
             'border:  1px solid rgb(240,240,240); \n'
             'border-width: 1px; \n'
             'font-size: 13px;')      

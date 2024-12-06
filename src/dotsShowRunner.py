@@ -74,9 +74,13 @@ class ShowRunner:
         return dlist                                                            
                                                                                                                                                                                                                           
 ### --------------------------------------------------------                            
-    def loadPlay(self, src=''):   
-        if self.canvas.pathMakerOn:  ## use pathChooser - was loader once but now you can see them
-            return
+    def loadPlay(self, src=''):  ## scr='table' launch play file viewer
+        if self.canvas.pathMakerOn:  
+            return     
+        elif self.canvas.videoPlayer != None:
+            MsgBox('Delete the Video and Reload it as the Last Screen Item', 6)
+            return 
+        
         Q = QFileDialog()
         Q.Option.DontUseNativeDialog
         which = 'Files (*.play *.tmp)' if src == 'table' else  'Files (*.play *.tmp)'  

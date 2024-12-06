@@ -10,7 +10,6 @@ from dotsSideGig        import constrain
 from dotsMapMaker       import MapMaker
 from dotsVideoPlayer    import VideoPlayer, VideoWidget
 
-
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
     videoWidget, toggles, small functions and a few from showbiz '''   
@@ -24,7 +23,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-           
+          
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
@@ -73,40 +72,40 @@ class SideCar:
         self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops) 
         for itm in self.scene.items():
             if itm.type in ('bkg', 'flat'):
-                itm.setZValue(itm.zValue()-1) 
+                itm.setZValue(itm.zValue()-1)           
         self.canvas.videoPlayer.videoWidget.setZValue(-99)
-        self.canvas.scene.addItem(self.canvas.videoPlayer.videoWidget)  
+        self.scene.addItem(self.canvas.videoPlayer.videoWidget)     
         if src == 'dnd' and self.canvas.control == '':
             self.canvas.showWorks.disablePlay()  ## enables pause/resume/stop
         elif self.canvas.pathMakerOn == True:  ## no animation
              self.canvas.showWorks.enablePlay()
+        self.canvas.btnRun.setText('Video')
        
     def videoOff(self):  ## also called from storyboard in clear()
         for itm in self.scene.items():
             if 'VideoItem' in str(type(itm)) and self.canvas.videoPlayer != None:
-                self.canvas.scene.removeItem(itm); itm = None
-                self.closeVideoWidget() 
-                self.canvas.videoPlayer = None
-                self.fin()
+                self.scene.removeItem(itm)
+                del itm
                 break
-      
-    def fin(self):
+        self.closeVideoWidget() 
+        self.canvas.videoPlayer = None    
         if self.canvas.control == '' and \
             self.canvas.animation == False or  \
             self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):  
             if len(self.scene.items()) > 0:                         
                 self.canvas.showWorks.enablePlay() 
         else:
-            self.canvas.showWorks.disablePlay()    
+            self.canvas.showWorks.disablePlay()  
+        self.canvas.btnRun.setText('Run')     
             
     def addVideoWidget(self):
         self.canvas.videoPlayer.widget = VideoWidget(self.canvas)
                     
     def closeVideoWidget(self):
-        if self.canvas.videoPlayer.widget != None:
+        if self.canvas.videoPlayer and self.canvas.videoPlayer.widget != None:
             self.canvas.videoPlayer.widget.close()     
             self.canvas.videoPlayer.widget = None  
-                                   
+                                                                  
 ### -------------------------------------------------------- 
     def loopit(self):
         print('ff')
@@ -145,8 +144,8 @@ class SideCar:
                     else pix.unlinkShadow()    
                 self.mapper.tagsAndPaths.tagThis('', pix, '')
        
-    def toggleTagItems(self, all=''):  ##  standin for mapper version
-        if self.mapper.tagCount() > 0:      
+    def toggleTagItems(self, all=''):   ## standin for mapper version
+        if self.mapper.tagCount() > 0:  ## sprites and shadows
             self.mapper.clearTagGroup()
             self.mapper.clearPaths() 
             return

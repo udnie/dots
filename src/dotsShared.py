@@ -26,7 +26,7 @@ common = {  ## wherever it's needed
 ### --------------------------------------------------------
 CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,space,cmd,left,right,up,down,del,opt,shift,return,enter,tag"   
 
-PathStr = "B,C,D,E,F,H,L,N,M,P,R,S,T,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
+PathStr = "B,C,D,E,F,H,L,N,M,P,R,S,T,U,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
 PlayKeys = ('A','B','D','F','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
 

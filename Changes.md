@@ -4,6 +4,25 @@
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.    
 
+---  
+
+### Edits for Converting Dots from PyQt6 to PyQt5
+    1. Replace PyQt6 with PyQt5 
+    2. Replace globalPosition() with globalPos()
+    3. Replace e.position() with e.pos() in dotsControlView.py
+    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
+    5. Make required edits to dotsVideoPlayer.py and videoPlayerOne.py 
+    6. Make any edits involving cv2 if adding opencv-python
+    7. Optional: Change QMessageBox height in dotsSideGig.py
+
+    
+There's now a python script that takes care of steps 4-6 called **script-qt5.py**, see **November 30** for more detail. The first three steps can be accomplished in vscode with a minimum of time and effort.
+
+---
+**December 5 2024**   
+Added a **'Help Menus'** selection to the **StoryBoard** and **PathMaker** help menus to show all the menus just as in **Canvas** by clicking on the **Menus** entry. Fixes to **dotsMatte.py, videoWidget** and **pathMaker** to clean up some bugs. **'B'** in storyboard will call the background file dialog if there are no backgrounds in the scene, **'A'** does that in canvas and is used to select all in storyboard, otherwise **B** will mirror the background provided it's not from a .play file. 
+
+I was looking for a way to let the user know that a video was loaded and the only indicators were to either click on **'run'** or type in **'R'** or **'V'**  and see what happens. I had considered popping up the videoWidget once the video was loaded but thought it might become annoying after a while so I settled on what I hope will be a more gentle approach by setting the **Run** button text to **Video** when it's been loaded and back to **Run** when the video is deleted or the screen is cleared. 
 
 ---
 **November 2024**   
@@ -22,19 +41,7 @@ The three jelly fish videos formatted for 3:2, 16:9, and 9:16 all were cropped f
 
 New video:  <https://youtu.be/4afjwpiISlM>
 
-You'll need to edit **VideoPlayer** in **dotsSideGig** inorder to go from PyQt6 to PyQt5 along with the rest of the edits.  
-
-#### Edits for Converting Dots from PyQt6 to PyQt5
-    1. Replace PyQt6 with PyQt5 
-    2. Replace globalPosition() with globalPos()
-    3. Replace e.position() with e.pos() in dotsControlView.py
-    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
-    5. Make required edits to dotsVideoPlayer.py and videoPlayerOne.py 
-    6. Make any edits involving cv2 if adding opencv-python
-    7. Optional: Change QMessageBox height in dotsSideGig.py
-
-    
-There's now a python script that takes care of steps 4-6 called **script-qt5.py**.
+You'll need to edit **VideoPlayer** in **dotsSideGig** inorder to go from PyQt6 to PyQt5 along with the rest of the edits.  See above.
 
 ---
 

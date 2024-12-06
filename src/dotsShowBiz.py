@@ -25,13 +25,13 @@ class ShowBiz:
         self.scene  = self.canvas.scene
         self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper
-        
-        self.sideCar   = SideCar(self.canvas)  
-        self.sideCar2  = SideCar2(self.canvas) 
-               
+    
         self.pathMaker = self.canvas.pathMaker
         self.bkgMaker  = self.canvas.bkgMaker
-            
+    
+        self.sideCar   = SideCar(self.canvas)  
+        self.sideCar2  = SideCar2(self.canvas) 
+                 
         self.demoAvailable = DemoAvailable()
 
         self.showtime   = ShowTime(self.canvas)
@@ -64,9 +64,9 @@ class ShowBiz:
                 self.showRunner.runThese() 
                 
         elif key == 'U':  ## unselect for storyBoard and pathMaker
-            self.canvas.unSelect()
+            self.sideCar2.unSelect(self.pathMaker)
    
-        elif self.canvas.pathMakerOn == False:  
+        elif self.canvas.pathMakerOn == False:  ## see pathmaker for its single key commands
                                      
             if len(self.scene.items()) > 0:  ## storyboard single key commands
                 
@@ -87,7 +87,9 @@ class ShowBiz:
                         self.sideCar2.selectAll()
                                  
                     elif key == 'B':
-                        if self.canvas.openPlayFile == '':  ## only backgrounds
+                        if self.canvas.sideCar2.hasBackGround() == 0:
+                            self.bkgMaker.openBkgFiles()             
+                        elif self.canvas.openPlayFile == '':  ## only backgrounds
                             self.bkgMaker.mirror() 
                         
                     elif key == 'D':
@@ -155,20 +157,7 @@ class ShowBiz:
                     
                 elif key == 'S':   
                     self.helpMenus.setMenu(key)  ## screen menu
-                              
-        elif self.canvas.pathMakerOn == True:    
-            if key == 'D':     
-                self.pathMaker.delete()
-          
-            elif key == 'L':
-                self.canvas.pathMaker.pathKeys(key)  ## togglelasso
-             
-            elif key == 'M':
-                self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
-                         
-            elif key == 'W': 
-                self.canvas.pathMaker.pathWays.toggleWayPtTags()   
-                
+               
 ### ---------------------- dotsShowBiz --------------------
 
 

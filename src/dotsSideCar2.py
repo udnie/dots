@@ -3,7 +3,7 @@ import os
 import os.path
 import random
 
-from PyQt6.QtCore       import Qt,  QAbstractAnimation, QPoint, QSize, QRect
+from PyQt6.QtCore       import QAbstractAnimation, QPoint, QSize, QRect
 from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QFileDialog, QGraphicsSimpleTextItem
                                                     
@@ -12,7 +12,8 @@ from dotsSideGig        import MsgBox
 from dotsMapMaker       import MapMaker
 
 ### --------------------- dotsSideCar2 ---------------------
-''' no class: just snapShot,dumptrackers, addBkgLabels and small functions '''   
+''' no class: snapShot,dumptrackers, addBkgLabels, setMirroredBtnText,
+            setBtns, tagBkg and files from storyboard '''   
 ### --------------------------------------------------------
 class SideCar2:
 ### --------------------------------------------------------
@@ -23,11 +24,11 @@ class SideCar2:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-
+        
 ### --------------------------------------------------------      
-    def snapShot(self):  ## screen capture
-        if self.hasBackGround() or self.scene.items():
-            self.canvas.unSelect()  ## turn off any select borders
+    def snapShot(self, pathMaker):  ## screen capture
+        if self.hasBackGround() > 0 or self.scene.items():
+            self.unSelect(pathMaker)  ## turn off any select borders
             if self.canvas.pathMakerOn == False:
                 if self.canvas.mapper.isMapSet():
                     self.canvas.mapper.removeMap()
@@ -56,11 +57,9 @@ class SideCar2:
                 quality=100)        
             MsgBox('Saved as ' + snap, 3)
   
-    def hasBackGround(self):
-        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if itm.type == 'bkg':
-                return True
-        return False
+    def hasBackGround(self): 
+        return sum( pix.type == 'bkg' 
+            for pix in self.scene.items())
                          
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
@@ -156,23 +155,63 @@ class SideCar2:
                     del pix
                     k += 1
             if k > 0: self.canvas.showWorks.enablePlay()  ## stop it - otherwise it's hung
-            
+  
+    def unSelect(self, pathMaker):  ## shares the 'U' from pathMaker as well
+        for itm in self.scene.items():  
+            if itm.type == 'pix':       
+                itm.isHidden = False 
+                itm.setSelected(False) 
+            elif itm.type == 'pt' and pathMaker.selections and \
+                itm.idx in pathMaker.selections:    
+                    idx = pathMaker.selections.index(itm.idx)             
+                    pathMaker.selections.pop(idx)  
+                    itm.setBrush(QColor('white'))  
+            if itm.zValue() <= common['pathZ']:
+                break    
+                         
     def flopSelected(self):    
         if self.canvas.pathMakerOn == False:
             if len(self.scene.selectedItems()) > 0:
                 for pix in self.scene.items():
                     if pix.type == 'pix':
                         if pix.isSelected() or pix.isHidden:
-                            if pix.flopped:
-                                pix.setMirrored(False)
-                            else:
-                                pix.setMirrored(True)
+                            pix.setMirrored(False) if pix.flopped else pix.setMirrored(True)   
                     elif pix.zValue() <= common['pathZ']:
                         break
             else:
                 self.canvas.setKeys('F')
-      
-      ## press the '\' backslash first then click - works with pixitems and backgrounds 
+    
+    def setMirrorBtnText(self, bkg, widget):  ## if added 
+        if bkg:  ## shouldn't need this but - could have just started to clear        
+            if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
+                self.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
+                bkg.scrollable = True                                      
+            if bkg.scrollable == False:
+                widget.mirrorBtn.setText('Not Scrollable')  
+                bkg.direction = ''              
+            if bkg.mirroring == False:
+                widget.mirrorBtn.setText('Continuous')         
+            elif bkg.mirroring == True:
+                widget.mirrorBtn.setText('Mirrored')
+
+    def setBtns(self, bkg, widget):  ## from bkgMaker widget
+        if bkg.direction == 'right': 
+            widget.rightBtn.setStyleSheet(
+                'background-color: LIGHTGREY')
+            widget.leftBtn.setStyleSheet(
+                'background-color: None')            
+        elif bkg.direction == 'left': 
+            widget.leftBtn.setStyleSheet(
+                'background-color: LIGHTGREY')
+            widget.rightBtn.setStyleSheet(
+                'background-color: None')
+        elif bkg.direction == 'vertical':
+            widget.leftBtn.setText('Vertical')   
+            widget.leftBtn.setStyleSheet(
+                'background-color: LIGHTGREY')
+            
+### --------------------------------------------------------
+## press the '\' backslash first then click - works with pixitems and backgrounds      
 def tagBkg(bkg, pos):  
     x, y, z = pos.x(), pos.y(), bkg.zValue()   
     text = QGraphicsSimpleTextItem() 
@@ -206,10 +245,10 @@ def tagBkg(bkg, pos):
             x, y = common['ViewW']*.47, common['ViewH']-35
    
     if bkg.type == 'bkg':
-        color =     'LIGHTSKYBLUE'
-   
+        color = 'LIGHTSKYBLUE'
+        
     bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
-                       
+                                   
 ### --------------------- dotsSideCar2 ---------------------
 
 

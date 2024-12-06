@@ -8,13 +8,14 @@ from PyQt6.QtGui        import QColor, QCursor
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
                                 QColorDialog
 
-from dotsSideGig        import MsgBox
 from dotsShared         import common, paths, ControlKeys
+from dotsSideGig        import MsgBox
 from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
 from dotsSideCar        import SideCar
+from dotsSideCar2       import SideCar2
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -32,7 +33,8 @@ class BkgMaker(QWidget):
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
         
-        self.sideCar = SideCar(self.canvas)
+        self.sideCar  = SideCar(self.canvas)
+        self.sideCar2 = SideCar2(self.canvas)
         
         self.init()
       
@@ -132,7 +134,7 @@ class BkgMaker(QWidget):
                     MsgBox('saveBkgColor: Error saving file', 5)
                 self.flat = None
            
-    def mirror(self):  ## very basic
+    def mirror(self):  ## very basic 
         wuf = None
         for bkg in self.scene.items():  
             if bkg.type == 'bkg':
@@ -172,8 +174,8 @@ class BkgMaker(QWidget):
             self.view.grabKeyboard()
   
     def updateWidget(self, bkg):
-        self.setMirrorBtnText(bkg)
-        bkg.bkgScrollWrks.setBtns(bkg, self.widget)
+        self.sideCar2.setMirrorBtnText(bkg, self.widget)
+        self.sideCar2.setBtns(bkg, self.widget)
         self.setLocksText(bkg) 
         
 ### --------------------------------------------------------
@@ -187,22 +189,7 @@ class BkgMaker(QWidget):
             
             self.widget.showtimeSlider.setValue(bkg.showtime)
             self.widget.showtimeValue.setText(f'{bkg.showtime:3}')
-
-    def setMirrorBtnText(self, bkg):  ## if added 
-        if bkg:  ## shouldn't need this but - could have just started to clear        
-            if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
-                self.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
-                bkg.scrollable = True     
-                                          
-            if bkg.scrollable == False:
-                self.widget.mirrorBtn.setText('Not Scrollable')  
-                bkg.direction = ''
-                       
-            if bkg.mirroring == False:
-                self.widget.mirrorBtn.setText('Continuous')         
-            elif bkg.mirroring == True:
-                self.widget.mirrorBtn.setText('Mirrored')
-                                                                   
+                                                                 
     def setLocksText(self, bkg):
         if bkg == None:
             return
@@ -256,28 +243,13 @@ class BkgMaker(QWidget):
             else bkg.setZValue(self.mapper.lastZval('bkg')-1)  
         self.lockBkg(bkg)   
         self.closeWidget()
-        
-    def backOne(self, bkg):    
-        bkg.setZValue(bkg.zValue()-1)
-        self.lockBkg(bkg)   
-        self.closeWidget()
-        
-    def upOne(self, bkg):    
-        bkg.setZValue(bkg.zValue()+1)
-        self.lockBkg(bkg)   
-        self.closeWidget()
-                
+                     
     def updateZvals(self, bkg):  ## move the rest back one Z and lock them
         for itm in self.scene.items():
             if itm.type in ('bkg', 'flat') and itm.zValue() <= bkg.zValue():
                 if itm != bkg:
                     itm.setZValue(itm.zValue()-1) 
-     
-    def showZVals(self):
-        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if itm.type == 'bkg':
-                print(itm.zValue())  ## show zvals
-                                
+                               
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()
         bkg.setPos(p.x() , p.y())

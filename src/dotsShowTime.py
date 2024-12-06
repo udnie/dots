@@ -10,6 +10,7 @@ from dotsShowWorks      import ShowWorks
 from dotsShared         import ControlKeys
 from dotsAnimation      import Animation
 from dotsTableModel     import Types
+from dotsSideCar2       import SideCar2
 
 Demos = ['snakes', 'bats', 'hats']
 
@@ -32,6 +33,7 @@ class ShowTime:
         self.animation = Animation(self.canvas)
         
         self.pathMaker = self.canvas.pathMaker
+        self.sideCar2  = SideCar2(self.canvas) 
      
 ### --------------------------------------------------------        
     def run(self):  ## runs whatever is in scene that can be animated
@@ -40,9 +42,9 @@ class ShowTime:
         
         self.mapper.clearMap()
         self.mapper.clearPathsandTags()  
-        self.canvas.unSelect()
+        self.sideCar2.unSelect(self.pathMaker)
         self.canvas.sideCar.hideOutlines()
-                       
+                      
         if self.canvas.showbiz.tableView != None:
             if self.canvas.showbiz.tableView != None:
                 self.canvas.showbiz.tableView.bye()    
@@ -186,7 +188,7 @@ class ShowTime:
         self.showWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  
-                          
+                  
 ### --------------------------------------------------------
     def savePlay(self):   
         if self.canvas.control in ControlKeys:  ## there's an animation running - needs to be stopped first

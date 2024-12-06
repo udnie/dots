@@ -138,9 +138,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = key 
         try:  ## doesn't appear that the widget can get input other than thru this
             if self.key in ('up', 'down','right','left') and self.bkgMaker.widget != None:
-                if self.scene.selectedItems():  ## widget uses arrow keys to adjust screenrate 
-                    self.canvas.unSelect()
-                self.bkgMaker.widget.setKeys(key)
+                self.bkgMaker.widget.setKeys(key)  ## trapped in pixitem as it happens before bkg
         except AttributeError:
             pass
         

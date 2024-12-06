@@ -244,22 +244,6 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
         self.bkgItem.scrollable = False  
         return  
-      
-    def setBtns(self, bkg, widget):
-        if bkg.direction == 'right': 
-            widget.rightBtn.setStyleSheet(
-                'background-color: LIGHTGREY')
-            widget.leftBtn.setStyleSheet(
-                'background-color: None')            
-        elif bkg.direction == 'left': 
-            widget.leftBtn.setStyleSheet(
-                'background-color: LIGHTGREY')
-            widget.rightBtn.setStyleSheet(
-                'background-color: None')
-        elif bkg.direction == 'vertical':
-            widget.leftBtn.setText('Vertical')   
-            widget.leftBtn.setStyleSheet(
-                'background-color: LIGHTGREY')
             
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
              

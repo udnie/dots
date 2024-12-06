@@ -186,12 +186,12 @@ def addPlayBtnGroup(self):
     showtime = self.showbiz.showtime
     helpBtn  = self.helpButton
   
-    self.btnHelp.clicked.connect(helpBtn.openMenus) 
     btnLoad.clicked.connect(showbiz.showRunner.loadPlay)
     self.btnRun.clicked.connect(lambda: self.canvas.setKeys('R'))
     self.btnPause.clicked.connect(showtime.pause)
     self.btnStop.clicked.connect(showtime.stop)
     self.btnSave.clicked.connect(showtime.savePlay) 
+    self.btnHelp.clicked.connect(helpBtn.openMenus) 
   
     self.playGroup.setLayout(layout)
 
@@ -252,7 +252,7 @@ def addCanvasBtnGroup(self):
   
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
         btnClrCanvas.clicked.connect(canvas.clear)   
-        btnSnapShot.clicked.connect(canvas.sideCar2.snapShot)
+        btnSnapShot.clicked.connect(lambda: self.canvas.sideCar2.snapShot(pathMaker))
         btnPixTest.clicked.connect(canvas.sideCar.pixTest)
         btnExit.clicked.connect(canvas.exit)
         

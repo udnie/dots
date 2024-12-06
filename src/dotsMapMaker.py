@@ -183,10 +183,10 @@ class MapMaker:
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
 
-    def toggleTagItems(self, pid): 
+    def toggleTagItems(self, pid):   ## there's one another in sidecar for sprites/shadows
         if self.canvas.pathMakerOn:  ## doesn't work here
             return  
-        if self.tagCount() > 0:  ## clear tags     
+        if self.tagCount() > 0:  
             self.clearTagGroup()
             self.clearPaths() 
             return

@@ -87,13 +87,13 @@ class Works:  ## small functions that were in ShadowMaker
         self.maker.outline.setZValue(self.maker.shadow.zValue()-1)   
         self.scene.addItem(self.maker.outline)
         
-    def toggleOutline(self):
+    def toggleOutline(self):  ## called by sideCar thru toggleOutlines
         if self.maker.outline != None:
             if self.maker.outline.isVisible() == True:
                 self.hideOutline() 
             elif self.maker.outline.isVisible() == False:
                 self.showOutline()
-            self.closeWidget()
+        if self.maker.widget != None: self.closeWidget()
   
     def deleteOutline(self): 
         if self.maker.outline != None:

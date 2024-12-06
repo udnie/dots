@@ -10,7 +10,7 @@ from dotsSideGig        import MsgBox
 from dotsHelpMonkey     import PixHelp
 from dotsSideCar2       import tagBkg
 
-##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+# from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 from dotsAnimation      import fin
@@ -126,8 +126,10 @@ class PixItem(QGraphicsPixmapItem):
     @pyqtSlot(str)  ## updated by storyboard directly 
     def setPixKeys(self, key):  ## the decorator is suppose to get a better response
         self.key = key  
- 
-        if self.isHidden or self.isSelected():
+        
+        if self.canvas.bkgMaker.widget != None:  ## widget can use movekwys to set rates
+            return                               ## handled in bkgitem as well
+        elif self.isHidden or self.isSelected():
             if self.locked == False:
                 if key in RotateKeys:
                     self.works.rotateThis(key)
@@ -247,13 +249,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.shadowMaker.addShadow(self.x, self.y, common["ViewW"],common["ViewH"])
                 self.works.closeWidget()   
                 self.shadow = self.shadowMaker.shadow  
-                
-    def toggleThisTag(self, id):
-        if self.shadowMaker.shadow != None and self.shadowMaker.linked:
-            return
-        else:
-            self.mapper.toggleTagItems(id)  ## display
-                                         
+                                                     
     def setMirrored(self, bool): 
         self.flopped = bool
         self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
@@ -277,16 +273,11 @@ class PixItem(QGraphicsPixmapItem):
      
     def setLockBtnText(self):
         if self.widget != None:
-            if self.locked == False:
-                self.widget.lockBtn.setText('Lock')  ## keep it open  
-            else:
-                self.widget.lockBtn.setText('UnLock')  ## keep it open  
+            self.widget.lockBtn.setText('Lock') if self.locked == False else \
+                self.widget.lockBtn.setText('UnLock')    
                 
     def togglelock(self):
-        if self.locked == False:
-            self.lockSprite()
-        else:
-            self.unlockSprite()
+        self.lockSprite() if self.locked == False else self.unlockSprite()
         tagBkg(self, self.pos())
         QTimer.singleShot(3000, self.mapper.clearTagGroup)
         

@@ -46,6 +46,7 @@ class PathMaker(QWidget):
             'N': self.edits.toggleNewPath,
             'X': self.canvas.exit,
             'M': 'special case',
+            'W': self.pathWays.toggleWayPtTags,
         }
 
         self.direct = {
