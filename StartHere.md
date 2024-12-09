@@ -1,40 +1,50 @@
 
-### Last Update: 09/07/2024
+### Last Update: 12/08/2024
        
 ---
 **To Begin**  
-This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. 
+This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. PyQt5 runs with some edits, see **Changes**, they're right at the beginning. Two video related issues, there are no loops to set in Qt5 and a video may not disappear when it ends if there are too many animations running at the same time.
 
 ---
        
 **Screens**  
-I use 'screens' to refer to both the screen format, number of pixels and its ratio, and the three screens that make up dots, Canvas, Storyboard and PathMaker. 
-
-**Help**
-As of September 2024 I've added help menus that catalog what I feel are the most useful commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know.
+I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**. 
+ **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
+ 
+**Help**  
+As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember. 
        
+       
+**Four Important Files**   
+There are four files I'd suggest looking into - **ControlView**, **ShowBiz**, **Shared**, and **Screens**. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles all/most of the multi-key function requests and passes everything else to **Storyboard** which in turn passes them on either to **ShowBiz** which handles most of the single key requests from **Canvas** and **Storyboard** thru the **PlayFile** list or onto **PathMaker** for it to take care of if it's active. **Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**.  
+
+I recently made code changes **ControlView**, **ShowBiz**, **Storyboard** and others not only to accommodate new additions but to clarify working processes as well. Be aware that my code can change.
+       
+---
+
 **Files and Directories**   
-There are four directories that you should be aware of - **sprites** and **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to do something other than play with the **sprites** and **backgrounds** already there. 
+There are four directories you should be aware of, **sprites**, **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to do something other than play with the sprites and backgrounds already there. You can add any **videos** you plan to use to the backgrounds directory as they're treated as just another background.  
 
-What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend using a .jpg file and keeping it under or around **500MB** in size.   Format it to **640** pixels on the short side if you plan on scrolling it. 
+Except - when adding a video to an animation it needs to be added last so it's positioned as the first background screen object. You're also stopped from trying to open a play file if there's already an open video.  I've changed the text of the **'Run'** key to to display **'Video'** when there's one opened as an visual heads up -  you can also type in **'V'** for the videoWidget.
 
-If you have a current model iPhone, iPad, or Mac you may be able to generate a sprite using **Remove BackGround** as found in Preview Tools or in Photos on IOS devices by using your fingers or mouse to save a selection with the background removed. You also can look into using **SpriteMaker**. There's a write-up and a video for it.
+
+What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend using a .jpg file and keeping it under or around **500MB** in size and formatting it to **640** pixels on the short side if you plan on scrolling it. I'd considered these to be the minimum required sizes.  You'll need to do some experimenting to find out what works best for your setup, especially if scrolling backgrounds.
+
+If you have a current model iPhone, iPad, or Mac you may be able to generate a sprite using **Remove BackGround** as found in Preview Tools or in Photos on IOS devices by using your fingers or mouse to save a selection with the background removed. You also can look into using **SpriteMaker** in the **extras** dictionary. There's a write-up and a video for it. SpriteMaker requires **opencv-python** to generate a useable image.  Opencv is also used to create shadows and as an option in videoPlayerOne in helping to set the screen format used to display the video. 
 
 The **plays** directory is made up of **.json** formatted **.play** files used to store **animated scenes** or **collage** data required to restore the last saved scene/canvas. You'll also find the **screenrates.dict** file used by scrolling backgrounds there as well. Lastly the **paths** directory is used by **pathMaker** to store **.path** files - lists of screen point locations for building animated paths sprites can follow.
 
 Along with these four directories there are the **demo, extras, images** and **src** directories.  The **demo** and **images** directories contain some photo assets and demo path files and are primarily used in keeping the **sprites** and **backgrounds** directories free of unnecessary clutter. 
 
-The **extras** directory contains **outline.py** and **dropShadow.py** and the  **spriteMaker** directory. In May 2024, I posted a short video that reintroduces them. There are earlier videos as well.  
+The **extras** directory contains **outline**, **dropShadow** and the  **spriteMaker** directory. In May 2024, I posted a short video that reintroduces them. There are earlier videos as well.  I've added **videoPlayerOne** to extras and it's also posted to the src directory.
 
-I would suggest looking into **Changes** to get an idea of how **dots** works. These videos cover the most recent additions while touching on the basics along the way. Unfortunately YouTube needs to collect its tariff for hosting these videos and you could get misdirected. That's not me trying to sell you something.  
+I would suggest looking into **Changes** to get an idea of how the various parts of **dots** work together. There are videos which cover the most recent additions while touching on the basics along the way. Unfortunately YouTube needs to collect its tariff for hosting these videos and you could get misdirected. That's not me trying to sell you something. 
+
+Another suggestion is to type in **'D'** for the demo menu or click on the **help button** to get started.
 
 ---
-    
-**Four Important Files**   
-There are four files I'd suggest looking into - **dotsControlView.py**, **dotsShowBiz.py**, **dotsShared**, and **dotsScreens.py**. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles most of the multi-key function requests.  **dotsShowBiz** handles most of the single key requests from **Canvas** and **Storyboard** thru the **PlayFile** list.  **Shared** is made up of lists and dictionaries that are shared throughout dots and **Screens** contains all or most of the code and data used in reformatting and resizing **dots**.
 
-
-If you're in **Windows** you won't need to edit the **paths** dictionary in **dotsShared.py**. That was my experience recently when installing and running dots on a windows 11 laptop. It just worked.
+If you're in **Windows** you won't need to edit the **paths** dictionary in **Shared**. That was my experience recently when installing and running **dots** on a **windows 11** laptop. It just worked other than having to set the path to include **site-packages** so python could find PyQt and anything else I've added.
 
 
 
@@ -58,39 +68,26 @@ I've recently changed the directory layout for **dots** by moving the **dots\*.p
 ---
 
 **Menus and Their Locations**   
-The menus for **Animations and Paths**, **Demo Menu**, **HelpMenu** and the **Screen Menu** are in **dotsMenus.py**.   
-
-**From a blank canvas screen** you can trigger the **helpMenu** by entering **H** or clicking on the help button. These single-key commands will work if the **screen/canvas** is blank.  This menu has been updated and there are now 12 menus including this one.
-
-    'A':    'Add a Background', 
-    'B':    'Add a Background', 
-    'D':    'Display the Demo Menu',
-    'H':    'Canvas Help Menu',
-    'J':    'JSON File Viewer',
-    'L':    'Load a play file', 
-    'P':    'Switch to PathMaker', 
-    'R':    'Display the Demo Menu',
-    'S':    'Display the Screen Menu', 
-
-    'C' clears the canvas
-     The 'PathMaker' button enables a program with a program to draw a paths used to animate a sprite.
-    
+There are five help *.py files and each one has a list of help files that details the location of each help menu.  Selecting **help Menus** from a help button menu will let you examine them all. Many of the help menus will let you click on line item to perform the function attached to the key you'd actually use. Not all do and I've tried to distinguish those.
+   
 ---
 
 **Widgets and Keys**  
-A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMaker** from a blank canvas, will pop up a widget that provides access to the most often used functions such as scaling, rotation or scrolling controls.
+A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMaker** from a blank canvas, will pop up a widget that provides access to the most often used functions such as scaling, rotation, scrolling controls or others, including a help menu, depending on what you've selected.
 
-There are also a number of **keyboard** controls that either match the functions provided by the widgets or add additional functions, especially if more than one **sprite** has been selected.  The right hand panel is a scrolling list of the keys, key combinations and their actions. The key assignments will change as you switch between **StoryBoard/Canvas** and **PathMaker** or by entering **'K'** from the keyboard . **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active.
+There are a number of **keyboard** controls that either match the functions provided by the widgets or add additional functions, especially if more than one **sprite** has been selected.  The right hand panel is a scrolling list of the keys, key combinations and their actions. The key assignments will change as you switch between **StoryBoard/Canvas** and **PathMaker** or by entering **'K'**. 
+
+The keysPanel has been replaced by the help buttons and menus and will eventually disappear.
 
 ---
 
 **Sprites, Backgrounds and Flats**  
-**Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A', 'B'**  or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites** and **backgrounds** to a **play** file.
+**Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A'** from the **canvas** or **'B'** if there are sprites but no background or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites**, **backgrounds** and **video** to a **play** file.
 
 ---
 
 **Shadows**   
-If you would like to try out **shadows**, besides downloading and installing **opencv-python**, you'll need to make a small edit in **dotsPixItem.py** to comment out an import and uncomment another.
+If you would like to try out **shadows**, besides downloading and installing **opencv-python**, you'll need to make a small edit in **PixItem** to comment out an import and uncomment another.
 
     from dotsShadowMaker    import ShadowMaker  ## add shadows
     ##from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
@@ -102,13 +99,13 @@ An easy test is to run a left or right scrolling demo once you've downloaded, in
 ---
     
 **Scrolling Backgrounds**  
-I've moved the really gnarly stuff concerning scrolling backgrounds to the **screenrates.dict** in the **play** directory. Its contents are the two dictionaries, **screentimes** and **moretimes** which I've commented out in **BkgItem.py** and left as a reference. The **screentimes dictionary** handles the **16:9** formats while the **moretimes dictionary** takes care of the **3:2** formats.  You can mix formats if you use the **3:2** format to display them as each **background** is tracked separately. 
+I've moved the really gnarly stuff concerning scrolling backgrounds to the **screenrates.dict** in the **play** directory. Its contents are the two dictionaries, **screentimes** and **moretimes**, see **Rates and Background Widget**. The **screentimes dictionary** handles the **16:9** formats while the **moretimes dictionary** takes care of the **3:2** formats.  You can mix formats if you use the **3:2** format to display them as each **background** is tracked separately. 
 
-**Screentimes** and **moretimes** still provide the defaults for the **scrolling backgrounds screen rates** even though they're no longer tied to the code in **BkgItem.py**. By adding the **ScreenRate** slider to the **background widget** you're now able to adjust the rate and if the new rate is a better fit you can save it as the new default to **screenrates.dict** using the **update button**. The current **screen rate** value as well as the **factor** and **showtime** values are carried over if the **background** is saved to a **.play** file.
+You're can easily adjust the screen rate, the variable that determines how fast the **'next'** scrolling background moves, and if the new rate is a better fit you can save it as the default to **screenrates.dict** using the **update button**. The current **screen rate** value as well as the **factor** and **showtime** values are carried over if the scrolling background is saved to a **.play** file.
 
-Running a demo with a scrolling background will immediately inform you as to whether my best guess on **screenrates** was correct or not.  Probably not, which is why the demo background, **bluestone.jpg**, is in the **backgrounds** directory. As it's the same background used in the demos - once you've got the background to scroll smoothly the demo will do the same. Some of the bat demo backgrounds are also now read from the backgrounds directory as I've deleted the three same named files from the demo directory.
+Running a demo with a scrolling background will immediately inform you as to whether my best guess on **screenrates** was correct or not.  Probably not, which is why the demo background, **bluestone.jpg**, is in the **backgrounds** directory. As it's the same background used in the demos - once you've got the background to scroll smoothly the demo should do the same. 
 
-**Scrolling Backgrounds** are constantly being deleted and created and the data necessary to maintain the scrolling rate is lost between the two which is why I added the **newTracker** dictionary in **dotsBkgMaker.py**. Tracker data doesn't change unless there's a change in direction or to a control and it's saved between sessions when saving to a **.play** file.
+**Scrolling Backgrounds** are constantly being deleted and the data necessary to maintain the scrolling data is lost which is why I added the **newTracker** dictionary located in **BkgMaker**. Tracker data won't change unless there's a change in direction or to a control and it's saved between sessions when saving to a **.play** file. It's a good idea not to mix scrolling backgrounds and videos.
 
     tmp = {
         "fileName":   os.path.basename(bkg.fileName),
@@ -127,12 +124,13 @@ Running a demo with a scrolling background will immediately inform you as to whe
 **Rates and Background Widget Controls**  
 The **rate** is a list of three values each of which I also refer to as a rate.  The first value, **10.0**, is the **first screen rate**, the other two values are the rates for **next-left** and **next-right**.  The **first** background doesn't have to travel as far to exit while the second background, **next** has to wait its turn till it's **showtime** and then match the speed the **first** is traveling without gapping or overrunning it. Once **first** has exited the screen the backgrounds that follow are now all **next** and shouldn't require further adjustments.
 
-**You can use the arrow keys** to make small adjustments, 5 points or 1, plus or minus, to the **screenrate slider**.
+**You can use the arrow keys** to make small adjustments, 5 points or 1, plus or minus, to the **screenrate slider**.  There's a reminder on the backgrounds menu.
+
+Moving the **background widgets screenrate slider** to a higher value slows the backgrounds speed and a smaller value will speed it up. Once the **next screenrate** has been established and the background is scrolling smoothly you can use the **factor** dial - it's a multiplier - to speed up or slow down the backgrounds travel without changing the sliders rate or needing to edit **screenrates.dict**.  The speed **factor** value is also saved to the **.play** file.
+
+These values were established based on a fixed size which isn't as important as it once was as you now have more flexibility in setting a rate that best fits your scrolling background especially if you save it to a .play file.  Scaling the short side to 640 pixels still helps.  These values may have changed from what you're seeing but not by much.
 
 
-Moving the **background widgets screenrate slider** to a higher value slows the backgrounds speed and a smaller value will speed it up. Once the **next screenrate** has been established and the background is scrolling smoothly you can use the **factor** dial - it's a multiplier - to speed up or slow down the backgrounds travel without changing the sliders rate or needing to edit **screenrates.dict**.  The **factor** value is saved to the **.play** file as well.
-
-These values were established based on a fixed size which isn't as important as it once was as you now have more flexibility in setting a rate that best fits your background.  Scaling the short side to 640 pixels still helps.
    
     screentimes = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
       ##   first, next-rt<lft, next-lft>right --- there are always two backgrounds once started
@@ -156,14 +154,14 @@ These values were established based on a fixed size which isn't as important as 
   
 I use 10.0 for the **'first'** value as the background is already visible and needs to travel less of a distance to **clear the screen**. The **'first'** value 10.0 translates to 10 times the screen width and is used to set the duration, time in milliseconds, required to move the backgrounds scaled width from one side of the screen to completely off the other.  A 1080 pixel screen format for the **'first'** background translates to 10.0 X 1080 = 10,800 milliseconds to clear the screen.  A **'next'** background has to cover more distance and therefore its rate would be higher and results in a longer duration, more travel time, while also matching the **first** rate of travel.   
       
-The **background widgets 'showtime'** slider value represents the number of pixels remaining before the background appears in the scene.  When reached it triggers the **'next'** background process. This will vary depending on which direction the background is traveling and if it's a snake. It's set once you choose a direction. Hopefully you'll never need to edit showtime, but if you do it's in **dotsScrollWrks.py**.
+The **background widgets 'showtime'** slider value represents the number of pixels remaining before the background appears in the scene.  When reached it triggers the **'next'** background process. This will vary depending on which direction the background is traveling and if it's a snake. It's set once you choose a direction. Hopefully you'll never need to edit showtime, but if you do it's in **BkgScrollWrks**.
 
 ---
 
 **Background Matte Widget**  
-Selected from the **background widget** the **matte widget** draws a mat/matte around the background. Its help menu pops up when first selected and can also be triggered by entering **H** from the keyboard which toggles it on or off.  The menu should be pretty much self-explanatory and there are videos that illustrate the commands as well.
+Selected from the **background widget** the **BkgMatte** widget draws a mat/matte around the background. Its help menu pops up when first selected and can also be triggered by entering **H** from the keyboard which toggles it on or off.  The menu should be pretty much self-explanatory and there are videos that illustrate the commands as well.
 
-This has been changed as well but marginally.
+This has been changed as well but marginally.  **BkgMatte** grabs the keyboard so it's best to plan ahead if you going to run an animation with a matte around it.
 
  
     helpKeys = {
@@ -176,18 +174,18 @@ This has been changed as well but marginally.
         'H':    'Matte Help Menu',
         'P':    'Photo Background', 
         'Q':    'Close Matte', 
-        'R':    'Resize Matte by Height',
+        'V':    'Vary Matte by Height',
         'W':    'White',
         'X':    'Close Matte',   
-        'Shift-R - Run Animation'   ## the matte may cover the play buttons
-        'Space   - Pause/Resume'
-        'Shift-S - Stop Animation'
+        'R':    'Run Animation'   ## the matte may cover the play buttons
+        'Space': Pause/Resume'
+        'S':    `Stop Animation'
     }
 
 ---
 
 **Types**  
-The four main types are **'frame', 'pix', 'bkg'** and **'flat'**.  These help to organize the screen items from front to back as I use the **QGraphicsitem zValue()** in combination with the types to order the scene items list. There are two functions, **toFront()** and **lastZval()** that help to make sure the different types I've created are good neighbors.  The types also determine how the data is to be processed.
+The types are **'frame', 'pix', 'bkg', 'flat', 'shadow', and 'video'** .  These are used to organize the screen items from front to back as I use the **QGraphicsitem zValue()** in combination with the types to order the scene items list. There are two functions, **toFront()** and **lastZval()** that help to make sure the different types I've created are good neighbors.  The types also determine how each row of data from the .play file is to be processed.
 
 #### types and zValue range		
 | scene.item  | type  | zValue |
@@ -208,8 +206,6 @@ The four main types are **'frame', 'pix', 'bkg'** and **'flat'**.  These help to
   
 **\** number of screen items + 100 decreasing by 1 per item
 
-This was in **ReadMe** but it fits better here:
-
 ---
 
 ### A Brief History of Animation
@@ -218,7 +214,9 @@ This was in **ReadMe** but it fits better here:
 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
-**PixItems**, **BkgItems** and **BkgItems** have methods to **play, pause, resume and stop**. **Shadows** are not animated rather they can link to a **sprite** and share the ride.  **Wings** are also included as they're based on a collection of **PixItems**.  **Scrolling Backgrounds** have their own methods to set an animation but follow the  same **play** commands.
+I've not made any changes to animation as yet. It's up to you to create your own animation using what's here as a guide.
+
+**PixItems**, **BkgItems** and **BkgItems** have methods to **play, pause, resume and stop**. **Shadows** are not animated rather they can link to a **sprite** and share the ride.  **Wings** are also included as they're based on a collection of **PixItems**.  **Scrolling Backgrounds** have their own methods to set an animation but follow the  same **play** commands as do **videos**.
 
 A note about **Wings** - it's been rewritten and is now a class rather than a function. It's made up of three **PixItems** each defined by their **part** tag. The bat portion **part** is named **pivot** and the wings **left** and **right**. The animation is applied to the **pivot** while the wings have their own **flapper** animations.  
 
