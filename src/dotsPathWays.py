@@ -88,6 +88,16 @@ class PathWays:
         self.updatePts(float(key[0]), float(key[1]))
         self.editingPtsSet()  
    
+    def unSelect(self): 
+        for itm in self.scene.items():  
+            if itm.type == 'pt' and self.pathMaker.selections and \
+                itm.idx in self.pathMaker.selections:    
+                    idx = self.pathMaker.selections.index(itm.idx)             
+                    self.pathMaker.selections.pop(idx)  
+                    itm.setBrush(QColor('white'))  
+            if itm.zValue() <= common['pathZ']:
+                break    
+            
     def updatePts(self, x, y): 
         tmp = []
         for p in self.pathMaker.pts:

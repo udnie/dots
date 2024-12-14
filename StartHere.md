@@ -1,9 +1,9 @@
 
-### Last Update: 12/08/2024
+### Last Update: 12/13/2024
        
 ---
 **To Begin**  
-This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. PyQt5 runs with some edits, see **Changes**, they're right at the beginning. Two video related issues, there are no loops to set in Qt5 and a video may not disappear when it ends if there are too many animations running at the same time.
+This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. PyQt5 runs with some edits, see **Changes**, they're right at the beginning. 
 
 ---
        
@@ -12,13 +12,15 @@ I use **'screens'** to refer to both the screen format, number of pixels and rat
  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
  
 **Help**  
-As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember. 
-       
+**Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember.        
+     
+**Video**  
+Qt5 doesn't support loops so moving the videoWidget slider has no effect and in Qt5 a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running will start the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.
        
 **Four Important Files**   
 There are four files I'd suggest looking into - **ControlView**, **ShowBiz**, **Shared**, and **Screens**. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles all/most of the multi-key function requests and passes everything else to **Storyboard** which in turn passes them on either to **ShowBiz** which handles most of the single key requests from **Canvas** and **Storyboard** thru the **PlayFile** list or onto **PathMaker** for it to take care of if it's active. **Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**.  
 
-I recently made code changes **ControlView**, **ShowBiz**, **Storyboard** and others not only to accommodate new additions but to clarify working processes as well. Be aware that my code can change.
+I recently made some code changes to **ControlView**, **ShowBiz**, **Storyboard** and others, not only to accommodate new additions but to clarify working processes as well. My code can change, especially if I think there's room for improvement.
        
 ---
 

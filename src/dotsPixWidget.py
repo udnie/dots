@@ -205,11 +205,11 @@ class PixWidget(QWidget):
         if self.switch == '':
             shadowBtn.clicked.connect(self.pix.addShadow)
             helpBtn.clicked.connect(self.pix.openMenu)
-            flopBtn.clicked.connect(self.works.flopIt)
+            flopBtn.clicked.connect(lambda: self.pix.shared('F'))
             cloneBtn.clicked.connect(self.works.cloneThis)
             animeBtn.clicked.connect(self.works.animeMenu)
             delBtn.clicked.connect(self.pix.deletePix)
-            self.lockBtn.clicked.connect(self.pix.togglelock)
+            self.lockBtn.clicked.connect(lambda: self.pix.shared('T'))
             quitBtn.clicked.connect(self.works.closeWidget)
         else: 
             quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))

@@ -12,7 +12,7 @@ from dotsSidePath       import pathLoader
     directly and is managed by them. TagsAndPaths also uses TagIt but is
     mainly managed thru mapper. - another project awaits '''
 ### --------------------------------------------------------
-class TagIt(QGraphicsSimpleTextItem):  
+class TagIt(QGraphicsSimpleTextItem):  ## called in pathItem, pathWays and this
 ### --------------------------------------------------------   
     def __init__(self, token, tag, color, zval=None):
         super().__init__()
@@ -97,7 +97,7 @@ class TagIt(QGraphicsSimpleTextItem):
             Qt.AlignmentFlag.AlignCenter, self.text)
         
 ### --------------------------------------------------------
-class TagsAndPaths:
+class TagsAndPaths: ## handles more than one request
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -110,27 +110,27 @@ class TagsAndPaths:
 ### --------------------------------------------------------  
     def tagWorks(self, pid):  ## this if more than one
         k = 0
-        topZVal = self.mapper.toFront()  ## only once
+        # topZVal = self.mapper.toFront()  ## only once
         self.mapper.tagSet = False
-        if pid == '':  ## pid can also equal the pixitem.id - using scrollwrks tagBkg for singles
+        if pid == '':  ## pid can also equal the pixitem.id - using tagBkg in sideCar2 for singles
             pid = 'all'
         alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
             if pix.type in ( 'frame', 'pix', 'snake', 'bkg', 'shadow'):
                 if type(pix.tag) == str and 'path' in pix.tag and pid == 'paths':
-                    self.tagThis('paths', pix, topZVal) 
+                    self.tagThis('paths', pix) 
                     k += 1
                 if pid == 'all':
                     k += 1
                     if alltags != pix.tag:  ## only one per snake
                         alltags = pix.tag
-                        self.tagThis('',pix, topZVal)         
+                        self.tagThis('',pix)         
                 elif pid == 'select' and pix.isSelected():
-                    self.tagThis('', pix, topZVal)
+                    self.tagThis('', pix)
                     k += 1
                 elif pix.type == 'frame':  ## single tag  
-                    self.tagThis('',pix, topZVal) 
+                    self.tagThis('',pix) 
                     k = 1
                     break     
         if k > 0: 
@@ -138,8 +138,9 @@ class TagsAndPaths:
             self.dots.statusBar.showMessage(f"Number Tagged: {k}", 5000)
         else:
             self.mapper.clearTagGroup()
-        
-    def tagThis(self, token, pix, topZVal): 
+ 
+### --------------------------------------------------------        
+    def tagThis(self, token, pix):  ## used by tagWorks
         if pix.type != 'shadow': 
             p = pix.sceneBoundingRect()
             x = p.x() + p.width()*.45
@@ -153,10 +154,7 @@ class TagsAndPaths:
 
         tag = pix.tag
         color = ''
-
-        if 'frame' in pix.fileName: 
-            x, y = common['ViewW']*.47, common['ViewH']-35
-    
+        
         if pix.type in ('pix','bkg','frame'):
 
             if pix.locked == True:
@@ -167,30 +165,45 @@ class TagsAndPaths:
             color = 'orange'
             zval = pix.zValue()
           
+            if pix.type == 'bkg':
+                if pix.direction == ' left':
+                    tag = tag + ' Left'
+                elif pix.direction == 'right': 
+                    tag = tag + ' Right'
+                tag = tag + ' ' + pix.useThis  
+                color = 'AQUA'
+                x, y = 250, 150
+                
+        elif pix.type == 'flat':
+            color = 'AQUA'
+           
         elif pix.type == 'shadow':
+            color = 'lightgreen'
             if pix.maker.linked == True:
                 tag = 'Linked ' + tag
             else:
                 tag = 'UnLinked ' + tag
-      
-            color = 'lightgreen'
             zval = pix.zValue()
    
-        if pix.zValue() == topZVal:  ## set to front ZValue
-            color = 'yellow'
-
         if token == 'paths':
             y = y - 20
         else:
             token = self.canvas.control
           
+        if pix.zValue() == topZVal:  ## set to front ZValue
+            color = 'yellow'
+             
+        if 'frame' in pix.fileName: 
+            x, y = common['ViewW']*.47, common['ViewH']-35
+               
         self.TagItTwo(token, tag, color, x, y, zval)
         
+### --------------------------------------------------------       
     ## this way I can stretch it for backgrounds and pixitems
     def TagItTwo(self, token, tag, color, x, y, z, src=''):
-        tag = TagIt(token, tag, color, z)
-                
+        tag = TagIt(token, tag, color, z)         
         tag.setZValue(self.mapper.toFront(45.0))
+        
         if src in ('bkg', 'pix'):  ## single selections
             tag.setPos(x-50.0, y-10.0)  ## position it near cursor
             self.scene.addItem(tag)
@@ -227,7 +240,7 @@ class TagsAndPaths:
     def displayPath(self, pix):
         tag = pix.tag 
         if 'Random' in tag: tag = tag[7:]
-        ## don't add duplicates - causes performance issues
+        ## don't add duplicate paths - causes performance issues
         if not tag in self.mapper.paths:
             path = self.addPainterPath(tag)
             if path != None:

@@ -47,6 +47,7 @@ class PathMaker(QWidget):
             'X': self.canvas.exit,
             'M': 'special case',
             'W': self.pathWays.toggleWayPtTags,
+            'U': self.pathWays.unSelect,
         }
 
         self.direct = {
@@ -117,6 +118,7 @@ class PathMaker(QWidget):
     @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
     def pathKeys(self, key):
         self.key = key
+        
         if key in self.doFirst:
             if self.key == 'M':
                 self.canvas.setKeys('M') 

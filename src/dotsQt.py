@@ -65,7 +65,10 @@ class DotsQt(QMainWindow):
                          
         QTimer.singleShot(100, self.show)
                      
-### --------------------------------------------------------       
+### -------------------------------------------------------
+    def closeEvent(self, e):
+        self.canvas.exit()
+   
     def closeAll(self):  ## close all app widgets
         self.canvas.close()   
         self.canvas.keysPanel.close()

@@ -1,5 +1,5 @@
 
-from PyQt6.QtCore       import Qt, QTimer, QPoint, pyqtSlot, QPointF
+from PyQt6.QtCore       import Qt, QPoint, pyqtSlot, QPointF
 from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
@@ -125,9 +125,8 @@ class PixItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
     @pyqtSlot(str)  ## updated by storyboard directly 
     def setPixKeys(self, key):  ## the decorator is suppose to get a better response
-        self.key = key  
-        
-        if self.canvas.bkgMaker.widget != None:  ## widget can use movekwys to set rates
+        self.key = key    
+        if self.canvas.bkgMaker.widget != None:  ## so the widget can use movekwys to set rates
             return                               ## handled in bkgitem as well
         elif self.isHidden or self.isSelected():
             if self.locked == False:
@@ -160,18 +159,16 @@ class PixItem(QGraphicsPixmapItem):
         elif self.key in('enter','return'): # send to front
             self.setZValue(self.mapper.toFront(1))
         elif self.key == 'tag': ## '\' backslash
-            self.tagThis()            
+            p = QCursor.pos()   ## tagBkg handles individual requests
+            tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))  
+        elif self.key == 'T':   
+            self.lockSprite() if self.locked == False else self.unlockSprite()
+            tagBkg(self, self.pos())                        
         elif self.key == 'F':  ## flop it
             self.setMirrored(False) if self.flopped else self.setMirrored(True)  
         elif self.key == 'H':  
             self.openMenu()     
-        elif self.key == 'T':     
-            self.togglelock()
-  
-    def tagThis(self):
-        p = QCursor.pos()
-        tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))
-    
+
     def openMenu(self):
         self.works.closeWidget()
         x, y = self.works.makeXY()  
@@ -192,10 +189,11 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
             
     def mouseReleaseEvent(self, e): 
-        self.key = ''
+        # self.key = ''
         self.dragCnt = 0   
         self.works.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)  
+        self.mapper.clearTagGroup()
         e.accept()
         
     def mouseDoubleClickEvent(self, e):
@@ -205,8 +203,8 @@ class PixItem(QGraphicsPixmapItem):
                 if self.isHidden == False or self.isSelected():
                     self.setSelected(True) 
                     return      
-            if self.locked == True:
-                self.tagThis()      
+            if self.key in self.sharedKeys:
+                return   
             if self.isHidden:  ## otherwise you're stuck if others are selected as the others will become hidden
                 self.setSelected(True) 
                 self.isHidden = False  
@@ -275,11 +273,6 @@ class PixItem(QGraphicsPixmapItem):
         if self.widget != None:
             self.widget.lockBtn.setText('Lock') if self.locked == False else \
                 self.widget.lockBtn.setText('UnLock')    
-                
-    def togglelock(self):
-        self.lockSprite() if self.locked == False else self.unlockSprite()
-        tagBkg(self, self.pos())
-        QTimer.singleShot(3000, self.mapper.clearTagGroup)
         
     def lockSprite(self):
         self.locked = True     

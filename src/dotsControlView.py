@@ -89,7 +89,9 @@ class ControlView(QGraphicsView):
         
     def sendIt(self, key, mod):
 
-### ------------- single keys without modifiers -------------     
+### --------------------------------------------------------
+    ## single keys without modifiers
+### --------------------------------------------------------     
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
                 self.setKey('!')  ## half number of points
@@ -101,15 +103,23 @@ class ControlView(QGraphicsView):
                 
         elif key == Qt.Key.Key_C: 
             self.setKey('C')  ## clear canvas and storyboard, pathmaker if no edits
-                   
+        
+        elif key == Qt.Key.Key_F:
+            if self.canvas.pathMakerOn == False:  
+                self.sideCar2.flopSelected() 
+            else:
+                self.canvas.sideCar2.sendPixKeys('F')
+                           
         elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
             self.setKey('del')
                   
         elif key == Qt.Key.Key_Space:
             if self.canvas.control != '' or self.canvas.animation == True:
                 self.sideCar.pause()  ## SpaceBar - pause/resume
-                                                         
-### ---- keys with modifiers, are conditional or both -------                             
+                
+### --------------------------------------------------------                                                        
+    ## keys with modifiers
+### --------------------------------------------------------                            
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
                 self.setKey('delPts')  ## delete selected pts in pathmaker
@@ -127,9 +137,6 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass
             else:
                 self.setKey('L')  ## used by pathmaker to toggle lasso 
-    
-        elif key == Qt.Key.Key_P and mod & Qt.KeyboardModifier.AltModifier:
-            self.sideCar.loopit()
 
         elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect
             if mod & Qt.KeyboardModifier.ShiftModifier:  ## sprites and shadows
@@ -144,31 +151,36 @@ class ControlView(QGraphicsView):
             else:
                 self.setKey('S')  
                                                           
-        elif key == Qt.Key.Key_T:  ## toggles tags display on/off both link and lock
-            if mod & Qt.KeyboardModifier.ShiftModifier:      
-                self.sideCar.toggleTagItems('all') 
+        elif key == Qt.Key.Key_T:  ## toggles tags both link and lock
+            if self.canvas.pathMakerOn == True:
+                self.setKey('T')
+            elif mod & Qt.KeyboardModifier.ShiftModifier or self.canvas.control !='':
+                self.mapper.toggleTagItems('all') 
             else:
-                self.setKey('T')  
-  
+                self.canvas.sideCar2.sendPixKeys('T') 
+    
         ## apple option key and cmd key - used by scroll panel to scroll tiles
-        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and self.canvas.pathMakerOn == False: 
-                 
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and \
+            self.canvas.pathMakerOn == False:
+                       
             if mod & Qt.KeyboardModifier.AltModifier:  
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('-1')  ## scroll one tile   
-                          
+                                       
             elif mod & Qt.KeyboardModifier.ControlModifier:  
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1 
-                          
+                    self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1  
+                                    
             else:                  
                 self.setKey(singleKeys[key])  ## everyone else 
                                            
         elif key in singleKeys:  ## in dotsShared.py  
             self.setKey(singleKeys[key])
    
+### -------------------------------------------------------- 
+    ## send key to storyBoard    
 ### --------------------------------------------------------         
-    def setKey(self, key):  ## sending key to storyBoard
+    def setKey(self, key):  
         self.key = key
         self.keysSignal[str].emit(self.key)
 

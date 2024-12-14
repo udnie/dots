@@ -258,16 +258,15 @@ class BkgWorks:
             tmp['scrollable'] = False
             tmp['path']       = bkg.path
              
-        bkg.tag        = ''  ## no longer a scroller
         bkg.direction  = ''             
         bkg.mirroring  = False
         bkg.factor     = 1.0
-        bkg.rate       = 0
         bkg.showtime   = 0
-        bkg.useThis    = ''
+        bkg.useThis    = ''      
         bkg.rate       = 0
-        bkg.scrollable = False
-        
+        bkg.scrollable = False    
+        bkg.path       = ''
+  
         self.bkgMaker.addWidget(bkg)
                                                                                          
 ### -------------------------------------------------------- 

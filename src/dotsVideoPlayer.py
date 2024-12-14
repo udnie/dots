@@ -76,13 +76,12 @@ class VideoPlayer(QMediaPlayer):
     # def playVideo(self):  ## 5
     #     if self.player.state() == QMediaPlayer.PlayingState:  ## 5
     #         self.player.pause()  ## 5
-    ####      print('b', self.player.state() )  ## 5 
     #     else:  ## 5
     #         self.player.play()  ## 5 
    
     # def mediaStatusChanged(self, status):  ## 5
     #     if status == QMediaPlayer.MediaStatus.EndOfMedia:  ## 5
-    #         while not (self.player.state() == QMediaPlayer.StoppedState):  ## 5
+    #         while not (self.player.state() == QMediaPlayer.State.StoppedState):  ## 5
     #             time.sleep(.01)  ## 5
     #         self.stopVideo()  ## 5
 ### ---------------------------- end --------------------------------

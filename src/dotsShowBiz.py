@@ -45,7 +45,9 @@ class ShowBiz:
         
         self.locks = 0
         self.tableView = None 
-              
+
+### --------------------------------------------------------
+  ## do these first
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
         if key == 'X':  ## from help menus
@@ -62,101 +64,103 @@ class ShowBiz:
                 return
             else:
                 self.showRunner.runThese() 
-                
-        elif key == 'U':  ## unselect for storyBoard and pathMaker
-            self.sideCar2.unSelect(self.pathMaker)
    
-        elif self.canvas.pathMakerOn == False:  ## see pathmaker for its single key commands
-                                     
-            if len(self.scene.items()) > 0:  ## storyboard single key commands
-                
-                if self.canvas.control != '' or self.canvas.animation == True:  ## animation running
+### -------------------------------------------------------- 
+    ## storyboard single key commands
+### -------------------------------------------------------- 
+        elif len(self.scene.items()) > 0:   
+### --------------------------------------------------------    
+        ## animations running
+### --------------------------------------------------------             
+            if self.canvas.control != '' or self.canvas.animation == True:    
+                if key == 'P': 
+                    self.mapper.tagsAndPaths.togglePaths() 
+                                                                                                    
+                elif key == 'S':
+                    self.showtime.stop() 
+                                                                                                                
+                elif key == 'space': ## pause/resume
+                    self.sideCar.pause() 
+                                                                    
+### --------------------------------------------------------    
+        ## no animations running
+### --------------------------------------------------------  
+            elif self.canvas.control == '' or self.canvas.animation == False:  
+                if key == 'A':  
+                    self.sideCar2.selectAll()
+                                
+                elif key == 'B':
+                    if self.canvas.sideCar2.hasBackGround() == 0:
+                        self.bkgMaker.openBkgFiles()             
+                    elif self.canvas.openPlayFile == '':  ## only backgrounds
+                        self.bkgMaker.mirror() 
                     
-                    if key == 'P': 
-                        self.mapper.tagsAndPaths.togglePaths() 
-                                                                                                       
-                    elif key == 'S':
-                        self.showtime.stop() 
-                                        
-                    elif key == 'space': ## pause/resume
-                        self.sideCar.pause()
-                  
-                elif self.canvas.control == '':  ## no animations running
-        
-                    if key == 'A':  
-                        self.sideCar2.selectAll()
+                elif key == 'D':
+                    self.sideCar2.deleteSelected()
                                  
-                    elif key == 'B':
-                        if self.canvas.sideCar2.hasBackGround() == 0:
-                            self.bkgMaker.openBkgFiles()             
-                        elif self.canvas.openPlayFile == '':  ## only backgrounds
-                            self.bkgMaker.mirror() 
+                elif key == 'J':  ## view the layout of the currently opened play file 
+                    if dlist := self.showRunner.openPlay(self.canvas.openPlayFile):  
+                        self.showRunner.makeTableView(dlist, 'view') 
                         
-                    elif key == 'D':
-                        self.sideCar2.deleteSelected()
-                        
-                    elif key == 'F':
-                        self.sideCar2.flopSelected() 
-                  
-                    elif key == 'J':  ## view the layout of the currently opened play file 
-                        if dlist := self.showRunner.openPlay(self.canvas.openPlayFile):  
-                            self.showRunner.makeTableView(dlist, 'view') 
-                          
-                    elif key == 'L':  ## uses QFileDialog to open a .play file
-                        self.showRunner.loadPlay()         
-                      
-                    elif key == 'M':
-                        if self.scene.selectedItems() or self.sideCar.hasHiddenPix():
-                            self.mapper.toggleMap()  
-                        else:
-                            self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
-                      
-                    elif key == 'N':
-                        self.helpMaker.menuHelp()  ## called from help menus - no 'M' conflicts
-                    
-                    elif key == 'O':
-                        self.sideCar.clearWidgets()  
-                        self.sideCar.toggleOutlines()   
-                                          
-                    elif key == 'S':
-                        self.showtime.savePlay()
-       
-                    elif key == 'V' and self.canvas.videoPlayer != None:
-                        if self.canvas.videoPlayer.widget == None:
-                            self.sideCar.addVideoWidget()
-                        else:
-                            self.sideCar.closeVideoWidget()
-                            
-                    elif key == 'W':              
-                        self.sideCar.clearWidgets() 
-                            
-            ## single key commands continued - nothing on screen
-            elif len(self.scene.items()) == 0: 
-                
-                if self.demoAvailable:  ## always clear unless deleted
-                    self.canvas.clear()
-                    
-                if key == 'A':
-                    self.bkgMaker.openBkgFiles() 
-         
-                elif key == 'D':   ## runs demo menu in canvas
-                    if self.demoAvailable:   
-                        self.helpMenus.setMenu(key)
-    
-                elif key == 'J':  ##  use QFileDialog to launch a .play file viewer 
-                    self.showRunner.loadPlay('table')  
-                    
-                elif key == 'L':  ## use QFileDialog to open and display a .play file
-                    self.showRunner.loadPlay()  
+                elif key == 'L':  ## uses QFileDialog to open a .play file
+                    self.showRunner.loadPlay()         
                     
                 elif key == 'M':
-                    self.helpMaker.menuHelp()  ## show help menus
+                    if self.scene.selectedItems() or self.sideCar.hasHiddenPix():
+                        self.mapper.toggleMap()  
+                    else:
+                        self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
                     
-                elif key == 'P':  
-                    self.pathMaker.initPathMaker() 
+                elif key == 'N':
+                    self.helpMaker.menuHelp()  ## called from help menus - with no 'M' conflicts
+                
+                elif key == 'O':
+                    self.sideCar.clearWidgets()  
+                    self.sideCar.toggleOutlines()  ## run from shadowWorks
+                                        
+                elif key == 'S':
+                    self.showtime.savePlay()
+                      
+                elif key == 'U':  ## unselect for storyBoard
+                    self.sideCar2.unSelect()
+        
+                elif key == 'V' and self.canvas.videoPlayer != None:
+                    self.sideCar.addVideoWidget() \
+                        if self.canvas.videoPlayer.widget == None else \
+                            self.sideCar.closeVideoWidget()
+                        
+                elif key == 'W':              
+                    self.sideCar.clearWidgets() 
                     
-                elif key == 'S':   
-                    self.helpMenus.setMenu(key)  ## screen menu
+### --------------------------------------------------------                      
+    ## canvas single key commands
+### --------------------------------------------------------  
+        elif len(self.scene.items()) == 0: 
+                
+            if self.demoAvailable:  ## always clear unless deleted
+                self.canvas.clear()
+                
+            if key == 'A':
+                self.bkgMaker.openBkgFiles() 
+        
+            elif key == 'D':   ## runs demo menu in canvas
+                if self.demoAvailable:   
+                    self.helpMenus.setMenu(key)
+
+            elif key == 'J':  ##  use QFileDialog to launch a .play file viewer 
+                self.showRunner.loadPlay('table')  
+                
+            elif key == 'L':  ## use QFileDialog to open and display a .play file
+                self.showRunner.loadPlay()  
+                
+            elif key == 'M':
+                self.helpMaker.menuHelp()  ## show help menus
+                
+            elif key == 'P':  
+                self.pathMaker.initPathMaker() 
+                
+            elif key == 'S':   
+                self.helpMenus.setMenu(key)  ## screen menu
                
 ### ---------------------- dotsShowBiz --------------------
 

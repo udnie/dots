@@ -92,10 +92,10 @@ class StoryBoard(QWidget):
     def setKeys(self, key): 
         self.key = key     
         if not self.pathMakerOn: 
-            if self.key in PlayKeys:  ## absolutely necessary for help menus !!!
+            if self.key == 'C':
+                self.clear()   
+            elif self.key in PlayKeys:  ## absolutely necessary for help menus !!!
                 QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key)) 
-            elif self.key == 'C':
-                self.clear()        
             elif self.key == 'H' and len(self.scene.items()) == 0:
                 self.helpButton.openMenus()  ## opens canvas help menu
             elif self.key in CanvasStr or self.key == '':
@@ -111,8 +111,6 @@ class StoryBoard(QWidget):
                     self.clear()  ## really does it and returns to canvas
                 elif self.key in ('H', 'M'):
                     self.helpButton.openMenus() 
-                elif self.key == 'U':  ## uses unSelect in sideCar2 
-                    QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key)) 
                 else:    
                     self.pathMaker.pathKeys(self.key)
                 

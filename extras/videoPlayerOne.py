@@ -3,8 +3,15 @@ import os
 import sys
 import time
 import math  
-   
-# import cv2      ## required to choose screen format
+
+### --------------------------------------------------------
+''' You will need to install opencv-python and uncomment the cv2 import
+    and this line # self.setScreenFormat(fileName) inorder to have the 
+    videoPlayer set the screen format on drag and drop. cv2 is used
+    in setting the aspect-ratio (width/height) of a video file '''
+### --------------------------------------------------------              
+# import cv2 
+### --------------------------------------------------------
 
 from PyQt6.QtCore       import Qt, QUrl
 from PyQt6.QtGui        import QGuiApplication
@@ -14,13 +21,18 @@ from PyQt6.QtWidgets    import QWidget, QSlider, QHBoxLayout, QVBoxLayout, \
 from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QVideoWidget
 
-# from PyQt6.QtMultimedia   import QMediaContent  ## common out for 6, uncomment for 5 <<<--------
+### ------------ comment out for 6, uncomment for 5 -----------------
+# from PyQt6.QtMultimedia   import QMediaContent  ## 5
+### ---------------------------- end --------------------------------
 
-### --------------------------------------------------------
-''' There's a commented out self.resizeEvent which would probably be useful 
-    if you plan to make any size changes.  You will need to install opencv-python 
-    and uncomment out the two imports and this line # self.setScreenFormat(fileName) 
-    inorder to have the videoPlayer set the screen format on drag and drop. '''
+YoffSet, VYoffset = 450, 550   ## px above screen center
+Height,  VHeight  = 500, 750   ## default heights
+
+Chars   = ( 'A',  'F',  'H',  'V')  ## as in characters 
+Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
+Widths  =  (550,  615,  720,  395)  ## default widget widths
+WID, HGT = 40, 114  ## for opening without discovery
+
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
@@ -35,16 +47,15 @@ class VideoPlayer(QWidget):
 
         self.videoWidget = QVideoWidget()
         self.mediaPlayer.setVideoOutput(self.videoWidget)
-        
+                   
 ### ------------ comment out for 5, uncomment for 6 -----------------
-        self.audioOut = QAudioOutput()        
-        self.mediaPlayer.setAudioOutput(self.audioOut)     
-        self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged)    
-        self.mediaPlayer.errorChanged.connect(self.handleError)  
-            
+        self.audioOut = QAudioOutput()   ## 6      
+        self.mediaPlayer.setAudioOutput(self.audioOut)   ## 6   
+        self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) ## 6    
+        self.mediaPlayer.errorChanged.connect(self.handleError)   ## 6
 ### ------------ uncomment for 5 ... comment out for 6 ----------------- 
-        # self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStatusChanged)
-        # self.mediaPlayer.error.connect(self.handleError)     
+        # self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStatusChanged)  ## 5
+        # self.mediaPlayer.error.connect(self.handleError)  ## 5  
 ### ---------------------------- end --------------------------------
 
         self.mediaPlayer.durationChanged.connect(self.durationChanged) 
@@ -53,7 +64,13 @@ class VideoPlayer(QWidget):
         self.setAcceptDrops(True)  
       
         self.fileName = ''
-        self.path = '' 
+        self.path = ''
+        
+        self.lastKey = ''  ## the last key
+        self.lastHeight = 0
+
+        self.started = False
+        self.frameW, self.frameH = 0, 0  ## for framing 
         
         if len(sys.argv) > 1:  ## set starting directory
             self.path = sys.argv[1]
@@ -61,8 +78,7 @@ class VideoPlayer(QWidget):
         self.slider = QSlider(Qt.Orientation.Horizontal)
         self.slider.sliderMoved.connect(self.setPosition)
       
-        ## 'Customize the appearance' - to quote the browser
-        ##  with a little help from google AI  
+        ## a little help from google AI  
         self.slider.setStyleSheet("""                                        
             QSlider::groove:horizontal {
                 background-color: #ccc;
@@ -77,42 +93,50 @@ class VideoPlayer(QWidget):
                 border-radius: 3px;
             }
         """)
-        
+              
         vbox = QVBoxLayout()  
         vbox.addWidget(self.videoWidget)
-        vbox.addSpacing(10)
         vbox.addLayout(self.setButtons())
-        vbox.addSpacing(10)
         vbox.addWidget(self.slider)
         self.setLayout(vbox)   
-        
-        self.moveResize('F') ## default - roughly 3:2
+      
+        self.openPlayer('F') ## current default - 3:2
+       
         self.show()
 
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
         if e.key() == Qt.Key.Key_Space:  ## spacebar to pause/resume
             self.playVideo()
-        elif chr(e.key()) in ('A', 'F', 'H', 'S', 'V'):
-            self.moveResize(chr(e.key()))
-        e.accept()
+        else:
+            key = chr(e.key())
+            if key in Chars:
+                self.resizeAndMove(key)
+            elif key == 'S':  ## toggle start and stop
+                if self.started == False:   
+                    self.playVideo()
+                else:
+                    self.stopVideo(); self.started = False
+            elif key in ('Q', 'X'):
+                self.bye()
+            e.accept()
         
     def mousePressEvent(self, e):    
         if e.button() == Qt.MouseButton.RightButton:
             if self.fileName != '':
                 self.setWindowTitle(self.fileName)
             e.accept()
-             
+         
     def mouseReleaseEvent(self, e):
         self.setWindowTitle("VideoPlayer")
         e.accept()
-                   
+  
 ### --------------------------------------------------------   
     def dragEnterEvent(self, e):  
         if e.mimeData().hasUrls():   
             m = e.mimeData()
             fileName = m.urls()[0].toLocalFile() 
-            self.doit(fileName)
+            self.setFileName(fileName)
             self.playVideo()     
             e.accept()
         else:
@@ -121,62 +145,130 @@ class VideoPlayer(QWidget):
     def dragLeaveEvent(self, e):
         e.accept()
                  
+### -------------------------------------------------------- 
+    def openPlayer(self, key):  ## for default opening setting
+        ctr = QGuiApplication.primaryScreen().availableGeometry().center()
+        x, y = ctr.x(), ctr.y() 
+        width = Widths[Chars.index(key)]
+        if key in ('A', 'H', 'F'):   
+            self.resize(width, Height) 
+            self.move(x-int(width/2), int(y-YoffSet))  
+            self.lastHeight = Height
+        elif key == 'V':      
+            self.resize(Widths[3], VHeight) 
+            self.move(x-int(width/2), int(y-VYoffset))
+        self.lastKey = key
+     
+    def resizeAndMove(self, key):          
+        oldWidth = self.width()
+        pos = self.pos()
+        if key == 'V':
+            self.resize(Widths[3], VHeight)  ## doesn't change
+            dif = int((Widths[3] - oldWidth)/2) 
+        else:
+            dif = self.resizeNewWidth(key, oldWidth)  
+        self.move(pos.x()-dif, pos.y())  
+        self.lastKey = key  
+         
+    def resizeNewWidth(self, key, oldWidth):  
+        asp = Asps[Chars.index(key)]
+        if self.lastKey == 'V':     
+            height = self.lastHeight  
+        else:
+            height = self.height()
+            self.lastHeight = height
+        if  self.frameH > 0:  ## based on videoWidget
+            newWidth = int(asp * (height - self.frameH) + self.frameW) 
+        else:              ## videoWidget not discoverable
+            newWidth = int(asp * (height - HGT) + WID)   ## or use a screen pixel ruler
+        self.resize(newWidth, height)   
+        return int((newWidth - oldWidth )/2)  ## center qwidget
+    
+    def setScreenFormat(self, video_path):  ## optional - requires opencv-python
+        cap = cv2.VideoCapture(video_path)  ## plus edits - reads video file
+        if not cap.isOpened():
+            return None
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        cap.release()
+        asp = math.floor(width/height * 100)/100.0  
+        try: 
+            self.resizeAndMove(Chars[Asps.index(asp)])
+        except:
+            None
+   
+    def framing(self):  ## the differences between widget size and videoWidget
+        s, v = self.size(), self.videoWidget.size()   
+        return s.width() - v.width(), s.height() - v.height()
+             
 ### --------------------------------------------------------                         
     def openFile(self):
         if self.path == '':  self.path = os.getcwd()    
         fileName, _ = QFileDialog.getOpenFileName(self, "Select Media", self.path, \
                        "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
         if fileName != '':
-            self.doit(fileName)
-            
-    def doit(self, fileName):        
+            self.setFileName(fileName)
+            self.playVideo() 
+                
+    def setFileName(self, fileName):        
 ### ------------ uncomment for 6 ... comment out for 5 -----------------     
-        self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))     ## source doesn't change even if self.fileName gets truncated
-        # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))  ## uncomment for 5      
+        self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6  ## source doesn't change even if self.fileName gets truncated
+        # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))  ## 5      
 ### ---------------------------- end ----------------------------------- 
         self.playButton.setEnabled(True)   
+        self.fileName = ''
         self.path = fileName[0:fileName.rfind('/')]  ## so it knows where to start looking next time you search
         if fileName != self.fileName and len(fileName) <= 24:  ## if greater than 24 chars or self.fileName "" 
             self.fileName = fileName 
         else:
             self.fileName = pathMod(fileName)  ## it's for display
 
-        # self.setScreenFormat(fileName)    ## uses cv2 to set screen format on start of video
+### -------------------------- if using cv2 ----------------------------
+        # # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
+### ---------------------------- end ----------------------------------- 
 
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              
-    def playVideo(self):
-        if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
-            self.mediaPlayer.pause()
-            self.pauseButton.setText('Resume')  
-        else:
-            self.mediaPlayer.play()
-            self.pauseButton.setText('Pause') 
-                   
-    def mediaStateChanged(self, state):
-        if state == QMediaPlayer.MediaStatus.EndOfMedia:
-            while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState):
-                time.sleep(.05)
-            self.stopVideo()
-            
-### ------------ uncomment for 5 ... comment out for 6 -----------------
-    # def playVideo(self):
-    #     if self.mediaPlayer.state() == QMediaPlayer.PlayingState:
-    #         self.mediaPlayer.pause()
-    #         self.pauseButton.setText('Resume')  
-    #     else:
-    #         self.mediaPlayer.play()   
-    #         self.pauseButton.setText('Pause')  
+    def playVideo(self):  ## 6
+        if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
+            self.mediaPlayer.pause()  ## 6
+            self.playButton.setText('Resume')  ## 6 
+        else:   ## 6
+            if self.fileName != '':   ## 6
+                self.mediaPlayer.play()   ## 6
+                self.playButton.setText('Pause')  ## 6
+                self.started = True ## 6
+                self.frameW, self.frameH = self.framing()   ## 6   ## uses the videoWidget to get the widget framing sizes  
            
-    # def mediaStatusChanged(self, status):
-    #     if status == QMediaPlayer.MediaStatus.EndOfMedia:
-    #         while not (self.mediaPlayer.state() == QMediaPlayer.StoppedState):
-    #             time.sleep(.01)
-    #         self.stopVideo()
+    def mediaStateChanged(self, state): ## 6
+        if state == QMediaPlayer.MediaStatus.EndOfMedia: ## 6
+            while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState): ## 6
+                time.sleep(.05) ## 6
+            self.stopVideo()   ## 6    
+               
+### ------------ uncomment for 5 ... comment out for 6 -----------------
+    # def playVideo(self):   ## 5
+    #     if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
+    #         self.mediaPlayer.pause()   ## 5
+    #         self.playButton.setText('Resume')   ## 5
+    #     else:   ## 5
+    #          if self.fileName != '':   ## 5
+    #             self.mediaPlayer.play()  ## 5
+    #             self.playButton.setText('Pause')  ## 5
+    #             self.started = True   ## 5
+    #             self.frameW, self.frameH = self.framing()  ## uses the videoWidget to get the widget framing sizes   ## 5
+         
+    # def mediaStatusChanged(self, status):   ## 5
+    #     if status == QMediaPlayer.MediaStatus.EndOfMedia:   ## 5
+    #         while not (self.mediaPlayer.state() == QMediaPlayer.StoppedState):   ## 5
+    #             time.sleep(.05)   ## 5
+    #         self.stopVideo()   ## 5
     
- ### ---------------------------- end -----------------------------------    
+ ### ---------------------------- end ----------------------------------- 
     def stopVideo(self):
         self.mediaPlayer.stop()
         self.setPosition(0)
+        self.playButton.setText('Start')
+        self.started = False 
   
     def positionChanged(self, position):
         self.slider.setValue(position)
@@ -194,81 +286,28 @@ class VideoPlayer(QWidget):
     def bye(self):
         self.close()
         
-### --------------------------------------------------------      
-    def moveResize(self, key):
-        ctr = QGuiApplication.primaryScreen().availableGeometry().center()
-        x, y = ctr.x(), ctr.y() 
-        if key == 'A':      ## academy - 4:3
-            self.move(x-320, y-350)
-            self.resize(645, 600)
-        elif key == 'F':    ## full-frame - 3:2
-            self.move(x-360, y-350)
-            self.resize(720, 600)
-        elif key == 'H':        ## 16:9 aka 1080
-            self.move(x-425,y-350)
-            self.resize(850, 600)
-        elif key == 'V':        ## 9:16
-            self.move(x-225, y-450)
-            self.resize(450, 875) 
-        elif key == 'S':
-            self.stopVideo()
-
-    def setScreenFormat(self, video_path):  ## optional - requires opencv-python
-        cap = cv2.VideoCapture(video_path)  ## plus edits
-        if not cap.isOpened():
-            return None
-
-        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        cap.release()
-
-        asp = math.floor(width/height * 100)/100.0
-        if asp == 1.77:
-            self.moveResize('H')
-        elif asp == 1.50:
-            self.moveResize('F')
-        elif asp == 1.33:
-            self.moveResize('A')
-        elif asp == 0.56:
-            self.moveResize('V')
-        else:
-            self.moveResize('F')  ## default
-
-    # def resizeEvent(self, event):   ## get the aspect ratio for both widgets
-    #     s, v = self.size(), self.videoWidget.size()    
-    #     print(f"( {v.width()}, {v.height()}, {math.floor(v.width()/v.height() * 100)/100.0}, {s.width()}, {s.height()})")
-
 ### --------------------------------------------------------          
     def setButtons(self):     
         self.buttonGroup = QLabel()
-        self.buttonGroup.setFixedHeight(50)
-        
-        self.openButton  = QPushButton("Files")
-        self.playButton  = QPushButton("Start")
-        self.pauseButton = QPushButton("Pause")
-        self.stopButton  = QPushButton("Stop")
-        self.byeButton   = QPushButton("Quit")  
+        self.buttonGroup.setFixedHeight(40)
+  
+        self.openButton = QPushButton("Files")
+        self.playButton = QPushButton("Start")
+        self.stopButton = QPushButton("Stop")
+        self.byeButton  = QPushButton("Quit")  
         
         self.openButton.clicked.connect(self.openFile)
         self.playButton.clicked.connect(self.playVideo)
-        self.pauseButton.clicked.connect(self.playVideo)
         self.stopButton.clicked.connect(self.stopVideo)
         self.byeButton.clicked.connect(self.bye)
 
         hbox = QHBoxLayout()
         
-        hbox.addSpacing(15)
         hbox.addWidget(self.openButton)  
-        hbox.addSpacing(10)
         hbox.addWidget(self.playButton)
-        hbox.addSpacing(5)
-        hbox.addWidget(self.pauseButton) 
-        hbox.addSpacing(5) 
         hbox.addWidget(self.stopButton)
-        hbox.addSpacing(10)
         hbox.addWidget(self.byeButton)
-        hbox.addSpacing(15)
- 
+
         self.buttonGroup.setLayout(hbox)
         self.buttonGroup.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Plain)
         self.buttonGroup.setLineWidth(1)

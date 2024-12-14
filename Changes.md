@@ -18,11 +18,16 @@ Before all else I'd like to thank those individuals who were kind enough to awar
     
 There's now a python script that takes care of steps 4-6 called **script-qt5.py**, see **November 30** for more detail. The first three steps can be accomplished in vscode with a minimum of time and effort.
 
+See the **Help** and **Video** entries in **Start Here** for updates as of December 13, 2024. 
+
 ---
 **December 5 2024**   
-Added a **'Help Menus'** selection to the **StoryBoard** and **PathMaker** help menus to show all the menus just as in **Canvas** by clicking on the **Menus** entry. Fixes to **dotsMatte.py, videoWidget** and **pathMaker** to clean up some bugs. **'B'** in storyboard will call the background file dialog if there are no backgrounds in the scene, **'A'** does that in canvas and is used to select all in storyboard, otherwise **B** will mirror the background provided it's not from a .play file. 
+Added a **'Help Menus'** selection to the **StoryBoard** and **PathMaker** help menus to show all the menus just as in **Canvas** by clicking on the **Menus** entry. Fixes to **Matte**,  **videoWidget** and **pathMaker** to clean up some bugs. **'B'** in storyboard will call the background file dialog if there are no backgrounds in the scene, **'A'** does that in canvas and is used to select all in storyboard, otherwise **B** will mirror the background provided it's not from a .play file. 
 
 I was looking for a way to let the user know that a video was loaded and the only indicators were to either click on **'run'** or type in **'R'** or **'V'**  and see what happens. I had considered popping up the videoWidget once the video was loaded but thought it might become annoying after a while so I settled on what I hope will be a more gentle approach by setting the **Run** button text to **Video** when it's been loaded and back to **Run** when the video is deleted or the screen is cleared. 
+
+**December 13 2024**  
+Did some more work on **showbiz** and **controlView**.  The **'T'** key was updated to add a function that got lost. The **'Storyboard 2'** menu houses two of it's uses - both display tags, one when an animation is running or paused, the other, **shift-T**, when there is no animation  The **'T'** key is also used to toggle locks or links on and off to scene items and to run the Mr.Ball animation in pathMaker.
 
 ---
 **November 2024**   

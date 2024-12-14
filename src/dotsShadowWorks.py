@@ -90,7 +90,7 @@ class Works:  ## small functions that were in ShadowMaker
     def toggleOutline(self):  ## called by sideCar thru toggleOutlines
         if self.maker.outline != None:
             if self.maker.outline.isVisible() == True:
-                self.hideOutline() 
+                self.hideOutline()
             elif self.maker.outline.isVisible() == False:
                 self.showOutline()
         if self.maker.widget != None: self.closeWidget()

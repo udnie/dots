@@ -7,12 +7,13 @@ from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 
 storyKeys = {  
     'F':    'Flop Selected',
-    'P':    'Toggle Paths',
+    'P':    'Toggle Paths - Animation',
+    'T':    'ToggleTags - Animation',
     'Shift-H': 'Hide Selected Outlines',    
     'Shift-L': 'Toggle Sprite Locks',
     'Shift-R': 'Unlink, Unlock, UnSelect',
     'Shift-S': 'Toggle Shadow Links',  
-    'Shift-T': 'Toggle Tag Display',   
+    'Shift-T': 'Toggle Sprite Shadow Tags',   
     'Cmd':  'Drag to Select',
     'M':    'Move Selected off/on',
     'U':    'UnSelect - End',     
@@ -39,15 +40,15 @@ PathStr = ('>', '<', '!', '@','/','{','}')  ## wired up
 ### --------------------- dotsHelpDesk --------------------- 
 ''' classes: StoryHelp2, PathHelp2,  '''
 ### --------------------------------------------------------
-    ## Canvas and StoryBoard Menus in helpButtons
-    ## Demos, Screens Menus in helpMenus
-    ## Sprites, Background and Shadow Menus in helpMonkey
-    ## Widgets for Pixitems, Backgrounds., in helpMaker
     ## Animation Menu in pixWork
+    ## Canvas and StoryBoard Menus in helpButtons
+    ## Demos, Screens Menus in helpMenus 
     ## Frames and Flats Menu in frames and flats
     ## Matte Menu in bkgMatte    
     ## PathMaker Menu in pathWorks
-    ## StoryHelp2 in helpDesk                                        
+    ## StoryHelp2 in helpDesk    
+    ## Sprites, Background and Shadow Menus in helpMonkey
+    ## Widgets for Pixitems, Backgrounds., in helpMaker                                    
 ### --------------------------------------------------------     
 class StoryHelp2: 
 ### -------------------------------------------------------- 
@@ -57,24 +58,24 @@ class StoryHelp2:
         self.canvas = parent
         self.switch = switch
 
-        self.table = TableWidgetSetUp(65, 170, len(storyKeys)+4)
+        self.table = TableWidgetSetUp(65, 185, len(storyKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 242, 426
+        width, height = 257, 456
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}','',True,True,2)
     
         row = 1  
         for k, val in storyKeys.items():
-            if row < 8:
+            if row < 9:
                 self.table.setRow(row, 0, k, '', True,True)
                 self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
-                if row == 8:
+                if row == 9:
                     self.table.setRow(row, 0, f"{' Keys for Rubberband Select':<32}",QC,True,True,2)
-                    row = 9
+                    row = 10
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1

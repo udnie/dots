@@ -8,8 +8,8 @@ from dotsShared         import common
 from dotsTagsAndPaths   import TagsAndPaths
 
 ### --------------------- dotsMapMaker ---------------------
-''' dotsMapMaker: handles the mapItem, tags and paths display.
-    Classes: MapItem, MapMaker - uses self.canvas for canvas '''
+''' Classes: MapItem, MapMaker and various tags and path functions
+    mainly for use by storyborad - and no overlap with pathmaker '''
 ### --------------------------------------------------------
 class MapItem(QGraphicsItem):
 ### --------------------------------------------------------
@@ -172,7 +172,7 @@ class MapMaker:
                     break
 
 ### ------------------- tags and paths ---------------------                        
-    def clearPathsandTags(self):
+    def clearPathsandTags(self):  ## used in showtime 
         self.clearTagGroup()
         self.clearPaths()  ## clears tags as well
 
@@ -183,14 +183,14 @@ class MapMaker:
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
 
-    def toggleTagItems(self, pid):   ## there's one another in sidecar for sprites/shadows
-        if self.canvas.pathMakerOn:  ## doesn't work here
+    def toggleTagItems(self, pid):  
+        if self.canvas.pathMakerOn: 
             return  
-        if self.tagCount() > 0:  
+        elif self.tagCount() > 0:  
             self.clearTagGroup()
             self.clearPaths() 
             return
-        if self.isMapSet():
+        elif self.isMapSet():
             self.clearMap()
         if self.scene.items():  ## tag them all
             if self.pathSet:
@@ -222,19 +222,19 @@ class MapMaker:
         self.paths = []
         self.pathTagGroup = None
       
-    def lastZval(self, str):  ## finds the lowest pix or bkg zValue
-        last = 100000.0
+    def lastZval(self, str):  ## finds the lowest pix or bkg zValue - 
+        last = 100000.0       ## looks like it's only used for 'bkg'
         for itm in self.scene.items():
             if itm.type == str and itm.zValue() < last:
                 last = itm.zValue()
         return last
         
-    def removeTags(self):
+    def removeTags(self):  ## mapper only
         for p in self.canvas.scene.items():
             if p.type == 'tag':
                 self.scene.removeItem(p)  
     
-    def toFront(self, inc=0):  ## finds the highest pixitem zValue
+    def toFront(self, inc=0):  ## finds the highest pixitem zValue - first
         first = 0               ## returns it plus the increment
         for pix in self.scene.items():
             if pix.type in ('flat', 'pix', 'shadow','snake', 'frame', 'bat'): 
@@ -244,7 +244,7 @@ class MapMaker:
                 break
         return inc + first
    
-    def tagCount(self):  
+    def tagCount(self):  ## there's another one used by pathMaker 
         return sum( pix.type == 'tag' 
             for pix in self.scene.items())
                  

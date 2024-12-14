@@ -13,7 +13,7 @@ from dotsMapMaker       import MapMaker
 
 ### --------------------- dotsSideCar2 ---------------------
 ''' no class: snapShot,dumptrackers, addBkgLabels, setMirroredBtnText,
-            setBtns, tagBkg and files from storyboard '''   
+    setBtns, tagBkg and files from storyboard - no connection to pathMaker'''   
 ### --------------------------------------------------------
 class SideCar2:
 ### --------------------------------------------------------
@@ -28,7 +28,7 @@ class SideCar2:
 ### --------------------------------------------------------      
     def snapShot(self, pathMaker):  ## screen capture
         if self.hasBackGround() > 0 or self.scene.items():
-            self.unSelect(pathMaker)  ## turn off any select borders
+            self.unSelect()  ## turn off any select borders
             if self.canvas.pathMakerOn == False:
                 if self.canvas.mapper.isMapSet():
                     self.canvas.mapper.removeMap()
@@ -156,19 +156,12 @@ class SideCar2:
                     k += 1
             if k > 0: self.canvas.showWorks.enablePlay()  ## stop it - otherwise it's hung
   
-    def unSelect(self, pathMaker):  ## shares the 'U' from pathMaker as well
+    def unSelect(self):
         for itm in self.scene.items():  
             if itm.type == 'pix':       
                 itm.isHidden = False 
                 itm.setSelected(False) 
-            elif itm.type == 'pt' and pathMaker.selections and \
-                itm.idx in pathMaker.selections:    
-                    idx = pathMaker.selections.index(itm.idx)             
-                    pathMaker.selections.pop(idx)  
-                    itm.setBrush(QColor('white'))  
-            if itm.zValue() <= common['pathZ']:
-                break    
-                         
+         
     def flopSelected(self):    
         if self.canvas.pathMakerOn == False:
             if len(self.scene.selectedItems()) > 0:
@@ -181,7 +174,7 @@ class SideCar2:
             else:
                 self.canvas.setKeys('F')
     
-    def setMirrorBtnText(self, bkg, widget):  ## if added 
+    def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
         if bkg:  ## shouldn't need this but - could have just started to clear        
             if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
                 self.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
@@ -211,42 +204,47 @@ class SideCar2:
                 'background-color: LIGHTGREY')
             
 ### --------------------------------------------------------
-## press the '\' backslash first then click - works with pixitems and backgrounds      
+    ## single tag - press the '\' backslash key then click 
+    ## for screen items pix, bkg, flat, shadows and frames    
+### --------------------------------------------------------  
 def tagBkg(bkg, pos):  
     x, y, z = pos.x(), pos.y(), bkg.zValue()   
     text = QGraphicsSimpleTextItem() 
               
     src = 'bkg'  
     color = 'orange'
+    
+    topZVal = bkg.canvas.mapper.toFront()
        
-    if bkg.type == 'shadow':
+    if bkg.type == 'shadow': 
+        color = 'lightgreen'   
         if bkg.maker.linked == True:
             tag = 'Linked' 
         else: 
-            tag = 'Unlinked'    
-    else:      
+            tag = 'Unlinked' 
+    else:    
         if bkg.locked == True:
             text = 'Locked' 
         else:
             text = 'Unlocked'
-        fileName = os.path.basename(bkg.fileName)  ## other than backgrounds
+        fileName = os.path.basename(bkg.fileName)  ## other than shadows
         tag = fileName + " " + text     
-        
-        if bkg.type == 'bkg':
-            if bkg.direction == ' left':
-                tag = tag + ' Left'
-            elif bkg.direction == 'right': 
-                tag = tag + ' Right'
-            tag = tag + ' ' + bkg.useThis    
-        elif bkg.type in ('pix', 'frame') and z == bkg.canvas.mapper.toFront():
-            color = 'yellow' 
-            src = 'pix'      
-        if 'frame' in bkg.fileName: 
-            x, y = common['ViewW']*.47, common['ViewH']-35
-   
+    
     if bkg.type == 'bkg':
-        color = 'LIGHTSKYBLUE'
-        
+        if bkg.direction == ' left':
+            tag = tag + ' Left'
+        elif bkg.direction == 'right': 
+            tag = tag + ' Right'
+        tag = tag + ' ' + bkg.useThis  
+        color = 'AQUA'
+           
+    elif bkg.type in ('pix', 'frame') and z == topZVal:
+        color = 'yellow' 
+        src = 'pix'  
+            
+    if 'frame' in bkg.fileName: 
+        x, y = common['ViewW']*.47, common['ViewH']-35
+   
     bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
                                    
 ### --------------------- dotsSideCar2 ---------------------

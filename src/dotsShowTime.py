@@ -42,7 +42,7 @@ class ShowTime:
         
         self.mapper.clearMap()
         self.mapper.clearPathsandTags()  
-        self.sideCar2.unSelect(self.pathMaker)
+        self.sideCar2.unSelect()
         self.canvas.sideCar.hideOutlines()
                       
         if self.canvas.showbiz.tableView != None:
