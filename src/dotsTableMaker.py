@@ -191,7 +191,7 @@ class TableView:  ## formats a json .play file to display missing files or not
  
     def shuffle(self):  ## the save key
         if self.src != 'table':  
-            self.showtime.savePlay()  ## drops any missing files
+            self.showbiz.showtime.savePlay()  ## drops any missing files
         else:
             self.showWorks.saveToPlays(self.data)  ## retains remaining missing files when saved
  
