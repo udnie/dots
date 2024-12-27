@@ -103,7 +103,7 @@ class Matte(QWidget):  ## opens itself
                     Qt.AspectRatioMode.IgnoreAspectRatio,
                     Qt.TransformationMode.SmoothTransformation)    
             except Exception.TypeError:
-                print('bad')
+                MsgBox('Paint Error', 5) 
                 return         
             self.brush = QBrush(self.pix)
       
@@ -133,7 +133,11 @@ class Matte(QWidget):  ## opens itself
             self.shared('Space')
             
         else: 
-            key = chr(key) 
+            try:
+                key = chr(key) 
+            except:
+                MsgBox('Key Error', 5)  ## can vary 
+                return
             self.shared(key)   
          
     def shared(self, key):  

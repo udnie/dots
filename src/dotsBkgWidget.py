@@ -87,6 +87,7 @@ class BkgWidget(QWidget):
                 key = 'down' 
         else:
             points = .05  
+            
         if self.bkgItem.rate > 12.45 and self.switch == '':
             if key in ('up'): 
                 self.setBkgRateValue(int((self.bkgItem.rate + points) *100))
