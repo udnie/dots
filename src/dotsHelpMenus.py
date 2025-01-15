@@ -74,7 +74,7 @@ class DemoHelp:
         self.table = TableWidgetSetUp(0, 215, rows+3)
         self.table.itemClicked.connect(self.clicked)   
         
-        self.table.setRow(0, 0, f'{"Demos Menu":<13}','',True,True,2)
+        self.table.setRow(0, 0, f'{"Demos Menu":<45}','',True,True,2)  ## :<59 in qt5 <<---
 
         row = 1; self.lst = [] 
         for k, val in demoKeys.items():
@@ -85,8 +85,8 @@ class DemoHelp:
                 self.table.setRow(row, 0, "  " + val,'',False,True, 2)
             row += 1
    
-        self.table.setRow(row,      0,f'{"Select From Above":<23}',QL,True,True, 2)
-        self.table.setRow(row + 1,  0,f'{"Click Here to Close Menu":<27}','',True,True, 2)
+        self.table.setRow(row,      0,f'{"Select From Above":<47}',QL,True,True, 2)
+        self.table.setRow(row + 1,  0,f'{"Click Here to Close Menu":<50}','',True,True, 2)
     
         x, y = getVuCtr(self.canvas)  
         if off != 0: x += off

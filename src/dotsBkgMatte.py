@@ -20,8 +20,8 @@ matteKeys = {
     'Q':    'Close Matte', 
     'V':    'Vary Matte Height',
     'W':    'White',
-    '>':    'Expand Matte Size',
-    '<':    'Reduce Matte Size',
+    ']':    'Expand Matte Size',
+    '[':    'Reduce Matte Size',
     'X':    'Close Matte',   
     'R':    'Run Animation',
     'SpaceBar':   'Pause/Resume',  
@@ -69,8 +69,8 @@ class Matte(QWidget):  ## opens itself
         self.stop   = 50  ## min y.() - Max Headroom
         self.brush  = self.white  ## default   
           
-        self.ratio = 1.0    
-        self.altRatio = .77 ##.55 = 16:9 # .77  
+        self.ratio = 1.0     ## see below
+        self.altRatio = .77  ## less than (.55 of 16:9) 
         self.resize(common['ViewW']+100, common['ViewH']+100) 
         
         self.move(self.x, self.y)  ## 0,0 for canvas relative to actual screen format
@@ -116,18 +116,13 @@ class Matte(QWidget):  ## opens itself
         
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
-        key = e.key()   
-        mod = e.modifiers()
-
-        if mod & Qt.KeyboardModifier.ShiftModifier:
-            if key == Qt.Key.Key_Greater:
-                self.shared('>')
-                
-            elif key == Qt.Key.Key_Less:
-                self.shared('<')
-                
-        elif key in ('E',  Qt.Key.Key_Enter, Qt.Key.Key_Return):
+        key = e.key() 
+       
+        if key in ('E',  Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.matteHelp.closeMenu()
+                           
+        elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
+            self.shared('>') if e.key() == Qt.Key.Key_BracketRight else self.shared('<')
             
         elif key == Qt.Key.Key_Space:
             self.shared('Space')
@@ -135,8 +130,7 @@ class Matte(QWidget):  ## opens itself
         else: 
             try:
                 key = chr(key) 
-            except:
-                MsgBox('Key Error', 5)  ## can vary 
+            except: 
                 return
             self.shared(key)   
          
@@ -192,7 +186,7 @@ class Matte(QWidget):  ## opens itself
                   
         self.update() if key not in ('Q','X') else self.bye()
             
-### --------------------------------------------------------  
+### --------------------------------------------------------
     def scaleUp(self):      
         wuf = self.border    ## self.border = 30  
         if self.border == 5:

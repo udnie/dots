@@ -16,9 +16,17 @@ Before all else I'd like to thank those individuals who were kind enough to awar
     7. Optional: Change QMessageBox height in dotsSideGig.py
 
     
-There's now a python script that takes care of steps 4-6 called **script-qt5.py**, see **November 30** for more detail. The first three steps can be accomplished in vscode with a minimum of time and effort.
+There's now a python script that takes care of steps 4-6 called **script-qt5.py**, see  **January 2025** and **November 30** for more detail. The first three steps can be accomplished in vscode with a minimum of time and effort. See the **Help** and **Video** entries in **Start Here** for updates as of December 13, 2024. 
 
-See the **Help** and **Video** entries in **Start Here** for updates as of December 13, 2024. 
+If you're using **vscode** going from **X86** to **arm64** requires an edit to the terminal settings in the **code-workspace** as well. 
+
+---
+**January 15 2025**  
+**Dots** is now running on **Apple Silicon** in **PyQt6** and **PyQt5**. So far the only issue I've encountered is with some of the **f-strings** in my help menus not following the padding carried over from **PyQt6**.  Some of the padding in **PyQt6** going from **Rosetta** to **arm** changed as well.  I've whittled it down to two help files and added them to **script-qt5.py** to make the changes needed to work on my mac. 
+
+**Script-qt5.py** has also been updated to produce a **PyQt5** file without any of the little extras I made to comment and uncomment lines. I've also added **script-qt6.py** which does the same for **videoPlayerOne** and **dotsVideoPlayer** if you only plan to run these in **PyQt6**.  **VideoPlayerOne** now has a zoom feature which uses the square bracket keys, **'['** and **']'**.  The zoom button serves as a reminder only. I also switched to square brackets in **BkgMatte** and **VHX** replacing  **'<'** and **'>'** with square brackets as **'['** and **']'**  don't require using a shift key and are in easy reach.  
+
+Which introduces **slideShow.py** - a program which came about because I was thinking about possibly making a photo book and wanted a way to visualize how it might look. The zoom function was partially in response to an issue which came up in **PyQt5**.  If you set a frameless window hint you're not able to change the widget size using a mouse. The zoom addition should help in that circumstance. And last, **videoPlayerOne** and **slideShow** both include bits and pieces of code originated by google gemini. 
 
 ---
 **December 5 2024**   

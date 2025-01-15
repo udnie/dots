@@ -162,7 +162,7 @@ class ControlView(QGraphicsView):
         ## apple option key and cmd key - used by scroll panel to scroll tiles
         elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and \
             self.canvas.pathMakerOn == False:
-                       
+                
             if mod & Qt.KeyboardModifier.AltModifier:  
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
                     self.sideCar.pageDown('-1')  ## scroll one tile   

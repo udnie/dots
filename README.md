@@ -1,7 +1,7 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds.
 
-Currently **dots** is running in **PyQt 6.7.1**, **Python 3.12.6** and **Sonoma 14.6.1** on a **M1 MacBookPro** in **X86 mode.** As of **June 2024** you can run **dots** on **Apple Silicon** using **PyQt5**. Definitely read the **June 2024** entry in **Changes.md** - it's not difficult. **August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.
+Currently **dots** runs in both **PyQt6.8** and **PyQt5.15** on a **M1 MacBookPro** in **arm64 mode** and **Apple Silicon**. See **Changes.md** for converting **Dots** from PyQt6 to PyQt5. There's a script to handle the less intuitive parts.  **August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.
 
 You'll need to install **opencv-python** if you plan to use **Shadows** - **numpy** is included.
 **StartHere.md** has also been updated to cover the latest on **scrolling backgrounds** and **shadows** as well as whatever else I thought might be useful.  

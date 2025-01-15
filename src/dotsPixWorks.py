@@ -16,8 +16,8 @@ from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 Pct = -0.50   ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
-    # "apple": (650, 450),  ## see setPixSizes below
-    'doral': (215, 215),
+    # "apple": (650, 450),  ## see setPixSizes below   
+    'doral': (215, 215),  
 }
                   
 ### --------------------------------------------------------  
@@ -50,16 +50,16 @@ class AnimationHelp:
         width, height = 191, 426
         self.table.setFixedSize(width, height)
                          
-        self.table.setRow(0, 0, f"{'Animations and Paths':<17}",'',True,True,2)  
+        self.table.setRow(0, 0, f"{'Animations and Paths':<47}",'',True,True,2)  
         
         row = 1
         for anime in alst: 
             self.table.setRow(row, 0,  "  " + anime,'', False, True, 2) 
             row += 1
 
-        self.table.setRow(row,  0,f'{"Path Chooser":<15}',QC,True,True, 2)  ## these are tags
-        self.table.setRow(row + 1, 0,f'{"Clear Tags":<14}',QL,True,True, 2)       
-        self.table.setRow(row + 2, 0,f'{"Click Here to Close Menu":<23}','',True,True, 2)
+        self.table.setRow(row,     0,f'{"Path Chooser":<44}',QC,True,True, 2)  ## these are tags
+        self.table.setRow(row + 1, 0,f'{"Clear Tags":<42}',QL,True,True, 2)       
+        self.table.setRow(row + 2, 0,f'{"Click Here to Close Menu":<49}','',True,True, 2)
 
         x, y = getVuCtr(self.pixitem.canvas)
         z = 50

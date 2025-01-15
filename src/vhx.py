@@ -6,11 +6,8 @@ from PyQt6.QtCore       import Qt, QPointF, PYQT_VERSION_STR
 from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
 from PyQt6.QtWidgets    import QApplication, QWidget
 
-ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
-SizeKeys = (Qt.Key.Key_Less, Qt.Key.Key_Greater)  ## '</>'
 Ticks    = (100,50,10)  ## how often to draw a line and size
-
-VWidth, VHeight, BHeight = 1200, 70, 900  
+VWidth, VHeight, BHeight = 1400, 70, 1000  
 
 # print("\n" + "PyQt version:", PYQT_VERSION_STR) 
 # print(f'Python: {platform.python_version()}'+ "\n")
@@ -108,9 +105,9 @@ class VHX(QWidget):  ## yet another screen pixel ruler
             self.horizontal = True
             self.resize(VWidth, VHeight)
             self.center()
-        elif key in SizeKeys:
+        elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
             self.scaleThis(key)
-        elif key in ExitKeys:
+        elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.close()
                 
     def mousePressEvent(self, e):
@@ -142,8 +139,8 @@ class VHX(QWidget):  ## yet another screen pixel ruler
     def mouseDoubleClickEvent(self, e):
         self.close()  
     
-    def scaleThis(self, key):
-        if key == Qt.Key.Key_Greater:
+    def scaleThis(self, key):     
+        if key == Qt.Key.Key_BracketRight:
             scale = 100
         else:
             scale = -100

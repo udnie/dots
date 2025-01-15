@@ -1,8 +1,10 @@
 
-## ------------------- scripter.py ------------------------
+## ------------------- script-qt5.py ------------------------
 import os
 
-files = ["videoPlayerOne.py", \
+files = ["dotsHelpMenus.py", \
+        "dotsHelpMaker.py", \
+        "videoPlayerOne.py", \
         "dotsVideoPlayer.py", \
         "dotsTableMaker.py", \
         "dotsPixItem.py"]
@@ -11,7 +13,24 @@ for file in files:
     with open(file, 'r') as fp: 
         for line in fp:
             
-            if file == "dotsPixItem.py":
+            if file == "dotsHelpMenus.py":  
+                if '45' in line:
+                    i = line.index('45') 
+                    line = line[0:i] + '59' + line[i+2:]
+                    print(line, i)
+                    
+            elif file == "dotsHelpMaker.py":  
+                if '42' in line:
+                    i = line.index('42') 
+                    line = line[0:i] + '17' + line[i+2:]
+                    print(line, i)
+                    
+                elif '47' in line:
+                    i = line.index('47') 
+                    line = line[0:i] + '23' + line[i+2:]
+                    print(line, i)
+                             
+            elif file == "dotsPixItem.py":
                 if line.startswith('from dotsShadowMaker'):
                     line = '# ' + line
                 
@@ -25,8 +44,8 @@ for file in files:
                 
                 elif 'QtWidgets' in line:
                     line = line.strip() + ', QShortcut' + '\n'
-                    
-            elif file == "videoPlayerOne.py":
+                           
+            elif file in ("dotsVideoPlayer.py","videoPlayerOne.py"):
                 if line.startswith('import cv2'):
                     line = '# ' + line
                 
@@ -34,21 +53,30 @@ for file in files:
                     i = line.index('s')  ## self.set
                     line = line[0:i] + '# ' + line[i:]
            
-            if '## 6' in line:
-                for i, c in enumerate(line):
-                    if c != ' ' and c != '\t':
-                        break
-                line = line[0:i] + '# ' + line[i:]
-               
-            elif '## 5' in line:
-                for i, c in enumerate(line):
-                    if c == '#':
-                        break
-                if i == 0:
-                    line = line[2:]
-                else:
-                    line = line[0:i-1] +  ' ' + line[i+2:]
-          
+                # if '## 6' in line:     
+                #     for i, c in enumerate(line):  
+                #         if c != ' ' and c != '\t':
+                #             break
+                #         line = line[0:i] + '# ' + line[i:]
+                
+                if '## 6' in line or 'end' in line or 'comment' in line:  ## skip
+                    continue
+                
+                elif '## 5' in line:
+                    for i, c in enumerate(line):
+                        if c == '#':
+                            break
+                    if i == 0:
+                        line = line[2:]
+                    else:
+                        line = line[0:i-1] +  ' ' + line[i+2:]
+                        
+                    i = line.index('## 5')  ## remove it 
+                    line = line[0:i] + '\n'
+                    
+                if line.startswith('#d'):
+                    line = line[3:]
+                                         
             if line.startswith('from PyQt'): ## just to make sure
                 line = 'from PyQt5' + line[line.index('.'):]
       

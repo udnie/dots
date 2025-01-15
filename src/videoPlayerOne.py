@@ -5,15 +5,15 @@ import time
 import math  
 
 ### --------------------------------------------------------
-''' You will need to install opencv-python and uncomment the cv2 import
-    and this line # self.setScreenFormat(fileName) inorder to have the 
-    videoPlayer set the screen format on drag and drop. cv2 is used
-    in setting the aspect-ratio (width/height) of a video file '''
+#d ''' You will need to install opencv-python and unComment the cv2 import
+#d     and this line # self.setScreenFormat(fileName) inorder to have the 
+#d     videoPlayer set the screen format on drag and drop. cv2 is used
+#d     in setting the aspect-ratio (width/height) of a video file '''
 ### --------------------------------------------------------              
-# import cv2 
+import cv2 
 ### --------------------------------------------------------
 
-from PyQt6.QtCore       import Qt, QUrl
+from PyQt6.QtCore       import Qt, QUrl,QPoint
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QSlider, QHBoxLayout, QVBoxLayout, \
                                 QFileDialog, QLabel, QPushButton, QFrame, QApplication
@@ -31,7 +31,7 @@ Height,  VHeight  = 500, 750   ## default heights
 Chars   = ( 'A',  'F',  'H',  'V')  ## as in characters 
 Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
 Widths  =  (550,  615,  720,  395)  ## default widget widths
-WID, HGT = 40, 114  ## for opening without discovery
+WID, HGT = 40, 116  ## for opening without discovery
 
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
@@ -103,13 +103,18 @@ class VideoPlayer(QWidget):
         self.openPlayer('F') ## current default - 3:2
        
         self.show()
-
+        
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
         if e.key() == Qt.Key.Key_Space:  ## spacebar to pause/resume
             self.playVideo()
+        elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
+            self.zoom(1.10) if e.key() == Qt.Key.Key_BracketRight else self.zoom(.90)
         else:
-            key = chr(e.key())
+            try:
+                key = chr(e.key())
+            except:
+                return
             if key in Chars:
                 self.resizeAndMove(key)
             elif key == 'S':  ## toggle start and stop
@@ -183,11 +188,27 @@ class VideoPlayer(QWidget):
             newWidth = int(asp * (height - HGT) + WID)   ## or use a screen pixel ruler
         self.resize(newWidth, height)   
         return int((newWidth - oldWidth )/2)  ## center qwidget
-    
+  
+    def zoom(self, zoom):
+        if self.mediaPlayer != None:  
+            height = int(self.height()* zoom)  ## new height
+            p, width = self.pos(), self.width()  
+ 
+            asp = Asps[Chars.index(self.lastKey)]   
+            frW, frH = self.framing() 
+      
+            nvH = (height - frH)  ## new video height
+            nvW = int(nvH *asp)   ## new video width   
+            nwidth = nvW + frW    ## new widget width 
+            
+            self.resize(nwidth, height)   
+            dif = int((self.width() - width)/2) 
+            self.move(p.x()-dif, p.y())   
+        
     def setScreenFormat(self, video_path):  ## optional - requires opencv-python
-        cap = cv2.VideoCapture(video_path)  ## plus edits - reads video file
+        cap = cv2.VideoCapture(video_path)  ## plus edits - reads video file    
         if not cap.isOpened():
-            return None
+            return None  
         width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         cap.release()
@@ -224,9 +245,9 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-        # # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
-### ---------------------------- end ----------------------------------- 
-
+        self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
+### -------------------------- if using cv2 ----------------------------
+    ## 6
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              
     def playVideo(self):  ## 6
         if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
@@ -244,7 +265,7 @@ class VideoPlayer(QWidget):
             while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState): ## 6
                 time.sleep(.05) ## 6
             self.stopVideo()   ## 6    
-               
+    ## 6          
 ### ------------ uncomment for 5 ... comment out for 6 -----------------
     # def playVideo(self):   ## 5
     #     if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
@@ -293,6 +314,7 @@ class VideoPlayer(QWidget):
   
         self.openButton = QPushButton("Files")
         self.playButton = QPushButton("Start")
+        self.zoomButton = QPushButton('Zoom Keys [ ]')
         self.stopButton = QPushButton("Stop")
         self.byeButton  = QPushButton("Quit")  
         
@@ -305,6 +327,7 @@ class VideoPlayer(QWidget):
         
         hbox.addWidget(self.openButton)  
         hbox.addWidget(self.playButton)
+        hbox.addWidget(self.zoomButton)
         hbox.addWidget(self.stopButton)
         hbox.addWidget(self.byeButton)
 
@@ -329,4 +352,9 @@ if __name__ == '__main__':
     player = VideoPlayer()
     sys.exit(app.exec())
     
+### ---------------------- that's all ----------------------
+
+
+
+
 
