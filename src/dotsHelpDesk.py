@@ -64,7 +64,7 @@ class StoryHelp2:
         width, height = 257, 456
         self.table.setFixedSize(width, height)
      
-        self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}','',True,True,2)
+        self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}',QL,True,True,2)
     
         row = 1  
         for k, val in storyKeys.items():
@@ -122,7 +122,7 @@ class PathHelp2:
         width, height = 256, 512
         self.table.setFixedSize(width, height)
      
-        self.table.setRow(0, 0, f'{" PathMaker Help Menu 2":<27}','',True,True,2)
+        self.table.setRow(0, 0, f'{" PathMaker Help Menu 2":<27}',QL,True,True,2)
         
         row = 1
         for k , val in pathKeys.items():

@@ -80,7 +80,7 @@ class PixHelp:
         width, height = 221, 607
         self.table.setFixedSize(width, height)
                           
-        self.table.setRow(0, 0, f'{"Sprite/PixItem Help Menu":<25}','',True, True, 2)
+        self.table.setRow(0, 0, f'{"Sprite/PixItem Help Menu":<25}',QL,True, True, 2)
         
         row = 1
         for k, val in pixKeys.items():    
@@ -150,7 +150,7 @@ class BkgHelp:
         width, height = 241, 427
         
         self.table.setFixedSize(width, height)  
-        self.table.setRow(0, 0, f'{"Background Help Menu":<22}','',True,True,2)
+        self.table.setRow(0, 0, f'{"Background Help Menu":<22}',QL,True,True,2)
     
         row = 1
         for k , val in bkgHelpKeys.items():
@@ -200,7 +200,7 @@ class ShadowHelp:
         width, height = 221, 366
         self.table.setFixedSize(width, height)
 
-        self.table.setRow(0, 0, f'{" Shadow Help Menu":<20}','',True,True, 2)
+        self.table.setRow(0, 0, f'{" Shadow Help Menu":<20}',QL,True,True, 2)
 
         row = 1
         for k , val in shadowKeys.items():

@@ -69,8 +69,10 @@ class  MainMenu:
         self.sideCar = self.canvas.sideCar
              
         self.table = TableWidgetSetUp(0, 260, len(switchKeys)+3)
-        self.table.itemClicked.connect(self.clicked)                                      
-        self.table.setRow(0, 0, f'{"Help Menus":<42}','',True,True,2)  ## :<17 in qt5 <<---
+        self.table.setColumnHidden(0, True) 
+        self.table.itemClicked.connect(self.clicked)      
+                                     
+        self.table.setRow(0, 0, f'{"Help Menus":<60}',QL,True,True,2)  ## :<17 in qt5 <<---
         
         row = 1; self.lst = []
         for k, val in switchKeys.items():
@@ -78,12 +80,12 @@ class  MainMenu:
             self.table.setRow(row, 0,  f'{val:<59}','', True, True, 2)
             row += 1
    
-        self.table.setRow(row, 0,f'{"Select From Above":<47}',QL,True,True, 2)   ## :<23 in qt5 <<---
-        self.table.setRow(row + 1, 0,f'{"Click Here to Close":<47}','',True,True, 2)    ## :<23 in qt5 <<---
-     
-        self.table.setFixedSize(266, 305)    
-        x, y = getVuCtr(self.canvas)  
-         
+        self.table.setRow(row, 0,f'{"Select From Above":<57}',QL,True,True, 2)   ## :<23 in qt5 <<---
+        self.table.setRow(row + 1, 0,f'{"Click Here to Close":<20}','',True,True, 2)    ## :<23 in qt5 <<---
+          
+        self.table.setFixedSize(267, 307)
+        
+        x, y = getVuCtr(self.canvas)      
         if self.canvas.dots.Vertical:
             y = y - 60          
       

@@ -63,7 +63,7 @@ class PathHelp:
         width, height = 246, 656
         self.table.setFixedSize(width, height)
   
-        self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}','',True, True, 2)
+        self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}',QL,True, True, 2)
     
         row = 1
         for k, val in pathKeys.items():

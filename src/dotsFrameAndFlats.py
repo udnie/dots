@@ -43,9 +43,9 @@ class FlatHelp:  ## flat and frame keyboard help for both
         self.table.setFixedSize(width, height)
  
         if str == 'flat':
-            self.table.setRow(0, 0, f"{'Flat Help Menu   ':<15}",'',True,True,2)
+            self.table.setRow(0, 0, f"{'Flat Help Menu   ':<15}",QL,True,True,2)
         else:
-            self.table.setRow(0, 0, f"{'Frame Help Menu  ':<15}",'',True,True,2)
+            self.table.setRow(0, 0, f"{'Frame Help Menu  ':<15}",QL,True,True,2)
         
         row = 1
         for k , val in flatKeys.items():

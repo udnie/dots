@@ -72,9 +72,10 @@ class DemoHelp:
         if self.dots.Vertical: rows = len(demoKeys)-2
 
         self.table = TableWidgetSetUp(0, 215, rows+3)
+        self.table.setColumnHidden(0, True) 
         self.table.itemClicked.connect(self.clicked)   
         
-        self.table.setRow(0, 0, f'{"Demos Menu":<45}','',True,True,2)  ## :<59 in qt5 <<---
+        self.table.setRow(0, 0, f'{"Demos Menu":<60}',QL,True,True,2)  ## :<59 in qt5 <<---
 
         row = 1; self.lst = [] 
         for k, val in demoKeys.items():
@@ -174,7 +175,7 @@ class ScreenHelp:
         width, height = 222, 396
         self.table.setFixedSize(width, height)
         
-        self.table.setRow(0, 0, f'{"Screen Formats":<14}','',True,True,3)
+        self.table.setRow(0, 0, f'{"Screen Formats":<14}',QL,True,True,3)
         
         row = 1
         for k , val in screens.items():

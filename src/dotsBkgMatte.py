@@ -243,7 +243,7 @@ class MatteHelp:
         width, height = 252, 511
         self.table.setFixedSize(width, height)
 
-        self.table.setRow(0, 0, f"{' Matte KeyBoard Help ':<23}",'',True,True,2)
+        self.table.setRow(0, 0, f"{' Matte KeyBoard Help ':<23}",QL,True,True,2)
 
         row = 1
         for k, val in matteKeys.items():

@@ -28,6 +28,12 @@ If you're using **vscode** going from **X86** to **arm64** requires an edit to t
 
 Which introduces **slideShow.py** - a program which came about because I was thinking about possibly making a photo book and wanted a way to visualize how it might look. The zoom function was partially in response to an issue which came up in **PyQt5**.  If you set a frameless window hint you're not able to change the widget size using a mouse. The zoom addition should help in that circumstance. And last, **videoPlayerOne** and **slideShow** both include bits and pieces of code originated by google gemini. 
 
+**January 16 2025**   
+Another fix for f-strings used in menus by tableWidgets displaying only centered text.  Added a square format for slide shows.
+
+New video:  <https://youtu.be/7CWd5Z7IfK4>
+
+
 ---
 **December 5 2024**   
 Added a **'Help Menus'** selection to the **StoryBoard** and **PathMaker** help menus to show all the menus just as in **Canvas** by clicking on the **Menus** entry. Fixes to **Matte**,  **videoWidget** and **pathMaker** to clean up some bugs. **'B'** in storyboard will call the background file dialog if there are no backgrounds in the scene, **'A'** does that in canvas and is used to select all in storyboard, otherwise **B** will mirror the background provided it's not from a .play file. 

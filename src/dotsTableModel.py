@@ -56,7 +56,7 @@ class TableWidgetSetUp(QTableWidget):  ## used by help menus
         self.setAccessibleName('widget')
         self.height = fontSize
         
-    def setRow(self, row, col, str, color='', ctr=bool, bold=False, span=0):
+    def setRow(self, row, col, str, color='', ctr=False, bold=False, span=0):
         self.setRowHeight(row, self.height) if self.height > 0 else self.setRowHeight(row, RH)
         item = QTableWidgetItem(str)
         
@@ -75,7 +75,7 @@ class TableWidgetSetUp(QTableWidget):  ## used by help menus
         elif span == 3:
             self.setSpan(row, 0, 1, 3) 
      
-        self.setItem(row, col, item)
+        return self.setItem(row, col, item)
                              
 ### --------------------------------------------------------  
 class Typelist:  ## for type header 

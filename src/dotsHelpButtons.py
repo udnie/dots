@@ -124,7 +124,7 @@ class CanvasHelp:
         width, height = 246, 487
         self.table.setFixedSize(width, height)
 
-        self.table.setRow(0, 0, f'{"   Canvas Help Menu ":<20}','',True,True,2)
+        self.table.setRow(0, 0, f'{"   Canvas Help Menu ":<20}',QL,True,True,2)
         
         row = 1
         for k , val in canvasKeys.items():
@@ -183,7 +183,7 @@ class StoryHelp:
         width, height = 267, 630
         self.table.setFixedSize(width, height)
      
-        self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}','',True,True,2)
+        self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}',QL, True,True,2)
     
         row = 1
         for k, val in storyKeys.items():

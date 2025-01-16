@@ -15,6 +15,10 @@ Width, Height = 1400,    900 ## widget size and SceneRectSize - see pixXY
 ViewW, ViewH  = 1360,    860 ## scene size - for a moment
 MaxW, MaxH, MaxV = 1100, 650, 770 
 
+# Width, Height = 900,    900 ## widget size and SceneRectSize - see pixXY
+# ViewW, ViewH  = 860,    860 ## scene size - for a moment
+# MaxW, MaxH, MaxV = 550, 550, 550
+
 # Width, Height = 1500,   1000 ## widget size  ## reset setGeometry(x, y = to 150  from 200
 # ViewW, ViewH  = 1460,    960 ## scene size
 # MaxW, MaxH, MaxV = 1200, 650, 800 

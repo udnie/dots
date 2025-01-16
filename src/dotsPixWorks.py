@@ -16,8 +16,8 @@ from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 Pct = -0.50   ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
-    # "apple": (650, 450),  ## see setPixSizes below   
-    'doral': (215, 215),  
+    # "apple": (650, 450),  ## see setPixSizes below
+    'doral': (215, 215),
 }
                   
 ### --------------------------------------------------------  
@@ -45,12 +45,13 @@ class AnimationHelp:
         alst.extend(['Random']) ## add random to lst
         
         self.table = TableWidgetSetUp(0, 185, len(alst)+4)
+        self.table.setColumnHidden(0, True) 
         self.table.itemClicked.connect(self.clicked)   
         
         width, height = 191, 426
         self.table.setFixedSize(width, height)
                          
-        self.table.setRow(0, 0, f"{'Animations and Paths':<47}",'',True,True,2)  
+        self.table.setRow(0, 0, f"{'Animations and Paths':<47}",QL,True,True,2)  
         
         row = 1
         for anime in alst: 
