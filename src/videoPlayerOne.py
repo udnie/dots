@@ -10,7 +10,7 @@ import math
 #d     videoPlayer set the screen format on drag and drop. cv2 is used
 #d     in setting the aspect-ratio (width/height) of a video file '''
 ### --------------------------------------------------------              
-import cv2 
+# import cv2 
 ### --------------------------------------------------------
 
 from PyQt6.QtCore       import Qt, QUrl,QPoint
@@ -245,7 +245,7 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-        self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
+        # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
 ### -------------------------- if using cv2 ----------------------------
     ## 6
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              
