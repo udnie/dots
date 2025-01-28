@@ -8,12 +8,13 @@ import math
 #d ''' You will need to install opencv-python and unComment the cv2 import
 #d     and this line # self.setScreenFormat(fileName) inorder to have the 
 #d     videoPlayer set the screen format on drag and drop. cv2 is used
-#d     in setting the aspect-ratio (width/height) of a video file '''
+#d     in setting the aspect-ratio (width/height) of a video file.
+#d     A right-mouse click displays the filename in the window title.  '''
 ### --------------------------------------------------------              
 # import cv2 
 ### --------------------------------------------------------
 
-from PyQt6.QtCore       import Qt, QUrl,QPoint
+from PyQt6.QtCore       import Qt, QUrl
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QSlider, QHBoxLayout, QVBoxLayout, \
                                 QFileDialog, QLabel, QPushButton, QFrame, QApplication
@@ -26,11 +27,11 @@ from PyQt6.QtMultimediaWidgets  import QVideoWidget
 ### ---------------------------- end --------------------------------
 
 YoffSet, VYoffset = 450, 550   ## px above screen center
-Height,  VHeight  = 500, 750   ## default heights
+Height,  VHeight  = 500, 815   ## default heights
 
 Chars   = ( 'A',  'F',  'H',  'V')  ## as in characters 
 Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
-Widths  =  (550,  615,  720,  395)  ## default widget widths
+Widths  =  (550,  615,  720, 435)  ## default widget widths
 WID, HGT = 40, 116  ## for opening without discovery
 
 ### --------------------------------------------------------
@@ -216,7 +217,7 @@ class VideoPlayer(QWidget):
         try: 
             self.resizeAndMove(Chars[Asps.index(asp)])
         except:
-            None
+            return None
    
     def framing(self):  ## the differences between widget size and videoWidget
         s, v = self.size(), self.videoWidget.size()   
@@ -245,7 +246,7 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-        # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
+        # # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
 ### -------------------------- if using cv2 ----------------------------
     ## 6
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              

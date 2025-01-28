@@ -251,16 +251,7 @@ def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on
     bytesPerLine = ch * width  ## 4 bits of information
     
     return img, width, height, bytesPerLine   
-                                 
-### --------------------------------------------------------
-    # def paint(self, painter, option, widget=None):  ## just in case
-    #     super().paint(painter, option, widget)      ## for shadow
-    #     if self.isSelected():
-    #         pen = QPen(QColor('lime'))
-    #         pen.setWidth(2)
-    #         painter.setPen(pen)
-    #         painter.drawRect(self.boundingRect())
-                              
+                                                               
 ### ---------------------- dotsShadow ----------------------
 
 

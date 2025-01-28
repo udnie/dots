@@ -123,7 +123,7 @@ class StoryBoard(QWidget):
                 
                 if self.key == 'cmd':   ## start rubberband 
                     self.mapper.clearMap() 
-                    self.sideCar2.unSelect(self.pathMaker)              
+                    self.sideCar2.unSelect()              
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
                     if self.animation == False:
                         self.mapper.updatePixItemPos()   

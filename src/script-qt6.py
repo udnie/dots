@@ -1,5 +1,8 @@
 
-## ------------------- script-qt6.py ------------------------
+## ------------------- script-qt6.py ----------------------
+''' Removes any unnecessary code, comments or tokens leaving
+    only PyQt6 code. '''
+### -------------------------------------------------------
 import os
 
 files = ["videoPlayerOne.py", "dotsVideoPlayer.py"]

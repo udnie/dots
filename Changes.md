@@ -18,7 +18,7 @@ Before all else I'd like to thank those individuals who were kind enough to awar
     
 There's now a python script that takes care of steps 4-6 called **script-qt5.py**, see  **January 2025** and **November 30** for more detail. The first three steps can be accomplished in vscode with a minimum of time and effort. See the **Help** and **Video** entries in **Start Here** for updates as of December 13, 2024. 
 
-If you're using **vscode** going from **X86** to **arm64** requires an edit to the terminal settings in the **code-workspace** as well. 
+If you're using **vscode** going from **X86** to **arm64** requires an edit to the terminal settings in the **.code-workspace** as well. 
 
 ---
 **January 15 2025**  
@@ -32,6 +32,11 @@ Which introduces **slideShow.py** - a program which came about because I was thi
 Another fix for f-strings used in menus by tableWidgets displaying only centered text.  Added a square format for slide shows.
 
 New video:  <https://youtu.be/7CWd5Z7IfK4>
+
+**January 27 2025**  
+A bug fix to the **'RubberBand'** selector.  An update to **VHX** that anchors the beginning of the ruler when holding down the '**command**' key on a Mac while adjusting the ruler's length using the square bracket keys.
+
+The three small desktop apps, **VHX, slideShow** and **videoPlayerOne** all run in **PySide6**. Change **PyQt6** to **PySide6**, that's it.
 
 
 ---

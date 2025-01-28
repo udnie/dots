@@ -1,24 +1,24 @@
 
 import sys
-import platform
 
-from PyQt6.QtCore       import Qt, QPointF, PYQT_VERSION_STR
+from PyQt6.QtCore       import Qt, QPointF
 from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
 from PyQt6.QtWidgets    import QApplication, QWidget
 
-Ticks    = (100,50,10)  ## how often to draw a line and size
-VWidth, VHeight, BHeight = 1400, 70, 1000  
-
-# print("\n" + "PyQt version:", PYQT_VERSION_STR) 
-# print(f'Python: {platform.python_version()}'+ "\n")
+Ticks = (100,50,10)  ## how often to draw a line and size
+RWidth, RSize, RHeight = 1500, 70, 1000  
 
 ### ------------------------- vhx --------------------------
+''' Pressing the 'command' key, on my mac, and one of the square 
+    brackets anchors the rulers current 'x' position if horizontal 
+    or its current 'y' position if vertical ''' 
+### --------------------------------------------------------
 class VHX(QWidget):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------
     def __init__(self):
         super().__init__()
 
-        self.resize(VWidth, VHeight)
+        self.resize(RWidth, RSize)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
 
         self.setWindowOpacity(.80)
@@ -49,10 +49,8 @@ class VHX(QWidget):  ## yet another screen pixel ruler
 ### --------------------------------------------------------
     def paintEvent(self, event):
         painter = QPainter(self)
-        if self.horizontal:  ## need to keep one component constant
-            self.resize(self.width(), VHeight)  ## fixes a small bug 
-        else:                
-            self.resize(VHeight, self.height() )
+        self.resize(self.width(), RSize) if self.horizontal else\
+            self.resize(RSize, self.height() )
         painter.setBrush(QColor(128, 255, 0)) 
         painter.drawRect(0, 0, self.width(), self.height() )
         painter.setBrush(Qt.BrushStyle.NoBrush) 
@@ -60,9 +58,7 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         painter.drawRect(0, 0, self.width(), self.height())
         painter.setPen(QPen(Qt.GlobalColor.black, 1.0)) 
         metrics = QFontMetrics(self.font)
-        if self.horizontal:
-            self.drawHorizontalLines(painter, metrics)  
-        else:
+        self.drawHorizontalLines(painter, metrics) if self.horizontal else\
             self.drawVerticalLines(painter, metrics)  
 
     def drawHorizontalLines(self, painter, metrics): 
@@ -74,11 +70,11 @@ class VHX(QWidget):  ## yet another screen pixel ruler
                 p = metrics.boundingRect(txt)
                 p = p.width()
                 if t > 10:
-                    painter.drawLine(i, 20, i, VHeight)
+                    painter.drawLine(i, 20, i, RSize)
                     if i == w * t: p = p + 4
                     painter.drawText(i-p, 15, txt)
                 else:  ## just draw lines
-                    painter.drawLine(i, 35, i, VHeight)
+                    painter.drawLine(i, 35, i, RSize)
 
     def drawVerticalLines(self, painter, metrics):  
         for t in Ticks:  
@@ -97,16 +93,18 @@ class VHX(QWidget):  ## yet another screen pixel ruler
        
     def keyPressEvent(self, e):
         key = e.key()
-        if key == Qt.Key.Key_V:
+        mod = e.modifiers()   
+        if key == Qt.Key.Key_V:  ## select vertical
             self.horizontal = False
-            self.resize(VHeight, BHeight)
+            self.resize(RSize, RHeight)
             self.center()
-        elif key == Qt.Key.Key_H:
+        elif key == Qt.Key.Key_H: ## select horizontal
             self.horizontal = True
-            self.resize(VWidth, VHeight)
+            self.resize(RWidth, RSize)
             self.center()
         elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
-            self.scaleThis(key)
+            self.scaleThis(key, 1) if mod & Qt.KeyboardModifier.ControlModifier else\
+                self.scaleThis(key, 0)  
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.close()
                 
@@ -125,8 +123,8 @@ class VHX(QWidget):  ## yet another screen pixel ruler
             y = constrain(y, self.height(), self.scrnHeight, 200)
         ## so it doesn't get lost and go off screen
         if self.horizontal:
-            if y >= self.scrnHeight - VHeight/2:
-                y = int(self.scrnHeight - VHeight/2)
+            if y >= self.scrnHeight - RSize/2:
+                y = int(self.scrnHeight - RSize/2)
         else:
             if x >= self.scrnWidth - self.width()/2:
                 x = int(self.scrnWidth - self.width()/2)
@@ -139,35 +137,38 @@ class VHX(QWidget):  ## yet another screen pixel ruler
     def mouseDoubleClickEvent(self, e):
         self.close()  
     
-    def scaleThis(self, key):     
+    def scaleThis(self, key, switch):     
         if key == Qt.Key.Key_BracketRight:
             scale = 100
         else:
             scale = -100
-        p = self.pos()
-        x, y = p.x(), p.y()
+        p = self.pos();  x, y = p.x(), p.y()
         if self.horizontal and (self.width() + scale) > 100: 
             self.resize(self.width() + scale, self.height())
-            if scale == 100:
-                x -= 50         
+            if switch != 0:  
+                switch = x
+            elif scale == 100:
+                 x -= 50         
             else:
-                x += 50         
-        elif self.height() + scale > 100:
+                x += 50    
+        elif self.height() + scale > 100:    
             self.resize(self.width(), self.height() + scale)
-            if scale == 100:
-                y -= 50         
+            if switch != 0:  
+                switch = y
+            elif scale == 100:
+                 y -= 50         
             else:
-                y += 50  
+                 y += 50  
         self.move(x,y)
         self.update()
 
     def center(self):
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         if self.horizontal:
-            x = int(((ctr.x() * 2 ) - VWidth)/2)
+            x = int(((ctr.x() * 2 ) - RWidth)/2)
             self.move(x, ctr.y()-100)
         else:
-            y = int((((ctr.y() * 2 ) - BHeight)/2))
+            y = int((((ctr.y() * 2 ) - RHeight)/2))
             x = int(ctr.x()-self.width()/2)
             self.move(x, y-50)
 
@@ -190,3 +191,4 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ------------------------- vhx --------------------------
+

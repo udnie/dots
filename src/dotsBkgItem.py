@@ -3,7 +3,7 @@ import os
 import os.path
 
 from PyQt6.QtCore       import Qt, QPointF, QPoint, QPropertyAnimation, pyqtSlot
-from PyQt6.QtGui        import QImage, QPixmap, QCursor
+from PyQt6.QtGui        import QImage, QPixmap, QCursor, QTransform
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, paths
@@ -297,9 +297,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def setMirrored(self, bool):
         self.flopped = bool  
         if not self.dots.Vertical:
-            self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-                horizontal=self.flopped, vertical=False)))
-        self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
+            if self.flopped:
+                transform = QTransform().scale(-1,1)
+            else:
+                transform = QTransform().scale(1,1)
+            pix = QPixmap.fromImage(self.imgFile)
+            self.setPixmap(pix.transformed(transform))
+            self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
 
     def setOrigin(self):  
         b = self.boundingRect()

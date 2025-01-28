@@ -5,7 +5,7 @@ import math
 
 from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint
 from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap, QPen, QColor
-from PyQt6.QtWidgets    import QMessageBox, QGraphicsItemGroup, QGraphicsLineItem
+from PyQt6.QtWidgets    import QMessageBox, QGraphicsLineItem
      
 from dotsShared         import common, paths, pathcolors
 
@@ -74,21 +74,15 @@ class Grid:  ## moved from sideCar
         self.canvas = parent
         self.scene  = self.canvas.scene
         
-        self.gridZ     = common['gridZ']    
-        self.gridGroup = None  
+        self.gridZ   = common['gridZ']    
+        self.gridSet = False  
         
 ### -------------------------------------------------------                                        
     def toggleGrid(self):
-        if self.gridGroup != None:
-            self.removeGrid()
-            self.gridGroup = None
-        else: 
-            self.addGrid()
-            
-    def addGrid(self):
-        self.gridGroup = QGraphicsItemGroup()  
-        self.gridGroup.setZValue(common['gridZ'])
-        self.scene.addItem(self.gridGroup)         
+        self.removeGrid() if self.gridSet == True else self.addGrid()
+     
+    def addGrid(self):   
+        self.gridSet = True 
         gs = common['gridSize']
         pen = QPen(QColor(0,0,255))       
         for y in range(1, int(common['ViewH']/gs)):
@@ -104,20 +98,20 @@ class Grid:  ## moved from sideCar
         line.setOpacity(.30)
         line.setZValue(common['gridZ'])
         line.setFlag(QGraphicsLineItem.GraphicsItemFlag.ItemIsMovable, False)
-        self.gridGroup.addToGroup(line)
+        self.scene.addItem(line)
 
     def removeGrid(self):
+        self.gridSet = False 
         try:
             for pix in self.scene.items():
                 if pix.type == 'grid': self.scene.removeItem(pix)
-            self.scene.removeItem(self.gridGroup)
         except:
             return
         
     def gridCount(self):  
         return sum(pix.type == 'grid' 
             for pix in self.canvas.scene.items())
-                 
+                       
 ### --------------------------------------------------------
 ''' functions that mostly return values follow '''
 ### --------------------------------------------------------

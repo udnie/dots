@@ -1,6 +1,6 @@
 
 from PyQt6.QtCore       import Qt, QPoint, pyqtSlot, QPointF
-from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor, QCursor
+from PyQt6.QtGui        import QImage, QPen, QPixmap, QColor, QCursor, QTransform
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
@@ -98,14 +98,12 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlags(True)
     
 ### --------------------------------------------------------
-    def paint(self, painter, option, widget=None):  ## this may be the source of a type error in pyside
-        super().paint(painter, option, widget)  ## why is this necessary??
+    def paint(self, painter, option, widget):  ## use paintEvent for widgets
+        super().paint(painter, option, widget) 
         if self.isSelected():
-            pen = QPen(QColor("lime"))
-            pen.setWidth(2)
-            painter.setPen(pen)
+            painter.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.SolidLine))
             painter.drawRect(self.boundingRect())
-                   
+               
     def hoverLeaveEvent(self, e):
         if self.locked:
             self.mapper.clearTagGroup()
@@ -250,8 +248,12 @@ class PixItem(QGraphicsPixmapItem):
                                                      
     def setMirrored(self, bool): 
         self.flopped = bool
-        self.setPixmap(QPixmap.fromImage(self.imgFile.mirrored(
-            horizontal=self.flopped, vertical=False)))
+        if self.flopped:
+            transform = QTransform().scale(-1,1)
+        else:
+            transform = QTransform().scale(1,1)
+        pix = QPixmap.fromImage(self.imgFile)
+        self.setPixmap(pix.transformed(transform))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
 
 ### --------------------------------------------------------       

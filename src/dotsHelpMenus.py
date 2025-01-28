@@ -223,9 +223,9 @@ class ScreenHelp:
         else:
             return True            
         
-    def exceedsMsg(self):  ## in storyBoard on start       ## use getCtr with MsgBox
-        MsgBox('Selected Format Exceeds Current Display Size', 8, getCtr(-200,-145)) 
-     
+    def exceedsMsg(self):  ## in storyBoard on start       
+        MsgBox('Format Exceeds Current Display Size',5, getCtr(-200,-150)) 
+      
 ### ---------------------- dotsMenus -----------------------              
 
 

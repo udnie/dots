@@ -1,5 +1,8 @@
 
-## ------------------- script-qt5.py ------------------------
+## ------------------- script-qt5.py ----------------------
+''' Removes any unnecessary code, comments or tokens leaving
+    only PyQt5 code. '''
+### -------------------------------------------------------
 import os
 
 files = ["dotsHelpMenus.py", \

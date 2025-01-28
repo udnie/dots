@@ -127,9 +127,7 @@ class ControlView(QGraphicsView):
                 self.setKey('D')
                                                     
         elif key == Qt.Key.Key_H:  ## toggles hides/unhides selections 
-            if mod & Qt.KeyboardModifier.ShiftModifier:
-                self.sideCar.toggleSelections()      
-            else:
+            self.sideCar.toggleSelections() if mod & Qt.KeyboardModifier.ShiftModifier else\
                 self.setKey('H')  ## help 
                  
         elif key == Qt.Key.Key_L:
@@ -138,10 +136,8 @@ class ControlView(QGraphicsView):
             else:
                 self.setKey('L')  ## used by pathmaker to toggle lasso 
 
-        elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect
-            if mod & Qt.KeyboardModifier.ShiftModifier:  ## sprites and shadows
-                self.sideCar.resetAll()  
-            else:
+        elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadows
+            self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else\
                 self.setKey('R')
                                                        
         elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off        
