@@ -231,8 +231,6 @@ class ShowTime:
                     dlist.append(self.showFiles.saveFlat(pix))
                 elif pix.type == 'video' and self.canvas.videoPlayer != None:
                     dlist.append(self.canvas.videoPlayer.saveVideo())
-            elif 'VideoItem' in str(type(pix)) and self.canvas.videoPlayer != None:
-                dlist.append(self.canvas.videoPlayer.saveVideo())
         return dlist           
 
 ### ---------------------- dotsShowTime --------------------

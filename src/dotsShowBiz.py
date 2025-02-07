@@ -114,12 +114,12 @@ class ShowBiz:
                       
                 elif key == 'U':  ## unselect for storyBoard
                     self.sideCar2.unSelect()
-        
+                                
                 elif key == 'V' and self.canvas.videoPlayer != None:
                     self.sideCar.addVideoWidget() \
                         if self.canvas.videoPlayer.widget == None else \
                             self.sideCar.closeVideoWidget()
-                        
+                              
                 elif key == 'W':              
                     self.sideCar.clearWidgets() 
     
@@ -152,7 +152,7 @@ class ShowBiz:
                 
             elif key == 'S':   
                 self.helpMenus.setMenu(key)  ## screen menu
-                           
+                     
 ### ---------------------- dotsShowBiz --------------------
 
 

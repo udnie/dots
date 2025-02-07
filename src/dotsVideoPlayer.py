@@ -16,7 +16,7 @@ class QVD(QGraphicsVideoItem):  ## added type to track it better
      def __init__(self):
           super().__init__()          
          
-          self.type = 'poly'
+          self.type = 'video'
 
 ### ------------ comment out for 6, uncomment for 5 -----------------
 # from PyQt5.QtMultimedia   import QMediaContent  ## 5 

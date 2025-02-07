@@ -47,10 +47,10 @@ class StoryBoard(QWidget):
         self.pathMakerOn = False    ## shared
         self.openPlayFile = ''      ## shared 
         self.pathList = []          ## used by animations and animation menu
-        self.videoPlayer = None           ## holds mediaplayer reference
+        self.videoPlayer = None     ## holds mediaplayer reference
         self.animation = False      ## set by showtime
     
-        self.canvas = self
+        self.canvas = self 
             
         self.sideCar   = SideCar(self)  ## extends canvas
         self.sideCar2  = SideCar2(self)

@@ -51,6 +51,10 @@ From my perspective it appears that **PyQt6** treats **'type'** very differently
 
 Last, animation doesn't work in **dots** using **PySide6** and there's a problem with **TableModels** - and I'm still finding things to sub-class. I've added some of the changes such as the sub-class code other changes to help down the road when I try this again.  Much testing.  Using sed commands really helps.
 
+**February 7 2025**  
+Bug fix to dotsVideoPlayer.
+  
+
 ---
 **December 5 2024**   
 Added a **'Help Menus'** selection to the **StoryBoard** and **PathMaker** help menus to show all the menus just as in **Canvas** by clicking on the **Menus** entry. Fixes to **Matte**,  **videoWidget** and **pathMaker** to clean up some bugs. **'B'** in storyboard will call the background file dialog if there are no backgrounds in the scene, **'A'** does that in canvas and is used to select all in storyboard, otherwise **B** will mirror the background provided it's not from a .play file. 

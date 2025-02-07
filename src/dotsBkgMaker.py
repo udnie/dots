@@ -54,7 +54,7 @@ class BkgMaker(QWidget):
         file, _ = Q.getOpenFileName(self.canvas,
             'Choose an image file to open', paths['bkgPath'],
             'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG *.mov *.mp4)')
-        if file:  ## it's either a flat or an jpg/png
+        if file:  ## it's either a flat or an jpg/png or a video
             if file.endswith('.mov') or file.endswith('.mp4'):
                 self.canvas.sideCar.addVideo(file, 'open') 
             else:

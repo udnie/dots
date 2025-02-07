@@ -23,7 +23,7 @@ class SideCar:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-          
+       
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
@@ -83,7 +83,7 @@ class SideCar:
        
     def videoOff(self):  ## also called from storyboard in clear()
         for itm in self.scene.items():
-            if 'VideoItem' in str(type(itm)) and self.canvas.videoPlayer != None:
+            if itm.type == 'video' and self.canvas.videoPlayer != None: 
                 self.scene.removeItem(itm)
                 del itm
                 break
@@ -97,7 +97,7 @@ class SideCar:
         else:
             self.canvas.showWorks.disablePlay()  
         self.canvas.btnRun.setText('Run')     
-            
+
     def addVideoWidget(self):
         self.canvas.videoPlayer.widget = VideoWidget(self.canvas)
                     
@@ -105,7 +105,7 @@ class SideCar:
         if self.canvas.videoPlayer and self.canvas.videoPlayer.widget != None:
             self.canvas.videoPlayer.widget.close()     
             self.canvas.videoPlayer.widget = None  
-                                                                  
+    
 ### --------------------------------------------------------      
     def xy(self, max):
         return random.randrange(-40, max+40)

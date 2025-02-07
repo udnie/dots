@@ -116,7 +116,7 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key.Key_Space:
             if self.canvas.control != '' or self.canvas.animation == True:
                 self.sideCar.pause()  ## SpaceBar - pause/resume
-                
+                                
 ### --------------------------------------------------------                                                        
     ## keys with modifiers
 ### --------------------------------------------------------   
@@ -158,7 +158,7 @@ class ControlView(QGraphicsView):
                 self.mapper.toggleTagItems('all') 
             else:
                 self.canvas.sideCar2.sendPixKeys('T') 
-    
+
         ## apple option key and cmd key - used by scroll panel to scroll tiles
         elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and \
             self.canvas.pathMakerOn == False:
