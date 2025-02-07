@@ -5,7 +5,7 @@ import math
 
 from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint
 from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap, QPen, QColor
-from PyQt6.QtWidgets    import QMessageBox, QGraphicsLineItem
+from PyQt6.QtWidgets    import QMessageBox, QGraphicsLineItem, QGraphicsSimpleTextItem
      
 from dotsShared         import common, paths, pathcolors
 
@@ -45,8 +45,7 @@ class MsgBox:  ## always use getCtr for setting point
         self.timer.timeout.connect(self.changeContent)
         self.timer.start()
 
-        # pt = getCtr(-200,-245)  ## pyqt-five
-        pt = getCtr(-200,-50)  ## pyqt-six
+        pt = getCtr(-200,-50)  ## 5
 
         if isinstance(pt, QPoint) and pt.x() > 0 and pt.y() > 0: 
             self.msg.move(pt)
@@ -219,6 +218,50 @@ def getCrop(path):  ## from path - bounding size and position
             y1 = p.y()  
     return int(x), int(y), int((x1-x)), int((y1-y))
 
+### --------------------------------------------------------
+    ## single tag - press the '\' backslash key then click 
+    ## for screen items pix, bkg, flat, shadows and frames    
+### --------------------------------------------------------  
+def tagBkg(bkg, pos):  
+    x, y, z = pos.x(), pos.y(), bkg.zValue()   
+    text = QGraphicsSimpleTextItem() 
+              
+    src = 'bkg'  
+    color = 'orange'
+    
+    topZVal = bkg.canvas.mapper.toFront()
+       
+    if bkg.type == 'shadow': 
+        color = 'lightgreen'   
+        if bkg.maker.linked == True:
+            tag = 'Linked' 
+        else: 
+            tag = 'Unlinked' 
+    else:    
+        if bkg.locked == True:
+            text = 'Locked' 
+        else:
+            text = 'Unlocked'
+        fileName = os.path.basename(bkg.fileName)  ## other than shadows
+        tag = fileName + " " + text     
+    
+    if bkg.type == 'bkg':
+        if bkg.direction == ' left':
+            tag = tag + ' Left'
+        elif bkg.direction == 'right': 
+            tag = tag + ' Right'
+        tag = tag + ' ' + bkg.useThis  
+        color = 'AQUA'
+           
+    elif bkg.type in ('pix', 'frame') and z == topZVal:
+        color = 'yellow' 
+        src = 'pix'  
+            
+    if 'frame' in bkg.fileName: 
+        x, y = common['ViewW']*.47, common['ViewH']-35
+   
+    bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
+    
 ### --------------------- dotsSideGig ----------------------
   
   

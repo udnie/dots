@@ -17,6 +17,8 @@ class TagIt(QGraphicsSimpleTextItem):  ## called in pathItem, pathWays and this
     def __init__(self, token, tag, color, zval=None):
         super().__init__()
   
+        self.type = 'tag'
+  
         if token == 'paths':
             color = 'lime'
             if 'Locked Random' in tag:
@@ -60,8 +62,6 @@ class TagIt(QGraphicsSimpleTextItem):  ## called in pathItem, pathWays and this
     
         if token == 'points':
             self.type = 'ptTag'  ## changed from 'pt'
-        else:
-            self.type = 'tag'
 
         self.text = tag   
      

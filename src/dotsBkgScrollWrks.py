@@ -9,8 +9,7 @@ from PyQt6.QtWidgets    import QMessageBox, QWidget, QAbstractItemView, \
                                 QTableWidget, QPushButton, QVBoxLayout, QTableWidgetItem
                         
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox, getVuCtr
-from dotsSideCar2       import tagBkg
+from dotsSideGig        import MsgBox, getVuCtr, tagBkg
 
 showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
     'snakes':   15,  ## also used by vertical 
@@ -49,7 +48,7 @@ class Trackers(QWidget):
         self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
             'background-color: rgb(115,225,225)}')	 
             
-        self.closeBtn = QPushButton("Close")
+        self.closeBtn = QPushButton("Use Button to Close")
         self.closeBtn.clicked.connect(self.bye)
         self.closeBtn.setMinimumWidth(200)
 
@@ -74,8 +73,11 @@ class Trackers(QWidget):
                 self.tableWidget.setItem(row, col, item)
 		
     def bye(self):
-        self.tableWidget.close()
-        self.close() 
+        if self.tableWidget != None:
+            self.tableWidget.close()
+            self.tableWidget = None
+            self.canvas.sideCar2.tracker = None
+            self.close()          
   
 ### ------------------ dotsBkgScrollWrks -------------------           
 class BkgScrollWrks:  ## mainly functions used for scrolling 
@@ -237,7 +239,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
                 tagBkg(self.bkgItem, QPoint(int(p.x())+200,int(p.y())+50))
                 QTimer.singleShot(3000, self.canvas.mapper.clearTagGroup)
                                                                                                
-    def filePixX(self, file, bkg):  ## also see dumpTrackerss - shift 'B'   
+    def filePixX(self, file, bkg):  ## also see dumpTrackers
         print(f'tracker {bkg.fileName}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.rate}\t{bkg.factor}\t{bkg.zValue()}')
                                                                        
     def notScrollable(self):

@@ -245,8 +245,7 @@ class MapMaker:
         return inc + first
    
     def tagCount(self):  ## there's another one used by pathMaker 
-        return sum( pix.type == 'tag' 
-            for pix in self.scene.items())
+        return sum(pix.type == 'tag' for pix in self.scene.items())
                  
 ### -------------------- dotsMapMaker ----------------------
 

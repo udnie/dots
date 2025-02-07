@@ -38,6 +38,18 @@ A bug fix to the **'RubberBand'** selector.  An update to **VHX** that anchors t
 
 The three small desktop apps, **VHX, slideShow** and **videoPlayerOne** all run in **PySide6**. Change **PyQt6** to **PySide6**, that's it.
 
+---
+
+**February 6 2025**  
+Some changes to Backgrounds in order to get the **'B'** key to multi-task better. **Shift-B** now does the mirror routine that used to be run by typing in just **'B'**.  **'B'** with nothing on the screen triggers the background file dialog just as if you had typed in **'A'** and typing **'B'** with a **mouse-press** on a background pops up the **Tracker** tableWidget.  The background help menu has been updated as well.
+
+I've run into an interesting issue with **'type'** as it's used in **dots**.  I did some experimenting a few weeks back to see if I was able to run **dots** in **PySide6**. After getting my three small desktop apps to run with no work other then to change **PyQt6** to **PySide6** I decided to see if I could get further along from my last attempt. 
+
+I tried this a few years ago and all I got was a **Type Error** and no idea where to look. This time I got a similar error but with a little more added verbiage with no traceback. Finally after a few hours of getting nowhere, it came to me that my use of **'type'**  may be the problem as **PySide6** must see it as a **function/keyword**.  I changed **'type'** to something else and was able to run to the next **Type Error**.  I use **'type'** as a class variable/property throughout **dots** to help manage screen/scene items and to replace it is a non-trivial matter.
+
+From my perspective it appears that **PyQt6** treats **'type'** very differently from **PySide6**. As I started to replace **'type'** in **PyQt6** with **desc** I also found I needed to sub-class a number of scene items to add **self.desc = <something>** as there never a **'type'**  to be found in the first place. I do many for-loops based on types and up until now it didn't throw an exception in **PyQt6** or **PyQt5** if a screen item didn't have one, it was just ignored - now it crashes if one's not found.
+
+Last, animation doesn't work in **dots** using **PySide6** and there's a problem with **TableModels** - and I'm still finding things to sub-class. I've added some of the changes such as the sub-class code other changes to help down the road when I try this again.  Much testing.  Using sed commands really helps.
 
 ---
 **December 5 2024**   

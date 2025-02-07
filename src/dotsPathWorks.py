@@ -4,7 +4,7 @@ import math
 from functools          import partial
 
 from PyQt6.QtCore       import QTimer, QRect, QPointF, QPoint, QPropertyAnimation
-from PyQt6.QtGui        import QPixmap, QPainterPath, QColor
+from PyQt6.QtGui        import QPixmap, QPainterPath, QColor, QImage
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsAnimation      import Node 
@@ -43,6 +43,16 @@ pathKeys = {
 }
 
 NS = 27  ## row height override
+### --------------------------------------------------------
+class Ball(QGraphicsPixmapItem):  ## added type to track it better
+### --------------------------------------------------------
+    def __init__(self, file):
+        super().__init__()          
+      
+        self.type = 'ball'
+        self.img  = QImage(file)
+        self.setPixmap(QPixmap(self.img))
+
 ### --------------------------------------------------------     
 class PathHelp:  
 ### --------------------------------------------------------
@@ -231,8 +241,7 @@ class PathWorks:
     def pathTest(self):
         if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet == True:
             if self.pathMaker.pathTestSet == False:
-                self.ball = QGraphicsPixmapItem(QPixmap(paths['imagePath'] + \
-                    'ball.png'))
+                self.ball = Ball(paths['imagePath'] + 'ball.png')
                 node = Node(self.ball)
                 self.ball.setZValue(self.findTop()+10)
        

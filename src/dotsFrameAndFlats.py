@@ -5,9 +5,8 @@ from PyQt6.QtGui        import QColor, QPixmap, QImage, QCursor
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common
-from dotsSideGig        import getVuCtr 
+from dotsSideGig        import getVuCtr, tagBkg 
 from dotsTableModel     import TableWidgetSetUp, QL
-from dotsSideCar2       import tagBkg
 
 ### ------------------ dotsFrameAndFlats.py ----------------
 ''' classes: Frame and Flat '''

@@ -9,10 +9,19 @@ from dotsShared         import common
 from dotsSideGig        import distance, getCrop
 
 PathStr = ['topLeft','topRight','botRight','botLeft'] 
-V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget       
-                                            
+V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget     
+  
 ### -------------------- dotsShadowWorks -------------------
-''' classes: Works and PointItem '''
+''' classes: Outline, Works and PointItem '''
+### --------------------------------------------------------
+class Outline(QGraphicsPolygonItem):  ## added 'type' to track it better
+### --------------------------------------------------------
+    def __init__(self, path):
+        super().__init__()          
+        
+        self.type = 'poly'
+        self.setPolygon(path)
+                                                  
 ### --------------------------------------------------------
 class Works:  ## small functions that were in ShadowMaker
 ### --------------------------------------------------------
@@ -78,7 +87,7 @@ class Works:  ## small functions that were in ShadowMaker
 ### --------------------------------------------------------
     def updateOutline(self, hide=''): 
         self.deleteOutline()
-        self.maker.outline = QGraphicsPolygonItem(self.makeOutline()) 
+        self.maker.outline = Outline(self.makeOutline()) 
         self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
         self.maker.outline.setZValue(common['outline'])       
         if self.maker.linked == True or hide != '':  ## used throughout shadow and updateShadow

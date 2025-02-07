@@ -62,7 +62,7 @@ class ShowRunner:
     def makeTableView(self, dlist, src=''):  ## called if missing files     
         if self.showbiz.tableView != None:
             self.showbiz.tableView.bye()                      
-        self.showbiz.tableView = TableView(self, dlist, src) 
+        self.showbiz.tableView = TableView(self, dlist, src)  ## show it
                                                             
     def openPlay(self, file):    
         try:
@@ -97,8 +97,9 @@ class ShowRunner:
                 MsgBox('loadPlay ' + file + 'Not Found')              
             if len(dlist) > 0: 
                 self.makeTableView(dlist, src)  ## display any missing files or what's there if 'table'
-                if src == 'table':  ## show tableview when run from canvas when typing 'j'
-                    return  
+                ## src = 'table' if run from canvas when typing 'j'
+                if self.showbiz.tableView.loadingError == True or src == 'table':
+                    return
                 self.updateStoryBoard(dlist) 
             else:
                 return

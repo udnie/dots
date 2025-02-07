@@ -25,7 +25,6 @@ canvasKeys = {
 
 storyKeys = {
     'A':    'Select All',  
-    'B':    'Background Add or Mirrored', 
     'C':    'Clear Canvas',
     'D':    'Delete Selected',
     'J':    'JSON Play File Viewer',
@@ -180,7 +179,7 @@ class StoryHelp:
         self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 267, 630
+        width, height = 267, 600
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}',QL, True,True,2)

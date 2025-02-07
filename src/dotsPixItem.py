@@ -6,9 +6,8 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 from dotsShared         import common, MoveKeys, RotateKeys, ControlKeys
 from dotsPixWorks       import Works
 from dotsPixWidget      import PixWidget
-from dotsSideGig        import MsgBox
+from dotsSideGig        import MsgBox, tagBkg
 from dotsHelpMonkey     import PixHelp
-from dotsSideCar2       import tagBkg
 
 # from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
@@ -99,7 +98,7 @@ class PixItem(QGraphicsPixmapItem):
     
 ### --------------------------------------------------------
     def paint(self, painter, option, widget):  ## use paintEvent for widgets
-        super().paint(painter, option, widget) 
+        super().paint(painter, option, widget) ## only place this is required - why??
         if self.isSelected():
             painter.setPen(QPen(QColor("lime"), 2, Qt.PenStyle.SolidLine))
             painter.drawRect(self.boundingRect())
@@ -187,7 +186,6 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
             
     def mouseReleaseEvent(self, e): 
-        # self.key = ''
         self.dragCnt = 0   
         self.works.updateXY(self.mapToScene(e.pos()))
         self.setPos(self.x, self.y)  
@@ -295,12 +293,4 @@ class PixItem(QGraphicsPixmapItem):
                 
 ### -------------------- dotsPixItem -----------------------
 
-
-     # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemRotationChange:  ## experiment
-            #     self.shadowMaker.shadow.setRotation(value)
-            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemScaleChange:
-            #     self.shadowMaker.shadow.setScale(value)      
-            # elif change == QGraphicsPixmapItem.GraphicsItemChange.ItemOpacityChange:
-            #     self.shadowMaker.shadow.setOpacity(value-.50) 
-            
          

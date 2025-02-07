@@ -10,6 +10,14 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
 from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
 
+### --------------------------------------------------------
+class QVD(QGraphicsVideoItem):  ## added type to track it better
+### --------------------------------------------------------
+     def __init__(self):
+          super().__init__()          
+         
+          self.type = 'poly'
+
 ### ------------ comment out for 6, uncomment for 5 -----------------
 # from PyQt5.QtMultimedia   import QMediaContent  ## 5 
 ### ---------------------------- end --------------------------------
@@ -40,7 +48,7 @@ class VideoPlayer(QMediaPlayer):
         # self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5
 ### ---------------------------- end --------------------------------
         
-        self.videoWidget = QGraphicsVideoItem()   
+        self.videoWidget = QVD()   
         
         self.videoWidget.setSize(QSizeF(common['ViewW']+2, common['ViewH']+2))  
         self.player.setVideoOutput(self.videoWidget) 

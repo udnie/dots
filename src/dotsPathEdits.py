@@ -7,7 +7,16 @@ from dotsShared      import common
 from dotsPathItem    import PathItem
 
 ### ------------------- dotsPathEdits ---------------------
-''' class: PathEdits, functions; newPath, lasso '''
+''' class: Outline, PathEdits, functions; newPath, lasso '''
+### --------------------------------------------------------
+class Outline(QGraphicsPolygonItem):  ## added type to track it better
+### --------------------------------------------------------
+     def __init__(self, path):
+          super().__init__()          
+         
+          self.type = 'poly'
+          self.setPolygon(path)
+
 ### --------------------------------------------------------
 class PathEdits(QWidget):
 ### --------------------------------------------------------
@@ -119,7 +128,7 @@ class PathEdits(QWidget):
                                 
     def drawLasso(self):
         self.pathWorks.removePoly()    
-        self.pathMaker.poly = QGraphicsPolygonItem(self.drawPoly(self.lasso)) 
+        self.pathMaker.poly = Outline(self.drawPoly(self.lasso)) 
         self.pathMaker.poly.setBrush(QBrush(QColor(160,160,160,50)))
         self.pathMaker.poly.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
         self.pathMaker.poly.setZValue(common['pathZ']) 

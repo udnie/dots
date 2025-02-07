@@ -113,7 +113,7 @@ class StoryBoard(QWidget):
                     self.helpButton.openMenus() 
                 else:    
                     self.pathMaker.pathKeys(self.key)
-                
+                     
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e): 
         if not self.pathMakerOn:  ## using a rubberband used by mapper for selecting sprites     

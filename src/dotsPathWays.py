@@ -14,6 +14,14 @@ from dotsTagsAndPaths   import TagIt
 ''' class PathWays: extends pathMaker. Includes path and wayPoints
     functions - flopPath, reversePathetc..'''
 ### --------------------------------------------------------
+class PathGroup(QGraphicsItemGroup):  ## added type to track it better
+### --------------------------------------------------------
+    def __init__(self):
+        super().__init__()          
+      
+        self.type = 'group'
+        
+### --------------------------------------------------------
 class PathWays:
 ### --------------------------------------------------------
     def __init__(self, parent):
@@ -233,7 +241,7 @@ class PathWays:
         self.tagGroup.addToGroup(self.tag)
            
     def toggleWayPtTagsGroup(self):
-        self.tagGroup = QGraphicsItemGroup()
+        self.tagGroup = PathGroup()
         self.tagGroup.setZValue((common['pathZ'])+35)
         self.scene.addItem(self.tagGroup)
                  
@@ -252,8 +260,7 @@ class PathWays:
         return f"({pt.x():.2f}, {pt.y():.2f})  %{pct:.2f}   {idx}"
     
     def tagCount(self):  ## shared among path modules - there's one in mapper as well
-        return sum(pix.type == 'tag' 
-            for pix in self.scene.items())
+        return sum(pix.type == 'tag' for pix in self.scene.items())
                          
 ### --------------------- dotsPathWays ---------------------
 

@@ -13,8 +13,8 @@ from dotsHelpButtons    import ButtonHelp
 from dotsShowRunner     import ShowRunner
 
 ### ---------------------- dotsShowBiz --------------------
-''' functions to load and add both demo and non demo items,
-            play files, to the scene/canvas/storyboard '''    
+''' single key functions to load and add both demo and non demo 
+    items, play files, to the scene/canvas/storyboard '''    
 ### --------------------------------------------------------
 class ShowBiz:  
 ### --------------------------------------------------------
@@ -47,7 +47,7 @@ class ShowBiz:
         self.tableView = None 
 
 ### --------------------------------------------------------
-  ## do these first
+    ## do these first
 ### --------------------------------------------------------    
     def keysInPlay(self, key):
         if key == 'X':  ## from help menus
@@ -64,13 +64,10 @@ class ShowBiz:
                 return
             else:
                 self.showRunner.runThese() 
-   
-### -------------------------------------------------------- 
-    ## storyboard single key commands
-### -------------------------------------------------------- 
+                    
         elif len(self.scene.items()) > 0:   
 ### --------------------------------------------------------    
-        ## animations running
+    ## animations running
 ### --------------------------------------------------------             
             if self.canvas.control != '' or self.canvas.animation == True:    
                 if key == 'P': 
@@ -83,18 +80,12 @@ class ShowBiz:
                     self.sideCar.pause() 
                                                                     
 ### --------------------------------------------------------    
-        ## no animations running
+    ## no animations running
 ### --------------------------------------------------------  
             elif self.canvas.control == '' or self.canvas.animation == False:  
                 if key == 'A':  
                     self.sideCar2.selectAll()
-                                
-                elif key == 'B':
-                    if self.canvas.sideCar2.hasBackGround() == 0:
-                        self.bkgMaker.openBkgFiles()             
-                    elif self.canvas.openPlayFile == '':  ## only backgrounds
-                        self.bkgMaker.mirror() 
-                    
+                                  
                 elif key == 'D':
                     self.sideCar2.deleteSelected()
                                  
@@ -131,7 +122,7 @@ class ShowBiz:
                         
                 elif key == 'W':              
                     self.sideCar.clearWidgets() 
-                    
+    
 ### --------------------------------------------------------                      
     ## canvas single key commands
 ### --------------------------------------------------------  
@@ -140,7 +131,7 @@ class ShowBiz:
             if self.demoAvailable:  ## always clear unless deleted
                 self.canvas.clear()
                 
-            if key == 'A':
+            if key == 'A': 
                 self.bkgMaker.openBkgFiles() 
         
             elif key == 'D':   ## runs demo menu in canvas
@@ -161,7 +152,7 @@ class ShowBiz:
                 
             elif key == 'S':   
                 self.helpMenus.setMenu(key)  ## screen menu
-               
+                           
 ### ---------------------- dotsShowBiz --------------------
 
 

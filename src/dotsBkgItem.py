@@ -7,12 +7,11 @@ from PyQt6.QtGui        import QImage, QPixmap, QCursor, QTransform
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox
+from dotsSideGig        import MsgBox, tagBkg
 from dotsBkgWorks       import BkgWorks
-from dotsBkgScrollWrks  import BkgScrollWrks, Trackers
+from dotsBkgScrollWrks  import BkgScrollWrks
 from dotsHelpMonkey     import BkgHelp
 from dotsAnimation      import Node
-from dotsSideCar2       import tagBkg
 
 SharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
 
@@ -36,7 +35,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.bkgWorks = BkgWorks(self)  
         self.bkgScrollWrks = BkgScrollWrks(self)
        
-        self.tracker = None  
         self.widgetOn = False  
        
         self.ViewW = common['ViewW']
@@ -115,7 +113,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = ''    
         self.dragCnt = 0
         self.save = QPointF()  
-          
+ 
         play, rot = '', 0
         
         if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':   
@@ -148,16 +146,18 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 self.bkgMaker.addWidget(self)   
                 if self.direction == '' or self.useThis == '':   
                     self.bkgWorks.reset(self)
-                    self.bkgMaker.resetSliders(self)                                       
-            elif self.key in self.sharedKeys:
-                self.shared(self.key) 
-                self.key = ''
-                e.accept()  
+                    self.bkgMaker.resetSliders(self)  
+            else: 
+                if self.key in self.sharedKeys:
+                    self.shared(self.key)           
             self.initX, self.initY = self.x, self.y  
-            self.dragCnt = self.mapToScene(e.pos())
-            self.key = ''
-        e.accept()     
-
+            self.dragCnt = self.mapToScene(e.pos())                                
+        e.accept()   
+        
+    def mouseReleaseEvent(self, e):
+        key = ''
+        e.accept()   
+          
     def shared(self, key):  ## from helpMenu and keyboard
         if not self.canvas.pathMakerOn: 
             self.key = key
@@ -169,10 +169,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 self.bkgMaker.front(self)    
             elif self.key == 'tag': ## '\' <- tagKey
                 self.tagThis()
-            elif self.key == 'B':   
-                self.tracker = Trackers(self.canvas, self.canvas.sideCar2.dumpTrackers())
-                if self.tracker != None:
-                    self.tracker.show()    
+            elif self.key == 'B': 
+                self.canvas.sideCar2.trackThis() if self.canvas.sideCar2.tracker == None \
+                    else self.canvas.sideCar2.tracker.bye() 
             elif self.key == 'E':   
                 self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
             elif self.key == 'F':  ## flop it
@@ -184,7 +183,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     else self.bkgMaker.unlockBkg(self)
                 self.tagThis()
             key = ''
-                 
+        
     def tagThis(self):
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 

@@ -11,6 +11,7 @@ from dotsScreens        import getCtr
 from dotsTableModel     import TableModel, Typelist, Types
 from dotsShowFiles      import ShowFiles 
 from dotsShowWorks      import ShowWorks 
+from dotsSideGig        import MsgBox
 
 MinRows = 5  ## to display
 MaxRows = 17
@@ -49,9 +50,11 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.showWorks = ShowWorks(self.canvas)
         self.showFiles = ShowFiles(self.canvas) 
   
+        self.loadingError = False
+  
         self.hdr, self.cols = '', 0
         self.deleteKey = False
-
+ 
         self.selected = []  ## fileName and zValue used to delete selected rows rather than just by filename
         self.typelist = []  ## stores type, hdr, col
              
@@ -105,12 +108,12 @@ class TableView:  ## formats a json .play file to display missing files or not
  
         self.tableView.setAlternatingRowColors(True) 
           
-        self.makeTable(self.data)  ## eventually calls addTable
-                                                              
+        self.makeTable(self.data)  ## eventually calls addTable unless loading error
+                                    
 ### --------------------------------------------------------
     def addTable(self, data, miss, save):        
         width, height = self.widthHeight(data)
-        
+  
         file = os.path.basename(self.canvas.openPlayFile)
         self.dots.statusBar.showMessage(file)      
           
@@ -214,13 +217,18 @@ class TableView:  ## formats a json .play file to display missing files or not
         ## flat and frame make it difficult to sort correctly as 'flat' comes before 'frame'
         typ, save = [], [] 
         self.typelist.clear()
-        for type in Types:
+        for types in Types:
             for tmp in dlist: 
-                if tmp['type'] == type:
-                    if tmp['type'] not in typ:  ## set the types to watch
-                        self.typelist.append(Typelist(tmp['type']))  
-                        typ.append(tmp['type'])  ## there can be only one   
-                    save.append(tmp)  ## saving them by type                        
+                try:
+                    if tmp['type'] == types:
+                        if tmp['type'] not in typ:  ## set the types to watch
+                            self.typelist.append(Typelist(tmp['type']))  ## Typelist is a class, type, hdr, len
+                            typ.append(tmp['type'])  ## there can be only one   
+                        save.append(tmp)  ## saving them by type  
+                except: 
+                    self.loadingError = True  ## read by showrunner 
+                    MsgBox("TableMaker: Error Loading Play File", 5)
+                    return                 
         dlist = save
         del save    
         self.setupHdrs(dlist)
@@ -229,15 +237,14 @@ class TableView:  ## formats a json .play file to display missing files or not
     ## looking for the greatest number of .keys() per type and saving it as the type header
     def setupHdrs(self, dlist):
         self.cols = 0  ## just to make sure
-        for typ in self.typelist: 
+        for typ in self.typelist: ## a list of Typelists - type, hdr, len
             for tmp in dlist:
-                if tmp['type'] == typ.type:  ## read them all 
+                if tmp['type'] == typ.type:  ## read them all  ## etyp
                     if len(tmp.keys()) > typ.len:  ## save it to typelist
                         typ.len = len(tmp.keys())
                         typ.hdr = list(tmp.keys())
                     if len(tmp.keys()) > self.cols:  ## save the most number of columns
                         self.cols = len(tmp.keys()) 
-            
         self.unpackIt(dlist)
     
 ### -------------------------------------------------------- 
@@ -269,7 +276,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.deleteKey == False    
              
         elif len(self.Missingfiles) == 0 and self.src != 'table':  ## nothing to show 
-            return
+            return 
                  
 ### --------------------------------------------------------
     def widthHeight(self, data):

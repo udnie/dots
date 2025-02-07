@@ -1,19 +1,21 @@
 
-### Last Update: 12/13/2024
+### Last Update: 02/06/2025
        
 ---
 **To Begin**  
 This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. PyQt5 runs with some edits, see **Changes**, they're right at the beginning. 
 
 ---
+Once running, type **M** from a blank screen to bring up the **help menus**.
+
+**Help**  
+**Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember.
+
        
 **Screens**  
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**. 
  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
- 
-**Help**  
-**Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember.        
-     
+      
 **Video**  
 Qt5 doesn't support loops so moving the videoWidget slider has no effect and in Qt5 a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running will start the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.
        

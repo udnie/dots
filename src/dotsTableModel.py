@@ -15,6 +15,16 @@ Types = ['frame', 'pix', 'video', 'bkg', 'flat']  ## used by tableMaker
 
 ### --------------------- dotsTableModel -------------------
 ''' classes: TableWidgetSetUp, Typelist and TableModel '''  
+### --------------------------------------------------------  
+class Typelist:  ## for type header 
+### --------------------------------------------------------
+    def __init__(self, typ):  
+        super().__init__()
+
+        self.type = typ    
+        self.len  = 0
+        self.hdr  = ''
+
 ### -------------------------------------------------------- 
 class TableWidgetSetUp(QTableWidget):  ## used by help menus 
 ### -------------------------------------------------------- 
@@ -77,16 +87,6 @@ class TableWidgetSetUp(QTableWidget):  ## used by help menus
      
         return self.setItem(row, col, item)
                              
-### --------------------------------------------------------  
-class Typelist:  ## for type header 
-### --------------------------------------------------------
-    def __init__(self, type):  
-        super().__init__()
-
-        self.type = type    
-        self.len  = 0
-        self.hdr  = ''
-
 ### --------------------------------------------------------
 class TableModel(QAbstractTableModel):  ## used by tableMaker
 ### --------------------------------------------------------

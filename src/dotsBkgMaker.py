@@ -14,8 +14,6 @@ from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
-from dotsSideCar        import SideCar
-from dotsSideCar2       import SideCar2
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -32,10 +30,7 @@ class BkgMaker(QWidget):
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
-        
-        self.sideCar  = SideCar(self.canvas)
-        self.sideCar2 = SideCar2(self.canvas)
-        
+  
         self.init()
       
     def init(self):
@@ -48,7 +43,7 @@ class BkgMaker(QWidget):
           
         self.screenrate = {}
         self.newTracker = {}
-        
+           
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats 
         if self.canvas.control in ControlKeys and \
@@ -61,7 +56,7 @@ class BkgMaker(QWidget):
             'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG *.mov *.mp4)')
         if file:  ## it's either a flat or an jpg/png
             if file.endswith('.mov') or file.endswith('.mp4'):
-                self.sideCar.addVideo(file, 'open') 
+                self.canvas.sideCar.addVideo(file, 'open') 
             else:
                 file = paths['bkgPath'] + os.path.basename(file)  
                 self.openFlatFile(file) if file.endswith('.bkg') else self.addBkg(file)
@@ -133,24 +128,7 @@ class BkgMaker(QWidget):
                 except IOError:
                     MsgBox('saveBkgColor: Error saving file', 5)
                 self.flat = None
-           
-    def mirror(self):  ## very basic 
-        wuf = None
-        for bkg in self.scene.items():  
-            if bkg.type == 'bkg':
-                wuf = bkg
-                break  
-        if wuf != None:
-            bkg = wuf
-            x = int(common['ViewW']/2- bkg.width)   
-            bkg.setPos(x , 0)    
-            akg = BkgItem(bkg.fileName, self.canvas, common['bkgZ'], True, bkg.imgFile)
-            if akg == None:
-                return
-            self.scene.addItem(akg)  
-            akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
-            akg.setPos(int(common['ViewW']/2), 0)  
-                        
+                                           
 ### -------------------------------------------------------- 
     def addWidget(self, bkg):  ## background widget
         self.closeWidget()  
@@ -174,8 +152,8 @@ class BkgMaker(QWidget):
             self.view.grabKeyboard()
   
     def updateWidget(self, bkg):
-        self.sideCar2.setMirrorBtnText(bkg, self.widget)
-        self.sideCar2.setBtns(bkg, self.widget)
+        self.canvas.sideCar2.setMirrorBtnText(bkg, self.widget)
+        self.canvas.sideCar2.setBtns(bkg, self.widget)
         self.setLocksText(bkg) 
         
 ### --------------------------------------------------------

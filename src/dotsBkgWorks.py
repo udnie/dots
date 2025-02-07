@@ -13,7 +13,6 @@ from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgMatte       import Matte
 from dotsBkgScrollWrks  import BkgScrollWrks
-from dotsSideCar2       import SideCar2
 
 ### --------------------- dotsBkgWorks --------------------- 
 ''' classes: BkgWorks -- mostly scrolling'''    
@@ -32,8 +31,7 @@ class BkgWorks:
         self.target = None
         
         self.bkgScrollWrks = BkgScrollWrks(self.bkgItem)
-        self.sideCar2 = SideCar2(self.canvas)
-        
+     
 ### -------------------------------------------------------- 
     ## when loading a play file or adding from the screen - Tracker is in dotsBkgScrollWrks
     def addTracker(self, bkg): 
@@ -225,7 +223,7 @@ class BkgWorks:
         fileName = self.bkgItem.fileName              
         if self.bkgMaker.newTracker[fileName]:  
             self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
-            self.sideCar2.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 
+            self.canvas.sideCar2.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 
          
     def openMatte(self):  ## runs from bkgWidget - starts here
         self.bkgItem.widget = False

@@ -10,7 +10,8 @@ files = ["dotsHelpMenus.py", \
         "videoPlayerOne.py", \
         "dotsVideoPlayer.py", \
         "dotsTableMaker.py", \
-        "dotsPixItem.py"]
+        "dotsPixItem.py",\
+        "dotsSideGig.py"]
 for file in files:
     lines = []
     with open(file, 'r') as fp: 
@@ -21,7 +22,12 @@ for file in files:
                     i = line.index('45') 
                     line = line[0:i] + '59' + line[i+2:]
                     print(line, i)
-                    
+              
+            elif file == "dotsSideGig.py":
+                if  '## 5' in line:
+                    i = line.index('50') 
+                    line = line[0:i] + '250)' + '\n'
+                          
             elif file == "dotsHelpMaker.py":  
                 if '42' in line:
                     i = line.index('42') 

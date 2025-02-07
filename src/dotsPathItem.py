@@ -3,7 +3,7 @@ import os
 
 from PyQt6.QtCore       import QPointF, pyqtSlot, QRect, QRectF
 from PyQt6.QtGui        import QColor
-from PyQt6.QtWidgets    import QGraphicsEllipseItem
+from PyQt6.QtWidgets    import QGraphicsEllipseItem, QGraphicsPathItem
 
 from dotsShared         import MoveKeys, common 
 from dotsTagsAndPaths   import TagIt
@@ -11,7 +11,16 @@ from dotsTagsAndPaths   import TagIt
 V = 7.5  ## the diameter of a pointItem
 
 ### -------------------- dotsPathItem ----------------------
-''' classes:  PathItem - represents a point  '''                                                                                         
+''' classes:  Pathline, PathItem - represents a point  '''                                                                                         
+### --------------------------------------------------------
+class Pathline(QGraphicsPathItem):  ## added type to track it better
+### --------------------------------------------------------
+    def __init__(self, path):
+        super().__init__()          
+      
+        self.type = 'poly'
+        self.setPath(path)
+                                                                                              
 ### --------------------------------------------------------
 class PathItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------

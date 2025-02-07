@@ -42,9 +42,7 @@ class Bats:
         self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper  
                                          
-        self.sideCar   = self.canvas.sideCar
         self.animation = Animation(self.canvas)
-       
         self.showWorks = ShowWorks(self.canvas)
                                                    
 ### --------------------------------------------------------
@@ -159,8 +157,7 @@ class Hats:  ## hats - was abstract
         self.scene  = self.canvas.scene
         self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper
-        
-        self.sideCar   = self.canvas.sideCar                                          
+                                             
         self.animation = Animation(self.canvas)
         self.showWorks = ShowWorks(self.canvas)
    

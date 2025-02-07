@@ -4,12 +4,13 @@ import os.path
 import random
 
 from PyQt6.QtCore       import QAbstractAnimation, QPoint, QSize, QRect
-from PyQt6.QtGui        import QColor
-from PyQt6.QtWidgets    import QFileDialog, QGraphicsSimpleTextItem
+from PyQt6.QtWidgets    import QFileDialog
                                                     
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsMapMaker       import MapMaker
+from dotsBkgScrollWrks  import Trackers
+from dotsBkgItem        import BkgItem
 
 ### --------------------- dotsSideCar2 ---------------------
 ''' no class: snapShot,dumptrackers, addBkgLabels, setMirroredBtnText,
@@ -24,7 +25,9 @@ class SideCar2:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-        
+         
+        self.tracker = None
+         
 ### --------------------------------------------------------      
     def snapShot(self, pathMaker):  ## screen capture
         if self.hasBackGround() > 0 or self.scene.items():
@@ -58,8 +61,7 @@ class SideCar2:
             MsgBox('Saved as ' + snap, 3)
   
     def hasBackGround(self): 
-        return sum( pix.type == 'bkg' 
-            for pix in self.scene.items())
+        return sum(pix.type == 'bkg' for pix in self.scene.items())
                          
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
@@ -90,6 +92,37 @@ class SideCar2:
         else:
             MsgBox('Error in dumpTrackers - SideCar')
             return None
+                      
+    def bkgStuff(self):
+        self.canvas.bkgMaker.openBkgFiles() if self.hasBackGround() == 0\
+            else self.sendPixKeys('B')
+
+    def trackThis(self):
+        if self.tracker == None:
+            self.tracker = Trackers(self.canvas, self.dumpTrackers())
+            self.tracker.show() 
+      
+    def mirrorBkg(self):
+        if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only backgrounds
+            self.mirrored() 
+            
+    def mirrored(self):  ## very basic 
+        wuf = None
+        for bkg in self.scene.items():  
+            if bkg.type == 'bkg':
+                wuf = bkg
+                break  
+        if wuf != None:
+            bkg = wuf
+            x = int(common['ViewW']/2- bkg.width)   
+            bkg.setPos(x , 0)    
+            akg = BkgItem(bkg.fileName, self.canvas, common['bkgZ'], True, bkg.imgFile)
+            if akg == None:
+                return
+            self.scene.addItem(akg)  
+            akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
+            akg.setPos(int(common['ViewW']/2), 0)
+            
 
     def addBkgLabels(self, bkg):  ## used by dumpTrackers
         fileName = bkg.fileName       
@@ -202,51 +235,7 @@ class SideCar2:
             widget.leftBtn.setText('Vertical')   
             widget.leftBtn.setStyleSheet(
                 'background-color: LIGHTGREY')
-            
-### --------------------------------------------------------
-    ## single tag - press the '\' backslash key then click 
-    ## for screen items pix, bkg, flat, shadows and frames    
-### --------------------------------------------------------  
-def tagBkg(bkg, pos):  
-    x, y, z = pos.x(), pos.y(), bkg.zValue()   
-    text = QGraphicsSimpleTextItem() 
-              
-    src = 'bkg'  
-    color = 'orange'
-    
-    topZVal = bkg.canvas.mapper.toFront()
-       
-    if bkg.type == 'shadow': 
-        color = 'lightgreen'   
-        if bkg.maker.linked == True:
-            tag = 'Linked' 
-        else: 
-            tag = 'Unlinked' 
-    else:    
-        if bkg.locked == True:
-            text = 'Locked' 
-        else:
-            text = 'Unlocked'
-        fileName = os.path.basename(bkg.fileName)  ## other than shadows
-        tag = fileName + " " + text     
-    
-    if bkg.type == 'bkg':
-        if bkg.direction == ' left':
-            tag = tag + ' Left'
-        elif bkg.direction == 'right': 
-            tag = tag + ' Right'
-        tag = tag + ' ' + bkg.useThis  
-        color = 'AQUA'
-           
-    elif bkg.type in ('pix', 'frame') and z == topZVal:
-        color = 'yellow' 
-        src = 'pix'  
-            
-    if 'frame' in bkg.fileName: 
-        x, y = common['ViewW']*.47, common['ViewH']-35
-   
-    bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
-                                   
+                                              
 ### --------------------- dotsSideCar2 ---------------------
 
 
