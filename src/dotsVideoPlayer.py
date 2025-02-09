@@ -10,6 +10,10 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
 from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
 
+from dotsSideGig        import getVuCtr
+from dotsSideGig        import MsgBox
+from dotsShared         import common
+
 ### --------------------------------------------------------
 class QVD(QGraphicsVideoItem):  ## added type to track it better
 ### --------------------------------------------------------
@@ -21,10 +25,6 @@ class QVD(QGraphicsVideoItem):  ## added type to track it better
 ### ------------ comment out for 6, uncomment for 5 -----------------
 # from PyQt5.QtMultimedia   import QMediaContent  ## 5 
 ### ---------------------------- end --------------------------------
-
-from dotsSideGig        import getVuCtr
-from dotsSideGig        import MsgBox
-from dotsShared         import common
 
 ### ------------------ dotsVideoPlayer ---------------------        
 class VideoPlayer(QMediaPlayer):

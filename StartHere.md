@@ -1,35 +1,39 @@
 
-### Last Update: 02/06/2025
+### Last Update: 02/09/2025
        
 ---
 **To Begin**  
-This file presents an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of the how I see it. PyQt5 runs with some edits, see **Changes**, they're right at the beginning. 
+This file is an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of how the various pieces of **dots** work and fit together. **PyQt5** runs with some edits, see **Changes**, they're right at the beginning.  
 
 ---
-Once running, type **M** from a blank screen to bring up the **help menus**.
+Once you have **dots** up and running from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu - the easiest way to understand what commands are available, where they are located and what they do.  
 
+**Opencv-python** is required to add **shadows** to **sprites** or to adjust screen formats in **videoPlayerOne** -
+that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne** to implement it. 
+
+---
 **Help**  
 **Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember.
 
        
 **Screens**  
-I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**. 
- **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
+I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
 **Video**  
-Qt5 doesn't support loops so moving the videoWidget slider has no effect and in Qt5 a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running will start the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.
+**PyQt5** doesn't support loops so moving the **videoWidget** slider has no effect and a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running will cause the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.
        
 **Four Important Files**   
-There are four files I'd suggest looking into - **ControlView**, **ShowBiz**, **Shared**, and **Screens**. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles all/most of the multi-key function requests and passes everything else to **Storyboard** which in turn passes them on either to **ShowBiz** which handles most of the single key requests from **Canvas** and **Storyboard** thru the **PlayFile** list or onto **PathMaker** for it to take care of if it's active. **Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**.  
+There are four files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
+as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles all/most of the multi-key function requests - the rest pass on to **Storyboard** which in turn passes them on either to **ShowBiz**, which handles most of the single key requests from **Canvas** and **Storyboard** through the **PlayFile** list, or on to functions that send keys to the current screen items to perform actions not already triggered. **Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**.  
 
 I recently made some code changes to **ControlView**, **ShowBiz**, **Storyboard** and others, not only to accommodate new additions but to clarify working processes as well. My code can change, especially if I think there's room for improvement.
        
 ---
 
 **Files and Directories**   
-There are four directories you should be aware of, **sprites**, **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to do something other than play with the sprites and backgrounds already there. You can add any **videos** you plan to use to the backgrounds directory as they're treated as just another background.  
+There are four directories to be aware of, **sprites**, **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to add your own material to **dots**. You can add any **videos** you plan to use to the **backgrounds** directory as they're treated as just another background.  
 
-Except - when adding a video to an animation it needs to be added last so it's positioned as the first background screen object. You're also stopped from trying to open a play file if there's already an open video.  I've changed the text of the **'Run'** key to to display **'Video'** when there's one opened as an visual heads up -  you can also type in **'V'** for the videoWidget.
+When adding a video to an animation it needs to be added last so it's positioned as the first background screen item otherwise it will run unseen. I've changed the text of the **'Run'** key to to display **'Video'** when there's one opened as an visual heads up -  you can also type in **'V'** for the videoWidget.  These are the only indicators to know if there's a video loaded.  You're also stopped from trying to open a play file if there's already an open video present.
 
 
 What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend using a .jpg file and keeping it under or around **500MB** in size and formatting it to **640** pixels on the short side if you plan on scrolling it. I'd considered these to be the minimum required sizes.  You'll need to do some experimenting to find out what works best for your setup, especially if scrolling backgrounds.
