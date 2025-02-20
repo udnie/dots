@@ -32,7 +32,7 @@ PlayKeys = ('A','D','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X',
 
 ## use this and make sure your editor points to the right directory
 paths = {          
-    'snapShot':     ',/../',  
+    'snapShot':     './',    ## src directory for now - add yours
     'bkgPath':      './../backgrounds/',
     'imagePath':    './../images/',
     'playPath':     './../plays/',

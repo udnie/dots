@@ -2,8 +2,10 @@
 import os 
 import os.path
 import json
+
+from functools          import partial
        
-from PyQt6.QtCore       import Qt, QPoint, QPointF, QRect
+from PyQt6.QtCore       import QPoint, QPointF, QRect, QTimer
 from PyQt6.QtGui        import QColor, QCursor
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
                                 QColorDialog
@@ -55,8 +57,8 @@ class BkgMaker(QWidget):
             'Choose an image file to open', paths['bkgPath'],
             'Images Files(*.bmp *.jpg *.png *.bkg *.JPG *.PNG *.mov *.mp4)')
         if file:  ## it's either a flat or an jpg/png or a video
-            if file.endswith('.mov') or file.endswith('.mp4'):
-                self.canvas.sideCar.addVideo(file, 'open') 
+            if file.endswith('.mov') or file.endswith('.mp4'): 
+                QTimer.singleShot(100, partial(self.canvas.sideCar.addVideo, file)) 
             else:
                 file = paths['bkgPath'] + os.path.basename(file)  
                 self.openFlatFile(file) if file.endswith('.bkg') else self.addBkg(file)

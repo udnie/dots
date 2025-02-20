@@ -123,7 +123,6 @@ class SideCar2:
             akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
             akg.setPos(int(common['ViewW']/2), 0)
             
-
     def addBkgLabels(self, bkg):  ## used by dumpTrackers
         fileName = bkg.fileName       
         if bkg.locked == True:

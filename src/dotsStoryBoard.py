@@ -2,9 +2,7 @@
 import random
 import time
 
-from functools          import partial
-
-from PyQt6.QtCore       import QTimer, QEvent, QPointF, pyqtSlot, QRect, QPoint
+from PyQt6.QtCore       import QEvent, QPointF, pyqtSlot, QRect, QPoint
 from PyQt6.QtGui        import QTransform, QCursor
 from PyQt6.QtWidgets    import QWidget, QRubberBand, QGraphicsScene
                                         
@@ -183,12 +181,17 @@ class StoryBoard(QWidget):
         QTimer.singleShot(100, self.dots.closeAll)
         QTimer.singleShot(200, self.dots.close)   
                            
-    def clear(self):  ## do this before exiting app as well 
-        if self.animation == True:
-            self.showbiz.showtime.stop('clear') 
-        if self.canvas.videoPlayer != None:  ## make sure it's stopped
-            self.sideCar.videoOff()
-        time.sleep(.10)  ## otherwise an error report and lockup
+    def clear(self):
+        if  self.canvas.videoPlayer != None:  ## this is seriously redundant but necessary
+            self.canvas.videoPlayer.stopVideo()
+            time.sleep(.10) 
+            self.canvas.sideCar.videoOff()
+        time.sleep(.10) 
+            
+        if self.control != '' or self.animation == True:
+            self.showbiz.showtime.stop('clear')  
+            time.sleep(.10)  ## otherwise an error report and lockup
+        
         if self.canvas.pathMakerOn:
             self.pathMaker.pathMakerOff() 
         if self.showbiz.tableView != None:

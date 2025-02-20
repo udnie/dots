@@ -2,17 +2,21 @@
 import os
 import time
 
-from PyQt6.QtCore       import Qt, QUrl, QSizeF, QRectF
+from PyQt6.QtCore       import Qt, QUrl, QSizeF, QRectF, QTimer, QRect, QPoint, QSize  
 from PyQt6.QtGui        import QColor, QPen, QPainter                          
 from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
                                 QPushButton, QVBoxLayout
                                 
 from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
+### ------------ comment out for 6, uncomment for 5 -----------------
+# from PyQt5.QtMultimedia       import QMediaContent  ## 5 
 
+### ---------------------------- end --------------------------------
 from dotsSideGig        import getVuCtr
 from dotsSideGig        import MsgBox
 from dotsShared         import common
+from dotsPathWorks      import Ball
 
 ### --------------------------------------------------------
 class QVD(QGraphicsVideoItem):  ## added type to track it better
@@ -21,10 +25,6 @@ class QVD(QGraphicsVideoItem):  ## added type to track it better
           super().__init__()          
          
           self.type = 'video'
-
-### ------------ comment out for 6, uncomment for 5 -----------------
-# from PyQt5.QtMultimedia   import QMediaContent  ## 5 
-### ---------------------------- end --------------------------------
 
 ### ------------------ dotsVideoPlayer ---------------------        
 class VideoPlayer(QMediaPlayer):
@@ -37,7 +37,7 @@ class VideoPlayer(QMediaPlayer):
          
         self.fileName = ''
         self.type    = 'video'
-        self.tag     = ''
+        self.tag     = src
         self.loops   = loops
         self.widget  = None 
     
@@ -49,8 +49,9 @@ class VideoPlayer(QMediaPlayer):
 ### ---------------------------- end --------------------------------
         
         self.videoWidget = QVD()   
+        self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) ## !!!
         
-        self.videoWidget.setSize(QSizeF(common['ViewW']+2, common['ViewH']+2))  
+        self.videoWidget.setSize(QSizeF(common['ViewW'], common['ViewH']))  
         self.player.setVideoOutput(self.videoWidget) 
            
         self.player.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStatusChanged)
@@ -64,9 +65,6 @@ class VideoPlayer(QMediaPlayer):
 ### ------------ uncomment for 5, comment out for 6 -----------------     
         # self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5
 ### ---------------------------- end --------------------------------
-
-        if src == 'dnd':  self.playVideo()  
- 
 ### ------------ uncomment for 6 ... comment out for 5 -----------------           
     def playVideo(self):  ## 6
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
@@ -93,15 +91,30 @@ class VideoPlayer(QMediaPlayer):
     #             time.sleep(.01)  ## 5
     #         self.stopVideo()  ## 5
 ### ---------------------------- end --------------------------------
+    def setFrame(self):   
+        self.player.setPosition(0)
+        self.player.pause()
+        QTimer.singleShot(200, self.copyFrame) 
 
+    def copyFrame(self):      
+        copy = Ball(self.canvas.view.grab(QRect(QPoint(0,0), QSize())))  ## subclass - borrowed
+        copy.setZValue(-100)  ## copy is a graphics pixmapItem 
+        self.scene.addItem(copy)        
+        self.videoWidget.setZValue(-99)  ## reset behind sprites
+        self.canvas.btnRun.setText('Video')
+        if self.tag == 'dnd': self.player.play()  
+        
     def handleError(self):
         print(self.player.errorString())
 
     def stopVideo(self):
-        self.player.stop()   
-        if self.canvas.animation == False and  \
-            self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):            
-            self.canvas.showWorks.enablePlay()  
+        try:
+            self.player.stop()   
+            if self.canvas.animation == False and  \
+                self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):            
+                self.canvas.showWorks.enablePlay()  
+        except:
+            return
 
     def setVideo(self, tmp, pix):  ## some of which is filler
         pix.fileName = tmp['fileName']  ## the better to fit in
@@ -174,9 +187,9 @@ class VideoWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
-        painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,            
+        painter.setPen(QPen(QColor(0, 80, 255), 5, Qt.PenStyle.SolidLine,            
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
-        painter.setBrush(QColor(215,215,215,255))
+        painter.setBrush(QColor(225, 100, 30, 255))
         painter.drawRoundedRect(rect, 15, 15)
     
     def setLoopCount(self, val):
@@ -202,17 +215,6 @@ class VideoWidget(QWidget):
 
         self.factorValue = QLabel(str(self.factor),  alignment=Qt.AlignmentFlag.AlignHCenter)
         self.factorValue.setFixedWidth(40)
-                  
-        # self.factorDial = QDial()  ## original plan - if needed
-        # self.factorDial.setFixedWidth(55)
-        # self.factorDial.setMinimum(1)
-        # self.factorDial.setMaximum(10)
-        # self.factorDial.setValue(1)
-        # self.factorDial.setWrapping(False)
-        # self.factorDial.setNotchesVisible(True)
-        # self.factorDial.setNotchTarget(10)
-        # self.factorDial.setSingleStep(1)
-        # self.factorDial.valueChanged.connect(self.setLoopCount) 
       
         vbox = QVBoxLayout()    
         vbox.addWidget(self.title, alignment=Qt.AlignmentFlag.AlignCenter)

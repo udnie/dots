@@ -5,7 +5,6 @@ import asyncio
 import os      
 
 from functools          import partial
-
 from PyQt6.QtCore       import QTimer
 
 from dotsShared         import common, paths
@@ -76,7 +75,7 @@ class ShowRunner:
 ### --------------------------------------------------------                            
     def loadPlay(self, src=''):  ## scr='table' launch play file viewer
         if self.canvas.pathMakerOn:  
-            return     
+            return    
         elif self.canvas.videoPlayer != None:
             MsgBox('Delete the Video and Reload it as the Last Screen Item', 6)
             return 

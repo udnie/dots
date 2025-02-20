@@ -16,12 +16,26 @@ Before all else I'd like to thank those individuals who were kind enough to awar
     7. Change QMessageBox move(x,y) height in dotsSideGig.py
 
     
-The first three steps can be accomplished in **vscode** with a minimum of time and effort. Running the python script **script-qt5.py** will take care of steps 4-7, see **January 2025** and **November 30 2024** for more details as well as the **Help** and **Video** entries in **Start Here**.
+The first three steps can be accomplished in **vscode** with a minimum of time and effort. Running the python script **script-qt5.py** will take care of steps 4-7, see **January 2025** and **November 30 2024** for more details as well as the **Help** and **Video** entries in **Start Here**. There's also **script-qt6.py** to remove all the code and comments that reference **PyQt5**.
 
-If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** will require an edit to the terminal settings in the **.code-workspace** as well. 
-
+If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** will require an edit to the terminal settings in the **.code-workspace** as well. Clearing **\_\_pycache\_\_** after applying code changes is recommended.
 
 ---
+
+**February 19 2025**   
+I've made a change to **dotsVideoPlayer** as to how a video appears when added a scene. The first frame is now visible where previously there was nothing to see until the video started playing. Drag and drop works as before and will play the video automatically. In my first attempt to generate a frame I could see a flash, the white screen, when the video ended and if I displayed the first frame immediately after.  To get around this I decided to capture the frame and use it as a background, positioning it behind the videoWidget, giving the appearance of ready to play after the video stopped and also eliminating the flash. 
+
+My solution is a bit of a sleight of a hand as I make the videoWidget the topmost scene item to better capture the frame and once I've made a copy I reset the videoWidget's zValue moving it to the background. No guarantees on how it will run on other hardware as it's somewhat time sensitive. 
+
+I've used **QTimer.singleShot** and **time.sleep()** to slow things down particularly around and after calling the videoPlayer **stop** function as more time is necessary for it to clean up after itself and not collide with the next statement that otherwise might be attempting to execute. At least that's how it appears to behave and when it does you get beachballs. Adding sleep following a few function calls plus some changes in the clear function helped **dots** avoid crashing. If you get a white screen once the video has stopped you may need to make adjustments to the **QTimer.singleshot** calls in **addVideo** and **setFrame** as well as bumping up the **sleep** setting that follows the call **self.canvas.videoPlayer.stopVideo()**. 
+
+There are no changes to **videoPlayerOne** and **16:9** videos can sometimes appear upside down in **dotsVideoPlayer** especially if running in **PyQt5**.
+
+Lastly I discovered that **snapshots** weren't going where I thought they were and made a change to **Shared** to direct them to the **src** directory.  Originally they were sent to the Desktop but that only worked for me.  
+
+**February 7-9 2025**  
+Bug fix to dotsVideoPlayer.  Edits to **Changes** and **Start Here**. 
+
 **February 6 2025**  
 Some changes to Backgrounds in order to get the **'B'** key to multi-task better. **Shift-B** now does the mirror routine that used to be run by typing in just **'B'**.  **'B'** with nothing on the screen triggers the background file dialog just as if you had typed in **'A'** and typing **'B'** with a **mouse-press** on a background pops up the **Tracker** tableWidget.  The background help menu has been updated as well.
 
@@ -33,10 +47,17 @@ From my perspective it appears that **PyQt6** treats **'type'** very differently
 
 Last, animation doesn't work in **dots** using **PySide6** and there's a problem with **TableModels** - and I'm still finding things to sub-class. I've added some of the changes such as the sub-class code other changes to help down the road when I try this again.  Much testing.  Using sed commands really helps.
 
-**February 7-9 2025**  
-Bug fix to dotsVideoPlayer.  Edits to **Changes** and **Start Here**. 
-  
 ---
+**January 27 2025**  
+A bug fix to the **'RubberBand'** selector.  An update to **VHX** that anchors the beginning of the ruler when holding down the '**command**' key on a Mac while adjusting the ruler's length using the square bracket keys.
+
+The three small desktop apps, **VHX, slideShow** and **videoPlayerOne** all run in **PySide6**. Change **PyQt6** to **PySide6**, that's it.
+
+**January 16 2025**   
+Another fix for f-strings used in menus by tableWidgets displaying only centered text.  Added a square format for slide shows.
+
+New video:  <https://youtu.be/7CWd5Z7IfK4>
+
 **January 15 2025**  
 **Dots** is now running on **Apple Silicon** in **PyQt6** and **PyQt5**. So far the only issue I've encountered is with some of the **f-strings** in my help menus not following the padding carried over from **PyQt6**.  Some of the padding in **PyQt6** going from **Rosetta** to **arm** changed as well.  I've whittled it down to two help files and added them to **script-qt5.py** to make the changes needed to work on my mac. 
 
@@ -44,27 +65,37 @@ Bug fix to dotsVideoPlayer.  Edits to **Changes** and **Start Here**.
 
 Which introduces **slideShow.py** - a program which came about because I was thinking about possibly making a photo book and wanted a way to visualize how it might look. The zoom function was partially in response to an issue which came up in **PyQt5**.  If you set a frameless window hint you're not able to change the widget size using a mouse. The zoom addition should help in that circumstance. And last, **videoPlayerOne** and **slideShow** both include bits and pieces of code originated by google gemini. 
 
-**January 16 2025**   
-Another fix for f-strings used in menus by tableWidgets displaying only centered text.  Added a square format for slide shows.
-
-New video:  <https://youtu.be/7CWd5Z7IfK4>
-
-**January 27 2025**  
-A bug fix to the **'RubberBand'** selector.  An update to **VHX** that anchors the beginning of the ruler when holding down the '**command**' key on a Mac while adjusting the ruler's length using the square bracket keys.
-
-The three small desktop apps, **VHX, slideShow** and **videoPlayerOne** all run in **PySide6**. Change **PyQt6** to **PySide6**, that's it.
-
-
 ---
+**December 13 2024**  
+Did some more work on **showbiz** and **controlView**.  The **'T'** key was updated to add a function that got lost. The **'Storyboard 2'** menu houses two of it's uses - both display tags, one when an animation is running or paused, the other, **shift-T**, when there is no animation  The **'T'** key is also used to toggle locks or links on and off to scene items and to run the Mr.Ball animation in pathMaker.
+
+
 **December 5 2024**   
 Added a **'Help Menus'** selection to the **StoryBoard** and **PathMaker** help menus to show all the menus just as in **Canvas** by clicking on the **Menus** entry. Fixes to **Matte**,  **videoWidget** and **pathMaker** to clean up some bugs. **'B'** in storyboard will call the background file dialog if there are no backgrounds in the scene, **'A'** does that in canvas and is used to select all in storyboard, otherwise **B** will mirror the background provided it's not from a .play file. 
 
 I was looking for a way to let the user know that a video was loaded and the only indicators were to either click on **'run'** or type in **'R'** or **'V'**  and see what happens. I had considered popping up the videoWidget once the video was loaded but thought it might become annoying after a while so I settled on what I hope will be a more gentle approach by setting the **Run** button text to **Video** when it's been loaded and back to **Run** when the video is deleted or the screen is cleared. 
 
-**December 13 2024**  
-Did some more work on **showbiz** and **controlView**.  The **'T'** key was updated to add a function that got lost. The **'Storyboard 2'** menu houses two of it's uses - both display tags, one when an animation is running or paused, the other, **shift-T**, when there is no animation  The **'T'** key is also used to toggle locks or links on and off to scene items and to run the Mr.Ball animation in pathMaker.
-
 ---
+**November 30 2024**  
+I've added a python script, **script-qt5.py**, to finish the last few steps converting dots from PyQt6 to PyQt5.  It does the commenting/uncommenting in the two videoPlayer files, moves QShortcut to QWidgets in dotsTableMaker and comments out the three lines in PixItem and videoPlayerOne that reference open-cv in case you haven't installed it. It also leaves behind the files dotsPixItem.py--, dotsTableMaker.py--, dotsVideoPlayer.py-- and videoPlayerOne.py--, the original files renamed the way sed does it so the shell script I use can easily delete them once it's finished. Plus a number of changes to consolidate single keys commands in **dotShowBiz.py**.
+
+**November 23 2024**  
+Backed out an edit on videoPlayerOne. It's now both in the source directory as well as in extras as it's easier to test that way.
+
+**November 22 2024**    
+I moved the VideoPlayer I had originally added to **dotsSideGig.py** to **dotsVideoPlayer.py** and added a  **VideoWidget** to that file as well. Once you've added a video typing in **'V'** will open the videoWidget and typing **'V"** when it's displayed will close it as well. This only works if there's a video present. The addition of the videoWidget and the changes required to incorporate a video into dots accomplished three things. First, it eliminated needing to drag a drop the video on to the screen as you can now load a video from the background directory and save a reference to it to in a **.play** file. Second, it provided a means to add looping to the video through the **videoPlayer** and last, a means to delete/remove a video added to a **.play** file. Saving a video to a **.play** file treats the video as just another **.play** file record though it does require saving the file and clearing the screen once the video is deleted if there is more than one item in the file.  Looping isn't available in Qt5 as it isn't in **QMediaPlayer** for that version. This message may appear in the terminal while running **dots** in Qt5  when a video finishes.  
+
+    updateVideoFrame called without AVPlayerLayer (which shouldn't happen
+    updateVideoFrame called without AVPlayerLayer (which shouldn't happen
+    
+Also, I removed the **keys.pdf** as the help menus have replaced it. Looking into the **videoplayer** and **videoWidget** code may be a bit confusing as there are two videoWidgets. One is the graphics scene item that provides the video to the screen while the other is the pop-up widget that handles loops and deletes.  You may also notice '## 5', '## 6' stuck on the end of some lines - that's used to by a python script to comment out the '## 6' lines and uncomment the '## 5' lines so I no longer have to inorder for me to test the code in Qt5.
+
+Video at: <https://youtu.be/SR47SMG_eXs>
+
+**November 4 2024**     
+A few bug fixes.
+
+
 **November 2024**   
 Updated the Help Menus once again by eliminating three menus that were already represented in some form.  The video covers many of the new menus keyboard commands and functions, most of which have been present in Dots for some time now, but probably not as visible.  
 
@@ -82,27 +113,6 @@ The three jelly fish videos formatted for 3:2, 16:9, and 9:16 all were cropped f
 New video:  <https://youtu.be/4afjwpiISlM>
 
 You'll need to edit **VideoPlayer** in **dotsSideGig** inorder to go from PyQt6 to PyQt5 along with the rest of the edits.  See above.
-
----
-
-**November 4 2024**     
-A few bug fixes.
-
-**November 22 2024**    
-I moved the VideoPlayer I had originally added to **dotsSideGig.py** to **dotsVideoPlayer.py** and added a  **VideoWidget** to that file as well. Once you've added a video typing in **'V'** will open the videoWidget and typing **'V"** when it's displayed will close it as well. This only works if there's a video present. The addition of the videoWidget and the changes required to incorporate a video into dots accomplished three things. First, it eliminated needing to drag a drop the video on to the screen as you can now load a video from the background directory and save a reference to it to in a **.play** file. Second, it provided a means to add looping to the video through the **videoPlayer** and last, a means to delete/remove a video added to a **.play** file. Saving a video to a **.play** file treats the video as just another **.play** file record though it does require saving the file and clearing the screen once the video is deleted if there is more than one item in the file.  Looping isn't available in Qt5 as it isn't in **QMediaPlayer** for that version. This message may appear in the terminal while running **dots** in Qt5  when a video finishes.  
-
-    updateVideoFrame called without AVPlayerLayer (which shouldn't happen
-    updateVideoFrame called without AVPlayerLayer (which shouldn't happen
-    
-Also, I removed the **keys.pdf** as the help menus have replaced it. Looking into the **videoplayer** and **videoWidget** code may be a bit confusing as there are two videoWidgets. One is the graphics scene item that provides the video to the screen while the other is the pop-up widget that handles loops and deletes.  You may also notice '## 5', '## 6' stuck on the end of some lines - that's used to by a python script to comment out the '## 6' lines and uncomment the '## 5' lines so I no longer have to inorder for me to test the code in Qt5.
-
-Video at: <https://youtu.be/SR47SMG_eXs>
-
-**November 23 2024**  
-Backed out an edit on videoPlayerOne. It's now both in the source directory as well as in extras as it's easier to test that way.
-  
-**November 30 2024**  
-I've added a python script, **script-qt5.py**, to finish the last few steps converting dots from PyQt6 to PyQt5.  It does the commenting/uncommenting in the two videoPlayer files, moves QShortcut to QWidgets in dotsTableMaker and comments out the three lines in PixItem and videoPlayerOne that reference open-cv in case you haven't installed it. It also leaves behind the files dotsPixItem.py--, dotsTableMaker.py--, dotsVideoPlayer.py-- and videoPlayerOne.py--, the original files renamed the way sed does it so the shell script I use can easily delete them once it's finished. Plus a number of changes to consolidate single keys commands in **dotShowBiz.py**.
 
 ---
 

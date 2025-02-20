@@ -6,7 +6,7 @@ import os
 from PyQt6.QtCore       import QTimer, QT_VERSION_STR, PYQT_VERSION_STR
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
-from dotsScreens        import *
+from dotsScreens        import *   ## including pathMod
 from dotsShared         import common
 
 import dotsStoryBoard   as canvas

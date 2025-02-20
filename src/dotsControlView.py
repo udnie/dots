@@ -1,7 +1,8 @@
 
 import os
+import time
 
-from PyQt6.QtCore       import Qt, pyqtSignal
+from PyQt6.QtCore       import Qt, pyqtSignal, QTimer
 from PyQt6.QtGui        import QPainter
 from PyQt6.QtWidgets    import QGraphicsView
 
@@ -56,16 +57,25 @@ class ControlView(QGraphicsView):
         if e.mimeData().hasUrls():
             m = e.mimeData()
             fileName = m.urls()[0].toLocalFile()       
-            ext = fileName[fileName.rfind('.'):].lower()     
-            if ext in ('.mov', '.mp4', '.caf', '.mp3', '.m4a', '.ogg', '.wav'):
-                self.sideCar.addVideo(fileName, 'dnd')     
-            elif self.canvas.pathMakerOn:  ## added for pathmaker
+            ext = fileName[fileName.rfind('.'):].lower()        
+            if self.canvas.control != '' or self.canvas.animation == True: 
                 e.setAccepted(False)
-                MsgBox("Can't add sprites to PathMaker", 5)
-                return     
-            elif fileName != 'star' and ext in ('.png', '.jpg', '.jpeg', '.bmp', '.gif'):
-                e.setAccepted(True)
-                self.dragOver = True
+                return
+            
+            if ext in ('.mov', '.mp4', '.caf', '.mp3', '.m4a', '.ogg', '.wav'):
+                if  self.canvas.videoPlayer != None:
+                    self.canvas.videoPlayer.stopVideo()
+                    time.sleep(.05)
+                self.canvas.sideCar.addVideo(fileName, "dnd")
+                    
+            if fileName != 'star' and ext in ('.png', '.jpg', '.jpeg', '.bmp', '.gif'):     
+                if self.canvas.pathMakerOn:  
+                    e.setAccepted(False)
+                    MsgBox("Can't add sprites to PathMaker", 5)
+                    return    
+                else:             
+                    e.setAccepted(True)
+                    self.dragOver = True
             else:
                 e.setAccepted(False)
 
@@ -114,7 +124,7 @@ class ControlView(QGraphicsView):
             self.setKey('del')
                   
         elif key == Qt.Key.Key_Space:
-            if self.canvas.control != '' or self.canvas.animation == True:
+            if self.canvas.control != '' or self.canvas.animation == True or self.canvas.videoPlayer != None:
                 self.sideCar.pause()  ## SpaceBar - pause/resume
                                 
 ### --------------------------------------------------------                                                        

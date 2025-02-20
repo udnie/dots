@@ -1,7 +1,8 @@
 
 import random
+import time
 
-from PyQt6.QtCore       import Qt, QPointF
+from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtWidgets    import QApplication
                                                  
 from dotsShared         import common, paths
@@ -65,39 +66,52 @@ class SideCar:
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
         
 ### --------------------------------------------------------         
-    def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd')
-        if self.canvas.videoPlayer != None: 
-            self.canvas.videoPlayer = None
-            self.videoOff()  ## calls closeVideoWidget as well
-        self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops) 
-        for itm in self.scene.items():
-            if itm.type in ('bkg', 'flat'):
-                itm.setZValue(itm.zValue()-1)           
-        self.canvas.videoPlayer.videoWidget.setZValue(-99)  ## keeper
-        self.scene.addItem(self.canvas.videoPlayer.videoWidget)     
+    def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd'  
+        if  self.canvas.videoPlayer != None:
+            self.videoOff()
+                     
         if src == 'dnd' and self.canvas.control == '':
-            self.canvas.showWorks.disablePlay()  ## enables pause/resume/stop
+            self.canvas.showWorks.disablePlay()  ## enables pause/resume/stop   
+            self.canvas.control = ''  ## otherwise it won't run
         elif self.canvas.pathMakerOn == True:  ## no animation
              self.canvas.showWorks.enablePlay()
-        self.canvas.btnRun.setText('Video')
+                  
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itm.type in ('bkg', 'flat'):
+                itm.setZValue(itm.zValue()-1)    
+                   
+        self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)    
+        self.scene.addItem(self.canvas.videoPlayer.videoWidget)  ## zValue set to cover screen    
+        QTimer.singleShot(200, self.canvas.videoPlayer.setFrame) 
        
     def videoOff(self):  ## also called from storyboard in clear()
-        for itm in self.scene.items():
-            if itm.type == 'video' and self.canvas.videoPlayer != None: 
+        if  self.canvas.videoPlayer == None:
+            return 
+               
+        self.canvas.videoPlayer.stopVideo()  ## very process intensive
+        self.canvas.videoPlayer = None 
+        time.sleep(.15)  
+        
+        self.closeVideoWidget()              
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itm.type in ('video', 'ball'):
                 self.scene.removeItem(itm)
                 del itm
-                break
-        self.closeVideoWidget() 
-        self.canvas.videoPlayer = None    
+            elif itm.zValue() > -50:
+                break   
+             
+        self.nextbit()
+             
+    def nextbit(self):
         if self.canvas.control == '' and \
             self.canvas.animation == False or  \
             self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):  
             if len(self.scene.items()) > 0:                         
                 self.canvas.showWorks.enablePlay() 
         else:
-            self.canvas.showWorks.disablePlay()  
-        self.canvas.btnRun.setText('Run')     
-
+            self.canvas.showWorks.disablePlay()        
+        self.canvas.btnRun.setText('Run')  
+           
     def addVideoWidget(self):
         self.canvas.videoPlayer.widget = VideoWidget(self.canvas)
                     
