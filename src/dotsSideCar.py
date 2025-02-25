@@ -9,7 +9,7 @@ from dotsShared         import common, paths
 from dotsPixItem        import PixItem
 from dotsSideGig        import constrain
 from dotsMapMaker       import MapMaker
-from dotsVideoPlayer    import VideoPlayer, VideoWidget
+from dotsVideoPlayer    import VideoPlayer, AvideoWidget
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
@@ -78,7 +78,9 @@ class SideCar:
                   
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
             if itm.type in ('bkg', 'flat'):
-                itm.setZValue(itm.zValue()-1)    
+                itm.setZValue(itm.zValue()-1)  
+            elif itm.zValue() > -50:
+                break    
                    
         self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)    
         self.scene.addItem(self.canvas.videoPlayer.videoWidget)  ## zValue set to cover screen    
@@ -87,16 +89,18 @@ class SideCar:
     def videoOff(self):  ## also called from storyboard in clear()
         if  self.canvas.videoPlayer == None:
             return 
-               
+            
+        self.closeVideoWidget()  ## the pop-up  
+        time.sleep(.10)
+        
         self.canvas.videoPlayer.stopVideo()  ## very process intensive
         self.canvas.videoPlayer = None 
-        time.sleep(.15)  
-        
-        self.closeVideoWidget()              
+        time.sleep(.20)  
+                  
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
             if itm.type in ('video', 'ball'):
                 self.scene.removeItem(itm)
-                del itm
+                del itm 
             elif itm.zValue() > -50:
                 break   
              
@@ -111,12 +115,22 @@ class SideCar:
         else:
             self.canvas.showWorks.disablePlay()        
         self.canvas.btnRun.setText('Run')  
-           
-    def addVideoWidget(self):
-        self.canvas.videoPlayer.widget = VideoWidget(self.canvas)
+        
+    def delbackdrp(self):  ## dbl-clk from backdrp
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itm.type == 'ball':
+                self.scene.removeItem(itm)
+                del itm
+            elif itm.zValue() > -50:
+                break  
+        if self.canvas.videoPlayer != None:
+            self.canvas.videoPlayer.backdrp = None
+     
+    def addVideoWidget(self):  ## pop-up
+        self.canvas.videoPlayer.widget = AvideoWidget(self.canvas)
                     
     def closeVideoWidget(self):
-        if self.canvas.videoPlayer and self.canvas.videoPlayer.widget != None:
+        if self.canvas.videoPlayer.widget != None:
             self.canvas.videoPlayer.widget.close()     
             self.canvas.videoPlayer.widget = None  
     

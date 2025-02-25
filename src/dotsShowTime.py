@@ -55,10 +55,10 @@ class ShowTime:
                         
         b, k = 0, 0  ## counts bats and pixitems  
         for pix in self.scene.items():  ## main loop - sets and runs animations
-            if type(pix) == 'dotsShadowWidget.PointItem' or \
+            if pix.type in( 'point', 'poly') or \
                 isinstance(pix, QGraphicsPolygonItem):
                 continue
-                    
+           
             if pix.type in ('pix', 'bkg') and pix.tag:    
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
@@ -67,9 +67,13 @@ class ShowTime:
                 if pix.type == 'pix':
                     pix.anime = self.animation.setAnimation(          
                         pix.tag, 
-                        pix)        
+                        pix)     
+                       
                 elif pix.type == 'bkg': 
-                    if pix.tag == 'scroller':                       
+                    if pix.tag == 'scroller':      
+                        if self.canvas.videoPlayer != None:
+                            continue  
+                                        
                         pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem 
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag. \
                             ItemSendsScenePositionChanges, True)
@@ -77,13 +81,6 @@ class ShowTime:
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag. \
                             ItemIsMovable,False)
                          
-                # if pix.type == 'pix' and pix.part == 'pivot': ## staggers bats zvalue
-                #     if b == 1: 
-                #         pix.setZValue(-101) 
-                #     elif b == 2:            
-                #         pix.setZValue(-102) 
-                #     b += 1   
-                
                 k += 1  ## k = number of pixitems - bats count as three
                 if pix.anime == None:  ## not animated
                     continue
@@ -109,30 +106,30 @@ class ShowTime:
            self.resume()
         else:          
             for pix in self.scene.items(): 
-                if type(pix) == 'dotsShadowWidget.PointItem' or \
+                if pix.type in( 'point', 'poly', 'flat', 'frame') or \
                     isinstance(pix, QGraphicsPolygonItem):
-                    continue
-                if pix.type in ('flat', 'frame'):
-                    continue             
-                if pix.type in ('pix', 'snake', 'bkg'):  
+                    continue   
+                         
+                elif pix.type in ('pix', 'snake', 'bkg'):  
                     if pix.anime != None and pix.anime.state() == \
                         QAbstractAnimation.State.Running:  ## running
                         pix.anime.pause() 
+                        
             self.showWorks.setPauseKey()
             if self.canvas.videoPlayer != None:
                 self.canvas.videoPlayer.playVideo()  ## toggles pause and play
             
     def resume(self):   
         for pix in self.scene.items():  
-            if type(pix) == 'dotsShadowWidget.PointItem' or \
+            if pix.type in( 'point', 'poly', 'flat', 'frame') or \
                 isinstance(pix, QGraphicsPolygonItem):
-                continue
-            if pix.type in ('frame','flat'):
-                continue      
-            if pix.type in ('pix', 'snake', 'bkg'):
+                continue   
+            
+            elif pix.type in ('pix', 'snake', 'bkg'):
                 if pix.anime != None and pix.anime.state() == \
                     QAbstractAnimation.State.Paused:
-                    pix.anime.resume()                   
+                    pix.anime.resume() 
+                                      
         self.showWorks.setPauseKey()  
         if self.canvas.videoPlayer != None:  ## toggles pause and play
             self.canvas.videoPlayer.playVideo()
@@ -147,24 +144,22 @@ class ShowTime:
             
         self.canvas.control = ''
             
-        for pix in self.scene.items():                          
-            if type(pix) == 'dotsShadowWidget.PointItem' or \
+        for pix in self.scene.items():      
+            if pix.type in( 'point', 'poly', 'flat', 'frame') or \
                 isinstance(pix, QGraphicsPolygonItem):
-                continue              
-            try:
-                if pix.type in ('frame','flat'):
-                    continue       
-            except:
-                continue
-            
-            if pix.type in ('pix', 'snake', 'bkg'):                   
+                 continue                                   
+     
+            elif pix.type in ('pix', 'snake', 'bkg'):                   
                 if pix.anime != None and pix.anime.state() != \
                     QAbstractAnimation.State.Stopped:       
                     pix.anime.stop()                                           
                     if pix.tag == 'scroller':  ## can be more than one
+                        if self.canvas.videoPlayer != None:
+                            continue 
+                        
                         pix.anime = None
-                        scrolling.append(pix.tag)    
-                                                   
+                        scrolling.append(pix.tag)  
+                                                      
                 if pix.type == 'pix' and pix.opacity() < .2:  ## just in case  
                     if self.canvas.openPlayFile != 'hats':            
                         pix.setOpacity(1.0) 
@@ -186,19 +181,22 @@ class ShowTime:
         self.showWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  
-                  
+                                
 ### --------------------------------------------------------
     def savePlay(self):   
         if self.canvas.control in ControlKeys:  ## there's an animation running - needs to be stopped first
             return 
+        
         if self.canvas.openPlayFile in Demos:
             self.showWorks.enablePlay()
             demo = self.canvas.openPlayFile 
             MsgBox("Can't Save " + demo + " as a Play File", 5)  ## seconds
-            return                 
+            return   
+                      
         if self.canvas.pathMakerOn == True:  ## using load in pathMaker
             self.pathMaker.pathWays.savePath()
-            return                   
+            return     
+                      
         if len(self.scene.items()) == 0:
             MsgBox("Nothing on Screen to Save", 5)
             return  
@@ -239,4 +237,11 @@ class ShowTime:
     # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)
     # pix.setGraphicsEffect(shadow)
 
-
+    # if pix.type == 'pix' and pix.part == 'pivot': ## staggers bats zvalue
+        #     if b == 1: 
+        #         pix.setZValue(-101) 
+        #     elif b == 2:            
+        #         pix.setZValue(-102) 
+        #     b += 1  
+        
+        

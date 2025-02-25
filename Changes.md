@@ -22,16 +22,22 @@ If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** 
 
 ---
 
-**February 19 2025**   
-I've made a change to **dotsVideoPlayer** as to how a video appears when added a scene. The first frame is now visible where previously there was nothing to see until the video started playing. Drag and drop works as before and will play the video automatically. In my first attempt to generate a frame I could see a flash, the white screen, when the video ended and if I displayed the first frame immediately after.  To get around this I decided to capture the frame and use it as a background, positioning it behind the videoWidget, giving the appearance of ready to play after the video stopped and also eliminating the flash. 
+**February 19-24 2025**   
+I've made a change to **dotsVideoPlayer** and now the first frame of the video appears when adding it to a scene, it should also appear when the video ends as well. Previously there was nothing to see until the video started playing. Drag and drop works as before and will play the video automatically. In my first attempt to generate a frame I could see a flash, the white screen, when the video stopped playing and if I displayed the first frame immediately after.  To get around this I decided to capture the frame and use it as a back drop, positioning it behind the videoWidget, giving the appearance of ready to play after the video stops while eliminating the flash. 
 
-My solution is a bit of a sleight of a hand as I make the videoWidget the topmost scene item to better capture the frame and once I've made a copy I reset the videoWidget's zValue moving it to the background. No guarantees on how it will run on other hardware as it's somewhat time sensitive. 
+My solution is a bit of a sleight of a hand as I make the videoWidget the topmost scene item to isolate and capture the first frame. Once I've made a copy of the frame I reset the videoWidget's **zValue()** moving it to the where background usually sits. No guarantees on how it will run on other hardware as it's somewhat time sensitive. 
 
-I've used **QTimer.singleShot** and **time.sleep()** to slow things down particularly around and after calling the videoPlayer **stop** function as more time is necessary for it to clean up after itself and not collide with the next statement that otherwise might be attempting to execute. At least that's how it appears to behave and when it does you get beachballs. Adding sleep following a few function calls plus some changes in the clear function helped **dots** avoid crashing. If you get a white screen once the video has stopped you may need to make adjustments to the **QTimer.singleshot** calls in **addVideo** and **setFrame** as well as bumping up the **sleep** setting that follows the call **self.canvas.videoPlayer.stopVideo()**. 
+I've used **QTimer.singleShot** and **time.sleep()** to slow things down particularly around and after calling the videoPlayer **stop** function as more time is necessary for it to clean up after itself and not collide with the next statement that otherwise might be attempting to execute. At least that's how it appears to behave and when it does you get beachballs. That and changes to the clear function to avoid **dots** from crashing.
+
+If you get a white screen after loading the video or after the video has stopped you probably need to make adjustments to the **QTimer.singleshot** calls in **addVideo** and **setFrame** as well as bumping up the **sleep** settings that bracket **videoPlayer.stopVideo()** and **clear()**.
 
 There are no changes to **videoPlayerOne** and **16:9** videos can sometimes appear upside down in **dotsVideoPlayer** especially if running in **PyQt5**.
 
 Lastly I discovered that **snapshots** weren't going where I thought they were and made a change to **Shared** to direct them to the **src** directory.  Originally they were sent to the Desktop but that only worked for me.  
+
+New Video:  <https://youtu.be/DvUYF5I5CH8>
+
+---
 
 **February 7-9 2025**  
 Bug fix to dotsVideoPlayer.  Edits to **Changes** and **Start Here**. 

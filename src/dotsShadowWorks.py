@@ -21,7 +21,96 @@ class Outline(QGraphicsPolygonItem):  ## added 'type' to track it better
         
         self.type = 'poly'
         self.setPolygon(path)
-                                                  
+                               
+### --------------------------------------------------------
+class PointItem(QGraphicsEllipseItem): 
+### --------------------------------------------------------
+    def __init__(self, pt, ptStr, parent):
+        super().__init__()
+
+        self.maker = parent
+        self.maker.path  = self.maker.path   
+        self.ptStr = ptStr
+        
+        self.type = 'point'
+        self.fileName = 'point'
+        
+        self.tag = 'point'  
+        self.dragCnt = 0
+                
+        ## -V*.5 so it's centered on the path 
+        self.x = pt.x()-V*.5
+        self.y = pt.y()-V*.5
+        
+        self.setZValue(common['points'])      
+        self.setRect(self.x, self.y, V, V)  
+        
+        self.setPen(QPen(QColor('gray'), 1))
+        
+        if self.ptStr in ('topLeft','topRight'):
+            self.setBrush(QColor('yellow'))
+        else:
+            self.setBrush(QColor('lime'))
+            
+        self.setAcceptHoverEvents(True)
+                        
+ ### --------------------------------------------------------
+    def hoverEnterEvent(self, e):
+        p = self.rect()      
+        if p.width() < V*1.5:
+            self.setRect(QRectF(p.x(), p.y(), V*1.5, V*1.5))
+        e.accept()
+        
+    def hoverLeaveEvent(self, e):  
+        p = self.rect()
+        self.setRect(QRectF(p.x(), p.y(), V, V))
+        e.accept()
+
+### --------------------------------------------------------
+    def mousePressEvent(self, e):  
+        e.accept() 
+        
+    def mouseMoveEvent(self, e):
+        self.dragCnt += 1
+        if self.dragCnt % 5 == 0:            
+            self.moveIt(e.pos()) 
+            self.maker.updateShadow()             
+        e.accept()
+                       
+    def mouseReleaseEvent(self, e):
+        self.moveIt(e.pos())
+        self.maker.updateShadow()
+        e.accept()
+                                        
+    def moveIt(self, e):     
+        pos = self.mapToScene(e)
+        x, y = pos.x(), pos.y()
+        self.setRect(x-V*.5, y-V*.5, V,V)  ## set current point    
+        if self.ptStr == 'topLeft':  ## push right
+            self.topLeft(x, y)
+        elif self.ptStr == 'botLeft':    
+            self.botLeft(x, y)
+        else:  
+            i = PathStr.index(self.ptStr)  ## move only 
+            self.maker.path[i] = QPointF(x,y)                  
+        
+    def topLeft(self, x, y):
+        w, y1 = self.current(0,1)            
+        self.maker.path[0] = QPointF(x,y) 
+        self.maker.path[1] = QPointF(x+w,y1)
+        self.maker.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)  
+        
+    def botLeft(self, x, y):
+        w, y1 = self.current(3,2)            
+        self.maker.path[3] = QPointF(x,y) 
+        self.maker.path[2] = QPointF(x+w,y1)
+        self.maker.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
+        
+    def current(self,a,b):
+        l = self.maker.path[a].x()
+        r = self.maker.path[b].x()
+        return r - l,  self.maker.path[b].y()
+                       
 ### --------------------------------------------------------
 class Works:  ## small functions that were in ShadowMaker
 ### --------------------------------------------------------
@@ -218,97 +307,6 @@ class Works:  ## small functions that were in ShadowMaker
                  
         self.maker.updateShadow('nope')  ## entering a string turns off the outline
            
-### --------------------------------------------------------
-class PointItem(QGraphicsEllipseItem): 
-### --------------------------------------------------------
-    def __init__(self, pt, ptStr, parent):
-        super().__init__()
-
-        self.maker = parent
-        self.maker.path  = self.maker.path   
-        self.ptStr = ptStr
-        
-        self.type = 'point'
-        self.fileName = 'point'
-        
-        self.tag = 'point'  
-        self.dragCnt = 0
-                
-        ## -V*.5 so it's centered on the path 
-        self.x = pt.x()-V*.5
-        self.y = pt.y()-V*.5
-        
-        self.setZValue(common['points'])      
-        self.setRect(self.x, self.y, V, V)  
-        
-        self.setPen(QPen(QColor('gray'), 1))
-        
-        if self.ptStr in ('topLeft','topRight'):
-            self.setBrush(QColor('yellow'))
-        else:
-            self.setBrush(QColor('lime'))
-            
-        self.setAcceptHoverEvents(True)
-                        
- ### --------------------------------------------------------
-    def hoverEnterEvent(self, e):
-        p = self.rect()      
-        if p.width() < V*1.5:
-            self.setRect(QRectF(p.x(), p.y(), V*1.5, V*1.5))
-        e.accept()
-        
-    def hoverLeaveEvent(self, e):  
-        p = self.rect()
-        self.setRect(QRectF(p.x(), p.y(), V, V))
-        e.accept()
-
-### --------------------------------------------------------
-    def mousePressEvent(self, e):  
-        e.accept() 
-        
-    def mouseMoveEvent(self, e):
-        self.dragCnt += 1
-        if self.dragCnt % 5 == 0:            
-            self.moveIt(e.pos()) 
-            self.maker.updateShadow()             
-        e.accept()
-                       
-    def mouseReleaseEvent(self, e):
-        self.moveIt(e.pos())
-        self.maker.updateShadow()
-        e.accept()
-                                        
-    def moveIt(self, e):     
-        pos = self.mapToScene(e)
-        x, y = pos.x(), pos.y()
-        self.setRect(x-V*.5, y-V*.5, V,V)  ## set current point    
-        if self.ptStr == 'topLeft':  ## push right
-            self.topLeft(x, y)
-        elif self.ptStr == 'botLeft':    
-            self.botLeft(x, y)
-        else:  
-            i = PathStr.index(self.ptStr)  ## move only 
-            self.maker.path[i] = QPointF(x,y)                  
-        
-    def topLeft(self, x, y):
-        w, y1 = self.current(0,1)            
-        self.maker.path[0] = QPointF(x,y) 
-        self.maker.path[1] = QPointF(x+w,y1)
-        self.maker.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)  
-        
-    def botLeft(self, x, y):
-        w, y1 = self.current(3,2)            
-        self.maker.path[3] = QPointF(x,y) 
-        self.maker.path[2] = QPointF(x+w,y1)
-        self.maker.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
-        
-    def current(self,a,b):
-        l = self.maker.path[a].x()
-        r = self.maker.path[b].x()
-        return r - l,  self.maker.path[b].y()
-         
 ### -------------------- dotsShadowWorks -------------------
-
-
 
 

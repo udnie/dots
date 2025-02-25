@@ -55,20 +55,22 @@ class ControlView(QGraphicsView):
 
     def dragEnterEvent(self, e):
         if e.mimeData().hasUrls():
-            m = e.mimeData()
-            fileName = m.urls()[0].toLocalFile()       
-            ext = fileName[fileName.rfind('.'):].lower()        
+      
             if self.canvas.control != '' or self.canvas.animation == True: 
                 e.setAccepted(False)
                 return
             
+            m = e.mimeData()
+            fileName = m.urls()[0].toLocalFile()       
+            ext = fileName[fileName.rfind('.'):].lower()
+    
             if ext in ('.mov', '.mp4', '.caf', '.mp3', '.m4a', '.ogg', '.wav'):
                 if  self.canvas.videoPlayer != None:
                     self.canvas.videoPlayer.stopVideo()
-                    time.sleep(.05)
+                    time.sleep(.10)
                 self.canvas.sideCar.addVideo(fileName, "dnd")
                     
-            if fileName != 'star' and ext in ('.png', '.jpg', '.jpeg', '.bmp', '.gif'):     
+            elif ext in ('.png', '.jpg', '.jpeg', '.bmp', '.gif') and fileName != 'star':
                 if self.canvas.pathMakerOn:  
                     e.setAccepted(False)
                     MsgBox("Can't add sprites to PathMaker", 5)

@@ -157,7 +157,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def mouseReleaseEvent(self, e):
         key = ''
         e.accept()   
-          
+   
     def shared(self, key):  ## from helpMenu and keyboard
         if not self.canvas.pathMakerOn: 
             self.key = key

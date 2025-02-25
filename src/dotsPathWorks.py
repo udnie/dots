@@ -46,13 +46,18 @@ NS = 27  ## row height override
 ### --------------------------------------------------------
 class Ball(QGraphicsPixmapItem):  ## added type to track it better
 ### --------------------------------------------------------
-    def __init__(self, file):
+    def __init__(self, file, parent):
         super().__init__()          
       
+        self.canvas = parent
+        
         self.type = 'ball'
         self.img  = QImage(file)
         self.setPixmap(QPixmap(self.img))
-
+            
+    def mouseDoubleClickEvent(self, e):
+        self.canvas.sideCar.delbackdrp()
+        
 ### --------------------------------------------------------     
 class PathHelp:  
 ### --------------------------------------------------------
@@ -241,7 +246,7 @@ class PathWorks:
     def pathTest(self):
         if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet == True:
             if self.pathMaker.pathTestSet == False:
-                self.ball = Ball(paths['imagePath'] + 'ball.png')
+                self.ball = Ball(paths['imagePath'] + 'ball.png', self.canvas)
                 node = Node(self.ball)
                 self.ball.setZValue(self.findTop()+10)
        

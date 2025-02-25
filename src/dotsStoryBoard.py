@@ -114,7 +114,8 @@ class StoryBoard(QWidget):
                      
 ### --------------------- event filter ---------------------- 
     def eventFilter(self, source, e): 
-        if not self.pathMakerOn:  ## using a rubberband used by mapper for selecting sprites     
+         ## mostly used by mapper and rubberband for selecting sprites  
+        if not self.pathMakerOn:    
             if e.type() == QEvent.Type.MouseButtonPress:      
                 self.origin = QPoint(e.pos())
                 self.mapper.clearTagGroup()  
@@ -127,7 +128,7 @@ class StoryBoard(QWidget):
                         self.mapper.updatePixItemPos()   
                             
             ##  enter 'cmd' before you move the mouse and the rubberband kicks in, but not after
-            if e.type() == QEvent.Type.MouseMove:  
+            elif e.type() == QEvent.Type.MouseMove:  
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
                     if self.mapper.isMapSet(): 
                         self.mapper.removeMap()
@@ -138,7 +139,7 @@ class StoryBoard(QWidget):
                 elif self.animation == False:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary    
                                
-            if e.type() == QEvent.Type.MouseButtonRelease:
+            elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas()           
@@ -148,14 +149,14 @@ class StoryBoard(QWidget):
                     self.mapper.removeMap()
                 self.mapper.updatePixItemPos()    
                        
-            if e.type() == QEvent.Type.MouseButtonDblClick:
+            elif e.type() == QEvent.Type.MouseButtonDblClick:
                 ## to preseve selections dbl-clk on an selection otherwise it 
                 ## will unselect all - possibly a default as it works the same as 
-                ## single click outside the map area do this if nothing at location
+                ## single click outside the map area do this if nothing at location          
                 if p := self.scene.itemAt(QPointF(e.pos()), QTransform()):
                     if p != None and p.type != 'pix' and self.mapper.isMapSet():
                         self.mapper.removeMap()
-                        self.setKeys('noMap')                                 
+                        self.setKeys('noMap')                                                 
         return QWidget.eventFilter(self, source, e)
     
 ### --------------------------------------------------------

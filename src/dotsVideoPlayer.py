@@ -40,6 +40,7 @@ class VideoPlayer(QMediaPlayer):
         self.tag     = src
         self.loops   = loops
         self.widget  = None 
+        self.backdrp = None
     
         if fileName != '': self.fileName = os.path.basename(fileName)
 
@@ -65,11 +66,14 @@ class VideoPlayer(QMediaPlayer):
 ### ------------ uncomment for 5, comment out for 6 -----------------     
         # self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5
 ### ---------------------------- end --------------------------------
-### ------------ uncomment for 6 ... comment out for 5 -----------------           
+### ------------ uncomment for 6 ... comment out for 5 ----------------- 
     def playVideo(self):  ## 6
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
             self.player.pause()  ## 6
         else:  ## 6
+            if self.backdrp == None:  ## 6
+                self.setFrame()  ## 6
+                time.sleep(.20)  ## 6
             self.player.play()  ## 6 
  
     def mediaStatusChanged(self, status):  ## 6
@@ -83,6 +87,9 @@ class VideoPlayer(QMediaPlayer):
     #     if self.player.state() == QMediaPlayer.PlayingState:  ## 5
     #         self.player.pause()  ## 5
     #     else:  ## 5
+    #         if self.backdrp == None:  ## 5
+    #             self.setFrame()  ## 5
+    #             time.sleep(.20)  ## 5
     #         self.player.play()  ## 5 
    
     # def mediaStatusChanged(self, status):  ## 5
@@ -96,10 +103,11 @@ class VideoPlayer(QMediaPlayer):
         self.player.pause()
         QTimer.singleShot(200, self.copyFrame) 
 
-    def copyFrame(self):      
-        copy = Ball(self.canvas.view.grab(QRect(QPoint(0,0), QSize())))  ## subclass - borrowed
-        copy.setZValue(-100)  ## copy is a graphics pixmapItem 
-        self.scene.addItem(copy)        
+    def copyFrame(self):     
+        self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) 
+        self.backdrp = Ball(self.canvas.view.grab(QRect(QPoint(0,0), QSize())),self.canvas)  ## subclass - borrowed
+        self.backdrp.setZValue(-100)  ## copy is a graphics pixmapItem 
+        self.scene.addItem(self.backdrp)        
         self.videoWidget.setZValue(-99)  ## reset behind sprites
         self.canvas.btnRun.setText('Video')
         if self.tag == 'dnd': self.player.play()  
@@ -109,7 +117,7 @@ class VideoPlayer(QMediaPlayer):
 
     def stopVideo(self):
         try:
-            self.player.stop()   
+            self.player.stop() 
             if self.canvas.animation == False and  \
                 self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):            
                 self.canvas.showWorks.enablePlay()  
@@ -138,9 +146,9 @@ class VideoPlayer(QMediaPlayer):
             'loops':        self.loops,    
         }
         return tmp
-   
-### -------------------- dotsVideoWidget -------------------       
-class VideoWidget(QWidget):  
+ 
+### --------------------------------------------------------        
+class AvideoWidget(QWidget):   ## so as not confused with the videoWidget
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
