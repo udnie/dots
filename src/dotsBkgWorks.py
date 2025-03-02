@@ -220,7 +220,8 @@ class BkgWorks:
                 self.bkgItem.mirroring = False ## continuous
             else:
                 self.bkgItem.mirroring = True  ## mirrored                                    
-        fileName = self.bkgItem.fileName              
+        fileName = self.bkgItem.fileName         
+             
         if self.bkgMaker.newTracker[fileName]:  
             self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
             self.canvas.sideCar2.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 

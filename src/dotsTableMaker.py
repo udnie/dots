@@ -6,7 +6,6 @@ from PyQt6.QtCore       import Qt, QTimer, QPoint
 from PyQt6.QtGui        import QFont, QKeySequence, QShortcut
 from PyQt6.QtWidgets    import QTableView, QAbstractItemView
 
-
 from dotsScreens        import getCtr
 from dotsTableModel     import TableModel, Typelist, Types
 from dotsShowFiles      import ShowFiles 

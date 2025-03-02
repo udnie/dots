@@ -1,9 +1,9 @@
 
 from PyQt6.QtCore       import Qt, QAbstractAnimation, QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter, QBrush, QFontMetrics, QColor, QFont
-from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, QGraphicsSimpleTextItem
+from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QGraphicsPathItem
                             
-from dotsShared         import common, ControlKeys
+from dotsShared         import common, ControlKeys, ItemsGroup, PathsItem
 from dotsSideGig        import getColorStr
 from dotsSidePath       import pathLoader
 
@@ -256,21 +256,21 @@ class TagsAndPaths: ## handles more than one request
             return None   
         pathPt = path.pointAtPercent(0.0)  ## so its consistent
         ## use painter path
-        pathItem = QGraphicsPathItem(path)        
+        pathItem = PathsItem(path)        
         pathItem.setPen(QPen(QColor(color), 3, Qt.PenStyle.DashDotLine))
         pathItem.setFlag(QGraphicsPathItem.GraphicsItemFlag.ItemIsMovable, False)
         self.pathGroup.addToGroup(pathItem)
         self.addTag(tag, color, pathPt)      
 
     def addPathGroup(self):
-        self.pathGroup = QGraphicsItemGroup()
+        self.pathGroup = ItemsGroup()
         self.pathGroup.setZValue(self.mapper.toFront(35.0))    
         self.scene.addItem(self.pathGroup)
     
     def addPathTagGroup(self):   
         ## add pathTags group to keep tags separate and visible
         self.pathTagZ = self.mapper.toFront(35.0)  ## otherwise it can be hidden 
-        self.pathTagGroup = QGraphicsItemGroup()
+        self.pathTagGroup = ItemsGroup()
         self.pathTagGroup.setZValue(self.pathTagZ)     
         self.scene.addItem(self.pathTagGroup)
 

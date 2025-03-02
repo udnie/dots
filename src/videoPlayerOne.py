@@ -4,16 +4,15 @@ import sys
 import time
 import math  
 
-### --------------------------------------------------------
+### ------------------ videoPlayerOne.py ------------------- 
 #d ''' You will need to install opencv-python and unComment the cv2 import
 #d     and this line # self.setScreenFormat(fileName) inorder to have the 
 #d     videoPlayer set the screen format on drag and drop. cv2 is used
 #d     in setting the aspect-ratio (width/height) of a video file.
-#d     A right-mouse click displays the filename in the window title.  '''
-### --------------------------------------------------------              
+#d     A right-mouse click displays the filename in the window title.  '''          
+### -------------------------------------------------------- 
 # import cv2 
 ### --------------------------------------------------------
-
 from PyQt6.QtCore       import Qt, QUrl
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QSlider, QHBoxLayout, QVBoxLayout, \
@@ -29,11 +28,14 @@ from PyQt6.QtMultimediaWidgets  import QVideoWidget
 YoffSet, VYoffset = 450, 550   ## px above screen center
 Height,  VHeight  = 500, 815   ## default heights
 
-Chars   = ( 'A',  'F',  'H',  'V')  ## as in characters 
-Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
-Widths  =  (550,  615,  720, 435)  ## default widget widths
 WID, HGT = 40, 116  ## for opening without discovery
 
+Chars   = ( 'A',  'F',  'H',  'V')  ## as in characters 
+Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
+Widths  =  (550,  615,  720,  435)  ## default widget widths
+
+### --------------------------------------------------------
+''' Adds a first frame display but not a backdrop '''
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
@@ -151,7 +153,7 @@ class VideoPlayer(QWidget):
     def dragLeaveEvent(self, e):
         e.accept()
                  
-### -------------------------------------------------------- 
+### --------------------------------------------------------                
     def openPlayer(self, key):  ## for default opening setting
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         x, y = ctr.x(), ctr.y() 
@@ -230,8 +232,9 @@ class VideoPlayer(QWidget):
                        "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
         if fileName != '':
             self.setFileName(fileName)
-            self.playVideo() 
-                
+            self.mediaPlayer.setPosition(0)  ## shows first frame plus pause
+            self.mediaPlayer.pause()  
+              
     def setFileName(self, fileName):        
 ### ------------ uncomment for 6 ... comment out for 5 -----------------     
         self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6  ## source doesn't change even if self.fileName gets truncated
@@ -288,9 +291,10 @@ class VideoPlayer(QWidget):
  ### ---------------------------- end ----------------------------------- 
     def stopVideo(self):
         self.mediaPlayer.stop()
-        self.setPosition(0)
+        self.setPosition(0)  ## shows first frame plus pause
         self.playButton.setText('Start')
         self.started = False 
+        self.mediaPlayer.pause() 
   
     def positionChanged(self, position):
         self.slider.setValue(position)

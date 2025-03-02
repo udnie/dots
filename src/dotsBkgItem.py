@@ -81,7 +81,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
                                                        
-        self.flopped = False
+        self.flipped = False
         self.locked = False
          
         self.width  = self.imgFile.width()
@@ -174,8 +174,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     else self.canvas.sideCar2.tracker.bye() 
             elif self.key == 'E':   
                 self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
-            elif self.key == 'F':  ## flop it
-                self.setMirrored(False) if self.flopped else self.setMirrored(True)  
+            elif self.key == 'F':  ## flip it
+                self.setMirrored(False) if self.flipped else self.setMirrored(True)  
             elif self.key == 'H':  
                 self.openMenu()
             elif self.key == 'T':     
@@ -226,7 +226,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
                                          
         if self.mirroring == True:
-            item.setMirrored(False) if self.flopped else item.setMirrored(True)   
+            item.setMirrored(False) if self.flipped else item.setMirrored(True)   
                                
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
@@ -294,9 +294,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             return None
    
     def setMirrored(self, bool):
-        self.flopped = bool  
+        self.flipped = bool  
         if not self.dots.Vertical:
-            if self.flopped:
+            if self.flipped:
                 transform = QTransform().scale(-1,1)
             else:
                 transform = QTransform().scale(1,1)

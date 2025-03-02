@@ -1,9 +1,56 @@
 
-from PyQt6.QtCore   import Qt
-from PyQt6.QtGui    import QColor
+from PyQt6.QtCore       import Qt, QPointF, pyqtProperty
+from PyQt6.QtGui        import QImage, QPixmap
+
+
+from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, \
+                            QGraphicsPolygonItem, QGraphicsPixmapItem
 
 ### --------------------- dotsShared.py --------------------
-''' no class: common data shared across classes and files '''
+''' classes:  Ball, Outline, PathsItem, ItemsGroup and data 
+                shared across classes and files ''' 
+### --------------------------------------------------------
+class Ball(QGraphicsPixmapItem):  ## added type to track it better
+### --------------------------------------------------------
+    def __init__(self, img, parent=''):
+        super().__init__()          
+      
+        self.canvas = parent
+        
+        self.type = 'ball'
+        self.setPixmap(QPixmap(img))
+   
+   
+    def mouseDoubleClickEvent(self, e):
+        if self.canvas != '':
+            self.canvas.sideCar.delbackdrp()
+    
+### --------------------------------------------------------
+class Outline(QGraphicsPolygonItem):  
+### --------------------------------------------------------
+     def __init__(self, path):
+          super().__init__()          
+         
+          self.type = 'poly'
+          self.setPolygon(path)
+
+### --------------------------------------------------------
+class PathsItem(QGraphicsPathItem): 
+### --------------------------------------------------------
+    def __init__(self, path):
+        super().__init__()          
+      
+        self.type = 'pathsItem'
+        self.setPath(path)
+        
+### --------------------------------------------------------
+class ItemsGroup(QGraphicsItemGroup): 
+### --------------------------------------------------------
+    def __init__(self):
+        super().__init__()          
+       
+        self.type = 'group'
+        
 ### --------------------------------------------------------
 
 common = {  ## wherever it's needed

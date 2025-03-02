@@ -1,10 +1,9 @@
 
 from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt6.QtGui     import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsItemGroup, \
-                            QGraphicsPixmapItem, QGraphicsSimpleTextItem
+from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsSimpleTextItem
 
-from dotsShared         import common
+from dotsShared         import common, ItemsGroup
 from dotsTagsAndPaths   import TagsAndPaths
 
 ### --------------------- dotsMapMaker ---------------------
@@ -179,7 +178,7 @@ class MapMaker:
     def addTagGroup(self):
         self.clearTagGroup()
         self.tagZ = self.toFront(45.0)   ## otherwise it can be hidden 
-        self.tagGroup = QGraphicsItemGroup()
+        self.tagGroup = ItemsGroup()
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
 
@@ -207,10 +206,11 @@ class MapMaker:
     def clearPaths(self):  ## used by snakes, showtime, hatsbats, and tagsandspaths
         if self.pathSet:
             for pix in self.scene.items():
-                if isinstance(pix, QGraphicsPathItem):
+                if pix.type == 'pathsItem':
                     self.scene.removeItem(pix)
-                if isinstance(pix, QGraphicsSimpleTextItem):
+                elif isinstance(pix, QGraphicsSimpleTextItem):
                    self.scene.removeItem(pix)
+                   
             for pix in self.scene.items():
                 if pix.type in ('pix', 'snake') and not pix.tag.endswith('.path'):
                     if pix.anime and pix.anime.state() ==  QAbstractAnimation.State.Paused:
@@ -218,6 +218,7 @@ class MapMaker:
                             pix.anime.resume()
                 elif pix.zValue() <= common['pathZ']:
                     break
+              
         self.pathSet = False
         self.paths = []
         self.pathTagGroup = None

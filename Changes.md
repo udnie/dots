@@ -22,6 +22,11 @@ If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** 
 
 ---
 
+**March 2 2025**  
+Added a first frame display to videoPlayerOne but without the screen capture.  The flash against a black background is less noticeable.  Relocated what I think of as the pyside sub-class types to **Shared** as there's less chance of any conflicts. 
+
+---
+
 **February 19-24 2025**   
 I've made a change to **dotsVideoPlayer** and now the first frame of the video appears when adding it to a scene, it should also appear when the video ends as well. Previously there was nothing to see until the video started playing. Drag and drop works as before and will play the video automatically. In my first attempt to generate a frame I could see a flash, the white screen, when the video stopped playing and if I displayed the first frame immediately after.  To get around this I decided to capture the frame and use it as a back drop, positioning it behind the videoWidget, giving the appearance of ready to play after the video stops while eliminating the flash. 
 

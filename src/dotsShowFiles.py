@@ -260,7 +260,7 @@ class ShowFiles:
             'z':            pix.zValue(),
             'tag':          pix.tag,
             'locked':       pix.locked,
-            'mirror':       pix.flopped,
+            'mirror':       pix.flipped,
             'width':        int(p.width()),
             'height':       int(p.height()),
             'scrollable':   pix.scrollable,

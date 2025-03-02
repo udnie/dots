@@ -65,7 +65,7 @@ class BkgMaker(QWidget):
         Q.accept()
 
 ### --------------------------------------------------------              
-    def addBkg(self, file, flopped=False):  ## background from jpg/png
+    def addBkg(self, file):  ## background from jpg/png
         if self.mapper.isMapSet():
             self.mapper.removeMap()
 
@@ -209,7 +209,7 @@ class BkgMaker(QWidget):
      
     def flopIt(self, bkg):  ## used by widget 
         if bkg and bkg.type == 'bkg':  
-            bkg.setMirrored(False) if bkg.flopped \
+            bkg.setMirrored(False) if bkg.flipped \
                 else bkg.setMirrored(True)
                                                                              
     def front(self, bkg):

@@ -3,24 +3,16 @@ import os
 
 from PyQt6.QtCore       import QPointF, QTimer
 from PyQt6.QtGui        import QColor
-from PyQt6.QtWidgets    import QFileDialog,  QGraphicsItemGroup
+from PyQt6.QtWidgets    import QFileDialog
 
 from dotsAnimation      import *  
-from dotsShared         import common, paths
+from dotsShared         import common, paths, ItemsGroup
 from dotsSideGig        import MsgBox, getPts
 from dotsTagsAndPaths   import TagIt
                                  
 ### --------------------- dotsPathWays ---------------------
 ''' class PathWays: extends pathMaker. Includes path and wayPoints
-    functions - flopPath, reversePathetc..'''
-### --------------------------------------------------------
-class PathGroup(QGraphicsItemGroup):  ## added type to track it better
-### --------------------------------------------------------
-    def __init__(self):
-        super().__init__()          
-      
-        self.type = 'group'
-        
+    functions - flopPath, reversePaths etc..'''
 ### --------------------------------------------------------
 class PathWays:
 ### --------------------------------------------------------
@@ -241,7 +233,7 @@ class PathWays:
         self.tagGroup.addToGroup(self.tag)
            
     def toggleWayPtTagsGroup(self):
-        self.tagGroup = PathGroup()
+        self.tagGroup = ItemsGroup()
         self.tagGroup.setZValue((common['pathZ'])+35)
         self.scene.addItem(self.tagGroup)
                  

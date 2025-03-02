@@ -1,14 +1,13 @@
 
 import os
 import math
-from functools          import partial
 
 from PyQt6.QtCore       import QTimer, QRect, QPointF, QPoint, QPropertyAnimation
-from PyQt6.QtGui        import QPixmap, QPainterPath, QColor, QImage
-from PyQt6.QtWidgets    import QGraphicsPixmapItem
+from PyQt6.QtGui        import QPainterPath, QColor
 
 from dotsAnimation      import Node 
-from dotsShared         import RotateKeys, paths, common
+from dotsShared         import RotateKeys, paths, common, Ball
+
 from dotsSideGig        import distance, getColorStr, getVuCtr
 from dotsPathWidget     import PathWidget
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
@@ -43,20 +42,6 @@ pathKeys = {
 }
 
 NS = 27  ## row height override
-### --------------------------------------------------------
-class Ball(QGraphicsPixmapItem):  ## added type to track it better
-### --------------------------------------------------------
-    def __init__(self, file, parent):
-        super().__init__()          
-      
-        self.canvas = parent
-        
-        self.type = 'ball'
-        self.img  = QImage(file)
-        self.setPixmap(QPixmap(self.img))
-            
-    def mouseDoubleClickEvent(self, e):
-        self.canvas.sideCar.delbackdrp()
         
 ### --------------------------------------------------------     
 class PathHelp:  
@@ -227,9 +212,12 @@ class PathWorks:
     def deleteSelections(self):  ## selected with lasso
         if len(self.pathMaker.selections) > 0: 
             sel = sorted(self.pathMaker.selections, reverse=True)  
-            for i in sel:
-                self.pathMaker.pts.pop(i)  
-            del sel         
+            try:
+                for i in sel:
+                    self.pathMaker.pts.pop(i)  
+                del sel   
+            except:
+                pass      
             self.pathMaker.selections = []
             self.pathMaker.edits.redrawPoints()
 

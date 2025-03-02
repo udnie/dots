@@ -3,15 +3,14 @@ import os.path
 
 from PyQt6.QtCore       import Qt, QEvent, QPoint, pyqtSlot
 from PyQt6.QtGui        import QColor, QPen
-from PyQt6.QtWidgets    import QWidget, QGraphicsPolygonItem, QGraphicsPathItem
+from PyQt6.QtWidgets    import QWidget
                
 from dotsSideGig        import MsgBox, distance, getCtr, getPathList
-from dotsShared         import common, MoveKeys
+from dotsShared         import common, MoveKeys, PathsItem, Outline
 
 from dotsPathWays       import PathWays
-from dotsPathEdits      import PathEdits, Outline
+from dotsPathEdits      import PathEdits
 from dotsPathWorks      import PathWorks
-from dotsPathItem       import Pathline
 
 from dotsDoodleMaker    import DoodleMaker
 
@@ -249,7 +248,7 @@ class PathMaker(QWidget):
         if self.addingNewPath:  ## list of points
             self.edits.removeNewPath()  ## clean up just in case
             ## no polyline in pyqt - use open painter path instead 
-            self.newPath = Pathline(self.pathWorks.setPaintPath())
+            self.newPath = PathsItem(self.pathWorks.setPaintPath())
             self.newPath.setPen(QPen(QColor(self.color), 3, Qt.PenStyle.DashDotLine))
             self.newPath.setZValue(common['pathZ']) 
             self.scene.addItem(self.newPath)  ## only one - no group needed

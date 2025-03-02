@@ -15,8 +15,7 @@ from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
 ### ---------------------------- end --------------------------------
 from dotsSideGig        import getVuCtr
 from dotsSideGig        import MsgBox
-from dotsShared         import common
-from dotsPathWorks      import Ball
+from dotsShared         import common, Ball
 
 ### --------------------------------------------------------
 class QVD(QGraphicsVideoItem):  ## added type to track it better
@@ -45,79 +44,82 @@ class VideoPlayer(QMediaPlayer):
         if fileName != '': self.fileName = os.path.basename(fileName)
 
 ### ------------ comment out for 5, uncomment for 6 -----------------
-        self.player = QMediaPlayer(self)   ## 6
-        # self.player = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5
+        self.mediaPlayer = QMediaPlayer(self)   ## 6
+        # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5
 ### ---------------------------- end --------------------------------
         
         self.videoWidget = QVD()   
-        self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) ## !!!
+        self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) 
         
         self.videoWidget.setSize(QSizeF(common['ViewW'], common['ViewH']))  
-        self.player.setVideoOutput(self.videoWidget) 
+        self.mediaPlayer.setVideoOutput(self.videoWidget) 
            
-        self.player.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStatusChanged)
-        # self.player.error.connect(self.handleError)  ## 5
+        self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) 
+        # self.mediaPlayer.error.connect(self.handleError)  ## 5
         
 ### ------------ comment out for 5, uncomment for 6 -----------------
-        self.player.setLoops(self.loops)  ## 6 -- note!!! doesn't work in 5
+        self.mediaPlayer.setLoops(self.loops)  ## 6 -- note!!! doesn't work in 5
         self.audioOut = QAudioOutput()  ## 6
-        self.player.setAudioOutput(self.audioOut)  ## 6     
-        self.player.setSource((QUrl.fromLocalFile(fileName)))  ## 6
+        self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6     
+        self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6
 ### ------------ uncomment for 5, comment out for 6 -----------------     
-        # self.player.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5
+        # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5
 ### ---------------------------- end --------------------------------
 ### ------------ uncomment for 6 ... comment out for 5 ----------------- 
     def playVideo(self):  ## 6
-        if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
-            self.player.pause()  ## 6
+        if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
+            self.mediaPlayer.pause()  ## 6
         else:  ## 6
             if self.backdrp == None:  ## 6
+                self.videoWidget.setZValue(self.canvas.mapper.toFront(100))  ## 6
                 self.setFrame()  ## 6
                 time.sleep(.20)  ## 6
-            self.player.play()  ## 6 
+            self.mediaPlayer.play()  ## 6 
  
-    def mediaStatusChanged(self, status):  ## 6
+    def mediaStateChanged(self, status):  ## 6
         if status == QMediaPlayer.MediaStatus.EndOfMedia:  ## 6
-            while not (self.player.playbackState() == QMediaPlayer.PlaybackState.StoppedState):  ## 6
+            while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState):  ## 6
                 time.sleep(.01)  ## 6
             self.stopVideo()  ## 6
                                            
 ### ------------ uncomment for 5 ... comment out for 6 -----------------
     # def playVideo(self):  ## 5
-    #     if self.player.state() == QMediaPlayer.PlayingState:  ## 5
-    #         self.player.pause()  ## 5
+    #     if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
+    #         self.mediaPlayer.pause()  ## 5
     #     else:  ## 5
     #         if self.backdrp == None:  ## 5
+    #             self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) ## 5
     #             self.setFrame()  ## 5
     #             time.sleep(.20)  ## 5
-    #         self.player.play()  ## 5 
+    #         self.mediaPlayer.play()  ## 5 
    
-    # def mediaStatusChanged(self, status):  ## 5
+    # def mediaStateChanged(self, status):  ## 5
     #     if status == QMediaPlayer.MediaStatus.EndOfMedia:  ## 5
-    #         while not (self.player.state() == QMediaPlayer.State.StoppedState):  ## 5
+    #         while not (self.mediaPlayer.state() == QMediaPlayer.State.StoppedState):  ## 5
     #             time.sleep(.01)  ## 5
     #         self.stopVideo()  ## 5
 ### ---------------------------- end --------------------------------
+### -----------------------------------------------------------------
     def setFrame(self):   
-        self.player.setPosition(0)
-        self.player.pause()
+        self.mediaPlayer.setPosition(0)
+        self.mediaPlayer.pause()
         QTimer.singleShot(200, self.copyFrame) 
 
-    def copyFrame(self):     
-        self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) 
-        self.backdrp = Ball(self.canvas.view.grab(QRect(QPoint(0,0), QSize())),self.canvas)  ## subclass - borrowed
+    def copyFrame(self):       
+        pix = self.canvas.view.grab(QRect(QPoint(0,0),QSize()))
+        self.backdrp = Ball(pix.toImage(), self.canvas)  ## subclass - borrowed
         self.backdrp.setZValue(-100)  ## copy is a graphics pixmapItem 
         self.scene.addItem(self.backdrp)        
         self.videoWidget.setZValue(-99)  ## reset behind sprites
         self.canvas.btnRun.setText('Video')
-        if self.tag == 'dnd': self.player.play()  
+        if self.tag == 'dnd': self.mediaPlayer.play()  
         
     def handleError(self):
-        print(self.player.errorString())
+        print(self.mediaPlayer.errorString())
 
     def stopVideo(self):
         try:
-            self.player.stop() 
+            self.mediaPlayer.stop() 
             if self.canvas.animation == False and  \
                 self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):            
                 self.canvas.showWorks.enablePlay()  
@@ -170,6 +172,7 @@ class AvideoWidget(QWidget):   ## so as not confused with the videoWidget
         hbox = QHBoxLayout() 
         hbox.addWidget(self.sliderGroup())  
         hbox.addWidget(self.buttonGroup())
+        
         hbox.addSpacing(10)   
         vbox.addLayout(hbox)
         

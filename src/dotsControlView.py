@@ -132,9 +132,10 @@ class ControlView(QGraphicsView):
 ### --------------------------------------------------------                                                        
     ## keys with modifiers
 ### --------------------------------------------------------   
-        elif key == Qt.Key.Key_B and not self.canvas.pathMakerOn:
-            self.sideCar2.mirrorBkg() if mod & Qt.KeyboardModifier.ShiftModifier\
-                else self.sideCar2.bkgStuff()
+        elif key == Qt.Key.Key_B:
+            if not self.canvas.pathMakerOn:
+                self.sideCar2.mirrorBkg() if mod & Qt.KeyboardModifier.ShiftModifier\
+                    else self.sideCar2.bkgStuff()
                                          
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:

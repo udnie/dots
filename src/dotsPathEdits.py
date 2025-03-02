@@ -1,22 +1,13 @@
 
 from PyQt6.QtCore    import Qt, QPointF, QEvent, QTimer
 from PyQt6.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
-from PyQt6.QtWidgets import QWidget, QGraphicsPolygonItem 
+from PyQt6.QtWidgets import QWidget 
                             
-from dotsShared      import common
+from dotsShared      import common, Outline
 from dotsPathItem    import PathItem
 
 ### ------------------- dotsPathEdits ---------------------
-''' class: Outline, PathEdits, functions; newPath, lasso '''
-### --------------------------------------------------------
-class Outline(QGraphicsPolygonItem):  ## added type to track it better
-### --------------------------------------------------------
-     def __init__(self, path):
-          super().__init__()          
-         
-          self.type = 'poly'
-          self.setPolygon(path)
-
+''' class: PathEdits, functions; newPath, lasso '''
 ### --------------------------------------------------------
 class PathEdits(QWidget):
 ### --------------------------------------------------------
