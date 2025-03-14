@@ -238,7 +238,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.cols = 0  ## just to make sure
         for typ in self.typelist: ## a list of Typelists - type, hdr, len
             for tmp in dlist:
-                if tmp['type'] == typ.type:  ## read them all  ## etyp
+                if tmp['type'] == typ.type:  ## read them all  
                     if len(tmp.keys()) > typ.len:  ## save it to typelist
                         typ.len = len(tmp.keys())
                         typ.hdr = list(tmp.keys())

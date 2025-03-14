@@ -196,8 +196,8 @@ class PathMaker(QWidget):
         else:
             self.canvas.pathMakerOn = True 
             self.initThis()
-            if not self.canvas.keysPanel.pathKeysSet:
-                self.canvas.sideCar.toggleKeysMenu()
+            if self.canvas.keysPanel.pathKeysSet == False:
+                self.canvas.keysPanel.setPathKeys()
             self.pathWorks.turnGreen()
             self.pathWorks.addWidget()  ## on start up 
                                                                        
@@ -226,9 +226,9 @@ class PathMaker(QWidget):
         if self.canvas.pathMakerOn:
             self.delete()   
             self.canvas.pathMakerOn = False
-            self.canvas.sideCar.clearWidgets()
+            self.canvas.sideCar.clearWidgets()  
             if self.canvas.keysPanel.pathKeysSet:
-                self.canvas.sideCar.toggleKeysMenu()
+                self.canvas.keysPanel.toggleKeysMenu()
             self.canvas.btnPathMaker.setStyleSheet('background-color: white')
             self.canvas.showWorks.enablePlay()
         self.canvas.setFocus()

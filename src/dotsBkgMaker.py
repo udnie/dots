@@ -5,7 +5,7 @@ import json
 
 from functools          import partial
        
-from PyQt6.QtCore       import QPoint, QPointF, QRect, QTimer
+from PyQt6.QtCore       import QPoint, QPointF, QRect, QTimer, Qt
 from PyQt6.QtGui        import QColor, QCursor
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
                                 QColorDialog
@@ -98,12 +98,13 @@ class BkgMaker(QWidget):
             return
         self.setBkgColor(QColorDialog.getColor())
 
-    def setBkgColor(self, color, bkz=common['bkgZ']):  ## add a flat color to canvas
+    def setBkgColor(self, color):  ## add a flat color to canvas
         if color.isValid():
-            self.flat = Flat(color, self, bkz) 
-            self.scene.addItem(self.flat)
-            self.updateZvals(self.flat)
-
+            self.flat = Flat(color, self) 
+            self.flat.setZValue(common['bkgZ'])  ## always on top       
+            self.scene.addItem(self.flat) 
+            self.updateZvals(self.flat)   ## update other bkg, frame zvalues 
+    
     def saveFlat(self):  ## saves a color 'flat' file - from bkg save button
         if self.flat != None and self.flat.type == 'flat':
             if self.flat.zValue() == self.mapper.toFront():  ## top most screen item   
@@ -209,33 +210,40 @@ class BkgMaker(QWidget):
      
     def flopIt(self, bkg):  ## used by widget 
         if bkg and bkg.type == 'bkg':  
-            bkg.setMirrored(False) if bkg.flipped \
-                else bkg.setMirrored(True)
+            bkg.setMirrored(False) if bkg.flopped else bkg.setMirrored(True)
                                                                              
     def front(self, bkg):
-        bkg.setZValue(common['bkgZ'])
-        self.updateZvals(bkg)
+        bkg.setZValue(common['bkgZ'])  ## -99
+        self.updateZvals(bkg)  ## update other bkg zvalues 
         self.lockBkg(bkg) 
         self.closeWidget()
         
-    def back(self, bkg): 
-        bkg.setZValue(self.mapper.lastZval('flat')-1) if bkg.type == 'flat' \
-            else bkg.setZValue(self.mapper.lastZval('bkg')-1)  
+    def back(self, bkg):  ## down one
+        self.updateZvals(bkg)
         self.lockBkg(bkg)   
-        self.closeWidget()
+        self.closeWidget() 
                      
-    def updateZvals(self, bkg):  ## move the rest back one Z and lock them
+    def updateZvals(self, bkg):  ## move the rest back one Z
         for itm in self.scene.items():
             if itm.type in ('bkg', 'flat') and itm.zValue() <= bkg.zValue():
                 if itm != bkg:
-                    itm.setZValue(itm.zValue()-1) 
-                               
+                    itm.setZValue(itm.zValue()-1)                 
+        self.renumZvals()
+     
+    def renumZvals(self):
+        bkz = common['bkgZ']  ## renumber - no gaps
+        for itm in self.scene.items():
+            if itm.type in ('bkg', 'flat'):
+                itm.setZValue(bkz)
+                bkz -= 1 
+                       
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()
         bkg.setPos(p.x() , p.y())
         self.x, self.y = p.x() , p.y()     
                                                  
 ### --------------------- dotsBkgMaker ---------------------
+
 
 
 

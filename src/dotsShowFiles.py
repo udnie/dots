@@ -260,7 +260,7 @@ class ShowFiles:
             'z':            pix.zValue(),
             'tag':          pix.tag,
             'locked':       pix.locked,
-            'mirror':       pix.flipped,
+            'mirror':       pix.flopped,
             'width':        int(p.width()),
             'height':       int(p.height()),
             'scrollable':   pix.scrollable,
@@ -276,7 +276,7 @@ class ShowFiles:
 
     def saveFrame(self, pix):       
         tmp = {
-            'fileName':     os.path.basename(pix.fileName),
+            'fileName':      os.path.basename(pix.fileName),
             'type':         'frame',
             'x':            float(f'{pix.x:.2f}'),
             'y':            float(f'{pix.y:.2f}'), 
@@ -288,7 +288,7 @@ class ShowFiles:
 
     def saveFlat(self, pix):  
         tmp = {
-            'fileName':     'flat',
+            'fileName':      'flat',
             'type':         'flat',
             'x':            float(f'{pix.x:.2f}'),
             'y':            float(f'{pix.y:.2f}'),

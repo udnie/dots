@@ -107,8 +107,9 @@ class ShowRunner:
     def updateStoryBoard(self, dlist):  ## turn the contents of the .play file into scene items            
         self.mapper.clearMap() 
         self.locks = 0
+        self.addedVideo = False  
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.newTracker.clear()        
+        self.canvas.bkgMaker.newTracker.clear()          
         ## number of pixitems, backgrounds zval, number of shadows        
         kix, ns, bkgz = 0, 0, common['bkgZ'] 
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
@@ -138,9 +139,10 @@ class ShowRunner:
                 lnn -= 1  
                 continue        
                    
-            elif tmp['type'] == 'video': 
+            elif tmp['type'] == 'video':  ## needs to happen before shadows
                 self.sideCar.addVideo(paths['bkgPath'] + tmp['fileName'], 'open', tmp['loops'])
                 bkgz = -100 
+                self.addedVideo = True
                    
             ## can be more than one background or flat                    
             elif tmp['type'] in ('bkg', 'flat'):                          
@@ -153,7 +155,7 @@ class ShowRunner:
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
                     self.showFiles.addPixToScene(pix, tmp, bkgz )  
              
-                pix.bkgMaker.lockBkg(pix)                                         
+                pix.bkgMaker.lockBkg(pix)  
                 bkgz -= 1   
                                   
             del tmp              
@@ -165,18 +167,24 @@ class ShowRunner:
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
         fileName = os.path.basename(self.canvas.openPlayFile) 
+        
         if 'play' in fileName:  ## could be something else
             self.canvas.showWorks.enablePlay() 
             if ns == 0 and self.locks == 0:
                 self.dots.statusBar.showMessage(f"{fileName} - Number of Pixitems: {kix}")
+                
             elif ns > 0:  ## there must be shadows
+                if self.addedVideo == True:  ## first frame capture in progress
+                    time.sleep(.10)  
+                    
                 QTimer.singleShot(200, self.addShadows)
                 t = int(1 + (ns * .25))
                 if self.showFiles.errorOnShadows == True:  ## will try and add if shadowMaker is on
                     MsgBox('Error Loading some Shadows...', 5)
                     self.showFiles.errorOnShadows = False  ## may need it again
                 else:
-                    MsgBox('Adding Shadows, please wait...', t)              
+                    MsgBox('Adding Shadows, please wait...', t)     
+                             
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
                 self.mapper.toggleTagItems('all')                                                      
@@ -187,13 +195,15 @@ class ShowRunner:
         tasks = []         
         start = time.time()
         loop  = asyncio.new_event_loop() 
+        
         for pix in self.scene.items():  ## thanks to a dev community post - it took some work to find a useful example
             if pix.type == 'pix' and pix.shadowMaker != None and pix.shadow != None:
                     pix.fileName = paths['spritePath'] + pix.fileName      
                     tasks.append(loop.create_task(pix.shadowMaker.restoreShadow()))        
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))        
-        loop.close()              
+        loop.close()    
+               
         self.sideCar.showOutlines()  ## turns them on      
         QTimer.singleShot(2000, self.sideCar.hideOutlines)          
         str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'

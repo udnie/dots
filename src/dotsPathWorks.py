@@ -235,10 +235,10 @@ class PathWorks:
         if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet == True:
             if self.pathMaker.pathTestSet == False:
                 self.ball = Ball(paths['imagePath'] + 'ball.png', self.canvas)
-                node = Node(self.ball)
+                self.node = Node(self.ball)
                 self.ball.setZValue(self.findTop()+10)
        
-                self.pathTestNode = QPropertyAnimation(node, b'pos')
+                self.pathTestNode = QPropertyAnimation(self.node, b'pos') 
                 self.pathTestNode.setDuration(self.pathMaker.seconds * 1000)
 
                 path = self.setPaintPath(True)  ## close subpath, uses    

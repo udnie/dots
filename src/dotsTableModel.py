@@ -94,7 +94,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
         super(TableModel, self).__init__()
    
         self.cols = cols
-        self.data = data
+        self._data = data
         self.idx = 0
         self.target = -1
         
@@ -108,7 +108,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
     def data(self, index, role): 
         try:   
             if role == Qt.ItemDataRole.DisplayRole: 
-                val = self.data[index.row()][index.column()]
+                val = self._data[index.row()][index.column()]
                 if isinstance(val, bool) and index.column() == 12:  ## scroller
                     if str(val) == 'True':        
                         return 'mirrored'
@@ -116,7 +116,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                         return 'continuous' 
                 elif isinstance(val, str) and val[-1] == '/':
                     return val[5:-1]
-                return self.data[index.row()][index.column()]
+                return self._data[index.row()][index.column()]
             
             if role == Qt.ItemDataRole.BackgroundRole:  ## background color for hdrs
                 color = self.rowheaders.get(index.row())  
@@ -129,7 +129,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                     return font
                     
             if role == Qt.ItemDataRole.TextAlignmentRole:  ## missing files   
-                val = self.data[index.row()][index.column()]  
+                val = self._data[index.row()][index.column()]  
                 
                 if self.rowMiss.get(index.row()):  
                     if  isinstance(val, bool):
@@ -145,7 +145,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                         return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter 
                     
             if role == Qt.ItemDataRole.TextAlignmentRole:  
-                val = self.data[index.row()][index.column()] 
+                val = self._data[index.row()][index.column()] 
                       
                 if self.rowheaders.get(index.row()): ## center 'type' header titles    
                     return Qt.AlignmentFlag.AlignCenter    
@@ -165,7 +165,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
             return  ## required for forcing the column width 
                       
     def rowCount(self, index):
-        return len(self.data)
+        return len(self._data)
 
     def columnCount(self, index):
         return self.cols 

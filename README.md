@@ -1,10 +1,14 @@
 ## DotsQt  
-**DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify paths, set backgrounds using photos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds.
+**DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify them, set backgrounds using photos, videos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds.  
 
-Currently **dots** runs in both **PyQt6.8** and **PyQt5.15** on a **M1 MacBookPro** in **arm64 mode** and **Apple Silicon**. See **Changes.md** for converting **Dots** from PyQt6 to PyQt5. There's a script to handle the less intuitive parts.  **August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.
+As of **March 2025**, **dots** now runs in **PyQt6.8.1**, **PyQt5.15** or **PySide6.8** as developed  on a **M1 MacBookPro** in **arm64 mode** on **Apple Silicon**. 
+See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
 
-You'll need to install **opencv-python** if you plan to use **Shadows** - **numpy** is included.
-**StartHere.md** has also been updated to cover the latest on **scrolling backgrounds** and **shadows** as well as whatever else I thought might be useful.  
+**August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.
+
+You'll need to install **opencv-python** if you plan to use **Shadows** - **numpy** is included.   I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  
+
+
 	  
 ## Stuff to know
 The code can change over time and it does.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. I also use camel case after many years of coding in snake.
@@ -15,17 +19,16 @@ The **background** image needs to reside in the **backgrounds** folder as **dots
 
 Flat colors will be saved to the backgrounds folder using the save button in the **backgrounds** button dock. The file name is up to you with **'.bkg'** as the file extension.  Saving a **background** to a **'.play'** file will preserve any settings you might have made, such as for scrolling and a flat color without needing to save the color.
 
-If you plan to run it on a Windows machine you'll **not** need to edit the **paths** dictionary in **dotsShared.py** - either Qt or Windows takes care of it for you. 
-
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
 The **star** in scrollPanel isn't currently designed to be dragged to the canvas, but without it none of this would exist.
 
 
 ## Requirements
-* **PyQt6** and you can also run **PyQt5** with some easy edits to the **PyQt6** source 
+* **PyQt6**, **PyQt5** or **PySide6** -- see **Start Here**
+* **Python 3.10** or above for walrus operators and async
 * functools, though I'm sure it's built-in
-* **opencv-python** if you're planning to use **Shadows** or **ShadowMaker**, it includes **numpy**
+* **opencv-python** if you're planning to use **Shadows**, **ShadowMaker** or **videoPlayerOne**, it includes **numpy**
 * Your favorite program for creating transparent pngs if you have one or try **ShadowMaker** 
 
 ## Lastly

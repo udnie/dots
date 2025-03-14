@@ -1,36 +1,66 @@
 
-### Last Update: 02/09/2025
-       
----
-**To Begin**  
-This file is an overview of **dots**. I've tried to cover what I feel is important and to give anyone reading this an idea of how the various pieces of **dots** work and fit together. **PyQt5** runs with some edits, see **Changes**, they're right at the beginning.  
+###*Last Update: 03/14/2025*
 
----
-Once you have **dots** up and running from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu - the easiest way to understand what commands are available, where they are located and what they do.  
+##Scripts  
 
-**Opencv-python** is required to add **shadows** to **sprites** or to adjust screen formats in **videoPlayerOne** -
-that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne** to implement it. 
+        script-qt6.py       Removes PyQt5 code and tokens from the two videoplayer files.
+        script-ps6.sh       See edits for PySide6
+        
+        script-qt5.py       Removes PyQt5 code and tokens, etc.., and other code changes
+        script-pyqt5.sh     See edit for PyQt5  
 
----
-**Help**  
+
+Scripts should be run in the **dots** source code directory.   I used the **unix sed** command in script-ps6.sh to do the search and replace for 'type' and to take care of the usual suspects - the always required.
+
+##Edits for Converting Dots from PyQt6 to PyQt5
+
+        1. Replace PyQt6 with PyQt5 
+        2. Replace globalPosition() with globalPos()
+        3. Replace e.position() with e.pos() in dotsControlView.py
+        4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
+        5. Make required edits and cleanup to dotsVideoPlayer.py and videoPlayerOne.py 
+        6. Comment out optional open-cv references to prevent crashing if not found
+        7. Change QMessageBox move(x,y) height in dotsSideGig.py
+
+    
+The shell script **script-pyqt5.sh** handles all the work required to convert **PyQt6** code to **PyQt5** and is responsible for running the **script-qt5.py** used to in steps 1-7.  See **January 2025** and **November 30 2024**.
+
+##Edits for Converting Dots from PyQt6 to PySide6
+
+The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the videoPlayer files and then 
+the sed commands used to replace **'type'** with **'desc'** in the **.py** and **.play** files - including those required.  See **February 6**.
+
+
+##Help and Stuff
 **Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember.
 
+
+If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** will require an edit to the terminal settings in the **.code-workspace** as well. Clearing **\_\_pycache\_\_** after applying code changes is recommended.    
+     
+Once you have **dots** up and running from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu - the easiest way to see what commands are available, where they are located and what they do.  I'd also recommend running some demos afterwards.
+
+**Opencv-python** is required to add **shadows** to **sprites** or to adjust screen formats in **videoPlayerOne** -
+that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne** to implement it.  This is repeated further on in more detail.
+
        
-**Screens**  
+##Screens 
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
-**Video**  
+##Video  
 **PyQt5** doesn't support loops so moving the **videoWidget** slider has no effect and a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running will cause the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.
        
-**Four Important Files**   
+##Four Files  
 There are four files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
-as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. It also handles all/most of the multi-key function requests - the rest pass on to **Storyboard** which in turn passes them on either to **ShowBiz**, which handles most of the single key requests from **Canvas** and **Storyboard** through the **PlayFile** list, or on to functions that send keys to the current screen items to perform actions not already triggered. **Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**.  
+as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. 
+
+It also handles all/most of the multi-key function requests - the rest pass on to **Storyboard** which in turn passes them on either to **ShowBiz**, which handles most of the single key requests from **Canvas** and **Storyboard** through the **PlayFile** list, or on to functions that send keys to the current screen items to perform actions not already triggered. 
+
+**Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**. It now hosts four sub-classed entities in support of **pyside6**.
 
 I recently made some code changes to **ControlView**, **ShowBiz**, **Storyboard** and others, not only to accommodate new additions but to clarify working processes as well. My code can change, especially if I think there's room for improvement.
        
----
 
-**Files and Directories**   
+##Files and Directories 
 There are four directories to be aware of, **sprites**, **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to add your own material to **dots**. You can add any **videos** you plan to use to the **backgrounds** directory as they're treated as just another background.  
 
 When adding a video to an animation it needs to be added last so it's positioned as the first background screen item otherwise it will run unseen. I've changed the text of the **'Run'** key to to display **'Video'** when there's one opened as an visual heads up -  you can also type in **'V'** for the videoWidget.  These are the only indicators to know if there's a video loaded.  You're also stopped from trying to open a play file if there's already an open video present.
@@ -73,28 +103,21 @@ I've recently changed the directory layout for **dots** by moving the **dots\*.p
 
     cd '/users/your directory/python/qt5/dots/src'; /usr/local/bin/python3 ./dotsQt.py      
     
----
-
-**Menus and Their Locations**   
+##Menus and Their Locations  
 There are five help *.py files and each one has a list of help files that details the location of each help menu.  Selecting **help Menus** from a help button menu will let you examine them all. Many of the help menus will let you click on line item to perform the function attached to the key you'd actually use. Not all do and I've tried to distinguish those.
    
----
-
-**Widgets and Keys**  
+##Widgets and Keys
 A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMaker** from a blank canvas, will pop up a widget that provides access to the most often used functions such as scaling, rotation, scrolling controls or others, including a help menu, depending on what you've selected.
 
 There are a number of **keyboard** controls that either match the functions provided by the widgets or add additional functions, especially if more than one **sprite** has been selected.  The right hand panel is a scrolling list of the keys, key combinations and their actions. The key assignments will change as you switch between **StoryBoard/Canvas** and **PathMaker** or by entering **'K'**. 
 
 The keysPanel has been replaced by the help buttons and menus and will eventually disappear.
 
----
-
-**Sprites, Backgrounds and Flats**  
+##Sprites, Backgrounds and Flats  
 **Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A'** from the **canvas** or **'B'** if there are sprites but no background or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites**, **backgrounds** and **video** to a **play** file.
 
----
 
-**Shadows**   
+##Shadows
 If you would like to try out **shadows**, besides downloading and installing **opencv-python**, you'll need to make a small edit in **PixItem** to comment out an import and uncomment another.
 
     from dotsShadowMaker    import ShadowMaker  ## add shadows
@@ -104,9 +127,8 @@ An easy test is to run a left or right scrolling demo once you've downloaded, in
 
 **Shadows** are created through the **sprite widget** and **right-clicking** on a shadow will trigger its widget which should take care most of the functions specific to shadows. **Double-clicking** on a shadow toggles the perspective controls (**points and outlines**) on and off.
 
----
-    
-**Scrolling Backgrounds**  
+
+##Scrolling Backgrounds
 I've moved the really gnarly stuff concerning scrolling backgrounds to the **screenrates.dict** in the **play** directory. Its contents are the two dictionaries, **screentimes** and **moretimes**, see **Rates and Background Widget**. The **screentimes dictionary** handles the **16:9** formats while the **moretimes dictionary** takes care of the **3:2** formats.  You can mix formats if you use the **3:2** format to display them as each **background** is tracked separately. 
 
 You're can easily adjust the screen rate, the variable that determines how fast the **'next'** scrolling background moves, and if the new rate is a better fit you can save it as the default to **screenrates.dict** using the **update button**. The current **screen rate** value as well as the **factor** and **showtime** values are carried over if the scrolling background is saved to a **.play** file.
@@ -127,9 +149,8 @@ Running a demo with a scrolling background will immediately inform you as to whe
         "scrollable": bkg.scrollable,
     }
 
----
 
-**Rates and Background Widget Controls**  
+##Rates for Scrolling Backgrounds and Widget Controls 
 The **rate** is a list of three values each of which I also refer to as a rate.  The first value, **10.0**, is the **first screen rate**, the other two values are the rates for **next-left** and **next-right**.  The **first** background doesn't have to travel as far to exit while the second background, **next** has to wait its turn till it's **showtime** and then match the speed the **first** is traveling without gapping or overrunning it. Once **first** has exited the screen the backgrounds that follow are now all **next** and shouldn't require further adjustments.
 
 **You can use the arrow keys** to make small adjustments, 5 points or 1, plus or minus, to the **screenrate slider**.  There's a reminder on the backgrounds menu.
@@ -164,9 +185,7 @@ I use 10.0 for the **'first'** value as the background is already visible and ne
       
 The **background widgets 'showtime'** slider value represents the number of pixels remaining before the background appears in the scene.  When reached it triggers the **'next'** background process. This will vary depending on which direction the background is traveling and if it's a snake. It's set once you choose a direction. Hopefully you'll never need to edit showtime, but if you do it's in **BkgScrollWrks**.
 
----
-
-**Background Matte Widget**  
+##Background Matte Widget
 Selected from the **background widget** the **BkgMatte** widget draws a mat/matte around the background. Its help menu pops up when first selected and can also be triggered by entering **H** from the keyboard which toggles it on or off.  The menu should be pretty much self-explanatory and there are videos that illustrate the commands as well.
 
 This has been changed as well but marginally.  **BkgMatte** grabs the keyboard so it's best to plan ahead if you going to run an animation with a matte around it.
@@ -190,15 +209,15 @@ This has been changed as well but marginally.  **BkgMatte** grabs the keyboard s
         'S':    `Stop Animation'
     }
 
----
+##Types
+The types are **'frame', 'pix', 'bkg', 'flat', 'shadow', and 'video'** .  These are used to organize the screen items from front to back as I use the **QGraphicsitem zValue()** in combination with the types to order the scene items list. There are two functions, **toFront()** and **lastZval()** that help to make sure the different types I've created are good neighbors.  The types also determine how each row of data from the .play file is to be processed.  
 
-**Types**  
-The types are **'frame', 'pix', 'bkg', 'flat', 'shadow', and 'video'** .  These are used to organize the screen items from front to back as I use the **QGraphicsitem zValue()** in combination with the types to order the scene items list. There are two functions, **toFront()** and **lastZval()** that help to make sure the different types I've created are good neighbors.  The types also determine how each row of data from the .play file is to be processed.
+The class attribute **type** is replaced in **PySide6** with **desc**.
 
 #### types and zValue range		
 | scene.item  | type  | zValue |
 |:------------- |:---------------:| -------------:|
-| PointItem | pt | 200 from topmost item+ |
+| PointItem | pt | 100 from topmost item+ |
 | MapItem | map | 50 over top pixItem |
 | TagItem | tag|45 over top pixItem|
 | Paths| path| 35 over top pixItem
@@ -214,15 +233,13 @@ The types are **'frame', 'pix', 'bkg', 'flat', 'shadow', and 'video'** .  These 
   
 **\** number of screen items + 100 decreasing by 1 per item
 
----
 
-### A Brief History of Animation
 
----
+##A Brief History of Animation
 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
-I've not made any changes to animation as yet. It's up to you to create your own animation using what's here as a guide.
+Strange as it seems the only changes I've made to Animation since I first wrote it were for PySide6.  You can create your own animation using **dotsAnimation.py** as a guide and add it to a sprite to run in **StoryBoard**.
 
 **PixItems**, **BkgItems** and **BkgItems** have methods to **play, pause, resume and stop**. **Shadows** are not animated rather they can link to a **sprite** and share the ride.  **Wings** are also included as they're based on a collection of **PixItems**.  **Scrolling Backgrounds** have their own methods to set an animation but follow the  same **play** commands as do **videos**.
 
@@ -308,22 +325,26 @@ animation to run. *Edited for brevity*.
             fn = self.singleFunctions[anime]  ## objects passed as functions
             return fn(pix)
 
-        ## one-offs
-        if anime == 'Rain':
-            return rain(pix, Node(pix))
-        elif anime in Stages:
-            return stage(pix, anime)
-        elif anime == 'Flapper':
+
+        elif anime == 'Flapper':  ## bat wings
+            return sidePath.flapper(pix)
+         
+        elif 'demo' in anime:  ## from BatsAndHats
+            return sidePath.demo(pix, anime)
+        
+        elif anime in self.canvas.pathList:
+            return sidePath.setPaths(anime, pix)
 		...
 
 
 
 You'll see these three lines in many of the animations that follow.  I mentioned the **Node** class earlier and here I'm creating a reference, **pos**, to the pix screen items current position, I'm also setting the **node's** point of origin based on the **PixItem**.  An animation function may **require** more that one **argument** which will need to be accounted for prior to using it.
 
-	def vibrate(pix):  
-	    node = Node(pix)
-	    pos  = node.pix.pos()
-	    node.pix.setOriginPt()
+
+    	def vibrate(pix): 
+            pos = pix.pos()
+            pix.setOriginPt()  
+            pix.node = Node(pix)
 
 Further down you'll see a variation of this repeated for each of the four properties used in other animations. An example of creating an animation that controls the position of the screen item.
 
@@ -340,10 +361,9 @@ And just below that how the **pos** variable is used.
 	
 	    vibrate.setLoopCount(-1)  ## let it run forever...
 
----
 
 Two other animations worth mentioning, **fin** and **reprise**, two of my little amusements. When you delete a **PixItem**, except for frames, I run **fin** which the scales the **PixItem** down in size, while rotating it and lowering its opacity before deleting it. When stopping an animation I run **reprise** to reposition screen objects back to their starting positions.  Carry overs from my original java program. 
 
-
-Have fun
+---
+###*Have fun*
 

@@ -120,7 +120,7 @@ class SideCar2:
             if akg == None:
                 return
             self.scene.addItem(akg)  
-            akg.setMirrored(True) if bkg.flipped == False else akg.setMirrored(False) 
+            akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
             akg.setPos(int(common['ViewW']/2), 0)
             
     def addBkgLabels(self, bkg):  ## used by dumpTrackers

@@ -8,7 +8,7 @@ import time
 from PyQt6.QtCore       import QTimer
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-from dotsAnimation      import Animation, Node
+from dotsAnimation      import Animation
 
 from dotsSidePath       import pathLoader, pathAnimator
 from dotsShared         import paths, common
@@ -80,10 +80,9 @@ class Bats:
      
     def runBat(self, pix, n, t):  ## run by run
         if pix.part == 'pivot':   ## adds path to follow
-            node = Node(pix)  ## gets pix pos property 
             sync = random.randint(11,16) * 1000  ## sets duration 
             waypts = pathLoader(pix.tag)  ## get the path        
-            pix.anime = pathAnimator(node, sync, waypts)  ## sets a path to follow     
+            pix.anime = pathAnimator(pix, sync, waypts)  ## sets a path to follow     
             QTimer.singleShot(100 + (n * t), pix.anime.start)  
         elif pix.part in ('left','right'): 
             pix.anime = self.animation.setAnimation(pix.tag, pix)  ## Flapper in Wings   
@@ -260,10 +259,9 @@ class Hats:  ## hats - was abstract
         k = 0  
         for pix in self.scene.items():
             if pix.type =='pix' and 'doral' in pix.fileName:
-                node = Node(pix)  ## get pix pos property 
                 sync   = random.randint(11,16) * 1000  ## duration   
                 waypts = pathLoader(pix.tag)
-                pix.anime = pathAnimator(node, sync, waypts)  ## set path animation 
+                pix.anime = pathAnimator(pix, sync, waypts)  ## set path animation 
                 QTimer.singleShot(100 + (k * 60), pix.anime.start)
                 k += 1
        

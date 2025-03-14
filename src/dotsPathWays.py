@@ -214,7 +214,7 @@ class PathWays:
             self.makeTags(lnn)
             
     def makeTags(self, lnn):
-        self.toggleWayPtTagsGroup()
+        self.addWayPtTagsGroup()
         inc = int(lnn/10)  ## approximate a 10% increment
         list = (x*inc for x in range(10))  ## get the indexes
         for idx in list:
@@ -232,7 +232,7 @@ class PathWays:
         self.tag.setZValue((common['pathZ'])+35) 
         self.tagGroup.addToGroup(self.tag)
            
-    def toggleWayPtTagsGroup(self):
+    def addWayPtTagsGroup(self):
         self.tagGroup = ItemsGroup()
         self.tagGroup.setZValue((common['pathZ'])+35)
         self.scene.addItem(self.tagGroup)

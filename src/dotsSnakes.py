@@ -7,7 +7,7 @@ from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtGui        import QColor, QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
-from dotsAnimation      import reprise, Node
+from dotsAnimation      import reprise
 
 from dotsSidePath       import pathLoader, pathAnimator
 from dotsShared         import paths, common
@@ -170,7 +170,7 @@ class Snakes:
     def setSelection(self, what):  ## no right scrolling for snakes
         if what == 'blue':
             color  = QColor(QColor(0,84,127) )  ## ocean blue                                
-            self.canvas.bkgMaker.setBkgColor(QColor(color), -99)  ## set zValue to -99
+            self.canvas.bkgMaker.setBkgColor(QColor(color))  
             
         if self.scroller != None:
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
@@ -227,10 +227,9 @@ class Snakes:
                 pix.height * -common['factor'])) 
              
         pix.setPos(pix.x, pix.y)                                                   
-        node = Node(pix)  ## get pix pos property    
         pix.tag = fileName      
         pix.path = paths['demo']   
-        pix.anime = pathAnimator(node, sync, waypts)  ## set path animation      
+        pix.anime = pathAnimator(pix, sync, waypts)  ## set path animation      
         return pix
         
     def run(self, p):

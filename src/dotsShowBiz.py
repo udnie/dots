@@ -57,8 +57,8 @@ class ShowBiz:
             self.grid.toggleGrid()           
                      
         elif key == 'K':  
-            self.sideCar.toggleKeysMenu()  ## keysMenu for storyboard and pathMaker 
-            
+            self.canvas.keysPanel.toggleKeysMenu()
+     
         elif key == 'R':    
             if self.canvas.control != '' or self.canvas.animation == True:  ## something's running
                 return

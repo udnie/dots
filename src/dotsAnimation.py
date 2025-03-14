@@ -1,11 +1,10 @@
 
 import random
 
-from PyQt6.QtCore   import QPoint, QPointF, pyqtProperty, QPropertyAnimation, \
+from PyQt6.QtCore   import QPointF, pyqtProperty, QPropertyAnimation, \
                         QParallelAnimationGroup, QSequentialAnimationGroup, \
                         QEasingCurve, QObject
 
-from dotsSideGig    import point
 from dotsShared     import common
 
 import dotsSidePath as sidePath
@@ -65,10 +64,10 @@ class Animation:
         self.canvas = parent 
     
         self.singleFunctions = {  ## values are objects 
-            'Vibrate': vibrate,  
-            'Pulse': pulse,
-            'Bobble': bobble,
-            'Idle': idle,
+            'Vibrate':  vibrate,  
+            'Pulse':    pulse,
+            'Bobble':   bobble,
+            'Idle':     idle,
         }
 
 ### --------------------------------------------------------
@@ -83,19 +82,23 @@ class Animation:
             fn = self.singleFunctions[anime]  ## objects passed as functions
             return fn(pix)
 
-        ## one-offs
         if anime == 'Rain':
-            return rain(pix, Node(pix))
+            return rain(pix)
+        
         elif anime in Stages:
             return stage(pix, anime)
-        elif anime == 'Flapper':
-            return sidePath.flapper(pix, anime, Node(pix)) 
+                
         elif anime in Spins:
-            return spin(pix, anime, Node(pix))
+            return spin(pix, anime)
+        
+        elif anime == 'Flapper':  ## bat wings
+            return sidePath.flapper(pix)
+         
         elif 'demo' in anime:  ## from BatsAndHats
-            return sidePath.demo(pix, anime, Node(pix))
+            return sidePath.demo(pix, anime)
+        
         elif anime in self.canvas.pathList:
-            return sidePath.setPaths(anime, Node(pix))
+            return sidePath.setPaths(anime, pix)
 
 ### --------------------------------------------------------
     def _random(self):  
@@ -105,15 +108,15 @@ class Animation:
 
 ### --------------------------------------------------------
 def vibrate(pix):  
-    node = Node(pix)
-    pos  = node.pix.pos()
-    node.pix.setOriginPt()
-    
+    pos = pix.pos()
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+ 
     random.seed()
     sync = random.randint(130,205)
     ran  = random.randint(3,7)*2
 
-    vibrate = QPropertyAnimation(node, b'pos')
+    vibrate = QPropertyAnimation(pix.node, b'pos')
     vibrate.setDuration(int(sync))
 
     vibrate.setStartValue(pos)
@@ -125,22 +128,25 @@ def vibrate(pix):
 
     vibrate.setLoopCount(-1)
     vibrate.setEasingCurve(QEasingCurve.Type.InOutBack)
+    
+    group = QParallelAnimationGroup()
+    group.addAnimation(vibrate)
 
-    return vibrate
+    return group
 
 ### --------------------------------------------------------
 def pulse(pix):   
-    node = Node(pix)
-    node.pix.setOriginPt()
-    
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+  
     random.seed()
     sync = random.gauss(450, 50)
 
-    pulse = QPropertyAnimation(node, b'scale')
+    pulse = QPropertyAnimation(pix.node, b'scale')
     pulse.setDuration(int(sync))
 
-    pulse.setStartValue(node.pix.scale * random.gauss(1.25, .25))
-    pulse.setEndValue(node.pix.scale * random.gauss(1.25, .25))
+    pulse.setStartValue(pix.scale * random.gauss(1.25, .25))
+    pulse.setEndValue(pix.scale * random.gauss(1.25, .25))
 
     pulse.setLoopCount(-1)
 
@@ -151,10 +157,10 @@ def pulse(pix):
     return seq
  
 ### --------------------------------------------------------
-def bobble(pix):   
-    node = Node(pix)
-    pos = node.pix.pos()
-    node.pix.setOriginPt()
+def bobble(pix):  
+    pos = pix.pos()
+    pix.setOriginPt()  
+    pix.node = Node(pix)
 
     sync = random.randint(4,9) * 400
     up   = random.randint(5, 12)
@@ -163,7 +169,7 @@ def bobble(pix):
     if random.randint(0, 1): up = up * -1
     if random.randint(0, 1): left = left * -1
 
-    bobble = QPropertyAnimation(node, b'pos')
+    bobble = QPropertyAnimation(pix.node, b'pos')
     bobble.setDuration(int(sync))
   
     bobble.setStartValue(pos)
@@ -176,34 +182,37 @@ def bobble(pix):
 
     bobble.setLoopCount(-1)
     bobble.setEasingCurve(QEasingCurve.Type.InOutCubic)
+    
+    group = QParallelAnimationGroup()
+    group.addAnimation(bobble)
 
-    return bobble
+    return group
 
 ### --------------------------------------------------------
-def fin(pix):            ## delete pixitem 
-    node = Node(pix)
-    node.pix.setOriginPt()
+def fin(pix):  ## delete pixitem 
+    pix.setOriginPt()  
+    pix.node = Node(pix)
 
     sync = random.randint(6,10) * 75
     rot = 270 
     
     if not random.randint(0,1): rot = -270
     
-    rotate = QPropertyAnimation(node, b'rotate')
+    rotate = QPropertyAnimation(pix.node, b'rotate')
     rotate.setDuration(int(sync))
-    rotate.setStartValue(node.pix.rotation)
-    rotate.setEndValue(rot+node.pix.rotation)
+    rotate.setStartValue(pix.rotation)
+    rotate.setEndValue(rot+pix.rotation)
 
-    opacity = QPropertyAnimation(node, b'opacity')  ## fade out
+    opacity = QPropertyAnimation(pix.node, b'opacity')  ## fade out
     opacity.setDuration(int(sync))
-    opacity.setStartValue(node.pix.opacity())
+    opacity.setStartValue(pix.opacity())
     opacity.setEndValue(0)
 
-    scale = QPropertyAnimation(node, b'scale')
+    scale = QPropertyAnimation(pix.node, b'scale')
     scale.setDuration(int(sync))
         
-    scale.setStartValue(node.pix.scale)
-    scale.setEndValue(node.pix.scale*.25)
+    scale.setStartValue(pix.scale)
+    scale.setEndValue(pix.scale*.25)
 
     group = QParallelAnimationGroup()
 
@@ -217,40 +226,41 @@ def fin(pix):            ## delete pixitem
 
 ### --------------------------------------------------------
 def reprise(pix):  ## reposition pixitems to starting x,y, etc.
-    node = Node(pix)
-    node.pix.setOriginPt()
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+    
     sync = 1000
 
     if pix.type == 'pix' and  pix.part in ('left','right'): 
         return
         
-    reprise = QPropertyAnimation(node, b'pos') 
+    reprise = QPropertyAnimation(pix.node, b'pos') 
     reprise.setDuration(int(sync))
-    reprise.setStartValue(node.pix.pos())
+    reprise.setStartValue(pix.pos())
     reprise.setEndValue(QPointF(pix.x, pix.y))
     
     if pix.type == 'pix' and pix.part == "pivot":
         return reprise
 
-    spin = QPropertyAnimation(node, b'rotate')
+    spin = QPropertyAnimation(pix.node, b'rotate')
     spin.setDuration(int(sync))
-    spin.setStartValue(node.pix.rotation)
+    spin.setStartValue(pix.rotation)
     spin.setKeyValueAt(0.50, pix.rotation+random.randint(15, 45))
     spin.setEndValue(pix.rotation)
 
-    scale = QPropertyAnimation(node, b'scale')
+    scale = QPropertyAnimation(pix.node, b'scale')
     scale.setDuration(int(sync))
                   
-    scale.setStartValue(node.pix.scale)
+    scale.setStartValue(pix.scale)
     if pix.canvas.openPlayFile == 'hats' and \
         pix.shadowMaker.isActive == True:
         scale.setEndValue(1.0)   
     else:    
         scale.setEndValue(pix.scale)
 
-    opacity = QPropertyAnimation(node, b'opacity')
+    opacity = QPropertyAnimation(pix.node, b'opacity')
     opacity.setDuration(int(sync))
-    opacity.setStartValue(node.pix.opacity())  ## reset to 1.0
+    opacity.setStartValue(pix.opacity())  ## reset to 1.0
     
     if pix.canvas.openPlayFile == 'hats' and \
         pix.shadowMaker.isActive == True:
@@ -268,36 +278,41 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     return group
 
 ### --------------------------------------------------------
-def idle(pix):           
-    node = Node(pix)
-    pos  = node.pix.pos()
+def idle(pix):      
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+    
+    pos  = pix.pos()
     sync = 1000
 
-    idle = QPropertyAnimation(node, b'pos')
+    idle = QPropertyAnimation(pix.node, b'pos')
     idle.setDuration(int(sync))
     idle.setStartValue(pos)
     idle.setEndValue(pos)
 
     idle.setLoopCount(-1)
+    
+    group = QParallelAnimationGroup()
+    group.addAnimation(idle)
 
-    return idle
-  
+    return group
+
 ### --------------------------------------------------------
-def stage(pix, which):           
-    node = Node(pix)    
-    pos  = node.pix.pos()
-    node.pix.setOriginPt()    
-
+def stage(pix, which):  ## left or right      
+    pos = pix.pos()
+    pix.setOriginPt()
+    pix.node = Node(pix)
+              
     x = int(pos.x())
     ViewW = common["ViewW"]
 
-    left = x+node.pix.width*3
-    right = ViewW+node.pix.width*3
+    left = x+pix.width*3
+    right = ViewW+pix.width*3
 
     if which.endswith('Left'):
-        stage1, stage2 = stageLeft(node, pos, left, right)
+        stage1, stage2 = stageLeft(pix.node, pos, left, right)
     else:
-        stage1, stage2 = stageRight(node, pos, left, right)
+        stage1, stage2 = stageRight(pix.node, pos, left, right)
    
     stage = QSequentialAnimationGroup()
     stage.addAnimation(stage1)
@@ -344,42 +359,49 @@ def stageRight(node, pos, left, right):
     return stage1, stage2
 
 ### --------------------------------------------------------
-def spin(pix, anime, node):  ## rotate
-    node.pix.setOriginPt()
-
+def spin(pix, anime):  ## rotate
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+   
     sync = random.randint(14, 23) * 50
     rot  = 360 
 
     if anime.endswith('Left'): rot = -360
 
-    spin = QPropertyAnimation(node, b'rotate')
+    spin = QPropertyAnimation(pix.node, b'rotate')
+    
     spin.setDuration(int(sync))
-    spin.setStartValue(node.pix.rotation)
-    spin.setEndValue(node.pix.rotation+rot)
+    spin.setStartValue(pix.rotation)
+    spin.setEndValue(pix.rotation+rot)
 
     spin.setLoopCount(-1)  
+    
+    group = QParallelAnimationGroup()
+    group.addAnimation(spin)
 
-    return spin
+    return group
 
 ### --------------------------------------------------------
-def rain(pix, node):           
-    node.pix.setOriginPt()
-    pos  = node.pix.pos()
+def rain(pix):      
+    pos = pix.pos()
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+
     sync = random.randint(17, 31) * 50
 
     y = int(pos.y())
     ViewH  = common["ViewH"]
-    bottom = y+ViewH+node.pix.height*2
-    top    = y+node.pix.height*2
+    bottom = y+ViewH+pix.height*2
+    top    = y+pix.height*2
 
-    rain1 = QPropertyAnimation(node, b'pos')
+    rain1 = QPropertyAnimation(pix.node, b'pos')
     rain1.setDuration(int(sync))
     rain1.setStartValue(pos)
     rain1.setEndValue(pos+QPointF(0, bottom))
 
-    opacity1 = QPropertyAnimation(node, b'opacity')
+    opacity1 = QPropertyAnimation(pix.node, b'opacity')
     opacity1.setDuration(int(sync))
-    opacity1.setStartValue(node.pix.opacity())
+    opacity1.setStartValue(pix.opacity())
     opacity1.setKeyValueAt(.10, .50)
     opacity1.setEndValue(0)
 
@@ -387,14 +409,14 @@ def rain(pix, node):
     par1.addAnimation(rain1)
     par1.addAnimation(opacity1)
 
-    rain2 = QPropertyAnimation(node, b'pos')
+    rain2 = QPropertyAnimation(pix.node, b'pos')
     rain2.setDuration(int(sync))
     rain2.setStartValue(pos+QPointF(0, -top))
     rain2.setEndValue(pos)
 
-    opacity2 = QPropertyAnimation(node, b'opacity')
+    opacity2 = QPropertyAnimation(pix.node, b'opacity')
     opacity2.setDuration(int(sync))
-    opacity2.setStartValue(node.pix.opacity())
+    opacity2.setStartValue(pix.opacity())
     opacity2.setEndValue(.85)
 
     par2 = QParallelAnimationGroup()

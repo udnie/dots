@@ -3,7 +3,7 @@ import sys
 import platform
 import os
      
-from PyQt6.QtCore       import QTimer, QT_VERSION_STR, PYQT_VERSION_STR
+from PyQt6.QtCore       import QTimer  ### QT_VERSION_STR, PYQT_VERSION_STR
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *   ## including pathMod

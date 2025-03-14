@@ -33,13 +33,16 @@ class KeysPanel(QWidget):
         self.layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
             
 ### --------------------------------------------------------
-    def toggleKeysMenu(self):  ## called thru sideCar 'K' key
-        if self.pathKeysSet:
-            self.setTableModel(self.storyKeys)
-            self.pathKeysSet = False
-        else:
-            self.setTableModel(self.pathKeys)
-            self.pathKeysSet = True 
+    def toggleKeysMenu(self):  ## called thru showbiz 'K' key
+        self.setStoryKeys() if self.pathKeysSet == True else self.setPathKeys()
+ 
+    def setStoryKeys(self):
+        self.setTableModel(self.storyKeys)
+        self.pathKeysSet = False
+        
+    def setPathKeys(self):
+        self.setTableModel(self.pathKeys)
+        self.pathKeysSet = True 
 
     def addTableGroup(self):                   
         self.tableView = QTableView()
@@ -111,21 +114,21 @@ class TableModel(QAbstractTableModel):
     def __init__(self, data, hdr):   
         super().__init__()
         
-        self.data = data
+        self._data = data
         self.header = hdr
              
     def data(self, index, role):
         if role == Qt.ItemDataRole.DisplayRole:
-            return self.data[index.row()][index.column()]
+            return self._data[index.row()][index.column()]
         elif index.column() == 0:
             if role == Qt.ItemDataRole.TextAlignmentRole:
                 return Qt.AlignmentFlag.AlignHCenter + Qt.AlignmentFlag.AlignVCenter
            
     def rowCount(self, index):
-        return len(self.data)
+        return len(self._data)
 
     def columnCount(self, index):
-        return len(self.data[0])
+        return len(self._data[0])
   
     def headerData(self, col, orientation, role):
         if orientation == Qt.Orientation.Horizontal and \
@@ -133,88 +136,90 @@ class TableModel(QAbstractTableModel):
             return self.header[col]
         return None
   
-### --------------------------------------------------------      
+  ### -------------------------------------------------------- 
 def storyBoard():
-    menu = (       ## a mix of canvas, storyboard, pixitems and bkgItems    
-        ('F', 'Flop Selected'),
-        ('G', 'Add/Hide Grid'),
-        ('H', '+Shift Hide/UnHide'),
-        ('M', 'Map Selected'),
-        ('O', '+ShiftToggle Outlines'),
-        ('P', 'Toggle Paths'),
-        ('T', 'Toggle Tags'),
-        ('L/R', 'Arrow Keys'),
-        ('U/D', 'Arrow Keys'),
-        ('Cmd', 'Drag to Select'),
-        ('Del', 'Clk to Delete'),
-        ('Opt', 'DbClk to Clone'),
-        ('Opt', 'Drag Clones'), 
-        ('Rtn', 'Enter to Front'),
-        ('Shift', 'Clk to Flop'),     
-        ('Shift', '+H Hide Selected'), 
-        ('Shift', '+J Play Table'), 
-        ('Shift', '+L ToggleLocks'),
-        ('Shift', '+O Hide Outlines'),
-        ('Shift', '+R Locks All'),
-        ('Shift', '+S UnLinks All'),
-        ('Shift', '+T TagSelected'),
-        ('Shift', '+U Unlocks All'),  
-        ('/', 'Clk to Back'),
-        ('_/+', 'Rotate 1 deg'),  
-        ('-/=', 'Rotate 15 deg'),
-        ('[/]', 'Rotate 45 deg'),
-        ('</>', 'Toggle Size'),     
-        ('\\',  'Show this Tag'),
-        ('A', 'Add a Background'), 
-        ('A', 'Select All'),  
-        ('C', 'Clear Canvas'),
-        ('D', 'Display the Demo Menu'),
-        ('D', 'Delete Selected'),
-        ('J', 'JSON Viewer'),
-        ('L', 'Load Play'), 
-        ('P', 'Switch to PathMaker'), 
-        ('R', 'Run/DemoHelp'),
-        ('S', 'Stop/SceenMenu'),   
-        ('U', 'UnSelect All'),
-        ('W', 'Clear Widgets'),  
-        ('X, Q', 'Escape to Quit'),     
-    )
+    menu = [     ## a mix of canvas, storyboard, pixitems and bkgItems    
+        ['F', 'Flop Selected'],
+        ['G', 'Add/Hide Grid'],
+        ['H', '+Shift Hide/UnHide'],
+        ['M', 'Map Selected'],
+        ['O', '+ShiftToggle Outlines'],
+        ['P', 'Toggle Paths'],
+        ['T', 'Toggle Tags'],
+        ['L/R', 'Arrow Keys'],
+        ['U/D', 'Arrow Keys'],
+        ['Cmd', 'Drag to Select'],
+        ['Del', 'Clk to Delete'],
+        ['Opt', 'DbClk to Clone'],
+        ['Opt', 'Drag Clones'], 
+        ['Rtn', 'Enter to Front'],
+        ['Shift', 'Clk to Flop'],     
+        ['Shift', '+H Hide Selected'], 
+        ['Shift', '+J Play Table'], 
+        ['Shift', '+L ToggleLocks'],
+        ['Shift', '+O Hide Outlines'],
+        ['Shift', '+R Locks All'],
+        ['Shift', '+S UnLinks All'],
+        ['Shift', '+T TagSelected'],
+        ['Shift', '+U Unlocks All'],  
+        ['/', 'Clk to Back'],
+        ['_/+', 'Rotate 1 deg'],  
+        ['-/=', 'Rotate 15 deg'],
+        ['[/]', 'Rotate 45 deg'],
+        ['</>', 'Toggle Size'],     
+        ['\\',  'Show this Tag'],
+        ['A', 'Add a Background'], 
+        ['A', 'Select All'],  
+        ['C', 'Clear Canvas'],
+        ['D', 'Display the Demo Menu'],
+        ['D', 'Delete Selected'],
+        ['J', 'JSON Viewer'],
+        ['L', 'Load Play'], 
+        ['P', 'Switch to PathMaker'], 
+        ['R', 'Run/DemoHelp'],
+        ['S', 'Stop/SceenMenu'],   
+        ['U', 'UnSelect All'],
+        ['W', 'Clear Widgets'],  
+        ['X, Q', 'Escape to Quit'],     
+    ]
     return menu
       
 def pathMaker():
-    menu = (
-        ('Shift', '+W Way Pts'),
-        ('>',   'Shift WayPts +5%'),
-        ('<',   'Shift WayPts -5%'),
-        ('</>', 'Toggle Size'), 
-        ('! ',  'Half Path Size'),
-        ('@ ',  'Redistribute Pts'),        
-        ('/',   'Path Color'),    
-        ('} ',  'Flop Path'),
-        ('{ ',  'Flip Path'),     
-        (':/\'',  'Scale X'),
-        (';/\'',  'Scale Y'),    
-        ('U/D',   'Arrow Keys'),
-        ('L/R',   'Arrow Keys'), 
-        ('_/+', 'Rotate 1 deg'),  
-        ('-/=', 'Rotate 15 deg'),
-        ('[/]', 'Rotate 45 deg'),
-        ('E',   'Edit Points'),
-        ('del', 'Delete a Point'),     
-        ('opt', 'Add a Point'), 
-        ('shift',   'D Deletes Selected Pts'),
-        ('L',   'Lasso'), 
-        ('U',   'UnSelect Points'), 
-        ('C',   'Center Path'),
-        ('D',   'Delete Screen'), 
-        ('N',   'New Path'),
-        ('N',   'Closes Path'),   
-        ('P',   'PathChooser'),
-        ('R',   'Reverse Path'),
-        ('S',   'Save Path'),
-        ('T',   'Test'),
-    )
+    menu = [
+        ['Shift', '+W Way Pts'],
+        ['>',   'Shift WayPts +5%'],
+        ['<',   'Shift WayPts -5%'],
+        ['</>', 'Toggle Size'], 
+        ['! ',  'Half Path Size'],
+        ['@ ',  'Redistribute Pts'],        
+        ['/',   'Path Color'],    
+        ['} ',  'Flop Path'],
+        ['{ ',  'Flip Path'],     
+        [':/\'',  'Scale X'],
+        [';/\'',  'Scale Y'],    
+        ['U/D',   'Arrow Keys'],
+        ['L/R',   'Arrow Keys'], 
+        ['_/+', 'Rotate 1 deg'],  
+        ['-/=', 'Rotate 15 deg'],
+        ['[/]', 'Rotate 45 deg'],
+        ['E',   'Edit Points'],
+        ['del', 'Delete a Point'],     
+        ['opt', 'Add a Point'], 
+        ['shift',   'D Deletes Selected Pts'],
+        ['L',   'Lasso'], 
+        ['U',   'UnSelect Points'], 
+        ['C',   'Center Path'],
+        ['D',   'Delete Screen'], 
+        ['N',   'New Path'],
+        ['N',   'Closes Path'],   
+        ['P',   'PathChooser'],
+        ['R',   'Reverse Path'],
+        ['S',   'Save Path'],
+        ['T',   'Test'],
+    ]
     return menu
 
 ### --------------------- dotsKeysAndHelp ------------------
+
+
 

@@ -137,7 +137,7 @@ class SlideShow(QWidget):
             if self.path != '': self.errMsg(self.path) 
         elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
             self.zoom(1.10) if e.key() == Qt.Key.Key_BracketRight else self.zoom(.90)
-              
+          
     def mousePressEvent(self, e):
         self.save = e.globalPosition() 
         e.accept()
@@ -260,20 +260,20 @@ class SlideShow(QWidget):
             self.addPixmap(self.files[self.current])  ## needs a refresh          
                         
     def nextSlide(self):
-        if lln := len(self.files):
-            if self.current >= 0 and self.current < lln:
+        if length := len(self.files):
+            if self.current >= 0 and self.current < length:
                 self.current += 1
-                if self.current == lln:
+                if self.current == length:
                     self.current = 0   
             self.rot = 0
             self.addPixmap(self.files[self.current])
             
     def backOne(self):
-        if lln := len(self.files):
-            if self.current >= 0 and self.current <= lln:
+        if length := len(self.files):
+            if self.current >= 0 and self.current <= length:
                 self.current -= 1
                 if self.current < 0:
-                    self.current = lln -1
+                    self.current = length -1
             self.rot = 0
             self.addPixmap(self.files[self.current])
                    

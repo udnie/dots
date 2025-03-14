@@ -152,7 +152,13 @@ class ControlView(QGraphicsView):
                 self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass
             else:
                 self.setKey('L')  ## used by pathmaker to toggle lasso 
-
+                
+        elif key == Qt.Key.Key_M:
+            if mod & Qt.KeyboardModifier.ShiftModifier:  
+                self.sideCar.dump()
+            else:
+                self.setKey('M')
+                
         elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadows
             self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else\
                 self.setKey('R')

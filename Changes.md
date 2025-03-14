@@ -1,4 +1,6 @@
-### Changes
+### Changes: 
+
+See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**.  
 
 ---
            
@@ -6,24 +8,18 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 
-### Edits for Converting Dots from PyQt6 to PyQt5
-    1. Replace PyQt6 with PyQt5 
-    2. Replace globalPosition() with globalPos()
-    3. Replace e.position() with e.pos() in dotsControlView.py
-    4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
-    5. Make required edits and cleanup to dotsVideoPlayer.py and videoPlayerOne.py 
-    6. Comment out optional open-cv references to prevent crashing if not found
-    7. Change QMessageBox move(x,y) height in dotsSideGig.py
-
-    
-The first three steps can be accomplished in **vscode** with a minimum of time and effort. Running the python script **script-qt5.py** will take care of steps 4-7, see **January 2025** and **November 30 2024** for more details as well as the **Help** and **Video** entries in **Start Here**. There's also **script-qt6.py** to remove all the code and comments that reference **PyQt5**.
-
-If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** will require an edit to the terminal settings in the **.code-workspace** as well. Clearing **\_\_pycache\_\_** after applying code changes is recommended.
 
 ---
+**March 14 2025**  
+As far I can tell, everything that works in **dots**, either in **PyQt6** or **PyQt5**, now works in **PySide6** as well. See **February 6** for more detail on replacing the **type** class attribute.
+
+There's a video:  <https://youtu.be/EC-n4nJF7YQ>
+
+Added a small app, **three-paths.py**, used to get animations in **dots** running in **PySide6** as they weren't - just dead in the water.  It's a scaled down version of the **scene/view** setup from **Storyboard** with a **QGraphicsPixmapItem** as the **sprite** written to replace the examples I never found. **Three-paths.py** should be run in the **dots** source directory as it imports both the **path** and the **sprite** from their respective directories.
+
 
 **March 2 2025**  
-Added a first frame display to videoPlayerOne but without the screen capture.  The flash against a black background is less noticeable.  Relocated what I think of as the pyside sub-class types to **Shared** as there's less chance of any conflicts. 
+Added a first frame display to videoPlayerOne but without the screen capture.  The flash against a black background is less noticeable.  Relocated what I think of as the **pyside6** sub-class types to **Shared** as there's less chance of any conflicts. 
 
 ---
 

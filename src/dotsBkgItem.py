@@ -55,7 +55,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if not os.path.exists(self.path + self.fileName):
             self.type = None        
             MsgBox(f'BkgItem Error: {self.fileName} Not Found', 5)
-            self.type = None
             return
 
         self.setZValue(z)      
@@ -81,7 +80,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
                                                        
-        self.flipped = False
+        self.flopped = False
         self.locked = False
          
         self.width  = self.imgFile.width()
@@ -164,7 +163,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             if self.key == 'del':    
                 self.bkgMaker.deleteBkg(self)    
             elif self.key == 'shift':  ## to back
-                self.setZValue(self.canvas.mapper.lastZval('bkg')-1)      
+                self.setZValue(self.canvas.sideCar.lastZval()-1)  
+                self.canvas.bkgMaker.renumZvals()
             elif self.key in ('enter','return'):  ## to front     
                 self.bkgMaker.front(self)    
             elif self.key == 'tag': ## '\' <- tagKey
@@ -175,14 +175,14 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.key == 'E':   
                 self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
             elif self.key == 'F':  ## flip it
-                self.setMirrored(False) if self.flipped else self.setMirrored(True)  
+                self.setMirrored(False) if self.flopped else self.setMirrored(True)  
             elif self.key == 'H':  
                 self.openMenu()
             elif self.key == 'T':     
                 self.bkgMaker.lockBkg(self) if self.locked == False \
                     else self.bkgMaker.unlockBkg(self)
                 self.tagThis()
-            key = ''
+            self.key = ''
         
     def tagThis(self):
         p = QCursor.pos()
@@ -226,15 +226,15 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
                                          
         if self.mirroring == True:
-            item.setMirrored(False) if self.flipped else item.setMirrored(True)   
+            item.setMirrored(False) if self.flopped else item.setMirrored(True)   
                                
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     
         self.bkgWorks.restoreFromTrackers(item)  
     
-        node = self.setNode(item)  ## sets property used in animation        
-        item.anime = self.bkgWorks.setNextPath(node, item) 
+        item.node = self.setNode(item)  ## sets property used in animation        
+        item.anime = self.bkgWorks.setNextPath(item) 
 
         item.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
         self.scene.addItem(item)   
@@ -294,9 +294,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             return None
    
     def setMirrored(self, bool):
-        self.flipped = bool  
+        self.flopped = bool  
         if not self.dots.Vertical:
-            if self.flipped:
+            if self.flopped:
                 transform = QTransform().scale(-1,1)
             else:
                 transform = QTransform().scale(1,1)

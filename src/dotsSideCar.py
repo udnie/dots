@@ -64,7 +64,20 @@ class SideCar:
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
-        
+         
+    def dump(self, called):
+        print()
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+            if itm.type in ('bkg', 'flat', 'video'):       
+                print(f'{called}\t{itm.type}\t {itm.zValue()}\t{itm.fileName}')
+ 
+    def lastZval(self):  ## finds the lowest bkg, flat zValue 
+        last = 1000     
+        for itm in self.scene.items():
+            if itm.type in  ('bkg', 'flat') and itm.zValue() < last:
+                last = itm.zValue()
+        return last
+    
 ### --------------------------------------------------------         
     def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd'  
         if  self.canvas.videoPlayer != None:
@@ -76,8 +89,8 @@ class SideCar:
         elif self.canvas.pathMakerOn == True:  ## no animation
              self.canvas.showWorks.enablePlay()
                   
-        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
-            if itm.type in ('bkg', 'flat'):
+        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):  
+            if itm.type in ('bkg', 'flat'):  ## make room for videowidget and backdrop
                 itm.setZValue(itm.zValue()-1)  
             elif itm.zValue() > -50:
                 break    
@@ -144,9 +157,6 @@ class SideCar:
     def pause(self):  ## called thru controlview spacebar as well
         self.canvas.showbiz.showtime.pause() 
         
-    def toggleKeysMenu(self):  ## in keysPanel
-        self.canvas.keysPanel.toggleKeysMenu()  ## no direct path from controlView
-  
     def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker != None and \
@@ -213,12 +223,9 @@ class SideCar:
                 pix.shadowMaker.isActive == True:
                     pix.shadowMaker.works.showOutline()
                                   
-    def toggleSelections(self):
-        if self.hasHiddenPix():
-            self.showSelected()  ## hide selector frame - that's it     
-        else:
-            self.hideSelected()   
-     
+    def toggleSelections(self):  ## hides/unhides selections 
+        self.showSelected() if self.hasHiddenPix() else self.hideSelected()   
+           
     def hideSelected(self):  
         if len(self.scene.items()) > 0 and self.scene.selectedItems():
             self.mapper.removeMap()  ## also updates pix.pos()

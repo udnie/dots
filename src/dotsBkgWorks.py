@@ -5,7 +5,7 @@ import json
 
 from functools          import partial
 
-from PyQt6.QtCore       import QPoint, QTimer
+from PyQt6.QtCore       import QPoint, QTimer, QParallelAnimationGroup, QPropertyAnimation
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
                        
@@ -13,6 +13,8 @@ from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgMatte       import Matte
 from dotsBkgScrollWrks  import BkgScrollWrks
+
+from dotsAnimation      import Node
 
 ### --------------------- dotsBkgWorks --------------------- 
 ''' classes: BkgWorks -- mostly scrolling'''    
@@ -148,39 +150,59 @@ class BkgWorks:
         
 ### --------------------------------------------------------
     ## rate times screen long side = milliseconds needed to clear the scene end to end
-    def setNextPath(self, path, bkg):  
+    def setNextPath(self, bkg):  
         fact = bkg.factor      
+        
+        bkg.node = Node(bkg)
+        path = QPropertyAnimation(bkg.node, b'pos')
+        
         if bkg.direction == 'left':   
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))    
             path.setStartValue(QPoint(common['ViewW'], 0))
             path.setEndValue(QPoint(int(-bkg.width), 0))
+            
         elif bkg.direction == 'right':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))  
             path.setStartValue(QPoint(-bkg.width, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
+            
         elif bkg.direction == 'vertical':
             path.setDuration(int(common['ViewH'] * (bkg.rate*fact))) 
             ## current kludge advances background into scene before starting - verticals seem to take longer to start
             path.setStartValue(QPoint(0, common['ViewH']-int(bkg.showtime*.75)))
             path.setEndValue(QPoint(0, -bkg.height))
-        return path
-           
+                  
+        group = QParallelAnimationGroup()
+        group.addAnimation(path)
+
+        return group
+          
     def setFirstPath(self, path, bkg):  ## 'first' is already filling the scene  
         fact = bkg.factor  
+        
+        bkg.node = Node(bkg)
+        path = QPropertyAnimation(bkg.node, b'pos')
+        
         if bkg.direction == 'left':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact))) 
             path.setStartValue(QPoint(0,0)) 
             path.setEndValue(QPoint(-int(bkg.width), 0))
+            
         elif bkg.direction == 'right':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))
             path.setStartValue(QPoint(bkg.runway, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
+            
         elif bkg.direction == 'vertical':   
             path.setDuration(int(common['ViewH'] * (bkg.rate*fact)))  ## rate time equals time to clear   
             path.setStartValue(QPoint(0, bkg.runway))
             path.setEndValue(QPoint(0, -bkg.height)) 
-        return path
-                
+            
+        group = QParallelAnimationGroup()
+        group.addAnimation(path)
+
+        return group
+                     
 ### -------------------------------------------------------- 
     def spotColor(self, p):
         x, y = int(p.x()), int(p.y())                   

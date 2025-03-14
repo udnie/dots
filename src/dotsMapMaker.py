@@ -222,14 +222,7 @@ class MapMaker:
         self.pathSet = False
         self.paths = []
         self.pathTagGroup = None
-      
-    def lastZval(self, str):  ## finds the lowest pix or bkg zValue - 
-        last = 100000.0       ## looks like it's only used for 'bkg'
-        for itm in self.scene.items():
-            if itm.type == str and itm.zValue() < last:
-                last = itm.zValue()
-        return last
-        
+              
     def removeTags(self):  ## mapper only
         for p in self.canvas.scene.items():
             if p.type == 'tag':

@@ -166,10 +166,6 @@ def getVuCtr(self):  ## used by menus and widgets - maps view center to global
     p = self.canvas.mapToGlobal(QPoint(x,y))
     return int(p.x()), int(p.y())
 
-def getOffSet(pix):
-    b = pix.boundingRect()
-    return QPointF(b.width()*.5, b.height()*.5)
-
 def xy(max):
     return random.randrange(-40, max+40)
 

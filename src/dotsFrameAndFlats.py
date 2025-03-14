@@ -114,39 +114,43 @@ class Flat(QGraphicsPixmapItem):
     @pyqtSlot(str)  ## updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
-            
+         
     def mousePressEvent(self, e):  
         if e.button() == Qt.MouseButton.RightButton:
             self.openMenu()  
-        elif not self.canvas.pathMakerOn:    
-            if self.key in sharedKeys:
-                self.shared(self.key)                       
+        elif self.key in sharedKeys and not self.canvas.pathMakerOn: 
+            self.shared(self.key)                       
         e.accept()
         
-    def mouseDoubleClickEvent(self, e):
-        self.delete()
-
+    def mouseReleaseEvent(self, e):
+        self.key = ''
+        e.accept() 
+   
     def shared(self, key):  ## used with help menu
         self.key = key
-        if self.key == 'del':    
-            self.delete()      
+        if self.key == 'del':   
+            self.delete()     
         elif self.key == 'shift': 
-            self.setZValue(self.zValue()-1)    
-        elif self.key in('enter','return'): # send to front
-            self.setZValue(self.mapper.toFront(1)) 
-        elif self.key == 'tag': 
-            self.tagThis()
+            self.setZValue(self.canvas.sideCar.lastZval()-1)
+            self.canvas.bkgMaker.renumZvals()
         elif self.key == 'H':  
             self.openMenu()      
+        elif self.key == 'tag':  ## '\' tag key
+            self.tagThis()
+        elif self.key in('enter','return'): # send to front
+            self.bkgMaker.front(self)         
         elif self.key == 'T':     
-            if self.locked == False:
-                self.locked = True     
-                self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            else:
-                self.locked = False
-                self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+            self.setLock() if self.locked == False else self.setUnlock()
             self.tagThis()
         self.key = ''
+            
+    def setLock(self):
+        self.locked = True     
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        
+    def setUnLock(self):
+        self.locked = False
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
             
     def openMenu(self):
         self.help = FlatHelp(self, self.canvas, 0,'flat')
@@ -154,12 +158,7 @@ class Flat(QGraphicsPixmapItem):
     def tagThis(self):
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
-                 
-    def mouseReleaseEvent(self, e):
-        if not self.canvas.pathMakerOn:
-            self.key = ''       
-        e.accept()
-     
+                      
     def delete(self):  ## also called by widget
         self.bkgMaker.deleteBkg(self)
   
@@ -220,47 +219,48 @@ class Frame(QGraphicsPixmapItem):
                 self.shared(self.key)     
         e.accept()
         
-    def mouseDoubleClickEvent(self, e):
-        self.delete()
-          
+    def mouseReleaseEvent(self, e):
+        self.key = ''       
+        e.accept()
+ 
     def shared(self, key):  ## with help menu
         self.key = key
         if self.key == 'del':    
             self.delete()      
-        elif self.key == 'shift':  ## send to back of pixitems
-            self.setZValue(self.zValue()-1)     
+        elif self.key == 'shift':  ## back one
+            self.setZValue(self.zValue()-1)   
         elif self.key == 'H':  
             self.openMenu()      
+        elif self.key == 'tag':  ## '\' tag key
+            self.tagThis() 
         elif self.key in('enter','return'): # send to front
             self.setZValue(self.mapper.toFront(1))    
-        elif self.key == 'tag':  ## was '\'
-            self.tagThis()
         elif self.key == 'T':     
-            if self.locked == False:
-                self.locked = True     
-                self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
-            else:
-                self.locked = False
-                self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+            self.setLock() if self.locked == False else self.setUnLock()
             self.tagThis()
         self.key = ''
-    
+            
+    def setLock(self):
+        self.locked = True     
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
+        
+    def setUnLock(self):
+        self.locked = False
+        self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
+        
     def openMenu(self):
         self.help = FlatHelp(self, self.canvas, 0,'frame')
                 
     def tagThis(self):
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
-                   
-    def mouseReleaseEvent(self, e):
-        if self.canvas.pathMakerOn == False:
-            self.key = '' 
-            e.accept()
-       
+                    
     def delete(self):  ## also called by widget
         self.canvas.showWorks.deleteFrame(self)  
                            
 ### ------------------ dotsFrameAndFlats.py ---------------- 
+
+
 
 
 

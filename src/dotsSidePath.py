@@ -7,84 +7,93 @@ from PyQt6.QtCore       import QPointF, QPropertyAnimation, QEasingCurve, \
 from PyQt6.QtGui        import QPainterPath
 
 from dotsShared         import paths, common
-from dotsSideGig        import getOffSet, MsgBox, DemoAvailable
+from dotsSideGig        import MsgBox, DemoAvailable
+from dotsAnimation      import Node
 
 ### ---------------------- dotsSidePath --------------------
 ''' dotsSidePath is used by storyboard, showbiz, animations, 
-    pathmaker and contains demo, setPath, pathLoader.
+    pathmaker and contains flapper, demo, setPath, pathLoader.
     Mostly all of the original demo is here '''
 ### --------------------------------------------------------
-def flapper(pix, anime, node):  ## used by demo bat wings  
+def flapper(pix):  ## used by demo bat wings  
     baseName = os.path.basename(pix.fileName)
-
+    
+    pix.setOriginPt()  
+    pix.node = Node(pix)
+    
     if pix.part == 'right':
-        node.pix.setTransformOriginPoint(QPointF(pix.width*0.25, pix.height*0.65))
+        pix.setTransformOriginPoint(QPointF(pix.width*0.25, pix.height*0.65))
         rot = 25.0
     else:
         rot = -25.0
-        node.pix.setTransformOriginPoint(QPointF(pix.width*0.75, pix.height*0.65))
+        pix.setTransformOriginPoint(QPointF(pix.width*0.75, pix.height*0.65))
 
-    rotate = QPropertyAnimation(node, b'rotate')
+    rotate = QPropertyAnimation(pix.node, b'rotate')
     rotate.setDuration(1200)  ## bats
 
     if 'bat' in baseName:
         rotate.setDuration(300)
 
-    rotate.setStartValue(node.pix.rotation)
+    rotate.setStartValue(pix.rotation)
     rotate.setKeyValueAt(0.50, rot+pix.rotation)
-    rotate.setEndValue(node.pix.rotation)
+    rotate.setEndValue(pix.rotation)
     rotate.setEasingCurve(QEasingCurve.Type.Linear)
 
     rotate.setLoopCount(-1) 
-
-    return rotate
     
+    group = QParallelAnimationGroup()
+    group.addAnimation(rotate)
+
+    return group
+
 ### --------------------------------------------------------  
-def demo(pix, anime, node):  ## sets the demo path  
+def demo(pix, path):  ## sets the demo path  
     if not DemoAvailable():  ## <--- shouldn't happen
         return
     
+    waypts = pathLoader(path)  ## demo-path file name from the demo directory
+    if not waypts: 
+        return
+    
+    pix.node = Node(pix)   
+    pt = getOffSet(pix)   ## offset for origin pt - setOrigin wasn't working
     sync = 11000
-
-    waypts = pathLoader(anime)  ## demo-path file name from the demo directory
-    if not waypts: return
-    ## offset for origin pt - setOrigin wasn't working
-    pt = getOffSet(node.pix)
-
-    path = QPropertyAnimation(node, b'pos')
+ 
+    path = QPropertyAnimation(pix.node, b'pos')
     path.setDuration(int(sync))
+    
     path.setStartValue(waypts.pointAtPercent(0.0)-pt)
     for i in range(1, 99):    
         path.setKeyValueAt(i/100.0, waypts.pointAtPercent(i/100.0)-pt)
     path.setEndValue(waypts.pointAtPercent(1.0)-pt)  
     path.setLoopCount(-1) 
 
-    rotate = QPropertyAnimation(node, b'rotate')
+    rotate = QPropertyAnimation(pix.node, b'rotate')
     rotate.setDuration(int(sync/3))
     rotate.setEasingCurve(QEasingCurve.Type.InBounce)
-    rotate.setStartValue(node.pix.rotation)    
+    rotate.setStartValue(pix.rotation)    
     rotate.setKeyValueAt(0.25, pix.rotation-45)
     rotate.setKeyValueAt(0.50, pix.rotation)
     rotate.setKeyValueAt(0.75, pix.rotation+45)
-    rotate.setEndValue(node.pix.rotation)
+    rotate.setEndValue(pix.rotation)
     rotate.setEasingCurve(QEasingCurve.Type.OutBounce)
     rotate.setLoopCount(-1)
 
-    opacity = QPropertyAnimation(node, b'opacity')
+    opacity = QPropertyAnimation(pix.node, b'opacity')
     opacity.setDuration(int(sync))
-    opacity.setStartValue(node.pix.opacity())
+    opacity.setStartValue(pix.opacity())
     opacity.setKeyValueAt(.20, 1.0) 
     opacity.setKeyValueAt(.53, 1.0)
     opacity.setKeyValueAt(.56, 0.0)
     opacity.setKeyValueAt(.73, 0.0)
     opacity.setKeyValueAt(.75, .70)
     opacity.setKeyValueAt(.85, .95)
-    opacity.setEndValue(node.pix.opacity())
+    opacity.setEndValue(pix.opacity())
     opacity.setLoopCount(-1)
 
-    scale = QPropertyAnimation(node, b'scale')
+    scale = QPropertyAnimation(pix.node, b'scale')
     scale.setDuration(int(sync))
-    scale.setStartValue(node.pix.scale*1.05)
+    scale.setStartValue(pix.scale*1.05)
     scale.setKeyValueAt(.45, pix.scale*.80)
     scale.setKeyValueAt(.53, pix.scale*.25)
     scale.setKeyValueAt(.56, pix.scale*0.0)
@@ -93,7 +102,7 @@ def demo(pix, anime, node):  ## sets the demo path
     scale.setKeyValueAt(.85, pix.scale*.65)
     scale.setKeyValueAt(.90, pix.scale*.80)
     scale.setKeyValueAt(.95, pix.scale*.90)
-    scale.setEndValue(node.pix.scale*1.05)
+    scale.setEndValue(pix.scale*1.05)
     scale.setLoopCount(-1)
 
     group = QParallelAnimationGroup()
@@ -107,7 +116,12 @@ def demo(pix, anime, node):  ## sets the demo path
     return group
 
 ### --------------------------------------------------------
-def setPaths(tag, node):  ## called by setAnimation, one at a time        
+def getOffSet(pix):
+    b = pix.boundingRect()
+    return QPointF(b.width()*.5, b.height()*.5)
+
+### --------------------------------------------------------
+def setPaths(tag, pix):  ## called by setAnimation, one at a time        
     waypts = pathLoader(tag)  
     if not waypts: 
         return 
@@ -115,12 +129,14 @@ def setPaths(tag, node):  ## called by setAnimation, one at a time
     k = random.randint(55,105) % 5  ## just to make things interesting
     if k == 0: 
         waypts = waypts.toReversed()
-    return pathAnimator(node, sync, waypts)  ## shared
+    return pathAnimator(pix, sync, waypts)  ## shared
 
 ### --------------------------------------------------------
-def pathAnimator(node, sync, wpts):         
-    path = QPropertyAnimation(node, b'pos')  
-    pt = getOffSet(node.pix)  
+def pathAnimator(pix, sync, wpts):  ## called by demo
+    pt = getOffSet(pix) 
+    pix.node = Node(pix)
+          
+    path = QPropertyAnimation(pix.node, b'pos')   
     path.setDuration(sync)  
     
     path.setStartValue(wpts.pointAtPercent(0.0)-pt)
@@ -129,7 +145,11 @@ def pathAnimator(node, sync, wpts):
     path.setEndValue(wpts.pointAtPercent(1.0)-pt)
 
     path.setLoopCount(-1)
-    return path 
+    
+    group = QParallelAnimationGroup()
+    group.addAnimation(path)
+    
+    return group
       
 ### --------------------------------------------------------
 def pathLoader(path):  ## used by MapItem, Snakes. Abstract, Bats

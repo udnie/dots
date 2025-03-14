@@ -249,7 +249,7 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-        # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
+        # # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
 ### -------------------------- if using cv2 ----------------------------
     ## 6
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              
@@ -291,10 +291,12 @@ class VideoPlayer(QWidget):
  ### ---------------------------- end ----------------------------------- 
     def stopVideo(self):
         self.mediaPlayer.stop()
-        self.setPosition(0)  ## shows first frame plus pause
+        time.sleep(.10)
         self.playButton.setText('Start')
         self.started = False 
+        self.setPosition(0)  ## shows first frame plus pause
         self.mediaPlayer.pause() 
+  
   
     def positionChanged(self, position):
         self.slider.setValue(position)
