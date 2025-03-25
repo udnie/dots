@@ -235,7 +235,7 @@ The class attribute **type** is replaced in **PySide6** with **desc**.
 
 
 
-## A Brief History of Animation
+##A Brief History of Animation
 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
