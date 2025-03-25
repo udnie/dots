@@ -235,8 +235,8 @@ The class attribute **type** is replaced in **PySide6** with **desc**.
 
 
 
-##A Brief History of Animation
-
+## A Brief History of Animation
+ 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
 Strange as it seems the only changes I've made to Animation since I first wrote it were for PySide6.  You can create your own animation using **dotsAnimation.py** as a guide and add it to a sprite to run in **StoryBoard**.
