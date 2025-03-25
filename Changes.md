@@ -10,6 +10,15 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 
 ---
+**March 25 2025**  
+This is a major update to the **QTableWidget**, **Trackers**, used to display background tracking data when scrolling and still does. I've added methods  to **Trackers** that can arrange the order of how backgrounds are displayed from the closest appearing to the furthest - best appreciated when using backgrounds with overlapping transparent sections.
+
+These methods were the direct result of me typing into a google search query, **pyqt qtablewidget row move up or down** and later, **pyqt swap qtablewidget cells in table**.  As I say in the video, 'I got a bunch of code I could plug in and wire up' and it all worked. This was the first time this happened and to this degree. I now had the cell data I needed to actually swap the **'ZValues'** of two background items and effect how they would appear, front to back or back to front, as the row selected moved up or down.  I typed the first query in a few days later and got something different from the first code example and decided to pass as I already had a solution.
+
+I sound like I have a cold.  <https://youtu.be/GplA0Wil1qY>
+
+
+
 **March 14 2025**  
 As far I can tell, everything that works in **dots**, either in **PyQt6** or **PyQt5**, now works in **PySide6** as well. See **February 6** for more detail on replacing the **type** class attribute.
 

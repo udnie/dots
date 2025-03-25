@@ -85,10 +85,10 @@ class StoryBoard(QWidget):
             self.dots.msg = ''
                 
 ### ---------------------- send keys -----------------------
-    @pyqtSlot(str)
-    ## sends keys to canvas, storyboard, pathMaker and sceneItems
+    @pyqtSlot(str)   ## sends keys to canvas, storyboard, pathMaker and sceneItems
     def setKeys(self, key): 
-        self.key = key     
+        self.key = key    
+         
         if not self.pathMakerOn: 
             if self.key == 'C':
                 self.clear()   
@@ -98,11 +98,13 @@ class StoryBoard(QWidget):
                 self.helpButton.openMenus()  ## opens canvas help menu
             elif self.key in CanvasStr or self.key == '':
                 self.sideCar2.sendPixKeys(self.key) 
+                
         elif self.pathMakerOn:                            
             ## send MoveKeys to PathItem selections in PathEdits
             if self.pathMaker.edits.pointItemsSet() == True and \
                 self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
-                    self.sideCar2.sendPixKeys(self.key)  ## pointItems get messaged                   
+                    self.sideCar2.sendPixKeys(self.key)  ## pointItems get messaged    
+                                   
             ## send the rest to pathMaker
             elif self.key in PathStr: 
                 if self.key == 'C' and len(self.scene.items()) == 0: 

@@ -258,7 +258,7 @@ class BkgWidget(QWidget):
         quitBtn   = QPushButton('Close')
               
         if self.switch == '':
-            resetBtn.clicked.connect(lambda: self.bkgWorks.reset(self.bkgItem))
+            resetBtn.clicked.connect(lambda: self.bkgMaker.bkgtrackers.resetTracker(self.bkgItem))
             helpBtn.clicked.connect(self.bkgItem.openMenu)
             runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))    
             self.lockBtn.clicked.connect(self.bkgScrollWrks.toggleBkgLocks)   

@@ -1,11 +1,10 @@
 
 import os 
 import os.path
-import json
 
 from functools          import partial
        
-from PyQt6.QtCore       import QPoint, QPointF, QRect, QTimer, Qt
+from PyQt6.QtCore       import QPoint, QPointF, QTimer
 from PyQt6.QtGui        import QColor, QCursor
 from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
                                 QColorDialog
@@ -16,6 +15,7 @@ from dotsBkgWidget      import BkgWidget
 from dotsBkgItem        import BkgItem
 from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
+from dotsBkgTrackers    import BkgTrackers
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -45,6 +45,8 @@ class BkgMaker(QWidget):
           
         self.screenrate = {}
         self.newTracker = {}
+        
+        self.bkgtrackers = BkgTrackers(self)
            
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats 
@@ -79,7 +81,7 @@ class BkgMaker(QWidget):
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.setXY(bkg)
             
-        bkg.bkgWorks.addTracker(bkg)  ## always - even if not a scroller   
+        self.bkgtrackers.addTracker(bkg)  ## always - even if not a scroller   
         self.lockBkg(bkg)  ## always lock it
                         
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
@@ -145,7 +147,7 @@ class BkgMaker(QWidget):
         self.widget.setGeometry(p.x(), p.y(), int(self.widget.WidgetW), \
             int(self.widget.WidgetH))
         self.resetSliders(bkg)
-        bkg.bkgWorks.restoreFromTrackers(bkg)
+        self.bkgtrackers.restoreFromTrackers(bkg)
         self.updateWidget(bkg)
                            
     def closeWidget(self):
@@ -158,7 +160,7 @@ class BkgMaker(QWidget):
         self.canvas.sideCar2.setMirrorBtnText(bkg, self.widget)
         self.canvas.sideCar2.setBtns(bkg, self.widget)
         self.setLocksText(bkg) 
-        
+                
 ### --------------------------------------------------------
     def resetSliders(self, bkg):
         if bkg != None and bkg.type == 'bkg':                                
@@ -180,7 +182,7 @@ class BkgMaker(QWidget):
 ### --------------------------------------------------------                                           
     def deleteBkg(self, bkg, where=''):  ## delete tracker as well               
         if where == '' and bkg.type == 'bkg':
-            bkg.bkgWorks.delTracker(bkg)
+            self.bkgtrackers.delTracker(bkg)
         if self.widget:
             self.closeWidget() 
         self.scene.removeItem(bkg)
@@ -217,25 +219,28 @@ class BkgMaker(QWidget):
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.lockBkg(bkg) 
         self.closeWidget()
-        
-    def back(self, bkg):  ## down one
-        self.updateZvals(bkg)
-        self.lockBkg(bkg)   
-        self.closeWidget() 
-                     
+             
     def updateZvals(self, bkg):  ## move the rest back one Z
-        for itm in self.scene.items():
+        for itm in self.scene.items():  ## used by bkgMaker mainly to add
             if itm.type in ('bkg', 'flat') and itm.zValue() <= bkg.zValue():
                 if itm != bkg:
                     itm.setZValue(itm.zValue()-1)                 
         self.renumZvals()
-     
-    def renumZvals(self):
-        bkz = common['bkgZ']  ## renumber - no gaps
+        
+    def toBack(self):  ## finds the lowest bkg, flat zValue 
+        last = 1000  ## used by bkgItem and flat - default
+        for itm in self.scene.items():
+            if itm.type in  ('bkg', 'flat') and itm.zValue() < last:
+                last = itm.zValue()
+        return last - 1   
+ 
+    def renumZvals(self, called=''):
+        bkz = common['bkgZ']  ## renumber - bkg and flats no gaps
         for itm in self.scene.items():
             if itm.type in ('bkg', 'flat'):
                 itm.setZValue(bkz)
                 bkz -= 1 
+        # self.canvas.sideCar.dump(called)
                        
     def setXY(self, bkg):
         p = bkg.sceneBoundingRect()

@@ -109,13 +109,19 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
         try:   
             if role == Qt.ItemDataRole.DisplayRole: 
                 val = self._data[index.row()][index.column()]
-                if isinstance(val, bool) and index.column() == 12:  ## scroller
+                
+                if isinstance(val, str) and index.column() == 0 and val != 'fileName':
+                    return val.capitalize()
+                
+                elif isinstance(val, bool) and index.column() == 12:  ## scroller
                     if str(val) == 'True':        
                         return 'mirrored'
                     else:
                         return 'continuous' 
+                    
                 elif isinstance(val, str) and val[-1] == '/':
                     return val[5:-1]
+                
                 return self._data[index.row()][index.column()]
             
             if role == Qt.ItemDataRole.BackgroundRole:  ## background color for hdrs

@@ -35,7 +35,7 @@ class ShowWorks:
                     if p.tag == 'scroller' and p.direction == v['direction']:
                         if k == 0:
                             self.dothis(p) 
-                            p.setStartingPos(p)
+                            p.bkgWorks.setStartingPos(p)
                             k = 1
                         elif k > 0:
                             self.scene.removeItem(p)

@@ -131,21 +131,12 @@ class Bats:
                     t = (random.randint(13, 18) * 2) - 1  ## 25 to 35.ms            
                     self.runBat(pix, n, t)
                     n +=1 
-                    
- ### --------------------------------------------------------  
+                     
     def rerun(self):  ## no reason to delete     
         clearPaths(self)
         self.run()
         self.showWorks.disablePlay()
-     
-    def delBats(self):
-        if len(self.scene.items()) > 0:
-            for pix in self.scene.items():      
-                if pix.type == 'pix':  ## deleting pivot deletes the wings
-                    if pix.part in ('pivot') or 'alien' in pix.fileName:   
-                        self.scene.removeItem(pix)
-                        del pix
-                                       
+                                      
 ### --------------------------------------------------------
 class Hats:  ## hats - was abstract
 ### --------------------------------------------------------
@@ -194,8 +185,9 @@ class Hats:  ## hats - was abstract
         self.scroller.direction = self.direction       
         self.scroller.path = paths['bkgPath']  
         self.scroller.tag = 'scroller'
-        self.scroller.mirroring = True      
-        self.scroller.bkgWorks.addTracker(self.scroller)  
+        self.scroller.mirroring = True  
+            
+        self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)  
         self.scroller.bkgWorks.setDirection(self.scroller.direction)
 
         self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  
@@ -264,12 +256,11 @@ class Hats:  ## hats - was abstract
                 pix.anime = pathAnimator(pix, sync, waypts)  ## set path animation 
                 QTimer.singleShot(100 + (k * 60), pix.anime.start)
                 k += 1
-       
-### --------------------------------------------------------                                                
+                                                     
     def rerunAbstract(self, direction):       
         clearPaths(self)
         self.delHats() 
-        self.scroller.bkgWorks.delTracker(self.scroller) 
+        self.canvas.bkgMaker.bkgtrackers.delTracker(self.scroller) 
         self.makeHatsDemo(direction) 
       
     def delHats(self):

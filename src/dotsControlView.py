@@ -131,12 +131,17 @@ class ControlView(QGraphicsView):
                                 
 ### --------------------------------------------------------                                                        
     ## keys with modifiers
-### --------------------------------------------------------   
+### -------------------------------------------------------- 
         elif key == Qt.Key.Key_B:
             if not self.canvas.pathMakerOn:
-                self.sideCar2.mirrorBkg() if mod & Qt.KeyboardModifier.ShiftModifier\
-                    else self.sideCar2.bkgStuff()
-                                         
+                if mod & Qt.KeyboardModifier.ShiftModifier:
+                    self.sideCar2.mirrorBkg() 
+                elif mod & Qt.KeyboardModifier.AltModifier or \
+                    mod & Qt.KeyboardModifier.ControlModifier:  
+                        self.sideCar2.newTracker()                              
+                else:
+                    self.sideCar2.bkgStuff()
+                                                          
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
                 self.setKey('delPts')  ## delete selected pts in pathmaker
@@ -159,7 +164,7 @@ class ControlView(QGraphicsView):
             else:
                 self.setKey('M')
                 
-        elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadows
+        elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadowsand bkgs
             self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else\
                 self.setKey('R')
                                                        
@@ -177,6 +182,12 @@ class ControlView(QGraphicsView):
                 self.mapper.toggleTagItems('all') 
             else:
                 self.canvas.sideCar2.sendPixKeys('T') 
+
+        elif key == Qt.Key.Key_U:  ## unlocks all sceneItems     
+            if mod & Qt.KeyboardModifier.ShiftModifier:
+                self.canvas.sideCar2.unlockAll()
+            else:
+                self.setKey('U')  
 
         ## apple option key and cmd key - used by scroll panel to scroll tiles
         elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and \

@@ -34,8 +34,8 @@ class Matte(QWidget):  ## opens itself
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas   = parent 
-        self.view     = self.canvas.view  
+        self.canvas = parent 
+        self.view   = self.canvas.view  
             
         self.type = 'widget' 
         self.setAccessibleName('widget')
@@ -60,8 +60,7 @@ class Matte(QWidget):  ## opens itself
         
         self.lst = [self.white, self.grey, self.black]
         
-        self.pix   = None
-       
+        self.pix = None
         self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## photo used by matte
     
         self.border = 30  ## inital
@@ -259,8 +258,8 @@ class MatteHelp:
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1
      
-        self.table.setRow(row,      0, f'{"Enter Key or Select From Above "}',QH,True,True, 2) 
-        self.table.setRow(row + 1,  0, f'{"Click Here to Close Menu  ":<26}' ,'',True,True, 2)
+        self.table.setRow(row,     0, f'{"Enter Key or Select From Above "}',QH,True,True, 2) 
+        self.table.setRow(row + 1, 0, f'{"Click Here to Close Menu  ":<26}' ,'',True,True, 2)
    
         x, y = getVuCtr(self.canvas)    
         

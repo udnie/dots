@@ -15,12 +15,11 @@ from dotsTableModel     import TableWidgetSetUp, QL
 flatKeys = {  
     ' H ':     'Help Menu',
     ' T ':     'Toggle Lock',
-    ' \\ ':     'Background Tag',
+    ' \\ ':    'Background Tag',
     'del':     'delete from screen', 
     'enter':   'move to the front',
     'return':  'move to the front',   
-    'shift':   'move back one ZValue',
-    'dbl-clk': 'delete from screen',   
+    'shift':   'move to the back',
 }
 
 sharedKeys =  ('H','T','del','tag','shift','enter','return')
@@ -38,7 +37,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
         self.table = TableWidgetSetUp(55, 155, len(flatKeys)+3)
         self.table.itemClicked.connect(self.clicked)         
   
-        width, height = 216, 336
+        width, height = 216, 306
         self.table.setFixedSize(width, height)
  
         if str == 'flat':
@@ -129,10 +128,13 @@ class Flat(QGraphicsPixmapItem):
     def shared(self, key):  ## used with help menu
         self.key = key
         if self.key == 'del':   
-            self.delete()     
-        elif self.key == 'shift': 
-            self.setZValue(self.canvas.sideCar.lastZval()-1)
-            self.canvas.bkgMaker.renumZvals()
+            self.delete()               
+        elif self.key == 'shift':  ## to the back
+            self.setZValue(self.bkgMaker.toBack())
+            self.canvas.bkgMaker.renumZvals()       
+        elif self.key == 'B': 
+            self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
+                else self.bkgtrackers.tracker.bye()     
         elif self.key == 'H':  
             self.openMenu()      
         elif self.key == 'tag':  ## '\' tag key
@@ -211,19 +213,20 @@ class Frame(QGraphicsPixmapItem):
         self.mapper.clearTagGroup()
         e.accept()
            
-    def mousePressEvent(self, e):     
-        if e.button() == Qt.MouseButton.RightButton:
-            self.openMenu()  
-        elif self.canvas.pathMakerOn == False:  ## doesn't run in pathMaker   
-            if self.key in sharedKeys:
-                self.shared(self.key)     
+    def mousePressEvent(self, e):   
+        if not self.canvas.pathMakerOn:    
+            if e.button() == Qt.MouseButton.RightButton:
+                self.openMenu()  
+            else:  ## doesn't run in pathMaker   
+                if self.key in sharedKeys:
+                    self.shared(self.key)     
         e.accept()
         
     def mouseReleaseEvent(self, e):
-        self.key = ''       
+        key = ''       
         e.accept()
  
-    def shared(self, key):  ## with help menu
+    def shared(self, key):  ## key can come from help as well
         self.key = key
         if self.key == 'del':    
             self.delete()      
@@ -238,7 +241,6 @@ class Frame(QGraphicsPixmapItem):
         elif self.key == 'T':     
             self.setLock() if self.locked == False else self.setUnLock()
             self.tagThis()
-        self.key = ''
             
     def setLock(self):
         self.locked = True     

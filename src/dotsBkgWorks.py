@@ -1,11 +1,11 @@
 
-import os.path
 import math
 import json
 
 from functools          import partial
 
-from PyQt6.QtCore       import QPoint, QTimer, QParallelAnimationGroup, QPropertyAnimation
+from PyQt6.QtCore       import QPoint, QTimer, QParallelAnimationGroup, QPropertyAnimation, \
+                                QPointF
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
                        
@@ -34,31 +34,6 @@ class BkgWorks:
         
         self.bkgScrollWrks = BkgScrollWrks(self.bkgItem)
      
-### -------------------------------------------------------- 
-    ## when loading a play file or adding from the screen - Tracker is in dotsBkgScrollWrks
-    def addTracker(self, bkg): 
-        fileName = bkg.fileName
-   
-        ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
-        ## if randomizing speed factor do this 
-
-        # fact = float((random.randint(17,30) *5)/100)  ## .85-1.50
-        # bkg.factor = fact  ## if using a random screen speed factor 
-
-        if len(self.bkgMaker.newTracker) == 0:
-            self.bkgMaker.newTracker[fileName] = addNewTracker(bkg)  
-            return True
-        else:   
-            if self.bkgMaker.newTracker.get(fileName) == None:
-                self.bkgMaker.newTracker[fileName] = addNewTracker(bkg)
-                return True
-            else:   
-                return False
-                
-    def delTracker(self, bkg):  
-        if self.bkgMaker.newTracker.get(bkg.fileName):
-            del self.bkgMaker.newTracker[bkg.fileName]
-   
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):  ## from keybooard or widget - sets 'first'    
         if math.fabs(self.bkgItem.runway) < self.bkgItem.showtime:
@@ -202,6 +177,14 @@ class BkgWorks:
         group.addAnimation(path)
 
         return group
+    
+    def setStartingPos(self, bkg):
+        if bkg.direction == 'right':  ## gets it pointed in the right direction -->>
+            bkg.setPos(QPointF(bkg.runway, 0)) 
+        elif bkg.direction == 'left':  ## <<--
+            bkg.setPos(QPointF())
+        else:
+            bkg.setPos(QPointF(0.0, float(bkg.runway)))
                      
 ### -------------------------------------------------------- 
     def spotColor(self, p):
@@ -252,59 +235,7 @@ class BkgWorks:
         self.bkgItem.widget = False
         self.bkgMaker.closeWidget()
         self.matte = Matte(self.canvas)
-        
-### -------------------------------------------------------- 
-    ## returns what gets lost on each reincarnation
-    def restoreFromTrackers(self, bkg): 
-        if tmp := self.bkgMaker.newTracker.get(bkg.fileName):
-            bkg.direction  = tmp['direction']           
-            bkg.mirroring  = tmp['mirroring']
-            bkg.factor     = tmp['factor']
-            bkg.showtime   = tmp['showtime']
-            bkg.useThis    = tmp['useThis']
-            bkg.rate       = tmp['rate']
-            bkg.path       = tmp['path']
-            bkg.scrollable = tmp['scrollable']
-            
-### --------------------------------------------------------                                                                                      
-    def reset(self, bkg):  ## reset both tracker and bkgItem
-        if tmp := self.bkgMaker.newTracker.get(bkg.fileName):  
-            tmp['fileName']    = bkg.fileName 
-            tmp['direction']  = ''
-            tmp['mirroring']  = False
-            tmp['factor']     = 1.0
-            tmp['showtime']   = 0
-            tmp['useThis']    = ''
-            tmp['rate']       = 0
-            tmp['scrollable'] = False
-            tmp['path']       = bkg.path
-             
-        bkg.direction  = ''             
-        bkg.mirroring  = False
-        bkg.factor     = 1.0
-        bkg.showtime   = 0
-        bkg.useThis    = ''      
-        bkg.rate       = 0
-        bkg.scrollable = False    
-        bkg.path       = ''
-  
-        self.bkgMaker.addWidget(bkg)
-                                                                                         
-### -------------------------------------------------------- 
-def addNewTracker(bkg):
-    tmp = {
-        "fileName":    os.path.basename(bkg.fileName),
-        "direction":  bkg.direction,
-        "mirroring":  bkg.mirroring,
-        "factor":     bkg.factor,
-        "rate":       bkg.rate,
-        "showtime":   bkg.showtime,
-        "useThis":    bkg.useThis,
-        "path":       bkg.path,
-        "scrollable": bkg.scrollable,
-    }
-    return tmp
-                                                                                     
+                                                                                                                                                 
 ### --------------------- dotsBkgWorks ---------------------
 
 

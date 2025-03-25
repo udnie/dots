@@ -15,8 +15,9 @@ class ShowFiles:
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas  = parent
-        self.scene   = self.canvas.scene
+        self.canvas   = parent
+        self.scene    = self.canvas.scene
+        self.bkgMaker = self.canvas.bkgMaker
  
         self.errorOnShadows = False
        
@@ -149,9 +150,9 @@ class ShowFiles:
         if 'direction' not in tmp.keys(): 
             tmp['direction'] = 'left'              
         if 'mirroring' not in tmp.keys(): 
-            tmp['mirroring'] = self.canvas.bkgMaker.mirroring          
+            tmp['mirroring'] = self.bkgMaker.mirroring          
         if 'factor' not in tmp.keys(): 
-            tmp['factor'] = self.canvas.bkgMaker.factor             
+            tmp['factor'] = self.bkgMaker.factor             
         if 'rate' not in tmp.keys(): 
             tmp['rate'] = 0
         if 'showtime' not in tmp.keys(): 
@@ -172,7 +173,8 @@ class ShowFiles:
         bkg.useThis     = tmp['useThis']
         bkg.path        = tmp['path']
                           
-        result = bkg.bkgWorks.addTracker(bkg)  
+        result = self.bkgMaker.bkgtrackers.addTracker(bkg)  
+        
         if result == False:  ## must be a dupe
             del bkg  ## not yet added to scene
             return None      

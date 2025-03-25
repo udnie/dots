@@ -64,20 +64,13 @@ class SideCar:
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets
                 widget.close()
         if self.canvas.pathMakerOn: self.canvas.pathMaker.pathChooserOff()
-         
-    def dump(self, called):
+                                                              
+    def dump(self, called=''):  ## shift-M
         print()
-        for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
+        for itm in self.canvas.scene.items():
             if itm.type in ('bkg', 'flat', 'video'):       
-                print(f'{called}\t{itm.type}\t {itm.zValue()}\t{itm.fileName}')
- 
-    def lastZval(self):  ## finds the lowest bkg, flat zValue 
-        last = 1000     
-        for itm in self.scene.items():
-            if itm.type in  ('bkg', 'flat') and itm.zValue() < last:
-                last = itm.zValue()
-        return last
-    
+                print(f'{itm.type.strip()}\t{itm.zValue()}\t{itm.fileName}')  
+           
 ### --------------------------------------------------------         
     def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd'  
         if  self.canvas.videoPlayer != None:
@@ -191,6 +184,7 @@ class SideCar:
                 pix.unlinkShadow()
                 pix.maker.works.hideOutline()
                 self.mapper.tagsAndPaths.tagThis('',  pix)
+        self.canvas.sideCar2.unlockAll()
     
     def clearSceneItems(self):  ## from storyboard
         for p in self.scene.items():      

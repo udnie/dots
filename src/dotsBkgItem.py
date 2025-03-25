@@ -2,7 +2,7 @@
 import os
 import os.path
 
-from PyQt6.QtCore       import Qt, QPointF, QPoint, QPropertyAnimation, pyqtSlot
+from PyQt6.QtCore       import Qt, QPointF, QPoint, pyqtSlot
 from PyQt6.QtGui        import QImage, QPixmap, QCursor, QTransform
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
@@ -32,9 +32,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.scene    = self.canvas.scene
         self.bkgMaker = self.canvas.bkgMaker
 
-        self.bkgWorks = BkgWorks(self)  
-        self.bkgScrollWrks = BkgScrollWrks(self)
-       
+        self.bkgWorks       = BkgWorks(self)  
+        self.bkgScrollWrks  = BkgScrollWrks(self)
+        
         self.widgetOn = False  
        
         self.ViewW = common['ViewW']
@@ -133,18 +133,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     @pyqtSlot(str)
     def setPixKeys(self, key):  
         self.key = key 
-        try:  ## doesn't appear that the widget can get input other than thru this
-            if self.key in ('up', 'down','right','left') and self.bkgMaker.widget != None:
-                self.bkgMaker.widget.setKeys(key)  ## trapped in pixitem as it happens before bkg
-        except AttributeError:
-            pass
-        
+
     def mousePressEvent(self, e): 
         if not self.canvas.pathMakerOn:       
             if e.button() == Qt.MouseButton.RightButton:   
                 self.bkgMaker.addWidget(self)   
                 if self.direction == '' or self.useThis == '':   
-                    self.bkgWorks.reset(self)
+                    self.bkgMaker.bkgtrackers.resetTracker(self)
                     self.bkgMaker.resetSliders(self)  
             else: 
                 if self.key in self.sharedKeys:
@@ -161,17 +156,19 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if not self.canvas.pathMakerOn: 
             self.key = key
             if self.key == 'del':    
-                self.bkgMaker.deleteBkg(self)    
-            elif self.key == 'shift':  ## to back
-                self.setZValue(self.canvas.sideCar.lastZval()-1)  
-                self.canvas.bkgMaker.renumZvals()
+                self.bkgMaker.deleteBkg(self)          
+            elif self.key == 'shift':  ## to the back
+                if self.bkgMaker.toBack() == -100:
+                    MsgBox("There's is only One", 5)
+                else:
+                    self.setZValue(self.bkgMaker.toBack()) 
+                    self.bkgMaker.renumZvals()  
             elif self.key in ('enter','return'):  ## to front     
                 self.bkgMaker.front(self)    
             elif self.key == 'tag': ## '\' <- tagKey
                 self.tagThis()
             elif self.key == 'B': 
-                self.canvas.sideCar2.trackThis() if self.canvas.sideCar2.tracker == None \
-                    else self.canvas.sideCar2.tracker.bye() 
+                self.canvas.sideCar2.newTracker() 
             elif self.key == 'E':   
                 self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
             elif self.key == 'F':  ## flip it
@@ -182,7 +179,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 self.bkgMaker.lockBkg(self) if self.locked == False \
                     else self.bkgMaker.unlockBkg(self)
                 self.tagThis()
-            self.key = ''
         
     def tagThis(self):
         p = QCursor.pos()
@@ -191,7 +187,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def openMenu(self):
         self.bkgMaker.closeWidget()    
         self.help = BkgHelp(self) 
-
+        
 ### -------------------------------------------------------- 
     ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''
 ### -------------------------------------------------------- 
@@ -231,9 +227,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     
-        self.bkgWorks.restoreFromTrackers(item)  
+        self.bkgMaker.bkgtrackers.restoreFromTrackers(item)  
     
-        item.node = self.setNode(item)  ## sets property used in animation        
+        item.node = Node(item)  ## sets property used in animation        
         item.anime = self.bkgWorks.setNextPath(item) 
 
         item.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
@@ -248,8 +244,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if bkg.direction == '':   
             return  
             
-        node = self.setNode(bkg)  ## bkg property used in animation                      
-        if node == None:
+        node = Node(bkg)  ## bkg property used in animation                      
+        if node == None:          ## being ignored - just for pyside
             MsgBox('setScrollerPath: Error Setting Path ...')
             return          
                 
@@ -258,41 +254,10 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.bkgScrollWrks.notScrollable()  
             return 
    
-        self.setStartingPos(bkg)  ## not the scrolling position      
+        self.bkgWorks.setStartingPos(bkg)  ## not the scrolling position      
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
-               
-### --------------------------------------------------------   
-    def setStartingPos(self, bkg):
-        if bkg.direction == 'right':  ## gets it pointed in the right direction -->>
-            bkg.setPos(QPointF(bkg.runway, 0)) 
-        elif bkg.direction == 'left':  ## <<--
-            bkg.setPos(QPointF())
-        else:
-            bkg.setPos(QPointF(0.0, float(bkg.runway)))
-
-    def updateXY(self, pos):
-        dragX = pos.x() - self.dragCnt.x()
-        dragY = pos.y() - self.dragCnt.y()      
-        self.x = self.initX + dragX
-        self.y = self.initY + dragY
-        
-    def scaleThis(self, key):
-        self.setOrigin()
-        if key == '>':
-            scale = .01
-        elif key == '<':
-            scale = -.01
-        self.scale += scale
-        self.setScale(self.scale)
-    
-    def setNode(self, bkg):     
-        try:  
-            node = Node(bkg)       
-            return QPropertyAnimation(node, b'pos') 
-        except RuntimeError:
-            return None
-   
+                       
     def setMirrored(self, bool):
         self.flopped = bool  
         if not self.dots.Vertical:
@@ -303,12 +268,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             pix = QPixmap.fromImage(self.imgFile)
             self.setPixmap(pix.transformed(transform))
             self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-
-    def setOrigin(self):  
-        b = self.boundingRect()
-        op = QPointF(b.width()/2, b.height()/2)
-        self.setTransformOriginPoint(op)
-        self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                                                                                                                                                                       
 ### ---------------------- dotsBkgItem ---------------------
 

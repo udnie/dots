@@ -5,7 +5,7 @@ from PyQt6.QtGui        import QKeySequence
 from dotsSideGig        import getVuCtr
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 
-storyKeys = {  
+storyKeys = {   ## menu2
     'F':    'Flop Selected',
     'P':    'Toggle Paths - Animation',
     'T':    'ToggleTags - Animation',
@@ -13,7 +13,8 @@ storyKeys = {
     'Shift-L': 'Toggle Sprite Locks',
     'Shift-R': 'Unlink, Unlock, UnSelect',
     'Shift-S': 'Toggle Shadow Links',  
-    'Shift-T': 'Toggle Sprite Shadow Tags',   
+    'Shift-T': 'Toggle Sprite Shadow Tags',
+    'Shift-U': 'UnLock All Screen Items',  
     'Cmd':  'Drag to Select',
     'M':    'Move Selected off/on',
     'U':    'UnSelect - End',     
@@ -61,21 +62,21 @@ class StoryHelp2:
         self.table = TableWidgetSetUp(65, 185, len(storyKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 257, 456
+        width, height = 257, 486
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}',QL,True,True,2)
     
         row = 1  
         for k, val in storyKeys.items():
-            if row < 9:
+            if row < 10:
                 self.table.setRow(row, 0, k, '', True,True)
                 self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
-                if row == 9:
+                if row == 10:
                     self.table.setRow(row, 0, f"{' Keys for Rubberband Select':<32}",QC,True,True,2)
-                    row = 10
+                    row = 11
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1

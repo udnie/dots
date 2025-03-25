@@ -1,84 +1,22 @@
 
 import os
 import json
-import random
 
 from PyQt6.QtCore       import Qt, QPoint, QTimer
 from PyQt6.QtGui        import QImage, QPixmap, QCursor
-from PyQt6.QtWidgets    import QMessageBox, QWidget, QAbstractItemView, \
-                                QTableWidget, QPushButton, QVBoxLayout, QTableWidgetItem
-                        
-from dotsShared         import common, paths
-from dotsSideGig        import MsgBox, getVuCtr, tagBkg
+from PyQt6.QtWidgets    import QMessageBox
+                    
+from dotsShared         import common, paths                             
+from dotsSideGig        import MsgBox, tagBkg
 
-showtime = {  ## trigger to add a new background based on number of pixels remaining in runway
+ ## trigger a new background based on the number of pixels left in runway
+showtime = { 
     'snakes':   15,  ## also used by vertical 
     'left':     11, 
     'right':    15,  
     'vertical': 17,  ## trying this out 
 }
 
-RowHt = 30
-### -------------------------------------------------------- 
-class Trackers(QWidget): 
-### -------------------------------------------------------- 
-    def __init__(self, parent, dump): 
-        super().__init__() 
-
-        self.canvas = parent
-        self.setWindowTitle('trackers') 
-        
-        self.type = 'widget'
-        self.setAccessibleName('widget')
-
-        self.tableWidget = QTableWidget() 
-        self.tableWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers) 
-
-        self.tableWidget.setColumnCount(len(dump[0]))
-        self.tableWidget.setRowCount(len(dump))
-
-        self.width, self.height = 820, (len(dump)+1) * RowHt
-        self.tableWidget.setFixedSize(self.width, self.height)
-
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-   
-        self.tableWidget.setHorizontalHeaderLabels(
-            ["filename", "zvalue",  "direction", "mirrored", "rate", "showtime", "screenrate", "directory"]) 
-        self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
-            'background-color: rgb(115,225,225)}')	 
-            
-        self.closeBtn = QPushButton("Use Button to Close")
-        self.closeBtn.clicked.connect(self.bye)
-        self.closeBtn.setMinimumWidth(200)
-
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.tableWidget)
-        self.layout.addWidget(self.closeBtn, alignment=Qt.AlignmentFlag.AlignCenter)
-        self.setLayout(self.layout)
-        
-        x, y = getVuCtr(self.canvas)
-        pos = QPoint(x, int(y - (self.height/2)))
-        
-        self.move(int(pos.x()-self.width/2), int(pos.y())-50)
-
-        self.createTable(dump)
-
-    def createTable(self, dump): 
-        for row, val in enumerate(dump):
-            for col, v in enumerate(val):
-                item = QTableWidgetItem(v)
-                if col in (1,4,5):
-                    item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)  
-                self.tableWidget.setItem(row, col, item)
-		
-    def bye(self):
-        if self.tableWidget != None:
-            self.tableWidget.close()
-            self.tableWidget = None
-            self.canvas.sideCar2.tracker = None
-            self.close()          
-  
 ### ------------------ dotsBkgScrollWrks -------------------           
 class BkgScrollWrks:  ## mainly functions used for scrolling 
 ### --------------------------------------------------------
@@ -89,7 +27,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         self.canvas   = self.bkgItem.canvas 
         self.bkgMaker = self.bkgItem.bkgMaker
         self.dots     = self.bkgItem.dots
-                                                                                                                 
+                                                                                                                                         
 ### -------------------------------------------------------- 
     def updateDictionary(self):
         if self.bkgItem.useThis == '':
@@ -101,21 +39,18 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         if self.bkgItem.direction == 'right' and rate[2] != self.bkgItem.rate:
             rate[2] = self.bkgItem.rate
             test = True
-            
         elif self.bkgItem.direction == 'left' and rate[1] != self.bkgItem.rate:
             rate[1] = self.bkgItem.rate
-            test = True 
-              
+            test = True        
         elif self.bkgItem.direction == 'vertical' and rate[1] != self.bkgItem.rate:
             rate[1] = self.bkgItem.rate
-            test = True 
+            test = True  
               
         if test == False:
             MsgBox("Screen Rates Haven't Changed", 5)
             return   
     
         img = QImage(paths['spritePath'] + "doral.png")  ## icon .png
-
         img = img.scaled(60, 60,  ## keep it small
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation)  
@@ -174,8 +109,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         if bkg.scrollable:   
             if self.bkgMaker.newTracker.get(bkg.fileName):
                 self.bkgMaker.newTracker[bkg.fileName]['factor'] = bkg.factor          
-
-### --------------------------------------------------------             
+            
     def getTrackerRate(self, bkg):  ## used only once - getScreenRate
         if rate := self.bkgMaker.newTracker[bkg.fileName]['rate']:  
             return rate
@@ -250,4 +184,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
              
              
+
+
+
 

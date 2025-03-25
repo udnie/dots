@@ -34,7 +34,7 @@ storyKeys = {
     'Menus':'Help Menus',
     'O':    'Toggle Shadow Outlines', 
     'S':    'Save Play File',    
-    'U':    'UnSelect All',
+    'U':    'UnSelect All Sprites',
     'V':    'Video Widget',
     'W':    'Clear Widgets',
     'X':    'X, Q, Escape to Quit',

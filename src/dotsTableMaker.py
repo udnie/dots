@@ -183,7 +183,8 @@ class TableView:  ## formats a json .play file to display missing files or not
                 
 ### --------------------------------------------------------                            
     def resetColumnWidths(self, width):  
-        for i in range(0, self.cols):  
+        self.tableView.setColumnWidth(0, 135)
+        for i in range(1, self.cols):  
             if i in ColumnWidths:  ## reduce column widths for these
                 self.tableView.setColumnWidth(i, 85)  ## why is this so hard to find?      
         if Columns.get(self.cols):
@@ -198,7 +199,7 @@ class TableView:  ## formats a json .play file to display missing files or not
             self.showWorks.saveToPlays(self.data)  ## retains remaining missing files when saved
  
     def reposition(self, height):
-        g = getCtr()  ## reposition viewer if column number changes 
+        g = getCtr()  ## reposition viewer if column number changes  
         c = Columns[self.cols]  ## replacing dictionary value prior to math
         x = int(g.x() - int(c/2))
         y = int(g.y() - int(height/2)-100)

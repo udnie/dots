@@ -2,6 +2,7 @@
 from functools          import partial
 
 from PyQt6.QtCore       import QTimer
+from PyQt6.QtGui        import QKeySequence
 
 from dotsSideGig        import *
 from dotsTableModel     import TableWidgetSetUp, QL, QC, QH
@@ -33,8 +34,9 @@ bkgHelpKeys = {
     'del':      'delete from screen',  
     'enter':    'move to the front',
     'return':   'move to the front',    
-    'shift':    'move back one ZValue',
-    'Shift-B':  'Mirror Background',    
+    'shift':    'move to the back',
+    'Shift-B':  'Mirror Background',
+    'Shift-U':  'UnLock All Screen Items',   
 }
 
 shadowKeys = {
@@ -145,10 +147,10 @@ class BkgHelp:
         self.canvas = self.bkgItem.canvas
         self.switch = switch 
 
-        self.table = TableWidgetSetUp(50, 185, len(bkgHelpKeys)+4)
+        self.table = TableWidgetSetUp(55, 180, len(bkgHelpKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 241, 457
+        width, height = 241, 487
         
         self.table.setFixedSize(width, height)  
         self.table.setRow(0, 0, f'{"Background Help Menu":<22}',QL,True,True,2)
@@ -173,11 +175,12 @@ class BkgHelp:
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help == '\\': help = 'tag'
+                if help == '\\': 
+                    help = 'tag'
                 if help != 'H' and help in self.bkgItem.sharedKeys:
                     QTimer.singleShot(25, partial(self.bkgItem.shared, help))  
-                elif help == 'Shift-B':
-                    self.canvas.view.sendIt(Qt.Key.Key_B, Qt.KeyboardModifier.ShiftModifier)   
+                elif help in ('Shift-B', 'Shift-U'):
+                    self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)   
             except:
                 None
         self.closeMenu()

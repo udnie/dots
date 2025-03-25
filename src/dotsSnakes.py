@@ -182,7 +182,7 @@ class Snakes:
             self.scroller.tag = 'scroller'
             self.scroller.mirroring = True  
         
-            self.scroller.bkgWorks.addTracker(self.scroller)
+            self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
@@ -201,7 +201,7 @@ class Snakes:
                 self.scroller.mirroring = False
             else:
                 self.scroller.mirroring = True     
-            self.scroller.bkgWorks.addTracker(self.scroller)
+            self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
@@ -245,7 +245,7 @@ class Snakes:
         self.mapper.clearTagGroup()
         self.mapper.clearPaths()
         if what != 'blue':
-            self.scroller.bkgWorks.delTracker(self.scroller) 
+            self.canvas.bkgMaker.delTracker(self.scroller) 
         self.delSnakes()        
         self.makeSnakes(what)
               
