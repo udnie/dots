@@ -1,5 +1,5 @@
 
-### *Last Update: 03/14/2025*
+### *Last Update: 03/28/2025*
 
 ## Scripts  
 
@@ -42,7 +42,7 @@ Once you have **dots** up and running from the blank screen, **Canvas**, click o
 **Opencv-python** is required to add **shadows** to **sprites** or to adjust screen formats in **videoPlayerOne** -
 that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne** to implement it.  This is repeated further on in more detail.
 
-       
+   
 ## Screens 
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
@@ -212,7 +212,7 @@ This has been changed as well but marginally.  **BkgMatte** grabs the keyboard s
 ## Types
 The types are **'frame', 'pix', 'bkg', 'flat', 'shadow', and 'video'** .  These are used to organize the screen items from front to back as I use the **QGraphicsitem zValue()** in combination with the types to order the scene items list. There are two functions, **toFront()** and **lastZval()** that help to make sure the different types I've created are good neighbors.  The types also determine how each row of data from the .play file is to be processed.  
 
-The class attribute **type** is replaced in **PySide6** with **desc**.
+The class attribute **type** is replaced in **PySide6** with **desc** as **pyside** appears to treat it as a function and tosses an error.
 
 #### types and zValue range		
 | scene.item  | type  | zValue |
@@ -236,7 +236,7 @@ The class attribute **type** is replaced in **PySide6** with **desc**.
 
 
 ## A Brief History of Animation
- 
+
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
 Strange as it seems the only changes I've made to Animation since I first wrote it were for PySide6.  You can create your own animation using **dotsAnimation.py** as a guide and add it to a sprite to run in **StoryBoard**.
