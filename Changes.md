@@ -7,9 +7,6 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
-
-
----
 **March 25 2025**  
 This is a major update to the **QTableWidget**, **Trackers**, used to display background tracking data when scrolling and still does. I've added methods  to **Trackers** that can arrange the order of how backgrounds are displayed from the closest appearing to the furthest - best appreciated when using backgrounds with overlapping transparent sections.
 
