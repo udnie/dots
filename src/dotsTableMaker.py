@@ -58,6 +58,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.typelist = []  ## stores type, hdr, col
              
         self.Missingfiles = []  ## copy of missing files - showWorks has MissingFiles
+        self.missing = []
          
 ### --------------------------------------------------------              
         self.tableView = QTableView()        
@@ -87,7 +88,6 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.tableView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
                     
         ## dbl-click on any row to close the tableview except the header or white space
-        self.tableView.clicked.connect(self.bye)   
         self.tableView.doubleClicked.connect(self.bye)
      
         ##  or use 'C' to clear the tableview and not what it's in back of it
@@ -112,6 +112,8 @@ class TableView:  ## formats a json .play file to display missing files or not
 ### --------------------------------------------------------
     def addTable(self, data, miss, save):        
         width, height = self.widthHeight(data)
+        
+        self.missing = miss  ## used to delete
   
         file = os.path.basename(self.canvas.openPlayFile)
         self.dots.statusBar.showMessage(file)      
@@ -142,45 +144,34 @@ class TableView:  ## formats a json .play file to display missing files or not
         del data
  
 ### --------------------------------------------------------
-    def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue   
+    def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue 
         if len(self.selected) > 0: 
             self.selected.clear() 
-            
-        if len(self.Missingfiles) > 0: 
+           
+        if len(self.Missingfiles) > 0:
             if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
                 for indexes in sorted(self.tableView.selectionModel().selectedRows()):
-                    if self.isMissing(self.model.data[indexes.row()]) == True:
-                        self.updateSelected(self.model.data[indexes.row()])
+                    if indexes.row() in self.missing:  ## only place self.missing is used
+                        tmp = list(self.data[indexes.row()].values())
+                        self.selected.append((tmp[0], tmp[4]))
             else:
                 for tmp in self.Missingfiles:  ## delete all missing files
                     self.selected.append((tmp['fileName'], tmp['z'])) 
                        
-        if len(self.selected) > 0:  
+        if len(self.selected) > 0:   
             self.deleteKey = True  
             sorted(self.selected, key=lambda x: x[1], reverse=True)  
             self.deleteFromTable() 
             
-        self.makeTable(self.data)  ## refreshes tableview if anything was selected and possibly deleted
-            
-### --------------------------------------------------------   
-    def isMissing(self, row):
-        for tmp in self.Missingfiles:
-            if row[0] == tmp['fileName'] and row[4] == tmp['z']:
-                return True
-        return False
-       
-    def updateSelected(self, tmp):  ## make a list of fileName and zValue 
-        if 'fileName' in tmp[0]:  ## it's a hdr
-            return
-        self.selected.append((tmp[0], tmp[4]))  
-         
+        self.makeTable(self.data)  ## refreshes tableview if anything was deleted or not
+              
     def deleteFromTable(self):  ## doesn't affect the .play file unless saved    
         for s in self.selected:  
             for tmp in self.data:
                 if s[0] == tmp['fileName'] and s[1] == tmp['z']:          
                     self.data.remove(tmp) 
                     break
-                
+                    
 ### --------------------------------------------------------                            
     def resetColumnWidths(self, width):  
         self.tableView.setColumnWidth(0, 135)

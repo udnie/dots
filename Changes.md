@@ -7,6 +7,10 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
+**April 18 2025**       
+Bug fix to TableMaker.  The delete function for missing files died and needed to be replaced.
+
+---
 **March 25-28 2025**  
 This is a major update to the **QTableWidget**, **Trackers**, in **dotsBkgTrackers.py**, which is used to display background tracking data if scrolling and still does. I've added some methods to **Trackers** that can now arrange the order of how backgrounds are displayed from the closest appearing to the furthest - best appreciated when using backgrounds with overlapping transparent sections.
 
