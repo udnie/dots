@@ -255,7 +255,7 @@ class PathMaker(QWidget):
             self.addingNewPath = True
                   
 ### --------------------------------------------------------
-    def pathChooser(self, where=''): 
+    def pathChooser(self, where=''):
         if not self.pathChooserSet and not self.addingNewPath:
             if not self.editingPts:
                 paths = getPathList()

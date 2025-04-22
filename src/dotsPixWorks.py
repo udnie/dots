@@ -34,6 +34,12 @@ class AnimationHelp:
         self.mapper = MapMaker(self.canvas)
      
         self.token = token  
+         
+        if len(self.scene.selectedItems()) > 0:  ## the new way of doing things      
+            for p in self.canvas.scene.items():     
+                if p.type == 'pix' and p.isSelected() == True:
+                    self.token = 'pix'
+                    self.pixitem = p
                      
         alst = sorted(AnimeList)  
         ## basing pathlist on what's in the directory
@@ -78,13 +84,14 @@ class AnimationHelp:
         self.table.move(int(pos.x()) + int(width), int(pos.y())-z)
 
         self.table.show() 
-                
+          
     def clicked(self):   
         if self.token != 'on':
             try:
                 tag = self.table.item(self.table.currentRow(), 0).text().strip()   
                 if self.token == 'pix' and tag == 'Path Chooser': 
-                    QTimer.singleShot(25, partial(self.canvas.pathMaker.pathChooser, 'Path Menu')) 
+                    self.pixitem.setSelected(True)  ## double tap to be sure
+                    self.canvas.pathMaker.pathChooser('Path Menu')
                     self.closeMenu()
             except:
                 None

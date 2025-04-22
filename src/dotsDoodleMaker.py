@@ -15,6 +15,8 @@ class DoodleMaker(QWidget): ## my file display of path files
         super().__init__()
 
         self.canvas = parent
+        self.scene  = self.canvas.scene
+        
         self.pathMaker = self.canvas.pathMaker
                          
         self.type = 'widget'              
@@ -44,7 +46,7 @@ class DoodleMaker(QWidget): ## my file display of path files
         vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
         
         self.setLayout(vbox)  
-                                                            
+                                                                    
 ### --------------------------------------------------------                                          
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -106,16 +108,20 @@ class DoodleMaker(QWidget): ## my file display of path files
       
     def updateGrid(self):
         for file in getPathList():    
-            df = Doddle(self.canvas, self, file)
+            df = Doddle(self.canvas, self, file, self.canvas.scene.selectedItems())
             self.gLayout.addWidget(df)   
                     
 ### --------------------------------------------------------
 class Doddle(QLabel):  ## small drawing of path file content with filename
 ### --------------------------------------------------------
-    def __init__(self, parent, doodle, file):
+    def __init__(self, parent, doodle, file, items):  ## added items as it lost the reference
         super().__init__()
 
         self.canvas = parent
+        self.scene  = self.canvas.scene
+    
+        self.items  = items
+    
         self.doodle = doodle
         self.pathMaker = self.canvas.pathMaker
         
@@ -148,7 +154,7 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
             return      
         ## from animation menu - see menus
         if self.doodle.where == 'Path Menu': 
-            for pix in self.canvas.scene.selectedItems(): 
+            for pix in self.items: 
                 if pix.type == 'pix':
                     pix.tag = os.path.basename(self.file) 
                     pix.anime = None        ## set by play

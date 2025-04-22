@@ -18,7 +18,7 @@ MaxRows = 17
 MaxCols = 15  ## shown
 MinCols = 7
 
-ColWidth  = 100  ## seems to be the default sizes on my mac 
+ColWidth  = 100  ## seems to be the default size - see also 85px.
 RowHeight = 27
 
 ColumnWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px

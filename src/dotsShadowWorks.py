@@ -42,7 +42,9 @@ class PointItem(QGraphicsEllipseItem):
         self.x = pt.x()-V*.5
         self.y = pt.y()-V*.5
         
-        self.setZValue(common['points'])      
+        # self.setZValue(common['points'])      
+        self.setZValue(self.maker.shadow.zValue()+5) 
+          
         self.setRect(self.x, self.y, V, V)  
         
         self.setPen(QPen(QColor('gray'), 1))
@@ -177,12 +179,11 @@ class Works:  ## small functions that were in ShadowMaker
     def updateOutline(self, hide=''): 
         self.deleteOutline()
         self.maker.outline = Outline(self.makeOutline()) 
-        self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))
-        self.maker.outline.setZValue(common['outline'])       
+        self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))    
         if self.maker.linked == True or hide != '':  ## used throughout shadow and updateShadow
             self.hideOutline()  
             self.maker.dblclk = False
-        self.maker.outline.setZValue(self.maker.shadow.zValue()-1)   
+        self.maker.outline.setZValue(self.maker.shadow.zValue()+5)   
         self.scene.addItem(self.maker.outline)
         
     def toggleOutline(self):  ## called by sideCar thru toggleOutlines
