@@ -6,6 +6,7 @@ from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QGraphicsPathItem
 from dotsShared         import common, ControlKeys, ItemsGroup, PathsItem
 from dotsSideGig        import getColorStr
 from dotsSidePath       import pathLoader
+from dotsAnimation      import AnimeList
 
 ### ------------------- dotsTagsAndPaths -------------------
 ''' classes: TagIt, TagsAndPaths  - TagIt is used by PathItem and PathWays 
@@ -110,29 +111,39 @@ class TagsAndPaths: ## handles more than one request
 ### --------------------------------------------------------  
     def tagWorks(self, pid):  ## this if more than one
         k = 0
-        # topZVal = self.mapper.toFront()  ## only once
+        alltags = ''
         self.mapper.tagSet = False
+        self.alst = sorted(AnimeList); self.alst.extend(['Random'])   
         if pid == '':  ## pid can also equal the pixitem.id - using tagBkg in sideCar2 for singles
             pid = 'all'
-        alltags = ''
         ## changed order - otherwise the top tag can be hidden 
         for pix in self.scene.items(Qt.SortOrder.AscendingOrder):
             if pix.type in ( 'frame', 'pix', 'snake', 'bkg', 'shadow'):
-                if type(pix.tag) == str and 'path' in pix.tag and pid == 'paths':
+                
+                if pid == 'paths' and 'path' in str(pix.tag):  
                     self.tagThis('paths', pix) 
                     k += 1
-                if pid == 'all':
-                    k += 1
+                    
+                elif pid == 'anime' and pix.type == 'pix' and pix.tag in self.alst \
+                    or 'path' in pix.tag:  
+                    self.tagThis('',pix) 
+                    k += 1   
+                            
+                elif pid == 'all':
                     if alltags != pix.tag:  ## only one per snake
                         alltags = pix.tag
-                        self.tagThis('',pix)         
+                        self.tagThis('',pix) 
+                        k += 1    
+                            
                 elif pid == 'select' and pix.isSelected():
                     self.tagThis('', pix)
                     k += 1
+                    
                 elif pix.type == 'frame':  ## single tag  
-                    self.tagThis('',pix) 
+                    self.tagThis('', pix) 
                     k = 1
-                    break     
+                    break   
+                   
         if k > 0: 
             self.mapper.tagSet = True
             self.dots.statusBar.showMessage(f"Number Tagged: {k}", 5000)
@@ -141,6 +152,7 @@ class TagsAndPaths: ## handles more than one request
  
 ### --------------------------------------------------------        
     def tagThis(self, token, pix):  ## used by tagWorks
+        
         if pix.type != 'shadow': 
             p = pix.sceneBoundingRect()
             x = p.x() + p.width()*.45

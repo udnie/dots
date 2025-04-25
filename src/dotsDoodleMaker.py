@@ -16,7 +16,7 @@ class DoodleMaker(QWidget): ## my file display of path files
 
         self.canvas = parent
         self.scene  = self.canvas.scene
-        
+      
         self.pathMaker = self.canvas.pathMaker
                          
         self.type = 'widget'              
@@ -114,11 +114,12 @@ class DoodleMaker(QWidget): ## my file display of path files
 ### --------------------------------------------------------
 class Doddle(QLabel):  ## small drawing of path file content with filename
 ### --------------------------------------------------------
-    def __init__(self, parent, doodle, file, items):  ## added items as it lost the reference
+    def __init__(self, parent, doodle, file, items):  ## added items to insure its reference
         super().__init__()
 
         self.canvas = parent
         self.scene  = self.canvas.scene
+        self.mapper = self.canvas.mapper
     
         self.items  = items
     
@@ -153,13 +154,14 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
             e.button() == Qt.MouseButton.RightButton:
             return      
         ## from animation menu - see menus
-        if self.doodle.where == 'Path Menu': 
+        if self.doodle.where == 'Path Menu':   
             for pix in self.items: 
                 if pix.type == 'pix':
                     pix.tag = os.path.basename(self.file) 
                     pix.anime = None        ## set by play
-                    pix.setSelected(False)  ## when tagged     
+                    pix.setSelected(False)  ## when tagged    
             self.pathMaker.pathChooserOff() 
+            self.mapper.toggleTagItems('anime') 
             return
         elif self.pathMaker.key == 'del':
             self.pathMaker.pathWorks.deleteDoodle(self)

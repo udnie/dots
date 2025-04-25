@@ -7,8 +7,13 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
-**April 22 2025**   
-A bug fix for selecting paths, another thing that used to work stopped working.  It may be the result of the combination of Python 13.2, PyQt6.8 and Apple Sequoia. It appeared that scene.selectedItems() wasn't being referenced nor the sprite it was supposed to include inorder to trigger the PathChooser.  I also made a small change to the shadows outline and repositioned it so it floats above the sprite making it easier to grab and move the outline point handles.
+
+**April 22-24 2025**   
+Added a tag(s) to display the animation or path selected from the Animation Menu.
+
+A bug fix for selecting Paths from the Animation Menu, another thing that used to work stopped working.  It may be the result of the combination of Python 13.2, PyQt6.8 and Apple Sequoia or something I moved? It appeared that scene.selectedItems() wasn't being referenced nor the sprite it was supposed to include in-order to trigger the PathChooser. 
+
+I also made a small change to the shadows outline and repositioned it so it floats above the sprite making it easier to grab and move the outline point handles.
 
 **April 18 2025**       
 Bug fix to TableMaker.  The delete function for missing files died and needed to be replaced - possibly fallout from transitioning to PySide.

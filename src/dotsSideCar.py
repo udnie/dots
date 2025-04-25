@@ -57,6 +57,7 @@ class SideCar:
                 pix.setPos(pix.x, pix.y)
                 rotation = random.randrange(-5, 5) * 5
                 scale = random.randrange(90, 110)/100.0
+                pix.locked = False;  pix.tag = ''
                 self.transFormPixItem(pix, rotation, scale, 1.0)
                                                                  
     def clearWidgets(self):                             

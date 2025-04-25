@@ -1,9 +1,7 @@
 
 import os
 
-from functools          import partial
- 
-from PyQt6.QtCore       import QPoint, QTimer
+from PyQt6.QtCore       import QPoint
 from PyQt6.QtGui        import QCursor
 
 from dotsSideGig        import constrain, MsgBox, getPathList, getVuCtr
@@ -87,19 +85,14 @@ class AnimationHelp:
           
     def clicked(self):   
         if self.token != 'on':
-            try:
-                tag = self.table.item(self.table.currentRow(), 0).text().strip()   
+            tag = self.table.item(self.table.currentRow(), 0).text().strip()   
+            if tag != '':     
                 if self.token == 'pix' and tag == 'Path Chooser': 
                     self.pixitem.setSelected(True)  ## double tap to be sure
                     self.canvas.pathMaker.pathChooser('Path Menu')
-                    self.closeMenu()
-            except:
-                None
-                self.closeMenu()
-            else:
                 self.setTag(tag)
-        else:
-            self.closeMenu()
+                self.mapper.toggleTagItems('anime')  ## adds tagGroup
+        self.closeMenu()
       
     def closeMenu(self):   
         self.table.close()

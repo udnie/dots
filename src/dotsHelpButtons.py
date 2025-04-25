@@ -186,14 +186,14 @@ class StoryHelp:
     
         row = 1
         for k, val in storyKeys.items():
-            if row < 16:
+            if row < 15:
                 self.table.setRow(row, 0, k, '', True,True)
                 self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
-                if row == 16:
+                if row == 15:
                     self.table.setRow(row, 0, f"{' Keys for Running an Animation':<32}",QC,True,True,2)
-                    row = 17
+                    row = 16
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1

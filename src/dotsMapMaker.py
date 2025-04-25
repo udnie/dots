@@ -185,7 +185,7 @@ class MapMaker:
     def toggleTagItems(self, pid):  
         if self.canvas.pathMakerOn: 
             return  
-        elif self.tagCount() > 0:  
+        elif self.tagCount() > 0 and pid != 'anime':  ## don't clear these
             self.clearTagGroup()
             self.clearPaths() 
             return

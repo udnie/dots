@@ -43,7 +43,7 @@ class PointItem(QGraphicsEllipseItem):
         self.y = pt.y()-V*.5
         
         # self.setZValue(common['points'])      
-        self.setZValue(self.maker.shadow.zValue()+5) 
+        self.setZValue(self.maker.shadow.zValue()+10) 
           
         self.setRect(self.x, self.y, V, V)  
         
@@ -163,7 +163,7 @@ class Works:  ## small functions that were in ShadowMaker
     
     def addPointsToScene(self, hide=True):
         for p in self.maker.points:   
-            p.setZValue(self.maker.shadow.zValue())
+            p.setZValue(self.maker.shadow.zValue()+10)
             if self.maker.isHidden or \
                 self.maker.linked == True or hide == False:
                 p.hide()                          
