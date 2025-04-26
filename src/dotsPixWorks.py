@@ -85,13 +85,13 @@ class AnimationHelp:
           
     def clicked(self):   
         if self.token != 'on':
-            tag = self.table.item(self.table.currentRow(), 0).text().strip()   
-            if tag != '':     
+            if tag := self.table.item(self.table.currentRow(), 0).text().strip():
                 if self.token == 'pix' and tag == 'Path Chooser': 
                     self.pixitem.setSelected(True)  ## double tap to be sure
                     self.canvas.pathMaker.pathChooser('Path Menu')
                 self.setTag(tag)
-                self.mapper.toggleTagItems('anime')  ## adds tagGroup
+                if 'Path' not in tag: 
+                    self.mapper.toggleTagItems('anime')  ## handle non-path selections
         self.closeMenu()
       
     def closeMenu(self):   
