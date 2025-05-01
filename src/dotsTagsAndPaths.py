@@ -1,9 +1,9 @@
 
 from PyQt6.QtCore       import Qt, QAbstractAnimation, QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter, QBrush, QFontMetrics, QColor, QFont
-from PyQt6.QtWidgets    import QGraphicsSimpleTextItem, QGraphicsPathItem
+from PyQt6.QtWidgets    import QGraphicsPathItem
                             
-from dotsShared         import common, ControlKeys, ItemsGroup, PathsItem
+from dotsShared         import common, ControlKeys, ItemsGroup, PathsItem, TextItem
 from dotsSideGig        import getColorStr
 from dotsSidePath       import pathLoader
 from dotsAnimation      import AnimeList
@@ -13,7 +13,7 @@ from dotsAnimation      import AnimeList
     directly and is managed by them. TagsAndPaths also uses TagIt but is
     mainly managed thru mapper. - another project awaits '''
 ### --------------------------------------------------------
-class TagIt(QGraphicsSimpleTextItem):  ## called in pathItem, pathWays and this
+class TagIt(TextItem):  ## called in pathItem, pathWays and this
 ### --------------------------------------------------------   
     def __init__(self, token, tag, color, zval=None):
         super().__init__()

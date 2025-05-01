@@ -7,8 +7,10 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
+**April 30 2025**  
+Discovered and fixed a bug if in **pyside6** and selecting a path from the **animation menu** or selecting a path in **pathMaker**.  After two selections it would crash with a segmentation fault error.  I was able to get some help from **google A.I.** again with an example that showed how **pyside6** might handle combining a grid-layout and scrollbars.  It's a little bit different from how it worked in **pyqt** but enough to make a difference.
 
-**April 22-24 2025**   
+**April 22-25 2025**   
 Added a tag(s) to display the animation or path selected from the Animation Menu.
 
 A bug fix for selecting Paths from the Animation Menu, another thing that used to work stopped working.  It may be the result of the combination of Python 13.2, PyQt6.8 and Apple Sequoia or something I moved? It appeared that scene.selectedItems() wasn't being referenced nor the sprite it was supposed to include in-order to trigger the PathChooser. 

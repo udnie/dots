@@ -33,6 +33,7 @@ SpinDrift = QColor('#73fcd6')
 ### -------------------- dotsHelpMaker --------------------- 
 ''' Home for the help menus - uses switch, either '' or 'on' '''
 ### --------------------------------------------------------
+    ## see shared for most of the subclasses
     ## Animation Menu in pixWork
     ## Canvas and StoryBoard Menus in helpButtons
     ## Demos, Screens Menus in helpMenus 

@@ -208,7 +208,7 @@ class BkgTrackers:
                 try:            
                     if r := self.canvas.bkgMaker.newTracker[fileName]: 
                         zval = p.zValue()
-                        fileName, direction, mirroring, locked = self.canvas.sideCar2.addBkgLabels(p)
+                        fileName, direction, mirroring, locked = self.addBkgLabels(p)
                         rate, showtime, path = str(r['rate']), str(r['showtime']), r['path']
                         s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {r['useThis']} {path[5:-1]}"
                         dump.append(s.split())
@@ -219,7 +219,32 @@ class BkgTrackers:
         else:
             MsgBox('Error in dumpTrackers')
             return None
-                                
+                
+    def addBkgLabels(self, bkg):  ## used by dumpTrackers
+        fileName = bkg.fileName       
+        if bkg.locked == True:
+            locked = 'Locked' 
+        else:
+            locked = 'UnLocked' 
+        if bkg.direction == 'left':
+            direction = 'Left'
+        elif bkg.direction == 'right': 
+            direction = 'Right'     
+        elif self.dots.Vertical:
+            direction = 'Vertical'
+        else:
+            if self.bkgMaker.newTracker[fileName]:   
+                direction = self.bkgMaker.newTracker[fileName]['direction']     
+            if direction == '':
+                direction = 'NoDirection'
+        if bkg.mirroring == False:
+            mirror = 'Continuous'
+        elif bkg.mirroring == True:
+            mirror = 'Mirrored'
+        elif bkg.direction == '' and bkg.scrollable == False:
+            mirror = 'Not Scrollable'    
+        return fileName.capitalize(), direction, mirror, locked
+                              
 ### -------------------------------------------------------- 
     def restoreFromTrackers(self, bkg):  ## returns what gets lost on each new bkg
         if tmp := self.bkgMaker.newTracker.get(bkg.fileName):

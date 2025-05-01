@@ -24,7 +24,7 @@ class SideCar2:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-  
+    
 ### --------------------------------------------------------      
     def snapShot(self, pathMaker):  ## screen capture
         if self.hasBackGround() > 0 or self.scene.items():
@@ -108,32 +108,7 @@ class SideCar2:
                     i += 1 
                     if i >= 3:
                         self.scene.removeItem(bkg)
-                
-    def addBkgLabels(self, bkg):  ## used by dumpTrackers
-        fileName = bkg.fileName       
-        if bkg.locked == True:
-            locked = 'Locked' 
-        else:
-            locked = 'UnLocked' 
-        if bkg.direction == 'left':
-            direction = 'Left'
-        elif bkg.direction == 'right': 
-            direction = 'Right'     
-        elif self.dots.Vertical:
-            direction = 'Vertical'
-        else:
-            if self.canvas.bkgMaker.newTracker[fileName]:   
-                direction = self.canvas.bkgMaker.newTracker[fileName]['direction']     
-            if direction == '':
-                direction = 'NoDirection'
-        if bkg.mirroring == False:
-            mirror = 'Continuous'
-        elif bkg.mirroring == True:
-            mirror = 'Mirrored'
-        elif bkg.direction == '' and bkg.scrollable == False:
-            mirror = 'Not Scrollable'    
-        return fileName.capitalize(), direction, mirror, locked
-  
+
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
         if self.canvas.bkgMaker.bkgtrackers.tracker != None and \
@@ -164,6 +139,7 @@ class SideCar2:
             elif pix.zValue() <= common['pathZ']:
                 break
  
+### -------------------------------------------------------- 
     def deleteSelected(self):  ## self.pathMakerOn equals false   
         if len(self.scene.items()) == 0:
             self.canvas.setKeys('D')
@@ -180,6 +156,8 @@ class SideCar2:
                     pix.deletePix()  ## deletes shadow as well 
                     del pix
                     k += 1
+                # else:
+                #     print('sc2', pix.type)
             if k > 0: self.canvas.showWorks.enablePlay()  ## stop it - otherwise it's hung
   
     def unSelect(self):
@@ -207,6 +185,7 @@ class SideCar2:
             else:
                 self.canvas.setKeys('F')
     
+### --------------------------------------------------------  
     def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
         if bkg:  ## shouldn't need this but - could have just started to clear        
             if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \

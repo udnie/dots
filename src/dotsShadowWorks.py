@@ -14,7 +14,7 @@ V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
 ### -------------------- dotsShadowWorks -------------------
 ''' classes: Outline, Works and PointItem '''
 ### --------------------------------------------------------
-class Outline(QGraphicsPolygonItem):  ## added 'type' to track it better
+class Outline(QGraphicsPolygonItem):  ##  ## subclass - added 'type' to track it better
 ### --------------------------------------------------------
     def __init__(self, path):
         super().__init__()          

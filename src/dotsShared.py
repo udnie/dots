@@ -4,13 +4,14 @@ from PyQt6.QtGui        import QImage, QPixmap
 
 
 from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, \
-                            QGraphicsPolygonItem, QGraphicsPixmapItem
+                            QGraphicsPolygonItem, QGraphicsPixmapItem, \
+                            QGraphicsSimpleTextItem
 
 ### --------------------- dotsShared.py --------------------
-''' classes:  Ball, Outline, PathsItem, ItemsGroup and data 
+''' SubClasses: Ball, Outline, PathsItem, ItemsGroup and data 
                 shared across classes and files ''' 
 ### --------------------------------------------------------
-class Ball(QGraphicsPixmapItem):  ## added type to track it better
+class Ball(QGraphicsPixmapItem):  ## subclass - added type to track it better
 ### --------------------------------------------------------
     def __init__(self, img, parent=''):
         super().__init__()          
@@ -20,13 +21,12 @@ class Ball(QGraphicsPixmapItem):  ## added type to track it better
         self.type = 'ball'
         self.setPixmap(QPixmap(img))
    
-   
     def mouseDoubleClickEvent(self, e):
         if self.canvas != '':
             self.canvas.sideCar.delbackdrp()
     
 ### --------------------------------------------------------
-class Outline(QGraphicsPolygonItem):  
+class Outline(QGraphicsPolygonItem):  ## subclass 
 ### --------------------------------------------------------
      def __init__(self, path):
           super().__init__()          
@@ -35,7 +35,7 @@ class Outline(QGraphicsPolygonItem):
           self.setPolygon(path)
 
 ### --------------------------------------------------------
-class PathsItem(QGraphicsPathItem): 
+class PathsItem(QGraphicsPathItem):  ## subclass 
 ### --------------------------------------------------------
     def __init__(self, path):
         super().__init__()          
@@ -44,12 +44,20 @@ class PathsItem(QGraphicsPathItem):
         self.setPath(path)
         
 ### --------------------------------------------------------
-class ItemsGroup(QGraphicsItemGroup): 
+class ItemsGroup(QGraphicsItemGroup):  ## subclass 
 ### --------------------------------------------------------
     def __init__(self):
         super().__init__()          
        
         self.type = 'group'
+               
+### --------------------------------------------------------
+class TextItem(QGraphicsSimpleTextItem):  ## subclass 
+### --------------------------------------------------------
+    def __init__(self):
+        super().__init__()          
+       
+        self.type = 'text'
         
 ### --------------------------------------------------------
 

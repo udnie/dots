@@ -49,7 +49,7 @@ class StoryBoard(QWidget):
         self.animation = False      ## set by showtime
     
         self.canvas = self 
-            
+        
         self.sideCar   = SideCar(self)  ## extends canvas
         self.sideCar2  = SideCar2(self)
           
@@ -72,7 +72,9 @@ class StoryBoard(QWidget):
         self.origin = QPoint()
         self.pixCount = 1
         
+        self.animeHelp = None
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self)
+        
         self.setMouseTracking(True)
               
         self.view.viewport().installEventFilter(self)
@@ -218,8 +220,11 @@ class StoryBoard(QWidget):
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):  ## if sprites are selected and right-mouse click
         if len(self.scene.selectedItems()) > 0:  ## don't remove e
-            self.nowhere = AnimationHelp(self, QCursor.pos(),'')
-      
+            if self.animeHelp != None:
+                self.animeHelp == None
+            self.animeHelp = AnimationHelp(self.canvas, QCursor.pos(), 'story')
+        e.accept()
+        
 ### -------------------- dotsStoryBoard --------------------
 
 

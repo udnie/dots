@@ -1,7 +1,9 @@
 
 import os
 
-from PyQt6.QtCore       import QPoint
+from functools          import partial
+
+from PyQt6.QtCore       import QPoint, QTimer
 from PyQt6.QtGui        import QCursor
 
 from dotsSideGig        import constrain, MsgBox, getPathList, getVuCtr
@@ -14,33 +16,40 @@ from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 Pct = -0.50   ## used by constrain - percent allowable off screen
 
 PixSizes = {  ## match up on base filename using 5 characters - sometimes called chars?
-    # "apple": (650, 450),  ## see setPixSizes below
+    "apple": (175, 175),  ## see setPixSizes below
     'doral': (215, 215),
 }
                   
 ### --------------------------------------------------------  
 ''' shared with canvas.contextMenu and with pixitem thru pixwidget '''
 ### --------------------------------------------------------    
-class AnimationHelp:  
+class AnimationHelp: 
 ### --------------------------------------------------------
     def __init__(self, parent, pos, token='', off=0):
         super().__init__()
  
-        self.pixitem = parent
-        self.canvas = self.pixitem.canvas
-        self.scene  = self.canvas.scene
-        self.mapper = MapMaker(self.canvas)
-     
-        self.token = token  
-         
-        if len(self.scene.selectedItems()) > 0:  ## the new way of doing things      
-            for p in self.canvas.scene.items():     
-                if p.type == 'pix' and p.isSelected() == True:
+        if token == 'pix':
+            self.canvas  = parent.canvas
+            self.pixitem = parent
+        else:
+            self.canvas = parent
+        
+        self.scene   = self.canvas.scene
+        self.mapper  = MapMaker(self.canvas)
+        
+        self.sideCar2 = self.canvas.sideCar2
+        
+        self.token = token 
+ 
+        if token == 'story' and len(self.scene.selectedItems()) > 0:  ## seems to work 
+            for p in self.scene.selectedItems():     
+                if p.type == 'pix':
                     self.token = 'pix'
-                    self.pixitem = p
-                     
+                    self.pixitem = p  ## need one for a boundingRect
+                                           
         alst = sorted(AnimeList)  
-        ## basing pathlist on what's in the directory
+        
+        ## make a pathlist from what's in the directory
         self.canvas.pathList = getPathList(True)  ## names only
         if len(self.canvas.pathList) == 0:
             MsgBox('getPathList: No Paths Found!', 5)
@@ -66,39 +75,43 @@ class AnimationHelp:
         self.table.setRow(row + 1, 0,f'{"Clear Tags":<42}',QL,True,True, 2)       
         self.table.setRow(row + 2, 0,f'{"Click Here to Close Menu":<49}','',True,True, 2)
 
-        x, y = getVuCtr(self.pixitem.canvas)
-        z = 50
+        x, y = getVuCtr(self.canvas);  z = 50
         
         if self.token == 'pix':  ## from the sprite
              b = self.pixitem.boundingRect()
              width = b.width() + 20      
-        elif self.token == 'on':  ## from menus 
-             x, y = getVuCtr(self.pixitem.canvas)
+             
+        elif self.token == 'on':  ## from help menus 
+             x, y = getVuCtr(self.canvas)
              pos = QPoint(x + off, int(y - (height/2)) + 50)
-             width = 0           
-        else:
-            width, z = width/2, 100  ## from storyboard
+             width = 0   
+                  
+        if token == 'story':  ## from storyboard - pos comes from QCursor
+            width, z = width*.55, 100 
                      
         self.table.move(int(pos.x()) + int(width), int(pos.y())-z)
-
+        
         self.table.show() 
-          
-    def clicked(self):   
-        if self.token != 'on':
-            if tag := self.table.item(self.table.currentRow(), 0).text().strip():
+ 
+### --------------------------------------------------------         
+    def clicked(self):  
+        if self.token == 'pix':     
+            try:        
+                tag = self.table.item(self.table.currentRow(), 0).text().strip()   
                 if self.token == 'pix' and tag == 'Path Chooser': 
-                    self.pixitem.setSelected(True)  ## double tap to be sure
-                    self.canvas.pathMaker.pathChooser('Path Menu')
-                self.setTag(tag)
-                if 'Path' not in tag: 
-                    self.mapper.toggleTagItems('anime')  ## handle non-path selections
+                    QTimer.singleShot(25, partial(self.canvas.pathMaker.pathChooser, 'Path Menu'))   
+                elif tag != '':        
+                    self.setTag(tag)  ## non-path selection
+                    self.mapper.toggleTagItems('anime')  
+            except:
+                MsgBox('Error on Menu Selection', 6)  
         self.closeMenu()
-      
+
     def closeMenu(self):   
         self.table.close()
         if self.token == 'on':
             self.canvas.setKeys('N')
-      
+
     def setTag(self, tag):
         if self.mapper.tagSet and tag == 'Clear Tags':
             self.mapper.clearTagGroup()  
@@ -110,22 +123,20 @@ class AnimationHelp:
                 else:
                     pix.tag = tag
                 pix.anime = None  ## set by play
-                pix.setSelected(False)  ## when tagged
-                    
+                pix.setSelected(False)  ## when tagged    
+                           
         if self.mapper.isMapSet(): 
             self.mapper.removeMap()
-                
-        self.closeMenu()
-                                                       
+                                                         
 ### ---------------------- dotsPixWorks -------------------- 
 class Works:  ## extends pixitem and pixwidget
 ### --------------------------------------------------------
     def __init__(self, parent, pix):
         super().__init__()
  
-        self.canvas  = parent
+        self.canvas = parent
         self.pix = pix
-             
+        
 ### --------------------------------------------------------
     def closeWidget(self):
         if self.pix.widget != None:
@@ -147,11 +158,13 @@ class Works:  ## extends pixitem and pixwidget
         self.pix.setEnabled(False)
         self.pix.scene.removeItem(self.pix)
       
-    def animeMenu(self):
+    def animeMenu(self):  ## from pixwidget
         self.closeWidget()
         self.pix.setSelected(True)
-        x, y = self.makeXY()
-        self.help = AnimationHelp(self.pix, QPoint(x,y), 'pix')
+        x, y = self.makeXY()   
+        if self.canvas.animeHelp != None:
+            self.canvas.animeHelp = None
+        self.canvas.animeHelp = AnimationHelp(self.pix, QPoint(x,y), 'pix')
    
     def makeXY(self):  
         p = self.pix.pos()

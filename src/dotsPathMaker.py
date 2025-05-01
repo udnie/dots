@@ -11,6 +11,7 @@ from dotsShared         import common, MoveKeys, PathsItem, Outline
 from dotsPathWays       import PathWays
 from dotsPathEdits      import PathEdits
 from dotsPathWorks      import PathWorks
+from dotsMapMaker       import MapMaker
 
 from dotsDoodleMaker    import DoodleMaker
 
@@ -30,6 +31,8 @@ class PathMaker(QWidget):
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
         self.dots      = self.canvas.dots  
+        
+        self.mapper    = MapMaker(self.canvas)
          
         self.widget  = None
         self.seconds = 10  ## set how long it takes mr.ball to complete a path
@@ -39,6 +42,8 @@ class PathMaker(QWidget):
         self.edits      = PathEdits(self) 
   
         self.initThis()  
+        
+        self.pathMaker = self
                
         self.doFirst = {
             'D': self.delete,
@@ -113,7 +118,7 @@ class PathMaker(QWidget):
         self.chooser = None
         self.newPath = None 
         self.pathTestNode = None
-                         
+                               
 ### ---------------------- key handler ---------------------
     @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
     def pathKeys(self, key):
@@ -261,17 +266,24 @@ class PathMaker(QWidget):
                 paths = getPathList()
                 if len(paths) == 0:
                     MsgBox('getPathList: No Paths Found!', 5)
-                    return None
+                    return None 
+                self.preCleanUp()
+                if where != 'Path Menu':  where = 'pathMaker'  ## used by Doodle
                 self.chooser = DoodleMaker(self.canvas, where) 
-                if where == 'Path Menu':  ## from animation menu
-                    b = getCtr(-270,-385) 
-                else:
-                    b = getCtr(-270,-265)      
+                b = getCtr(-270,-350)      
                 self.chooser.move(int(b.x()), int(b.y()))
-                self.chooser.show()
+                self.chooser.show() 
                 self.pathChooserSet = True 
         else:  
             self.pathChooserOff()
+            
+    def preCleanUp(self):
+        self.mapper.clearMap()
+        self.mapper.clearTagGroup() 
+        if self.chooser != None:
+            self.chooser.close()
+            self.chooser = None   
+            self.pathChooserSet = False
 
     def pathChooserOff(self):
         if self.chooser: self.chooser.close()

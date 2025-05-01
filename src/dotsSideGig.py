@@ -5,9 +5,9 @@ import math
 
 from PyQt6.QtCore       import Qt, QTimer, QPointF, QRectF, QPoint
 from PyQt6.QtGui        import QGuiApplication, QImage, QPixmap, QPen, QColor
-from PyQt6.QtWidgets    import QMessageBox, QGraphicsLineItem, QGraphicsSimpleTextItem
+from PyQt6.QtWidgets    import QMessageBox, QGraphicsLineItem
      
-from dotsShared         import common, paths, pathcolors
+from dotsShared         import common, paths, pathcolors, TextItem
 
 ### ---------------------- dotsSideGig ---------------------
 ''' class: MsgBox, Grid, and misc  ...'''                       
@@ -220,7 +220,7 @@ def getCrop(path):  ## from path - bounding size and position
 ### --------------------------------------------------------  
 def tagBkg(bkg, pos):  
     x, y, z = pos.x(), pos.y(), bkg.zValue()   
-    text = QGraphicsSimpleTextItem() 
+    text = TextItem() 
               
     src = 'bkg'  
     color = 'orange'

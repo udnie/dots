@@ -1,7 +1,7 @@
 
 from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt6.QtGui     import QColor, QPen
-from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem, QGraphicsSimpleTextItem
+from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
 from dotsShared         import common, ItemsGroup
 from dotsTagsAndPaths   import TagsAndPaths
@@ -206,10 +206,10 @@ class MapMaker:
     def clearPaths(self):  ## used by snakes, showtime, hatsbats, and tagsandspaths
         if self.pathSet:
             for pix in self.scene.items():
-                if pix.type == 'pathsItem':
+                if pix.type in ('pathsItem', 'text'):
                     self.scene.removeItem(pix)
-                elif isinstance(pix, QGraphicsSimpleTextItem):
-                   self.scene.removeItem(pix)
+                # elif isinstance(pix, QGraphicsSimpleTextItem):
+                #    self.scene.removeItem(pix)
                    
             for pix in self.scene.items():
                 if pix.type in ('pix', 'snake') and not pix.tag.endswith('.path'):
@@ -225,7 +225,7 @@ class MapMaker:
               
     def removeTags(self):  ## mapper only
         for p in self.canvas.scene.items():
-            if p.type == 'tag':
+            if p.type in ('tag', 'text', 'group'):
                 self.scene.removeItem(p)  
     
     def toFront(self, inc=0):  ## finds the highest pixitem zValue - first
