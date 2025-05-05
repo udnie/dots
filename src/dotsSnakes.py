@@ -174,6 +174,7 @@ class Snakes:
             
         if self.scroller != None:
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
+            
         elif what == 'left':
             self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
             
@@ -191,7 +192,7 @@ class Snakes:
             if common['Screen'] == '1102':
                 self.scroller = BkgItem(paths['demo'] + 'snakes_1102.jpg', self.canvas) 
             else:
-                self.scroller =  BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)
+                self.scroller = BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)
                 
             self.scroller.direction = 'vertical'   
             self.scroller.path = paths['demo'] 
@@ -245,7 +246,7 @@ class Snakes:
         self.mapper.clearTagGroup()
         self.mapper.clearPaths()
         if what != 'blue':
-            self.canvas.bkgMaker.delTracker(self.scroller) 
+            self.canvas.bkgMaker.bkgtrackers.delTracker(self.scroller) 
         self.delSnakes()        
         self.makeSnakes(what)
               

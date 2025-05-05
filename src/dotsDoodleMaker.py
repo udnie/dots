@@ -85,14 +85,10 @@ class DoodleMaker(QWidget): ## my file display of path files
     def addGrid(self):     
         widget = QWidget()
         
-        gridLayout = QGridLayout()
-        gridLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
-        gridLayout.setHorizontalSpacing(5)
-        gridLayout.setContentsMargins(5, 5, 5, 5)
-        
-        for file in getPathList():  
-            df = Doddle(self.canvas, self.where, file)
-            gridLayout.addWidget(df)
+        self.gLayout = QGridLayout(widget)
+        self.gLayout.setDefaultPositioning(3, Qt.Orientation.Horizontal)
+        self.gLayout.setHorizontalSpacing(5)
+        self.gLayout.setContentsMargins(5, 5, 5, 5)
         
         scroll = QScrollArea()
         scroll.setFixedSize(self.WidgetW-40, self.WidgetH-70)
@@ -103,11 +99,16 @@ class DoodleMaker(QWidget): ## my file display of path files
         scroll.verticalScrollBar().setStyleSheet('QScrollBar:vertical {\n' 
             'background: rgb(245,245,245) }');  ## shows handle better
 
-        widget.setLayout(gridLayout)
-        scroll.setWidget(widget)
-        
+        self.updateGrid()
+
+        scroll.setWidget(widget) 
         return scroll
-                  
+    
+    def updateGrid(self):
+        for file in getPathList():    
+            df = Doddle(self.canvas, self.where, file)
+            self.gLayout.addWidget(df)  
+             
 ### --------------------------------------------------------
 class Doddle(QLabel):  ## small drawing of path file content with filename
 ### --------------------------------------------------------
@@ -146,7 +147,8 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
     def mousePressEvent(self, e): 
         if e.type() == QEvent.Type.MouseButtonPress and \
             e.button() == Qt.MouseButton.RightButton:
-            return      
+            return    
+          
         if self.where == 'pathMaker':
             if self.pathMaker.key == 'del':  ## deletes actual file
                 self.pathMaker.pathWorks.deleteDoodle(self)
@@ -157,7 +159,8 @@ class Doddle(QLabel):  ## small drawing of path file content with filename
                 self.pathMaker.openPathFile = os.path.basename(self.file) 
                 self.pathMaker.pathChooserOff()        
                 if self.pathMaker.widget != None:
-                    self.pathMaker.widget.resetSliders()        
+                    self.pathMaker.widget.resetSliders()  
+                          
         elif self.where == 'Path Menu':  ## from animation menu
             self.setPaths(self.file)
             self.canvas.mapper.toggleTagItems('anime')

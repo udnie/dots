@@ -177,10 +177,7 @@ class Hats:  ## hats - was abstract
 
 ### --------------------------------------------------------            
     def setBackGround(self):
-        if self.scroller != None:  ## uses imgFile rather than reading the file again
-            self.scroller = BkgItem(paths['bkgPath'] + 'bluestone.jpg', self.canvas, True, self.scroller.imgFile)
-        else:
-            self.scroller = BkgItem(paths['bkgPath'] + 'bluestone.jpg', self.canvas)
+        self.scroller = BkgItem(paths['bkgPath'] + 'bluestone.jpg', self.canvas)
    
         self.scroller.direction = self.direction       
         self.scroller.path = paths['bkgPath']  

@@ -24,7 +24,7 @@ SharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):  ## background
 ### --------------------------------------------------------
-    def __init__(self, fileName, parent, z=common['bkgZ'], mirror=False, copy=None):
+    def __init__(self, fileName, parent, z=common['bkgZ'], copy=None):
         super().__init__()
 
         self.canvas   = parent
@@ -219,7 +219,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         no longer needing to re-read the .jpg/.png file  '''       
 ### -------------------------------------------------------- 
     def addNextScroller(self): 
-        item = BkgItem(self.fileName, self.canvas, common['bkgZ'],self.mirroring, self.imgFile) 
+        item = BkgItem(self.fileName, self.canvas, common['bkgZ'], self.imgFile) 
                                          
         if self.mirroring == True:
             item.setMirrored(False) if self.flopped else item.setMirrored(True)   

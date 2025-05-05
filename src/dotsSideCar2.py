@@ -92,14 +92,14 @@ class SideCar2:
         if wuf == None: return   
         x = int(common['ViewW']/2- bkg.width)   
         bkg.setPos(x , 0)    
-        akg = BkgItem(wuf.fileName, self.canvas, common['bkgZ'], True, wuf.imgFile)
+        akg = BkgItem(wuf.fileName, self.canvas, common['bkgZ'], wuf.imgFile)
         if akg == None:
             return
         self.scene.addItem(akg)  
         akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
         akg.setPos(int(common['ViewW']/2), 0)
         self.delDupes()
-                 
+   
     def delDupes(self):  ## otherwise they can build up
         if self.hasBackGround() >= 3:
             i = 0

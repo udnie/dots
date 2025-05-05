@@ -107,6 +107,7 @@ class ControlView(QGraphicsView):
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
                 self.setKey('!')  ## half number of points
+                
             else:
                 self.setKey('@')  ## evenly redistribute points
               
@@ -119,6 +120,7 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key.Key_F:
             if self.canvas.pathMakerOn == False:  
                 self.sideCar2.flopSelected() 
+                
             else:
                 self.canvas.sideCar2.sendPixKeys('F')
                            
@@ -136,15 +138,18 @@ class ControlView(QGraphicsView):
             if not self.canvas.pathMakerOn:
                 if mod & Qt.KeyboardModifier.ShiftModifier:
                     self.sideCar2.mirrorBkg() 
+                    
                 elif mod & Qt.KeyboardModifier.AltModifier or \
                     mod & Qt.KeyboardModifier.ControlModifier:  
-                        self.sideCar2.newTracker()                              
+                        self.sideCar2.newTracker()  
+                                                    
                 else:
                     self.sideCar2.bkgStuff()
                                                           
         elif key == Qt.Key.Key_D:
             if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
                 self.setKey('delPts')  ## delete selected pts in pathmaker
+                
             else: 
                 self.setKey('D')
                                                     
@@ -155,12 +160,14 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key.Key_L:
             if mod & Qt.KeyboardModifier.ShiftModifier:  ##  ## toggles sprites locked on/off
                 self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass
+                
             else:
                 self.setKey('L')  ## used by pathmaker to toggle lasso 
                 
         elif key == Qt.Key.Key_M:
             if mod & Qt.KeyboardModifier.ShiftModifier:  
                 self.sideCar.dump()
+                
             else:
                 self.setKey('M')
                 
@@ -171,21 +178,25 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off        
             if mod & Qt.KeyboardModifier.ShiftModifier and \
                 self.canvas.control == '':
-                    self.sideCar.toggleShadowLinks()  ## does them all                            
+                    self.sideCar.toggleShadowLinks()  ## does them all 
+                                               
             else:
                 self.setKey('S')  
                                                           
         elif key == Qt.Key.Key_T:  ## toggles tags both link and lock
             if self.canvas.pathMakerOn == True:
                 self.setKey('T')
+                
             elif mod & Qt.KeyboardModifier.ShiftModifier or self.canvas.control !='':
                 self.mapper.toggleTagItems('all') 
+                
             else:
                 self.canvas.sideCar2.sendPixKeys('T') 
 
         elif key == Qt.Key.Key_U:  ## unlocks all sceneItems     
             if mod & Qt.KeyboardModifier.ShiftModifier:
                 self.canvas.sideCar2.unlockAll()
+                
             else:
                 self.setKey('U')  
 
