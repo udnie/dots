@@ -137,11 +137,10 @@ class ControlView(QGraphicsView):
         elif key == Qt.Key.Key_B:
             if not self.canvas.pathMakerOn:
                 if mod & Qt.KeyboardModifier.ShiftModifier:
-                    self.sideCar2.mirrorBkg() 
+                    self.sideCar2.mirrorBkg(1) 
                     
-                elif mod & Qt.KeyboardModifier.AltModifier or \
-                    mod & Qt.KeyboardModifier.ControlModifier:  
-                        self.sideCar2.newTracker()  
+                elif mod & Qt.KeyboardModifier.AltModifier:
+                    self.sideCar2.mirrorBkg(-1) 
                                                     
                 else:
                     self.sideCar2.bkgStuff()

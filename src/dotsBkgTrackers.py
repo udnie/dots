@@ -31,17 +31,20 @@ class Trackers(QWidget):
         self.tableWidget = QTableWidget()    
         self.tableWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)         
     
-        self.tableWidget.setColumnCount(len(dump[0]))
+        c = len(dump[0])
+    
+        self.tableWidget.setColumnCount(c)
         self.tableWidget.setRowCount(len(dump))
 
-        self.width, self.height = 865, (len(dump)+1) * RowHt
+        self.width, self.height = c*110, (len(dump)+1) * RowHt
         self.tableWidget.setFixedSize(self.width, self.height)
         
         self.tableWidget.setColumnWidth(0, 135)    
  
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-   
+        self.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+           
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)  ## google ai
 
@@ -190,8 +193,7 @@ class BkgTrackers:
                 elif itm.fileName == other.lower():
                     itm.setZValue(float(otherZ)) 
                     time.sleep(.05)  
-        # self.canvas.sideCar.dump()     
-    
+  
     def closeTracker(self):
         self.tracker.close()
         self.tracker = None 
@@ -204,7 +206,7 @@ class BkgTrackers:
         dump = []  
         for p in self.canvas.scene.items():
             if p.type == 'bkg':
-                fileName = os.path.basename(p.fileName)  ## opposite of setMirroring 
+                fileName = os.path.basename(p.fileName) 
                 try:            
                     if r := self.canvas.bkgMaker.newTracker[fileName]: 
                         zval = p.zValue()
@@ -219,8 +221,8 @@ class BkgTrackers:
         else:
             MsgBox('Error in dumpTrackers')
             return None
-                
-    def addBkgLabels(self, bkg):  ## used by dumpTrackers
+        
+    def addBkgLabels(self, bkg): 
         fileName = bkg.fileName       
         if bkg.locked == True:
             locked = 'Locked' 
@@ -230,7 +232,7 @@ class BkgTrackers:
             direction = 'Left'
         elif bkg.direction == 'right': 
             direction = 'Right'     
-        elif self.dots.Vertical:
+        elif self.canvas.dots.Vertical:  ## don't forget
             direction = 'Vertical'
         else:
             if self.bkgMaker.newTracker[fileName]:   
@@ -244,7 +246,7 @@ class BkgTrackers:
         elif bkg.direction == '' and bkg.scrollable == False:
             mirror = 'Not Scrollable'    
         return fileName.capitalize(), direction, mirror, locked
-                              
+              
 ### -------------------------------------------------------- 
     def restoreFromTrackers(self, bkg):  ## returns what gets lost on each new bkg
         if tmp := self.bkgMaker.newTracker.get(bkg.fileName):

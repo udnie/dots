@@ -168,7 +168,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             elif self.key == 'tag': ## '\' <- tagKey
                 self.tagThis()
             elif self.key == 'B': 
-                self.canvas.sideCar2.newTracker() 
+                self.bkgMaker.bkgtrackers.trackThis()
             elif self.key == 'E':   
                 self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
             elif self.key == 'F':  ## flip it
@@ -258,13 +258,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
                        
-    def setMirrored(self, bool):
+    def setMirrored(self, bool, switch=1):
         self.flopped = bool  
         if not self.dots.Vertical:
             if self.flopped:
-                transform = QTransform().scale(-1,1)
+                transform = QTransform().scale(-1, switch)
             else:
-                transform = QTransform().scale(1,1)
+                transform = QTransform().scale(1, switch)
             pix = QPixmap.fromImage(self.imgFile)
             self.setPixmap(pix.transformed(transform))
             self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)

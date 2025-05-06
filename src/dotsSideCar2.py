@@ -24,7 +24,7 @@ class SideCar2:
         self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-    
+  
 ### --------------------------------------------------------      
     def snapShot(self, pathMaker):  ## screen capture
         if self.hasBackGround() > 0 or self.scene.items():
@@ -73,33 +73,38 @@ class SideCar2:
     def bkgStuff(self):
         self.canvas.bkgMaker.openBkgFiles() if self.hasBackGround() == 0 \
             else self.sendPixKeys('B')
-  
-    def mirrorBkg(self):
+
+    def mirrorBkg(self, switch):
         if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only backgrounds
-            self.mirrored() 
+            self.mirrored(switch) 
                  
     def newTracker(self):  
         if self.hasBackGround() > 0:
             self.canvas.bkgMaker.bkgtrackers.trackThis() if self.canvas.bkgMaker.bkgtrackers.tracker == None \
-                else self.canvas.bkgMaker.bkgtrackers.tracker.bye() 
-                        
-    def mirrored(self):  ## very basic 
+                else self.canvas.bkgMaker.bkgtrackers.tracker.bye()  
+                            
+    def mirrored(self, switch):  ## added switch to flip as well - either 1 or -1
         wuf = None
         for bkg in self.scene.items():  
             if bkg.type == 'bkg':
                 wuf = bkg
                 break  
-        if wuf == None: return   
-        x = int(common['ViewW']/2- bkg.width)   
-        bkg.setPos(x , 0)    
+        if wuf == None: return  
+        
+        bkg.setMirrored(bkg.flopped, switch)    
+        x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
+        bkg.setPos(x , 0)   
+
         akg = BkgItem(wuf.fileName, self.canvas, common['bkgZ'], wuf.imgFile)
         if akg == None:
             return
+        
         self.scene.addItem(akg)  
-        akg.setMirrored(True) if bkg.flopped == False else akg.setMirrored(False) 
+        akg.setMirrored(True, switch) if bkg.flopped == False else akg.setMirrored(False, switch) 
         akg.setPos(int(common['ViewW']/2), 0)
+        
         self.delDupes()
-   
+                                       
     def delDupes(self):  ## otherwise they can build up
         if self.hasBackGround() >= 3:
             i = 0
@@ -139,7 +144,6 @@ class SideCar2:
             elif pix.zValue() <= common['pathZ']:
                 break
  
-### -------------------------------------------------------- 
     def deleteSelected(self):  ## self.pathMakerOn equals false   
         if len(self.scene.items()) == 0:
             self.canvas.setKeys('D')
@@ -156,8 +160,6 @@ class SideCar2:
                     pix.deletePix()  ## deletes shadow as well 
                     del pix
                     k += 1
-                # else:
-                #     print('sc2', pix.type)
             if k > 0: self.canvas.showWorks.enablePlay()  ## stop it - otherwise it's hung
   
     def unSelect(self):
@@ -185,7 +187,6 @@ class SideCar2:
             else:
                 self.canvas.setKeys('F')
     
-### --------------------------------------------------------  
     def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
         if bkg:  ## shouldn't need this but - could have just started to clear        
             if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \

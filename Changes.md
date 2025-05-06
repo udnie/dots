@@ -7,6 +7,9 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
+**May 6 2025**  
+A bug fix to **BkgTrackers** - not always displaying properly or erroring out.  Added an **option-B** command to **Backgrounds** to both mirror and flip a background.  As before, will only work if the background is the only scene item and not from a play file.
+
 **May 4 2025**  
 A bug fix to **Snakes**.  Missed a call to delete from trackers if re-running the scrolling background demo.  Also rolled back the **google A.I.** code in **DoodleMaker** as that wasn't the fix - more a catalyst. The issue was that **pyside** needed a stronger reference to DoodleMaker's **self.where** in **Doodle**, a change which I had just added. Up until then I was using only **self** as the reference which had worked from the beginning.
  

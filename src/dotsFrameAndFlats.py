@@ -132,7 +132,7 @@ class Flat(QGraphicsPixmapItem):
         elif self.key == 'shift':  ## to the back
             self.setZValue(self.bkgMaker.toBack())
             self.canvas.bkgMaker.renumZvals()       
-        elif self.key == 'B': 
+        elif self.key == 'B':  ## not actually tracked
             self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
                 else self.bkgtrackers.tracker.bye()     
         elif self.key == 'H':  

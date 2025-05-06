@@ -36,6 +36,7 @@ bkgHelpKeys = {
     'return':   'move to the front',    
     'shift':    'move to the back',
     'Shift-B':  'Mirror Background',
+    'Option-B': 'Mirror/Flip Background',
     'Shift-U':  'UnLock All Screen Items',   
 }
 
@@ -147,10 +148,10 @@ class BkgHelp:
         self.canvas = self.bkgItem.canvas
         self.switch = switch 
 
-        self.table = TableWidgetSetUp(55, 180, len(bkgHelpKeys)+4)
+        self.table = TableWidgetSetUp(65, 180, len(bkgHelpKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 241, 487
+        width, height = 251, 517
         
         self.table.setFixedSize(width, height)  
         self.table.setRow(0, 0, f'{"Background Help Menu":<22}',QL,True,True,2)
