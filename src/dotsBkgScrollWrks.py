@@ -26,8 +26,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         self.bkgItem  = parent    
         self.canvas   = self.bkgItem.canvas 
         self.bkgMaker = self.bkgItem.bkgMaker
-        self.dots     = self.bkgItem.dots
-                                                                                                                                         
+                                                                                                                                        
 ### -------------------------------------------------------- 
     def updateDictionary(self):
         if self.bkgItem.useThis == '':
@@ -117,7 +116,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
            
 ### --------------------------------------------------------    
     def setRunWay(self):      
-        if not self.dots.Vertical:             
+        if not self.canvas.dots.Vertical:             
             self.bkgItem.runway = int(common['ViewW'] - self.bkgItem.width)  ## pixels outside of view
         else:
             self.bkgItem.runway = int(common['ViewH'] - self.bkgItem.height) 

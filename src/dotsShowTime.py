@@ -24,7 +24,6 @@ class ShowTime:
  
         self.canvas   = parent
         self.scene    = self.canvas.scene
-        self.dots     = self.canvas.dots
         self.mapper   = self.canvas.mapper
 
         self.showWorks = ShowWorks(self.canvas)
@@ -91,7 +90,7 @@ class ShowTime:
             self.showWorks.disablePlay()  ## sets pause/resume/stop
             file = os.path.basename(self.canvas.openPlayFile)
             if "play" in file:
-                self.dots.statusBar.showMessage(file + ' - ' + \
+                self.canvas.dots.statusBar.showMessage(file + ' - ' + \
                     'Number of Pixitems: {}'.format(k))  
             self.canvas.animation = True
             

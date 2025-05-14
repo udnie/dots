@@ -130,8 +130,7 @@ class ScrollPanel(QWidget):
         
         self.canvas = parent  ## used in imgLabel
         self.view   = self.canvas.view  
-        self.dots   = self.canvas.dots
-
+ 
         self.setFixedSize(panel['ScrollW'],common['ScrollH']) ## scrollw used elsewhere 
         self.layout = QVBoxLayout(self)    
         self.layout.setSizeConstraint(QLayout.SizeConstraint.SetFixedSize)  # fixed size
@@ -251,7 +250,7 @@ class ScrollPanel(QWidget):
                 for s in sprites:
                     self.addImageTile(s)
                 self.top()   
-            self.dots.statusBar.showMessage(f'Number of Sprites: {self.scrollCount}', 9000)
+            self.canvas.dots.statusBar.showMessage(f'Number of Sprites: {self.scrollCount}', 9000)
 
     def spriteList(self):
         try:

@@ -76,17 +76,19 @@ class ShadowWidget(QWidget):
         e.accept()
 
     def mouseMoveEvent(self, e):
-        self.moveThis(e)
-        e.accept()
+        if self.switch != 'on':
+            self.moveThis(e)
+            e.accept()
         
     def mouseReleaseEvent(self, e):
         self.moveThis(e)
         e.accept()
                       
     def moveThis(self, e):
-        dif = e.globalPosition() - self.save      
-        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-        self.save = e.globalPosition()
+        if self.switch != 'on':
+            dif = e.globalPosition() - self.save      
+            self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
+            self.save = e.globalPosition()
         
     def mouseDoubleClickEvent(self, e):
         self.works.closeWidget()

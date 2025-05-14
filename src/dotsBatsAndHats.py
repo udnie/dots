@@ -39,7 +39,6 @@ class Bats:
  
         self.canvas = parent
         self.scene  = self.canvas.scene
-        self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper  
                                          
         self.animation = Animation(self.canvas)
@@ -145,7 +144,6 @@ class Hats:  ## hats - was abstract
  
         self.canvas = parent    
         self.scene  = self.canvas.scene
-        self.dots   = self.canvas.dots
         self.mapper = self.canvas.mapper
                                              
         self.animation = Animation(self.canvas)
@@ -233,7 +231,7 @@ class Hats:  ## hats - was abstract
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()  
         str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
-        self.dots.statusBar.showMessage(str, 10000)
+        self.canvas.dots.statusBar.showMessage(str, 10000)
                               
     async def newShadow(self, pix): 
         pix.addShadow() 

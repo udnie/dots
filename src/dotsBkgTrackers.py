@@ -160,20 +160,14 @@ class BkgTrackers:
         self.tracker  = None
                 
   ### --------------------------------------------------------   
-    def addTracker(self, bkg):  ## when loading a play file or adding from the screen
+    def addTracker(self, bkg):  ## always - either loading a play file or adding from backgrounds
         fileName = bkg.fileName
         
-        ## bkg.factor is set to 1.0  ## default - if it's running slow - lower it to .85 in bkgItem 
-        ## if randomizing speed factor do this 
-
-        # fact = float((random.randint(17,30) *5)/100)  ## .85-1.50
-        # bkg.factor = fact  ## if using a random screen speed factor 
-
-        if len(self.bkgMaker.newTracker) == 0:
+        if len(self.bkgMaker.newTracker) == 0:  ## add the first one as its unique
             self.bkgMaker.newTracker[fileName] = self.addNewTracker(bkg)  
             return True
         else:   
-            if self.bkgMaker.newTracker.get(fileName) == None:
+            if self.bkgMaker.newTracker.get(fileName) == None:  ## no duplicate filenames
                 self.bkgMaker.newTracker[fileName] = self.addNewTracker(bkg)
                 return True
             else:   
@@ -190,6 +184,7 @@ class BkgTrackers:
                 if itm.fileName == saved.lower():   
                     itm.setZValue(float(savedZ))  
                     time.sleep(.05) 
+                    
                 elif itm.fileName == other.lower():
                     itm.setZValue(float(otherZ)) 
                     time.sleep(.05)  
@@ -201,18 +196,18 @@ class BkgTrackers:
     def delTracker(self, bkg):  
         if self.bkgMaker.newTracker.get(bkg.fileName):
             del self.bkgMaker.newTracker[bkg.fileName]
-                              
+                       
     def dumpTrackers(self):  ## used by bkgItem - 'B' in BkgHelp menu
         dump = []  
-        for p in self.canvas.scene.items():
-            if p.type == 'bkg':
-                fileName = os.path.basename(p.fileName) 
+        for bkg in self.canvas.scene.items(): ## need a bkg referernce for bkglabels
+            if bkg.type == 'bkg':
+                fileName = os.path.basename(bkg.fileName) 
                 try:            
-                    if r := self.canvas.bkgMaker.newTracker[fileName]: 
-                        zval = p.zValue()
-                        fileName, direction, mirroring, locked = self.addBkgLabels(p)
-                        rate, showtime, path = str(r['rate']), str(r['showtime']), r['path']
-                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {r['useThis']} {path[5:-1]}"
+                    if trk := self.canvas.bkgMaker.newTracker[fileName]: 
+                        zval = bkg.zValue()
+                        fileName, direction, mirroring, locked = self.addBkgLabels(bkg)
+                        rate, showtime, path = str(trk['rate']), str(trk['showtime']), trk['path']
+                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {trk['useThis']} {path[5:-1]}"
                         dump.append(s.split())
                 except:
                     None            
@@ -228,17 +223,19 @@ class BkgTrackers:
             locked = 'Locked' 
         else:
             locked = 'UnLocked' 
+            
         if bkg.direction == 'left':
             direction = 'Left'
         elif bkg.direction == 'right': 
             direction = 'Right'     
-        elif self.canvas.dots.Vertical:  ## don't forget
+        elif self.canvas.dots.Vertical:  ## don't forget dots.
             direction = 'Vertical'
         else:
             if self.bkgMaker.newTracker[fileName]:   
                 direction = self.bkgMaker.newTracker[fileName]['direction']     
             if direction == '':
                 direction = 'NoDirection'
+                
         if bkg.mirroring == False:
             mirror = 'Continuous'
         elif bkg.mirroring == True:

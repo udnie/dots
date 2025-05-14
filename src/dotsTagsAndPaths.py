@@ -106,8 +106,7 @@ class TagsAndPaths: ## handles more than one request
         self.mapper = parent
         self.scene  = self.mapper.scene
         self.canvas = self.mapper.canvas
-        self.dots   = self.canvas.dots
-
+     
 ### --------------------------------------------------------  
     def tagWorks(self, pid):  ## this if more than one
         k = 0
@@ -146,7 +145,7 @@ class TagsAndPaths: ## handles more than one request
                    
         if k > 0: 
             self.mapper.tagSet = True
-            self.dots.statusBar.showMessage(f"Number Tagged: {k}", 5000)
+            self.canvas.dots.statusBar.showMessage(f"Number Tagged: {k}", 5000)
         else:
             self.mapper.clearTagGroup()
  

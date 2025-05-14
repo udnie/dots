@@ -53,8 +53,7 @@ class MapMaker:
 
         self.canvas = canvas
         self.scene  = self.canvas.scene
-        self.dots   = self.canvas.dots
-        
+   
         self.tagsAndPaths = TagsAndPaths(self)
 
         self.tagZ = 0
@@ -103,7 +102,7 @@ class MapMaker:
         self.map.setZValue(self.toFront(50)) ## higher up than tags
         self.scene.addItem(self.map)
         k = len(self.selections)
-        self.dots.statusBar.showMessage(f'Number Selected: {k}', 5000)
+        self.canvas.dots.statusBar.showMessage(f'Number Selected: {k}', 5000)
 
     def mapBoundingRects(self):
         tx, ty = common['ViewW'], common['ViewH']

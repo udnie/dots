@@ -27,7 +27,6 @@ class BkgWorks:
         self.bkgItem  = parent     
         self.canvas   = self.bkgItem.canvas
         self.bkgMaker = self.bkgItem.bkgMaker
-        self.dots     = self.bkgItem.dots
         
         self.point = None 
         self.target = None
@@ -41,7 +40,7 @@ class BkgWorks:
             return     
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
             
-            if self.dots.Vertical:   ## no direction equals 'not scrollable'
+            if self.canvas.dots.Vertical:   ## no direction equals 'not scrollable'
                 self.bkgItem.direction = 'vertical'
             else:
                 self.bkgItem.direction = key

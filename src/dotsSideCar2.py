@@ -21,7 +21,6 @@ class SideCar2:
         super().__init__()
  
         self.canvas = parent
-        self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
   
@@ -30,8 +29,8 @@ class SideCar2:
         if self.hasBackGround() > 0 or self.scene.items():
             self.unSelect()  ## turn off any select borders
             if self.canvas.pathMakerOn == False:
-                if self.canvas.mapper.isMapSet():
-                    self.canvas.mapper.removeMap()
+                if self.mapper.isMapSet():
+                    self.mapper.removeMap()
                     
             if self.canvas.openPlayFile == '':
                 snap = 'dots_' + self.snapTag() + '.jpg'
@@ -46,12 +45,14 @@ class SideCar2:
                 f = Q.getSaveFileName(self.canvas, paths['snapShot'],
                     paths['snapShot'] + snap)
                 Q.accept()
+                
                 if not f[0]:
                     return
                 elif not f[0].lower().endswith('.jpg'):
                     MsgBox("Wrong file extention - use '.jpg'", 5)
                     return
                 snap = os.path.basename(f[0])
+                
             pix = self.canvas.view.grab(QRect(QPoint(0,0), QSize()))
             pix.save(paths['snapShot'] + snap, format='jpg',
                 quality=100)        
@@ -73,35 +74,32 @@ class SideCar2:
     def bkgStuff(self):
         self.canvas.bkgMaker.openBkgFiles() if self.hasBackGround() == 0 \
             else self.sendPixKeys('B')
-
-    def mirrorBkg(self, switch):
-        if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only backgrounds
-            self.mirrored(switch) 
                  
     def newTracker(self):  
         if self.hasBackGround() > 0:
             self.canvas.bkgMaker.bkgtrackers.trackThis() if self.canvas.bkgMaker.bkgtrackers.tracker == None \
                 else self.canvas.bkgMaker.bkgtrackers.tracker.bye()  
                             
-    def mirrored(self, switch):  ## added switch to flip as well - either 1 or -1
-        wuf = None
-        for bkg in self.scene.items():  
-            if bkg.type == 'bkg':
-                wuf = bkg
-                break  
-        if wuf == None: return  
-        
-        bkg.setMirrored(bkg.flopped, switch)    
-        x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
-        bkg.setPos(x , 0)   
+    def mirrorBkg(self, switch):  ## either 1 default or -1, flip it
+        if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only a background
+            wuf = None
+            for bkg in self.scene.items():  
+                if bkg.type == 'bkg':
+                    wuf = bkg
+                    break  
+            if wuf == None: return  
+            
+            bkg.setMirrored(bkg.flopped, switch)    
+            x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
+            bkg.setPos(x , 0)   
 
-        akg = BkgItem(wuf.fileName, self.canvas, common['bkgZ'], wuf.imgFile)
-        if akg == None:
-            return
-        
-        self.scene.addItem(akg)  
-        akg.setMirrored(True, switch) if bkg.flopped == False else akg.setMirrored(False, switch) 
-        akg.setPos(int(common['ViewW']/2), 0)
+            akg = BkgItem(wuf.fileName, self.canvas, common['bkgZ'], wuf.imgFile)
+            if akg == None:
+                return
+            
+            self.scene.addItem(akg)  
+            akg.setMirrored(True, switch) if bkg.flopped == False else akg.setMirrored(False, switch) 
+            akg.setPos(int(common['ViewW']/2), 0)  ## start center screen
         
         self.delDupes()
                                        
@@ -120,6 +118,7 @@ class SideCar2:
             key in ('up', 'down'):  ## to trackers
                 self.canvas.bkgMaker.bkgtrackers.tracker.setPixKeys(key) 
                 return
+            
         elif self.canvas.bkgMaker.widget != None and key in ('up', 'down','right','left'):
             self.canvas.bkgMaker.widget.setKeys(key)  ## to bkgWidget
             return
@@ -128,8 +127,10 @@ class SideCar2:
             if itm.type == 'pt' or itm.type == 'pix' and \
                 itm.part not in ('pivot','left','right'):  
                 itm.setPixKeys(key)
+                
             elif itm.type in ('bkg', 'frame', 'flat', 'shadow'):   
                 itm.setPixKeys(key)  
+                
         if self.mapper.isMapSet(): 
             self.mapper.updateMap()
 
@@ -141,6 +142,7 @@ class SideCar2:
             if pix.type in ('pix', 'shadow'):
                 pix.setSelected(True)
                 pix.isHidden = False
+                
             elif pix.zValue() <= common['pathZ']:
                 break
  
@@ -170,8 +172,8 @@ class SideCar2:
             
     def unlockAll(self):
         for itm in self.scene.items():  
-            if itm.type in('pix'):
-                itm.unlockSprite()
+            if itm.type == 'pix':
+                itm.unlockSprite()            
             elif itm.type == 'bkg':
                 self.canvas.bkgMaker.unlockBkg(itm)
         
@@ -189,15 +191,15 @@ class SideCar2:
     
     def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
         if bkg:  ## shouldn't need this but - could have just started to clear        
-            if self.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
-                self.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
-                bkg.scrollable = True                                      
+            if self.canvas.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
+                self.canvas.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
+                bkg.scrollable = True    
+                                                  
             if bkg.scrollable == False:
                 widget.mirrorBtn.setText('Not Scrollable')  
-                bkg.direction = ''              
-            if bkg.mirroring == False:
-                widget.mirrorBtn.setText('Continuous')         
-            elif bkg.mirroring == True:
+                bkg.direction = ''    
+                          
+            widget.mirrorBtn.setText('Continuous') if bkg.mirroring == False else \
                 widget.mirrorBtn.setText('Mirrored')
 
     def setBtns(self, bkg, widget):  ## from bkgMaker widget
@@ -205,12 +207,14 @@ class SideCar2:
             widget.rightBtn.setStyleSheet(
                 'background-color: LIGHTGREY')
             widget.leftBtn.setStyleSheet(
-                'background-color: None')            
+                'background-color: None') 
+                       
         elif bkg.direction == 'left': 
             widget.leftBtn.setStyleSheet(
                 'background-color: LIGHTGREY')
             widget.rightBtn.setStyleSheet(
                 'background-color: None')
+            
         elif bkg.direction == 'vertical':
             widget.leftBtn.setText('Vertical')   
             widget.leftBtn.setStyleSheet(

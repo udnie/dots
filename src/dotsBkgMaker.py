@@ -26,12 +26,11 @@ class BkgMaker(QWidget):
         super().__init__()
            
         self.canvas = parent 
-        self.fileName = file
-
-        self.dots   = self.canvas.dots
         self.scene  = self.canvas.scene
         self.view   = self.canvas.view  
         self.mapper = self.canvas.mapper
+        
+        self.fileName = file  ## current
   
         self.init()
       
