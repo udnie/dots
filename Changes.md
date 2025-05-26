@@ -7,7 +7,7 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
-**May 20 2025**   
+**May 25 2025**   
 Added additional keyboard commands used for zoom/scaling,  to include the **greater** and **less** keys, **'<,>'**, and the **plus** and **underscore** keys, **'+,_'**.  In **vhx.py**, **videoPlayerOne.py**, **slideShow.py** and **BkgMatte.py**.  Square **brackets, '[,]'** are still supported - updated docstrings reflecting changes. One more update to **vhx.py** allowing the user to anchor an end and have the ruler expand or collapse in one direction, to the right or down, rather than both.  Added an additional blur to **shadows** using the **DropShadowEffect** to soften their edges a bit more.  Rotating a photo in **slideShow.py** now stays rotated throughout the session, and as a reminder - typing the letter **'O'** resets to the opening display.  You can also use the mouse to zoom/scale as well and the zoom keys will work accordingly.
 
 **May 13 2025**  
