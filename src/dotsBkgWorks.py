@@ -233,7 +233,9 @@ class BkgWorks:
     def openMatte(self):  ## runs from bkgWidget - starts here
         self.bkgItem.widget = False
         self.bkgMaker.closeWidget()
-        self.matte = Matte(self.canvas)
+        if self.bkgItem.matte != None:
+            self.bkgItem.matte.close()
+        self.bkgItem.matte = Matte(self.bkgItem)
                                                                                                                                                  
 ### --------------------- dotsBkgWorks ---------------------
 

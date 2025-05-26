@@ -11,23 +11,26 @@ from PyQt6.QtWidgets import QWidget, QApplication, QGraphicsView, \
                             QFileDialog, QFrame, QGraphicsTextItem, QTableWidget, \
                             QTableWidgetItem, QAbstractItemView
 
-Width, Height = 1400,    900 ## widget size and SceneRectSize - see pixXY
-ViewW, ViewH  = 1360,    860 ## scene size - for a moment
-MaxW, MaxH, MaxV = 1100, 650, 770 
+SetY = 75       ## Y position of slideShow
+Hpad = 60       ## padding for button added to height
+Path = ''       ## set default path
+CutOff = 550    ## when to stop showing text 
+Buttons = True  ## true adds setButtons to layout
 
-# Width, Height = 900,    900 ## widget size and SceneRectSize - see pixXY
-# ViewW, ViewH  = 860,    860 ## scene size - for a moment
-# MaxW, MaxH, MaxV = 550, 550, 550
+## ------------------------------------------     Width Height ViewW ViewH   MaxW   MaxH   MaxV
+# Width, Height, ViewW, ViewH, MaxW, MaxH, MaxV = 1500,  1000,  1450,  950,  1250,   700,   800 
 
-# Width, Height = 1500,   1000 ## widget size  ## reset setGeometry(x, y = to 150  from 200
-# ViewW, ViewH  = 1460,    960 ## scene size
-# MaxW, MaxH, MaxV = 1200, 650, 800 
+# Width, Height, ViewW, ViewH, MaxW, MaxH, MaxV = 1400,   900,  1350,  875,  1150,   650,   750  
 
-# Width, Height    = 1300,  800  ## widget size
-# ViewW, ViewH     = 1260,  760  ## scene size - widget height and width - 40 for framing
-# MaxW, MaxH, MaxV = 1060,  560, 660  ## max width, height and vertical
+# Width, Height, ViewW, ViewH, MaxW, MaxH, MaxV = 1300,   850,  1250,  800,  1075,   600,   700   
 
-helpKeys = {
+Width, Height, ViewW, ViewH, MaxW, MaxH, MaxV = 1200,   775,  1150,  750,  1000,   550,   650   
+
+# Width, Height, ViewW, ViewH, MaxW, MaxH, MaxV =  900,   900,   860,  860,   550,   550,   550
+
+### --------------------------------------------------------
+
+helpKeys = {  ## help menu - 'H' or button
     'C':                'Clear Screen',  
     'F ':               'File Chooser', 
     'H ':               'Help Menu On/Off',
@@ -38,12 +41,14 @@ helpKeys = {
     'S, SpaceBar':      'Slide Show',
     'T':                'Text On/Off',   
     'W':                'Where am I?', 
-    'Square Brackets [ ]':  'Zoom In/Out',
+    '>,  +,  ]':          'Scale Up',
+    '<,  _,  ]':          'Scale Down',
     'X, Q, Escape':     'Quit/Exit',
 }
 
 ### --------------------- slideShow.py ---------------------
-''' slideShow.py: works with '.png', '.jpg', '.jpeg', '.tif', '.tiff', '.webp' '''
+''' slideShow.py: reads .png, .jpg, .jpeg, .tif, .tiff, and .webp.
+    '>' ,'+', ']' scales up,  '<', '_', scales down'''
 ### --------------------------------------------------------
 class SlideShow(QWidget): 
 ### --------------------------------------------------------
@@ -77,17 +82,18 @@ class SlideShow(QWidget):
         ## in qt5 framelessWindow won't resize with mouse - use zoom keys instead   <<<---------------[2]
         # self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
    
-        self.setGeometry(x, 200, Width, Height)   
-        
+        H = Height
+        if Buttons: H = Height + Hpad
+        self.setGeometry(x, SetY, Width, H)  
+  
         self.init()
         
-        self.delay   = 2000  ## slide show 
-        self.setTags = True  ## toggle textItems <<<------------------------[4]
-        self.buttons = False ## set to true if setButtons added to layout
-        
+        self.delay   = 2000  ## slide show time
+        self.setTags = True  ## toggle textItems or if False - not <<<------------------------[4]
+  
         vbox = QVBoxLayout()      
         vbox.addWidget(self.view)
-        vbox.addWidget(self.setButtons())  ## will hide tags when visible <<<------------[1]
+        if Buttons:  vbox.addWidget(self.setButtons())  ## will hide tags when visible <<<------------[1]
         self.setLayout(vbox)
     
         self.grabKeyboard()
@@ -100,44 +106,65 @@ class SlideShow(QWidget):
     def init(self):  ## on each new directory
         self.files       = []   
         self.txtlst     = []
+        self.rotters    = {}
         self.fileName    = ''
-        self.path       = ''  
+        self.path       = Path
         self.current    = 0
         self.rot        = 0
         self.running    = False  ## used by slideshow
         self.save       = QPointF()
-        self.pixmap     = None 
+        self.pixItem    = None 
         self.textItem   = None
         self.table      = None
-     
+      
+### --------------------------------------------------------     
     def keyPressEvent(self, e):
         mod = e.modifiers()
+        
         if e.key() in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.clearScene()
             self.close()
+            
         elif e.key() in (Qt.Key.Key_N, Qt.Key.Key_Right):
             self.nextSlide()
+            
         elif  e.key() in (Qt.Key.Key_B, Qt.Key.Key_Left):
             self.backOne()
+            
         elif e.key() == Qt.Key.Key_C:
             self.clearScene()
+            
         elif e.key() == Qt.Key.Key_F:
             self.openFiles()
+            
         elif e.key() == Qt.Key.Key_H:
             self.helpMenu()    
+            
         elif e.key() in (Qt.Key.Key_L, Qt.Key.Key_R):
             self.rotateThis(90)
+            
         elif e.key() == Qt.Key.Key_O:
             self.openingLayout()   
+            
         elif e.key() in (Qt.Key.Key_S, Qt.Key.Key_Space):
             self.slideShow()
+            
         elif e.key() == Qt.Key.Key_T:
             self.toggleText()
+            
         elif e.key() == Qt.Key.Key_W:
             if self.path != '': self.errMsg(self.path) 
+  
         elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
-            self.zoom(1.10) if e.key() == Qt.Key.Key_BracketRight else self.zoom(.90)
-          
+            self.zoom(1.05) if e.key() == Qt.Key.Key_BracketRight else self.zoom(.95)
+        
+        elif mod & Qt.KeyboardModifier.ShiftModifier and e.key() in (Qt.Key.Key_Greater, Qt.Key.Key_Less):
+            self.zoom(1.05) if e.key() == Qt.Key.Key_Greater else self.zoom(.95)
+                
+        elif mod & Qt.KeyboardModifier.ShiftModifier and  e.key() in (Qt.Key.Key_Plus, Qt.Key.Key_Underscore):
+            self.zoom(1.05) if e.key() == Qt.Key.Key_Plus else self.zoom(.95)
+
+### --------------------------------------------------------          
     def mousePressEvent(self, e):
         self.save = e.globalPosition() 
         e.accept()
@@ -157,9 +184,9 @@ class SlideShow(QWidget):
       
 ### --------------------------------------------------------       
     def addPixmap(self, file):  ## the scene is cleared each new file  
-        if self.pixmap != None:
-            self.scene.removeItem(self.pixmap)
-            del self.pixmap
+        if self.pixItem != None:
+            self.scene.removeItem(self.pixItem)
+            del self.pixItem
             
         if self.table != None: self.helpStop()  ## close help menu   
               
@@ -169,101 +196,94 @@ class SlideShow(QWidget):
         except:
             self.errMsg('addPixMap: problem with ' + file)
             return
-    
-        maxH = MaxH  ## set default       
+      
+        self.scaleW = self.view.width()/ViewW
+        self.scaleH = self.view.height()/ViewH   
+                
+        maxH = MaxH   
         self.txtlst = [file, img.width(), img.height()]  ## save it for textItem
-     
-        if self.rot in (90, 270) and abs(img.width() - img.height()) > 5:  ## swap width to height for rotatation
-            img = img.scaled(MaxV, int(ViewH * (self.height()/Height)),  ## limit height
+  
+        if rot := self.rotters.get(file): 
+            self.rot = rot
+                                           
+        if self.rot in (90, 270) and abs(img.width() - img.height()) > 5: ## swap width to height for rotation
+            img = img.scaled(int(MaxV * self.scaleH), int(MaxH * self.scaleH),
                 Qt.AspectRatioMode.KeepAspectRatio,
                 Qt.TransformationMode.SmoothTransformation) 
         else:
             if img.height() > img.width() and abs(img.width() - img.height()) > 5:
-                maxH = MaxV   ## set height for vertical
-            img = img.scaled(MaxW, int(maxH * (self.height()/Height)),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation)  
-    
-        self.pixmap = QGraphicsPixmapItem()          
-        self.pixmap.setPixmap(QPixmap(img))  
-         
-        self.pixmap.setZValue(0)
-        self.pixmap.setPos(self.pixXY())
+                maxH = MaxV  
         
-        self.scene.addItem(self.pixmap)
+            img = img.scaled(int(MaxW * self.scaleW), int(maxH * self.scaleH),
+                Qt.AspectRatioMode.KeepAspectRatio,       
+                Qt.TransformationMode.SmoothTransformation)  
+          
+        self.pixItem = QGraphicsPixmapItem()          
+        self.pixItem.setPixmap(QPixmap(img))  
+        
+        self.pixItem.setZValue(0)
+        self.pixItem.setPos(self.pixXY())
+        
+        self.setOrigin()             
+        self.pixItem.setRotation(self.rot) 
+        self.pixItem.setScale(1.0)
+        
+        self.scene.addItem(self.pixItem)
   
-        if self.setTags == True and int(ViewH * (self.height()/Height ) > 500): ## optional
+        if self.setTags == True and self.view.height() > CutOff:   
             self.addTextItem()           
         del img
     
-        self.update()    
-     
-### --------------------------------------------------------    
-    def pixXY(self):          
-        self.scene.setSceneRect(0.0, 0.0, \
-            float(self.width()),\
-            float(self.height()))   
-   
-        scaleH = self.height()/Height
-  
-        self.setOrigin()  
-                      
-        self.pixmap.setRotation(self.rot) 
-        self.pixmap.setScale(scaleH) 
-                                                   
-        # print(f'Height {Height}\t height() {self.height()}\t sceneH {self.scene.height()}\t viewH {int(ViewH*scaleH)}')
-                                                                                               
-        w, W = int(self.pixmap.boundingRect().width()),  int(self.width()) 
-        h, H = int(self.pixmap.boundingRect().height()), int(self.height())  ## more framing
-   
-        x = int(W/2)- int(w/2)  
-        y = int(H/2)- int(h/2)
+        self.update()   
         
-        return QPointF(x-20, y-20)  ## subtract framing
-                             
-### --------------------------------------------------------  
+### -------------------------------------------------------- 
+    def pixXY(self):     
+        self.setScene()                                                                                                                                                                       
+        x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
+        y = int((self.view.height() - self.pixItem.boundingRect().height())/2)   
+        return QPointF(x, y)
+
+    def setScene(self):
+        self.scene.setSceneRect(0, 0, self.view.width(), self.view.height())
+        
     def zoom(self, zoom):
-        if self.pixmap != None: 
-            self.scene.setSceneRect(0.0, 0.0, \
-                float(self.width()),\
-                float(self.height()))  
-            
+        if self.pixItem != None:           
+            if self.width() *zoom > 1920 or self.height() * zoom < 350:
+                return    
+            self.setScene()     
             p, width = self.pos(), self.width()        
-            self.resize(int(self.width()* zoom), int(self.height()* zoom))  
-             
+            self.resize(int(self.width() * zoom), int(self.height() * zoom)) 
             dif = int((self.width() - width)/2) 
-            self.move(p.x()-dif, p.y())     
-            self.updTextItem()  
-         
-    def openingLayout(self):
-        if self.pixmap != None:
-            self.scene.setSceneRect(0.0, 0.0, \
-                float(self.width()),\
-                float(self.height()))    
-            x = int(((self.ctr.x() * 2 ) - Width)/2)
-            self.setGeometry(x, 200, Width, Height) 
-            self.pixmap.setPos(self.pixXY())
-           
-### --------------------------------------------------------               
+            self.move(p.x()-dif, p.y())
+
     def resizeEvent(self, e):  
-        if self.pixmap != None:  
-            self.pixmap.setPos(self.pixXY())
-            self.updTextItem()
-        e.accept()
-          
+        if self.pixItem != None:  
+            self.pixItem.setScale(self.scaleW)  
+            self.addPixmap(self.files[self.current])   
+        e.accept()       
+                 
+    def openingLayout(self):
+        if self.pixItem != None:
+            self.setScene() 
+            x, H = int(((self.ctr.x() * 2 ) - Width)/2), Height
+            if Buttons: H = Height + Hpad
+            self.setGeometry(x, SetY, Width, H) 
+            self.addPixmap(self.files[self.current])  ## refresh  
+       
+### --------------------------------------------------------                  
     def rotateThis(self, r=0):
-        if self.pixmap != None:  
-            if self.rot != 0:
-                r = r + self.rot
+        if self.pixItem != None:  
+            r = r + self.rot
             if r > 270: r = 0
             self.rot = r
-            self.addPixmap(self.files[self.current])  ## needs a refresh          
-                        
+            self.rotters[self.txtlst[0]] = self.rot 
+            self.addPixmap(self.files[self.current])  ## refresh  
+                                 
     def nextSlide(self):
         if length := len(self.files):
             if self.current >= 0 and self.current < length:
                 self.current += 1
-                if self.current == length:
+                if self.current == length:  ## wrap it
                     self.current = 0   
             self.rot = 0
             self.addPixmap(self.files[self.current])
@@ -279,36 +299,55 @@ class SlideShow(QWidget):
                    
 ### --------------------------------------------------------
     def addTextItem(self):   
-        if self.buttons == True:  
-            return
-        elif self.textItem != None:
+        if self.textItem != None:
             self.scene.removeItem(self.textItem)
-            del self.textItem 
+            del self.textItem       
         self.textItem = self.tagIt()   
         if self.textItem == None: 
-            return     
+            return         
         self.textItem.setZValue(100) 
         self.textItem.setPos(self.textXY()) 
         self.scene.addItem(self.textItem)
         
-    def textXY(self):    
-        self.scene.setSceneRect(0.0, 0.0, \
-            float(self.width()),\
-            float(self.height()))    
-           
-        scaleH = self.height()/Height     
-      
+    def textXY(self):   
+        self.setScene()  
         w, W = self.textItem.boundingRect().width(),  int(self.width())  
-        h, H = self.textItem.boundingRect().height(), int(ViewH * scaleH)
-        x, y = int((W - w)/2),  int((H-(h)))
-
-        return QPointF(x, y)
+        h, H = self.textItem.boundingRect().height(), int(self.height()) 
+        x, y = int((W - w)/2), int(H-h)
+        if Buttons: 
+            y = y - 105
+        else:
+            y = y - 50
+        return QPointF(x-15, y)
     
     def updTextItem(self):
         if self.setTags == True and self.textItem != None:
-            if int(ViewH * (self.height()/Height )) > 400: 
+            if int(self.view.height()) > CutOff: 
                 self.textItem.setPos(self.textXY()) 
-                
+    
+    def tagIt(self):   
+        try:
+            file, width, height = self.txtlst[0], self.txtlst[1], self.txtlst[2]   
+            asp = math.floor(width/height *100)/100.0  
+        except:
+            self.errMsg('tagIt: problem with ' + file)
+            return None
+        s = (f"{file} {width}X{height} asp {asp}")
+        textItem = QGraphicsTextItem(s.strip())
+        font = QFont("Arial", 14)
+        textItem .setFont(font)
+        return textItem
+    
+    def toggleText(self):   
+        if self.pixItem != None:    
+            if self.setTags == False:
+                self.setTags = True
+                self.addTextItem()
+            elif self.textItem != None:
+                self.scene.removeItem(self.textItem)
+                self.textItem = None
+                self.setTags = False
+                    
 ### --------------------------------------------------------         
     def clearScene(self):
         self.helpStop()
@@ -333,10 +372,10 @@ class SlideShow(QWidget):
             self.table = None
                                    
     def setOrigin(self):   
-        b = self.pixmap.boundingRect()
+        b = self.pixItem.boundingRect()
         op = QPointF(b.width()/2, b.height()/2)
-        self.pixmap.setTransformOriginPoint(op)
-        self.pixmap.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
+        self.pixItem.setTransformOriginPoint(op)
+        self.pixItem.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                                                                                                                  
     def slideShow(self):     
         self.showtime() if self.running == False else self.timerStop()
@@ -350,28 +389,6 @@ class SlideShow(QWidget):
     def timerStop(self):
         self.timer.stop()
         self.running = False
-        
-    def tagIt(self):   
-        try:
-            file, width, height = self.txtlst[0], self.txtlst[1], self.txtlst[2]   
-            asp = math.floor(width/height *100)/100.0  
-        except:
-            self.errMsg('tagIt: problem with ' + file)
-            return None
-        textItem = QGraphicsTextItem(f"{file} {width}X{height} asp {asp}")
-        font = QFont("Arial", 14)
-        textItem .setFont(font)
-        return textItem
-    
-    def toggleText(self):   
-        if self.pixmap != None:    
-            if self.setTags == False:
-                self.setTags = True
-                self.addTextItem()
-            elif self.textItem != None:
-                self.scene.removeItem(self.textItem)
-                self.textItem = None
-                self.setTags = False
         
 ### --------------------------------------------------------
     def openFiles(self):
@@ -387,8 +404,12 @@ class SlideShow(QWidget):
     def getPathList(self):
         if len(sys.argv) > 1:  ## set starting directory
             self.path = sys.argv[1]
-        else:
+        elif self.path == '':
             self.path = os.getcwd()  
+        else:
+            files = os.listdir(self.path)  ## path set with default directory
+            return files
+              
         self.path = QFileDialog.getExistingDirectory(self, '', self.path)
         if self.path == '':
             return None
@@ -418,11 +439,10 @@ class SlideShow(QWidget):
     def setButtons(self): 
         self.buttonGroup = QLabel()
         self.buttonGroup.setFixedHeight(50)
-        self.buttons = True
- 
+  
         self.buttonGroup.setStyleSheet("QPushButton {\n"               
             "max-width:   200px;\n"
-            "max-height:  40px;\n"  ## 30 must be the default
+            "max-height:   40px;\n"  ## 30 must be the default
             "font-size:    13px;\n"
             "}")   
         
@@ -486,7 +506,7 @@ class Help(QWidget):
         self.table.setColumnWidth(0, 130) 
         self.table.setColumnWidth(1, 130)
 
-        width, height = 267, 421
+        width, height = 267, 451  
         self.table.setFixedSize(width, height)  
         
         self.table.verticalHeader().setVisible(False) 
@@ -533,4 +553,4 @@ if __name__ == '__main__':
     
 
  
-    
+     

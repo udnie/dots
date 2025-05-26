@@ -36,7 +36,6 @@ class BkgMaker(QWidget):
       
     def init(self):
         self.flat    = None
-        self.matte  = None
         self.widget = None  ## there is only one
                 
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
@@ -184,6 +183,9 @@ class BkgMaker(QWidget):
             self.bkgtrackers.delTracker(bkg)
         if self.widget:
             self.closeWidget() 
+        if bkg.matte != None:
+            bkg.matte.bye()
+            bkg.matte = None
         self.scene.removeItem(bkg)
         bkg = None
         self.canvas.btnAddBkg.setEnabled(True)

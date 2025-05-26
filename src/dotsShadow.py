@@ -4,8 +4,8 @@ import numpy as np
 import os.path
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF, pyqtSlot
-from PyQt6.QtGui        import QCursor
-from PyQt6.QtWidgets    import QGraphicsPixmapItem
+from PyQt6.QtGui        import QCursor, QColor
+from PyQt6.QtWidgets    import QGraphicsPixmapItem, QGraphicsDropShadowEffect
                               
 from dotsShared         import common, paths, ControlKeys
 from dotsHelpMonkey     import SharedKeys
@@ -53,6 +53,13 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True)
         
         self.setOriginPt()
+        
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(35)
+        shadow.setColor(QColor('220,220,220,128'))
+        shadow.setOffset(0, 0)
+
+        self.setGraphicsEffect(shadow)
          
 ### --------------------------------------------------------
     def itemChange(self, change, value):  ## continue to updatePath when animated

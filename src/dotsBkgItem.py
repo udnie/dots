@@ -41,8 +41,10 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
-        self.path = paths['bkgPath']  
-          
+        self.path = paths['bkgPath'] 
+        
+        self.matte = None  
+        
         self.fileName = os.path.basename(fileName) 
         self.sharedKeys = SharedKeys  ## shared with bkgMenu
         

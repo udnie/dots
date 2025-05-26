@@ -14,29 +14,32 @@ from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 matteKeys = {
     'B':    'Black Matte Color',  
     'C':    'Change Matte Color', 
+    'D':    'Delete Background',
     'G':    'Grey Matte Color',
     'H':    'Matte Help Menu',
     'P':    'Photo Background', 
     'Q':    'Close Matte', 
     'V':    'Vary Matte Height',
     'W':    'White',
-    ']':    'Expand Matte Size',
-    '[':    'Reduce Matte Size',
-    'X':    'Close Matte',   
+    'X':    'Close Matte',  
+    '+, >, ]':  'Expand Matte Size',
+    '_, <, [':  'Reduce Matte Size',
     'R':    'Run Animation',
-    'SpaceBar':   'Pause/Resume',  
-    'S':       'Stop Animation',
+    'SpaceBar': 'Pause/Resume',  
+    'S':        'Stop Animation',
 }
-                
-### --------------------- dotsBkgMatte ---------------------           
+### --------------------- dotsBkgMatte ---------------------     
+''' '>', ']', '=' expands in both directions horizontally or 
+    vertically and '<', '[', '-' contracts in both as well. '''
+### --------------------------------------------------------      
 class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
 
-        self.canvas = parent 
-        self.view   = self.canvas.view  
-            
+        self.bkgItem = parent 
+        self.canvas   = self.bkgItem.canvas
+      
         self.type = 'widget' 
         self.setAccessibleName('widget')
    
@@ -116,13 +119,23 @@ class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
         key = e.key() 
-       
+        mod = e.modifiers()   
+  
         if key in ('E',  Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.matteHelp.closeMenu()
                            
         elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
-            self.shared('>') if e.key() == Qt.Key.Key_BracketRight else self.shared('<')
-            
+            self.shared('>') if e.key() == Qt.Key.Key_BracketRight else \
+                self.shared('<')
+       
+        elif mod & Qt.KeyboardModifier.ShiftModifier and key in (Qt.Key.Key_Greater, Qt.Key.Key_Less):
+            self.shared('>') if key == Qt.Key.Key_Greater else \
+                self.shared('<')  
+                
+        elif mod & Qt.KeyboardModifier.ShiftModifier and key in (Qt.Key.Key_Plus, Qt.Key.Key_Underscore):
+            self.shared('>') if key == Qt.Key.Key_Plus else \
+                self.shared('<')   
+                   
         elif key == Qt.Key.Key_Space:
             self.shared('Space')
             
@@ -135,31 +148,35 @@ class Matte(QWidget):  ## opens itself
          
     def shared(self, key):  
         if key != 'P' and self.pix != None:
-            if key in ('W', 'B', 'G', 'C', 'V', '<', '>'):
+            if key in ('W', 'B', 'D', 'G', 'C', 'V', '<', '>'):
                 self.pix = None 
+                
+        if key == 'B':  ## change color  
+            self.brush = self.black    
 
-        if key == 'W':  ## change color  
-            self.brush = self.white    
+        elif key == 'C':  ## change color
+            self.brush = self.lst[random.randint(0,2)] 
+            
+        elif key == 'D':  ## delete background    
+            self.bkgItem.bkgMaker.deleteBkg(self.bkgItem)            
                 
         elif key == 'G':  ## change color  
             self.brush = self.grey       
-                    
-        elif key == 'B':  ## change color  
-            self.brush = self.black    
+                               
+        elif key == 'P':
+            if self.pix == None:    
+                self.pix = self.img  ## something to initialize it  
             
-        elif key == 'C':  ## change color
-            self.brush = self.lst[random.randint(0,2)] 
-                
-        elif key == 'P' and self.pix == None:    
-            self.pix = self.img  ## something to initialize it  
-            
-        elif key == 'P' and self.pix != None: 
-            self.pix = None
-            self.brush = self.lst[random.randint(0,2)]
-                            
+            elif self.pix != None: 
+                self.pix = None
+                self.brush = self.lst[random.randint(0,2)]
+                                
         ## set screen format ratio to around .61 - midway between 16:9 and 3:2 
         elif key == 'V': 
             self.ratio = self.altRatio if self.ratio == 1.0 else 1.0    
+            
+        elif key == 'W':  ## change color  
+            self.brush = self.white  
         
         elif key == '>':  ## scale up  
             self.scaleUp()       
@@ -190,11 +207,14 @@ class Matte(QWidget):  ## opens itself
         wuf = self.border    ## self.border = 30  
         if self.border == 5:
             self.border = 12     
+            
         elif self.border == 12: 
             self.border = self.step    ## self.step = 27
+            
         elif self.border >= self.step:
-            self.border += (self.step + 2)               
-        if self.y-(self.border*self.ratio) < self.stop:  ## self.stop = 50 = (min y.() - Max Headroom) 
+            self.border += (self.step + 2)   
+                            
+        if self.y-(self.border*self.ratio) < self.stop-10:  ## self.stop = 50 = (min y.() - Max Headroom) 
             self.border = wuf  ## back it off - top of screen display
             MsgBox('  Max Headroom  ', 5)  ## can vary 
                    
@@ -202,7 +222,7 @@ class Matte(QWidget):  ## opens itself
         border = (self.border - self.step) - 2          
         if self.border == self.step or border < self.step and \
             border > 5 or border == 1:  ## 30-2-27
-                border = 12        
+                border = 12            
         elif border <= 5:
             border = 5
         self.border = border
@@ -218,7 +238,7 @@ class Matte(QWidget):  ## opens itself
             
     def bye(self):   
         self.matteHelp.closeMenu()     
-        self.view.grabKeyboard()     
+        self.canvas.view.grabKeyboard()     
         self.close()       
     
 ### --------------------------------------------------------     
@@ -239,21 +259,21 @@ class MatteHelp:
         self.table = TableWidgetSetUp(75, 170, len(matteKeys)+4,0,28)
         self.table.itemClicked.connect(self.clicked)         
   
-        width, height = 252, 511
+        width, height = 252, 541
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f"{' Matte KeyBoard Help ':<23}",QL,True,True,2)
 
         row = 1
         for k, val in matteKeys.items():
-            if row < 12:
+            if row < 13:
                 self.table.setRow(row, 0, k, '', True,True)
                 self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
-                if row == 12:
+                if row == 13:
                     self.table.setRow(row, 0, f"{' Keys for Running an Animation':<32}",QC,True,True,2)
-                    row = 13
+                    row = 14
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1

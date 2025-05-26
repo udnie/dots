@@ -9,7 +9,11 @@ import math
 #d     and this line # self.setScreenFormat(fileName) inorder to have the 
 #d     videoPlayer set the screen format on drag and drop. cv2 is used
 #d     in setting the aspect-ratio (width/height) of a video file.
-#d     A right-mouse click displays the filename in the window title.  '''          
+#d     A right-mouse click displays the filename in the window title.
+#d
+#d     Also, adds a first frame display but not a backdrop and 
+#d    '>', ']', '=' expands in both directions horizontally or 
+#d    vertically and '<', '[', '-' contracts in both as well. '''    
 ### -------------------------------------------------------- 
 # import cv2 
 ### --------------------------------------------------------
@@ -34,8 +38,6 @@ Chars   = ( 'A',  'F',  'H',  'V')  ## as in characters
 Asps    = (1.33, 1.50, 1.77, 0.56)  ## more snakes - Cleopatra's favorite
 Widths  =  (550,  615,  720,  435)  ## default widget widths
 
-### --------------------------------------------------------
-''' Adds a first frame display but not a backdrop '''
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
@@ -109,10 +111,20 @@ class VideoPlayer(QWidget):
         
 ### --------------------------------------------------------
     def keyPressEvent(self, e):
+        mod = e.modifiers()  
+        
         if e.key() == Qt.Key.Key_Space:  ## spacebar to pause/resume
             self.playVideo()
+            
         elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
             self.zoom(1.10) if e.key() == Qt.Key.Key_BracketRight else self.zoom(.90)
+        
+        elif mod & Qt.KeyboardModifier.ShiftModifier and e.key() in (Qt.Key.Key_Greater, Qt.Key.Key_Less):
+            self.zoom(1.10) if e.key() == Qt.Key.Key_Greater else self.zoom(.90)
+                
+        elif mod & Qt.KeyboardModifier.ShiftModifier and  e.key() in (Qt.Key.Key_Plus, Qt.Key.Key_Underscore):
+            self.zoom(1.10) if e.key() == Qt.Key.Key_Plus else self.zoom(.90)
+      
         else:
             try:
                 key = chr(e.key())
@@ -249,7 +261,7 @@ class VideoPlayer(QWidget):
             self.fileName = pathMod(fileName)  ## it's for display
 
 ### -------------------------- if using cv2 ----------------------------
-        # # # # # # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
+        # self.setScreenFormat(fileName)  ## uses cv2 to get aspect/ratio screen format on start of video
 ### -------------------------- if using cv2 ----------------------------
     ## 6
 ### ------------ uncomment for 6 ... comment out for 5 -----------------              
@@ -297,7 +309,6 @@ class VideoPlayer(QWidget):
         self.setPosition(0)  ## shows first frame plus pause
         self.mediaPlayer.pause() 
   
-  
     def positionChanged(self, position):
         self.slider.setValue(position)
 
@@ -321,7 +332,6 @@ class VideoPlayer(QWidget):
   
         self.openButton = QPushButton("Files")
         self.playButton = QPushButton("Start")
-        self.zoomButton = QPushButton('Zoom Keys [ ]')
         self.stopButton = QPushButton("Stop")
         self.byeButton  = QPushButton("Quit")  
         
@@ -334,7 +344,6 @@ class VideoPlayer(QWidget):
         
         hbox.addWidget(self.openButton)  
         hbox.addWidget(self.playButton)
-        hbox.addWidget(self.zoomButton)
         hbox.addWidget(self.stopButton)
         hbox.addWidget(self.byeButton)
 
