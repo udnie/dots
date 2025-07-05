@@ -7,20 +7,6 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
-**July 4 2025**  
-Updates to **slideShow** and **videoPlayerOne**.  Added three global variables to slideshow to configure hiding the buttons, hiding the title bar or filling the frame with a background color or all three at once. Also changes to remember which photos were rotated and redisplay them rotated throughout the session with their corrected width, height and aspect ratio if the textitem is showing.  Also added, a right-mouse click to pop-up the slideShow help menu and wired up its selections to run when clicked.
-
-VideoPlayerOne has been overhauled to auto-resize and display videos correctly on a Mac regardless of their aspect ratio.  I was curious as to why videoPlayerOne displayed vertical videos, the ones I had cropped, in a horizontal format rather than a in vertical format as the Mac **quicktime player** did. Both **opencv**, which I have been using to generate an aspect ratio, and the **QMediaMetaData** class I was testing, defaulted to a 3:2 format, centering the video within a horizontal format with black sidebars. I eventually found the Mac/Unix command, **mdls**, that returned the same width and height as did **'Get Info'** and was able to run it from videoPlayerOne using the python **subprocess** module. 
-
-The function **getVideoWidthHeight** in videoPlayerOne is where the function that uses **mdls** resides and there you'll also find two other commented out **try blocks** - one based on **ffprobe** and the other based on **opencv** which was in the initial release. I have provided a work around if not using any of the three code blocks by adding an **Aspect** button to set the aspect ratio once you've resized and formatted the video display. This should only be needed for non 9:16 vertical formats as horizontal formats should  be auto-displayed correctly. **FFprobe** runs well in vscode but fails on the desktop as an automator app.  The video and what you cropped it with will determine how it's displayed.
-
-Also added two global variables to videoPlayerOne. **PlayVideo** to play the video as soon as it's loaded and **AspectRationOn** that tells videoPlayer goto **getVideoWidthHeight** to set the aspect ratio - otherwise the only aspect ratios it knows about are the four I originally programmed it with.
-
-
-Dots has been reworked as I replaced most of the **elif** structures with **match case** ones.  It's cleaner-looking and easier to read.
-    
----
-
 **May 20 2025**   
 Added additional keyboard commands used for zoom/scaling,  to include the **greater** and **less** keys, **'<,>'**, and the **plus** and **underscore** keys, **'+,_'**.  In **vhx.py**, **videoPlayerOne.py**, **slideShow.py** and **BkgMatte.py**.  Square **brackets, '[,]'** are still supported - updated docstrings reflecting changes. One more update to **vhx.py** allowing the user to anchor an end and have the ruler expand or collapse in one direction, to the right or down, rather than both.  Added an additional blur to **shadows** using the **DropShadowEffect** to soften their edges a bit more.  Rotating a photo in **slideShow.py** now stays rotated throughout the session, and as a reminder - typing the letter **'O'** resets to the opening display.  You can also use the mouse to zoom/scale as well and the zoom keys will work accordingly.
 
