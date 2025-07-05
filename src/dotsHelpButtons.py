@@ -72,9 +72,11 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
     def openMenus(self):   
         if self.canvas.pathMakerOn == False:
   
-            if self.canvas.openPlayFile == 'menu':
-                return
-            
+            if self.canvas.openPlayFile == 'menu':  ##  left over 
+                if sum(pix.type == 'flat' for pix in self.scene.items()) == 1 and \
+                    len(self.scene.items()) == 1:
+                        self.canvas.clear()
+                        
             if len(self.scene.items()) == 0:
                 if self.canvasFlag == True:
                     self.canvasHelp.closeMenu() 
@@ -163,7 +165,7 @@ class CanvasHelp:
             self.canvas.setKeys('N')
     
 ### --------------------------------------------------------     
-class StoryHelp: 
+class StoryHelp:  ## storyboard help goes directly to showbiz
 ### -------------------------------------------------------- 
     def __init__(self, parent, canvas, off=0, switch=''):
         super().__init__()  
@@ -179,7 +181,7 @@ class StoryHelp:
         self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 267, 600
+        width, height = 267, 603
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}',QL, True,True,2)
@@ -212,14 +214,15 @@ class StoryHelp:
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help == 'Menus': 
-                    QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
-                    self.canvas.clear()
-                elif help == 'Menu':   
-                    self.storyHelp2 = StoryHelp2(self.canvas)      
-                elif help == 'SpaceBar': 
-                    help = 'space'                 
-                if help in PlayKeys: 
+                match help:
+                    case 'Menus': 
+                        QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
+                        self.canvas.clear()
+                    case 'Menu':  
+                        self.storyHelp2 = StoryHelp2(self.canvas)      
+                    case 'SpaceBar': 
+                        help = 'space'                 
+                if help in PlayKeys:  ## in Shared
                     QTimer.singleShot(10, partial(self.canvas.setKeys, help))
                 self.table.close()  
             except:

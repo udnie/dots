@@ -14,8 +14,7 @@ class PixWidget(QWidget):
     def __init__(self, parent, switch=''):
         super().__init__()
            
-        self.fileName = ''
-        
+        self.fileName = '' 
         self.switch = switch
                        
         if self.switch == '':              

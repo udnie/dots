@@ -24,6 +24,10 @@ for file in files:
         
             if '## 5' in line or 'end' in line or 'comment' in line:  ## skip
                 continue
+            
+            if '##--5' in line:
+                i = line.index('##--5') 
+                line = line[0:i] + '\n' 
                                    
             if line.startswith('#d'):
                 line = line[3:]

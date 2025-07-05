@@ -11,13 +11,13 @@ from dotsShared         import common, paths, ControlKeys
 from dotsHelpMonkey     import SharedKeys
 from dotsSideGig        import tagBkg
 
-## SharedKeys =  ('H','T','/','del','tag','shift','enter','return') 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
 
 ### ---------------------- dotsShadow ----------------------
 ''' classes: Shadow and cv2 functions... 
     Shadow doesn't hold state as it's constantly being updated - 
-    shadowMaker.shadow is where to look. pixitem.shadow is storage ''' 
+    shadowMaker.shadow is where to look. pixitem.shadow is storage 
+    The Shadow helpMenu and sharedkeys are in helpMonkey ''' 
 ### ---------------------- dotsShadow ----------------------  
 class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
 ### --------------------------------------------------------
@@ -86,24 +86,26 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         e.accept() 
 
     def shared(self, key):  ## with help menuu
-        self.key = key 
-        if self.key == 'del':    
-            self.delete()      
-        elif self.key == 'shift':  ## send back  
-            self.setZValue(self.zValue()-1)
-        elif self.key in('enter','return'): # send to front
-            self.setZValue(self.mapper.toFront(1))  
-        elif self.key == 'tag':  ## '\' backslash
-            self.tagThis()
-        elif self.key == 'H':  
-            self.maker.openMenu()      
-        elif self.key == 'T':     
-            self.linkShadow() if self.maker.linked == False \
-                else self.unlinkShadow()
-            self.tagThis() 
-        elif self.key == '/':  ## cuts off shadow if partial offscreen and points tweaked
-            self.maker.updateShadow()  
-          
+        match key:
+            case 'del':    
+                self.delete()      
+            case 'shift':       ## send back 3 - otherwise it still covers the sprite
+                self.setZValue(self.zValue()-3)
+            case 'enter' | 'return':    # send to front
+                self.setZValue(self.mapper.toFront(1))  
+            case 'tag':                  ## '\' backslash
+                self.tagThis()
+            case 'H':  
+                self.maker.openMenu() 
+            case 'T':     
+                self.linkShadow() if self.maker.linked == False \
+                    else self.unlinkShadow()
+                self.tagThis() 
+            case '/':  ## cuts off shadow if partial offscreen and points tweaked
+                self.maker.updateShadow() 
+            case 'dblclk':
+                self.maker.works.toggleOutline()
+        
     def tagThis(self):  
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
@@ -113,30 +115,25 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
             self.dragCnt += 1
             if self.dragCnt % 5 == 0:  ## updatePath handles dblclk           
                 self.maker.updatePath(self.mapToScene(e.pos()))  
-            e.accept()       
+        e.accept()       
                           
     def mouseReleaseEvent(self, e): 
+        self.key = '' 
         if self.maker.linked == False:  
             self.maker.updatePath(self.mapToScene(e.pos()))            
             if self.maker.dblclk == False:  
-                self.maker.works.hideOutline()   
-            e.accept()
-        self.key = '' 
-  
+                self.maker.works.hideOutline()                
+        e.accept()
+   
     def mouseDoubleClickEvent(self, e):  ## if 'resume', 'pause', animation running
         if self.canvas.control not in ControlKeys and \
-            self.key not in self.sharedKeys:  
+            self.key not in self.sharedKeys:    
             if self.maker.linked == False:
-                if self.maker.dblclk == False:
-                    self.maker.dblclk = True
-                else:
-                    self.maker.dblclk = False
-                self.maker.updatePath(self.mapToScene(e.pos()))
-                self.updOutline()
+                self.maker.works.toggleOutline()
             else:
                 self.tagThis()
-            e.accept()
-    
+        e.accept()
+                
     def delete(self):  
         self.maker.works.deleteShadow()
   

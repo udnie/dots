@@ -111,11 +111,11 @@ class VideoPlayer(QMediaPlayer):
         self.backdrp.setZValue(-100)  ## copy is a graphics pixmapItem 
         self.scene.addItem(self.backdrp)        
         self.videoWidget.setZValue(-99)  ## reset behind sprites
-        self.canvas.btnRun.setText('Video')
         if self.tag == 'dnd': self.mediaPlayer.play()  
         
     def handleError(self):
-        print(self.mediaPlayer.errorString())
+        MsgBox(self.mediaPlayer.errorString())
+        return
 
     def stopVideo(self):
         try:
@@ -150,7 +150,7 @@ class VideoPlayer(QMediaPlayer):
         return tmp
  
 ### --------------------------------------------------------        
-class AvideoWidget(QWidget):   ## so as not confused with the videoWidget
+class AVideoWidget(QWidget):   ## so as not confused with the videoWidget
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
@@ -263,7 +263,7 @@ class AvideoWidget(QWidget):   ## so as not confused with the videoWidget
         groupBox.setLayout(vbox)
         return groupBox 
    
-   ### -------------------------------------------------------- 
+### -------------------------------------------------------- 
     def save(self):  
         self.canvas.showbiz.showtime.savePlay()
     

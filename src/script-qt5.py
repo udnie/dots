@@ -37,8 +37,7 @@ for file in files:
                 elif '47' in line:
                     i = line.index('47') 
                     line = line[0:i] + '23' + line[i+2:]
-                    print(line, i)
-                             
+                            
             elif file == "dotsPixItem.py":
                 if line.startswith('from dotsShadowMaker'):
                     line = '# ' + line
@@ -68,7 +67,8 @@ for file in files:
                 #             break
                 #         line = line[0:i] + '# ' + line[i:]
                 
-                if '## 6' in line or 'end' in line or 'comment' in line:  ## skip
+                if '## 6' in line or 'end' in line or 'comment' in line or\
+                    '##--5' in line:
                     continue
                 
                 elif '## 5' in line:
@@ -82,7 +82,7 @@ for file in files:
                         
                     i = line.index('## 5')  ## remove it 
                     line = line[0:i] + '\n'
-                    
+             
                 if line.startswith('#d'):
                     line = line[3:]
                                          

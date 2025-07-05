@@ -37,7 +37,7 @@ bkgHelpKeys = {
     'shift':    'move to the back',
     'Shift-B':  'Mirror Background',
     'Option-B': 'Mirror/Flip Background',
-    'Shift-U':  'UnLock All Screen Items',   
+    'Shift-U':  'UnLock All Screen Items',    
 }
 
 shadowKeys = {
@@ -48,12 +48,12 @@ shadowKeys = {
     'del':      'delete from screen', 
     'enter':    'move to the front',
     'return':   'move to the front',   
-    'shift':    'move back one ZValue',  
-    'dlb-clk':   'Dbl-Click Toggles Outline',    
+    'shift':    'move back 3 zvalues',  ## otherwise it still covers the sprite
+    'dblclk':   'Dbl-Click Toggles Outline',    
 }
 
-## avoids a circular reference
-SharedKeys =  ('H','T','/','del','tag','shift','enter','return') 
+## avoids a circular reference -these are used by shadow 
+SharedKeys = ('H','T','/','del','tag','shift','enter','return', 'dblclk') 
 
 ### --------------------- dotsHelpMonkey ------------------- 
 ''' classes: PixHelp, BkgHelp and ShadowHelp '''
@@ -125,8 +125,8 @@ class PixHelp:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help == '\\': 
                     help = 'tag'
-                elif help == 'dlbclk':
-                    self.closeMenu()
+                elif help == 'H':
+                    self.closeMenu()        ## pixiitem has its own sharedkeys
                 if help != 'H' and help in self.pixitem.sharedKeys:
                     QTimer.singleShot(25, partial(self.pixitem.shared, help))  
             except:
@@ -177,11 +177,15 @@ class BkgHelp:
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help == '\\': 
-                    help = 'tag'
+                    help = 'tag'    
+                elif help == 'option':
+                    help = 'opt'  
                 if help != 'H' and help in self.bkgItem.sharedKeys:
-                    QTimer.singleShot(25, partial(self.bkgItem.shared, help))  
+                    QTimer.singleShot(25, partial(self.bkgItem.shared, help)) 
                 elif help in ('Shift-B', 'Shift-U'):
-                    self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)   
+                    self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)  
+                elif help == 'Option-B':
+                    self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.AltModifier)
             except:
                 None
         self.closeMenu()
@@ -210,10 +214,10 @@ class ShadowHelp:
         self.table.setRow(0, 0, f'{" Shadow Help Menu":<20}',QL,True,True, 2)
 
         row = 1
-        for k , val in shadowKeys.items():
-            if k == 'dlbclk':
-                self.table.setRow(row, 0, k,QC,True,True)
-                self.table.setRow(row, 1, "  " + val,QC,'',True)      
+        for k , val in shadowKeys.items(): 
+            if k == 'dblclk':
+                self.table.setRow(row, 0, k, QC , True, True)
+                self.table.setRow(row, 1, "  " + val, QC, '', True)      
             else:
                 self.table.setRow(row, 0, k,'',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)
@@ -242,7 +246,8 @@ class ShadowHelp:
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help == '\\': help = 'tag'
+                if help == '\\': 
+                    help = 'tag'
                 if help != 'H' and help in SharedKeys:
                     QTimer.singleShot(25, partial(self.maker.shadow.shared, help))
             except:
@@ -252,7 +257,7 @@ class ShadowHelp:
     def closeMenu(self):   
         self.table.close()  
         if self.switch != '' and self.switch != 'pix':
-            self.canvas.setKeys('N')
+            self.canvas.setKeys('N')  ## open help menus
          
 ### -------------------- dotsHelpMonkey -------------------- 
 

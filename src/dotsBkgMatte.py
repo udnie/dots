@@ -28,9 +28,13 @@ matteKeys = {
     'SpaceBar': 'Pause/Resume',  
     'S':        'Stop Animation',
 }
+
+SharedKeys = ('B','C', 'D', 'G', 'H', 'P', 'Q', 'R', 'S', 'V', 'W', 'X', 'Space', '<', '>')
+
 ### --------------------- dotsBkgMatte ---------------------     
 ''' '>', ']', '=' expands in both directions horizontally or 
-    vertically and '<', '[', '-' contracts in both as well. '''
+    vertically and '<', '[', '-' contracts in both as well. 
+    Opening the help menu can reset the border  '''
 ### --------------------------------------------------------      
 class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------
@@ -90,7 +94,7 @@ class Matte(QWidget):  ## opens itself
         qp.begin(self)
  
         path = QPainterPath() 
-    
+
         viewW = int(common['ViewW']+(self.border*2))  ## inner
         viewH = int(common['ViewH']+(self.border*2)*self.ratio)
     
@@ -111,7 +115,7 @@ class Matte(QWidget):  ## opens itself
       
         qp.setBrush(self.brush)  
         qp.drawPath(path)
-        
+ 
         self.move(self.x-self.border, int(self.y-(self.border)*self.ratio))
                 
         qp.end()
@@ -124,21 +128,16 @@ class Matte(QWidget):  ## opens itself
         if key in ('E',  Qt.Key.Key_Enter, Qt.Key.Key_Return):
             self.matteHelp.closeMenu()
                            
-        elif e.key() in (Qt.Key.Key_BracketRight, Qt.Key.Key_BracketLeft):
-            self.shared('>') if e.key() == Qt.Key.Key_BracketRight else \
-                self.shared('<')
-       
-        elif mod & Qt.KeyboardModifier.ShiftModifier and key in (Qt.Key.Key_Greater, Qt.Key.Key_Less):
-            self.shared('>') if key == Qt.Key.Key_Greater else \
-                self.shared('<')  
+        elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
+            and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
+                self.shared('>')
                 
-        elif mod & Qt.KeyboardModifier.ShiftModifier and key in (Qt.Key.Key_Plus, Qt.Key.Key_Underscore):
-            self.shared('>') if key == Qt.Key.Key_Plus else \
-                self.shared('<')   
-                   
+        elif key == Qt.Key.Key_BracketLeft or mod & Qt.KeyboardModifier.ShiftModifier \
+            and key in (Qt.Key.Key_Less, Qt.Key.Key_Underscore):
+                self.shared('<') 
+                
         elif key == Qt.Key.Key_Space:
             self.shared('Space')
-            
         else: 
             try:
                 key = chr(key) 
@@ -148,58 +147,43 @@ class Matte(QWidget):  ## opens itself
          
     def shared(self, key):  
         if key != 'P' and self.pix != None:
-            if key in ('W', 'B', 'D', 'G', 'C', 'V', '<', '>'):
-                self.pix = None 
-                
-        if key == 'B':  ## change color  
-            self.brush = self.black    
-
-        elif key == 'C':  ## change color
-            self.brush = self.lst[random.randint(0,2)] 
-            
-        elif key == 'D':  ## delete background    
-            self.bkgItem.bkgMaker.deleteBkg(self.bkgItem)            
-                
-        elif key == 'G':  ## change color  
-            self.brush = self.grey       
-                               
-        elif key == 'P':
-            if self.pix == None:    
-                self.pix = self.img  ## something to initialize it  
-            
-            elif self.pix != None: 
-                self.pix = None
-                self.brush = self.lst[random.randint(0,2)]
-                                
-        ## set screen format ratio to around .61 - midway between 16:9 and 3:2 
-        elif key == 'V': 
-            self.ratio = self.altRatio if self.ratio == 1.0 else 1.0    
-            
-        elif key == 'W':  ## change color  
-            self.brush = self.white  
-        
-        elif key == '>':  ## scale up  
-            self.scaleUp()       
-                
-        elif key == '<':  ## scale down
-            self.scaleDown()   
-                                                                                     
-        elif key == 'H': 
-            if self.help == False:  
-                self.matteHelp = MatteHelp(self.canvas, self) 
-                     
-            elif self.help == True:   
-                self.matteHelp.closeMenu()
-                                                                          
-        elif key == 'R': 
-                self.canvas.showbiz.showtime.run()
-        
-        elif key == 'Space':          
-            self.canvas.showbiz.showtime.pause() 
-        
-        elif key == 'S':  
-            self.canvas.showbiz.showtime.stop() 
-                  
+            if key in SharedKeys:
+                self.pix = None           
+        match key: 
+            case 'B':     
+                self.brush = self.black    
+            case 'C':      ## change color
+                self.brush = self.lst[random.randint(0,2)]     
+            case 'D':      ## delete background    
+                self.bkgItem.bkgMaker.deleteBkg(self.bkgItem)                  
+            case 'G':      # 
+                self.brush = self.grey  
+            case 'H': 
+                if self.help == False:  
+                    self.matteHelp = MatteHelp(self.canvas, self) 
+                elif self.help == True:   
+                    self.matteHelp.closeMenu()                    
+            case 'P':
+                if self.pix == None:    
+                    self.pix = self.img  ## something to initialize it       
+                elif self.pix != None: 
+                    self.pix = None
+                    self.brush = self.lst[random.randint(0,2)]      
+            case 'R': 
+                 self.canvas.showbiz.showtime.run()
+            case 'Space':          
+                self.canvas.showbiz.showtime.pause()   
+            case 'S':  
+                self.canvas.showbiz.showtime.stop()                           
+            case 'V':      ## set screen format ratio to around .61 - midway between 16:9 and 3:2 
+                self.ratio = self.altRatio if self.ratio == 1.0 else 1.0          
+            case 'W':      
+                self.brush = self.white  
+            case '>':     
+                self.scaleUp()           
+            case '<':   
+                self.scaleDown()   
+                                                                                           
         self.update() if key not in ('Q','X') else self.bye()
             
 ### --------------------------------------------------------
@@ -290,8 +274,15 @@ class MatteHelp:
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help != 'H' and help in matteKeys:
-                    QTimer.singleShot(100, partial(self.matte.shared, help))      
+                match help: 
+                    case 'SpaceBar':
+                        help = 'Space'  
+                    case '+, >, ]':
+                        help = '>'
+                    case  '_, <, [':
+                         help = '<'  
+                if help != 'H' and help in SharedKeys:
+                    QTimer.singleShot(50, partial(self.matte.shared, help))      
             except:
                 None
         self.closeMenu() 

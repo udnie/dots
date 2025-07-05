@@ -25,61 +25,61 @@ screens = {  ## used by helpmenus and dots
 ''' no class: screen formats and functions '''     
 ### -------------------------------------------------------- 
 def setCommon(format=''):
-    if format == '1080':      ## 1080X720 - 3:2 same as default
-        common.update(ten80)  
-        common.update(seven20)  
-        return screens['1080']  
+    match format:
+        case '1080':    ## 1080X720 - 3:2 same as default
+            common.update(ten80)  
+            common.update(seven20)  
+            return screens['1080']  
+        
+        case '1280':    ## 1280X720 - 16:9
+            common.update(twelve80)  
+            common.update(seven20) 
+            return screens['1280']  
+        
+        case '1215':     ## 1215X810 - 3:2
+            common.update(twelve15) 
+            common.update(eight10) 
+            return screens['1215']
+        
+        case '1440':     ## 1440X810 - 16:9
+            common.update(fourteen40) 
+            common.update(eight10) 
+            return screens['1440'] 
+        
+        case '1296':     ## 1296X864 - 3:2
+            common.update(twelve96)  
+            common.update(eight64) 
+            return screens['1296']       
     
-    elif format == '1280':    ## 1280X720 - 16:9
-        common.update(twelve80)  
-        common.update(seven20) 
-        return screens['1280']  
-    
-    elif format == '1215':     ## 1215X810 - 3:2
-        common.update(twelve15) 
-        common.update(eight10) 
-        return screens['1215']
-    
-    elif format == '1440':     ## 1440X810 - 16:9
-        common.update(fourteen40) 
-        common.update(eight10) 
-        return screens['1440'] 
-    
-    elif format == '1296':     ## 1296X864 - 3:2
-        common.update(twelve96)  
-        common.update(eight64) 
-        return screens['1296']       
-  
-    elif format == '1536':      ## 1536X864 - 16:9
-        common.update(fifteen36) 
-        common.update(eight64) 
-        return screens['1536']   
-         
-    ## verticals
-    elif format == '1102':       ## 620X1102 - 9:16
-        common.update(vert)
-        common.update(six20)              
-        return screens['1102'] 
-    
-    elif format == '900':       ## 600X900 - 2:3
-        common.update(vert)
-        common.update(six30)              
-        return screens['900'] 
-    
-    elif format == '912':       ## 513X912 - 9:16
-        common.update(vert)
-        common.update(nine12)              
-        return screens['912'] 
-    
-    elif format == '1024':       ## 576X1024 - 9:16
-        common.update(vert)
-        common.update(ten24)              
-        return screens['1024']
-     
-    else:
-        common.update(ten80)  ## 1080X720 - 3:2 - default
-        common.update(seven20) 
-        return '1080X720 - 3:2' 
+        case '1536':      ## 1536X864 - 16:9
+            common.update(fifteen36) 
+            common.update(eight64) 
+            return screens['1536']   
+            
+        case '1102':       ##  ## verticals -- 620X1102 - 9:16
+            common.update(vert)
+            common.update(six20)              
+            return screens['1102'] 
+        
+        case '900':       ## 600X900 - 2:3
+            common.update(vert)
+            common.update(six30)              
+            return screens['900'] 
+        
+        case '912':       ## 513X912 - 9:16
+            common.update(vert)
+            common.update(nine12)              
+            return screens['912'] 
+        
+        case '1024':       ## 576X1024 - 9:16
+            common.update(vert)
+            common.update(ten24)              
+            return screens['1024']
+        
+        case _:
+            common.update(ten80)  ## 1080X720 - 3:2 - default
+            common.update(seven20) 
+            return '1080X720 - 3:2' 
    
 ##  -------------- 1080X720 - 3:2 and 1280X720 - 16:9 ----------------
 seven20 = {     ## used by both 1080X720 and 1280X720px     

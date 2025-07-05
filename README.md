@@ -19,14 +19,13 @@ The **background** image needs to reside in the **backgrounds** folder as **dots
 
 Flat colors will be saved to the backgrounds folder using the save button in the **backgrounds** button dock. The file name is up to you with **'.bkg'** as the file extension.  Saving a **background** to a **'.play'** file will preserve any settings you might have made, such as for scrolling and a flat color without needing to save the color.
 
-**It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
-
 The **star** in scrollPanel isn't currently designed to be dragged to the canvas, but without it none of this would exist.
 
 
 ## Requirements
 * **PyQt6**, **PyQt5** or **PySide6** -- see **Start Here**
 * **Python 3.10** or above for walrus operators and async
+* There are two scripts that require a unix/linux shell, bash or zsh, and sed 
 * functools, though I'm sure it's built-in
 * **opencv-python** if you're planning to use **Shadows**, **ShadowMaker** or **videoPlayerOne**, it includes **numpy**
 * Your favorite program for creating transparent pngs if you have one or try **ShadowMaker** 

@@ -1,15 +1,17 @@
 
 import random
 import time
+import subprocess
+import sys
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtWidgets    import QApplication
                                                  
 from dotsShared         import common, paths
 from dotsPixItem        import PixItem
-from dotsSideGig        import constrain
+from dotsSideGig        import MsgBox, constrain
 from dotsMapMaker       import MapMaker
-from dotsVideoPlayer    import VideoPlayer, AvideoWidget
+from dotsVideoPlayer    import VideoPlayer, AVideoWidget
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
@@ -71,7 +73,7 @@ class SideCar:
         for itm in self.canvas.scene.items():
             if itm.type in ('bkg', 'flat', 'video'):       
                 print(f'{itm.type.strip()}\t{itm.zValue()}\t{itm.fileName}')  
-           
+     
 ### --------------------------------------------------------         
     def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd'  
         if  self.canvas.videoPlayer != None:
@@ -134,7 +136,7 @@ class SideCar:
             self.canvas.videoPlayer.backdrp = None
      
     def addVideoWidget(self):  ## pop-up
-        self.canvas.videoPlayer.widget = AvideoWidget(self.canvas)
+        self.canvas.videoPlayer.widget = AVideoWidget(self.canvas)
                     
     def closeVideoWidget(self):
         if self.canvas.videoPlayer.widget != None:

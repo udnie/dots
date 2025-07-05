@@ -268,7 +268,7 @@ class BkgWidget(QWidget):
             matteBtn.clicked.connect(self.bkgWorks.openMatte)
             centerBtn.clicked.connect(self.bkgWorks.centerBkg)   
             deleteBtn.clicked.connect(lambda: self.bkgMaker.deleteBkg(self.bkgItem))  
-            quitBtn.clicked.connect(self.bkgMaker.closeWidget) 
+            quitBtn.clicked.connect(self.bkgWorks.closeWidget) 
         else: 
             quitBtn.clicked.connect(lambda: self.canvas.setKeys('N'))
         

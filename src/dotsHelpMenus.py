@@ -26,7 +26,7 @@ demoKeys = {
 ### ---------------------- dotsMenus ----------------------- 
 ''' classes: HelpMenus, DemoHelp, ScreenHelp '''
 ### --------------------------------------------------------
-    ## Animation Menu in pixWork
+    ## Animation Menu in pixWorks
     ## Canvas and StoryBoard Menus in helpButtons
     ## Demos, Screens Menus in helpMenus 
     ## Frames and Flats Menu in frames and flats

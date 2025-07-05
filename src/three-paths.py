@@ -2,9 +2,9 @@
 import sys
 import os
 
-from PyQt5.QtCore       import Qt, QPointF, pyqtProperty, QPropertyAnimation, QObject 
-from PyQt5.QtGui        import QGuiApplication, QPainterPath, QPixmap
-from PyQt5.QtWidgets    import QWidget, QApplication, QGraphicsView, QMessageBox, \
+from PyQt6.QtCore       import Qt, QPointF, pyqtProperty, QPropertyAnimation, QObject 
+from PyQt6.QtGui        import QGuiApplication, QPainterPath, QPixmap
+from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, QMessageBox, \
                                 QGraphicsScene, QLabel, QFrame, QGraphicsPixmapItem, \
                                 QHBoxLayout, QVBoxLayout, QPushButton
                                  
@@ -15,7 +15,7 @@ ViewW, ViewH, Width = 650, 500, 695
 ### ------------------- three-paths.py --------------------- 
 ''' This app relies on imports from dots sprite and path directories
     and needs be run in the dots source directory in order to work. 
-    There's an edit to pyqtProperty for pyside - need to drop pyqt. '''
+    There's an edit to ptqtproperty for pyside - need to drop pyqt. '''
 ### -------------------------------------------------------- 
 class Node(QObject):
 ### --------------------------------------------------------

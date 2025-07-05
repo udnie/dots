@@ -54,10 +54,9 @@ class HelpMaker:  ## the help menus
     def menuHelp(self):
         self.canvas.sideCar.clearWidgets()
         self.canvas.bkgMaker.setBkgColor(SpinDrift)
-        self.switchHelp =  MainMenu(self.canvas)
+        self.switchHelp = MainMenu(self.canvas)
         
         self.canvas.openPlayFile = 'menu'  ## blocks helpbutton and 'H' and 'M' keys
-        self.canvas.btnHelp.setEnabled(False)  
 
 ### --------------------------------------------------------     
 class  MainMenu: 
@@ -92,7 +91,7 @@ class  MainMenu:
       
         self.table.move(x-135, y-210)                
         self.table.show() 
-           
+     
     def clicked(self):  
         p = self.table.currentRow() - 1  ## position in lst to key   
         if p+1 <= len(switchKeys):       ## is it valid           
@@ -101,53 +100,55 @@ class  MainMenu:
             self.sideCar.clearWidgets()
             self.canvas.bkgMaker.setBkgColor(SpinDrift)  
             
-            if help == 'buttons':
-                self.canvasHelp = CanvasHelp(self, self.canvas, -350, 'on')
-                self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on')
-                self.pathHelp   = PathHelp(self, self.canvas, 350, 'on')
-                
-            elif help == 'sprites': 
-                self.bkgHelp    = BkgHelp(self.canvas,0, 'on')
-                self.shadowHelp = ShadowHelp(self.canvas, 350, 'on')
-                self.pixHelp    = PixHelp(self.canvas, -350, 'on')  
-                
-            elif help == 'demos':  
-                self.demoHelp   = DemoHelp(self.canvas, -325, 'on')
-                self.screenHelp = ScreenHelp(self.canvas, 0, 'on')
-                self.animeHelp  = AnimationHelp(self.canvas, QPoint(), 'on', 225)
-                
-            elif help == 'flats':  
-                self.flatHelp   = FlatHelp(self, self.canvas, -350, 'flat', 'on')
-                self.matteHelp = MatteHelp(self.canvas, None, 0, 'on')
-                self.frameHelp = FlatHelp(self, self.canvas, 350, 'frame', 'on')
-                
-            elif help == 'widgets': 
-                bkg    = BkgWidget(self.canvas, None, 'on')
-                pix    = PixWidget(self.canvas, 'on')
-                path   = PathWidget(self.canvas, None, 'on')
-                shadow = ShadowWidget(self.canvas, None, 'on')
-                             
-            elif help == 'bkg':   
-                bkg = BkgWidget(self.canvas, 0, 'all')
-                self.bkgHelp = BkgHelp(self.canvas, 250, 'all')
-                
-            elif help == 'shadow':   
-                shadow = ShadowWidget(self.canvas, 0, 'all')
-                self.shadowHelp = ShadowHelp(self.canvas, 200, 'all')
+            match help:            
+                case 'buttons':
+                    self.canvasHelp = CanvasHelp(self, self.canvas, -350, 'on')
+                    self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on')
+                    self.pathHelp   = PathHelp(self, self.canvas, 350, 'on')
                     
-            elif help == 'pix':  
-                self.pixWidget = PixWidget(self.canvas, 'all')
-                self.pixHelp   = PixHelp(self.canvas, 215, 'all') 
-  
-            elif help == 'story':  
-                self.pixHelp    = PixHelp(self.canvas, -355, 'all') 
-                self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on') 
-                self.storyHelp2 = StoryHelp2(self.canvas, 355, 'on')
+                case 'sprites': 
+                    self.bkgHelp    = BkgHelp(self.canvas,0, 'on')
+                    self.shadowHelp = ShadowHelp(self.canvas, 350, 'on')
+                    self.pixHelp    = PixHelp(self.canvas, -350, 'on')  
+                    
+                case 'demos':  
+                    self.demoHelp   = DemoHelp(self.canvas, -325, 'on')
+                    self.screenHelp = ScreenHelp(self.canvas, 0, 'on')
+                    self.animeHelp  = AnimationHelp(self.canvas, QPoint(), 'on', 225)
+                
+                case 'flats':  
+                    self.flatHelp   = FlatHelp(self, self.canvas, -350, 'flat', 'on')
+                    self.matteHelp = MatteHelp(self.canvas, None, 0, 'on')
+                    self.frameHelp = FlatHelp(self, self.canvas, 350, 'frame', 'on')
+                    
+                case 'widgets': 
+                    bkg    = BkgWidget(self.canvas, None, 'on')
+                    pix    = PixWidget(self.canvas, 'on')
+                    path   = PathWidget(self.canvas, None, 'on')
+                    shadow = ShadowWidget(self.canvas, None, 'on')
+                                
+                case 'bkg':   
+                    bkg = BkgWidget(self.canvas, 0, 'all')
+                    self.bkgHelp = BkgHelp(self.canvas, 250, 'all')
+                
+                case 'shadow':   
+                    shadow = ShadowWidget(self.canvas, 0, 'all')
+                    self.shadowHelp = ShadowHelp(self.canvas, 200, 'all')
+                        
+                case 'pix':  
+                    self.pixWidget = PixWidget(self.canvas, 'all')
+                    self.pixHelp   = PixHelp(self.canvas, 215, 'all') 
+    
+                case 'story':  
+                    self.pixHelp    = PixHelp(self.canvas, -355, 'all') 
+                    self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on') 
+                    self.storyHelp2 = StoryHelp2(self.canvas, 355, 'on')
                   
-            elif help == 'path':
-                self.pathWidget = PathWidget(self.canvas, '', 'all')
-                self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
-                self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')          
+                case 'path':
+                    self.pathWidget = PathWidget(self.canvas, '', 'all')
+                    self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
+                    self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')  
+                            
         else:
             self.table.close() 
             self.canvas.clear()   

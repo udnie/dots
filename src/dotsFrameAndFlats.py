@@ -124,28 +124,30 @@ class Flat(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         self.key = ''
         e.accept() 
-   
+        
+    def mouseDoubleClickEvent(self, e):
+        self.delete()
+
     def shared(self, key):  ## used with help menu
-        self.key = key
-        if self.key == 'del':   
-            self.delete()               
-        elif self.key == 'shift':  ## to the back
-            self.setZValue(self.bkgMaker.toBack())
-            self.canvas.bkgMaker.renumZvals()       
-        elif self.key == 'B':  ## not actually tracked
-            self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
-                else self.bkgtrackers.tracker.bye()     
-        elif self.key == 'H':  
-            self.openMenu()      
-        elif self.key == 'tag':  ## '\' tag key
-            self.tagThis()
-        elif self.key in('enter','return'): # send to front
-            self.bkgMaker.front(self)         
-        elif self.key == 'T':     
-            self.setLock() if self.locked == False else self.setUnlock()
-            self.tagThis()
-        self.key = ''
-            
+        match key:
+            case 'del':   
+                self.delete()               
+            case 'shift':       ## to the back
+                self.setZValue(self.bkgMaker.toBack())
+                self.canvas.bkgMaker.renumZvals()       
+            case 'B':           ## not actually tracked
+                self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
+                    else self.bkgtrackers.tracker.bye()     
+            case 'H':  
+                self.openMenu()      
+            case 'tag':          ## '\' tag key
+                self.tagThis()
+            case 'enter' | 'return':
+                self.bkgMaker.front(self)         
+            case 'T':     
+                self.setLock() if self.locked == False else self.setUnlock()
+                self.tagThis()
+     
     def setLock(self):
         self.locked = True     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
@@ -222,26 +224,26 @@ class Frame(QGraphicsPixmapItem):
                     self.shared(self.key)     
         e.accept()
         
-    def mouseReleaseEvent(self, e):
-        key = ''       
+    def mouseReleaseEvent(self, e):   
+        self.key = ''  
         e.accept()
  
     def shared(self, key):  ## key can come from help as well
-        self.key = key
-        if self.key == 'del':    
-            self.delete()      
-        elif self.key == 'shift':  ## back one
-            self.setZValue(self.zValue()-1)   
-        elif self.key == 'H':  
-            self.openMenu()      
-        elif self.key == 'tag':  ## '\' tag key
-            self.tagThis() 
-        elif self.key in('enter','return'): # send to front
-            self.setZValue(self.mapper.toFront(1))    
-        elif self.key == 'T':     
-            self.setLock() if self.locked == False else self.setUnLock()
-            self.tagThis()
-            
+        match key:
+            case 'del':    
+                self.delete()      
+            case 'shift':   ## back one
+                self.setZValue(self.zValue()-1)   
+            case 'H':  
+                self.openMenu()      
+            case 'tag':     ## '\' tag key
+                self.tagThis() 
+            case 'enter'| 'return': # send to front
+                self.setZValue(self.mapper.toFront(1))    
+            case 'T':     
+                self.setLock() if self.locked == False else self.setUnLock()
+                self.tagThis()
+      
     def setLock(self):
         self.locked = True     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)

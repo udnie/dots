@@ -13,7 +13,7 @@ from dotsBkgScrollWrks  import BkgScrollWrks
 from dotsHelpMonkey     import BkgHelp
 from dotsAnimation      import Node
 
-SharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
+BkgSharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
 
 ### ---------------------- dotsBkgItem ---------------------                   
 ''' Background Class - there can be more than one background in a scene '''
@@ -46,7 +46,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.matte = None  
         
         self.fileName = os.path.basename(fileName) 
-        self.sharedKeys = SharedKeys  ## shared with bkgMenu
+        self.sharedKeys = BkgSharedKeys  ## shared with bkgMenu
         
         if self.canvas.openPlayFile != '':
             if self.canvas.openPlayFile == 'snakes':      
@@ -95,6 +95,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.tag = ''  
         self.anime = None 
         self.addedScroller = False
+        
+        self.help = None
            
         self.direction = ''  ## direction of travel: left <<--, right -->>
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
@@ -143,45 +145,44 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 if self.direction == '' or self.useThis == '':   
                     self.bkgMaker.bkgtrackers.resetTracker(self)
                     self.bkgMaker.resetSliders(self)  
-            else: 
-                if self.key in self.sharedKeys:
-                    self.shared(self.key)           
+            elif self.key in self.sharedKeys:
+                self.shared(self.key) 
             self.initX, self.initY = self.x, self.y  
-            self.dragCnt = self.mapToScene(e.pos())                                
+            self.dragCnt = self.mapToScene(e.pos())                               
         e.accept()   
         
     def mouseReleaseEvent(self, e):
-        key = ''
+        self.key = ''
         e.accept()   
-   
+                
     def shared(self, key):  ## from helpMenu and keyboard
         if not self.canvas.pathMakerOn: 
-            self.key = key
-            if self.key == 'del':    
-                self.bkgMaker.deleteBkg(self)          
-            elif self.key == 'shift':  ## to the back
-                if self.bkgMaker.toBack() == -100:
-                    MsgBox("There's is only One", 5)
-                else:
-                    self.setZValue(self.bkgMaker.toBack()) 
-                    self.bkgMaker.renumZvals()  
-            elif self.key in ('enter','return'):  ## to front     
-                self.bkgMaker.front(self)    
-            elif self.key == 'tag': ## '\' <- tagKey
-                self.tagThis()
-            elif self.key == 'B': 
-                self.bkgMaker.bkgtrackers.trackThis()
-            elif self.key == 'E':   
-                self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
-            elif self.key == 'F':  ## flip it
-                self.setMirrored(False) if self.flopped else self.setMirrored(True)  
-            elif self.key == 'H':  
-                self.openMenu()
-            elif self.key == 'T':     
-                self.bkgMaker.lockBkg(self) if self.locked == False \
-                    else self.bkgMaker.unlockBkg(self)
-                self.tagThis()
-        
+            match key: 
+                case 'del':    
+                    self.bkgMaker.deleteBkg(self)          
+                case 'shift':           ## to the back
+                    if self.bkgMaker.toBack() == -100:
+                        MsgBox("There's is only One", 5)
+                    else:
+                        self.setZValue(self.bkgMaker.toBack()) 
+                        self.bkgMaker.renumZvals()  
+                case  'enter' | 'return':   ## to front     
+                    self.bkgMaker.front(self)    
+                case  'tag':                ## '\' <- tagKey
+                    self.tagThis()
+                case  'B': 
+                    self.bkgMaker.bkgtrackers.trackThis()
+                case  'E':   
+                    self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
+                case  'F':          ## flip it
+                    self.setMirrored(False) if self.flopped else self.setMirrored(True)  
+                case  'H':  
+                    self.openMenu()
+                case  'T':     
+                    self.bkgMaker.lockBkg(self) if self.locked == False \
+                        else self.bkgMaker.unlockBkg(self)
+                    self.tagThis()
+                 
     def tagThis(self):
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
@@ -189,6 +190,11 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def openMenu(self):
         self.bkgMaker.closeWidget()    
         self.help = BkgHelp(self) 
+        
+    def closeMenu(self):
+        if self.help != None:
+            self.help.closeMenu()
+            self.help = None
         
 ### -------------------------------------------------------- 
     ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''

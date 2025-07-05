@@ -190,10 +190,12 @@ class Works:  ## small functions that were in ShadowMaker
         if self.maker.outline != None:
             if self.maker.outline.isVisible() == True:
                 self.hideOutline()
+                self.maker.dblclk = False
             elif self.maker.outline.isVisible() == False:
                 self.showOutline()
+                self.maker.dblclk = True
         if self.maker.widget != None: self.closeWidget()
-  
+ 
     def deleteOutline(self): 
         if self.maker.outline != None:
             self.scene.removeItem(self.maker.outline)
@@ -212,16 +214,16 @@ class Works:  ## small functions that were in ShadowMaker
     def hideOutline(self):
         if self.maker.outline != None:
             self.maker.outline.hide()
-            self.hidePoints()  ## default True       
-            
+            self.hidePoints()  ## default True  
+      
     def showOutline(self):
         if self.maker.outline != None:
             self.maker.outline.setVisible(True)
             self.maker.updatePath(self.maker.shadow.save)  ## a QPointF class attr.
             self.updateOutline()
             self.maker.outline.show()
-            self.hidePoints(False)      
-      
+            self.hidePoints(False)    
+         
 ### --------------------------------------------------------                                                                
     def rotateShadow(self, val): 
         inc = (val - self.maker.rotate)

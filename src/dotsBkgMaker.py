@@ -178,14 +178,21 @@ class BkgMaker(QWidget):
             else self.widget.lockBtn.setText('Locked')         
                                      
 ### --------------------------------------------------------                                           
-    def deleteBkg(self, bkg, where=''):  ## delete tracker as well               
-        if where == '' and bkg.type == 'bkg':
+    def deleteBkg(self, bkg, where=''):  ## delete tracker as well   
+        if bkg.type == 'flat':
+            self.scene.removeItem(bkg)
+            bkg = None
+            return
+        elif where == '' and bkg.type == 'bkg':
             self.bkgtrackers.delTracker(bkg)
+            
         if self.widget:
-            self.closeWidget() 
+            self.closeWidget()
+             
         if bkg.matte != None:
             bkg.matte.bye()
             bkg.matte = None
+           
         self.scene.removeItem(bkg)
         bkg = None
         self.canvas.btnAddBkg.setEnabled(True)

@@ -148,23 +148,23 @@ class PixItem(QGraphicsPixmapItem):
         e.accept()
 
     def shared(self, key):  ## with help menu
-        self.key = key
-        if self.key == 'del':    
-            self.deletePix()        
-        elif self.key == 'shift': 
-            self.setZValue(self.zValue()-1)      
-        elif self.key in('enter','return'): # send to front
-            self.setZValue(self.mapper.toFront(1))
-        elif self.key == 'tag': ## '\' backslash
-            p = QCursor.pos()   ## tagBkg handles individual requests
-            tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))  
-        elif self.key == 'T':   
-            self.lockSprite() if self.locked == False else self.unlockSprite()
-            tagBkg(self, self.pos())                        
-        elif self.key == 'F':  ## flop it
-            self.setMirrored(False) if self.flopped else self.setMirrored(True)  
-        elif self.key == 'H':  
-            self.openMenu()     
+        match key:
+            case 'del':    
+                self.deletePix()        
+            case 'shift': 
+                self.setZValue(self.zValue()-1)      
+            case 'enter' | 'return':     # send to front
+                self.setZValue(self.mapper.toFront(1))
+            case 'tag':                 ## '\' backslash
+                p = QCursor.pos()       ## tagBkg handles individual requests
+                tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))  
+            case 'T':   
+                self.lockSprite() if self.locked == False else self.unlockSprite()
+                tagBkg(self, self.pos())                        
+            case 'F':           ## flop it
+                self.setMirrored(False) if self.flopped else self.setMirrored(True)  
+            case 'H':  
+                self.openMenu()     
 
     def openMenu(self):
         self.works.closeWidget()

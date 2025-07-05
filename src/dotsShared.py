@@ -83,7 +83,7 @@ CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,sp
 
 PathStr = "B,C,D,E,H,L,N,M,P,R,S,T,U,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
-PlayKeys = ('A','D','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
+PlayKeys = ('A','C', 'D','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
 
 ## use this and make sure your editor points to the right directory
 paths = {          

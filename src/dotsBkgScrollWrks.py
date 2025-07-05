@@ -80,6 +80,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         show = 0
         if 'snakes' in self.bkgItem.fileName and self.bkgItem.direction != 'vertical':
             show = showtime['snakes']   
+            
         elif self.bkgItem.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge
             show = showtime['vertical']       
         elif self.bkgItem.direction == 'left':   

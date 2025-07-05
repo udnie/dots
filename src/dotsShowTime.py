@@ -11,7 +11,7 @@ from dotsShared         import ControlKeys
 from dotsAnimation      import Animation
 from dotsTableModel     import Types
 
-Demos = ['snakes', 'bats', 'hats']
+Demos = ('snakes', 'bats', 'hats')
 
 ### ---------------------- dotsShowTime --------------------
 ''' ShowTime: functions to run .play animations, pause, stop,
@@ -212,22 +212,24 @@ class ShowTime:
         if self.showFiles.errorOnShadows == True:
             MsgBox('Error on Saving Some Shadows...', 5)
                             
-    def updlist(self):
+    def updlist(self):  ## saves to play file
         dlist = []
         for pix in self.scene.items():  ## bag what's left     
             if pix.type in Types:  ## let 'pivot' thru
                 if pix.type == 'pix' and pix.part in ('left','right'): 
-                    continue    
-                if pix.type == 'frame': 
-                    dlist.append(self.showFiles.saveFrame(pix))       
-                elif pix.type == 'pix':                 
-                    dlist.append(self.showFiles.savePix(pix))                    
-                elif pix.type == 'bkg':    
-                    dlist.append(self.showFiles.saveBkgnd(pix)) 
-                elif pix.type == 'flat': 
-                    dlist.append(self.showFiles.saveFlat(pix))
-                elif pix.type == 'video' and self.canvas.videoPlayer != None:
-                    dlist.append(self.canvas.videoPlayer.saveVideo())
+                    continue 
+                match pix.type:
+                    case 'pix':                 
+                        dlist.append(self.showFiles.savePix(pix))    
+                    case 'bkg':    
+                        dlist.append(self.showFiles.saveBkgnd(pix)) 
+                    case 'frame': 
+                        dlist.append(self.showFiles.saveFrame(pix))       
+                    case 'flat': 
+                        dlist.append(self.showFiles.saveFlat(pix))
+                    case 'video':
+                        if self.canvas.videoPlayer != None:
+                            dlist.append(self.canvas.videoPlayer.saveVideo())
         return dlist           
 
 ### ---------------------- dotsShowTime --------------------
@@ -236,11 +238,4 @@ class ShowTime:
     # shadow = QGraphicsDropShadowEffect(blurRadius=11, xOffset=8, yOffset=8)
     # pix.setGraphicsEffect(shadow)
 
-    # if pix.type == 'pix' and pix.part == 'pivot': ## staggers bats zvalue
-        #     if b == 1: 
-        #         pix.setZValue(-101) 
-        #     elif b == 2:            
-        #         pix.setZValue(-102) 
-        #     b += 1  
-        
-        
+

@@ -236,7 +236,13 @@ class BkgWorks:
         if self.bkgItem.matte != None:
             self.bkgItem.matte.close()
         self.bkgItem.matte = Matte(self.bkgItem)
-                                                                                                                                                 
+        
+    def closeWidget(self):
+        if self.bkgItem.matte != None:
+            self.bkgItem.matte.close()  
+            self.bkgItem.matte.matteHelp.closeMenu()      
+        self.bkgMaker.closeWidget()
+                                                                                                                                              
 ### --------------------- dotsBkgWorks ---------------------
 
 

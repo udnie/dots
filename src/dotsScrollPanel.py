@@ -172,14 +172,15 @@ class ScrollPanel(QWidget):
             
     def pageDown(self, key):
         scrollBar = self.scroll.verticalScrollBar()
-        if key == 'down': 
-            steps = common['steps'] - 1
-        elif key == 'up':
-            steps = (common['steps'] - 1 ) * -1
-        elif key == '1':
-            steps = 1
-        else:
-            steps = -1      
+        match key:
+            case 'down': 
+                steps = common['steps'] - 1
+            case 'up':
+                steps = (common['steps'] - 1 ) * -1
+            case '1':
+                steps = 1
+            case _:
+                steps = -1      
         scrollBar.setValue(scrollBar.value() + scrollBar.singleStep() * steps)
    
     def addScrollArea(self):

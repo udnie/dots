@@ -230,6 +230,7 @@ class BkgTrackers:
             direction = 'Right'     
         elif self.canvas.dots.Vertical:  ## don't forget dots.
             direction = 'Vertical'
+            
         else:
             if self.bkgMaker.newTracker[fileName]:   
                 direction = self.bkgMaker.newTracker[fileName]['direction']     

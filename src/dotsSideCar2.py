@@ -203,22 +203,21 @@ class SideCar2:
                 widget.mirrorBtn.setText('Mirrored')
 
     def setBtns(self, bkg, widget):  ## from bkgMaker widget
-        if bkg.direction == 'right': 
-            widget.rightBtn.setStyleSheet(
-                'background-color: LIGHTGREY')
-            widget.leftBtn.setStyleSheet(
-                'background-color: None') 
-                       
-        elif bkg.direction == 'left': 
-            widget.leftBtn.setStyleSheet(
-                'background-color: LIGHTGREY')
-            widget.rightBtn.setStyleSheet(
-                'background-color: None')
-            
-        elif bkg.direction == 'vertical':
-            widget.leftBtn.setText('Vertical')   
-            widget.leftBtn.setStyleSheet(
-                'background-color: LIGHTGREY')
+        match bkg.direction:  
+            case 'right': 
+                widget.rightBtn.setStyleSheet(
+                    'background-color: LIGHTGREY')
+                widget.leftBtn.setStyleSheet(
+                    'background-color: None') 
+            case 'left': 
+                widget.leftBtn.setStyleSheet(
+                    'background-color: LIGHTGREY')
+                widget.rightBtn.setStyleSheet(
+                    'background-color: None')
+            case 'vertical':
+                widget.leftBtn.setText('Vertical')   
+                widget.leftBtn.setStyleSheet(
+                    'background-color: LIGHTGREY')
                                               
 ### --------------------- dotsSideCar2 ---------------------
 

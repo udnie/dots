@@ -89,15 +89,17 @@ class StoryBoard(QWidget):
 ### ---------------------- send keys -----------------------
     @pyqtSlot(str)   ## sends keys to canvas, storyboard, pathMaker and sceneItems
     def setKeys(self, key): 
-        self.key = key    
-         
+        self.key = key     
         if not self.pathMakerOn: 
             if self.key == 'C':
                 self.clear()   
+                
             elif self.key in PlayKeys:  ## absolutely necessary for help menus !!!
                 QTimer.singleShot(10, partial(self.showbiz.keysInPlay, self.key)) 
+                
             elif self.key == 'H' and len(self.scene.items()) == 0:
                 self.helpButton.openMenus()  ## opens canvas help menu
+                
             elif self.key in CanvasStr or self.key == '':
                 self.sideCar2.sendPixKeys(self.key) 
                 
@@ -111,6 +113,7 @@ class StoryBoard(QWidget):
             elif self.key in PathStr: 
                 if self.key == 'C' and len(self.scene.items()) == 0: 
                     self.clear()  ## really does it and returns to canvas
+            
                 elif self.key in ('H', 'M'):
                     self.helpButton.openMenus() 
                 else:    
@@ -126,7 +129,8 @@ class StoryBoard(QWidget):
                 
                 if self.key == 'cmd':   ## start rubberband 
                     self.mapper.clearMap() 
-                    self.sideCar2.unSelect()              
+                    self.sideCar2.unSelect()  
+                                
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
                     if self.animation == False:
                         self.mapper.updatePixItemPos()   
@@ -137,18 +141,22 @@ class StoryBoard(QWidget):
                     if self.mapper.isMapSet(): 
                         self.mapper.removeMap()
                     self.rubberBand.show()
-                    self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized())          
+                    self.rubberBand.setGeometry(QRect(self.origin, e.pos()).normalized()) 
+                            
                 elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
+                    
                 elif self.animation == False:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary    
                                
             elif e.type() == QEvent.Type.MouseButtonRelease:
                 if self.mapper.isMapSet() == False:
                     self.rubberBand.hide()  ## supposes something is selected
-                    self.mapper.addSelectionsFromCanvas()           
+                    self.mapper.addSelectionsFromCanvas()  
+                             
                 if self.key == 'cmd'and self.mapper.isMapSet():
-                    self.setKeys('')           
+                    self.setKeys('')          
+                     
                 if self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                 self.mapper.updatePixItemPos()    
@@ -200,7 +208,8 @@ class StoryBoard(QWidget):
         if self.canvas.pathMakerOn:
             self.pathMaker.pathMakerOff() 
         if self.showbiz.tableView != None:
-            self.showbiz.tableView.bye()                     
+            self.showbiz.tableView.bye()
+                                 
         self.sideCar.clearWidgets()   
         self.sideCar.clearSceneItems()    
         self.scene.clear() 

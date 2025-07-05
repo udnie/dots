@@ -1,7 +1,9 @@
 
-### *Last Update: 03/28/2025*
+### *Last Update: 07/05/2025*
 
 ## Scripts  
+
+There is only one codebase and it's written in **pyqt6**.  These scripts will make the necessary changes to convert the **pyqt6** code to either **pyqt5** or **pyside6** and provide any cleanup as well.
 
         script-qt6.py       Removes PyQt5 code and tokens from the two videoplayer files.
         script-ps6.sh       See edits for PySide6
@@ -10,7 +12,7 @@
         script-pyqt5.sh     See edit for PyQt5  
 
 
-Scripts should be run in the **dots** source code directory.   I used the **unix sed** command in script-ps6.sh to do the search and replace for 'type' and to take care of the usual suspects - the always required.
+Scripts should be run in the **dots** source code directory.   A **unix/linux bash/zsh** shell is required to run the  **sed** command in script-pyqt5.sh to do the necessary and in script-ps6.sh to do the search and replace of 'type' to 'desc' inorder to run **pyside6**.
 
 ## Edits for Converting Dots from PyQt6 to PyQt5
 
@@ -23,16 +25,18 @@ Scripts should be run in the **dots** source code directory.   I used the **unix
         7. Change QMessageBox move(x,y) height in dotsSideGig.py
 
     
-The shell script **script-pyqt5.sh** handles all the work required to convert **PyQt6** code to **PyQt5** and is responsible for running the **script-qt5.py** used to in steps 1-7.  See **January 2025** and **November 30 2024**.
+The shell script **script-pyqt5.sh** handles all the above work required to convert **PyQt6** code to **PyQt5** and is responsible for running the **script-qt5.py** used to in steps 1-7.  See **January 2025** and **November 30 2024**.
 
 ## Edits for Converting Dots from PyQt6 to PySide6
 
-The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the videoPlayer files and then 
-the sed commands used to replace **'type'** with **'desc'** in the **.py** and **.play** files - including those required.  See **February 6**.
+The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the videoPlayer files and then the **sed** commands are used to replace **'type'** with **'desc'** in the **.py** and **.play** files - and any required as well.  See **February 6**.
+
+## Once installed  
+Enter 'M' to bring up Help Menus, only works on a blank screen, or click on the help button and then on Menus.  An easy way to get the big picture. 
 
 
 ## Help and Stuff
-**Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu if there is one for that screen item - something to remember.
+**Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu for almost all of the storyboard screen items - something to remember.
 
 
 If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** will require an edit to the terminal settings in the **.code-workspace** as well. Clearing **\_\_pycache\_\_** after applying code changes is recommended.    
@@ -41,6 +45,8 @@ Once you have **dots** up and running from the blank screen, **Canvas**, click o
 
 **Opencv-python** is required to add **shadows** to **sprites** or to adjust screen formats in **videoPlayerOne** -
 that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne** to implement it.  This is repeated further on in more detail.
+
+The three files **vhx.py**, **slideShow.py** and **videPlayerOne.py** are included in the src directory.
 
    
 ## Screens 

@@ -97,7 +97,7 @@ class ShowWorks:
     def addFrame(self, frame):  ## it's a handoff 
         frame = Frame(frame, self.canvas, self.canvas.mapper.toFront(1))
         self.scene.addItem(frame)
-    
+      
     def deleteFrame(self, frame):
         self.scene.removeItem(frame)
         frame = None    
