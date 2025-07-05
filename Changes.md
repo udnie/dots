@@ -18,6 +18,8 @@ Also added two global variables to videoPlayerOne. **PlayVideo** to play the vid
 
 
 Dots has been reworked as I replaced most of the **elif** structures with **match case** ones.  It's cleaner-looking and easier to read.
+
+New Video:  <<https://youtu.be/9hMyVmDN-UA>>
     
 ---
 
