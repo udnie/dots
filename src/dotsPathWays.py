@@ -120,7 +120,8 @@ class PathWays:
             
     def cleanUp(self):
         self.redrawTagsAndPaths() if self.tagCount() > 0 else self.pathMaker.addPath()
-        self.pathMaker.edits.redrawPoints(self.pathMaker.edits.pointItemsSet())
+        if self.pathMaker.edits.ifpointItemsSet():
+            self.pathMaker.edits.redrawPoints()
          
     def editingPtsSet(self):
         if self.pathMaker.editingPts == True:

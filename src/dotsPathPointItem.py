@@ -8,20 +8,22 @@ from PyQt6.QtWidgets    import QGraphicsEllipseItem
 from dotsShared         import MoveKeys, common 
 from dotsTagsAndPaths   import TagIt
        
-V = 7.5  ## the diameter of a pointItem
+V = 8.0  ## the diameter of a pointItem
 
-### -------------------- dotsPathItem ----------------------
-''' classes:  PathItem - represents a point  '''                                                                                                                                                                  
+### ---------------- dotsPathPointItem ---------------------
+''' classes:  PointItem - represents a point - lassoing a selected 
+    point unselects it '''                                                                                                                                                                  
 ### --------------------------------------------------------
-class PathItem(QGraphicsEllipseItem):
+class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
     def __init__(self, parent, pt, idx, adto):
         super().__init__()
 
         self.pathMaker = parent
-        self.canvas    = self.pathMaker.canvas
-        self.scene     = self.pathMaker.scene
-        self.edits     = self.pathMaker.edits
+        
+        self.canvas = self.pathMaker.canvas
+        self.scene  = self.pathMaker.scene
+        self.edits  = self.pathMaker.edits
           
         self.pt = pt
         self.idx = idx
@@ -76,12 +78,11 @@ class PathItem(QGraphicsEllipseItem):
         e.accept()
 
     def mousePressEvent(self, e):   
-        if self.pathMaker.key == 'del':  
-            self.edits.deletePathItem(self.idx)
-        elif self.pathMaker.key == 'opt': 
-            self.edits.insertPathItem(self) 
-        if self.pathMaker.key in ('del','opt'):   
-            self.pathMaker.key = ''       
+        if self.pathMaker.key in ('del','opt'): 
+            if self.pathMaker.key == 'del':  
+                self.edits.deletePointItem(self.idx)   
+            elif self.pathMaker.key == 'opt': 
+                self.edits.insertPointItem(self)            
         e.accept() 
         
     def mouseMoveEvent(self, e):
@@ -95,11 +96,11 @@ class PathItem(QGraphicsEllipseItem):
         e.accept()
            
     def mouseDoubleClickEvent(self, e):
-        if self.idx not in self.selections:  ## selects/unselects
+        if self.idx not in self.selections:  ## adds if not selected
             self.maptos = self.mapToScene(e.pos())
             self.selections.append(self.idx)            
         else:        
-            self.selections.remove(self.idx)  
+            self.edits.deletePointItem(self.idx)  ## deletes if selected
         self.edits.updatePath()
         e.accept()
              
@@ -108,6 +109,7 @@ class PathItem(QGraphicsEllipseItem):
             if self.dragCnt > 0:
                 self.pathMaker.pts[self.idx] = self.mapToScene(e.pos())                
                 self.edits.updatePath()  ## rewrites pointItems as well
+        self.pathMaker.key = ''
         e.accept()
               
     def cleanUp(self):
@@ -137,8 +139,7 @@ class PathItem(QGraphicsEllipseItem):
         op = QPointF(b.width()/2, b.height()/2)
         self.setTransformOriginPoint(op)
  
-### -------------------- dotsPathItem ----------------------
- 
- 
- 
- 
+### ----------------- dotsPathPointItem --------------------
+
+
+  

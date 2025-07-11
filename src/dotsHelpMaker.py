@@ -140,8 +140,8 @@ class  MainMenu:
                     self.pixHelp   = PixHelp(self.canvas, 215, 'all') 
     
                 case 'story':  
-                    self.pixHelp    = PixHelp(self.canvas, -355, 'all') 
-                    self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on') 
+                    self.pixHelp    = PixHelp(self.canvas, 0, 'all') 
+                    self.storyHelp  = StoryHelp(self, self.canvas, -355, 'on') 
                     self.storyHelp2 = StoryHelp2(self.canvas, 355, 'on')
                   
                 case 'path':

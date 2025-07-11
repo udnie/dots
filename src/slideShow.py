@@ -18,9 +18,9 @@ SetY = 175      ## Y position of slideShow
 Hpad = 60       ## padding for buttons added to height
 CutOff = 550    ## when to stop showing text 
 
-Buttons   = False ## true adds setButtons to layout
-Frameless = True  ## sets windowhint to frameless - see comment on qt5 and frameless
-OneColor  = False ## sets frame same as background
+Buttons   = True   ## true adds setButtons to layout
+Frameless = False  ## sets windowhint to frameless - see comment on qt5 and frameless
+OneColor  = False  ## sets frame same as background
 
 Width, Height     = 1200,  750 
 ViewW, ViewH      = 1150,  700
@@ -111,7 +111,8 @@ class SlideShow(QWidget):
     
         self.grabKeyboard()
         
-        QTimer.singleShot(25, self.openFiles)  ## always
+        QTimer.singleShot(25, self.fileChooser) if Buttons == False else \
+              QTimer.singleShot(25, self.openFiles)
 
         self.show()
              
@@ -129,6 +130,7 @@ class SlideShow(QWidget):
         self.pixItem    = None 
         self.textItem   = None
         self.helpMenu   = None
+        self.helpFlag   = False
  
 ### --------------------------------------------------------
     def keyPressEvent(self, e):  
@@ -196,7 +198,9 @@ class SlideShow(QWidget):
     def mousePressEvent(self, e):
         self.save = e.globalPosition()  
         if e.button() == Qt.MouseButton.RightButton:
-            self.openHelpMenu()  
+            self.openHelpMenu() 
+        else:
+            self.closeHelpMenu()
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -265,17 +269,17 @@ class SlideShow(QWidget):
         
 ### --------------------------------------------------------           
     def openHelpMenu(self):
-        if self.helpMenu != None: 
-            self.helpMenu.tableClose()
-            self.helpMenu = None
+        if self.helpFlag == True:
+            self.closeHelpMenu()
         else:
             self.helpMenu = Help(self)
+            self.helpFlag = True
             
     def closeHelpMenu(self):
-        if self.helpMenu != None:
+        if self.helpMenu != None: 
             self.helpMenu.tableClose()
-            self.helpMenu = None
-    
+            self.helpMenu.close()   
+     
     def pixXY(self):     
         self.setScene()                                                                                                                                                                       
         x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
@@ -442,7 +446,7 @@ class SlideShow(QWidget):
     def selectDirectory(self):
         path = QFileDialog.getExistingDirectory(self, '')
         if path == None or path == '':
-            return None
+            path = os.getcwd()
         os.chdir(path)
         return os.getcwd()
                             
@@ -598,6 +602,7 @@ class Help(QWidget):
         self.tableClose()
             
     def tableClose(self):
+        self.parent.helpFlag = False 
         self.table.close()
         
 ### -------------------------------------------------------- 

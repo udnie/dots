@@ -43,12 +43,12 @@ bkgHelpKeys = {
 shadowKeys = {
     ' H ':      'This Help Menu',
     ' T ':      'Toggles Link', 
-    ' / ':      'Update Shadow',
+    ' / ':      'Refresh Shadow',
     ' \\ ':     'Background Tag',
-    'del':      'delete from screen', 
-    'enter':    'move to the front',
-    'return':   'move to the front',   
-    'shift':    'move back 3 zvalues',  ## otherwise it still covers the sprite
+    'del':      'Delete from screen', 
+    'enter':    'Move to the front',
+    'return':   'Move to the front',   
+    'shift':    'Move back 3 zvalues',  ## otherwise it still covers the sprite
     'dblclk':   'Dbl-Click Toggles Outline',    
 }
 
@@ -201,14 +201,14 @@ class ShadowHelp:
     def __init__(self, parent, off=0, switch=''):
         super().__init__()  
         
-        self.maker = parent  
+        self.maker  = parent  
         self.canvas = self.maker.canvas
         self.switch = switch 
-                         
-        self.table = TableWidgetSetUp(50, 165, len(SharedKeys)+4)
+                            
+        self.table = TableWidgetSetUp(50, 165, len(SharedKeys)+3)
         self.table.itemClicked.connect(self.clicked)   
  
-        width, height = 221, 366
+        width, height = 221, 368
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f'{" Shadow Help Menu":<20}',QL,True,True, 2)
@@ -228,19 +228,24 @@ class ShadowHelp:
     
         x, y = getVuCtr(self.maker.canvas) 
 
-        if self.switch != 'pix':
+        if self.switch != '':   ## help 
             if off != 0: x += off
-            x = int(x - width /2)  
-        else: 
-            x, _ = self.maker.getXY()   
+            x = int(x - width /2) 
+            y = int(y - height /2) 
+        else:
+            self.maker.shadow = parent.shadow
+            x, _ = self.maker.getXY()  ## move it to the right one width +
             b = self.maker.shadow.boundingRect()
             width = int(b.width() + 20)
             x = int(x + width)       
-    
-        y = int(y - height /2) 
-    
+            
+            p = self.maker.shadow.pos(); y = int(p.y()) 
+            p = self.canvas.mapToGlobal(QPoint(x ,y)) 
+            y = int(p.y())
+            
         self.table.move(x, y)          
         self.table.show() 
+ 
  
     def clicked(self):
         if self.switch == '':

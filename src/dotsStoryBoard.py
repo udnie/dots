@@ -105,7 +105,7 @@ class StoryBoard(QWidget):
                 
         elif self.pathMakerOn:                            
             ## send MoveKeys to PathItem selections in PathEdits
-            if self.pathMaker.edits.pointItemsSet() == True and \
+            if self.pathMaker.edits.ifpointItemsSet() == True and \
                 self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
                     self.sideCar2.sendPixKeys(self.key)  ## pointItems get messaged    
                                    

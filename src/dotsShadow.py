@@ -101,8 +101,8 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                 self.linkShadow() if self.maker.linked == False \
                     else self.unlinkShadow()
                 self.tagThis() 
-            case '/':  ## cuts off shadow if partial offscreen and points tweaked
-                self.maker.updateShadow() 
+            case '/':  ## fixes cut off shadow if partial offscreen
+                self.maker.updateShadow('nope') 
             case 'dblclk':
                 self.maker.works.toggleOutline()
         

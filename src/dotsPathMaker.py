@@ -92,7 +92,7 @@ class PathMaker(QWidget):
 ### --------------------------------------------------------
     def initThis(self):
         self.pts = []  ## after adding a new path or from a file
-        self.selections = []  ## needs to here, strongest reference
+        self.selections = [] 
   
         self.color = 'DODGERBLUE'
            
@@ -132,7 +132,7 @@ class PathMaker(QWidget):
        
         elif self.key == 'E' and self.pathWays.tagCount() > 0:
             self.pathWays.removeWayPtTags()
-            if len(self.selections) > 0:
+            if len(self.selections) > 0:  ## toggle edit on/off
                 self.editingPts = True
                 self.edits.updatePath()
                 self.pathWorks.turnBlue()

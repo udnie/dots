@@ -7,7 +7,11 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
-**July 4 2025**  
+**July 10 2025**  
+Moved the sprite menu in the help Menu selection, 'Sprite and StoryBoard Menus', to the center as it's acted upon by both storyboard menus - pretty much their main job. Made sure the pop-up menu in slideShow closed and reopened correctly and set a default to display the current directory on open if no buttons have been set. The help menu for shadows is now offset and no longer centers directly over it and renamed pathItems to pointItems in PathEdits and renamed dotsPathItems to dotsPathPointItem to remove any ambiguity.
+
+
+**July 5 2025**  
 Updates to **slideShow** and **videoPlayerOne**.  Added three global variables to slideshow to configure hiding the buttons, hiding the title bar or filling the frame with a background color or all three at once. Also changes to remember which photos were rotated and redisplay them rotated throughout the session with their corrected width, height and aspect ratio if the textitem is showing.  Also added, a right-mouse click to pop-up the slideShow help menu and wired up its selections to run when clicked.
 
 VideoPlayerOne has been overhauled to auto-resize and display videos correctly on a Mac regardless of their aspect ratio.  I was curious as to why videoPlayerOne displayed vertical videos, the ones I had cropped, in a horizontal format rather than a in vertical format as the Mac **quicktime player** did. Both **opencv**, which I have been using to generate an aspect ratio, and the **QMediaMetaData** class I was testing, defaulted to a 3:2 format, centering the video within a horizontal format with black sidebars. I eventually found the Mac/Unix command, **mdls**, that returned the same width and height as did **'Get Info'** and was able to run it from videoPlayerOne using the python **subprocess** module. 

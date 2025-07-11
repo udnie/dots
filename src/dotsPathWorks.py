@@ -213,7 +213,7 @@ class PathWorks:
         if len(self.pathMaker.selections) > 0: 
             sel = sorted(self.pathMaker.selections, reverse=True)  
             try:
-                for i in sel:
+                for i in sel:   
                     self.pathMaker.pts.pop(i)  
                 del sel   
             except:
@@ -229,7 +229,7 @@ class PathWorks:
             path.lineTo(QPointF(pt)) 
         if bool: path.closeSubpath()
         return path
-                         
+                          
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
         if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet == True:
@@ -270,8 +270,9 @@ class PathWorks:
             self.ball = None
             self.pathTestNode = None
             self.pathMaker.pathTestSet = False
-            self.pathMaker.edits.redrawPoints(self.pathMaker.edits.pointItemsSet())
-            
+            if self.pathMaker.edits.ifpointItemsSet():
+                self.pathMaker.edits.redrawPoints()
+           
 ### --------------------------------------------------------
     def changePathColor(self):
         self.pathMaker.color = getColorStr()

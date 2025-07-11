@@ -1,10 +1,10 @@
 
-from PyQt6.QtCore    import Qt, QPointF, QEvent, QTimer
-from PyQt6.QtGui     import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
-from PyQt6.QtWidgets import QWidget 
+from PyQt6.QtCore       import Qt, QPointF, QEvent, QTimer
+from PyQt6.QtGui        import QBrush, QColor, QCursor, QPen, QPolygonF, QGuiApplication
+from PyQt6.QtWidgets    import QWidget 
                             
-from dotsShared      import common, Outline
-from dotsPathItem    import PathItem
+from dotsShared         import common, Outline
+from dotsPathPointItem  import PointItem
 
 ### ------------------- dotsPathEdits ---------------------
 ''' class: PathEdits, functions; newPath, lasso '''
@@ -28,7 +28,6 @@ class PathEdits(QWidget):
 ### --------------------- event filter ----------------------          
     def eventFilter(self, source, e):  ## used by lasso    
         if self.canvas.pathMakerOn:
-    
             if self.pathMaker.editingPts == True and self.pathMaker.lassoOn == True:
                          
                 if e.type() == QEvent.Type.MouseButtonPress and \
@@ -125,19 +124,17 @@ class PathEdits(QWidget):
         self.pathMaker.poly.setZValue(common['pathZ']) 
         self.pathMaker.scene.addItem(self.pathMaker.poly)
                     
-    def finalizeSelections(self, pt):
+    def finalizeSelections(self, pt):   ## start here        
         self.lasso.append(QPointF(pt))
-        poly = self.drawPoly(self.lasso)  ## required to match selected points
-        for i in range(len(self.pathMaker.pts)):  
-            p = QPointF(self.pathMaker.pts[i])
-            if poly.containsPoint(p, Qt.FillRule.WindingFill):  ## match 
-                if self.pathMaker.selections and i in self.pathMaker.selections:  ## unselect 
-                    idx = self.pathMaker.selections.index(i)
-                    # print('a ', i, idx, self.pathMaker.selections)
-                    self.pathMaker.selections.pop(idx)
+        poly = self.drawPoly(self.lasso)   ## required to match selected points
+        for idx in range(len(self.pathMaker.pts)):   ## match by index
+            if poly.containsPoint(QPointF(self.pathMaker.pts[idx]),   ##  if in lasso
+                    Qt.FillRule.WindingFill): 
+                if self.pathMaker.selections and idx in self.pathMaker.selections: 
+                    idx = self.pathMaker.selections.index(idx)   ## unselect by index
+                    self.pathMaker.selections.pop(idx) 
                 else:
-                    self.pathMaker.selections.append(i)  ## save pts index 
-                    # print('b ', i, self.pathMaker.selections)            
+                    self.pathMaker.selections.append(idx)   ## add by index                 
         del poly
         self.deleteLasso()
         if self.pathMaker.selections:
@@ -145,13 +142,13 @@ class PathEdits(QWidget):
         QTimer.singleShot(200, self.updatePath)  ## it works better this way   
                                  
 ### -------------------- pointItems ------------------------    
-    def togglePathItems(self):  ## the letter 'V'
+    def togglePointItems(self):  ## the letter 'V'
         if len(self.lasso) > 0: 
             self.deleteLasso()
-        if self.pointItemsSet():
-            self.removePathItems()
+        if self.ifpointItemsSet():
+            self.removePointItems()
         else:
-            self.addPathItems()
+            self.addPointItems()
 
     def editPoints(self):
         if len(self.pathMaker.pts) > 0:
@@ -160,7 +157,7 @@ class PathEdits(QWidget):
                 self.pathMaker.editingPts = True
                 self.pathMaker.selections.clear() 
                 self.lasso.clear()
-                self.addPathItems()
+                self.addPointItems()
                 self.pathWorks.turnBlue()
                 self.newLasso()   
             else:
@@ -169,66 +166,69 @@ class PathEdits(QWidget):
     def editPointsOff(self):
         self.pathMaker.editingPts = False
         self.pathMaker.selections.clear()
-        self.removePathItems()
+        self.removePointItems()
         self.pathWorks.turnGreen()
         self.deleteLasso()
            
-    def addPathItems(self): 
+    def addPointItems(self): 
         idx = 0 
-        add = self.pathWorks.findTop() + 10  ## added to idx to set zvalue
+        # add = self.pathWorks.findTop() + 10  ## added to idx to set zvalue
         for pt in self.pathMaker.pts:  
-            self.scene.addItem(PathItem(self.pathMaker, pt, idx, common['pathZ']+10)) 
+            self.scene.addItem(PointItem(self.pathMaker, pt, idx, common['pathZ']+10)) 
             idx += 1  
                
-    def removePathItems(self):   
+    def removePointItems(self):   
         for ptr in self.scene.items():
             if ptr.type in ('pt','ptTag'):
                 self.scene.removeItem(ptr)
                 del ptr
 
     def updatePath(self):  ## pointItem responding to mouse events
-        self.removePathItems()      
-        self.pathMaker.addPath() 
-        self.addPathItems()  
+        self.removePointItems()      
+        self.pathMaker.addPath()  ## only one path
+        self.addPointItems()  
         
-    def pointItemsSet(self):
-        for itm in self.scene.items():
-            if itm.type == 'pt':
-                return True
+    def ifpointItemsSet(self):
+        if sum(pix.type == 'pt' for pix in self.scene.items()) > 0:
+            return True
         return False
 
-    def insertPathItem(self, pointItem):  ## halfway between points
+    def insertPointItem(self, pointItem):  ## halfway between points
         idx, pt = pointItem.idx + 1, pointItem.pt  ## idx, the next point
-        if idx == len(self.pathMaker.pts): 
+        if idx == len(self.pathMaker.pts):  ## wrap it around
             idx = 0   
         if self.pathMaker.selections:
             self.insertSelection(pointItem.idx)  
+            
         pt1 = self.pathMaker.pts[idx]  ## calculate new x,y
         pt1 = QPointF(pt1.x() - pt.x(), pt1.y() - pt.y())
-        pt1 = pt + QPointF(pt1)*.5       
+        pt1 = pt + QPointF(pt1)*.5    
+           
         self.pathMaker.pts.insert(idx, pt1)
         self.redrawPoints()  
             
-    def deletePathItem(self, idx):  
+    def deletePointItem(self, idx):  
         self.removeSelection(idx)
-        self.pathMaker.pts.pop(idx) 
+        self.pathMaker.pts.pop(idx)     
         self.redrawPoints()
        
     def redrawPoints(self, bool=True):  ## pointItems - non-edit
-        self.removePathItems()
+        self.removePointItems()
         if self.pathMaker.pathWays.tagCount() > 0:
             self.pathMaker.pathWays.redrawTagsAndPaths()
         else:
             self.pathMaker.addPath()
-        if bool: self.addPathItems()
+        if bool: self.addPointItems()
         
 ### -------------------- selections ------------------------                
     def insertSelection(self, idx):  ## used only by pointItems 
         if self.pathMaker.selections:       
             self.pathMaker.selections.sort()  
+            
             if idx < self.pathMaker.selections[0]:  ## if first
                 for i in range(len(self.pathMaker.selections)):  
                     self.pathMaker.selections[i] += 1 
+                    
             elif idx > self.pathMaker.selections[-1]:  ## if last
                 return
             else:
@@ -236,30 +236,28 @@ class PathEdits(QWidget):
             
     def insertIntoSelection(self, idx):      
         if idx in self.pathMaker.selections:      
-            # print('j-insert: ', idx, self.pathMaker.selections)
             j = self.pathMaker.selections.index(idx) + 1  ## use the index        
             for k in range(j, len(self.pathMaker.selections)):
                 self.pathMaker.selections[k] += 1         
         else:
             for i in range(len(self.pathMaker.selections)): 
                 if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
-                    # print('k-insert: ', idx, self.pathMaker.selections[i])
                     for k in range(i+1, len(self.pathMaker.selections)):
                         self.pathMaker.selections[k] += 1  
                     self.pathMaker.selections[i] == idx  
                     break
-        # print('n-insert', self.pathMaker.selections, '\n')
-   
+ 
+### -------------------- selections ------------------------
     def removeSelection(self, idx):  ## used only by pointItems          
         if self.pathMaker.selections:
-            self.pathMaker.selections.sort() 
-            # print('a-delete: ', idx, self.pathMaker.selections)  
+            
             if idx <= self.pathMaker.selections[0]:  ## test for first
                 if idx == self.pathMaker.selections[0]: 
                     self.pathMaker.selections.pop(0)  
                 for i in range(len(self.pathMaker.selections)):
                     self.pathMaker.selections[i] += -1  
-            elif idx >= self.pathMaker.selections[-1]:
+                    
+            elif idx >= self.pathMaker.selections[-1]:  ## last
                 if idx == self.pathMaker.selections[-1]:
                     del self.pathMaker.selections[-1]
                 else:
@@ -269,20 +267,16 @@ class PathEdits(QWidget):
                                 
     def removeFromSelections(self, idx):            
         if idx in self.pathMaker.selections:  ## remove and renumber
-            # print('b-delete: ', idx, self.pathMaker.selections)  
             idx = self.pathMaker.selections.index(idx)  ## use the index        
             self.pathMaker.selections.pop(idx)  
             for i in range(idx, len(self.pathMaker.selections)):  ## only returns index
                 self.pathMaker.selections[i] += -1  ## from this point on  
         else:             
-            for i in range(len(self.pathMaker.selections)):  ## just renumber
-                # print('c-delete: ', idx, self.pathMaker.selections[i])              
+            for i in range(len(self.pathMaker.selections)):  ## just renumber           
                 if idx > self.pathMaker.selections[i] and idx < self.pathMaker.selections[i+1]:
                     for k in range(i+1, len(self.pathMaker.selections)):
-                        # print('c-renum: ', k, idx, self.pathMaker.selections[k]) 
                         self.pathMaker.selections[k] += -1       
                     break
-        # print('d-delete: ', self.pathMaker.selections, '\n')
                        
 ### ------------------- dotsPathEdits ---------------------
 
