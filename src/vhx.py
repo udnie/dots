@@ -9,10 +9,11 @@ Ticks = (100,50,10)  ## how many pixels apart to draw a line and size
 RWidth, RSize, RHeight = 1500, 70, 1000  ## startup
 
 ### ------------------------- vhx --------------------------
-''' '>', ']', '=' expands in both directions horizontally or vertically 
-    and '<', '[', '-' contracts in both as well. A mouse-press on the 
-    ruler plus one of the keys anchors either the far-left or top-most
-    end of the ruler so to expand or contract in the opposite direction.''' 
+''' '+, >, ]' expands, scales up, the ruler either horizontally or 
+    vertically and  '_, <, [' scales it down - contracts. A mouse-press 
+    to the ruler's left or top-most end, if vertical, will anchor it, 
+    limiting its expansion or contraction to the ruler's opposite end
+    rather than the default - both ends it once. '''
 ### --------------------------------------------------------
 class VHX(QWidget):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------

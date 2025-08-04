@@ -223,6 +223,8 @@ class BkgMaker(QWidget):
             bkg.setMirrored(False) if bkg.flopped else bkg.setMirrored(True)
                                                                              
     def front(self, bkg):
+        if bkg.zValue() == common['bkgZ']:
+            return
         bkg.setZValue(common['bkgZ'])  ## -99
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.lockBkg(bkg) 

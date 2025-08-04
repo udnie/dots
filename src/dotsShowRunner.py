@@ -107,11 +107,13 @@ class ShowRunner:
     def updateStoryBoard(self, dlist):  ## turn the contents of the .play file into scene items            
         self.mapper.clearMap() 
         self.locks = 0
+        
         self.addedVideo = False  
         self.canvas.pixCount = self.mapper.toFront(0) 
-        self.canvas.bkgMaker.newTracker.clear()          
+        self.canvas.bkgMaker.newTracker.clear() 
+                 
         ## number of pixitems, backgrounds zval, number of shadows        
-        kix, ns, bkgz = 0, 0, common['bkgZ'] 
+        kix, ns, bkgz = 0, 0, common['bkgZ']
         lnn = len(dlist)  ## decrement top to bottom - preserves front to back relationships
         lnn = lnn + self.mapper.toFront(0) + 100  ## start at the top  for sprites and frames                               
       
@@ -141,7 +143,7 @@ class ShowRunner:
                    
             elif tmp['type'] == 'video':  ## needs to happen before shadows
                 self.sideCar.addVideo(paths['bkgPath'] + tmp['fileName'], 'open', tmp['loops'])
-                bkgz = -100 
+                bkgz = -101  ## takes two 
                 self.addedVideo = True
                    
             ## can be more than one background or flat                    
@@ -154,13 +156,13 @@ class ShowRunner:
                 elif tmp['type'] == 'bkg':       
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
                     self.showFiles.addPixToScene(pix, tmp, bkgz )  
-             
+                    
                 pix.bkgMaker.lockBkg(pix)  
                 bkgz -= 1   
                                   
             del tmp              
         ## end for loop   
-                         
+                 
         del dlist
         self.cleanup(ns, kix)  ## add shadows
   

@@ -13,16 +13,20 @@ from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, \
                                 QFileDialog, QFrame, QGraphicsTextItem, QTableWidget, \
                                 QTableWidgetItem, QAbstractItemView
 
+### --------------------------------------------------------
 Path = ''       ## set a default directory
-SetY = 175      ## Y position of slideShow
+SetY = 175      ## Y position of slideShow   
+
 Hpad = 60       ## padding for buttons added to height
 CutOff = 550    ## when to stop showing text 
+Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 
 Buttons   = True   ## true adds setButtons to layout
 Frameless = False  ## sets windowhint to frameless - see comment on qt5 and frameless
 OneColor  = False  ## sets frame same as background
 
-Width, Height     = 1200,  750 
+### --------------------------------------------------------
+Width, Height     = 1200,  750   ## choose one you like and delete the rest
 ViewW, ViewH      = 1150,  700
 MaxW, MaxH, MaxV  =  950,  500, 550 
 
@@ -185,7 +189,7 @@ class SlideShow(QWidget):
             case 'T':
                 self.toggleText()   
             case 'W':
-                if self.path != '': self.errMsg(self.path)        
+                if self.path != '': self.msgbox(self.path)        
             case 'X':
                 self.clearScene();  
                 self.close()  
@@ -193,6 +197,8 @@ class SlideShow(QWidget):
                 self.zoom(1.05)  
             case '[':    
                 self.zoom(0.95)
+            case _:
+                return
 
 ### --------------------------------------------------------          
     def mousePressEvent(self, e):
@@ -228,7 +234,7 @@ class SlideShow(QWidget):
         try:
             img = QImage(self.fileName) 
         except:
-            self.errMsg('addPixMap: problem with ' + file)
+            self.msgbox('addPixMap: problem with ' + file)
             return
       
         self.scaleW = self.view.width()/ViewW
@@ -373,13 +379,13 @@ class SlideShow(QWidget):
             file, width, height = self.txtlst[0], self.txtlst[1], self.txtlst[2]   
             asp = math.floor(width/height *100)/100.0  
         except:
-            self.errMsg('tagIt: problem with ' + file)
+            self.msgbox('tagIt: problem with ' + file)
             return None
-        if self.rot in (90, 270):
-            asp = math.floor(height/width *100)/100.0  
-            s = (f"{file} {height}X{width} asp {asp}")
+        if self.rot in (90, 270):  ## recalc for rotation
+            asp = math.floor(height/width *100)/100.0    
+            s = (f"{file}   {(height)}X{int(width)}   asp {asp}")           
         else:
-            s = (f"{file} {width}X{height} asp {asp}")
+            s = (f"{file}   {int(width)}X{int(height)}   asp {asp}")   
         textItem = QGraphicsTextItem(s.strip())
         font = QFont("Arial", 14)
         textItem .setFont(font)
@@ -401,11 +407,16 @@ class SlideShow(QWidget):
         self.scene.clear()  
         self.init() 
             
-    def errMsg(self, str=''):
+    def msgbox(self, str):
         msg = QMessageBox()
         msg.setText(str)
-        msg.exec()
-                                          
+        timer = QTimer(msg)
+        timer.setSingleShot(True)
+        timer.setInterval(5000)
+        timer.timeout.connect(msg.close)
+        timer.start()
+        msg.exec() 
+                                            
     def setOrigin(self):   
         b = self.pixItem.boundingRect()
         op = QPointF(b.width()/2, b.height()/2)
@@ -441,7 +452,7 @@ class SlideShow(QWidget):
                 self.files = sorted(files)
                 self.addPixmap(self.files[0]) 
                 if len(self.files) == 1:
-                    self.errMsg('openFiles: Only One Matching File')
+                    self.msgbox('openFiles: Only One Matching File')
         
     def selectDirectory(self):
         path = QFileDialog.getExistingDirectory(self, '')
@@ -465,11 +476,11 @@ class SlideShow(QWidget):
             path = os.path.join(self.path, file)
             if os.path.isdir(path):  ## ignore directories
                 continue  
-            file = file.lower();  ext = file[file.rfind('.'):]
-            if ext in ('.png', '.jpg', '.jpeg', '.tif', '.tiff', '.webp'):                  
+            file = file.lower(); 
+            if file[file.rfind('.'):] in Ext:                  
                 filenames.append(file)
         if len(filenames) == 0:
-            self.errMsg('getFileNames: No Files Found')
+            self.msgbox('getFileNames: No Files Found')
             return None
         return filenames
                                          
@@ -509,7 +520,6 @@ class SlideShow(QWidget):
         self.buttonGroup.setLineWidth(1)
   
         return self.buttonGroup
-
 ### --------------------------------------------------------     
 class Help(QWidget): 
 ### -------------------------------------------------------- 
@@ -604,7 +614,7 @@ class Help(QWidget):
     def tableClose(self):
         self.parent.helpFlag = False 
         self.table.close()
-        
+ 
 ### -------------------------------------------------------- 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

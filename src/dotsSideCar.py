@@ -92,7 +92,7 @@ class SideCar:
                 break    
                    
         self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)    
-        self.scene.addItem(self.canvas.videoPlayer.videoWidget)  ## zValue set to cover screen    
+        self.scene.addItem(self.canvas.videoPlayer.videoItem)  ## zValue set to cover screen    
         QTimer.singleShot(200, self.canvas.videoPlayer.setFrame) 
        
     def videoOff(self):  ## also called from storyboard in clear()

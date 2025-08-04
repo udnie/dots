@@ -67,7 +67,7 @@ for file in files:
                 #             break
                 #         line = line[0:i] + '# ' + line[i:]
                 
-                if '## 6' in line or 'end' in line or 'comment' in line or\
+                if '## 6' in line or 'end' in line or '## del' in line or\
                     '##--5' in line:
                     continue
                 
@@ -82,9 +82,6 @@ for file in files:
                         
                     i = line.index('## 5')  ## remove it 
                     line = line[0:i] + '\n'
-             
-                if line.startswith('#d'):
-                    line = line[3:]
                                          
             if line.startswith('from PyQt'): ## just to make sure
                 line = 'from PyQt5' + line[line.index('.'):]

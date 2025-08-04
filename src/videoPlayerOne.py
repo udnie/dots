@@ -30,7 +30,7 @@ from PyQt6.QtMultimediaWidgets  import QVideoWidget
 
 ### -------------------------------------------------------- 
 PlayVideo = True  ## when loaded - no start button
-AspectRatioOn = False  ## requires a method that returns width and height
+AspectRatioOn = True  ## requires a method that returns width and height
 
 AspKeys = ['A','F','H','V']
 WID, HGT, OTH = 40, 116, 60  ## for opening without discovery

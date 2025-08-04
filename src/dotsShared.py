@@ -1,6 +1,6 @@
 
-from PyQt6.QtCore       import Qt, QPointF, pyqtProperty
-from PyQt6.QtGui        import QImage, QPixmap
+from PyQt6.QtCore       import Qt
+from PyQt6.QtGui        import QPixmap
 
 
 from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, \
@@ -9,9 +9,10 @@ from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, \
 
 ### --------------------- dotsShared.py --------------------
 ''' SubClasses: Ball, Outline, PathsItem, ItemsGroup and data 
-                shared across classes and files ''' 
+    shared across classes and files. Subclasses add type to 
+    better track screen items and as required by pyside6. '''
 ### --------------------------------------------------------
-class Ball(QGraphicsPixmapItem):  ## subclass - added type to track it better
+class Ball(QGraphicsPixmapItem):
 ### --------------------------------------------------------
     def __init__(self, img, parent=''):
         super().__init__()          
@@ -20,11 +21,11 @@ class Ball(QGraphicsPixmapItem):  ## subclass - added type to track it better
         
         self.type = 'ball'
         self.setPixmap(QPixmap(img))
-   
+    
     def mouseDoubleClickEvent(self, e):
         if self.canvas != '':
             self.canvas.sideCar.delbackdrp()
-    
+   
 ### --------------------------------------------------------
 class Outline(QGraphicsPolygonItem):  ## subclass 
 ### --------------------------------------------------------

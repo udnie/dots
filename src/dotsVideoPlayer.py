@@ -9,10 +9,10 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
                                 
 from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
-### ------------ comment out for 6, uncomment for 5 -----------------
+### ------------ comment out for 6, uncomment for 5 ----------------- ## del
 # from PyQt5.QtMultimedia       import QMediaContent  ## 5 
 
-### ---------------------------- end --------------------------------
+### ---------------------------- end -------------------------------- ## del
 from dotsSideGig        import getVuCtr
 from dotsSideGig        import MsgBox
 from dotsShared         import common, Ball
@@ -43,35 +43,36 @@ class VideoPlayer(QMediaPlayer):
     
         if fileName != '': self.fileName = os.path.basename(fileName)
 
-### ------------ comment out for 5, uncomment for 6 -----------------
+### ------------ comment out for 5, uncomment for 6 -----------------  ## del
         self.mediaPlayer = QMediaPlayer(self)   ## 6
         # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5
-### ---------------------------- end --------------------------------
+### ---------------------------- end --------------------------------  ## del
         
-        self.videoWidget = QVD()   
-        self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) 
+        self.videoItem = QVD()   
+        self.videoItem.setZValue(self.canvas.mapper.toFront(100)) 
         
-        self.videoWidget.setSize(QSizeF(common['ViewW'], common['ViewH']))  
-        self.mediaPlayer.setVideoOutput(self.videoWidget) 
+        self.videoItem.setSize(QSizeF(common['ViewW'], common['ViewH']))  
+        self.mediaPlayer.setVideoOutput(self.videoItem) 
            
         self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) 
         # self.mediaPlayer.error.connect(self.handleError)  ## 5
         
-### ------------ comment out for 5, uncomment for 6 -----------------
+### ------------ comment out for 5, uncomment for 6 -----------------  ## del
         self.mediaPlayer.setLoops(self.loops)  ## 6 -- note!!! doesn't work in 5
         self.audioOut = QAudioOutput()  ## 6
         self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6     
         self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6
-### ------------ uncomment for 5, comment out for 6 -----------------     
+### ------------ uncomment for 5, comment out for 6 -----------------      ## del
         # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5
 ### ---------------------------- end --------------------------------
-### ------------ uncomment for 6 ... comment out for 5 ----------------- 
+### ------------ uncomment for 6 ... comment out for 5 -----------------  ## del
+
     def playVideo(self):  ## 6
         if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
             self.mediaPlayer.pause()  ## 6
         else:  ## 6
             if self.backdrp == None:  ## 6
-                self.videoWidget.setZValue(self.canvas.mapper.toFront(100))  ## 6
+                self.videoItem.setZValue(self.canvas.mapper.toFront(100))  ## 6
                 self.setFrame()  ## 6
                 time.sleep(.20)  ## 6
             self.mediaPlayer.play()  ## 6 
@@ -82,13 +83,13 @@ class VideoPlayer(QMediaPlayer):
                 time.sleep(.01)  ## 6
             self.stopVideo()  ## 6
                                            
-### ------------ uncomment for 5 ... comment out for 6 -----------------
+### ------------ uncomment for 5 ... comment out for 6 ----------------- ## del
     # def playVideo(self):  ## 5
     #     if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
     #         self.mediaPlayer.pause()  ## 5
     #     else:  ## 5
     #         if self.backdrp == None:  ## 5
-    #             self.videoWidget.setZValue(self.canvas.mapper.toFront(100)) ## 5
+    #             self.videoItem.setZValue(self.canvas.mapper.toFront(100)) ## 5
     #             self.setFrame()  ## 5
     #             time.sleep(.20)  ## 5
     #         self.mediaPlayer.play()  ## 5 
@@ -98,7 +99,7 @@ class VideoPlayer(QMediaPlayer):
     #         while not (self.mediaPlayer.state() == QMediaPlayer.State.StoppedState):  ## 5
     #             time.sleep(.01)  ## 5
     #         self.stopVideo()  ## 5
-### ---------------------------- end --------------------------------
+### ---------------------------- end -------------------------------- ## del
 ### -----------------------------------------------------------------
     def setFrame(self):   
         self.mediaPlayer.setPosition(0)
@@ -110,7 +111,7 @@ class VideoPlayer(QMediaPlayer):
         self.backdrp = Ball(pix.toImage(), self.canvas)  ## subclass - borrowed
         self.backdrp.setZValue(-100)  ## copy is a graphics pixmapItem 
         self.scene.addItem(self.backdrp)        
-        self.videoWidget.setZValue(-99)  ## reset behind sprites
+        self.videoItem.setZValue(-99)  ## reset behind sprites
         if self.tag == 'dnd': self.mediaPlayer.play()  
         
     def handleError(self):

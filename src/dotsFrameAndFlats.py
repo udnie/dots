@@ -1,4 +1,5 @@
 
+import time
 
 from PyQt6.QtCore       import Qt, QPointF, QPoint, pyqtSlot
 from PyQt6.QtGui        import QColor, QPixmap, QImage, QCursor
@@ -133,8 +134,10 @@ class Flat(QGraphicsPixmapItem):
             case 'del':   
                 self.delete()               
             case 'shift':       ## to the back
-                self.setZValue(self.bkgMaker.toBack())
-                self.canvas.bkgMaker.renumZvals()       
+                self.setZValue(self.canvas.bkgMaker.toBack())
+                time.sleep(.10)       
+                self.canvas.bkgMaker.renumZvals()     
+                time.sleep(.10) 
             case 'B':           ## not actually tracked
                 self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
                     else self.bkgtrackers.tracker.bye()     
@@ -143,7 +146,10 @@ class Flat(QGraphicsPixmapItem):
             case 'tag':          ## '\' tag key
                 self.tagThis()
             case 'enter' | 'return':
-                self.bkgMaker.front(self)         
+                if self.zValue() == common['bkgZ']:
+                    return
+                self.canvas.bkgMaker.front(self)        
+                time.sleep(.10)   
             case 'T':     
                 self.setLock() if self.locked == False else self.setUnlock()
                 self.tagThis()
@@ -164,7 +170,7 @@ class Flat(QGraphicsPixmapItem):
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
                       
     def delete(self):  ## also called by widget
-        self.bkgMaker.deleteBkg(self)
+        self.canvas.bkgMaker.deleteBkg(self)
   
 ### --------------------------------------------------------
 class Frame(QGraphicsPixmapItem): 

@@ -54,7 +54,7 @@ class HelpMaker:  ## the help menus
     def menuHelp(self):
         self.canvas.sideCar.clearWidgets()
         self.canvas.bkgMaker.setBkgColor(SpinDrift)
-        self.switchHelp = MainMenu(self.canvas)
+        self.switchHelp = MainMenu(self.canvas)  ## throwaway - needs to instantiated
         
         self.canvas.openPlayFile = 'menu'  ## blocks helpbutton and 'H' and 'M' keys
 

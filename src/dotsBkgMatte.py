@@ -22,8 +22,8 @@ matteKeys = {
     'V':    'Vary Matte Height',
     'W':    'White',
     'X':    'Close Matte',  
-    '+, >, ]':  'Expand Matte Size',
-    '_, <, [':  'Reduce Matte Size',
+    '+, >, ]':  'Scales Matte Up',
+    '_, <, [':  'Scales Matte Down',
     'R':    'Run Animation',
     'SpaceBar': 'Pause/Resume',  
     'S':        'Stop Animation',
@@ -32,9 +32,9 @@ matteKeys = {
 SharedKeys = ('B','C', 'D', 'G', 'H', 'P', 'Q', 'R', 'S', 'V', 'W', 'X', 'Space', '<', '>')
 
 ### --------------------- dotsBkgMatte ---------------------     
-''' '>', ']', '=' expands in both directions horizontally or 
-    vertically and '<', '[', '-' contracts in both as well. 
-    Opening the help menu can reset the border  '''
+''' '+, >, ]' scales the Matte up in both directions and 
+    '_, <, [' scales it down.  Calling the bkgWidget reset the 
+    matte's border'''
 ### --------------------------------------------------------      
 class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------
@@ -277,7 +277,7 @@ class MatteHelp:
                 match help: 
                     case 'SpaceBar':
                         help = 'Space'  
-                    case '+, >, ]':
+                    case '+, >, ]': 
                         help = '>'
                     case  '_, <, [':
                          help = '<'  
