@@ -181,7 +181,6 @@ class TagsAndPaths: ## handles more than one request
                     tag = tag + ' Left'
                 elif pix.direction == 'right': 
                     tag = tag + ' Right'
-                tag = tag + ' ' + pix.useThis  
                 color = 'AQUA'
                 x, y = 250, 150
                 

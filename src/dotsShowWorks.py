@@ -47,7 +47,6 @@ class ShowWorks:
         factor    = p.factor
         showtime  = p.showtime
         rate      = p.rate
-        usethis   = p.useThis
         path      = p.path
         z         = p.zValue()
 
@@ -59,7 +58,6 @@ class ShowWorks:
         p.factor    = factor
         p.showtime  = showtime 
         p.rate      = rate
-        p.useThis   = usethis
         p.path      = path
            
         p.setZValue(z)   

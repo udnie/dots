@@ -117,7 +117,8 @@ class Flat(QGraphicsPixmapItem):
          
     def mousePressEvent(self, e):  
         if e.button() == Qt.MouseButton.RightButton:
-            self.openMenu()  
+            if self.canvas.openPlayFile != 'menu' and self.canvas.videoPlayer == None:
+                self.openMenu()  
         elif self.key in sharedKeys and not self.canvas.pathMakerOn: 
             self.shared(self.key)                       
         e.accept()
@@ -126,9 +127,6 @@ class Flat(QGraphicsPixmapItem):
         self.key = ''
         e.accept() 
         
-    def mouseDoubleClickEvent(self, e):
-        self.delete()
-
     def shared(self, key):  ## used with help menu
         match key:
             case 'del':   

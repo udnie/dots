@@ -22,7 +22,7 @@ newWidths = {     ## if vertical 1102, 912, 1024
     "spacer":      7,  ## forces buttons closer together
 }
 
-vert900 = {   ## vertical 900
+vert900 = {   ## vertical 900, 800
     "fixedHgt":     70, 
     "scrollGrp":   85,  
     "playGrp":    175,
@@ -49,9 +49,11 @@ def addButtonDock(self):
     hbox.addStretch(2) 
     hbox.addWidget(addPlayBtnGroup(self))
     hbox.addStretch(2) 
+    
     if not self.dots.Vertical:
         hbox.addWidget(addBkgBtnGroup(self))
         hbox.addStretch(2) 
+        
     hbox.addWidget(addCanvasBtnGroup(self))
     hbox.addStretch(docks['spacer']) 
 
@@ -99,7 +101,7 @@ def addKeysDock(self):
 
 ### --------------------------------------------------------  
 def addScrollBtnGroup(self):  
-    self.scrollGroup = QGroupBox("Scroll Panel")
+    self.scrollGroup = QGroupBox("Scroll Panel")  ## just that
     
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
     self.scrollGroup.setFixedWidth(docks['scrollGrp']) 
@@ -128,7 +130,7 @@ def addScrollBtnGroup(self):
         btnStar.clicked.connect(panel.Star)
     
         self.scrollGroup.setLayout(layout)
-    else:
+    else:   
         if common['Screen'] != '912': 
             self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])  ## 1024,1102 ... 
         else:
@@ -161,17 +163,19 @@ def addPlayBtnGroup(self):
 
     if not self.dots.Vertical:  ## nothing changes but the width
         self.playGroup.setFixedWidth(docks['playGrp'])
+        
     elif common['Screen'] != '912':
         self.playGroup.setFixedWidth(newWidths['playGrp'])
+        
     else:
         self.scrollGroup.setFixedWidth(vert900['playGrp']) 
                
     btnLoad  = QPushButton("Load")
-    self.btnRun = QPushButton("Run")  
+    self.btnRun   = QPushButton("Run")  
     self.btnPause = QPushButton("Pause")
-    self.btnStop = QPushButton("Stop")
-    self.btnSave = QPushButton("Save")
-    self.btnHelp = QPushButton("Help") 
+    self.btnStop  = QPushButton("Stop")
+    self.btnSave  = QPushButton("Save")
+    self.btnHelp  = QPushButton("Help") 
 
     layout = QHBoxLayout()    
 
@@ -187,7 +191,7 @@ def addPlayBtnGroup(self):
     helpBtn  = self.helpButton
   
     btnLoad.clicked.connect(showbiz.showRunner.loadPlay)
-    self.btnRun.clicked.connect(lambda: self.canvas.setKeys('R'))
+    self.btnRun.clicked.connect(showtime.run)  ###  was --- lambda: self.canvas.setKeys('R'))  
     self.btnPause.clicked.connect(showtime.pause)
     self.btnStop.clicked.connect(showtime.stop)
     self.btnSave.clicked.connect(showtime.savePlay) 
@@ -204,8 +208,8 @@ def addBkgBtnGroup(self):
     bkgGroup.setFixedWidth(docks['backGrp'])
     bkgGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
-    self.btnAddBkg    = QPushButton(" Add ")    
-    self.btnBkgColor  = QPushButton("Color")
+    self.btnAddBkg   = QPushButton(" Add ")    
+    self.btnBkgColor = QPushButton("Color")
     self.btnSaveFlat = QPushButton("Save")
 
     layout = QHBoxLayout()    
@@ -258,7 +262,7 @@ def addCanvasBtnGroup(self):
         
         self.canvasGroup.setLayout(layout)         
     else:
-        if common['Screen'] != '912' and common['Screen'] != '1024':
+        if common['Screen'] in ('1102', '900', '800'):
             self.canvasGroup.setFixedWidth(newWidths['canvasGrp'])
         else:
             self.canvasGroup.setFixedWidth(vert900['canvasGrp'])

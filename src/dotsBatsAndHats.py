@@ -19,16 +19,22 @@ from dotsShowWorks      import ShowWorks
 from dotsWings          import Wings
 
 backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directory
+     '960':  'montreaux.jpg',               
     '1080':  'montreaux.jpg', 
     '1280':  'montreaux-1280.jpg',
+    '108O':  'montreaux.jpg',      
     '1215':  'montreaux.jpg',  
     '1440':  'montreaux-1280.jpg',
     '1296':  'montreaux.jpg',    
     '1536':  'montreaux-1280.jpg',
-     '900':  'bats_900.jpg',  ## blue night photo
-     '912':  'bats_vertical.jpg', 
-    '1024':  'bats_vertical.jpg', 
-    '1102':  'bats_vertical.jpg',
+    
+     '800':  'bats_800.jpg',   ## 3X4
+     'SQR':  'bats_800.jpg',   ## 1X1
+     '900':  'bats_900.jpg',   ## 2X3
+     '912':  'bats_1066.jpg',  ## 9:16
+    '1066':  'bats_1066.jpg',
+    '1024':  'bats_1066.jpg', 
+    '1102':  'bats_1066.jpg',
 }
     
 ### -------------------- dotsBatsAndHats -------------------
@@ -83,6 +89,7 @@ class Bats:
             waypts = pathLoader(pix.tag)  ## get the path        
             pix.anime = pathAnimator(pix, sync, waypts)  ## sets a path to follow     
             QTimer.singleShot(100 + (n * t), pix.anime.start)  
+            
         elif pix.part in ('left','right'): 
             pix.anime = self.animation.setAnimation(pix.tag, pix)  ## Flapper in Wings   
             QTimer.singleShot(100 + (n * t), pix.anime.start)
@@ -103,10 +110,16 @@ class Bats:
         pix.y = random.randrange(200, common['ViewH']-300)
         pix.setPos(pix.x, pix.y)     
         pix.setScale(.65)   
+        
         if common['Screen'] == '912':
             pix.tag = 'demo-' + '900' + '.path' 
+        
+        elif common['Screen'] == 'SQR':
+            pix.tag = 'demo-' + '800' + '.path' 
+            
         else:
-            pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory             
+            pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory   
+                      
         return pix
                                        
     def runGrey(self, pix, k, scale):
@@ -126,6 +139,7 @@ class Bats:
                 if 'alien' in pix.fileName:
                     self.runGrey(pix, k,  scale)
                     k += 1
+                    
                 elif pix.part in pix.part in ('pivot','left','right'):
                     t = (random.randint(13, 18) * 2) - 1  ## 25 to 35.ms            
                     self.runBat(pix, n, t)
@@ -200,6 +214,7 @@ class Hats:  ## hats - was abstract
             MsgBox('getPathList: No Paths Found!', 5)
             QTimer.singleShot(200, self.canvas.clear)     
             return 
+        
         for i in range(self.hats):  
             path = getPath(apaths)                                           
             self.makeHats(path)
@@ -213,7 +228,8 @@ class Hats:  ## hats - was abstract
         pix.y = random.randrange(200, common['ViewH']-300)
         pix.setPos(pix.x, pix.y)  
         pix.setScale(1.0)   
-        pix.tag = path    
+        pix.tag = path   
+         
         if pix.shadowMaker.isActive == True:
             self.shadows = True
             pix.setOpacity(0.001) 
@@ -226,7 +242,8 @@ class Hats:  ## hats - was abstract
         loop  = asyncio.new_event_loop() 
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker.isActive == True: 
-                tasks.append(loop.create_task(self.newShadow(pix))) 
+                tasks.append(loop.create_task(self.newShadow(pix)))
+                 
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()  
@@ -264,6 +281,7 @@ class Hats:  ## hats - was abstract
                 if pix.type == 'pix' and 'doral' in pix.fileName:
                     self.scene.removeItem(pix)
                     del pix
+                    
                 elif pix.type == 'bkg':
                     self.scene.removeItem(pix)
                     del pix

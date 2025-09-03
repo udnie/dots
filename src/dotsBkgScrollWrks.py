@@ -9,16 +9,42 @@ from PyQt6.QtWidgets    import QMessageBox
 from dotsShared         import common, paths                             
 from dotsSideGig        import MsgBox, tagBkg
 
- ## trigger a new background based on the number of pixels left in runway
-showtime = { 
+
+showtime = {   ## trigger a new background based on the number of pixels left in runway
     'snakes':   15,  ## also used by vertical 
     'left':     11, 
     'right':    15,  
     'vertical': 17,  ## trying this out 
 }
 
-### ------------------ dotsBkgScrollWrks -------------------           
-class BkgScrollWrks:  ## mainly functions used for scrolling 
+# screentimes = {  ## may not be current
+#     '800': [10.0, 22.76, 0.0], 
+#     '900': [10.0, 23.2, 0.0], 
+#     '912': [10.0, 21.1, 0.0],
+#     '960': [10.0, 16.75, 16.75], 
+#     '1080': [10.0, 17.57, 17.72], 
+#     '108O': [10.0, 16.79, 16.79],
+#     '1066': [10.0, 21.84, 0.0], 
+#     '1024': [10.0, 21.31, 0.0], 
+#     '1102': [10.0, 21.3, 0.0], 
+#     '1215': [10.0, 17.35, 17.4], 
+#     '1280': [10.0, 18.92, 19.07], 
+#     '1296': [10.0, 17.5, 17.45],
+#     '1440': [10.0, 18.7, 18.82],  
+#     '1536': [10.0, 18.65, 18.92], 
+# }
+
+## read and dump the current screen rates
+# with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
+#     screenrate = json.load(fp) 
+
+# for k, vals in screenrate.items():
+#     print( f'{k.rjust(5)} {str(vals[0]).rjust(6)}  {vals[1]:6.2f}  {vals[2]:5.2f} ') 
+ 
+### ------------------ dotsBkgScrollWrks -------------------  
+''' updateDictionary, tracker and scrolling functions '''
+### --------------------------------------------------------        
+class BkgScrollWrks: 
 ### --------------------------------------------------------
     def __init__(self, parent):  
         super().__init__()
@@ -29,11 +55,9 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
                                                                                                                                         
 ### -------------------------------------------------------- 
     def updateDictionary(self):
-        if self.bkgItem.useThis == '':
-            return  
-        
         test = False
-        rate = self.bkgMaker.screenrate[self.bkgItem.useThis][common['Screen']]  
+   
+        rate = self.bkgMaker.screenrate.get(common['Screen'])
          
         if self.bkgItem.direction == 'right' and rate[2] != self.bkgItem.rate:
             rate[2] = self.bkgItem.rate
@@ -66,9 +90,9 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
         try:
             with open(paths['playPath'] +  "screenrates.dict", 'w') as fp:  
                 json.dump(self.bkgMaker.screenrate, fp)
-            MsgBox(f'{self.bkgItem.useThis} Updated', 5)
+            MsgBox('Rates Dictionary Updated' ,5)
         except:
-            MsgBox(f'Error Updating Rates Dictionary {self.bkgItem.useThis}', 5)
+            MsgBox('Error Updating Rates Dictionary', 5)
         return 
      
 ### --------------------------------------------------------
@@ -96,8 +120,7 @@ class BkgScrollWrks:  ## mainly functions used for scrolling
             if self.bkgMaker.newTracker.get(fileName):
                 self.bkgMaker.newTracker[fileName]['direction'] = bkg.direction
                 self.bkgMaker.newTracker[fileName]['rate']      = bkg.rate 
-                self.bkgMaker.newTracker[fileName]['useThis']   = bkg.useThis
-                
+              
     def setShowTimeTrackers(self, bkg):  ## used by resetSliders
         if bkg.scrollable:      
             fileName = bkg.fileName                                                            

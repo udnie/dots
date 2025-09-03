@@ -160,7 +160,7 @@ class DemoHelp:
             self.bats.rerun()
 
 ### --------------------------------------------------------     
-class ScreenHelp:  
+class ScreenHelp:  ## screens are from dotsScreens
 ### -------------------------------------------------------- 
     def __init__(self, parent, off=0, switch=''):
         super().__init__()  
@@ -172,7 +172,7 @@ class ScreenHelp:
         self.table = TableWidgetSetUp(60, 95, 60, len(screens)+3)
         self.table.itemClicked.connect(self.clicked)   
         
-        width, height = 222, 396
+        width, height = 222, 516
         self.table.setFixedSize(width, height)
         
         self.table.setRow(0, 0, f'{"Screen Formats":<14}',QL,True,True,3)

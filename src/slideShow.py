@@ -549,12 +549,12 @@ class Help(QWidget):
             'font-size: 13pt;\n' 
             'font-family: Arial;\n' 
             'border: 3px solid dodgerblue;\n'
-            'gridline-color: silver;}') 
+            'gridline-color: rgb(190,190,190);}') 
                                                                                                              
         self.table.setColumnWidth(0, 130) 
-        self.table.setColumnWidth(1, 130)
+        self.table.setColumnWidth(1, 140)
 
-        width, height = 267, 451  
+        width, height = 277, 451  
         self.table.setFixedSize(width, height)  
         
         self.table.verticalHeader().setVisible(False) 

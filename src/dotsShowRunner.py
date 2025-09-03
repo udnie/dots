@@ -93,13 +93,17 @@ class ShowRunner:
                 dlist = self.openPlay(file) 
             except IOError:
                 self.canvas.openPlayFile = ''
-                MsgBox('loadPlay ' + file + 'Not Found')              
+                MsgBox('loadPlay ' + file + 'Not Found')  
+                            
             if len(dlist) > 0: 
-                self.makeTableView(dlist, src)  ## display any missing files or what's there if 'table'
-                ## src = 'table' if run from canvas when typing 'j'
-                if self.showbiz.tableView.loadingError == True or src == 'table':
-                    return
-                self.updateStoryBoard(dlist) 
+                try:
+                    self.makeTableView(dlist, src)  ## display any missing files or what's there if 'table'
+                    ## src = 'table' if run from canvas when typing 'j'
+                    if self.showbiz.tableView.loadingError == True or src == 'table':
+                        return
+                    self.updateStoryBoard(dlist) 
+                except:
+                    MsgBox('showRunner: error on making tableview')
             else:
                 return
               
@@ -121,7 +125,7 @@ class ShowRunner:
             if self.showFiles.fileNotFound(tmp):  ## the reason missing files don't get saved - works with dictionaries
                 continue  
    
-            elif tmp['type'] == 'frame' or 'frame' in tmp['fileName']:        
+            if tmp['type'] == 'frame' or 'frame' in tmp['fileName']:        
                 frame = Frame(paths['spritePath'] + tmp['fileName'], self.canvas, lnn)
                 self.showFiles.addPixToScene(frame, tmp, lnn)  ## finish unpacking tmp                 
                 lnn -= 1 

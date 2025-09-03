@@ -246,7 +246,6 @@ def tagBkg(bkg, pos):
             tag = tag + ' Left'
         elif bkg.direction == 'right': 
             tag = tag + ' Right'
-        tag = tag + ' ' + bkg.useThis  
         color = 'AQUA'
            
     elif bkg.type in ('pix', 'frame') and z == topZVal:

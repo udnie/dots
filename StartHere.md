@@ -53,7 +53,9 @@ The three files **vhx.py**, **slideShow.py** and **videPlayerOne.py** are includ
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
 ## Video  
-**PyQt5** doesn't support loops so moving the **videoWidget** slider has no effect and a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running will cause the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.
+**PyQt5** doesn't support loops so moving the **videoWidget** slider has no effect and a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running may cause the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.  
+
+There may be a problem running videos in pyside6 as I've encountered some occasional unplanned exits.  VideoPlayerOne seems pretty stable as it uses a VideoWidget rather than the QGraphicsVideoItem used by dotsVideoPlayer.  I think python 3.11 and 3.12 are recommended, I'm using 3.13 and it didn't seem to matter much. 
        
 ## Four Files  
 There are four files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
@@ -166,27 +168,27 @@ Moving the **background widgets screenrate slider** to a higher value slows the 
 These values were established based on a fixed size which isn't as important as it once was as you now have more flexibility in setting a rate that best fits your scrolling background especially if you save it to a .play file.  Scaling the short side to 640 pixels still helps.  These values may have changed from what you're seeing but not by much.
 
 
-   
-    screentimes = {  ## based on a 1280X640 .jpg under .5MB for 16:9 background
-      ##   first, next-rt<lft, next-lft>right --- there are always two backgrounds once started
-     '1080':  [10.0,  17.50,  17.45],   ## 1440px actual size when scaled 1280X640 for 16:9
-     '1280':  [10.0,  18.75,  18.85],  
-     '1215':  [10.0,  17.35,  17.4],    ## 1620px actual size when scaled 1280X640 for 16:9
-     '1440':  [10.0,  18.7,   18.85],
-     '1296':  [10.0,  17.50,  17.45],   ## 1728px actual size when scaled 1280X640 for 16:9
-     '1536':  [10.0,  18.65,  18.60],  
-     '1102':  [10.0,  20.9,    0.0],
-      '900':  [10.0,  23.2,    0.0],
-      '912':  [10.0,  20.9,    0.0],
-     }
+Current but can change. It was two dictionaries but one works just as well.
+
+      screentimes = {
+          800 [10.00,  24.92,   0.00], 
+          SQR [10.00,  30.00,   0.00],
+          900 [10.00,  23.20,   0.00],
+          912 [10.00,  21.10,   0.00],
+          960 [10.00,  16.75,  16.75],
+         108O [10.00,  16.79,  16.79],
+         1080 [10.00,  18.65,  17.72],
+         1066 [10.00,  21.84,   0.00],
+         1024 [10.00,  21.31,   0.00],
+         1102 [10.00,  21.30,   0.00],
+         1215 [10.00,  17.35,  17.40],
+         1280 [10.00,  18.92,  19.07],
+         1296 [10.00,  17.50,  17.45],
+         1440 [10.00,  18.70,  18.82],
+         1536 [10.00,  18.65,  18.92],
+        }
+
      
-     moretimes = {   ## based on a 1080X640 .jpg under .5MB for 3:2 background
-        '1080':  [10.0,   19.05, 19.05],   ## 1215px actual size when scaled 1080X640 for 3:2
-        '1215':  [10.0,   18.88, 18.89],   ## 1367px actual size when scaled 1080X640 for 3:2
-        '1296':  [10.0,   18.88, 18.87],   ## 1458px actual size when scaled 1080X640 for 3:2
-         '900':  [10.0,    21.4,   0.0]    ## 1013px actual size when scaled 640X1080 for 2:3
-     } 
-  
 I use 10.0 for the **'first'** value as the background is already visible and needs to travel less of a distance to **clear the screen**. The **'first'** value 10.0 translates to 10 times the screen width and is used to set the duration, time in milliseconds, required to move the backgrounds scaled width from one side of the screen to completely off the other.  A 1080 pixel screen format for the **'first'** background translates to 10.0 X 1080 = 10,800 milliseconds to clear the screen.  A **'next'** background has to cover more distance and therefore its rate would be higher and results in a longer duration, more travel time, while also matching the **first** rate of travel.   
       
 The **background widgets 'showtime'** slider value represents the number of pixels remaining before the background appears in the scene.  When reached it triggers the **'next'** background process. This will vary depending on which direction the background is traveling and if it's a snake. It's set once you choose a direction. Hopefully you'll never need to edit showtime, but if you do it's in **BkgScrollWrks**.

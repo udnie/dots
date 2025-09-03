@@ -25,7 +25,7 @@ pixKeys = {  ## sprites
 }
           
 bkgHelpKeys = {
-    ' B ':      'Background TableWidget',
+    ' B ':      'Background Tracker',
     ' E ':      'Eye-Dropper',  
     ' F ':      'Flop It', 
     ' H ':      'This Help Menu',

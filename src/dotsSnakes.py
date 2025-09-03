@@ -198,10 +198,11 @@ class Snakes:
             self.scroller.path = paths['demo'] 
             self.scroller.tag = 'scroller'
             
-            if common['Screen'] in ('900', '912'):
+            if common['Screen'] in ('800','900', '1066'):
                 self.scroller.mirroring = False
             else:
                 self.scroller.mirroring = True     
+                
             self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)
             

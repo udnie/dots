@@ -159,9 +159,7 @@ class ShowFiles:
             tmp['showtime'] = 0
         if 'path' not in tmp.keys(): 
             tmp['path'] = ''
-        if 'useThis' not in tmp.keys(): 
-            tmp['useThis'] = ''
-   
+
         bkg.locked      = tmp['locked']                 
         bkg.anime       = tmp['anime']
         bkg.scrollable  = tmp['scrollable']
@@ -170,7 +168,6 @@ class ShowFiles:
         bkg.factor      = tmp['factor']
         bkg.rate        = tmp['rate']
         bkg.showtime    = tmp['showtime']
-        bkg.useThis     = tmp['useThis']
         bkg.path        = tmp['path']
                           
         result = self.bkgMaker.bkgtrackers.addTracker(bkg)  
@@ -271,7 +268,6 @@ class ShowFiles:
             'factor':       pix.factor,
             'rate':         pix.rate,
             'showtime':     pix.showtime,  
-            'useThis':      pix.useThis,  
             'path':         pix.path,    
         }     
         return tmp

@@ -174,7 +174,7 @@ class BkgWidget(QWidget):
         self.rateValue.setFixedWidth(35)
         self.rateSlider = QSlider(Qt.Orientation.Vertical)
         self.rateSlider.setMinimum(1250)
-        self.rateSlider.setMaximum(2500)
+        self.rateSlider.setMaximum(3500)
         self.rateSlider.setSingleStep(1)
         self.rateSlider.setValue(0)
         self.rateSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
@@ -262,7 +262,7 @@ class BkgWidget(QWidget):
         if self.switch == '':
             resetBtn.clicked.connect(lambda: self.bkgMaker.bkgtrackers.resetTracker(self.bkgItem))
             helpBtn.clicked.connect(self.bkgItem.openMenu)
-            runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))    
+            runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))  ## run a scroller  
             self.lockBtn.clicked.connect(self.bkgScrollWrks.toggleBkgLocks)   
             flopBtn.clicked.connect(lambda: self.bkgMaker.flopIt(self.bkgItem))  
             matteBtn.clicked.connect(self.bkgWorks.openMatte)

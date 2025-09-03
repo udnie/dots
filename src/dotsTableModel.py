@@ -26,7 +26,7 @@ class Typelist:  ## for type header
         self.hdr  = ''
 
 ### -------------------------------------------------------- 
-class TableWidgetSetUp(QTableWidget):  ## used by help menus 
+class TableWidgetSetUp(QTableWidget):  ## used by help menus not by tablemodel
 ### -------------------------------------------------------- 
     def __init__(self, a, b, c, cols3=0, fontSize=0):
         super().__init__()   
@@ -47,6 +47,7 @@ class TableWidgetSetUp(QTableWidget):  ## used by help menus
             
             self.setColumnWidth(0, a) 
             self.setColumnWidth(1, b)
+            
         elif cols3 > 0:
             self.setRowCount(cols3) 
             self.setColumnCount(3)
@@ -60,13 +61,14 @@ class TableWidgetSetUp(QTableWidget):  ## used by help menus
             'font-size: 12pt;\n' 
             'font-family: Arial;\n' 
             'border: 3px solid dodgerblue;\n'
-            'gridline-color: silver;}')  
+            'gridline-color: rgb(180,180,180);}')
           
         self.type = 'widget'
         self.setAccessibleName('widget')
         self.height = fontSize
         
     def setRow(self, row, col, str, color='', ctr=False, bold=False, span=0):
+        
         self.setRowHeight(row, self.height) if self.height > 0 else self.setRowHeight(row, RH)
         item = QTableWidgetItem(str)
         
@@ -93,11 +95,9 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
     def __init__(self, data, cols, hdr):
         super(TableModel, self).__init__()
    
-        self.cols = cols
+        self.cols = cols + 1
         self._data = data
-        self.idx = 0
-        self.target = -1
-        
+    
         self.header = hdr  ## first row - column titles
         
         ## holds row indexs to modify both color and alignment 
@@ -110,10 +110,10 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
             if role == Qt.ItemDataRole.DisplayRole: 
                 val = self._data[index.row()][index.column()]
                 
-                if isinstance(val, str) and index.column() == 0 and val != 'fileName':
-                    return val.capitalize()
-                
-                elif isinstance(val, bool) and index.column() == 12:  ## scroller
+                if index.column() == 0:
+                    return index.row()
+    
+                if isinstance(val, bool) and index.column() == 12:  ## scroller
                     if str(val) == 'True':        
                         return 'mirrored'
                     else:
@@ -123,7 +123,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                     return val[5:-1]
                 
                 return self._data[index.row()][index.column()]
-            
+    
             if role == Qt.ItemDataRole.BackgroundRole:  ## background color for hdrs
                 color = self.rowheaders.get(index.row())  
                 if color:      
@@ -137,6 +137,9 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
             if role == Qt.ItemDataRole.TextAlignmentRole:  ## missing files   
                 val = self._data[index.row()][index.column()]  
                 
+                if index.column() == 0:
+                    return Qt.AlignmentFlag.AlignRight
+        
                 if self.rowMiss.get(index.row()):  
                     if  isinstance(val, bool):
                         return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter

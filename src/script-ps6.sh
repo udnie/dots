@@ -22,6 +22,8 @@ sed -i -- 's/flat.type /flat.desc /g' *.py
 sed -i -- 's/p.type /p.desc /g' *.py
 sed -i -- 's/ptr.type /ptr.desc /g' *.py
 sed -i -- 's/typ.type /typ.desc /g' *.py
+sed -i -- 's/pix.type\:/pix.desc\:/g' *.py
+sed -i -- 's/itm.type\./itm.desc\./g' *.py
 
 sed -i -- 's/line.type /line.desc /g' *.py
 sed -i -- 's/typ.type /typ.desc /g' *.py

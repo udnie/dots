@@ -4,8 +4,8 @@ import json
 
 from functools          import partial
 
-from PyQt6.QtCore       import QPoint, QTimer, QParallelAnimationGroup, QPropertyAnimation, \
-                                QPointF
+from PyQt6.QtCore       import QPoint, QTimer, QParallelAnimationGroup, \
+                                QPropertyAnimation, QPointF
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
                        
@@ -17,7 +17,7 @@ from dotsBkgScrollWrks  import BkgScrollWrks
 from dotsAnimation      import Node
 
 ### --------------------- dotsBkgWorks --------------------- 
-''' classes: BkgWorks -- mostly scrolling'''    
+''' setDirection, getScreenRate, some scrolling and menu functions '''    
 ### ------------------------------------------------------- 
 class BkgWorks:  
 ### --------------------------------------------------------
@@ -38,6 +38,7 @@ class BkgWorks:
         if math.fabs(self.bkgItem.runway) < self.bkgItem.showtime:
             self.bkgScrollWrks.notScrollable()   
             return     
+        
         if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
             
             if self.canvas.dots.Vertical:   ## no direction equals 'not scrollable'
@@ -61,7 +62,7 @@ class BkgWorks:
                 self.bkgMaker.newTracker[fileName]['rate'] = self.bkgItem.rate
                 self.bkgMaker.newTracker[fileName]['path'] = self.bkgItem.path 
          
-            if self.bkgItem.rate == 0 and self.bkgItem.useThis == '':
+            if self.bkgItem.rate == 0:
                 return
             
             self.bkgMaker.lockBkg(self.bkgItem)  ## locks the background to begin 
@@ -78,8 +79,7 @@ class BkgWorks:
         rate = self.getThisRate(bkg) 
          
         if rate == 0:
-            MsgBox(f'Error Loading Screen Rates File {bkg.useThis}', 5)
-            bkg.useThis = ''
+            MsgBox(f'Error Loading Screen Rates File', 5)
             self.bkgMaker.screenrate.clear()
             return 0  
 
@@ -88,9 +88,8 @@ class BkgWorks:
                 
         elif bkg.rate == 0:  ## sets tracker rate for 'next'
             
-            if bkg.useThis == '':  ## shouldn't happen - wasn't getting carried over
-                rate = self.getThisRate(bkg)  
-                 
+            rate = self.getThisRate(bkg)  
+           
             if bkg.direction == 'right':
                 rate = rate[2]
             else:
@@ -105,20 +104,12 @@ class BkgWorks:
     
 ### --------------------------------------------------------
     ## rates can vary within a scene by background width
-    def getThisRate(self, bkg): 
-        bkg.useThis == ''  ## set which dictionary to use  
-        if common['Screen']  == '1080' and bkg.width  < 1280 or \
-            common['Screen'] == '1215' and bkg.width  < 1440 or \
-            common['Screen'] == '1296' and bkg.width  < 1536 or \
-            common['Screen'] ==  '900' and bkg.height < 1102: 
-            bkg.useThis = 'moretimes'  ## in this case 2:3 
-        else:
-            bkg.useThis = 'screentimes'  ## 16:9 or larger         
+    def getThisRate(self, bkg):       
         try:  
             if len(self.bkgMaker.screenrate) == 0:  ## fewer reads
                 with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
                     self.bkgMaker.screenrate = json.load(fp)  
-            return self.bkgMaker.screenrate[bkg.useThis][common['Screen']]        
+            return self.bkgMaker.screenrate[common['Screen']]      
         except:
             return 0
         

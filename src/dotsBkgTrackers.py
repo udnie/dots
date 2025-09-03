@@ -13,7 +13,7 @@ RowHt = 30
 HdrStr =  ["filename", "zvalue",  "direction", "mirrored", "rate", "showtime",\
             "screenrate", "directory"]                                                                                         
 ### ------------------- dotsBkgTrackers --------------------
-''' Tracker related code '''
+''' Tracker related code - tracker tableWidget'''
 ### --------------------------------------------------------
 class Trackers(QWidget): 
 ### -------------------------------------------------------- 
@@ -54,15 +54,15 @@ class Trackers(QWidget):
         self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
             'background-color: rgb(115,225,225)}')	 
             
-        self.upBtn = QPushButton("Up One")
+        self.upBtn = QPushButton("Move Up One")
         self.upBtn.clicked.connect(self.up)
         self.upBtn.setMaximumWidth(200)  
               
-        self.closeBtn = QPushButton("Use Button to Close")
+        self.closeBtn = QPushButton("This Button to Close")
         self.closeBtn.clicked.connect(self.bye)
         self.closeBtn.setMaximumWidth(200)              
               
-        self.downBtn = QPushButton("Down One")
+        self.downBtn = QPushButton("Move Down One")
         self.downBtn.clicked.connect(self.down)
         self.downBtn.setMaximumWidth(200) 
     
@@ -207,7 +207,7 @@ class BkgTrackers:
                         zval = bkg.zValue()
                         fileName, direction, mirroring, locked = self.addBkgLabels(bkg)
                         rate, showtime, path = str(trk['rate']), str(trk['showtime']), trk['path']
-                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {trk['useThis']} {path[5:-1]}"
+                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {path[5:-1]}"
                         dump.append(s.split())
                 except:
                     None            
@@ -252,7 +252,6 @@ class BkgTrackers:
             bkg.mirroring  = tmp['mirroring']
             bkg.factor     = tmp['factor']
             bkg.showtime   = tmp['showtime']
-            bkg.useThis    = tmp['useThis']
             bkg.rate       = tmp['rate']
             bkg.path       = tmp['path']
             bkg.scrollable = tmp['scrollable']
@@ -264,7 +263,6 @@ class BkgTrackers:
             tmp['mirroring']  = False
             tmp['factor']     = 1.0
             tmp['showtime']   = 0
-            tmp['useThis']    = ''
             tmp['rate']       = 0
             tmp['scrollable'] = False
             tmp['path']       = bkg.path
@@ -272,8 +270,7 @@ class BkgTrackers:
         bkg.direction  = ''             
         bkg.mirroring  = False
         bkg.factor     = 1.0
-        bkg.showtime   = 0
-        bkg.useThis    = ''      
+        bkg.showtime   = 0   
         bkg.rate       = 0
         bkg.scrollable = False    
         bkg.path       = ''
@@ -289,7 +286,6 @@ class BkgTrackers:
             "factor":     bkg.factor,
             "rate":       bkg.rate,
             "showtime":   bkg.showtime,
-            "useThis":    bkg.useThis,
             "path":       bkg.path,
             "scrollable": bkg.scrollable,
         }

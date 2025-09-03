@@ -7,6 +7,24 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
+**September 3 2025**  
+VideoPlayerOne now has some company as I've added videoClipsMaker and videoClipsWidget to the mix. ClipsMaker came about as a result of finding some video I had made a few years earlier which was based on reading a directory of photos and assembling them into a stop-motion video.  I had read somewhere that the app I had used to make the videos was no longer being updated and I wondered if I could replicate it using openCV.  
+
+ClipsMaker started out as a stand-alone app and it soon became apparent that it needed an easy way to display its output and so it made sense to use what was already in videoPlayerOne and not create another version of it in clipsMaker. Its output is a '.mov' file to the working directory as directory name '.mov' and appears in the window title bar as a reminder as well. 
+  
+
+As I state in the video, you'll need openCV version 4.12 or better to run clipsMaker and get full use of its openCV functions. If you're on a Mac you can use the apple 'mdls' command in 'getVideoWidthHeight' to read metadata but you still need to install openCV and uncomment the import statement in clipsMaker in order for clipsMaker to run.  Also, read the docstrings in each of the modules for further information and the July 5th entry below for more on videoPlayerOne and my obsession with aspect-ratios.
+
+There are actually three separate video functions in clipsMaker - the first which does what I describe above. Next in widget button order the function to read the first frame of a video followed by the function to read every 'nth frame.  I guess four if you count adding the fileName.
+
+All of the openCV code used by clipsMaker was a direct result of some simple queries to google search in my FireFox browser - no dedicated A.I., Claude, Copilot or chat-bot was used. Of course it's still Gemini and this isn't the only time I've used it.  
+
+And last, added two 4:3 screens, one 3:4, one square and another 9:16 to **dots** - also added three video formats to **videPlayerOne** and a fix in tableMaker.  You'll need to run one of the scripts to convert the pyQt6 code to  pyQt5  or
+pyside6 or just to clean up the Qt5 if running pyQt6.
+
+New video:  <<https://youtu.be/DPYu2mdDE7E>>
+
+---
 **July 10 2025**  
 Moved the sprite menu in the help Menu selection, 'Sprite and StoryBoard Menus', to the center as it's acted upon by both storyboard menus - pretty much their main job. Made sure the pop-up menu in slideShow closed and reopened correctly and set a default to display the current directory on open if no buttons have been set. The help menu for shadows is now offset and no longer centers directly over it and renamed pathItems to pointItems in PathEdits and renamed dotsPathItems to dotsPathPointItem to remove any ambiguity.
 

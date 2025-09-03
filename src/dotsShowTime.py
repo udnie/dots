@@ -22,9 +22,9 @@ class ShowTime:
     def __init__(self, parent):
         super().__init__()
  
-        self.canvas   = parent
-        self.scene    = self.canvas.scene
-        self.mapper   = self.canvas.mapper
+        self.canvas = parent
+        self.scene  = self.canvas.scene
+        self.mapper = self.canvas.mapper
 
         self.showWorks = ShowWorks(self.canvas)
         self.showFiles = ShowFiles(self.canvas) 
@@ -137,7 +137,7 @@ class ShowTime:
     def stop(self, action=''):  ## action used by clear               
         self.mapper.clearPathsandTags()     
         scrolling = []  ## used by tracker to remove the 'next' bkg 
-        
+   
         if self.canvas.videoPlayer != None:
             self.canvas.videoPlayer.stopVideo()
             
@@ -199,6 +199,7 @@ class ShowTime:
         if len(self.scene.items()) == 0:
             MsgBox("Nothing on Screen to Save", 5)
             return  
+        
         self.reallySaveIt()
             
     def reallySaveIt(self):                                    

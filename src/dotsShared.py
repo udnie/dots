@@ -22,10 +22,6 @@ class Ball(QGraphicsPixmapItem):
         self.type = 'ball'
         self.setPixmap(QPixmap(img))
     
-    def mouseDoubleClickEvent(self, e):
-        if self.canvas != '':
-            self.canvas.sideCar.delbackdrp()
-   
 ### --------------------------------------------------------
 class Outline(QGraphicsPolygonItem):  ## subclass 
 ### --------------------------------------------------------
@@ -85,6 +81,8 @@ CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,sp
 PathStr = "B,C,D,E,H,L,N,M,P,R,S,T,U,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
 PlayKeys = ('A','C', 'D','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
+
+Verts = ('800','SQR', '900','912','1024','1066','1102')
 
 ## use this and make sure your editor points to the right directory
 paths = {          

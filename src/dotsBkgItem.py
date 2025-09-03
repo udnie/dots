@@ -102,7 +102,6 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
         self.factor    = self.bkgMaker.factor    ## sets default 
         self.showtime  = 0  ## the number of pixels to showtime before the runway goes to zero
-        self.useThis   = ''
         self.rate      = 0
         self.runway    = 0  ## what's not visible     
         self.bkgScrollWrks.setRunWay()  
@@ -142,7 +141,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if not self.canvas.pathMakerOn:       
             if e.button() == Qt.MouseButton.RightButton:   
                 self.bkgMaker.addWidget(self)   
-                if self.direction == '' or self.useThis == '':   
+                if self.direction == '':
                     self.bkgMaker.bkgtrackers.resetTracker(self)
                     self.bkgMaker.resetSliders(self)  
             elif self.key in self.sharedKeys:
@@ -261,7 +260,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             bkg.direction == 'vertical' and bkg.height < common['ViewH']:
             self.bkgScrollWrks.notScrollable()  
             return 
-   
+ 
         self.bkgWorks.setStartingPos(bkg)  ## not the scrolling position      
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration

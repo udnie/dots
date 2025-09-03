@@ -13,7 +13,7 @@ from dotsShowWorks      import ShowWorks
 from dotsSideGig        import MsgBox
 
 MinRows = 5  ## to display
-MaxRows = 17
+MaxRows = 22
 
 MaxCols = 15  ## shown
 MinCols = 7
@@ -21,7 +21,7 @@ MinCols = 7
 ColWidth  = 100  ## seems to be the default size - see also 85px.
 RowHeight = 27
 
-ColumnWidths = [1,2,3,4,6,7,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
+ColumnWidths = [2,3,4,5,8,9,10,11,12,13,14,15]  ## set these columns width to 85px
 ##                      5,16...
 
 Columns = {  ## set widths by number of columns
@@ -56,9 +56,7 @@ class TableView:  ## formats a json .play file to display missing files or not
  
         self.selected = []  ## fileName and zValue used to delete selected rows rather than just by filename
         self.typelist = []  ## stores type, hdr, col
-             
-        self.Missingfiles = []  ## copy of missing files - showWorks has MissingFiles
-        self.missing = []
+        self.missing  = []  ## pre selected
          
 ### --------------------------------------------------------              
         self.tableView = QTableView()        
@@ -76,17 +74,18 @@ class TableView:  ## formats a json .play file to display missing files or not
             'background-color: rgb(220,220,220)}')
       
         self.tableView.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
-            'border: 1px solid rgb(240,240,240);\n'
+            'border: 1px solid rgb(230,230,230);\n'
             'text-align: center;\n' 
-            'font-size: 13px;\n' 
-            'background-color: rgb(225,225,225)}')  
+            'font-size: 14px;\n' 
+            'height: 32px;\n'
+            'background-color: rgb(215,215,215)}')  
            
         self.tableView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.tableView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         
         self.tableView.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.tableView.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
-                    
+   
         ## dbl-click on any row to close the tableview except the header or white space
         self.tableView.doubleClicked.connect(self.bye)
      
@@ -106,11 +105,12 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.shortcut.activated.connect(self.deleteSelectedRows) 
  
         self.tableView.setAlternatingRowColors(True) 
+        self.tableView.setStyleSheet("QTableView { gridline-color: rgb(200,200,200);}")
           
         self.makeTable(self.data)  ## eventually calls addTable unless loading error
-                                    
+                                 
 ### --------------------------------------------------------
-    def addTable(self, data, miss, save):        
+    def addTable(self, data, miss, hdrs):        
         width, height = self.widthHeight(data)
         
         self.missing = miss  ## used to delete
@@ -119,7 +119,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.dots.statusBar.showMessage(file)      
           
         self.tableView.setWindowTitle(f"C: to Close -- D: to Delete -- J: Toggles Viewer -- S: to Save")
-        QTimer.singleShot(10000, partial(self.tableView.setWindowTitle, f"{file} - {len(data)-1} rows"))  
+        QTimer.singleShot(5000, partial(self.tableView.setWindowTitle, f"{file} - {len(data)-1} rows"))  
    
         self.model = TableModel(data, self.cols, self.hdr)   
         self.tableView.setModel(self.model)
@@ -128,13 +128,14 @@ class TableView:  ## formats a json .play file to display missing files or not
        
         ## make changes to the table layout by row - good to know - thanks Martin
         font = QFont("Arial", 14)  
-        for i in save: 
-            self.model.setHdrColor(i, '#e2e2e2')  ## make it look like a header
+        for i in hdrs: 
+            self.model.setHdrColor(i, '#e1e1e1')  ## make it look like a header
             self.model.setHdrFonts(i, font)  ## type instructions
             
-        for i in miss: 
-            self.model.setHdrColor(i, 'yellow')  ## missing files 
-            self.model.setMisses(i, font)
+        for i in self.missing:
+            k = i[2]  ## row
+            self.model.setHdrColor(k, 'yellow')  ## missing files 
+            self.model.setMisses(k, font)
             
         self.tableView.resize(width, height)
         self.tableView.move(self.reposition(height))  ## uses both width(self.cols) & height
@@ -142,21 +143,20 @@ class TableView:  ## formats a json .play file to display missing files or not
         self.tableView.show()
         
         del data
- 
+    
 ### --------------------------------------------------------
     def deleteSelectedRows(self):  ## makes a list of selected rows by filename and zValue 
-        if len(self.selected) > 0: 
-            self.selected.clear() 
-           
-        if len(self.Missingfiles) > 0:
-            if len({index.row() for index in self.tableView.selectionModel().selectedIndexes()}) > 0:    
-                for indexes in sorted(self.tableView.selectionModel().selectedRows()):
-                    if indexes.row() in self.missing:  ## only place self.missing is used
-                        tmp = list(self.data[indexes.row()].values())
-                        self.selected.append((tmp[0], tmp[4]))
+        self.selected.clear() 
+               
+        if len(self.missing) > 0:
+            if len(self.tableView.selectionModel().selectedIndexes()) > 0:       
+                for indexes in self.tableView.selectionModel().selectedRows():
+                    for tmp in self.missing:    ## match on row number - use filename and 'z' to delete
+                        if indexes.row() == tmp[2]:  ## hdrs throw rows off, data row numbers won't match
+                            self.selected.append([tmp[0], tmp[1]])  ## same as selected
             else:
-                for tmp in self.Missingfiles:  ## delete all missing files
-                    self.selected.append((tmp['fileName'], tmp['z'])) 
+                for tmp in self.missing:  ## delete all missing files
+                    self.selected.append([tmp[0], tmp[1]])
                        
         if len(self.selected) > 0:   
             self.deleteKey = True  
@@ -168,13 +168,13 @@ class TableView:  ## formats a json .play file to display missing files or not
     def deleteFromTable(self):  ## doesn't affect the .play file unless saved    
         for s in self.selected:  
             for tmp in self.data:
-                if s[0] == tmp['fileName'] and s[1] == tmp['z']:          
+                if s[0] == tmp['fileName'] and s[1] == tmp['z']:     
                     self.data.remove(tmp) 
-                    break
-                    
+               
 ### --------------------------------------------------------                            
     def resetColumnWidths(self, width):  
-        self.tableView.setColumnWidth(0, 135)
+        self.tableView.setColumnWidth(0, 65)
+        self.tableView.setColumnWidth(1, 135)
         for i in range(1, self.cols):  
             if i in ColumnWidths:  ## reduce column widths for these
                 self.tableView.setColumnWidth(i, 85)  ## why is this so hard to find?      
@@ -228,45 +228,58 @@ class TableView:  ## formats a json .play file to display missing files or not
     ## looking for the greatest number of .keys() per type and saving it as the type header
     def setupHdrs(self, dlist):
         self.cols = 0  ## just to make sure
-        for typ in self.typelist: ## a list of Typelists - type, hdr, len
+        for typ in self.typelist: ## a list of Typelists - type, hdr, len 
             for tmp in dlist:
                 if tmp['type'] == typ.type:  ## read them all  
                     if len(tmp.keys()) > typ.len:  ## save it to typelist
                         typ.len = len(tmp.keys())
-                        typ.hdr = list(tmp.keys())
+                        typ.hdr = list(tmp.keys())     
                     if len(tmp.keys()) > self.cols:  ## save the most number of columns
                         self.cols = len(tmp.keys()) 
         self.unpackIt(dlist)
     
 ### -------------------------------------------------------- 
     def unpackIt(self, dlist):
-        self.Missingfiles.clear()
         ## unpack dictionary values and save them as a list in data
-        data, save, miss, k, first = [], [],[], 0, ''
-        for tmp in dlist:  
-            for typ in self.typelist:  ## do type header stuff
-                if tmp['type'] == typ.type and typ.type != first:
-                    if first == '':
-                        self.hdr = typ.hdr  ## make this the top header 
-                    else:
-                        data.append(typ.hdr)  ## do this when the type changes 
-                        save.append(k)  ## keep track of hdr row index
-                        k += 1
-                    first = typ.type   
-                    
-            if self.showFiles.fileNotFound(tmp):          
-                miss.append(k) 
-                self.Missingfiles.append(tmp)                
-                                          
-            data.append(list(tmp.values()))  
-            k += 1  ## tracking the row number       
-                          
-        if self.deleteKey == True or self.src in('view', 'table') or len(self.Missingfiles) > 0:
+        data, hdrs, miss, k, first, x = [], [],[], 0, '', []
+     
+        for tmp in dlist:  # add a row column
+            tmp = {'row': 0, **tmp}
+            x.append(tmp)
+        dlist = x;  del x
+        
+        for typ in self.typelist:  ## do type header stuff
+            for tmp in dlist:  
+          
+                if tmp['type'] == typ.type:
+                    if typ.type != first:
+                        if first == '':
+                            self.hdr = typ.hdr  ## make this the top header 
+                            self.hdr.insert(0, 'row')
+                        else:
+                            self.hdr = typ.hdr  ## make this the top header 
+                            self.hdr.insert(0, 'row')
+                            data.append(self.hdr)  ## do this when the type changes 
+                            hdrs.append(k)  ## keep track of hdr row index
+                            k += 1
+                        first = typ.type   
+                             
+                    data.append(list(tmp.values()))  
+                            
+                    if self.showFiles.fileNotFound(tmp):         
+                        miss.append([tmp['fileName'], tmp['z'], k])
+                        
+                    k += 1             
+         
+        if self.deleteKey == True or self.src in('view', 'table') or len(miss) > 0:
             data.append(' ')  ## last line fix
-            self.addTable(data, miss, save) 
-            self.deleteKey == False    
+            self.addTable(data, miss, hdrs) 
+            self.deleteKey == False     
              
-        elif len(self.Missingfiles) == 0 and self.src != 'table':  ## nothing to show 
+            del data, miss, hdrs
+             
+        elif len(miss) == 0 and self.src != 'table':  ## nothing to show 
+            del data, miss, hdrs
             return 
                  
 ### --------------------------------------------------------

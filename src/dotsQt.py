@@ -7,7 +7,7 @@ from PyQt6.QtCore       import QTimer  ### QT_VERSION_STR, PYQT_VERSION_STR
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *   ## including pathMod
-from dotsShared         import common
+from dotsShared         import common, Verts
 
 import dotsStoryBoard   as canvas
 
@@ -80,7 +80,7 @@ class DotsQt(QMainWindow):
     def switch(self, key):  ## from screenMenu in screens
         QApplication.setQuitOnLastWindowClosed(False)
         self.closeAll()
-        if key in ('1102', '1024', '900', '912'): 
+        if key in Verts: 
             self.Vertical = True
         else:
             self.Vertical = False               

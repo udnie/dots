@@ -1,15 +1,15 @@
 
 import random
 import time
-import subprocess
-import sys
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtWidgets    import QApplication
+
                                                  
 from dotsShared         import common, paths
+from dotsSideGig        import constrain
+
 from dotsPixItem        import PixItem
-from dotsSideGig        import MsgBox, constrain
 from dotsMapMaker       import MapMaker
 from dotsVideoPlayer    import VideoPlayer, AVideoWidget
 
@@ -30,6 +30,7 @@ class SideCar:
 ### --------------------------------------------------------
     def transFormPixItem(self, pix, rotation, scale, alpha2):         
         op = QPointF(pix.width/2, pix.height/2)  
+    
         pix.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         pix.setTransformOriginPoint(op)
               
@@ -73,7 +74,7 @@ class SideCar:
         for itm in self.canvas.scene.items():
             if itm.type in ('bkg', 'flat', 'video'):       
                 print(f'{itm.type.strip()}\t{itm.zValue()}\t{itm.fileName}')  
-     
+           
 ### --------------------------------------------------------         
     def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd'  
         if  self.canvas.videoPlayer != None:
@@ -91,8 +92,8 @@ class SideCar:
             elif itm.zValue() > -50:
                 break    
                    
-        self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)    
-        self.scene.addItem(self.canvas.videoPlayer.videoItem)  ## zValue set to cover screen    
+        self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)   
+        self.scene.addItem(self.canvas.videoPlayer.videoItem)  ## zValue set to cover screen  
         QTimer.singleShot(200, self.canvas.videoPlayer.setFrame) 
        
     def videoOff(self):  ## also called from storyboard in clear()
