@@ -13,8 +13,7 @@ from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
 # from PyQt5.QtMultimedia       import QMediaContent  ## 5 
 
 ### ---------------------------- end -------------------------------- ## del
-from dotsSideGig        import getVuCtr
-from dotsSideGig        import MsgBox
+from dotsSideGig        import getVuCtr, MsgBox
 from dotsShared         import common, Ball
 
 ### --------------------------------------------------------
@@ -49,7 +48,7 @@ class VideoPlayer(QMediaPlayer):
 ### ---------------------------- end --------------------------------  ## del
         
         self.videoItem = QVD()   
-        self.videoItem.setZValue(self.canvas.mapper.toFront(100)) 
+        self.videoItem.setZValue(self.canvas.mapper.toFront(100))  ## sets zValue
         
         self.videoItem.setSize(QSizeF(common['ViewW'], common['ViewH']))  
         self.mediaPlayer.setVideoOutput(self.videoItem) 
@@ -110,8 +109,8 @@ class VideoPlayer(QMediaPlayer):
         pix = self.canvas.view.grab(QRect(QPoint(0,0),QSize()))
         self.backdrp = Ball(pix.toImage(), self.canvas)  ## subclass - borrowed
         self.backdrp.setZValue(-100)  ## copy is a graphics pixmapItem 
-        self.scene.addItem(self.backdrp)        
-        self.videoItem.setZValue(-99)  ## reset behind sprites
+        self.scene.addItem(self.backdrp)    
+        self.videoItem.setZValue(-99)  ## reset behind sprites - zval was 100 over topmost sceneitem 
         if self.tag == 'dnd': self.mediaPlayer.play()  
         
     def handleError(self):

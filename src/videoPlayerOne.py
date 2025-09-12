@@ -34,7 +34,7 @@ VHgt = 150  ## starting 'y' in move for verticals
 # from PyQt6.QtMultimedia   import QMediaContent  ## 5
 ### ---------------------------- end --------------------------------
 
-from videoClipsMaker     import Clips
+from videoClipsMaker     import Clips, Ext
 from videoClipsWidget    import *
                     
 ### --------------------------------------------------------
@@ -108,7 +108,7 @@ class VideoPlayer(QWidget):
           
 ### --------------------------------------------------------        
     def init(self):
-        self.key = 'F'
+        self.key = 'F'   ## <<----->> open full frame - 3:2]
         self.path = ''
         self.lastKey = '' 
         self.fileName = ''
@@ -165,12 +165,12 @@ class VideoPlayer(QWidget):
                     self.closeHelpMenu()  ## improvised clear
                     self.mediaPlayer.stop()        
                 case 'D':   
-                    self.clips.openDirectory()  ## if MakeClips True sets path to folder
+                    self.clips.openDirectory()  ## if MakeClipsOn sets path to folder
                 case 'X' | 'Q':
                     self.bye()   
            
  ### --------------------------------------------------------
-    def mousePressEvent(self, e):  ## takes two fingers on a mac and a double-click
+    def mousePressEvent(self, e):  ## takes two fingers on my mac and a double-click
         if e.button() == Qt.MouseButton.RightButton:
             if self.clips.videowidget == None:
                 self.closeHelpMenu() if self.helpFlag == True \
@@ -208,7 +208,11 @@ class VideoPlayer(QWidget):
         self.aspButton.setText("Aspect: " + self.lastKey)
         
     def setAspectRatio(self, fileName=''):  ## if AutoAspect True read video metadata and set aspect ratio 
-        if fileName == '': return 
+        if fileName == '':
+            return 
+        ext = fileName[fileName.rfind('.'):].lower()
+        if ext in Ext:  ## photo not video
+            return
         err, asp, width, height = False, 0, 0, 0
         try:
             width, height = self.getVideoWidthHeight(self.path + '/' + os.path.basename(fileName)) 
@@ -244,7 +248,7 @@ class VideoPlayer(QWidget):
         self.resizeAndMove('O')  ## becomes shared.lastKey 
   
   ### -------------------------------------------------------- 
-    def getVideoWidthHeight(self, path):  ## to detect and set the aspect ratio
+    def getVideoWidthHeight(self, path):  ## to detect and set the aspect ratio  
         ''' requires opencv-python - may not always report width/height correctly 
             for non 9:16 verticals - initial method - not mac specific '''
         # try:  
@@ -259,7 +263,7 @@ class VideoPlayer(QWidget):
         #     return width, height
         # except:
         #     return 0, 0
-  
+
         ''' uses mdls - mac only - reports non 9:16 vertical width and height correctly -- 
         drag and drop doesn't work in pyqt5 on desktop '''   
         # try:  
@@ -354,8 +358,8 @@ class VideoPlayer(QWidget):
 ### --------------------------------------------------------                                                               
     def setFileName(self, fileName):       
         if self.clips.AutoAspect == True and self.clips.MakeClips == False:
-            self.setAspectRatio(fileName)  
-           
+            self.setAspectRatio(fileName)  ## else skip it and open without
+
 ### ------------ uncomment for 6 ... comment out for 5 -----------------     ## del
         self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6  ## source doesn't change even if self.fileName gets truncated
         # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))  ## 5      

@@ -8,18 +8,14 @@ from functools          import partial
 from PyQt6.QtCore       import QTimer
 
 from dotsShared         import common, paths
-from dotsPixItem        import PixItem
+from dotsSideGig        import MsgBox
 
 from dotsBkgMaker       import *
-
 from dotsFrameAndFlats  import Frame
-
-from dotsSideGig        import MsgBox
+from dotsPixItem        import PixItem
 from dotsSideCar        import SideCar 
-
 from dotsShowFiles      import ShowFiles   
 from dotsShowTime       import ShowTime
-
 from dotsTableMaker     import TableView
 from dotsWings          import Wings
 

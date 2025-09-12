@@ -195,7 +195,10 @@ class BkgMaker(QWidget):
            
         self.scene.removeItem(bkg)
         bkg = None
-        self.canvas.btnAddBkg.setEnabled(True)
+        try:
+            self.canvas.btnAddBkg.setEnabled(True)
+        except:
+            None
                                                      
     def lockBkg(self, bkg):
         if bkg and bkg.type == 'bkg':  

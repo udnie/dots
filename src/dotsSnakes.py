@@ -225,6 +225,7 @@ class Snakes:
                         
         pix.x = int(constrain(xy(common['ViewW']), pix.width, common['ViewW'], 
                 pix.width * -common['factor']))
+        
         pix.y = int(constrain(xy(common['ViewH']), pix.height, common['ViewH'],
                 pix.height * -common['factor'])) 
              

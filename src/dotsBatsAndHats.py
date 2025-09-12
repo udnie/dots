@@ -22,6 +22,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
      '960':  'montreaux.jpg',               
     '1080':  'montreaux.jpg', 
     '1280':  'montreaux-1280.jpg',
+     'SQH':  'montreaux.jpg', 
     '108O':  'montreaux.jpg',      
     '1215':  'montreaux.jpg',  
     '1440':  'montreaux-1280.jpg',
@@ -29,7 +30,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1536':  'montreaux-1280.jpg',
     
      '800':  'bats_800.jpg',   ## 3X4
-     'SQR':  'bats_800.jpg',   ## 1X1
+     'SQV':  'bats_800.jpg',   ## 1X1
      '900':  'bats_900.jpg',   ## 2X3
      '912':  'bats_1066.jpg',  ## 9:16
     '1066':  'bats_1066.jpg',
@@ -71,7 +72,7 @@ class Bats:
     def batWings(self):  ## these go to screen and wait to be run
         k = 0   
         bats = 3 
-        apaths = getPathList()        
+        apaths = getPathList()   ## from sideGig
         if apaths == []:
             MsgBox('getPathList: No Paths Found!', 5)
             QTimer.singleShot(200, self.canvas.clear)    
@@ -111,14 +112,15 @@ class Bats:
         pix.setPos(pix.x, pix.y)     
         pix.setScale(.65)   
         
-        if common['Screen'] == '912':
-            pix.tag = 'demo-' + '900' + '.path' 
-        
-        elif common['Screen'] == 'SQR':
-            pix.tag = 'demo-' + '800' + '.path' 
-            
-        else:
-            pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory   
+        match common['Screen']: 
+            case '912':
+                pix.tag = 'demo-' + '900' + '.path' 
+            case 'SQV':
+                pix.tag = 'demo-' + '800' + '.path' 
+            case '960':
+                pix.tag = 'demo-' + '1080' + '.path'  
+            case _:
+                pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory   
                       
         return pix
                                        

@@ -1,6 +1,6 @@
 
 from PyQt6.QtCore       import Qt
-from PyQt6.QtWidgets    import QWidget, QDockWidget, QPushButton, \
+from PyQt6.QtWidgets    import QWidget, QDockWidget, QPushButton, QLabel, \
                                QGroupBox, QHBoxLayout, QVBoxLayout, QLayout
                   
 from dotsShared         import common 
@@ -50,7 +50,7 @@ def addButtonDock(self):
     hbox.addWidget(addPlayBtnGroup(self))
     hbox.addStretch(2) 
     
-    if not self.dots.Vertical:
+    if not self.dots.Vertical and common['Screen'] != 'SQH':
         hbox.addWidget(addBkgBtnGroup(self))
         hbox.addStretch(2) 
         
@@ -106,7 +106,7 @@ def addScrollBtnGroup(self):
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
     self.scrollGroup.setFixedWidth(docks['scrollGrp']) 
 
-    if self.dots.Vertical == False:  ## set in dotsQt    
+    if self.dots.Vertical == False or common['Screen'] == 'SQV':  ## set in dotsQt    
         btnTop = QPushButton("Top")
         btnBottom = QPushButton("Bottom")
         btnClear = QPushButton("Clear")
@@ -218,7 +218,7 @@ def addBkgBtnGroup(self):
     layout.addWidget(self.btnBkgColor)
     layout.addWidget(self.btnSaveFlat) 
 
-    bkg  = self.bkgMaker
+    bkg = self.bkgMaker
 
     self.btnAddBkg.clicked.connect(bkg.openBkgFiles)       
     self.btnSaveFlat.clicked.connect(bkg.saveFlat)
@@ -239,7 +239,7 @@ def addCanvasBtnGroup(self):
     bkg = self.bkgMaker
     pathMaker = self.pathMaker
 
-    if self.dots.Vertical == False:
+    if self.dots.Vertical == False and common['Screen'] != 'SQH':
         btnClrCanvas = QPushButton("Clear")
         self.btnPathMaker = QPushButton("PathMaker")
         btnSnapShot = QPushButton("Shapshot")  
@@ -261,7 +261,7 @@ def addCanvasBtnGroup(self):
         btnExit.clicked.connect(canvas.exit)
         
         self.canvasGroup.setLayout(layout)         
-    else:
+    else: 
         if common['Screen'] in ('1102', '900', '800'):
             self.canvasGroup.setFixedWidth(newWidths['canvasGrp'])
         else:
@@ -279,6 +279,12 @@ def addCanvasBtnGroup(self):
         layout.addWidget(self.btnPathMaker) 
         layout.addWidget(btnExit)
         
+        if common['Screen'] in ('SQH', 'SQV'):
+            label = QLabel(f'{common['Screen']:^9}') 
+            label.setStyleSheet("background-color: '#92f39f'"); label.setFixedHeight(22) 
+            layout.addWidget(label)          
+            self.canvasGroup.setFixedWidth(newWidths['canvasGrp']+100)
+
         btnClrCanvas.clicked.connect(self.clear) 
         self.btnAddBkg.clicked.connect(bkg.openBkgFiles)
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)        

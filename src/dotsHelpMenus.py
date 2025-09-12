@@ -135,6 +135,7 @@ class DemoHelp:
                 MsgBox('Not Implemented for Vertical Format')
                 return            
             self.canvas.bkgMaker.newTracker.clear()
+            
             if key == 'left':  ## direction of travel
                 self.hats.makeHatsDemo('left')  ## right to left 
             else: 
@@ -142,9 +143,11 @@ class DemoHelp:
       
     def runSnakes(self, what): 
         if what in ('blue', 'snakes'): 
-            self.snakes.delSnakes()   
+            self.snakes.delSnakes()  
+             
         if what != '': 
             self.snakes.makeSnakes(what)
+            
         elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
             MsgBox('The Screen Needs to be Cleared to Run Snakes', 6, getCtr(-225,-175))
             return
@@ -172,7 +175,7 @@ class ScreenHelp:  ## screens are from dotsScreens
         self.table = TableWidgetSetUp(60, 95, 60, len(screens)+3)
         self.table.itemClicked.connect(self.clicked)   
         
-        width, height = 222, 516
+        width, height = 222, 546
         self.table.setFixedSize(width, height)
         
         self.table.setRow(0, 0, f'{"Screen Formats":<14}',QL,True,True,3)

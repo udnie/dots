@@ -215,9 +215,12 @@ class StoryBoard(QWidget):
         self.scene.clear() 
         self.helpButton.closeMenus() 
         self.mapper.clearMap() 
-        self.bkgMaker.init()    
-        self.btnAddBkg.setEnabled(True)   
-        self.btnHelp.setEnabled(True)
+        self.bkgMaker.init()   
+        try: 
+            self.btnAddBkg.setEnabled(True)   
+            self.btnHelp.setEnabled(True)
+        except:
+            None
         self.pixCount = 0  ## set it to match showbiz
         self.sideCar.gridGroup = None
         self.openPlayFile = ''

@@ -13,6 +13,7 @@ screens = {  ## used by helpmenus and dots
     '1080': ('1080X720',  '3:2'),
     '1280': ('1280X720', '16:9'), 
   
+     'SQH':  ('800X800',  '1:1'),
     '108O': ('1080X810',  '4:3'),     
     '1215': ('1215X810',  '3:2'),
     '1440': ('1440X810', '16:9'),
@@ -21,7 +22,7 @@ screens = {  ## used by helpmenus and dots
     '1536': ('1536X864', '16:9'),
     
      '800':  ('600X800',  '3:4'),
-     'SQR':  ('800X800',  '1:1'),
+     'SQV':  ('800X800',  '1:1'),
      '900':  ('600X900',  '2:3'), 
      '912':  ('513X912', '9:16'), 
       
@@ -29,7 +30,7 @@ screens = {  ## used by helpmenus and dots
     '1066': ('600X1066', '9:16'),    
     # '1102': ('620X1102', '9:16'),
 }
-      
+          
 ### -------------------- dotsScreens -----------------------
 ''' no class: screen formats and functions '''     
 ### -------------------------------------------------------- 
@@ -49,7 +50,12 @@ def setCommon(format=''):
             common.update(twelve80)  
             common.update(seven20) 
             return screens['1280']  
-        
+          
+        case 'SQH':     ## 800X800 - 1:1
+            common.update(vert)
+            common.update(sqh00)              
+            return screens['SQH'] 
+          
         case '108O':    ## 1080X810 - 4:3  - letter 'O' - 1080 would have been a conflict
             common.update(ten81)    
             common.update(eight10)            
@@ -86,10 +92,10 @@ def setCommon(format=''):
             common.update(six90)              
             return screens['900'] 
         
-        case 'SQR':       ## 800X800 - 1:1
+        case 'SQV':       ## 800X800 - 1:1
             common.update(vert)
-            common.update(square)              
-            return screens['SQR'] 
+            common.update(sqv00)              
+            return screens['SQV'] 
          
         case '912':       ## 513X912 - 9:16
             common.update(vert)
@@ -149,7 +155,7 @@ twelve80 = {    ## 1280X720 - 16:9
     'Screen':   '1280',        
     'DotsW':      1583, 
     'ViewW':      1280,  
-    'gridSize':  26.66,  
+    'gridSize':  32.70,  
     'scaleX':     1.15,
 }
 
@@ -166,11 +172,24 @@ eight10 = {  ## used by both 1215X810 and 140X810px
     'steps':       8, 
 }
 
+sqh00 = {  ## 800X800 - 1:1
+    'Screen':    'SQH',  
+    'DotsW':     1140,
+    'DotsH':      902,   
+    'ViewW':      800, 
+    'ViewH':      800,   
+    'margin1':     10,  
+    'scaleX':    1.05,   
+    'ScrollH':    769,
+    'SliderH':    762, 
+    'gridSize':  32.0,
+}
+
 ten81 = {  ## 1080X810 - 4:3 format 
-    'Screen':   '108O',  
+    'Screen':   '108O',  ## uses letter 'O'
     'DotsW':      1383,   
     'ViewW':      1080,    
-    'gridSize': 28.925, 
+    'gridSize':   30.0, 
     'scaleX':     1.05, 
 }
 
@@ -208,7 +227,7 @@ twelve96 = {
     'Screen':   '1296',  
     'DotsW':     1597,
     'ViewW':     1296,  
-    'gridSize':    30, 
+    'gridSize':    36, 
     'scaleX':   1.123,
 }
 
@@ -240,7 +259,7 @@ six80 = {  ## 600X800  - 3:4
     'margin1':     10,    
     'ScrollH':    767,
     'SliderH':    762, 
-    'gridSize':  30.0,
+    'gridSize':   28.5,
 }
 
 six90 = {  ## 600X900 - 2:3
@@ -255,17 +274,40 @@ six90 = {  ## 600X900 - 2:3
     'gridSize':  30.0,
 }
 
-square = {  ## 800X800 - 1:1
-    'Screen':    'SQR',  
-    'DotsW':      1140,
+sqv00 = {  ## 800X800 - 1:1
+    'Screen':    'SQV',  
+    'DotsW':     1140,
     'DotsH':      902,  
     'ViewW':      800, 
     'ViewH':      800,   
     'margin1':     10,    
-    'ScrollH':    767,
+    'ScrollH':    769,
     'SliderH':    762, 
-    'gridSize':  30.0,
+    'gridSize':  32.0,
+}
 
+nine12 = {  ## 513X912
+    'Screen':    '912',  
+    'DotsW':      860,
+    'DotsH':     1015,  
+    'ViewW':      513, 
+    'ViewH':      912,   
+    'margin1':     10,    
+    'ScrollH':    867,
+    'SliderH':    862, 
+    'gridSize':  28.5,
+}
+
+ten24 = {  ## 576X1024
+   'Screen':    '1024',  
+    'DotsW':      920,
+    'DotsH':     1126,  
+    'ViewW':      576, 
+    'ViewH':     1024,   
+    'margin1':     10,    
+    'ScrollH':    965,
+    'SliderH':    972, 
+    'gridSize':  32.0,
 }
 
 ten66 = {  ## 600X1066 - so it doesn't conflict
@@ -278,30 +320,6 @@ ten66 = {  ## 600X1066 - so it doesn't conflict
     'ScrollH':    965,
     'SliderH':    972, 
     'gridSize':  30.0,
-}
-
-nine12 = {  ## 513X912
-    'Screen':    '912',  
-    'DotsW':      838,
-    'DotsH':     1015,  
-    'ViewW':      513, 
-    'ViewH':      912,   
-    'margin1':     10,    
-    'ScrollH':    867,
-    'SliderH':    862, 
-    'gridSize':  28.5,
-}
-
-ten24 = {  ## 576X1024
-   'Screen':    '1024',  
-    'DotsW':      895,
-    'DotsH':     1126,  
-    'ViewW':      576, 
-    'ViewH':     1024,   
-    'margin1':     10,    
-    'ScrollH':    965,
-    'SliderH':    972, 
-    'gridSize':  32.0,
 }
 
 six20 = {   ## 1102 - must be a string not a number

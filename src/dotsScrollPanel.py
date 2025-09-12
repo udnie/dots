@@ -145,7 +145,7 @@ class ScrollPanel(QWidget):
         if common['Screen'] in ('912','1102','1024'):
             self.setContentsMargins(10,0,0,0) 
             
-        elif common['Screen'] in ('800','900','SQR', '1066'):  ## 600 width
+        elif common['Screen'] in ('800','900','SQV','1066','SQH'):  ## 600 width
             self.setContentsMargins(15,0,0,0) 
      
         else:

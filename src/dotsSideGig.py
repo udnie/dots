@@ -79,7 +79,7 @@ class Grid:  ## moved from sideCar
 ### -------------------------------------------------------                                        
     def toggleGrid(self):
         self.removeGrid() if self.gridSet == True else self.addGrid()
-     
+ 
     def addGrid(self):   
         self.gridSet = True 
         gs = common['gridSize']

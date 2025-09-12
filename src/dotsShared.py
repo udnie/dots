@@ -82,7 +82,7 @@ PathStr = "B,C,D,E,H,L,N,M,P,R,S,T,U,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cm
 
 PlayKeys = ('A','C', 'D','G','J','K','L','M','N','O','P','R','S','U','V','W','Y','X','space') 
 
-Verts = ('800','SQR', '900','912','1024','1066','1102')
+Verts = ('800','SQV', '900','912','1024','1066','1102')
 
 ## use this and make sure your editor points to the right directory
 paths = {          

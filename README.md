@@ -6,7 +6,7 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 
 **August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.
 
-You'll need to install **opencv-python** if you plan to use **Shadows** - **numpy** is included.   I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  
+You'll need to install **opencv-python 4.12** or above to run **VideoPlayerOne/VideoClipsMaker** - **numpy** is included. Doing so makes it an easy edit to turn on **Shadows** in **dots**.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  
 
 
 	  
@@ -25,9 +25,9 @@ The **star** in scrollPanel isn't currently designed to be dragged to the canvas
 ## Requirements
 * **PyQt6**, **PyQt5** or **PySide6** -- see **Start Here**
 * **Python 3.10** or above for walrus operators and async
-* There are two scripts that require a unix/linux shell, bash or zsh, and sed 
+* There are two scripts that require a **unix/linux shell, bash or zsh, and sed** 
 * functools, though I'm sure it's built-in
-* **opencv-python** if you're planning to use **Shadows**, **ShadowMaker** or **videoPlayerOne**, it includes **numpy**
+* **opencv-python 4.12** or above
 * Your favorite program for creating transparent pngs if you have one or try **ShadowMaker** 
 
 ## Lastly

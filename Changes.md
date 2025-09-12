@@ -1,14 +1,18 @@
 ## Changes: 
 
-See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**.  There are **scripts** in the **/src** directory both in python and those that require a **linux/unix shell** and the **sed** command that will take care of the conversion for you.
+See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**.  There are **scripts** in the **/src** directory both in python and those that require a **linux/unix shell** and the **sed** command to take care of the conversions for you.
 
 ---
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
 
 ---
+**September 12 2025**  
+I've added another square screen, this one runs horizontal scrolling backgrounds and along with it an added label to mark the differences, **'SQH'** for horizontal and **'SQV'** for vertical - renamed from **'SQR'**, plus changes and retesting of screens and demos.  
+
+
 **September 3 2025**  
-VideoPlayerOne now has some company as I've added videoClipsMaker and videoClipsWidget to the mix. ClipsMaker came about as a result of finding some video I had made a few years earlier which was based on reading a directory of photos and assembling them into a stop-motion video.  I had read somewhere that the app I had used to make the videos was no longer being updated and I wondered if I could replicate it using openCV.  
+**VideoPlayerOne** now has some company as I've added **videoClipsMaker** and **videoClipsWidget** to the mix. ClipsMaker came about as a result of finding some video I had made a few years earlier which was based on reading a directory of photos and assembling them into a stop-motion video.  I had read somewhere that the app I had used to make the videos was no longer being updated and I wondered if I could replicate it using openCV.  
 
 ClipsMaker started out as a stand-alone app and it soon became apparent that it needed an easy way to display its output and so it made sense to use what was already in videoPlayerOne and not create another version of it in clipsMaker. Its output is a '.mov' file to the working directory as directory name '.mov' and appears in the window title bar as a reminder as well. 
   

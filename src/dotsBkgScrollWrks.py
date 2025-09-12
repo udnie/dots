@@ -62,9 +62,11 @@ class BkgScrollWrks:
         if self.bkgItem.direction == 'right' and rate[2] != self.bkgItem.rate:
             rate[2] = self.bkgItem.rate
             test = True
+            
         elif self.bkgItem.direction == 'left' and rate[1] != self.bkgItem.rate:
             rate[1] = self.bkgItem.rate
-            test = True        
+            test = True      
+              
         elif self.bkgItem.direction == 'vertical' and rate[1] != self.bkgItem.rate:
             rate[1] = self.bkgItem.rate
             test = True  
@@ -91,9 +93,11 @@ class BkgScrollWrks:
             with open(paths['playPath'] +  "screenrates.dict", 'w') as fp:  
                 json.dump(self.bkgMaker.screenrate, fp)
             MsgBox('Rates Dictionary Updated' ,5)
+            return
         except:
             MsgBox('Error Updating Rates Dictionary', 5)
-        return 
+            return
+      
      
 ### --------------------------------------------------------
     ## snakes need more time - the rest vary to build and position and comes before vertical  
@@ -103,12 +107,14 @@ class BkgScrollWrks:
             return show   
         show = 0
         if 'snakes' in self.bkgItem.fileName and self.bkgItem.direction != 'vertical':
-            show = showtime['snakes']   
-            
+            show = showtime['snakes']    
+                 
         elif self.bkgItem.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge
-            show = showtime['vertical']       
+            show = showtime['vertical']     
+              
         elif self.bkgItem.direction == 'left':   
             show = showtime['left']
+            
         elif self.bkgItem.direction == 'right':  
             show = showtime['right']                                             
         return show

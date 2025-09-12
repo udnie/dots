@@ -318,8 +318,8 @@ class VideoWidget(QWidget):
         groupBox.setFixedHeight(260)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
       
-        self.aspBtn = QPushButton('AutoAspect')
-        if self.clips.AutoAspect == True:
+        self.aspBtn = QPushButton('AutoAspect')   ## buttons true/false set in clipsmaker
+        if self.clips.AutoAspect == True: 
             self.aspBtn.setText('AutoAspectOn')
         
         self.clpsBtn = QPushButton('MakeClips') 
@@ -403,7 +403,21 @@ class VideoWidget(QWidget):
     # except Exception:
     #     return 0, 0 
          
-        
+    ''' requires opencv-python - may not always report width/height correctly 
+        for non 9:16 verticals - initial method - not mac specific '''
+    # try:  
+    #     import cv2  ## <<---------------------  
+    #     try:
+    #         cap = cv2.VideoCapture(path) 
+    #     except:
+    #         return 0,0
+    #     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    #     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    #     cap.release()
+    #     return width, height
+    # except:
+    #     return 0, 0
+
     ''' uses ffprobe -- may not always report width/height correctly for non 9:16 verticals
         and blows up if run from mac desktop -- works well in vscode '''
     # try: 
