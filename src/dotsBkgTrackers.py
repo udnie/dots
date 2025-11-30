@@ -80,7 +80,7 @@ class Trackers(QWidget):
         x, y = getVuCtr(self.canvas)
         pos = QPoint(x, int(y - (self.height/2)))
         
-        self.move(int(pos.x()-self.width/2), int(pos.y())-50)
+        self.move(int(pos.x()-(self.width/2)), int(pos.y())-50)
           
         self.createTable(dump)
  

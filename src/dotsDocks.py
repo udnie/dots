@@ -7,19 +7,19 @@ from dotsShared         import common
    
 docks = {
     "fixedHgt":     82, 
-    "scrollGrp":  320,  
-    "playGrp":    320,
+    "scrollGrp":  310,  
+    "playGrp":    375,
     "backGrp":    195,
-    "canvasGrp":  325,
+    "canvasGrp":  335,
     "spacer":      10,  ## forces buttons closer together
 }
 
 newWidths = {     ## if vertical 1102, 912, 1024
     "fixedHgt":     70, 
     "scrollGrp":  200,  
-    "playGrp":    350,
+    "playGrp":    360,
     "canvasGrp":  300,
-    "spacer":      7,  ## forces buttons closer together
+    "spacer":      5,  ## forces buttons closer together
 }
 
 vert900 = {   ## vertical 900, 800
@@ -101,11 +101,9 @@ def addKeysDock(self):
 
 ### --------------------------------------------------------  
 def addScrollBtnGroup(self):  
-    self.scrollGroup = QGroupBox("Scroll Panel")  ## just that
-    
+    self.scrollGroup = QGroupBox("Scroll Panel")  ## just that  
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-    self.scrollGroup.setFixedWidth(docks['scrollGrp']) 
-
+        
     if self.dots.Vertical == False or common['Screen'] == 'SQV':  ## set in dotsQt    
         btnTop = QPushButton("Top")
         btnBottom = QPushButton("Bottom")
@@ -113,14 +111,14 @@ def addScrollBtnGroup(self):
         btnLoad = QPushButton("Sprites")
         btnStar = QPushButton("Star")
 
-        layout = QHBoxLayout()
-            
+        layout = QHBoxLayout()      
         layout.addWidget(btnTop)
         layout.addWidget(btnBottom)
         layout.addWidget(btnClear)
         layout.addWidget(btnLoad)
-        layout.addWidget(btnStar)
-        
+        if common['Screen'] != '960':
+            layout.addWidget(btnStar)
+                
         panel = self.scroll  ## make it easier to type
             
         btnTop.clicked.connect(panel.top)
@@ -128,6 +126,12 @@ def addScrollBtnGroup(self):
         btnClear.clicked.connect(panel.clear)
         btnLoad.clicked.connect(panel.loadSprites)
         btnStar.clicked.connect(panel.Star)
+        
+        if common['Screen'] != '960':
+            self.scrollGroup.setFixedWidth(docks['scrollGrp']) 
+        else:
+            w = docks['scrollGrp'] - 45
+            self.scrollGroup.setFixedWidth(w)
     
         self.scrollGroup.setLayout(layout)
     else:   
@@ -173,6 +177,7 @@ def addPlayBtnGroup(self):
     btnLoad  = QPushButton("Load")
     self.btnRun   = QPushButton("Run")  
     self.btnPause = QPushButton("Pause")
+    self.btnLoop  = QPushButton("Loop")
     self.btnStop  = QPushButton("Stop")
     self.btnSave  = QPushButton("Save")
     self.btnHelp  = QPushButton("Help") 
@@ -182,6 +187,7 @@ def addPlayBtnGroup(self):
     layout.addWidget(btnLoad)  
     layout.addWidget(self.btnRun)      
     layout.addWidget(self.btnPause)
+    layout.addWidget(self.btnLoop)
     layout.addWidget(self.btnStop)
     layout.addWidget(self.btnSave)
     layout.addWidget(self.btnHelp)
@@ -193,6 +199,7 @@ def addPlayBtnGroup(self):
     btnLoad.clicked.connect(showbiz.showRunner.loadPlay)
     self.btnRun.clicked.connect(showtime.run)  ###  was --- lambda: self.canvas.setKeys('R'))  
     self.btnPause.clicked.connect(showtime.pause)
+    self.btnLoop.clicked.connect(self.canvas.sideCar.looper) 
     self.btnStop.clicked.connect(showtime.stop)
     self.btnSave.clicked.connect(showtime.savePlay) 
     self.btnHelp.clicked.connect(helpBtn.openMenus) 

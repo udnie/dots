@@ -108,13 +108,13 @@ class PixHelp:
                 
         if self.switch != 'pix':
             if off != 0: x += off
-            x = int(x - width/2)  
+            x = int(x - (width/2)) 
         else: 
             b = self.pixitem.boundingRect()
             width = int(b.width() + 20)
             x = int(off + width)
      
-        y = int(y - height/2)  ## default
+        y = int(y - (height/2))  ## default
      
         self.table.move(x, y)     
         self.table.show()  
@@ -169,7 +169,7 @@ class BkgHelp:
         x, y = getVuCtr(self.bkgItem.canvas)  
         if off != 0: x += off  
         
-        self.table.move(int(x - width /2), int(y - height /2)+10)    
+        self.table.move(int(x - (width /2)), int(y - (height /2))+10)    
         self.table.show()
   
     def clicked(self):
@@ -230,8 +230,8 @@ class ShadowHelp:
 
         if self.switch != '':   ## help 
             if off != 0: x += off
-            x = int(x - width /2) 
-            y = int(y - height /2) 
+            x = int(x - (width /2)) 
+            y = int(y - (height /2)) 
         else:
             self.maker.shadow = parent.shadow
             x, _ = self.maker.getXY()  ## move it to the right one width +

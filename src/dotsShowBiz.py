@@ -67,17 +67,16 @@ class ShowBiz:
         elif len(self.scene.items()) > 0:   
 ### --------------------------------------------------------    
     ## animations running
-### --------------------------------------------------------      
-            if self.canvas.control != '' or self.canvas.animation == True:       
-                if key in ('P', 'S', 'space'): 
-                    match key:
-                        case 'P': 
-                            self.mapper.tagsAndPaths.togglePaths()                                                                                    
-                        case 'S':
-                            self.showtime.stop()                                                                                               
-                        case 'space': ## pause/resume
-                            self.sideCar.pause() 
-                                                                
+### --------------------------------------------------------               
+            if key in ('P', 'S', 'space') and self.canvas.control != '' or self.canvas.animation == True: 
+                match key:
+                    case 'P': 
+                        self.mapper.tagsAndPaths.togglePaths()                                                                                    
+                    case 'S':
+                        self.showtime.stop()                                                                                               
+                    case 'space': ## pause/resume
+                        self.sideCar.pause() 
+                                                  
 ### --------------------------------------------------------    
     ## no animations running - from storyboard menu
 ### --------------------------------------------------------  
@@ -94,10 +93,8 @@ class ShowBiz:
                         case 'L':                   ## load a .play file
                             self.showRunner.loadPlay()         
                         case 'M':
-                            if self.scene.selectedItems() or self.sideCar.hasHiddenPix():
-                                self.mapper.toggleMap()  
-                            else:
-                                self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
+                            self.mapper.toggleMap() if self.scene.selectedItems() or self.sideCar.hasHiddenPix() \
+                                else self.helpButtons.openMenus()  ## shows storyboard if nothing mapped
                         case 'N':
                             self.helpMaker.menuHelp()  ## called from help menus to avoid 'M' conflicts
                         case 'O':
@@ -108,17 +105,16 @@ class ShowBiz:
                         case 'U':                           ## unselect for storyBoard
                             self.sideCar2.unSelect()            
                         case 'V':
-                            if self.canvas.videoPlayer != None:     ## the video widget
-                                self.sideCar.addVideoWidget() \
-                                    if self.canvas.videoPlayer.widget == None else \
-                                        self.sideCar.closeVideoWidget()
+                            if self.canvas.videoPlayer != None:     ## delete video
+                                self.canvas.videoPlayer.ask2deleteVideo() 
                         case 'W':              
                             self.sideCar.clearWidgets() 
     
 ### --------------------------------------------------------                      
     ## canvas single key commands - no screenitems
 ### --------------------------------------------------------  
-        elif len(self.scene.items()) == 0:      
+        elif len(self.scene.items()) == 0:    
+              
             if self.demoAvailable:  ## always clear unless deleted
                 self.canvas.clear()  
             if key in ('A', 'D', 'J', 'L', 'M', 'P', 'S'):                 

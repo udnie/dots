@@ -4,9 +4,21 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 
 ---
            
-Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.        
+Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
+
+     
 
 ---
+
+**November 29 2025**   
+Using a **Shift-B** hides or shows the **slideShow** button group while a **Shift-F** toggles the window title bar off and on. See the July 5th entry for adjusting the look of slideShow.  Loops will work in **dotsVideoPlayer** and **PyQt5** as long as shadows aren't present.  **VideoPlayerOne** now can be resized by simply dragging down or up from the bottom of the app or from the bottom corners - the top and its corners have not been touched - they'll do something. A **Shift-S** will toggle the slider off and on (visible).
+
+**VideoPlayerTwo** came about as a way to try things out without causing undue harm and is a mix of **dotsVideoPlayer** and **VideoPlayerOne**. It differs in that it uses a **GraphicsVideoItem** rather than a **VideoWidget** used by **videoPlayerOne**. All three videoPlayers now share a common **MediaPlayer** class and have been overhauled to eliminate a range of no-longer needed comments having to do with maintaining the differences between a PyQt5 mediaPlayer and one for PyQt6.  There are now only six lines of PyQt6 and five lines of PyQt5 that may be affected when converting one to the other.
+ 
+New video:  <https://youtu.be/ydgb43BSDv8>
+
+---
+
 **September 12 2025**  
 I've added another square screen, this one runs horizontal scrolling backgrounds and along with it an added label to mark the differences, **'SQH'** for horizontal and **'SQV'** for vertical - renamed from **'SQR'**, plus changes and retesting of screens and demos.  
 

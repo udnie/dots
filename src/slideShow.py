@@ -20,15 +20,13 @@ SetY = 175      ## Y position of slideShow
 Hpad = 60       ## padding for buttons added to height
 CutOff = 550    ## when to stop showing text 
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
-
-Buttons   = True   ## true adds setButtons to layout
-Frameless = False  ## sets windowhint to frameless - see comment on qt5 and frameless
+ 
 OneColor  = False  ## sets frame same as background
 
 ### --------------------------------------------------------
 Width, Height     = 1200,  750   ## choose one you like and delete the rest
-ViewW, ViewH      = 1150,  700
-MaxW, MaxH, MaxV  =  950,  500, 550 
+ViewW, ViewH      = 1150,  700   ## starting viewport
+MaxW, MaxH, MaxV  =  950,  500, 550 ## max image size within the ViewW/H
 
 # Width, Height     = 1500, 1000  ## widget size  
 # ViewW, ViewH      = 1450,  950  ## scene size
@@ -52,14 +50,16 @@ helpMenuKeys = {  ## help menu - 'H' or button
     'O':                'Opening Layout',
     'R, L':             'Rotate 90.0',
     'S, SpaceBar':      'Slide Show',
-    'T':                'Text On/Off',   
+    'T':                'Text On/Off',  
     'W':                'Where am I?', 
-    '>,  +,  ]':          'Scale Up',
-    '<,  _,  [':          'Scale Down',
+    '>,  +,  ]':        'Scale Up',
+    '<,  _,  [':        'Scale Down',
+    'Shift-B':          'Buttons Show/Hide', 
+    'Shift-F':          'Frameless Hint', 
     'X, Q, Escape':     'Quit/Exit',
 }
 
-SharedKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']')
+SharedKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-B','Shift-F')
 
 ### --------------------- slideShow.py ---------------------
 ''' slideShow.py: reads .png, .jpg, .jpeg, .tif, .tiff, and .webp.
@@ -74,7 +74,10 @@ class SlideShow(QWidget):
             
         self.view = QGraphicsView(self)
         self.scene = QGraphicsScene(0, 0, ViewW, ViewH)
-         
+        
+        self.setMinimumHeight(350);   self.setMinimumWidth(350)
+        self.setMaximumHeight(1200);  self.setMaximumWidth(1850)
+        
         self.view.setScene(self.scene)                 
 
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)     
@@ -84,46 +87,45 @@ class SlideShow(QWidget):
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus);  self.setFocus()
-        
-        self.ctr = QGuiApplication.primaryScreen().availableGeometry().center()    
-        x = int(((self.ctr.x() * 2 ) - Width)/2)
-     
+
         if OneColor:   ##  makes widget one color
             self.setStyleSheet("QWidget {\n" 
                 "background-color: rgb(250,250,250);\n"
                 "border: 1px solid rgb(250,250,250);\n"
                 "color: rgb(250,250,250);\n"      
                 "}")
+          
+        self.init()  ## default True, add False to hide
         
         ## in qt5 framelessWindow won't resize with mouse - use zoom keys instead
-        if Frameless:  ## set WindowHint to Frameless
+        if self.frameHidden:  ## set WindowHint to Frameless
             self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-   
-        H = Height
-        if Buttons: H = Height + Hpad
-        self.setGeometry(x, SetY, Width, H)  
-  
-        self.init()
+
+        self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
+        x = self.ctr.x() - int(Width/2) 
         
+        if self.buttonsVisible: H = Height + Hpad
+        self.setGeometry(x, SetY, Width, H)  
+          
         self.delay   = 2000  ## slide show timer
         self.setTags = True  ## toggle textItems on/off
   
         vbox = QVBoxLayout()      
         vbox.addWidget(self.view)
-        if Buttons: vbox.addWidget(self.setButtons())  ## true adds setButtons to layout
+        if self.buttonsVisible: vbox.addWidget(self.setButtons())  ## default if True adds setButtons to layout
         self.setLayout(vbox)
     
         self.grabKeyboard()
         
-        QTimer.singleShot(25, self.fileChooser) if Buttons == False else \
-              QTimer.singleShot(25, self.openFiles)
+        QTimer.singleShot(25, self.fileChooser) if self.buttonsVisible == False else \
+              QTimer.singleShot(25, self.openFiles)  ## current directory or command line
 
         self.show()
              
 ### --------------------------------------------------------
-    def init(self):  ## on each new directory
+    def init(self, buttons=True):  ## on each new directory
         self.files       = []   
-        self.txtlst     = []
+        self.txtlst     = ''
         self.rotters    = {}
         self.fileName    = ''
         self.path       = Path
@@ -135,31 +137,42 @@ class SlideShow(QWidget):
         self.textItem   = None
         self.helpMenu   = None
         self.helpFlag   = False
+        self.buttonsVisible = buttons
+        self.frameHidden = False  
+        self.aspect  = 0.0
+        self.saveW = 0
+        self.saveH = 0
  
 ### --------------------------------------------------------
     def keyPressEvent(self, e):  
         key = e.key()
         mod = e.modifiers()  
-           
+  
         if key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
-            self.shared('X')
+            self.shared('X')       
             
         elif key in (Qt.Key.Key_N, Qt.Key.Key_Right):
-            self.shared('N')   
+            self.shared('N')        
+            
+        elif key == Qt.Key.Key_B and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.toggleButtons() 
+            
+        elif key == Qt.Key.Key_F and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.toggleFrameless()  
             
         elif  key in (Qt.Key.Key_B, Qt.Key.Key_Left):
-            self.shared('B')   
+            self.shared('B')      
             
         elif key == Qt.Key.Key_Space:
-            self.shared('Space')
+            self.shared('Space')  
             
         elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
-                self.shared(']')
+                self.shared(']')          
                 
         elif key == Qt.Key.Key_BracketLeft or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Less, Qt.Key.Key_Underscore):
-                self.shared('[')                    
+                self.shared('[')                                 
         else: 
             try:
                 key = chr(key) 
@@ -188,6 +201,10 @@ class SlideShow(QWidget):
                 self.slideShow()    
             case 'T':
                 self.toggleText()   
+            case 'Shift-B':
+                self.toggleButtons()
+            case 'Shift-F':
+                self.toggleFrameless()
             case 'W':
                 if self.path != '': self.msgbox(self.path)        
             case 'X':
@@ -203,10 +220,8 @@ class SlideShow(QWidget):
 ### --------------------------------------------------------          
     def mousePressEvent(self, e):
         self.save = e.globalPosition()  
-        if e.button() == Qt.MouseButton.RightButton:
-            self.openHelpMenu() 
-        else:
-            self.closeHelpMenu()
+        self.openHelpMenu() if e.button() == Qt.MouseButton.RightButton \
+            else self.closeHelpMenu()
         e.accept()
 
     def mouseMoveEvent(self, e):
@@ -237,11 +252,15 @@ class SlideShow(QWidget):
             self.msgbox('addPixMap: problem with ' + file)
             return
       
-        self.scaleW = self.view.width()/ViewW
+        self.scaleW = self.view.width()/ViewW  ## how width and height vary from ViewW/H
         self.scaleH = self.view.height()/ViewH   
-                
+        
         maxH = MaxH   
-        self.txtlst = [file, img.width(), img.height()]  ## save it for textItem
+        self.txtlst = file
+         
+        self.saveW, self.saveH = img.width(), img.height()
+        self.aspect = math.floor((img.width()/img.height()) * 100)/100.0
+   
         if rot := self.rotters.get(file): 
             self.rot = rot
                                            
@@ -256,17 +275,17 @@ class SlideShow(QWidget):
             img = img.scaled(int(MaxW * self.scaleW), int(maxH * self.scaleH),
                 Qt.AspectRatioMode.KeepAspectRatio,       
                 Qt.TransformationMode.SmoothTransformation)  
-          
+
         self.pixItem = QGraphicsPixmapItem()          
         self.pixItem.setPixmap(QPixmap(img))  
         
         self.pixItem.setZValue(0)
-        self.pixItem.setPos(self.pixXY())
+        self.pixItem.setPos(self.centerPixItem())
         
         self.setOrigin()             
         self.pixItem.setRotation(self.rot) 
         self.pixItem.setScale(1.0)
-        
+     
         self.scene.addItem(self.pixItem)
         if self.setTags == True and self.view.height() > CutOff:   
             self.addTextItem()           
@@ -277,16 +296,18 @@ class SlideShow(QWidget):
     def openHelpMenu(self):
         if self.helpFlag == True:
             self.closeHelpMenu()
+            self.helpFlag = False  
         else:
             self.helpMenu = Help(self)
             self.helpFlag = True
-            
+  
     def closeHelpMenu(self):
         if self.helpMenu != None: 
             self.helpMenu.tableClose()
-            self.helpMenu.close()   
-     
-    def pixXY(self):     
+            self.helpMenu.close() 
+            self.helpFlag = False  
+   
+    def centerPixItem(self):  ## center within view which can change
         self.setScene()                                                                                                                                                                       
         x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
         y = int((self.view.height() - self.pixItem.boundingRect().height())/2)   
@@ -310,12 +331,12 @@ class SlideShow(QWidget):
             self.pixItem.setScale(self.scaleW)  
             self.addPixmap(self.files[self.current])   
         e.accept()       
-                 
+           
     def openingLayout(self):
         if self.pixItem != None:
             self.setScene() 
-            x, H = int(((self.ctr.x() * 2 ) - Width)/2), Height
-            if Buttons: H = Height + Hpad
+            x, H = int(((self.ctr.x() * 2 ) - (Width)/2)), Height
+            if self.buttonsVisible: H = Height + Hpad
             self.setGeometry(x, SetY, Width, H) 
             self.addPixmap(self.files[self.current])  ## refresh  
        
@@ -325,7 +346,7 @@ class SlideShow(QWidget):
             r = r + self.rot
             if r > 270: r = 0
             self.rot = r
-            self.rotters[self.txtlst[0]] = self.rot 
+            self.rotters[self.txtlst] = self.rot  ## seems to work
             self.addPixmap(self.files[self.current])  ## refresh  
                                  
     def nextSlide(self):
@@ -363,10 +384,7 @@ class SlideShow(QWidget):
         w, W = self.textItem.boundingRect().width(),  int(self.width())  
         h, H = self.textItem.boundingRect().height(), int(self.height()) 
         x, y = int((W - w)/2), int(H-h)
-        if Buttons: 
-            y = y - 105
-        else:
-            y = y - 50
+        y = self.height() - 140 if self.buttonsVisible else self.height() - 80
         return QPointF(x-15, y)
     
     def updTextItem(self):
@@ -376,7 +394,7 @@ class SlideShow(QWidget):
     
     def tagIt(self):   
         try:
-            file, width, height = self.txtlst[0], self.txtlst[1], self.txtlst[2]   
+            file, width, height = self.txtlst, self.saveW, self.saveH   
             asp = math.floor(width/height *100)/100.0  
         except:
             self.msgbox('tagIt: problem with ' + file)
@@ -400,7 +418,26 @@ class SlideShow(QWidget):
                 self.scene.removeItem(self.textItem)
                 self.textItem = None
                 self.setTags = False
-                    
+                
+    def toggleButtons(self):
+        if self.buttonsVisible:
+            self.buttonGroup.hide()
+            self.buttonsVisible = False
+            self.resize(self.width(), self.height()-Hpad)
+        elif self.buttonsVisible == False:
+            self.buttonGroup.show()
+            self.buttonsVisible = True
+            self.resize(self.width(), self.height()+Hpad)
+    
+    def toggleFrameless(self):  ## google prompt
+        if self.frameHidden:
+            self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
+            self.frameHidden = False
+        else:
+            self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
+            self.frameHidden = True
+        self.show()
+                              
 ### --------------------------------------------------------         
     def clearScene(self):
         self.closeHelpMenu()
@@ -506,6 +543,7 @@ class SlideShow(QWidget):
         self.quitBtn.clicked.connect(lambda: self.shared('X'))
         
         hbox = QHBoxLayout(self)
+        
         hbox.addSpacing(50)       
         hbox.addWidget(self.filesBtn)
         hbox.addSpacing(50)        
@@ -554,7 +592,7 @@ class Help(QWidget):
         self.table.setColumnWidth(0, 130) 
         self.table.setColumnWidth(1, 140)
 
-        width, height = 277, 451  
+        width, height = 277, 511  
         self.table.setFixedSize(width, height)  
         
         self.table.verticalHeader().setVisible(False) 
@@ -603,13 +641,13 @@ class Help(QWidget):
             case '<,  _,  [':  
                 help = '['
             case 'X, Q, Escape':
-                help = 'X'     
+                help = 'X'    
         if help in SharedKeys:
             try:
                 QTimer.singleShot(25, partial(self.parent.shared, help))
             except:
                 None
-        self.tableClose()
+        self.parent.closeHelpMenu()
             
     def tableClose(self):
         self.parent.helpFlag = False 
@@ -622,8 +660,8 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ---------------------- that's all ----------------------
-    
 
- 
 
-     
+
+
+

@@ -189,19 +189,15 @@ class Snakes:
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
             
         elif what == 'vertical':
-            if common['Screen'] == '1102':
-                self.scroller = BkgItem(paths['demo'] + 'snakes_1102.jpg', self.canvas) 
-            else:
-                self.scroller = BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)
-                
+            
+            self.scroller = BkgItem(paths['demo'] + 'snakes_1102.jpg', self.canvas) if common['Screen'] == '1102' \
+                else BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)    
+                 
             self.scroller.direction = 'vertical'   
             self.scroller.path = paths['demo'] 
             self.scroller.tag = 'scroller'
             
-            if common['Screen'] in ('800','900', '1066'):
-                self.scroller.mirroring = False
-            else:
-                self.scroller.mirroring = True     
+            self.scroller.mirroring = False if common['Screen'] in ('800','900', '1066') else True
                 
             self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)

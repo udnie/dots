@@ -90,7 +90,7 @@ class Grid:  ## moved from sideCar
         for x in range(1, int(common['ViewW']/gs)):
             self.addLines(QGraphicsLineItem(gs*x, 0.0,
                 gs*x, float(common['ViewH'])), pen)
-        
+  
     def addLines(self, line, pen):
         line.type = 'grid'
         line.setPen(pen)
@@ -258,6 +258,8 @@ def tagBkg(bkg, pos):
     bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
     
 ### --------------------- dotsSideGig ----------------------
-  
+   
+   
+
   
         

@@ -96,9 +96,10 @@ class ShowTime:
             
         if self.canvas.videoPlayer != None: 
             self.canvas.videoPlayer.playVideo()
-            if k == 0: self.showWorks.disablePlay()
-                
-### --------------------------------------------------------                                 
+            if k == 0: 
+                self.showWorks.disablePlay()
+               
+### -------------------------------------------------------                                 
     def pause(self):
         self.mapper.clearPathsandTags()  
         if self.canvas.control == 'resume':

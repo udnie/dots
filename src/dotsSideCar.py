@@ -11,11 +11,11 @@ from dotsSideGig        import constrain
 
 from dotsPixItem        import PixItem
 from dotsMapMaker       import MapMaker
-from dotsVideoPlayer    import VideoPlayer, AVideoWidget
+from dotsVideoPlayer    import VideoPlayer
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
-    videoWidget, toggles, small functions and a few from showbiz '''   
+    toggles, small functions and a few from showbiz '''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -74,49 +74,60 @@ class SideCar:
         for itm in self.canvas.scene.items():
             if itm.type in ('bkg', 'flat', 'video'):       
                 print(f'{itm.type.strip()}\t{itm.zValue()}\t{itm.fileName}')  
-           
+                                       
 ### --------------------------------------------------------         
-    def addVideo(self, fileName, src='', loops=1):  ## plays if 'dnd'  
+    def addVideo(self, fileName, src='', loops=False):  ## plays if 'dnd'  
         if  self.canvas.videoPlayer != None:
             self.videoOff()
-                     
+             
         if src == 'dnd' and self.canvas.control == '':
             self.canvas.showWorks.disablePlay()  ## enables pause/resume/stop   
             self.canvas.control = ''  ## otherwise it won't run
+            
         elif self.canvas.pathMakerOn == True:  ## no animation
              self.canvas.showWorks.enablePlay()
                   
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):  
-            if itm.type in ('bkg', 'flat'):  ## make room for videowidget and backdrop
+            if itm.type in ('bkg', 'flat'):  ## make room for videoplayer and backdrop
                 itm.setZValue(itm.zValue()-1)  
             elif itm.zValue() > -50:
                 break    
                    
         self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)   
         self.scene.addItem(self.canvas.videoPlayer.videoItem)  ## zValue set to cover screen  
-        QTimer.singleShot(200, self.canvas.videoPlayer.setFrame) 
-       
+        QTimer.singleShot(300, self.canvas.videoPlayer.setBackDrop) 
+    
+    def looper(self):
+        if self.canvas.videoPlayer != None:  
+            if self.canvas.videoPlayer.loopSet == False:   
+                self.canvas.videoPlayer.loopSet = True
+                self.canvas.btnLoop.setText('LoopOn')
+            else:
+                self.canvas.videoPlayer.loopSet = False
+                self.canvas.btnLoop.setText('Loop')
+                self.canvas.btnStop.setEnabled(True)
+                self.canvas.videoPlayer.stopVideo()
+                if self.canvas.control != '':   ## animation running
+                    self.canvas.showbiz.showtime.stop()
+         
     def videoOff(self):  ## also called from storyboard in clear()
         if  self.canvas.videoPlayer == None:
             return 
-            
-        self.closeVideoWidget()  ## the pop-up  
-        time.sleep(.10)
-        
+        self.canvas.videoPlayer.loopSet = False
         self.canvas.videoPlayer.stopVideo()  ## very process intensive
         self.canvas.videoPlayer = None 
-        time.sleep(.20)  
+        self.canvas.showWorks.enablePlay()
+        self.canvas.btnLoop.setText('Loop')
+        time.sleep(.20) 
+        self.removeSceneItems() 
                   
+    def removeSceneItems(self):              
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
             if itm.type in ('video', 'ball'):
                 self.scene.removeItem(itm)
                 del itm 
             elif itm.zValue() > -50:
                 break   
-             
-        self.nextbit()
-             
-    def nextbit(self):
         if self.canvas.control == '' and \
             self.canvas.animation == False or  \
             self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):  
@@ -126,7 +137,7 @@ class SideCar:
             self.canvas.showWorks.disablePlay()        
         self.canvas.btnRun.setText('Run')  
         
-    def delbackdrp(self):  ## dbl-clk from backdrp
+    def delbackdrp(self):  ## dbl-clk from backdrp - just in case?
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):
             if itm.type == 'ball':
                 self.scene.removeItem(itm)
@@ -135,15 +146,7 @@ class SideCar:
                 break  
         if self.canvas.videoPlayer != None:
             self.canvas.videoPlayer.backdrp = None
-     
-    def addVideoWidget(self):  ## pop-up
-        self.canvas.videoPlayer.widget = AVideoWidget(self.canvas)
-                    
-    def closeVideoWidget(self):
-        if self.canvas.videoPlayer.widget != None:
-            self.canvas.videoPlayer.widget.close()     
-            self.canvas.videoPlayer.widget = None  
-    
+   
 ### --------------------------------------------------------      
     def xy(self, max):
         return random.randrange(-40, max+40)

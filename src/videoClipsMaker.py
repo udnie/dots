@@ -2,6 +2,7 @@
 import math
 import time
 # import cv2   ## required <<<----- 4.12.0 or above
+import sys
 
 import os.path
 import numpy as np
@@ -11,7 +12,7 @@ import numpy as np
     file dialogs and a number of small functions including setFormat. 
     Import cv2 needs to be uncommented once opencv is installed and 
     MakeClips set to true inorder to run assembler. The videoClipsWidget 
-    defaults are set here.  '''
+    defaults are set here.                               '''
 ### --------------------------------------------------------
     
 from functools          import partial
@@ -24,6 +25,9 @@ from videoClipsWidget   import *
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 Mxt = (".mov", ".mp4")
 
+MinWid = 300  ## minimum widget width
+MinHgt = 405  ## minimum widget height
+
 ### --------------------------------------------------------
 class Clips:
 ### --------------------------------------------------------
@@ -31,16 +35,16 @@ class Clips:
         super().__init__()
         
         self.parent = parent
-        self.videowidget = None
+        self.settings = None
 
         ### widget defaults - the limits are set in the widget sliders
 
         self.Fps = 5    ## frames per second - less than 5 and the video won't play
         self.Max = 25   ## max number of photos to read/write  
         self.Wpr = 1    ## writes per read
-        self.Rnf = 0    ## read every 'n frame
+        self.Rnf = 1    ## read every 'n frame - just to make sure 
                        
-        self.AutoAspect  = False     ## True reads the video metadata to set the aspect ratio and resize the widget
+        self.AutoAspect  = False    ## True reads the video metadata to set the aspect ratio and resize the widget
                                      ## requires that getVideoWidthHeight is working                                     
         self.MakeClips   = False     ## True requires having opencv installed and import cv2 uncommented
         self.FirstFrame  = False     ## True - read only the first frame of a video       
@@ -50,99 +54,118 @@ class Clips:
         self.AddFileName = False     ## True add to frame
         
 ### --------------------------------------------------------       
-    def toggleVideoWidget(self, parent):
-        if self.videowidget == None:
-            self.videowidget = VideoWidget(parent)
-        elif self.videowidget != None:
-            self.closeWidget()
+    def toggleSettings(self, parent):
+        if self.settings == None:  ## widget for clips settings  
+            self.settings = Settings(parent)
+        elif self.settings != None:
+            self.closeSettings()
       
-    def closeWidget(self):
-        if self.videowidget != None:
-            self.videowidget.close()
-        self.videowidget = None               
-
+    def closeSettings(self):
+        if self.settings != None:
+            self.settings.close()
+        self.settings = None 
+        time.sleep(.05)              
+        
     def setWidgetButtons(self, str):
         match str:
             case 'asp':
                 if self.AutoAspect == False:
                     self.AutoAspect = True
-                    self.videowidget.aspBtn.setText('AutoAspectOn')
+                    self.settings.aspBtn.setText('AutoAspectOn')
                 else: 
                     self.AutoAspect = False
-                    self.videowidget.aspBtn.setText('AutoAspect')
+                    self.settings.aspBtn.setText('AutoAspect')
            
             case 'clips':
                 if self.MakeClips == False:
                     self.MakeClips = True
-                    self.videowidget.clpsBtn.setText('MakeClipsOn')
+                    self.settings.clpsBtn.setText('MakeClipsOn')
                 else: 
                     self.MakeClips = False
-                    self.videowidget.clpsBtn.setText('MakeClips')
+                    self.settings.clpsBtn.setText('MakeClips')
            
             case 'first':
                 if self.FirstFrame == False:
                     self.FirstFrame = True
-                    self.videowidget.firstBtn.setText('FirstFrameOn')  
+                    self.settings.firstBtn.setText('FirstFrameOn')  
                     if self.SkipFrames == True:
                         self.SkipFrames = False
-                        self.videowidget.skipBtn.setText("NthFrame")     
+                        self.settings.skipBtn.setText("NthFrame")     
                 else: 
                     self.FirstFrame = False
-                    self.videowidget.firstBtn.setText('FirstFrame')
+                    self.settings.firstBtn.setText('FirstFrame')
                          
             case 'skip':
                 if self.SkipFrames == False:
                     self.SkipFrames = True
-                    self.videowidget.skipBtn.setText("NthFrameOn")
+                    self.settings.skipBtn.setText("NthFrameOn")
                     if self.FirstFrame == True:
                         self.FirstFrame = False
-                        self.videowidget.firstBtn.setText('FirstFrame')
+                        self.settings.firstBtn.setText('FirstFrame')
                 else: 
                     self.SkipFrames = False
-                    self.videowidget.skipBtn.setText("NthFrame")                    
+                    self.settings.skipBtn.setText("NthFrame")                    
                          
             case 'filter':
                 if self.FilterOn == False:
                     self.FilterOn = True
-                    self.videowidget.filterBtn.setText('FilterOn')
+                    self.settings.filterBtn.setText('FilterOn')
                 else: 
                     self.FilterOn = False
-                    self.videowidget.filterBtn.setText('Filter')       
+                    self.settings.filterBtn.setText('Filter')       
             
             case 'play':
                 if self.PlayVideo == False:
                     self.PlayVideo = True
-                    self.videowidget.playBtn.setText('PlayVideoOn')
+                    self.settings.playBtn.setText('PlayVideoOn')
                 else: 
                     self.PlayVideo = False
-                    self.videowidget.playBtn.setText('PlayVideo')  
+                    self.settings.playBtn.setText('PlayVideo')  
                     
             case 'name':
                 if self.AddFileName == False:
                     self.AddFileName = True
-                    self.videowidget.nameBtn.setText('FileNameOn')
+                    self.settings.nameBtn.setText('FileNameOn')
                 else: 
                     self.AddFileName = False
-                    self.videowidget.nameBtn.setText('FileName') 
+                    self.settings.nameBtn.setText('FileName') 
+            case _:
+                    return
                     
 ### --------------------------------------------------------
-    def toggleAspectBtn(self):
-        if self.parent.width()- WID <= Chars['V'][1]:
-            self.parent.aspButton.hide()
-        else:
-            self.parent.aspButton.show()
-
-    def looper(self):  ## doesn't run in qt5
-        if self.parent.loop == False:
-            self.parent.loop = True
+    def showHideAspectBtn(self):
+        self.parent.aspButton.show() if self.parent.width() >=  Keys['V'][1] \
+            else self.parent.aspButton.hide()
+    
+    def toggleSlider(self):
+        self.parent.flag = True
+        if self.parent.sliderVisible and self.parent.height() > MinHgt+PAD: 
+            self.parent.sliderVisible = False  
+            self.parent.slider.hide()
+            self.parent.resize(self.parent.width(), self.parent.height()-PAD)
+            time.sleep(.05)      
+        elif self.parent.sliderVisible == False:
+            self.parent.slider.show()
+            self.parent.sliderVisible = True
+            self.parent.resize(self.parent.width(), self.parent.height()+PAD)
+            time.sleep(.05)
+                 
+    def looper(self): 
+        if self.parent.loopSet == False:
+            self.parent.loopSet = True
             self.parent.loopButton.setText('LoopOn')
             self.parent.stopButton.setEnabled(False)
+            time.sleep(.05)    
         else:
-            self.parent.loop = False
-            self.parent.loopButton.setText('Loop')
-            self.parent.stopButton.setEnabled(True)
+            self.looperOff()
             self.parent.stopVideo()
-            
+            time.sleep(.05)
+       
+    def looperOff(self):
+        self.parent.loopSet = False
+        self.parent.loopButton.setText('Loop')
+        self.parent.stopButton.setEnabled(True)
+          
     def msgbox(self, str):
         msg = QMessageBox()
         msg.setText(str)
@@ -152,27 +175,34 @@ class Clips:
         timer.timeout.connect(msg.close)
         timer.start()
         msg.exec() 
-        
-    def pathMod(self, fileName):
-        fileName = fileName[-24:]
-        if fileName.find('/') > 0:
-            fileName = '..' + fileName[fileName.find('/'):]
-        return fileName
-    
-    def returnKey(self, asp):  
-        for k, v in Chars.items():
-            if asp in v: return k
+   
+    def returnKey(self, asp): 
+        for k, v in Keys.items():
+            if asp == v[0]: 
+                return k
+            elif asp - .01 == v[0] or asp + .01 == v[0]:
+                return k
         return None
-    
+         
+    def closeOnOpen(self):
+        self.parent.closeHelpMenu();   
+        self.closeSettings()
+        time.sleep(.05)  
+        self.looperOff() 
+        if self.parent.mediaPlayer != None:
+            self.parent.stopVideo()
+        self.parent.init()
+         
 ### --------------------------------------------------------  
-    def openFile(self, open=False):  ## opens one file - open = True comes openDirectory else the button 
-        self.parent.closeHelpMenu();   self.parent.mediaPlayer.stop() ## blacks out previous video
-        if self.parent.path == '':  
-            path = os.getcwd()   
-        else:
-            path = self.parent.path
+    def openFile(self, open=False):  ## opens one file - True comes from openDirectory else the button 
+        self.closeOnOpen()
+  
+        path = os.getcwd() if self.parent.path == '' \
+            else self.parent.path  
+            
         fileName, _ = QFileDialog.getOpenFileName(self.parent, "Select Media", path, \
                         "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
+     
         if fileName != '': 
             if self.SkipFrames == True and open == True:  ## read only one file every Nth frame
                 path = os.path.dirname(fileName)  
@@ -188,7 +218,8 @@ class Clips:
                 if self.PlayVideo:  QTimer.singleShot(100, self.parent.playVideo)   ## up to you
                      
     def openDirectory(self):  ## used by clips, point to directory to read from   
-        self.parent.closeHelpMenu();   self.parent.mediaPlayer.stop()    
+        self.closeOnOpen()  
+          
         if self. MakeClips == False: 
             self.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
             return      
@@ -202,7 +233,7 @@ class Clips:
             self.parent.setFileName(title)
             QTimer.singleShot(20, partial(self.assembler, os.getcwd(), title))
     
-    def setTitle(self, path):
+    def setTitle(self, path):  ## directory and name of clips *.mov there
         os.chdir(path)
         title = os.path.basename(path) + '.mov'  ## uses .mp4 codec - works on my mac
         try:
@@ -214,13 +245,13 @@ class Clips:
     def setFormat(self, key):  
         try:
             self.parent.key = key
-            self.parent.aspect = Chars[key][0]
-            self.parent.ViewW  = Chars[key][1]
-            self.parent.ViewH  = Chars[key][2]
-            self.parent.VideoW = Chars[key][3] 
-            self.parent.VideoH = Chars[key][4] 
+            self.parent.aspect = Keys[key][0]  ## aspect
+            self.parent.ViewW  = Keys[key][1]  ## min width
+            self.parent.ViewH  = Keys[key][2]  ## min height
+            self.parent.VideoW = Keys[key][3]  ## max width
+            self.parent.VideoH = Keys[key][4]  ## max height
             if key in ('S','T','U','V'):
-                self.toggleAspectBtn()
+                self.showHideAspectBtn()
         except:
             return False
                   
@@ -232,7 +263,7 @@ class Clips:
                 
             asp = 0    
             if self.parent.aspect == 0 and (self.parent.key != '' and self.parent.key != 'O'):
-                self.parent.aspect = Chars[self.parent.key][0]  
+                self.parent.aspect = Keys[self.parent.key][0]  
                       
             elif self.parent.key == 'O' and self.parent.aspect > 0:  ## horizontals
                 asp = self.parent.aspect
@@ -244,13 +275,12 @@ class Clips:
             elif asp == 0:
                 self.msgbox('The Aspect Ratio Has Not Been Set')
                 return 
-                                 
-            frW, frH = WID, HGT                      
+                                                       
             height = int(self.parent.height()* zoom)  ## new height  
             
-            nvH = (height - frH)  ## new video height
+            nvH = (height - HGT)  ## new video height
             nvW = int(nvH * asp)  ## new video width   
-            nwidth = nvW + frW    ## new widget width   
+            nwidth = nvW + WID    ## new widget width   
             
             p, width = self.parent.pos(), self.parent.width()  
             self.parent.resize(nwidth, height)   
@@ -259,7 +289,7 @@ class Clips:
                  
             self.parent.ViewW, self.parent.ViewH = self.parent.width()-WID, self.parent.height()-HGT 
             
-            self.toggleAspectBtn()
+            self.showHideAspectBtn()
                        
 ### --------------------------------------------------------
     def assembler(self, path, outputVideo, fileName=''):
@@ -273,7 +303,7 @@ class Clips:
             self.msgbox('assembler: OpenCV not Found')
             return
      
-        # print(cv2.__version__)
+        # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
      
         if self.SkipFrames == False:
             if self.FirstFrame == True:  
@@ -428,8 +458,9 @@ class Clips:
         #     return None  
                           
         return bkgImage
-                
+                         
 ### ---------------------- that's all ---------------------- 
- 
 
-    
+
+
+

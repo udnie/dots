@@ -8,20 +8,19 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
 from functools          import partial
 
 ### ------------------ videoClipsWidget.py -----------------
-''' Source for global varibles, help, videowidget and additional
-    code to extract metadata used by getVideoWidthHeight in 
+''' Source for global varibles, help, settings and additional
+    code to extract metadata used by getMetaData in 
     videoPlayerOne. '''
 ### --------------------------------------------------------
-WID, HGT = 40, 135  ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
-Chars  = {
-    'A': (1.33, 670,  500,  960,  720),  ##  4:3 apple horizontal    
-    'F': (1.50, 750,  500, 1080,  720),  ##  3:2 horizontal   
-    'H': (1.77, 890,  500, 1280,  720),  ## 16:9 horizontal
-    'S': (1.00, 500,  500,  720,  720),  ##  1:1 square   
-    'U': (0.75, 450,  600,  720,  960),  ##  3:4 digital-camera/iphone vertical  
-    'T': (0.66, 500,  750,  720, 1080),  ##  2:3 vertical   
-    'V': (0.56, 450,  800,  720, 1280),  ## 9:16 vertical
+Keys  = {
+    'A': (1.33, 700,  525,  960,  720),  ##  4:3 apple horizontal    
+    'F': (1.50, 790,  525, 1080,  720),  ##  3:2 horizontal   
+    'H': (1.77, 930,  525, 1280,  720),  ## 16:9 horizontal
+    'S': (1.00, 525,  525,  720,  720),  ##  1:1 square   
+    'U': (0.75, 525,  700,  720,  960),  ##  3:4 digital-camera/iphone vertical  
+    'T': (0.66, 525,  790,  720, 1080),  ##  2:3 vertical   
+    'V': (0.56, 525,  930,  720, 1280),  ## 9:16 vertical
 }
 
 helpMenuKeys = {  ## help menu - right-mouse-click
@@ -33,18 +32,20 @@ helpMenuKeys = {  ## help menu - right-mouse-click
     'U':    'Apple 3X4 Vertical',                  
     'V':    'Vertical 9X16',
     'C':    'To Clear',
-    'L':    'Loop On/Off',    
+    'L':    'Loop On/Off',
     '>,  +,  ]':    'Scale Up',
     '<,  _,  [':    'Scale Down',
     'X, Q Escape':  'Quit/Exit',
+    'Shift-S':      'Hide/Show Slider',
     'Aspect':       'Set Aspect (Button)',
     'Settings':     'Clip Settings',
     'Clips':        'Make a Clip',    
 }
 
-AspKeys = list(Chars.keys())
-SharedKeys = AspKeys + ['W','L','O','X','B','C','D',']','[']
-     
+AspKeys = list(Keys.keys())
+SharedKeys = AspKeys + ['L','O','X','C',']','[','Shift-S','Aspect','Settings','Clips']
+WID, HGT, PAD = 40, 140, 30 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
+
 ### --------------------------------------------------------     
 class Help(QWidget):  
 ### -------------------------------------------------------- 
@@ -79,8 +80,8 @@ class Help(QWidget):
         self.table.setColumnWidth(0, 110) 
         self.table.setColumnWidth(1, 156)
 
-        width, height = 272, 511 
-        self.table.setFixedSize(width, height)  
+        menuWidth, menuHeight = 272, 541 
+        self.table.setFixedSize(menuWidth, menuHeight)  
         
         self.table.verticalHeader().setVisible(False) 
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
@@ -111,8 +112,8 @@ class Help(QWidget):
         
         p, pwidth, pheight = self.parent.pos(), self.parent.width(), self.parent.height()
         
-        x = int(p.x() + (pwidth/2)) - int(width/2)   
-        y = int(p.y() + (pheight/2)) - int(height/2)   
+        x = int(p.x() + (pwidth/2)) - int(menuWidth/2)   
+        y = int(p.y() + (pheight/2)) - int(menuHeight/2)   
         
         self.table.move(x,y)  
         self.table.show()
@@ -125,13 +126,7 @@ class Help(QWidget):
             case ('>,  +,  ]'):
                 help = ']'
             case ('<,  _,  ['): 
-                help = '['
-            case 'Aspect':
-                help = 'B'
-            case'Clips':
-                help = 'D'  
-            case'Settings':
-                help = 'W'     
+                help = '['     
         if help in SharedKeys: 
             try:
                 QTimer.singleShot(25, partial(self.parent.sharedKeys, help))
@@ -144,17 +139,14 @@ class Help(QWidget):
         self.table.close()   
           
 ### --------------------------------------------------------        
-class VideoWidget(QWidget):   
+class Settings(QWidget):  ## settings for clipsMaker and autoAspect
 ### -------------------------------------------------------- 
     def __init__(self, parent):
         super().__init__()
 
         self.parent = parent
         self.clips  = self.parent.clips
-        
-        self.type = 'widget' 
-        self.setAccessibleName('widget')
-   
+
         self.WidgetW, self.WidgetH = 505.0, 300.0
            
         hbox = QHBoxLayout() 
@@ -355,7 +347,7 @@ class VideoWidget(QWidget):
         self.filterBtn.clicked.connect(lambda: self.clips.setWidgetButtons("filter"))
         self.playBtn.clicked.connect(lambda: self.clips.setWidgetButtons("play"))
         self.nameBtn.clicked.connect(lambda: self.clips.setWidgetButtons("name"))
-        self.quitBtn.clicked.connect(self.clips.closeWidget)
+        self.quitBtn.clicked.connect(self.clips.closeSettings)
         
         hbox = QVBoxLayout(self)
               
@@ -436,5 +428,7 @@ class VideoWidget(QWidget):
         
   
 ### ---------------------- that's all ---------------------- 
-  
+
+    
+    
     

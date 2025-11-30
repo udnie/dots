@@ -83,7 +83,6 @@ class ShowWorks:
         self.canvas.btnStop.setEnabled(False) 
         self.canvas.btnSave.setEnabled(True) 
         
-
     def disablePlay(self): ## turns play off - enables the rest
         self.canvas.control = 'pause'  ## blocks adding background
         self.canvas.btnRun.setEnabled(False)

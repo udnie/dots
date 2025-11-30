@@ -16,6 +16,7 @@ from dotsBkgItem        import BkgItem
 from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
 from dotsBkgTrackers    import BkgTrackers
+from dotsHelpDesk       import StoryHelp2
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -37,7 +38,9 @@ class BkgMaker(QWidget):
     def init(self):
         self.flat    = None
         self.widget = None  ## there is only one
-                
+        
+        self.storyHelp2 = None  ## do it here as there's no storyboard
+        
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False
           
@@ -147,9 +150,26 @@ class BkgMaker(QWidget):
         self.resetSliders(bkg)
         self.bkgtrackers.restoreFromTrackers(bkg)
         self.updateWidget(bkg)
-                           
+           
+    def addStoryHelp2(self):
+        self.closeStoryHelp2()
+        self.storyHelp2 = StoryHelp2(self.canvas)
+        
+    def closeStoryHelp2(self):
+        if self.storyHelp2 != None:
+            self.storyHelp2.closeMenu()
+            self.storyHelp2 = None  
+              
+    def closeStoryHelp(self):
+        if self.canvas.helpButton.storyFlag == True:
+            self.canvas.helpButton.storyHelp.closeMenu()
+            self.canvas.helpButton.storyFlag = False
+            self.canvas.helpButton.storyHelp = None
+                    
     def closeWidget(self):
         if self.widget != None:
+            self.closeStoryHelp()
+            self.closeStoryHelp2() 
             self.widget.close()
             self.widget = None
             self.view.grabKeyboard()

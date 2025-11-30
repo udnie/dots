@@ -58,10 +58,8 @@ class PathWidget(QWidget):
         if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')
-            if self.switch == 'on':
-                self.move(x+75, y+5)                 
-            else:
-                self.move(x-500,y-130)
+            self.move(x+75, y+5) if self.switch == 'on' \
+                else self.move(x-500,y-130)
                         
 ### -------------------------------------------------------- 
     def paintEvent(self, e):

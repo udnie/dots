@@ -5,7 +5,7 @@ from PyQt6.QtGui        import QKeySequence
 from dotsSideGig        import getVuCtr
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 
-storyKeys = {   ## menu2
+storyKeys = {   ## storyHelp2
     'F':    'Flop Selected',
     'P':    'Toggle Paths - Animation',
     'T':    'ToggleTags - Animation',
@@ -20,7 +20,7 @@ storyKeys = {   ## menu2
     'U':    'UnSelect - End',     
 }
 
-pathKeys = {             
+pathKeys = {     ## pathHelp2
     '>':    'Shift WayPts +5%',
     '<':    'Shift WayPts -5%',
     '!':    'Half Path Size',
@@ -87,7 +87,7 @@ class StoryHelp2:
         x, y = getVuCtr(self.canvas)  
         if off != 0: x += off  
         
-        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.move(int(x -(width /2)), int(y - (height /2)))
         self.table.show()
               
     def clicked(self):
@@ -144,9 +144,9 @@ class PathHelp2:
         self.table.setRow(row + 2,  0, f"{'Click Here to Close':<22}",'',True,True, 2)
   
         x, y = getVuCtr(self.canvas)  
-        if off != 0: x += off  
+        if off != 0: x = x + off  
 
-        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.move(int(x - (width /2)), int(y - (height /2)))
         self.table.show()
    
     def clicked(self): 

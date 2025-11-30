@@ -267,7 +267,7 @@ class MatteHelp:
    
         x, y = getVuCtr(self.canvas)    
         
-        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.move(int(x - (width/2)), int(y - (height/2)))
         self.table.show()
             
     def clicked(self):

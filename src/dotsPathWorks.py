@@ -87,7 +87,7 @@ class PathHelp:
         x, y = getVuCtr(self.canvas)   
         if off != 0: x += off 
         
-        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.move(int(x - (width /2)), int(y - (height /2)))
         self.table.show() 
               
     def clicked(self):
@@ -100,7 +100,8 @@ class PathHelp:
                     QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
                     self.canvas.pathMaker.pathMakerOff()
                  ## show help menus  
-                elif help == 'Menu':   
+                elif help == 'Menu':  ## menu2
+                    QTimer.singleShot(10, self.closeMenu) 
                     self.pathHelp2 = PathHelp2(self.canvas)  ## dotsHelpDesk
                 self.table.close()
             except:
@@ -157,7 +158,7 @@ class PathWorks:
     def openMenu(self):
         self.closeWidget()
         self.help = PathHelp(self, self.canvas)  
-    
+        
  ### --------------------------------------------------------    
     def scaleRotate(self, key, per=0, inc=0):  ## also used by pathWidget
         if len(self.pathMaker.pts) == 0: 

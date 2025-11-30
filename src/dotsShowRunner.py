@@ -50,8 +50,6 @@ class ShowRunner:
             if self.showbiz.helpMenus.demoHelp != None:
                 self.showbiz.helpMenus.demoHelp.runThese() 
         else:
-            if self.canvas.videoPlayer != None:
-                self.canvas.sideCar.closeVideoWidget()  ## pop-up  
             self.showtime.run()
         
     def makeTableView(self, dlist, src=''):  ## called if missing files     

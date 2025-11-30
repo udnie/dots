@@ -6,7 +6,7 @@ from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, QFontMet
 from PyQt6.QtWidgets    import QApplication, QWidget
 
 Ticks = (100,50,10)  ## how many pixels apart to draw a line and size
-RWidth, RSize, RHeight = 1500, 70, 1000  ## startup
+RWidth, RSize, RHeight = 1800, 70, 1000  ## startup
 
 ### ------------------------- vhx --------------------------
 ''' '+, >, ]' expands, scales up, the ruler either horizontally or 

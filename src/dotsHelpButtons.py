@@ -7,7 +7,6 @@ from dotsSideGig        import getVuCtr
 from dotsShared         import PlayKeys 
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 from dotsPathWorks      import PathHelp
-from dotsHelpDesk       import StoryHelp2
 
 canvasKeys = {
     'A':    'Add a Background', 
@@ -30,12 +29,12 @@ storyKeys = {
     'J':    'JSON Play File Viewer',
     'L':    'Load Play File',
     'M':    'This Help Menu',
-    'Menu': 'StoryBoard Help Menu 2',
-    'Menus':'Help Menus',
+    'Menu2': 'StoryBoard Help Menu 2',
+    'Menus': 'Help Menus',
     'O':    'Toggle Shadow Outlines', 
     'S':    'Save Play File',    
     'U':    'UnSelect All Sprites',
-    'V':    'Video Widget',
+    'V':    'Delete the Video',
     'W':    'Clear Widgets',
     'X':    'X, Q, Escape to Quit',
     'R':    'Run What\'s There',
@@ -143,7 +142,7 @@ class CanvasHelp:
         x, y = getVuCtr(canvas)    
         if off != 0: x += off
         
-        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.move(int(x - (width/2)), int(y - (height/2)))
         self.table.show() 
        
     def clicked(self):
@@ -176,8 +175,6 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
         self.canvas = canvas
         self.switch = switch
         
-        self.storyHelp2 = None
-    
         self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
@@ -207,7 +204,7 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
         x, y = getVuCtr(canvas)  
         if off != 0: x += off  
         
-        self.table.move(int(x - width /2), int(y - height /2))
+        self.table.move(int(x - (width/2)), int(y - (height/2)))
         self.table.show()
               
     def clicked(self):
@@ -218,8 +215,9 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
                     case 'Menus': 
                         QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
                         self.canvas.clear()
-                    case 'Menu':  
-                        self.storyHelp2 = StoryHelp2(self.canvas)      
+                    case 'Menu2':  
+                        QTimer.singleShot(10, self.closeMenu) 
+                        self.storyHelp2 = self.canvas.bkgMaker.addStoryHelp2()     
                     case 'SpaceBar': 
                         help = 'space'                 
                 if help in PlayKeys:  ## in Shared

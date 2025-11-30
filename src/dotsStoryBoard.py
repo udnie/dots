@@ -50,19 +50,19 @@ class StoryBoard(QWidget):
     
         self.canvas = self 
         
-        self.sideCar   = SideCar(self)  ## extends canvas
-        self.sideCar2  = SideCar2(self)
+        self.sideCar   = SideCar(self)    ## extends canvas
+        self.sideCar2  = SideCar2(self)   ## same
           
-        self.keysPanel = KeysPanel(self)
-        self.scroll    = ScrollPanel(self)
-        self.pathMaker = PathMaker(self)
+        self.keysPanel = KeysPanel(self)     ## artifact - replaced by help menu(s)
+        self.scroll    = ScrollPanel(self)   ## scrolling visual list of sprites  
+        self.pathMaker = PathMaker(self)     ## create and edit a path
 
-        self.mapper    = MapMaker(self) 
-        self.bkgMaker  = BkgMaker(self)
+        self.mapper    = MapMaker(self)    ## misc screen stuff
+        self.bkgMaker  = BkgMaker(self)    ## background hub
                    
-        self.showbiz    = ShowBiz(self)   ## reads .play files from showRunner
-        self.showWorks  = ShowWorks(self) 
-        self.helpButton = ButtonHelp(self)  
+        self.showbiz    = ShowBiz(self)     ## single key dispatch 
+        self.showWorks  = ShowWorks(self)   ## saves play files - manages play keys
+        self.helpButton = ButtonHelp(self)  ## launch help menu(s)
      
         addScrollDock(self) 
         addKeysDock(self)
@@ -74,9 +74,7 @@ class StoryBoard(QWidget):
         
         self.animeHelp = None
         self.rubberBand = QRubberBand(QRubberBand.Shape.Rectangle, self)
-        
-        self.setMouseTracking(True)
-              
+          
         self.view.viewport().installEventFilter(self)
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)  
     
