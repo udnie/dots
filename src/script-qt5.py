@@ -62,6 +62,9 @@ for file in files:
                     i = line.index('s')  ## self.set
                     line = line[0:i] + '# ' + line[i:]
            
+                if file == "videoPlayerOne.py" and 'setLoops(-1)' in line:
+                    continue
+           
                 # if '## 6' in line:     
                 #     for i, c in enumerate(line):  
                 #         if c != ' ' and c != '\t':
@@ -83,7 +86,7 @@ for file in files:
                         
                     i = line.index('## 5')  ## remove it 
                     line = line[0:i] + '\n'
-                                         
+                                           
             if line.startswith('from PyQt'): ## just to make sure
                 line = 'from PyQt5' + line[line.index('.'):]
       

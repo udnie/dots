@@ -6,7 +6,10 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
-     
+---
+
+**December 1 2025**  
+Looping a video no longer blips in  **VideoPlayerOne** when using either **PyQt6** or **PySide6**. I added a line of code to the MediaPlayer class in  **VideoPlayerOne** that ends with 'setLoops(-1)' - loop forever, and the blip went away. **PyQt5** as mentioned earlier has no 'setLoops()' and uses my looping solution which runs no differently than if I had been able to 'setLoops()' - strange, but grateful.  The loop button now only has an effect in **PyQt5**, otherwise you're on auto-pilot.
 
 ---
 

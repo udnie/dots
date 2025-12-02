@@ -1,6 +1,6 @@
 
 from PyQt6.QtCore       import Qt, QRectF, QTimer
-from PyQt6.QtGui        import QColor, QPen, QPainter, QFont                         
+from PyQt6.QtGui        import QColor, QPen, QPainter, QFont                      
 from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
                                 QPushButton, QVBoxLayout, QTableWidget,  QAbstractItemView, \
                                 QTableWidgetItem
@@ -426,7 +426,8 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
     # except Exception:
     #     return 0, 0
         
-  
+
+        
 ### ---------------------- that's all ---------------------- 
 
     

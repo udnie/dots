@@ -66,7 +66,9 @@ class MediaPlayer(QMediaPlayer):
              
         self.audioOut = QAudioOutput()  ## 6
         self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6
-     
+  
+        self.mediaPlayer.setLoops(-1)
+        
 ### -----------------------------------------------------------------
     def setFileName(self, fileName):
         try:
@@ -84,16 +86,16 @@ class MediaPlayer(QMediaPlayer):
             self.videoPlayer.playButton.setText('Resume') 
         elif self.videoPlayer.fileName != '':  
             self.mediaPlayer.play()  
-            self.videoPlayer.playButton.setText('Pause')  
- 
+            self.videoPlayer.playButton.setText('Pause') 
+     
     def mediaStateChanged(self, status): 
         if status == QMediaPlayer.MediaStatus.EndOfMedia:  
             while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState):   ## 6
             # while not (self.mediaPlayer.state() == QMediaPlayer.State.StoppedState):  ## 5
-                time.sleep(.01) 
+                time.sleep(.005) 
             self.stopVideo() 
 
-    def stopVideo(self):   
+    def stopVideo(self):  
         if self.videoPlayer.loopSet == False: 
             self.mediaPlayer.stop()
             self.setPosition(0) 
@@ -121,7 +123,7 @@ class VideoPlayer(QWidget):
         
         self.mediaPlayer = MediaPlayer(self)
         self.videoWidget = self.mediaPlayer.videoWidget
-        
+                
         self.init()   
         self.clips = Clips(self) 
         
@@ -138,7 +140,7 @@ class VideoPlayer(QWidget):
             vbox.addWidget(self.setSlider())
          
         self.setLayout(vbox)            
-    
+   
         self.openPlayer(self.key)   ## <<----->> open full frame - 3:2]  
          
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()
@@ -219,7 +221,7 @@ class VideoPlayer(QWidget):
         else: 
             match key:
                 case 'L':
-                    self.clips.looper()  ## doesn't run in qt5 - not supported
+                    self.clips.looper()  
                 case ']':
                     self.clips.zoom(1.05)  
                 case '[':    
