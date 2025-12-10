@@ -2,31 +2,29 @@
 import math
 import time
 # import cv2   ## required <<<----- 4.12.0 or above
-import sys
 
 import os.path
 import numpy as np
 
-### --------------------- videoClips.py --------------------
-''' Source for assembler, ctrOnBackground and zoom as well as both 
-    file dialogs and a number of small functions including setFormat. 
-    Import cv2 needs to be uncommented once opencv is installed and 
-    MakeClips set to true inorder to run assembler. The videoClipsWidget 
-    defaults are set here.                               '''
+### ----------------- videoClipsMaker.py -------------------
+''' Source for assembler, ctrOnBackground, a single-file dialog.
+    and a number of functions including setDefaultSizes and those 
+    used by Settings. 
+    Import cv2 needs to be uncommented once opencv is installed and also
+    one of the three functions in getMetaData - in videoPlayerShared,
+    inorder to run assembler. The videoClipsWidget defaults(Settings) are 
+    set here. '''
 ### --------------------------------------------------------
     
 from functools          import partial
 
 from PyQt6.QtCore       import QTimer
-from PyQt6.QtWidgets    import QMessageBox, QFileDialog
+from PyQt6.QtWidgets    import QFileDialog
                                 
 from videoClipsWidget   import *
 
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 Mxt = (".mov", ".mp4")
-
-MinWid = 300  ## minimum widget width
-MinHgt = 405  ## minimum widget height
 
 ### --------------------------------------------------------
 class Clips:
@@ -36,23 +34,23 @@ class Clips:
         
         self.parent = parent
         self.settings = None
-
-        ### widget defaults - the limits are set in the widget sliders
+   
+### ----- widget defaults(Settings) - the limits are set in the widget sliders ----- ###
 
         self.Fps = 5    ## frames per second - less than 5 and the video won't play
         self.Max = 25   ## max number of photos to read/write  
-        self.Wpr = 1    ## writes per read
+        self.Wpr = 4    ## writes per read
         self.Rnf = 1    ## read every 'n frame - just to make sure 
                        
-        self.AutoAspect  = False    ## True reads the video metadata to set the aspect ratio and resize the widget
+        self.AutoAspect  = False     ## True reads the video metadata to set the aspect ratio and resize the widget
                                      ## requires that getVideoWidthHeight is working                                     
-        self.MakeClips   = False     ## True requires having opencv installed and import cv2 uncommented
+        self.MakeClips   = False     ## True - from photos - requires having opencv installed and import cv2 uncommented
         self.FirstFrame  = False     ## True - read only the first frame of a video       
         self.SkipFrames  = False     ## True - read the Nth frame of a video 
         self.FilterOn    = False     ## True - image aspect matches self.aspect (parent)
         self.PlayVideo   = False     ## True plays video upon loading
         self.AddFileName = False     ## True add to frame
-        
+   
 ### --------------------------------------------------------       
     def toggleSettings(self, parent):
         if self.settings == None:  ## widget for clips settings  
@@ -64,8 +62,8 @@ class Clips:
         if self.settings != None:
             self.settings.close()
         self.settings = None 
-        time.sleep(.05)              
-        
+        time.sleep(.03)         
+                
     def setWidgetButtons(self, str):
         match str:
             case 'asp':
@@ -132,77 +130,37 @@ class Clips:
             case _:
                     return
                     
-### --------------------------------------------------------
-    def showHideAspectBtn(self):
-        self.parent.aspButton.show() if self.parent.width() >=  Keys['V'][1] \
-            else self.parent.aspButton.hide()
-    
-    def toggleSlider(self):
-        self.parent.flag = True
-        if self.parent.sliderVisible and self.parent.height() > MinHgt+PAD: 
-            self.parent.sliderVisible = False  
-            self.parent.slider.hide()
-            self.parent.resize(self.parent.width(), self.parent.height()-PAD)
-            time.sleep(.05)      
-        elif self.parent.sliderVisible == False:
-            self.parent.slider.show()
-            self.parent.sliderVisible = True
-            self.parent.resize(self.parent.width(), self.parent.height()+PAD)
-            time.sleep(.05)
-                 
+### --------------------------------------------------------          
     def looper(self): 
         if self.parent.loopSet == False:
             self.parent.loopSet = True
             self.parent.loopButton.setText('LoopOn')
             self.parent.stopButton.setEnabled(False)
-            time.sleep(.05)    
-        else:
+            time.sleep(.03)   
+        elif self.parent.loopSet == True:
             self.looperOff()
-            self.parent.stopVideo()
-            time.sleep(.05)
+            if self.parent.mediaPlayer != None:
+                self.parent.shared.stopVideo()
+            time.sleep(.03)
        
     def looperOff(self):
         self.parent.loopSet = False
         self.parent.loopButton.setText('Loop')
         self.parent.stopButton.setEnabled(True)
-          
-    def msgbox(self, str):
-        msg = QMessageBox()
-        msg.setText(str)
-        timer = QTimer(msg)
-        timer.setSingleShot(True)
-        timer.setInterval(5000)
-        timer.timeout.connect(msg.close)
-        timer.start()
-        msg.exec() 
-   
-    def returnKey(self, asp): 
-        for k, v in Keys.items():
-            if asp == v[0]: 
-                return k
-            elif asp - .01 == v[0] or asp + .01 == v[0]:
-                return k
-        return None
-         
-    def closeOnOpen(self):
-        self.parent.closeHelpMenu();   
-        self.closeSettings()
-        time.sleep(.05)  
-        self.looperOff() 
-        if self.parent.mediaPlayer != None:
-            self.parent.stopVideo()
-        self.parent.init()
-         
+        
 ### --------------------------------------------------------  
-    def openFile(self, open=False):  ## opens one file - True comes from openDirectory else the button 
-        self.closeOnOpen()
-  
+    def openFile(self, open=False):  ## opens one file, open=False, from the keyboard or helpMenu
+        if self.parent.player == 'two':  ## <- "two"
+            self.parent.shared.closeMediaPlayer()
+        self.parent.shared.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
         path = os.getcwd() if self.parent.path == '' \
-            else self.parent.path  
-            
-        fileName, _ = QFileDialog.getOpenFileName(self.parent, "Select Media", path, \
-                        "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
-     
+            else self.parent.path    
+        try:
+            fileName, _ = QFileDialog.getOpenFileName(self.parent, "Select Media",\
+                path, "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
+        except:
+            self.parent.shared.msgbox('error opening file')
+            return 
         if fileName != '': 
             if self.SkipFrames == True and open == True:  ## read only one file every Nth frame
                 path = os.path.dirname(fileName)  
@@ -213,26 +171,13 @@ class Clips:
             else:       ## play a video
                 self.parent.path = os.path.dirname(fileName)    
                 self.parent.setFileName(fileName)
-                self.parent.mediaPlayer.setPosition(0)  ## shows first frame
-                self.parent.mediaPlayer.pause()    
-                if self.PlayVideo:  QTimer.singleShot(100, self.parent.playVideo)   ## up to you
-                     
-    def openDirectory(self):  ## used by clips, point to directory to read from   
-        self.closeOnOpen()  
-          
-        if self. MakeClips == False: 
-            self.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
-            return      
-        if self.SkipFrames == True:
-            self.openFile(True)
+                if self.parent.mediaPlayer != None:
+                    self.parent.mediaPlayer.setPosition(0)  ## shows first frame
+                    self.parent.mediaPlayer.pause()    
+                if self.PlayVideo:  QTimer.singleShot(100, self.parent.shared.playVideo)   ## up to you
         else:
-            path = QFileDialog.getExistingDirectory(self.parent, '')
-            if path == None or path == '':
-                return  
-            title = self.setTitle(path)    
-            self.parent.setFileName(title)
-            QTimer.singleShot(20, partial(self.assembler, os.getcwd(), title))
-    
+            return
+                     
     def setTitle(self, path):  ## directory and name of clips *.mov there
         os.chdir(path)
         title = os.path.basename(path) + '.mov'  ## uses .mp4 codec - works on my mac
@@ -242,7 +187,7 @@ class Clips:
             None      
         return title
        
-    def setFormat(self, key):  
+    def setDefaultSizes(self, key):  
         try:
             self.parent.key = key
             self.parent.aspect = Keys[key][0]  ## aspect
@@ -250,57 +195,23 @@ class Clips:
             self.parent.ViewH  = Keys[key][2]  ## min height
             self.parent.VideoW = Keys[key][3]  ## max width
             self.parent.VideoH = Keys[key][4]  ## max height
-            if key in ('S','T','U','V'):
-                self.showHideAspectBtn()
         except:
-            return False
-                  
-### --------------------------------------------------------            
-    def zoom(self, zoom):
-        if self.parent.mediaPlayer != None:  
-            if int(self.parent.height() * zoom) > 1280 or int(self.parent.height()* zoom) < 300:
-                return  
-                
-            asp = 0    
-            if self.parent.aspect == 0 and (self.parent.key != '' and self.parent.key != 'O'):
-                self.parent.aspect = Keys[self.parent.key][0]  
-                      
-            elif self.parent.key == 'O' and self.parent.aspect > 0:  ## horizontals
-                asp = self.parent.aspect
-                nwidth = self.parent.lastVWidth
-                
-            if self.parent.aspect != 0:
-                asp = self.parent.aspect
-                
-            elif asp == 0:
-                self.msgbox('The Aspect Ratio Has Not Been Set')
-                return 
-                                                       
-            height = int(self.parent.height()* zoom)  ## new height  
-            
-            nvH = (height - HGT)  ## new video height
-            nvW = int(nvH * asp)  ## new video width   
-            nwidth = nvW + WID    ## new widget width   
-            
-            p, width = self.parent.pos(), self.parent.width()  
-            self.parent.resize(nwidth, height)   
-            dif = int((self.parent.width() - width)/2) 
-            self.parent.move(p.x()-dif, p.y()) 
-                 
-            self.parent.ViewW, self.parent.ViewH = self.parent.width()-WID, self.parent.height()-HGT 
-            
-            self.showHideAspectBtn()
-                       
+            self.parent.shared.msgbox('error in setDefaultSizes')
+            return
+        if key in ('S','T','U','V') and self.parent.player == 'one':
+            self.parent.shared.showHideAspectBtn()   ## <- "one"
+                                                                  
 ### --------------------------------------------------------
     def assembler(self, path, outputVideo, fileName=''):
         self.parent.setWindowTitle(outputVideo)
-        
+ 
         reads = 0;  frameCount = 0;  dim = (self.parent.VideoW, self.parent.VideoH)
+
         try:  
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4 and .mov
             out = cv2.VideoWriter(outputVideo, fourcc, self.Fps, dim)
         except:
-            self.msgbox('assembler: OpenCV not Found')
+            self.parent.shared.msgbox('assembler:  error setting output')
             return
      
         # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
@@ -324,13 +235,13 @@ class Clips:
             
             cap = cv2.VideoCapture(image_path)
             if not cap.isOpened():
-                self.msgbox("assembler: Could not open video.")
+                self.parent.shared.msgbox("assembler: Could not open video.")
                 return
 
             if self.FirstFrame == True:  ## reads the first frame of a video 
                 ret, img = cap.read()
                 if not ret:
-                    self.msgbox("assembler: Could not read the first frame.")
+                    self.parent.shared.msgbox("assembler: Could not read the first frame.")
                     return
                 if self.FilterOn and self.aspMatch(img) == False:
                     continue     
@@ -354,7 +265,7 @@ class Clips:
             else:  
                 img = cv2.imread(image_path)  ## reads a directory of photos
                 if img is None:
-                    self.msgbox(f"assembler Could not read file {image_name}")
+                    self.parent.shared.msgbox(f"assembler Could not read file {image_name}")
                     continue  
                 if self.FilterOn and self.aspMatch(img) == False:
                     continue
@@ -365,17 +276,21 @@ class Clips:
         if reads > 0:
             if self.FirstFrame == True or self.SkipFrames == True: cap.release()
             out.release()
-            self.msgbox(f"Video: {outputVideo} frames: {reads}")
-            fileName = os.getcwd() + '/' + outputVideo  
-            self.parent.setFileName(fileName)  
-            self.parent.mediaPlayer.setPosition(0)
-            self.parent.mediaPlayer.pause()
-            if self.PlayVideo:  QTimer.singleShot(100, self.parent.playVideo)
+            self.parent.shared.msgbox(f"Video: {outputVideo} frames: {reads}")
+            fileName = os.getcwd() + '/' + outputVideo 
+            
+            self.parent.setFileName(fileName) if self.parent.player == 'one' else\
+                self.parent.setMediaPlayer(fileName, 'assembler')  ## keep them separate
+                
+            if self.parent.mediaPlayer:
+                self.parent.mediaPlayer.setPosition(0)
+                self.parent.mediaPlayer.pause()
+            if self.PlayVideo: QTimer.singleShot(100, self.parent.shared.playVideo)
         else:
             os.remove(outputVideo)
-            self.msgbox('assembler: Nothing saved')
+            self.parent.shared.msgbox('assembler: Nothing saved')
             return
-        
+    
     def aspMatch(self, img):
         h, w = img.shape[:2]  ## numpy - returns rows and columns
         asp  = math.floor(w/h *100)/100.0 
@@ -392,7 +307,7 @@ class Clips:
         if isinstance(img, np.ndarray):
             n = 0 
             while n < self.Wpr:  ## writes per read
-                time.sleep(.05)
+                time.sleep(.03)
                 out.write(img)  
                 n += 1        
             del img
@@ -409,10 +324,10 @@ class Clips:
         cv2.putText(img, name, org, font, scale, color, thickness, type)
         
 ### --------------------------------------------------------
-    def ctrOnBackground(self, img, imgName): 
+    def ctrOnBackground(self, img, imgName):  
         fg_h, fg_w = img.shape[:2]
         bg_w, bg_h = self.parent.VideoW, self.parent.VideoH
-  
+        
         if bg_h < fg_h:  ## resize vertical - numpy likes it reversed  
             r = bg_h / fg_h
             fg_h = int(fg_h * r)

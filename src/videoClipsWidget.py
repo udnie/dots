@@ -1,4 +1,5 @@
 
+
 from PyQt6.QtCore       import Qt, QRectF, QTimer
 from PyQt6.QtGui        import QColor, QPen, QPainter, QFont                      
 from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
@@ -8,9 +9,7 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
 from functools          import partial
 
 ### ------------------ videoClipsWidget.py -----------------
-''' Source for global varibles, help, settings and additional
-    code to extract metadata used by getMetaData in 
-    videoPlayerOne. '''
+''' Source for global varibles, help and settings. '''
 ### --------------------------------------------------------
 
 Keys  = {
@@ -41,6 +40,16 @@ helpMenuKeys = {  ## help menu - right-mouse-click
     'Settings':     'Clip Settings',
     'Clips':        'Make a Clip',    
 }
+
+ViewW,  ViewH  =  790,  525  ## starting video size
+MaxWid, MaxHgt = 1800, 1065
+
+VertW = 525  ## minimum vertical width on open
+VertH = 100  ## vertical starting height
+HorzH = 200
+
+MinWid = 300  ## minimum widget width
+MinHgt = 400  ## minimum widget height
 
 AspKeys = list(Keys.keys())
 SharedKeys = AspKeys + ['L','O','X','C',']','[','Shift-S','Aspect','Settings','Clips']
@@ -132,7 +141,7 @@ class Help(QWidget):
                 QTimer.singleShot(25, partial(self.parent.sharedKeys, help))
             except:
                 None
-        self.parent.closeHelpMenu()
+        self.parent.shared.closeHelpMenu()
   
     def tableClose(self):
         self.parent.helpFlag == False
@@ -259,7 +268,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.rnflabel.setFixedWidth(40)
         self.rnfValue = QLabel(str(self.clips.Rnf), alignment=Qt.AlignmentFlag.AlignRight) 
         self.rnfSlider = QSlider(Qt.Orientation.Horizontal)   
-        self.rnfSlider.setMinimum(0)
+        self.rnfSlider.setMinimum(0)  ## unfortunate - should be one 
         self.rnfSlider.setMaximum(30)   ## <<-------- number of frames to skip
         self.rnfSlider.setSingleStep(5)          
         self.rnfSlider.setTickInterval(5)    
@@ -301,7 +310,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         
         groupBox.setLayout(vbox)
         return groupBox     
-    
+### -------------------------------------------------------- 
     def buttonGroup(self):
         groupBox = QGroupBox()
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
@@ -370,66 +379,8 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
   
         groupBox.setLayout(hbox)
         return groupBox
-       
-### -------------------------------------------------------- 
-### the other metadata readers, apple mdls and ffprobe  
-### -------------------------------------------------------- 
-    ''' uses mdls - mac only - reports non 9:16 vertical width and height correctly -- 
-        drag and drop doesn't work in pyqt5 on desktop '''   
-    # try:  
-    #     result = subprocess.run(
-    #         ['mdls', '-name', 'kMDItemPixelWidth', '-name', 'kMDItemPixelHeight', path],
-    #         capture_output=True,
-    #         text=True,
-    #         check=True
-    #         )
-    #     output = result.stdout
-    #     width, height = None, None
-    #     for line in output.splitlines():
-    #         if 'kMDItemPixelWidth' in line:
-    #             width = int(line.split('=')[-1].strip())
-    #         elif 'kMDItemPixelHeight' in line:
-    #             height = int(line.split('=')[-1].strip())
-    #         del line
-    #     return width, height
-    # except Exception:
-    #     return 0, 0 
-         
-    ''' requires opencv-python - may not always report width/height correctly 
-        for non 9:16 verticals - initial method - not mac specific '''
-    # try:  
-    #     import cv2  ## <<---------------------  
-    #     try:
-    #         cap = cv2.VideoCapture(path) 
-    #     except:
-    #         return 0,0
-    #     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    #     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    #     cap.release()
-    #     return width, height
-    # except:
-    #     return 0, 0
 
-    ''' uses ffprobe -- may not always report width/height correctly for non 9:16 verticals
-        and blows up if run from mac desktop -- works well in vscode '''
-    # try: 
-    #     result = subprocess.run(
-    #         ['ffprobe', '-v', 'error', '-select_streams',  'v:0', '-show_entries', 'stream=width,height','-of', 'csv=s=,:p=0', path],
-    #         capture_output=True,
-    #         text=True,
-    #         check=True
-    #     )
-    #     res = result.stdout.strip()
-    #     i = res.index(',')
-    #     width, height = res[0:i], res[i+1:]
-    #     return int(width), int(height) 
-    # except Exception:
-    #     return 0, 0
-        
-
-        
 ### ---------------------- that's all ---------------------- 
 
-    
     
     
