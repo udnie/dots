@@ -6,6 +6,11 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
+
+---
+**December 10 2025**  
+Added a few lines to both videoPlayers to hide the slider on open as an option by uncommenting the line following **'self.show()'**.  It was easier than doing a rewrite.  It also won't update the slider, move the handle, which may need a boost to get it running if the you made the slider visible.  Loading a file with a different screen format should unstick it,  alternating between 'play/run' and 'stop' might work as well.
+
 ---
 **December 9 2025**   
 Not long after my last post I started thinking about how much work would it be to merge **videoClipsMaker** and **videoClipsWidget** into **videoPlayerTwo**. There are some differences and also a far amount of code in common and out of that came **videoPlayerShared**.

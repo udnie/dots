@@ -18,7 +18,7 @@ import math
     Size detection doesn't work if clips are on.'''
 ### -------------------------------------------------------- 
 
-from PyQt6.QtCore       import Qt, QUrl, QPoint
+from PyQt6.QtCore       import Qt, QUrl, QPoint, QTimer
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, QSizePolicy
                                     
@@ -37,7 +37,7 @@ class MediaPlayer(QMediaPlayer):
     def __init__(self, parent):
         super().__init__()
         
-        self.videoPlayer = parent
+        self.parent = parent
     
         self.mediaPlayer = QMediaPlayer(self) ## 6
         # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5 
@@ -49,8 +49,9 @@ class MediaPlayer(QMediaPlayer):
           
         self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) 
        
-        self.mediaPlayer.positionChanged.connect(self.videoPlayer.shared.positionChanged)
-        self.mediaPlayer.durationChanged.connect(self.videoPlayer.shared.durationChanged)
+        if self.parent.sliderVisible:  ## you'll need to load a file to kickstart the slider if it won't move
+            self.mediaPlayer.positionChanged.connect(self.parent.shared.positionChanged)
+            self.mediaPlayer.durationChanged.connect(self.parent.shared.durationChanged)
              
         self.audioOut = QAudioOutput()  ## 6
         self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6
@@ -71,10 +72,10 @@ class MediaPlayer(QMediaPlayer):
         if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
         # if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
             self.mediaPlayer.pause()  
-            self.videoPlayer.playButton.setText('Resume') 
-        elif self.videoPlayer.fileName != '':  
+            self.parent.playButton.setText('Resume') 
+        elif self.parent.fileName != '':  
             self.mediaPlayer.play()  
-            self.videoPlayer.playButton.setText('Pause') 
+            self.parent.playButton.setText('Pause') 
      
     def mediaStateChanged(self, status): 
         if status == QMediaPlayer.MediaStatus.EndOfMedia:  
@@ -84,11 +85,11 @@ class MediaPlayer(QMediaPlayer):
             self.stopVideo() 
 
     def stopVideo(self):  
-        if self.videoPlayer.loopSet == False: 
+        if self.parent.loopSet == False: 
             self.mediaPlayer.stop()
             self.setPosition(0) 
             self.mediaPlayer.pause() 
-            self.videoPlayer.playButton.setText('Play')
+            self.parent.playButton.setText('Play')
             time.sleep(.03)
         else:   
             self.playVideo()  ## loop it
@@ -114,11 +115,11 @@ class VideoPlayer(QWidget):
         self.clips = Clips(self) 
         self.shared = Shared(self)
         
+        self.sliderVisible = True
+        
         self.mediaPlayer = MediaPlayer(self)
         self.videoWidget = self.mediaPlayer.videoWidget
-        
-        self.sliderVisible = True
-                
+             
         if len(sys.argv) > 1: 
             self.path = sys.argv[1]
          
@@ -126,8 +127,7 @@ class VideoPlayer(QWidget):
         
         vbox.addWidget(self.videoWidget)
         vbox.addWidget(setButtons(self))
-        if self.sliderVisible == True:
-            vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignCenter) 
+        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignCenter) 
        
         self.setLayout(vbox)            
    
@@ -140,7 +140,9 @@ class VideoPlayer(QWidget):
         self.grabKeyboard() 
             
         self.show()
-          
+        
+        # QTimer.singleShot(50, self.shared.toggleSlider)  ## hides slider on open
+            
 ### --------------------------------------------------------        
     def init(self):
         self.key = 'F'   ## <<----->> open full frame - 3:2]
