@@ -1,14 +1,14 @@
 
-### *Last Update: 07/05/2025*
+### *Last Update: 12/10/2025*
 
 ## Scripts  
 
 There is only one codebase and it's written in **pyqt6**.  These scripts will make the necessary changes to convert the **pyqt6** code to either **pyqt5** or **pyside6** and provide any cleanup as well.
 
-        script-qt6.py       Removes PyQt5 code and tokens from the two videoplayer files.
+        script-qt6.py       Removes PyQt5 code and tokens from the three videoplayer files.
         script-ps6.sh       See edits for PySide6
         
-        script-qt5.py       Removes PyQt5 code and tokens, etc.., and other code changes
+        script-qt5.py       Removes PyQt6 code and tokens, etc.., and other code changes
         script-pyqt5.sh     See edit for PyQt5  
 
 
@@ -20,7 +20,7 @@ Scripts should be run in the **dots** source code directory.   A **unix/linux ba
         2. Replace globalPosition() with globalPos()
         3. Replace e.position() with e.pos() in dotsControlView.py
         4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
-        5. Make required edits and cleanup to dotsVideoPlayer.py and videoPlayerOne.py 
+        5. Make required edits and cleanup to dotsVideoPlayer.py, videoPlayerOne.py, videoPLayerTwo 
         6. Comment out optional open-cv references to prevent crashing if not found
         7. Change QMessageBox move(x,y) height in dotsSideGig.py
 
@@ -31,32 +31,22 @@ The shell script **script-pyqt5.sh** handles all the above work required to conv
 
 The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the videoPlayer files and then the **sed** commands are used to replace **'type'** with **'desc'** in the **.py** and **.play** files - and any required as well.  See **February 6**.
 
-## Once installed  
-Enter 'M' to bring up Help Menus, only works on a blank screen, or click on the help button and then on Menus.  An easy way to get the big picture. 
-
-
+#
 ## Help and Stuff
-**Dots** is primarily run using single key commands as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a right mouse click to launch a widget or menu for almost all of the storyboard screen items - something to remember.
+**Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a **right mouse click** to launch a widget or menu for almost all of the storyboard screen items - something to remember.
 
+Once you have **dots** up and running - from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu. The easiest way to see what commands are available, where they are located and what they do.  I'd also recommend running some demos afterwards.
 
-If you're using **vscode** on an **M1 Mac** going from **Rosetta** to **arm64** will require an edit to the terminal settings in the **.code-workspace** as well. Clearing **\_\_pycache\_\_** after applying code changes is recommended.    
-     
-Once you have **dots** up and running from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu - the easiest way to see what commands are available, where they are located and what they do.  I'd also recommend running some demos afterwards.
+**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites**, detect and set screen formats and run the clip making functions in **videoClipsMaker** - that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne/Two** to implement it.  This is repeated further on in more detail.
 
-**Opencv-python** is required to add **shadows** to **sprites** or to adjust screen formats in **videoPlayerOne** -
-that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne** to implement it.  This is repeated further on in more detail.
-
-The three files **vhx.py**, **slideShow.py** and **videPlayerOne.py** are included in the src directory.
-
+The files **vhx.py**, **slideShow.py** and the **videoPlayers/Clips...py's** are included in the src directory.  See December 2025 for more on videoPlayerOne and clipsMaker.
    
 ## Screens 
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
 ## Video  
-**PyQt5** doesn't support loops so moving the **videoWidget** slider has no effect and a video may not disappear when it ends if there are too many animations running at the same time.  Another thing to be aware of, entering pause after the video has finished while an animation is running may cause the video to play again.  Make sure the video will run long enough to work with whatever it is you're doing.  
+**PyQt5** now supports looping using the loop button - the **videoWidget** has been removed. **PyQt5** won't loop a video though, if there's an animation running with shadows.  The two stand-alone videoPlayers each share code from videoClipsMaker, videoClipsWidget and videoPlayerShared with some differences; "one" uses a videoWidget to display and "two" a graphicsVideoItem.  **VideoClipsMaker** provides the functions, **assembler** and **ctrOnBackground**, to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** supplies the help menu and the widget used by clipsMaker to select functions or set variables and **VideoPlayerShared**, as the name suggests - mostly functions in common.
 
-There may be a problem running videos in pyside6 as I've encountered some occasional unplanned exits.  VideoPlayerOne seems pretty stable as it uses a VideoWidget rather than the QGraphicsVideoItem used by dotsVideoPlayer.  I think python 3.11 and 3.12 are recommended, I'm using 3.13 and it didn't seem to matter much. 
-       
 ## Four Files  
 There are four files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
 as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. 
@@ -117,9 +107,13 @@ There are five help *.py files and each one has a list of help files that detail
 ## Widgets and Keys
 A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMaker** from a blank canvas, will pop up a widget that provides access to the most often used functions such as scaling, rotation, scrolling controls or others, including a help menu, depending on what you've selected.
 
-There are a number of **keyboard** controls that either match the functions provided by the widgets or add additional functions, especially if more than one **sprite** has been selected.  The right hand panel is a scrolling list of the keys, key combinations and their actions. The key assignments will change as you switch between **StoryBoard/Canvas** and **PathMaker** or by entering **'K'**. 
+     There are a number of keyboard controls that either match the functions provided by 
+     the widgets or add additional functions, especially if more than one sprite has been 
+     selected. The right hand panel - the KeysPanel - is a scrolling list of the keys, 
+     key combinations and their actions. The key assignments will change as you switch 
+     between StoryBoard/Canvas and PathMaker or by entering 'K'. 
 
-The keysPanel has been replaced by the help buttons and menus and will eventually disappear.
+*The KeysPanel has been replaced by the help buttons and menus and will eventually disappear.*
 
 ## Sprites, Backgrounds and Flats  
 **Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A'** from the **canvas** or **'B'** if there are sprites but no background or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites**, **backgrounds** and **video** to a **play** file.
@@ -137,7 +131,7 @@ An easy test is to run a left or right scrolling demo once you've downloaded, in
 
 
 ## Scrolling Backgrounds
-I've moved the really gnarly stuff concerning scrolling backgrounds to the **screenrates.dict** in the **play** directory. Its contents are the two dictionaries, **screentimes** and **moretimes**, see **Rates and Background Widget**. The **screentimes dictionary** handles the **16:9** formats while the **moretimes dictionary** takes care of the **3:2** formats.  You can mix formats if you use the **3:2** format to display them as each **background** is tracked separately. 
+I've moved the really gnarly stuff concerning scrolling backgrounds to the **screenrates.dict** in the **play** directory. Its contents are the dictionary **screentimes**, see **Rates and Background Widget**. You can mix formats if you use a **3:2** format to display them as each **background** is tracked separately provided they scroll correctly.
 
 You're can easily adjust the screen rate, the variable that determines how fast the **'next'** scrolling background moves, and if the new rate is a better fit you can save it as the default to **screenrates.dict** using the **update button**. The current **screen rate** value as well as the **factor** and **showtime** values are carried over if the scrolling background is saved to a **.play** file.
 
@@ -240,7 +234,6 @@ The class attribute **type** is replaced in **PySide6** with **desc** as **pysid
 
   
 **\** number of screen items + 100 decreasing by 1 per item
-
 
 
 ## A Brief History of Animation
