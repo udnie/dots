@@ -148,7 +148,7 @@ class  MainMenu:
                     self.pathWidget = PathWidget(self.canvas, '', 'all')
                     self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
                     self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')  
-                            
+                                
         else:
             self.table.close() 
             self.canvas.clear()   

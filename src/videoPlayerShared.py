@@ -6,13 +6,19 @@ import subprocess
 
 from functools          import partial
 
-from PyQt6.QtCore       import Qt, QTimer, QPoint, QRect
+from PyQt6.QtCore       import Qt, QTimer, QPoint, QRect, QSizeF, QUrl
 from PyQt6.QtGui        import QGuiApplication, QCursor
 from PyQt6.QtWidgets    import QSlider, QHBoxLayout, QLabel, QFileDialog, \
                                 QPushButton, QFrame, QSizePolicy, QMessageBox
 
+from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
+from PyQt6.QtMultimediaWidgets  import QVideoWidget, QGraphicsVideoItem
+
+# from PyQt6.QtMultimedia           import QMediaContent  ## 5
+
 from videoClipsWidget   import *
 from videoClipsMaker    import Ext  
+from videoPlayerHelp    import VideoHelp
 
 ### -------------------------------------------------------- 
 ''' The function getMetaData and code shared by both videoPlayers 
@@ -20,6 +26,79 @@ from videoClipsMaker    import Ext
     and make files less packed and easier to read. I've added a 
     visual aid to point out files or code specific to videoPlayer 
     one or two... ## <- "one", ## <- "two". Easy to search for. '''
+### --------------------------------------------------------   
+class MediaPlayer(QMediaPlayer): 
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+        
+        self.parent = parent
+    
+        self.mediaPlayer = QMediaPlayer(self) ## 6
+        # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5 
+            
+        if self.parent.player == "one":
+            self.videoWidget = QVideoWidget()   
+            self.mediaPlayer.setVideoOutput(self.videoWidget) 
+            self.videoWidget.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+            
+        elif self.parent.player == "two":
+            self.videoItem = QGraphicsVideoItem()   
+            self.mediaPlayer.setVideoOutput(self.videoItem)  
+            self.videoItem.setZValue(100)
+            self.videoItem.setSize(QSizeF(float(ViewH*1.5), float(ViewH)))  
+            self.videoItem.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+            
+        self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) 
+       
+        if self.parent.sliderVisible:  ## you'll need to load a file to kickstart the slider if it won't move
+            self.mediaPlayer.positionChanged.connect(self.parent.shared.positionChanged)
+            self.mediaPlayer.durationChanged.connect(self.parent.shared.durationChanged)
+             
+        self.audioOut = QAudioOutput()  ## 6
+        self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6
+  
+        self.mediaPlayer.setLoops(-1)  ## 6
+        
+### -----------------------------------------------------------------
+    def setFileName(self, fileName): 
+        try:
+            self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6
+            # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5  
+        except:
+            return False
+        self.mediaPlayer.pause()  ## makes it visible 
+        return True
+        
+    def playVideo(self):  
+        if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
+        # if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
+            self.mediaPlayer.pause()  
+            self.parent.playButton.setText('Resume') 
+        elif self.parent.fileName != '':  
+            self.mediaPlayer.play()  
+            self.parent.playButton.setText('Pause') 
+     
+    def mediaStateChanged(self, status): 
+        if status == QMediaPlayer.MediaStatus.EndOfMedia:  
+            while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState):   ## 6
+            # while not (self.mediaPlayer.state() == QMediaPlayer.State.StoppedState):  ## 5
+                time.sleep(.005) 
+            self.stopVideo() 
+
+    def stopVideo(self):  
+        if self.parent.loopSet == False: 
+            self.mediaPlayer.stop()
+            self.setPosition(0) 
+            self.mediaPlayer.pause() 
+            self.parent.playButton.setText('Play')
+            time.sleep(.03)
+        else:   
+            self.playVideo()  ## loop it
+
+    def setPosition(self, position):  ## from videoPlayer by finger pull
+        self.mediaPlayer.setPosition(position)
+
 ### --------------------------------------------------------     
 class Shared:  
 ### -------------------------------------------------------- 
@@ -27,11 +106,13 @@ class Shared:
         super().__init__()  
         
         self.parent = parent
-    
+
 ### --------------------------------------------------------
     def openPlayer(self, key):  ## from keyboard or helpMenu - default on open      
         self.closeHelpMenu() 
-        if self.parent.player == "two": self.closeMediaPlayer()  ## <- "two"
+        if self.parent.player == "two": 
+            self.parent.closeMediaPlayer()  ## <- "two"
+   
         if key in AspKeys:    
             self.parent.clips.setDefaultSizes(key)  ## sets self.aspect
             self.parent.shared.setScreenFormat()  ## just resize it
@@ -46,7 +127,7 @@ class Shared:
             return False
         key, width, height = '', 0, 0
         try: 
-            width, height = getMetaData(fileName)  ## in clipswidget
+            width, height = getMetaData(fileName)  ## it's here
         except:   
             None    
         if width > 0 and height > 0: 
@@ -80,17 +161,13 @@ class Shared:
         hgt = HGT if self.parent.sliderVisible == True else HGT-PAD  
         self.parent.resize(self.parent.ViewW+WID, self.parent.ViewH+hgt) 
         self.moveAndSet()  
-           
-    def addToScene(self, fileName): ## <- "two"
-        self.parent.fileName = fileName  
-        self.parent.scene.addItem(self.parent.videoItem)
-        self.parent.mediaPlayer.setBackDrop()
-            
+                     
 ### --------------------------------------------------------
     def openDirectory(self):  ## in clips - point to a directory to read from  
-        if self.parent.player == 'two':  ## <- "two"
-            self.closeMediaPlayer()
-        self.closeOnOpen() 
+        if self.parent.player == 'two': 
+            self.parent.closeMediaPlayer()
+        elif self.parent.player == 'two': 
+            self.parent.closeOnOpen() 
         if self.parent.clips.MakeClips == False: 
             self.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
             return      
@@ -101,7 +178,7 @@ class Shared:
             if path == None or path == '':
                 return  
             title = self.parent.clips.setTitle(path)    
-            self.parent.setFileName(title)
+            self.parent.setFileName(title)      
             QTimer.singleShot(20, partial(self.parent.clips.assembler, os.getcwd(), title))
   
 ### --------------------------------------------------------
@@ -131,7 +208,7 @@ class Shared:
         if self.parent.helpFlag == True:
             self.closeHelpMenu()
         else:
-            self.parent.helpMenu = Help(self.parent)
+            self.parent.helpMenu = VideoHelp(self.parent)
             self.parent.helpFlag = True
             
     def closeHelpMenu(self):
@@ -140,33 +217,14 @@ class Shared:
             self.parent.helpMenu.close()
             self.parent.helpFlag = False
             time.sleep(.03)
-            
-    def closeOnOpen(self):   ## <- "one"
-        self.closeHelpMenu();   
-        self.parent.clips.closeSettings()
-        time.sleep(.03)  
-        self.parent.clips.looperOff() 
-        if self.parent.mediaPlayer != None:
-            self.stopVideo()
-                  
-    def closeMediaPlayer(self):   ## <- "two"
-        if self.parent.mediaPlayer != None: 
-            self.stopVideo() 
-            time.sleep(.03)  
-            self.parent.clips.looperOff()
-            self.parent.scene.removeItem(self.parent.mediaPlayer.backdrop)
-            self.parent.scene.removeItem(self.parent.videoItem) 
-            self.parent.videoItem = None
-            self.parent.mediaPlayer = None 
-            time.sleep(.03)      
-
+                    
 ### --------------------------------------------------------
     def msgbox(self, str):
         msg = QMessageBox()
         msg.setText(str)
         timer = QTimer(msg)
         timer.setSingleShot(True)
-        timer.setInterval(5000)
+        timer.setInterval(7000)
         timer.timeout.connect(msg.close)
         timer.start()
         msg.exec() 
@@ -178,11 +236,7 @@ class Shared:
             elif asp - .01 == v[0] or asp + .01 == v[0]:
                 return k
         return None
-    
-    def showHideAspectBtn(self):   ## <- "one"
-        self.parent.aspButton.show() if self.parent.width() > VertW \
-            else self.parent.aspButton.hide()
-        
+   
     def toggleSlider(self):
         self.parent.flag = True
         if self.parent.sliderVisible and self.parent.height() > MinHgt+PAD: 
@@ -195,43 +249,7 @@ class Shared:
             self.parent.sliderVisible = True
             self.parent.resize(self.parent.width(), self.parent.height()+PAD)
             time.sleep(.03)    
-        
-### --------------------------------------------------------            
-    def zoom(self, zoom):   ## <- "one"
-        if self.parent.mediaPlayer != None:  
-            if int(self.parent.height() * zoom) > 1280 or int(self.parent.height()* zoom) < 300:
-                return  
-                
-            asp = 0    
-            if self.parent.aspect == 0 and (self.parent.key != '' and self.parent.key != 'O'):
-                self.parent.aspect = Keys[self.parent.key][0]  
-                      
-            elif self.parent.key == 'O' and self.parent.aspect > 0:  ## horizontals
-                asp = self.parent.aspect
-                nwidth = self.parent.lastVWidth
-                
-            if self.parent.aspect != 0:
-                asp = self.parent.aspect
-                
-            elif asp == 0:
-                self.msgbox('The Aspect Ratio Has Not Been Set')
-                return 
-                                                       
-            height = int(self.parent.height()* zoom)  ## new height  
-            
-            nvH = (height - HGT)  ## new video height
-            nvW = int(nvH * asp)  ## new video width   
-            nwidth = nvW + WID    ## new widget width   
-            
-            p, width = self.parent.pos(), self.parent.width()  
-            self.parent.resize(nwidth, height)   
-            dif = int((self.parent.width() - width)/2) 
-            self.parent.move(p.x()-dif, p.y()) 
-                 
-            self.parent.ViewW, self.parent.ViewH = self.parent.width()-WID, self.parent.height()-HGT 
-            
-            self.showHideAspectBtn()
-                                      
+                                  
 ### -------------------------------------------------------           
 def getDirection(self):  ## left out top, topleft and topright - feel free to add them
     corner, which = 5, ''      
@@ -274,7 +292,6 @@ def setSlider(self):
             border-radius: 3px;
         }
     """)
-
     return self.slider
                            
 ### --------------------------------------------------------
@@ -284,14 +301,14 @@ def setButtons(self):
         
     self.openButton = QPushButton("Files")
     self.playButton = QPushButton("Play")  
-    if self.player == "one":                ## <- "one"
+    if self.player == "one":            
         self.aspButton   = QPushButton("Aspect")
     self.loopButton = QPushButton("Loop")
     self.stopButton = QPushButton("Stop")
     self.byeButton  = QPushButton("Quit")
     
     self.openButton.clicked.connect(self.clips.openFile) if self.player == "one"\
-        else  self.openButton.clicked.connect(self.openFile)         ## <- "one"
+        else self.openButton.clicked.connect(self.openFile)         ## <- "two"
     
     self.playButton.clicked.connect(self.shared.playVideo)
     if self.player == "one":
@@ -304,7 +321,7 @@ def setButtons(self):
             
     hbox.addWidget(self.openButton)  
     hbox.addWidget(self.playButton)    
-    if self.player == "one":                 ## <- "one"
+    if self.player == "one":       
         hbox.addWidget(self.aspButton)
     hbox.addWidget(self.loopButton)    
     hbox.addWidget(self.stopButton)  
@@ -323,12 +340,11 @@ def setButtons(self):
     self.bGroup.setLayout(hbox)
     
     return self.bGroup
-      
+    
 ### --------------------------------------------------------
 ### detect video width and height to set aspect ratio 
 ### --------------------------------------------------------
-def getMetaData(path):   
-    
+def getMetaData(path):    
     ''' requires opencv-python - may not always report width/height correctly 
         for non 9:16 verticals - initial method - not mac specific '''
     # try:  
@@ -343,7 +359,6 @@ def getMetaData(path):
     #     return width, height
     # except:
     #     return 0, 0
-    
     ''' uses mdls - mac only - reports non 9:16 vertical width and height correctly -- 
         drag and drop doesn't work in pyqt5 on desktop '''  
     # try:  
@@ -364,8 +379,6 @@ def getMetaData(path):
     #     return width, height
     # except Exception:
     #     return 0, 0
-    
-
     ''' uses ffprobe -- may not always report width/height correctly for non 9:16 verticals
         and blows up if run from mac desktop -- works well in vscode '''
     # try: 

@@ -18,85 +18,14 @@ import math
     Size detection doesn't work if clips are on.'''
 ### -------------------------------------------------------- 
 
-from PyQt6.QtCore       import Qt, QUrl, QPoint, QTimer
+from PyQt6.QtCore       import Qt, QPoint, QTimer
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, QSizePolicy
                                     
-from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
-from PyQt6.QtMultimediaWidgets  import QVideoWidget
-
-# from PyQt6.QtMultimedia           import QMediaContent  ## 5
-
-from videoClipsMaker        import Clips, Ext
+from videoClipsMaker        import Clips
 from videoClipsWidget       import *
 from videoPlayerShared      import *
 
-### --------------------------------------------------------   
-class MediaPlayer(QMediaPlayer): 
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
-        
-        self.parent = parent
-    
-        self.mediaPlayer = QMediaPlayer(self) ## 6
-        # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5 
-            
-        self.videoWidget = QVideoWidget()   
-        self.mediaPlayer.setVideoOutput(self.videoWidget)
-         
-        self.videoWidget.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-          
-        self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) 
-       
-        if self.parent.sliderVisible:  ## you'll need to load a file to kickstart the slider if it won't move
-            self.mediaPlayer.positionChanged.connect(self.parent.shared.positionChanged)
-            self.mediaPlayer.durationChanged.connect(self.parent.shared.durationChanged)
-             
-        self.audioOut = QAudioOutput()  ## 6
-        self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6
-  
-        self.mediaPlayer.setLoops(-1)
-        
-### -----------------------------------------------------------------
-    def setFileName(self, fileName):  ## set in clipsMaker
-        try:
-            self.mediaPlayer.setSource((QUrl.fromLocalFile(fileName)))  ## 6
-            # self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(os.path.abspath(fileName))))  ## 5  
-        except:
-            return False
-        self.mediaPlayer.pause()  ## makes it visible 
-        return True
-        
-    def playVideo(self):  
-        if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
-        # if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5
-            self.mediaPlayer.pause()  
-            self.parent.playButton.setText('Resume') 
-        elif self.parent.fileName != '':  
-            self.mediaPlayer.play()  
-            self.parent.playButton.setText('Pause') 
-     
-    def mediaStateChanged(self, status): 
-        if status == QMediaPlayer.MediaStatus.EndOfMedia:  
-            while not (self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.StoppedState):   ## 6
-            # while not (self.mediaPlayer.state() == QMediaPlayer.State.StoppedState):  ## 5
-                time.sleep(.005) 
-            self.stopVideo() 
-
-    def stopVideo(self):  
-        if self.parent.loopSet == False: 
-            self.mediaPlayer.stop()
-            self.setPosition(0) 
-            self.mediaPlayer.pause() 
-            self.parent.playButton.setText('Play')
-            time.sleep(.03)
-        else:   
-            self.playVideo()  ## loop it
-
-    def setPosition(self, position):  ## from videoPlayer by finger pull
-        self.mediaPlayer.setPosition(position)
-  
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
@@ -131,7 +60,7 @@ class VideoPlayer(QWidget):
        
         self.setLayout(vbox)            
    
-        self.shared.openPlayer(self.key)   ## <<----->> open full frame - 3:2]  
+        self.shared.openPlayer(self.key)   ## open full frame - 3:2
          
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()
         self.move(x-int((ViewW+WID)/2), HorzH)  
@@ -141,17 +70,15 @@ class VideoPlayer(QWidget):
             
         self.show()
         
-        # QTimer.singleShot(50, self.shared.toggleSlider)  ## hides slider on open
+        QTimer.singleShot(50, self.shared.toggleSlider)  ## hides slider on open
             
 ### --------------------------------------------------------        
     def init(self):
         self.key = 'F'   ## <<----->> open full frame - 3:2]
+        self.player = 'one'
         self.path = ''
         self.fileName = ''
-        self.player = 'one'
         self.aspect = 0.0
-        self.lastVWidth = 0
-        self.lastHeight = 0 
         self.loopSet = False
         self.helpFlag = False 
         self.helpMenu = None
@@ -165,7 +92,7 @@ class VideoPlayer(QWidget):
             m = e.mimeData()
             fileName = m.urls()[0].toLocalFile() 
             self.setFileName(fileName)  
-            self.playVideo() if self.clips.PlayVideo else \
+            self.shared.playVideo() if self.clips.PlayVideo else \
                 self.mediaPlayer.pause()  ## PlayVideo set in clipsMaker
             e.accept()
         else:
@@ -190,11 +117,11 @@ class VideoPlayer(QWidget):
                           
         elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
-                self.shared.zoom(1.05) 
+                self.zoom(1.05) 
                              
         elif key == Qt.Key.Key_BracketLeft or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Less, Qt.Key.Key_Underscore):
-                self.shared.zoom(.95)  
+                self.zoom(.95)  
                 
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.bye()
@@ -213,15 +140,15 @@ class VideoPlayer(QWidget):
         else: 
             match key:
                 case 'L':
-                    self.shared.looper()  
-                case ']':
-                    self.shared.zoom(1.05)  
-                case '[':    
-                    self.shared.zoom(0.95)      
-                case 'Aspect':
-                    self.setAspButton()  ## set aspect ratio manually clicking on aspect button
+                    self.clips.looper()      
                 case 'Settings':
                     self.clips.toggleSettings(self)  ## clipMaker settings
+                case ']':
+                    self.zoom(1.05)  
+                case '[':    
+                    self.zoom(0.95)      
+                case 'Aspect':
+                    self.setAspButton()  ## set aspect ratio manually clicking on aspect button
                 case 'C':
                     self.shared.closeHelpMenu()  ## improvised clear
                     self.mediaPlayer.stop()        
@@ -241,6 +168,8 @@ class VideoPlayer(QWidget):
             if self.clips.settings == None:
                 self.shared.closeHelpMenu() if self.helpFlag == True \
                     else self.shared.openHelpMenu() 
+        else:
+            self.shared.closeHelpMenu()
         e.accept() 
    
     def mouseMoveEvent(self, e):
@@ -270,7 +199,7 @@ class VideoPlayer(QWidget):
         if self.clips.AutoAspect == True and self.clips.MakeClips == False:
             if not self.shared.setAspectRatio(fileName): ## else skip it and open without
                 return 
-        if self.mediaPlayer.setFileName(fileName) == False:   ## <- "one"
+        if self.mediaPlayer.setFileName(fileName) == False: 
             self.shared.msgbox('error setting mediaPlayer')
             return
         self.playButton.setEnabled(True)      
@@ -293,7 +222,7 @@ class VideoPlayer(QWidget):
         time.sleep(.03)
         self.shared.moveAndSet()
 
-    def setAspButton(self):  ## from aspect button   ## <- "one"
+    def setAspButton(self):  ## from aspect button   
         if self.aspect == 0:
             v = self.videoWidget.size()  
             self.aspect = math.floor(v.width()/v.height() * 100)/100.0          
@@ -305,7 +234,56 @@ class VideoPlayer(QWidget):
         else:
             self.aspect = 0
             self.aspButton.setText("Set Aspect")
-                                                                  
+            
+### -------------------------------------------------------- 
+    def closeOnOpen(self):  
+        self.shared.closeHelpMenu();   
+        self.clips.closeSettings()
+        time.sleep(.03)  
+        self.clips.looperOff() 
+        if self.mediaPlayer != None:
+            self.shared.stopVideo()
+    
+    def showHideAspectBtn(self):  ## also called from clipsMaker
+        self.aspButton.show() if self.width() > VertW \
+            else self.aspButton.hide()
+    
+### -------------------------------------------------------- 
+    def zoom(self, zoom): 
+        if self.mediaPlayer != None:  
+            if int(self.height() * zoom) > 1280 or int(self.height()* zoom) < 300:
+                return  
+                
+            asp = 0    
+            if self.aspect == 0 and (self.key != '' and self.key != 'O'):
+                self.aspect = Keys[self.key][0]  
+                      
+            elif self.key == 'O' and self.aspect > 0:  ## horizontals
+                asp = self.aspect
+                nwidth = self.VideoW
+                
+            if self.aspect != 0:
+                asp = self.aspect
+                
+            elif asp == 0:
+                self.msgbox('The Aspect Ratio Has Not Been Set')
+                return 
+                                                       
+            height = int(self.height()* zoom)  ## new height  
+            
+            nvH = (height - HGT)  ## new video height
+            nvW = int(nvH * asp)  ## new video width   
+            nwidth = nvW + WID    ## new widget width   
+            
+            p, width = self.pos(), self.width()  
+            self.resize(nwidth, height)   
+            dif = int((self.width() - width)/2) 
+            self.move(p.x()-dif, p.y()) 
+                 
+            self.ViewW, self.ViewH = self.width()-WID, self.height()-HGT 
+            
+            self.showHideAspectBtn() 
+                                                                                                                               
 ### --------------------------------------------------------   
     def resizeEvent(self, e):
         if self.flag == True:

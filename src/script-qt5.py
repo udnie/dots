@@ -7,12 +7,11 @@ import os
 
 files = ["dotsHelpMenus.py", \
         "dotsHelpMaker.py", \
-        "videoPlayerOne.py", \
         "dotsVideoPlayer.py", \
         "dotsTableMaker.py", \
         "dotsPixItem.py",\
         "dotsSideGig.py",\
-        "videoPlayerTwo.py"]
+        "videoPlayerShared.py"]
 for file in files:
     lines = []
     with open(file, 'r') as fp: 
@@ -54,7 +53,7 @@ for file in files:
                 elif 'QtWidgets' in line:
                     line = line.strip() + ', QShortcut' + '\n'
                            
-            elif file in ("dotsVideoPlayer.py","videoPlayerOne.py", "videoPlayerTwo.py"):
+            elif file in ("dotsVideoPlayer.py", "videoPlayerShared.py"):
                 if line.startswith('import cv2'):
                     line = '# ' + line
                 

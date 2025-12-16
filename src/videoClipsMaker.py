@@ -39,7 +39,7 @@ class Clips:
 
         self.Fps = 5    ## frames per second - less than 5 and the video won't play
         self.Max = 25   ## max number of photos to read/write  
-        self.Wpr = 4    ## writes per read
+        self.Wpr = 3    ## writes per read
         self.Rnf = 1    ## read every 'n frame - just to make sure 
                        
         self.AutoAspect  = False     ## True reads the video metadata to set the aspect ratio and resize the widget
@@ -151,8 +151,10 @@ class Clips:
 ### --------------------------------------------------------  
     def openFile(self, open=False):  ## opens one file, open=False, from the keyboard or helpMenu
         if self.parent.player == 'two':  ## <- "two"
-            self.parent.shared.closeMediaPlayer()
-        self.parent.shared.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
+            self.parent.closeMediaPlayer()
+        
+        self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
+       
         path = os.getcwd() if self.parent.path == '' \
             else self.parent.path    
         try:
@@ -199,7 +201,7 @@ class Clips:
             self.parent.shared.msgbox('error in setDefaultSizes')
             return
         if key in ('S','T','U','V') and self.parent.player == 'one':
-            self.parent.shared.showHideAspectBtn()   ## <- "one"
+            self.parent.showHideAspectBtn()   ## <- "one"
                                                                   
 ### --------------------------------------------------------
     def assembler(self, path, outputVideo, fileName=''):
@@ -211,7 +213,8 @@ class Clips:
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4 and .mov
             out = cv2.VideoWriter(outputVideo, fourcc, self.Fps, dim)
         except:
-            self.parent.shared.msgbox('assembler:  error setting output')
+            self.parent.shared.msgbox('assembler: error setting output' +  '\n' + 
+                                      'check if opencv installed or uncommented')
             return
      
         # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
@@ -315,7 +318,7 @@ class Clips:
         return k
                     
     def addFileName(self, img, name):  ## right out of google - thanks
-        org   = (20, self.parent.VideoH-30)
+        org   = (20, self.parent.VideoH-25)
         font  = cv2.FONT_HERSHEY_SIMPLEX
         scale = 1
         color = (0,255,255)

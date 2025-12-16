@@ -1,15 +1,12 @@
 
 
-from PyQt6.QtCore       import Qt, QRectF, QTimer
-from PyQt6.QtGui        import QColor, QPen, QPainter, QFont                      
+from PyQt6.QtCore       import Qt, QRectF
+from PyQt6.QtGui        import QColor, QPen, QPainter                   
 from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
-                                QPushButton, QVBoxLayout, QTableWidget,  QAbstractItemView, \
-                                QTableWidgetItem
-
-from functools          import partial
-
+                                QPushButton, QVBoxLayout
+               
 ### ------------------ videoClipsWidget.py -----------------
-''' Source for global varibles, help and settings. '''
+''' global varibles and settings '''
 ### --------------------------------------------------------
 
 Keys  = {
@@ -20,25 +17,6 @@ Keys  = {
     'U': (0.75, 525,  700,  720,  960),  ##  3:4 digital-camera/iphone vertical  
     'T': (0.66, 525,  790,  720, 1080),  ##  2:3 vertical   
     'V': (0.56, 525,  930,  720, 1280),  ## 9:16 vertical
-}
-
-helpMenuKeys = {  ## help menu - right-mouse-click
-    'A':    'Apple/Academy 4X3',  
-    'F':    'Full Screen 3X2',
-    'H':    'Horiztonal HD 16X9',
-    'S':    'Square',
-    'T':    'Vertical 2X3',
-    'U':    'Apple 3X4 Vertical',                  
-    'V':    'Vertical 9X16',
-    'C':    'To Clear',
-    'L':    'Loop On/Off',
-    '>,  +,  ]':    'Scale Up',
-    '<,  _,  [':    'Scale Down',
-    'X, Q Escape':  'Quit/Exit',
-    'Shift-S':      'Hide/Show Slider',
-    'Aspect':       'Set Aspect (Button)',
-    'Settings':     'Clip Settings',
-    'Clips':        'Make a Clip',    
 }
 
 ViewW,  ViewH  =  790,  525  ## starting video size
@@ -52,105 +30,15 @@ MinWid = 300  ## minimum widget width
 MinHgt = 400  ## minimum widget height
 
 AspKeys = list(Keys.keys())
+
 SharedKeys = AspKeys + ['L','O','X','C',']','[','Shift-S','Aspect','Settings','Clips']
+
 WID, HGT, PAD = 40, 140, 30 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
-### --------------------------------------------------------     
-class Help(QWidget):  
-### -------------------------------------------------------- 
-    def __init__(self, parent): 
-        super().__init__()  
-        
-        self.parent = parent
-    
-        self.table = QTableWidget()
-        self.table.setRowCount(len(helpMenuKeys)+1)
-        self.table.setColumnCount(2)
-     
-        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-      
-        self.table.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        
-        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers) 
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        
-        self.table.setHorizontalHeaderLabels(["Key", "Function"])
-        stylesheet = "::section{Background-color: lightgray; font-size:14px;}"
-        self.table.horizontalHeader().setStyleSheet(stylesheet)
-        
-        self.table.setStyleSheet('QTableWidget{\n'   
-            'background-color: rgb(250,250,250);\n'                 
-            'font-size: 13pt;\n' 
-            'font-family: Arial;\n' 
-            'border: 3px solid dodgerblue;\n'
-            'gridline-color: rgb(190,190,190);}') 
-                                                                                                             
-        self.table.setColumnWidth(0, 110) 
-        self.table.setColumnWidth(1, 156)
-
-        menuWidth, menuHeight = 272, 541 
-        self.table.setFixedSize(menuWidth, menuHeight)  
-        
-        self.table.verticalHeader().setVisible(False) 
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        
-        self.table.itemClicked.connect(self.clicked)   
-         
-        row = 0     
-        for k,  val in helpMenuKeys.items():   
-            item = QTableWidgetItem(k)
-            if k in ('Aspect','Clips','Settings'):
-                item.setBackground(QColor(225, 225, 225))
-            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.table.setItem(row, 0, item)
-            
-            item = QTableWidgetItem(val)
-            if k in ('Aspect','Clips','Settings'):
-                item.setBackground(QColor(225, 225, 225))  
-            self.table.setItem(row, 1, item)      
-            row += 1
-                  
-        item = QTableWidgetItem("Right-Click or Click Here to Close")
-        item.setBackground(QColor('lightgray'))
-        item.setFont(QFont("Arial", 14))
-        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        self.table.setSpan(row, 0, 1, 2)  
-        self.table.setItem(row, 0, item)   
-        
-        p, pwidth, pheight = self.parent.pos(), self.parent.width(), self.parent.height()
-        
-        x = int(p.x() + (pwidth/2)) - int(menuWidth/2)   
-        y = int(p.y() + (pheight/2)) - int(menuHeight/2)   
-        
-        self.table.move(x,y)  
-        self.table.show()
-        
-    def clicked(self):
-        help = self.table.item(self.table.currentRow(), 0).text().strip()
-        match help: 
-            case ('X, Q Escape'):
-                help = 'X'
-            case ('>,  +,  ]'):
-                help = ']'
-            case ('<,  _,  ['): 
-                help = '['     
-        if help in SharedKeys: 
-            try:
-                QTimer.singleShot(25, partial(self.parent.sharedKeys, help))
-            except:
-                None
-        self.parent.shared.closeHelpMenu()
-  
-    def tableClose(self):
-        self.parent.helpFlag == False
-        self.table.close()   
-          
 ### --------------------------------------------------------        
 class Settings(QWidget):  ## settings for clipsMaker and autoAspect
 ### -------------------------------------------------------- 
-    def __init__(self, parent):
+    def __init__(self, parent): 
         super().__init__()
 
         self.parent = parent
@@ -172,9 +60,9 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
-        
+              
         p = self.parent.pos()
-        x = int(p.x() + (self.parent.width()/2)) - int(self.WidgetW/2)   
+        x = int(p.x() + (self.parent.width()/2)) - int(self.WidgetW/2)
         y = int(p.y() + (self.parent.height()/2)) - int(self.WidgetH/2)   
         
         self.move(x, y)

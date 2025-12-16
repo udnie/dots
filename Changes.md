@@ -8,6 +8,13 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 
 ---
+**December 15 2025**   
+Added **VideoPlayerHelp** which uses the **TableWidgetSetUp** class copied over from **dots** as it made making the helpMenus easier and provided more display options while removing any dependancies having to do with **dots**. There is only one menu for videoPlayers as they're actually the same. Some functions don't work in **videoPlayerTwo** and they're clearly noted. The helpMenus for the **videoPlayers** and **slideShow** are both to be found here. 
+
+Last, was able to move the MediaPlayer class originally in both **videoPlayerOne** and **Two** to **videoPlayerShared** and move all the one-player-use code in **Shared** back to their original locations - **getMetaData** still resides there.
+
+--- 
+
 **December 10 2025**  
 Added a few lines to both videoPlayers to hide the slider on open as an option by uncommenting the line following **'self.show()'**.  It was easier than doing a rewrite.  It also won't update the slider, move the handle, which may need a boost to get it running if the you made the slider visible.  Loading a file with a different screen format should unstick it,  alternating between 'play/run' and 'stop' might work as well.
 

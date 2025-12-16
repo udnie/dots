@@ -131,7 +131,7 @@ class ShowBiz:
                     case 'M':
                         self.helpMaker.menuHelp()       ## show help menus
                     case 'P':  
-                        self.pathMaker.initPathMaker()  ## switch tp pathmaker
+                        self.pathMaker.initPathMaker()  ## switch to pathmaker
                     case 'S':   
                         self.helpMenus.setMenu(key)     ## screen menu
                      

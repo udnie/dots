@@ -5,7 +5,7 @@
 ### -------------------------------------------------------
 import os
 
-files = ["videoPlayerOne.py", "dotsVideoPlayer.py", "videoPlayerTwo.py"]
+files = ["videoPlayerShared.py", "dotsVideoPlayer.py"]
 for file in files:
     lines = []
     with open(file, 'r') as fp: 

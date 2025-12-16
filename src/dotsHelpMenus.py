@@ -121,9 +121,8 @@ class DemoHelp:
             
         elif key == 'snakes':
             self.canvas.bkgMaker.newTracker.clear()
-            if self.dots.Vertical:   
-                self.runSnakes('vertical') 
-            else:
+            
+            self.runSnakes('vertical') if self.dots.Vertical else\
                 self.runSnakes('left')   
                     
         elif key == 'bats':
@@ -136,10 +135,8 @@ class DemoHelp:
                 return            
             self.canvas.bkgMaker.newTracker.clear()
             
-            if key == 'left':  ## direction of travel
-                self.hats.makeHatsDemo('left')  ## right to left 
-            else: 
-                self.hats.makeHatsDemo('right') ## left to right   
+            self.hats.makeHatsDemo('left') if key == 'left' else\
+                self.hats.makeHatsDemo('right') ## left to right - direction of travel
       
     def runSnakes(self, what): 
         if what in ('blue', 'snakes'): 

@@ -134,9 +134,8 @@ class ControlView(QGraphicsView):
 ### --------------------------------------------------------                                                        
     ## keys with modifiers
 ### -------------------------------------------------------- 
-        elif key in (Qt.Key.Key_B, Qt.Key.Key_D, Qt.Key.Key_H, Qt.Key.Key_L, \
-            Qt.Key.Key_M, Qt.Key.Key_R, Qt.Key.Key_S, Qt.Key.Key_T, Qt.Key.Key_U):
-
+        elif key in (Qt.Key.Key_B, Qt.Key.Key_D, Qt.Key.Key_H, Qt.Key.Key_L):
+           
             if key == Qt.Key.Key_B:
                 if not self.canvas.pathMakerOn:
                     if mod & Qt.KeyboardModifier.ShiftModifier:
@@ -164,8 +163,10 @@ class ControlView(QGraphicsView):
                     self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass  
                 else:
                     self.setKey('L')  ## used by pathmaker to toggle lasso 
-                    
-            elif key == Qt.Key.Key_M:
+           
+        elif key in (Qt.Key.Key_M, Qt.Key.Key_R, Qt.Key.Key_S, Qt.Key.Key_T, Qt.Key.Key_U):       
+           
+            if key == Qt.Key.Key_M:
                 if mod & Qt.KeyboardModifier.ShiftModifier:  
                     self.sideCar.dump()   
                 else:

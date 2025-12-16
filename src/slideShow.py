@@ -2,34 +2,31 @@
 import sys
 import os
 import math
-
-from functools          import partial
+import time
 
 from PyQt6.QtCore       import Qt, QPoint, QPointF, QTimer
-from PyQt6.QtGui        import QImage, QPixmap, QGuiApplication, QFont, QColor
+from PyQt6.QtGui        import QImage, QPixmap, QGuiApplication, QFont
 from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, \
                                 QGraphicsScene, QGraphicsPixmapItem, QLabel, \
                                 QHBoxLayout,  QVBoxLayout, QPushButton, QMessageBox, \
-                                QFileDialog, QFrame, QGraphicsTextItem, QTableWidget, \
-                                QTableWidgetItem, QAbstractItemView
+                                QFileDialog, QFrame, QGraphicsTextItem
+
+from videoPlayerHelp    import SlideShowHelp, SlideShowKeys
 
 ### --------------------------------------------------------
-Path = ''       ## set a default directory
-SetY = 175      ## Y position of slideShow   
+Path  = ''       ## set a default directory
+SetY  = 175      ## Y position of slideShow   
+Hpad  = 60       ## padding for buttons added to height
 
-Hpad = 60       ## padding for buttons added to height
-CutOff = 550    ## when to stop showing text 
-Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
- 
-OneColor  = False  ## sets frame same as background
+CutOff   = 550    ## when to stop showing text  
+OneColor = False  ## sets frame same as background
 
-### --------------------------------------------------------
-Width, Height     = 1200,  750   ## choose one you like and delete the rest
-ViewW, ViewH      = 1150,  700   ## starting viewport
+Width, Height     = 1200,  750      ## choose one you like and delete the rest
+ViewW, ViewH      = 1150,  700      ## starting viewport
 MaxW, MaxH, MaxV  =  950,  500, 550 ## max image size within the ViewW/H
 
-# Width, Height     = 1500, 1000  ## widget size  
-# ViewW, ViewH      = 1450,  950  ## scene size
+# Width, Height     = 1500, 1000    ## widget size  
+# ViewW, ViewH      = 1450,  950    ## scene size
 # MaxW, MaxH, MaxV  = 1200,  650, 800 
 
 # Width, Height     = 1450,  900  
@@ -40,30 +37,12 @@ MaxW, MaxH, MaxV  =  950,  500, 550 ## max image size within the ViewW/H
 # ViewW, ViewH      = 1300,  800 
 # MaxW, MaxH, MaxV  = 1100,  550, 650  
 
-### --------------------------------------------------------
-helpMenuKeys = {  ## help menu - 'H' or button
-    'C':                'Clear Screen',  
-    'F ':               'File Chooser', 
-    'H ':               'Help Menu On/Off',
-    'Right Arrow, N':   'Next Slide',
-    'Left Arrow, B':    'Previous Slide',
-    'O':                'Opening Layout',
-    'R, L':             'Rotate 90.0',
-    'S, SpaceBar':      'Slide Show',
-    'T':                'Text On/Off',  
-    'W':                'Where am I?', 
-    '>,  +,  ]':        'Scale Up',
-    '<,  _,  [':        'Scale Down',
-    'Shift-B':          'Buttons Show/Hide', 
-    'Shift-F':          'Frameless Hint', 
-    'X, Q, Escape':     'Quit/Exit',
-}
-
-SharedKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-B','Shift-F')
+Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 
 ### --------------------- slideShow.py ---------------------
 ''' slideShow.py: reads .png, .jpg, .jpeg, .tif, .tiff, and .webp.
-    '>' ,'+', ']' scales up,  '<', '_', scales down'''
+    '>' ,'+', ']' scales up,  '<', '_', scales down 
+    The helpMenu and sharedKeys are in videoPlayerHelp '''
 ### --------------------------------------------------------
 class SlideShow(QWidget): 
 ### --------------------------------------------------------
@@ -178,10 +157,10 @@ class SlideShow(QWidget):
                 key = chr(key) 
             except: 
                 return                     
-        if key in SharedKeys:
+        if key in SlideShowKeys:
             self.shared(key)
             
-    def shared(self, key): 
+    def shared(self, key):  
         match key:   
             case 'B': 
                 self.backOne()
@@ -296,16 +275,16 @@ class SlideShow(QWidget):
     def openHelpMenu(self):
         if self.helpFlag == True:
             self.closeHelpMenu()
-            self.helpFlag = False  
         else:
-            self.helpMenu = Help(self)
+            self.helpMenu = SlideShowHelp(self)
             self.helpFlag = True
   
     def closeHelpMenu(self):
         if self.helpMenu != None: 
             self.helpMenu.tableClose()
-            self.helpMenu.close() 
+            self.helpMenu.close()
             self.helpFlag = False  
+            time.sleep(.03)
    
     def centerPixItem(self):  ## center within view which can change
         self.setScene()                                                                                                                                                                       
@@ -335,7 +314,7 @@ class SlideShow(QWidget):
     def openingLayout(self):
         if self.pixItem != None:
             self.setScene() 
-            x, H = int(((self.ctr.x() * 2 ) - (Width)/2)), Height
+            x, H = int(self.ctr.x() - (Width)/2), Height
             if self.buttonsVisible: H = Height + Hpad
             self.setGeometry(x, SetY, Width, H) 
             self.addPixmap(self.files[self.current])  ## refresh  
@@ -558,101 +537,7 @@ class SlideShow(QWidget):
         self.buttonGroup.setLineWidth(1)
   
         return self.buttonGroup
-### --------------------------------------------------------     
-class Help(QWidget): 
-### -------------------------------------------------------- 
-    def __init__(self, parent): 
-        super().__init__()  
-        
-        self.parent = parent
-         
-        self.table = QTableWidget()
-        self.table.setRowCount(len(helpMenuKeys)+1)
-        self.table.setColumnCount(2)
-     
-        self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-      
-        self.table.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        
-        self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers) 
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        
-        self.table.setHorizontalHeaderLabels(["Key", "Function"])
-        stylesheet = "::section{Background-color: lightgray; font-size:14px;}"
-        self.table.horizontalHeader().setStyleSheet(stylesheet)
-        
-        self.table.setStyleSheet('QTableWidget{\n'   
-            'background-color: rgb(250,250,250);\n'                 
-            'font-size: 13pt;\n' 
-            'font-family: Arial;\n' 
-            'border: 3px solid dodgerblue;\n'
-            'gridline-color: rgb(190,190,190);}') 
-                                                                                                             
-        self.table.setColumnWidth(0, 130) 
-        self.table.setColumnWidth(1, 140)
-
-        width, height = 277, 511  
-        self.table.setFixedSize(width, height)  
-        
-        self.table.verticalHeader().setVisible(False) 
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        
-        self.table.itemClicked.connect(self.clicked)   
-         
-        row = 0
-        for k,  val in helpMenuKeys.items():
-            item = QTableWidgetItem(k)
-            item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.table.setItem(row, 0, item)
-            item = QTableWidgetItem(val)
-            self.table.setItem(row, 1, item)      
-            row += 1
-                  
-        item = QTableWidgetItem("Enter 'H' or Click Here to Close")
-        item.setBackground(QColor('lightgray'))
-        item.setFont(QFont("Arial", 14))
-        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        self.table.setSpan(row, 0, 1, 2)  
-        self.table.setItem(row, 0, item)   
-        
-        p, pwidth, pheight = self.parent.pos(), self.parent.width(), self.parent.height()
-        
-        x = int(p.x() + (pwidth/2)) - int(width/2)   
-        y = int(p.y() + (pheight/2)) - int(height/2)   
-        
-        self.table.move(x,y)  
-        self.table.show()
-        
-    def clicked(self):
-        help = self.table.item(self.table.currentRow(), 0).text().strip()
-        match help: 
-            case 'S, SpaceBar':  
-                help = 'S'
-            case 'R, L':        
-                help = 'R'
-            case 'Right Arrow, N':
-                help = 'N'
-            case 'Left Arrow, B': 
-                help = 'B'               
-            case '>,  +,  ]':
-                help = ']'
-            case '<,  _,  [':  
-                help = '['
-            case 'X, Q, Escape':
-                help = 'X'    
-        if help in SharedKeys:
-            try:
-                QTimer.singleShot(25, partial(self.parent.shared, help))
-            except:
-                None
-        self.parent.closeHelpMenu()
-            
-    def tableClose(self):
-        self.parent.helpFlag = False 
-        self.table.close()
- 
+    
 ### -------------------------------------------------------- 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

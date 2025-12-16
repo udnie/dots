@@ -78,10 +78,10 @@ class PixHelp:
         
         self.switch = switch
                       
-        self.table = TableWidgetSetUp(50, 165, len(pixKeys)+6)
+        self.table = TableWidgetSetUp(60, 180, len(pixKeys)+6)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 221, 607
+        width, height = 247, 607
         self.table.setFixedSize(width, height)
                           
         self.table.setRow(0, 0, f'{"Sprite/PixItem Help Menu":<25}',QL,True, True, 2)

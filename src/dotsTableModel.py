@@ -28,7 +28,7 @@ class Typelist:  ## for type header
 ### -------------------------------------------------------- 
 class TableWidgetSetUp(QTableWidget):  ## used by help menus not by tablemodel
 ### -------------------------------------------------------- 
-    def __init__(self, a, b, c, cols3=0, fontSize=0):
+    def __init__(self, a, b, c, cols3=0, fontSize=0):  ##  a, b, c - column widths 
         super().__init__()   
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
