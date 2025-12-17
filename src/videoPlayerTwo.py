@@ -133,7 +133,7 @@ class VideoPlayer(QWidget):
         else: 
             match key:
                 case 'L':
-                    self.clips.looper(self)  
+                    self.clips.looper()  
                 case 'Settings':
                     self.clips.toggleSettings(self)  ## clipMaker settings
                 case 'C':
