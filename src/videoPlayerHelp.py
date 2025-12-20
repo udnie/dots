@@ -7,13 +7,13 @@ from PyQt6.QtWidgets    import QWidget, QTableWidget, QAbstractItemView, \
 from functools          import partial
 
 from videoClipsWidget   import *
-# from slideShow          import SlideShowKeys, slideMenuKeys
 
 ### ------------------ videoPlayerHelp.py -----------------
-''' tablewidgetsetup and help for videoPlayers and slideShow '''
+''' Tablewidgetsetup and help for videoPlayers and slideShow.
+    The Menus selection isn't avaiable in SlideShow '''
 ### --------------------------------------------------------
 
-helpMenuKeys = {  ## help menu - right-mouse-click
+helpMenuKeys = {   ## videoplayers
     'A':    'Apple/Academy 4X3',  
     'F':    'Full Screen 3X2',
     'H':    'Horiztonal HD 16X9',
@@ -23,6 +23,7 @@ helpMenuKeys = {  ## help menu - right-mouse-click
     'V':    'Vertical 9X16',
     'C':    'To Clear',
     'L':    'Loop On/Off',
+    'M':    'Menus',
     '>,  +,  ]':    'Scale Up',
     '<,  _,  [':    'Scale Down',
     'X, Q Escape':  'Quit/Exit',
@@ -32,14 +33,14 @@ helpMenuKeys = {  ## help menu - right-mouse-click
     'Clips':        'Make a Clip',    
 }
 
-slideMenuKeys = {  ## help menu - 'H' or button
+slideMenuKeys = {  ## slideShow
     'C':                'Clear Screen',  
     'F ':               'File Chooser', 
     'H ':               'Help Menu On/Off',
     'Right Arrow, N':   'Next Slide',
     'Left Arrow, B':    'Previous Slide',
     'O':                'Opening Layout',
-    'R, L':             'Rotate 90.0',
+    'L, R':             'Rotate 90.0',
     'S, SpaceBar':      'Slide Show',
     'T':                'Text On/Off',  
     'W':                'Where am I?', 
@@ -57,6 +58,52 @@ QH = QColor(220,220,220)  ## 14% gray
 
 SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-B','Shift-F')
 
+### -------------------------------------------------------- 
+class VideoHelpWidget(QWidget):
+### -------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+  
+        self.parent = parent
+        self.player = "two"
+  
+        self.label = QLabel()
+        self.label.setStyleSheet("background: '#73fcd6'")
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.label)
+
+        quitButton = QPushButton("Click on Screen to Exit")
+        quitButton.setMaximumWidth(200)
+        quitButton.clicked.connect(self.parent.shared.closeVideoSlideMenus)
+
+        hbox = QHBoxLayout()
+        hbox.addWidget(quitButton, Qt.AlignmentFlag.AlignHCenter)
+        
+        vbox.addLayout(hbox)
+        self.setLayout(vbox)
+        
+        width, height = 1250, 850
+        self.resize(width, height)
+        
+        x, y = int(self.parent.width()/2), int(self.parent.height()/2)
+        p = self.parent.mapToGlobal(QPoint(x,y))
+        x, y = int(p.x()), p.y()
+              
+        x = int(x - (width /2)) 
+        y = int(y - (height /2)) 
+ 
+        self.move(x,y)  
+        self.show()
+      
+    def closeEvent(self, e):
+        self.parent.shared.closeVideoSlideMenus()
+        e.accept() 
+        
+    def mousePressEvent(self, e):  
+        self.parent.shared.closeVideoSlideMenus()
+        e.accept() 
+             
 ### -------------------------------------------------------- 
 class TableWidgetSetUp(QTableWidget):  ## duplicated as to not be reliant on dots
 ### -------------------------------------------------------- 
@@ -126,11 +173,15 @@ class VideoHelp(QWidget):
         
         self.parent = parent
         self.switch = switch
+        
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.FramelessWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
     
         self.table = TableWidgetSetUp(100, 150, len(helpMenuKeys)+4)
         self.table.itemClicked.connect(self.clicked)
     
-        width, height = 257, 606
+        width, height = 257, 636
         self.table.setFixedSize(width, height)
     
         str = "VideoPlayerOne" if self.parent.player == "one" else \
@@ -140,7 +191,7 @@ class VideoHelp(QWidget):
         
         row = 1  
         for k,  val in helpMenuKeys.items():
-            if self.parent.player == "two" and row in (10,11,14):
+            if self.parent.player == "two" and row in (11,12,15):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)
             else:
@@ -170,20 +221,23 @@ class VideoHelp(QWidget):
         self.table.show()
         
     def clicked(self):
-        help = self.table.item(self.table.currentRow(), 0).text().strip()
-        match help: 
-            case ('X, Q Escape'):
-                help = 'X'
-            case ('>,  +,  ]'):
-                help = ']'
-            case ('<,  _,  ['): 
-                help = '['     
-        if help in SharedKeys: 
-            try:
-                QTimer.singleShot(25, partial(self.parent.sharedKeys, help))
-            except:
-                None
-        self.parent.shared.closeHelpMenu()
+        if self.switch == '':
+            help = self.table.item(self.table.currentRow(), 0).text().strip()
+            match help: 
+                case ('X, Q Escape'):
+                    help = 'X'
+                case ('>,  +,  ]'):
+                    help = ']'
+                case ('<,  _,  ['): 
+                    help = '['     
+            if help in VideoMenuKeys: 
+                try:
+                    QTimer.singleShot(25, partial(self.parent.VideoMenuKeys, help))
+                except:
+                    None
+            self.parent.shared.closeHelpMenu()
+        else:
+            self.parent.shared.closeVideoSlideMenus()
   
     def tableClose(self):
         self.parent.helpFlag == False
@@ -197,6 +251,10 @@ class SlideShowHelp(QWidget):
         
         self.parent = parent
         self.switch = switch
+                                     
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.FramelessWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
                                                                                         
         self.table = TableWidgetSetUp(115, 145, len(slideMenuKeys)+2)
         self.table.itemClicked.connect(self.clicked)
@@ -232,36 +290,38 @@ class SlideShowHelp(QWidget):
         self.table.show()
         
     def clicked(self):
-        help = self.table.item(self.table.currentRow(), 0).text().strip()
-        if help == 'H': help = 'skip'  ## don't send it to shared
-        match help:    
-            case 'S, SpaceBar':  
-                help = 'S'
-            case 'R, L':        
-                help = 'R'
-            case 'Right Arrow, N':
-                help = 'N'
-            case 'Left Arrow, B': 
-                help = 'B'               
-            case '>,  +,  ]':
-                help = ']'
-            case '<,  _,  [':  
-                help = '['
-            case 'X, Q, Escape':
-                help = 'X'    
-        if help in SlideShowKeys:
-            try:
-                QTimer.singleShot(25, partial(self.parent.shared, help))
-            except:
-                None
         if self.switch == '':
-            self.parent.closeHelpMenu()
+            help = self.table.item(self.table.currentRow(), 0).text().strip()
+            if help == 'H': help = 'skip'  ## don't send it to shared
+            match help:    
+                case 'S, SpaceBar':  
+                    help = 'S'
+                case 'L, R':        
+                    help = 'R'
+                case 'Right Arrow, N':
+                    help = 'N'
+                case 'Left Arrow, B': 
+                    help = 'B'               
+                case '>,  +,  ]':
+                    help = ']'
+                case '<,  _,  [':  
+                    help = '['
+                case 'X, Q, Escape':
+                    help = 'X'    
+            if help in SlideShowKeys:
+                try:
+                    QTimer.singleShot(25, partial(self.parent.slideMenuKeys, help))
+                except:
+                    None
+            if self.switch == '':  ## still in slideShow
+                self.parent.closeHelpMenu()  
+        else:
+            self.parent.shared.closeVideoSlideMenus()  ## change of parent run by videoplayer
             
     def tableClose(self):
         self.parent.helpFlag = False 
         self.table.close()                                                                               
         
-
 ### ---------------------- that's all ---------------------- 
 
   

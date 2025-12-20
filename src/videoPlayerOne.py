@@ -26,6 +26,7 @@ from videoClipsMaker        import Clips
 from videoClipsWidget       import *
 from videoPlayerShared      import *
 
+
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
@@ -131,10 +132,10 @@ class VideoPlayer(QWidget):
                 key = chr(e.key())
             except:
                 return  
-        if key in SharedKeys:
-            self.sharedKeys(key)
+        if key in VideoMenuKeys:
+            self.VideoMenuKeys(key)
   
-    def sharedKeys(self,key):  
+    def VideoMenuKeys(self,key):  
         if key in AspKeys:
             self.shared.openPlayer(key)     
         else: 
@@ -156,6 +157,8 @@ class VideoPlayer(QWidget):
                     self.shared.openDirectory()  ## if MakeClipsOn sets path to folder
                 case 'Shift-S':
                     self.shared.toggleSlider()
+                case 'M':
+                    self.shared.openVideoSlideMenus()  
                 case 'X' | 'Q':
                     self.bye()   
                 case _:

@@ -40,9 +40,10 @@ MaxW, MaxH, MaxV  =  950,  500, 550 ## max image size within the ViewW/H
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 
 ### --------------------- slideShow.py ---------------------
-''' slideShow.py: reads .png, .jpg, .jpeg, .tif, .tiff, and .webp.
-    '>' ,'+', ']' scales up,  '<', '_', scales down 
-    The helpMenu and sharedKeys are in videoPlayerHelp '''
+''' Reads and displays .png, .jpg, .jpeg, .tif, .tiff, and .webp files.
+    '>' ,'+', ']' scales up, '<', '_', scales down,. retaining the
+    same aspect ratio - width to height.
+    The helpMenu and slideMenuKeys are in videoPlayerHelp '''
 ### --------------------------------------------------------
 class SlideShow(QWidget): 
 ### --------------------------------------------------------
@@ -75,7 +76,7 @@ class SlideShow(QWidget):
                 "}")
           
         self.init()  ## default True, add False to hide
-        
+ 
         ## in qt5 framelessWindow won't resize with mouse - use zoom keys instead
         if self.frameHidden:  ## set WindowHint to Frameless
             self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
@@ -104,6 +105,7 @@ class SlideShow(QWidget):
 ### --------------------------------------------------------
     def init(self, buttons=True):  ## on each new directory
         self.files       = []   
+        self.player = 'slides'
         self.txtlst     = ''
         self.rotters    = {}
         self.fileName    = ''
@@ -128,10 +130,10 @@ class SlideShow(QWidget):
         mod = e.modifiers()  
   
         if key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
-            self.shared('X')       
+            self.slideMenuKeys('X')       
             
         elif key in (Qt.Key.Key_N, Qt.Key.Key_Right):
-            self.shared('N')        
+            self.slideMenuKeys('N')        
             
         elif key == Qt.Key.Key_B and mod & Qt.KeyboardModifier.ShiftModifier:
             self.toggleButtons() 
@@ -140,27 +142,28 @@ class SlideShow(QWidget):
             self.toggleFrameless()  
             
         elif  key in (Qt.Key.Key_B, Qt.Key.Key_Left):
-            self.shared('B')      
+            self.slideMenuKeys('B')      
             
         elif key == Qt.Key.Key_Space:
-            self.shared('Space')  
+            self.slideMenuKeys('Space')  
             
         elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
-                self.shared(']')          
+                self.slideMenuKeys(']')          
                 
         elif key == Qt.Key.Key_BracketLeft or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Less, Qt.Key.Key_Underscore):
-                self.shared('[')                                 
+                self.slideMenuKeys('[')                                 
         else: 
             try:
                 key = chr(key) 
             except: 
-                return                     
+                return        
+                         
         if key in SlideShowKeys:
-            self.shared(key)
+            self.slideMenuKeys(key)
             
-    def shared(self, key):  
+    def slideMenuKeys(self, key):  
         match key:   
             case 'B': 
                 self.backOne()
@@ -170,8 +173,10 @@ class SlideShow(QWidget):
                 self.fileChooser()   
             case 'H':
                 self.openHelpMenu()        
-            case 'R' | 'L':
+            case 'R':
                 self.rotateThis(90)
+            case 'L':
+                self.rotateThis(-90)
             case 'N':
                 self.nextSlide()          
             case 'O':
@@ -471,9 +476,9 @@ class SlideShow(QWidget):
                     self.msgbox('openFiles: Only One Matching File')
         
     def selectDirectory(self):
-        path = QFileDialog.getExistingDirectory(self, '')
+        path = QFileDialog.getExistingDirectory(self, '') 
         if path == None or path == '':
-            path = os.getcwd()
+            return 
         os.chdir(path)
         return os.getcwd()
                             
@@ -517,9 +522,9 @@ class SlideShow(QWidget):
         self.quitBtn = QPushButton("Quit")        
           
         self.filesBtn.clicked.connect(self.fileChooser)
-        self.helpBtn.clicked.connect(lambda: self.shared('H'))
+        self.helpBtn.clicked.connect(lambda: self.slideMenuKeys('H'))
         self.clearBtn.clicked.connect(self.clearScene)
-        self.quitBtn.clicked.connect(lambda: self.shared('X'))
+        self.quitBtn.clicked.connect(lambda: self.slideMenuKeys('X'))
         
         hbox = QHBoxLayout(self)
         

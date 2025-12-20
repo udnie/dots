@@ -6,6 +6,11 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
+---
+
+
+**December 19 2025**    
+Added **'Menus'** to the **videoPlayers** helpMenus to display both videoPlayer and slideShow help plus the clipsMaker settings widget in a single layout much like in **dots**.  Not implemented in slideShow's helpMenu.  Fixed a few menu bugs - **rotate** nows works in either direction in slideShow as does **opening layout**.
 
 ---
 **December 15 2025**   

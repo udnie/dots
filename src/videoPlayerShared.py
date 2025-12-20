@@ -18,7 +18,7 @@ from PyQt6.QtMultimediaWidgets  import QVideoWidget, QGraphicsVideoItem
 
 from videoClipsWidget   import *
 from videoClipsMaker    import Ext  
-from videoPlayerHelp    import VideoHelp
+from videoPlayerHelp    import VideoHelp, SlideShowHelp, VideoHelpWidget
 
 ### -------------------------------------------------------- 
 ''' The function getMetaData and code shared by both videoPlayers 
@@ -106,6 +106,8 @@ class Shared:
         super().__init__()  
         
         self.parent = parent
+        self.player = 'shared'
+        self.helpMenus = False
 
 ### --------------------------------------------------------
     def openPlayer(self, key):  ## from keyboard or helpMenu - default on open      
@@ -182,6 +184,38 @@ class Shared:
             QTimer.singleShot(20, partial(self.parent.clips.assembler, os.getcwd(), title))
   
 ### --------------------------------------------------------
+    def openHelpMenu(self):
+        if self.parent.helpFlag == True:
+            self.closeHelpMenu()
+        else:
+            self.parent.helpMenu = VideoHelp(self.parent)
+            self.parent.helpFlag = True
+            
+    def closeHelpMenu(self):
+        if self.parent.helpMenu != None: 
+            self.parent.helpMenu.tableClose()
+            self.parent.helpMenu.close()
+            self.parent.helpFlag = False
+            time.sleep(.03)
+            if self.helpMenus == True:
+                self.closeVideoSlideMenus()
+            
+    def openVideoSlideMenus(self):
+        self.helpMenus = True
+        self.vwidget   = VideoHelpWidget(self.parent)
+        self.settings  = Settings(self.parent, 'aaa')
+        self.videohelp = VideoHelp(self.parent, -415, 'aaa')
+        self.slidehelp = SlideShowHelp(self.parent, 425, 'aaa')
+    
+    def closeVideoSlideMenus(self):
+        if self.helpMenus == True:    
+            self.settings.close()
+            self.videohelp.table.close()
+            self.slidehelp.table.close()
+            self.vwidget.close() 
+            self.helpMenus = False
+   
+### --------------------------------------------------------     
     def playVideo(self):  ## setButtons and setSlider don't know about mediaPlayer
         if self.parent.mediaPlayer != None:
             self.parent.mediaPlayer.playVideo()
@@ -203,21 +237,6 @@ class Shared:
         if self.parent.sliderVisible == True: 
             self.parent.slider.setRange(0, duration)  
   
-### --------------------------------------------------------
-    def openHelpMenu(self):
-        if self.parent.helpFlag == True:
-            self.closeHelpMenu()
-        else:
-            self.parent.helpMenu = VideoHelp(self.parent)
-            self.parent.helpFlag = True
-            
-    def closeHelpMenu(self):
-        if self.parent.helpMenu != None: 
-            self.parent.helpMenu.tableClose()
-            self.parent.helpMenu.close()
-            self.parent.helpFlag = False
-            time.sleep(.03)
-                    
 ### --------------------------------------------------------
     def msgbox(self, str):
         msg = QMessageBox()

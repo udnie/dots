@@ -31,18 +31,19 @@ MinHgt = 400  ## minimum widget height
 
 AspKeys = list(Keys.keys())
 
-SharedKeys = AspKeys + ['L','O','X','C',']','[','Shift-S','Aspect','Settings','Clips']
+VideoMenuKeys = AspKeys + ['L','O','X','C','M',']','[','Shift-S','Aspect','Settings','Clips']
 
 WID, HGT, PAD = 40, 140, 30 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
 ### --------------------------------------------------------        
 class Settings(QWidget):  ## settings for clipsMaker and autoAspect
 ### -------------------------------------------------------- 
-    def __init__(self, parent): 
+    def __init__(self, parent, switch=''): 
         super().__init__()
 
         self.parent = parent
         self.clips  = self.parent.clips
+        self.switch = switch
 
         self.WidgetW, self.WidgetH = 505.0, 300.0
            
@@ -237,15 +238,18 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         
         self.quitBtn = QPushButton('Close')
         
-        self.aspBtn.clicked.connect(lambda: self.clips.setWidgetButtons("asp"))
-        self.clpsBtn.clicked.connect(lambda: self.clips.setWidgetButtons("clips"))
-        self.firstBtn.clicked.connect(lambda: self.clips.setWidgetButtons("first"))
-        self.skipBtn.clicked.connect(lambda: self.clips.setWidgetButtons("skip"))
-        self.filterBtn.clicked.connect(lambda: self.clips.setWidgetButtons("filter"))
-        self.playBtn.clicked.connect(lambda: self.clips.setWidgetButtons("play"))
-        self.nameBtn.clicked.connect(lambda: self.clips.setWidgetButtons("name"))
-        self.quitBtn.clicked.connect(self.clips.closeSettings)
-        
+        if self.switch == '':
+            self.aspBtn.clicked.connect(lambda: self.clips.setWidgetButtons("asp"))
+            self.clpsBtn.clicked.connect(lambda: self.clips.setWidgetButtons("clips"))
+            self.firstBtn.clicked.connect(lambda: self.clips.setWidgetButtons("first"))
+            self.skipBtn.clicked.connect(lambda: self.clips.setWidgetButtons("skip"))
+            self.filterBtn.clicked.connect(lambda: self.clips.setWidgetButtons("filter"))
+            self.playBtn.clicked.connect(lambda: self.clips.setWidgetButtons("play"))
+            self.nameBtn.clicked.connect(lambda: self.clips.setWidgetButtons("name"))
+            self.quitBtn.clicked.connect(self.clips.closeSettings)
+        else:
+             self.quitBtn.clicked.connect(self.parent.shared.closeVideoSlideMenus)
+  
         hbox = QVBoxLayout(self)
               
         hbox.addWidget(self.aspBtn)
