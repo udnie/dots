@@ -1,18 +1,18 @@
 
-### *Last Update: 12/10/2025*
+### *Last Update: 12/20/2025*
 
 ## Scripts  
 
 There is only one codebase and it's written in **pyqt6**.  These scripts will make the necessary changes to convert the **pyqt6** code to either **pyqt5** or **pyside6** and provide any cleanup as well.
 
-        script-qt6.py       Removes PyQt5 code and tokens from the three videoplayer files.
+        script-qt6.py       Removes PyQt5 code and tokens from the two videoplayer files.
         script-ps6.sh       See edits for PySide6
         
         script-qt5.py       Removes PyQt6 code and tokens, etc.., and other code changes
         script-pyqt5.sh     See edit for PyQt5  
 
 
-Scripts should be run in the **dots** source code directory.   A **unix/linux bash/zsh** shell is required to run the  **sed** command in script-pyqt5.sh to do the necessary and in script-ps6.sh to do the search and replace of 'type' to 'desc' inorder to run **pyside6**.
+Scripts should be run in the **dots** source code directory.   A **unix/linux bash/zsh** shell is required to run the  **sed** command in **script-pyqt5.sh** to do the necessary and in **script-ps6.sh** to do the search and replace of 'type' to 'desc' inorder to run **pyside6**.
 
 ## Edits for Converting Dots from PyQt6 to PyQt5
 
@@ -33,22 +33,26 @@ The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the v
 
 #
 ## Help and Stuff
-**Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command are now accessible from the three screen help button menus.  I also use a **right mouse click** to launch a widget or menu for almost all of the storyboard screen items - something to remember.
+**Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command in **dots** are now accessible from the help button menus in Canvas, StoryBoard and PathMaker - the scenes that make up **dots**.  A **right mouse click** will launch a widget for most of the storyboard screen items.
+
+The helpMenus and menuKeys for **videoPlayers** and **slideShow** are located in **videoPlayerHelp** and are separate from **dots**.  There's a mini **Menus** selection in videoPlayer help. 
 
 Once you have **dots** up and running - from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu. The easiest way to see what commands are available, where they are located and what they do.  I'd also recommend running some demos afterwards.
 
-**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites**, detect and set screen formats and run the clip making functions in **videoClipsMaker** - that's the only addition.  Once it's installed you'll need to make some minor edits to **PixItems** and  **videoPlayerOne/Two** to implement it.  This is repeated further on in more detail.
+**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites**, detect and set screen formats and run the clip making functions in **videoClipsMaker**, and in **videoPlayerShared** if using the **cv2** code in **getMetaData**.  
 
-The files **vhx.py**, **slideShow.py** and the **videoPlayers/Clips...py's** are included in the src directory.  See December 2025 for more on videoPlayerOne and clipsMaker.
+The files **vhx.py**, **slideShow.py** and the **videoPlayers and videoClips...py's** are included in the src directory.  See December 2025 for more on videoPlayerOne and clipsMaker.
    
 ## Screens 
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
 ## Video  
-**PyQt5** now supports looping using the loop button - the **videoWidget** has been removed. **PyQt5** won't loop a video though, if there's an animation running with shadows.  The two stand-alone videoPlayers each share code from videoClipsMaker, videoClipsWidget and videoPlayerShared with some differences; "one" uses a videoWidget to display and "two" a graphicsVideoItem.  **VideoClipsMaker** provides the functions, **assembler** and **ctrOnBackground**, to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** supplies the help menu and the widget used by clipsMaker to select functions or set variables and **VideoPlayerShared**, as the name suggests - mostly functions in common.
+**PyQt5** now supports looping using the loop button - the **videoWidget** I was previously using has been removed. **PyQt5** also won't loop a video if there's an animation running with shadows.  The two stand-alone videoPlayers each share code from videoClipsMaker, videoClipsWidget, videoPlayerShared and videoPlayerHelp. There are some differences; **"one"** uses a **videoWidget** to display and still retains resizing from the keyboard and manually setting a video format/ aspect ratio; **"two"** is based on a **graphicsVideoItem** and requires selecting a means to read a video files metadata from **videoPlayerShared.getMetaData** to make it run.  **videoPlayerTwo** is based on **dotsVideoPlayer**.
+
+**VideoClipsMaker** includes the functions, **assembler** and **ctrOnBackground**, used to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** is the widget used by **clipsMaker** to select functions or set variables and **VideoPlayerShared**, as the name suggests, hosts a number go functions in common including the MediaPlayer, getMetaData, buttons and the slider setups.
 
 ## Four Files  
-There are four files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
+There are four **dots...py** files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
 as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. 
 
 It also handles all/most of the multi-key function requests - the rest pass on to **Storyboard** which in turn passes them on either to **ShowBiz**, which handles most of the single key requests from **Canvas** and **Storyboard** through the **PlayFile** list, or on to functions that send keys to the current screen items to perform actions not already triggered. 
@@ -60,9 +64,6 @@ I recently made some code changes to **ControlView**, **ShowBiz**, **Storyboard*
 
 ## Files and Directories 
 There are four directories to be aware of, **sprites**, **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to add your own material to **dots**. You can add any **videos** you plan to use to the **backgrounds** directory as they're treated as just another background.  
-
-When adding a video to an animation it needs to be added last so it's positioned as the first background screen item otherwise it will run unseen. I've changed the text of the **'Run'** key to to display **'Video'** when there's one opened as an visual heads up -  you can also type in **'V'** for the videoWidget.  These are the only indicators to know if there's a video loaded.  You're also stopped from trying to open a play file if there's already an open video present.
-
 
 What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend using a .jpg file and keeping it under or around **500MB** in size and formatting it to **640** pixels on the short side if you plan on scrolling it. I'd considered these to be the minimum required sizes.  You'll need to do some experimenting to find out what works best for your setup, especially if scrolling backgrounds.
 
