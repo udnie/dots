@@ -4,16 +4,16 @@ import time
 # import cv2   ## required <<<----- 4.12.0 or above
 
 import os.path
-import numpy as np
+import numpy as np  
 
 ### ----------------- videoClipsMaker.py -------------------
 ''' Source for assembler, ctrOnBackground, a single-file dialog.
     and a number of functions including setDefaultSizes and those 
     used by Settings. 
-    Import cv2 needs to be uncommented once opencv is installed and also
-    one of the three functions in getMetaData - in videoPlayerShared,
-    inorder to run assembler. The videoClipsWidget defaults(Settings) are 
-    set here. '''
+    Import cv2 needs to be uncommented once opencv is installed
+    to run assembler. It may also be required by getMetaData, 
+    videoPlayerShared, to set the video aspect-ratio on opening.
+    The videoClipsWidget defaults(Settings) are set here. '''
 ### --------------------------------------------------------
     
 from functools          import partial
@@ -86,7 +86,7 @@ class Clips:
                 if self.FirstFrame == False:
                     self.FirstFrame = True
                     self.settings.firstBtn.setText('FirstFrameOn')  
-                    if self.SkipFrames == True:
+                    if self.SkipFrames:
                         self.SkipFrames = False
                         self.settings.skipBtn.setText("NthFrame")     
                 else: 
@@ -97,7 +97,7 @@ class Clips:
                 if self.SkipFrames == False:
                     self.SkipFrames = True
                     self.settings.skipBtn.setText("NthFrameOn")
-                    if self.FirstFrame == True:
+                    if self.FirstFrame:
                         self.FirstFrame = False
                         self.settings.firstBtn.setText('FirstFrame')
                 else: 
@@ -137,7 +137,7 @@ class Clips:
             self.parent.loopButton.setText('LoopOn')
             self.parent.stopButton.setEnabled(False)
             time.sleep(.03)   
-        elif self.parent.loopSet == True:
+        elif self.parent.loopSet:
             self.looperOff()
             if self.parent.mediaPlayer != None:
                 self.parent.shared.stopVideo()
@@ -150,11 +150,8 @@ class Clips:
         
 ### --------------------------------------------------------  
     def openFile(self, open=False):  ## opens one file, open=False, from the keyboard or helpMenu
-        if self.parent.player == 'two':  ## <- "two"
-            self.parent.closeMediaPlayer()
-        
-        self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
-       
+        self.parent.closeMediaPlayer() if self.parent.player == 'two' else\
+            self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler   
         path = os.getcwd() if self.parent.path == '' \
             else self.parent.path    
         try:
@@ -164,7 +161,7 @@ class Clips:
             self.parent.shared.msgbox('error opening file')
             return 
         if fileName != '': 
-            if self.SkipFrames == True and open == True:  ## read only one file every Nth frame
+            if self.SkipFrames == True and open:  ## read only one file every Nth frame
                 path = os.path.dirname(fileName)  
                 fileName = os.path.basename(fileName)
                 title = self.setTitle(path)
@@ -220,13 +217,13 @@ class Clips:
         # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
      
         if self.SkipFrames == False:
-            if self.FirstFrame == True:  
+            if self.FirstFrame:  
                 images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos
             else:
                 images = [img for img in os.listdir(path) if img.lower().endswith(Ext)]  ## reads photos
             images.sort()  
                     
-        elif self.SkipFrames == True:
+        elif self.SkipFrames:
             images = [fileName]  ## read only one file
             image_name = images
  
@@ -241,7 +238,7 @@ class Clips:
                 self.parent.shared.msgbox("assembler: Could not open video.")
                 return
 
-            if self.FirstFrame == True:  ## reads the first frame of a video 
+            if self.FirstFrame:  ## reads the first frame of a video 
                 ret, img = cap.read()
                 if not ret:
                     self.parent.shared.msgbox("assembler: Could not read the first frame.")
@@ -252,7 +249,7 @@ class Clips:
                 if reads >= self.Max:
                     break
 
-            elif self.SkipFrames == True:  ## reads the Nth frame of a video
+            elif self.SkipFrames:  ## reads the Nth frame of a video
                 while True:
                     ret, img = cap.read()
                     if not ret:  # end of video
@@ -277,11 +274,11 @@ class Clips:
                     break
               
         if reads > 0:
-            if self.FirstFrame == True or self.SkipFrames == True: cap.release()
+            if self.FirstFrame or self.SkipFrames: cap.release()
             out.release()
             self.parent.shared.msgbox(f"Video: {outputVideo} frames: {reads}")
             fileName = os.getcwd() + '/' + outputVideo 
-            
+               
             self.parent.setFileName(fileName) if self.parent.player == 'one' else\
                 self.parent.setMediaPlayer(fileName, 'assembler')  ## keep them separate
                 
@@ -305,7 +302,7 @@ class Clips:
     def writeOut(self, img, image_name, out, k):     
         # img = cv2.rotate(img, cv2.ROTATE_180)    ## just in case they're upsidedown - and ROTATE_90_CLOCKWISE) etc. 
         img = self.ctrOnBackground(img, image_name)     
-        if self.AddFileName == True:
+        if self.AddFileName:
             self.addFileName(img, image_name)
         if isinstance(img, np.ndarray):
             n = 0 

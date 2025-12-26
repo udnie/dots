@@ -232,7 +232,7 @@ class StoryBoard(QWidget):
         if len(self.scene.selectedItems()) > 0:  ## don't remove e
             if self.animeHelp != None:
                 self.animeHelp == None
-            self.animeHelp = AnimationHelp(self.canvas, QCursor.pos(), 'story')
+            self.animeHelp = AnimationHelp(self.canvas, QCursor.pos(), 'story')  
         e.accept()
         
 ### -------------------- dotsStoryBoard --------------------

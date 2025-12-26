@@ -228,6 +228,7 @@ class TagsAndPaths: ## handles more than one request
             return 
         if self.mapper.pathSet:
             self.mapper.clearPaths() 
+            self.mapper.clearTagGroup()
             return
         k = 0
         self.mapper.pathSet = False  

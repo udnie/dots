@@ -56,9 +56,12 @@ class BkgScrollWrks:
 ### -------------------------------------------------------- 
     def updateDictionary(self):
         test = False
-   
-        rate = self.bkgMaker.screenrate.get(common['Screen'])
-         
+        rate = self.bkgMaker.screenrate.get(common['Screen'])   
+        
+        if rate == None:
+            MsgBox("Error Reading ScreenRates", 5)
+            return   
+      
         if self.bkgItem.direction == 'right' and rate[2] != self.bkgItem.rate:
             rate[2] = self.bkgItem.rate
             test = True

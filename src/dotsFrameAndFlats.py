@@ -126,7 +126,7 @@ class Flat(QGraphicsPixmapItem):
     def mouseReleaseEvent(self, e):
         self.key = ''
         e.accept() 
-        
+
     def shared(self, key):  ## used with help menu
         match key:
             case 'del':   

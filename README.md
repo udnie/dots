@@ -1,12 +1,11 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify them, set backgrounds using photos, videos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds.  
 
-As of **April 2025**, **dots** can now run in either **PyQt6.8.1**, **PyQt5.15** or **PySide6.8.2** as developed  on a **M1 MacBookPro** in **arm64 mode** on **Apple Silicon**, **Python 3.13.2**.
-See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
+As of **December 2025**, **dots** runs in **Python 3.13.10** using either **PyQt6.10.1**, **PyQt5.15.11** or **PySide6.10.1.** on a **MacBookPro**, **arm64** . See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
 
-**August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.
+**August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.  
 
-You'll need to install **opencv-python 4.12** or above to run **VideoPlayerOne/VideoClipsMaker** - **numpy** is included. Doing so makes it an easy edit to turn on **Shadows** in **dots**.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  
+You'll need to install **opencv-python 4.12** or above to run the **videoClipsMaker** portion of **videoPlayerOne** and **Two**, and possibly to run **videoPlayerTwo** if you're not on a Mac.  Once you've installed opencv it's an simple edit to turn on **Shadows** in **dots** as well.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  And there are demos and videos.
 
 
 	  
@@ -23,12 +22,11 @@ The **star** in scrollPanel isn't currently designed to be dragged to the canvas
 
 
 ## Requirements
-* **PyQt6**, **PyQt5** or **PySide6** -- see **Start Here**
+* **PyQt6** or **PyQt5** or **PySide6** -- see **Start Here**
 * **Python 3.10** or above for walrus operators and async
-* There are two scripts that require a **unix/linux shell, bash or zsh, and sed** 
-* functools, though I'm sure it's built-in
 * **opencv-python 4.12** or above
-* Your favorite program for creating transparent pngs if you have one or try **ShadowMaker** 
+* There are two scripts that require a **unix/linux shell, bash or zsh, and sed** 
+* Your favorite program for creating transparent pngs if you have one or try **ShadowMaker** in extras
 
 ## Lastly
 My background combines degrees in fine arts, photography and ceramics, work as a graphics artist, layout artist, photography teacher, and a 21 year career as a business application programmer. All procedural code and other than Fortran, languages you probably never heard of. 

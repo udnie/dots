@@ -166,10 +166,8 @@ class Shared:
                      
 ### --------------------------------------------------------
     def openDirectory(self):  ## in clips - point to a directory to read from  
-        if self.parent.player == 'two': 
-            self.parent.closeMediaPlayer()
-        elif self.parent.player == 'two': 
-            self.parent.closeOnOpen() 
+        self.parent.closeMediaPlayer() if self.parent.player == 'two' else\
+            self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
         if self.parent.clips.MakeClips == False: 
             self.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
             return      

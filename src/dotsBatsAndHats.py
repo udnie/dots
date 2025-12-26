@@ -39,7 +39,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
 }
     
 ### -------------------- dotsBatsAndHats -------------------
-class Bats:     
+class Bats:    ## backGrounds only used here 
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()

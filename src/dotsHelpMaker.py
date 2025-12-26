@@ -57,7 +57,7 @@ class HelpMaker:  ## the help menus
         self.switchHelp = MainMenu(self.canvas)  ## throwaway - needs to instantiated
         
         self.canvas.openPlayFile = 'menu'  ## blocks helpbutton and 'H' and 'M' keys
-
+        
 ### --------------------------------------------------------     
 class  MainMenu: 
 ### --------------------------------------------------------
@@ -91,8 +91,12 @@ class  MainMenu:
       
         self.table.move(x-135, y-210)                
         self.table.show() 
+
+    def closeMenu(self):
+        self.table.close() 
+        self.canvas.clear() 
      
-    def clicked(self):  
+    def clicked(self):    
         p = self.table.currentRow() - 1  ## position in lst to key   
         if p+1 <= len(switchKeys):       ## is it valid           
             help = self.lst[p].strip()    
@@ -150,9 +154,8 @@ class  MainMenu:
                     self.pathHelp2  = PathHelp2(self.canvas, 365, 'all')  
                                 
         else:
-            self.table.close() 
-            self.canvas.clear()   
-                 
+            self.closeMenu()
+                   
 ### -------------------- dotsHelpMaker --------------------- 
 
 

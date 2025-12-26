@@ -213,6 +213,7 @@ class SlideShow(QWidget):
         e.accept()
      
     def mouseReleaseEvent(self, e):
+        if self.frameHidden: return
         self.moveThis(e)
         e.accept()       
       
@@ -278,12 +279,12 @@ class SlideShow(QWidget):
         
 ### --------------------------------------------------------           
     def openHelpMenu(self):
-        if self.helpFlag == True:
+        if self.helpFlag:
             self.closeHelpMenu()
         else:
             self.helpMenu = SlideShowHelp(self)
             self.helpFlag = True
-  
+       
     def closeHelpMenu(self):
         if self.helpMenu != None: 
             self.helpMenu.tableClose()
@@ -413,13 +414,16 @@ class SlideShow(QWidget):
             self.buttonsVisible = True
             self.resize(self.width(), self.height()+Hpad)
     
-    def toggleFrameless(self):  ## google prompt
-        if self.frameHidden:
+    def toggleFrameless(self):  ## from a google prompt
+        p = self.pos()
+        if self.frameHidden:  ## make it visible 
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
             self.frameHidden = False
+            self.move(p.x(), p.y()-28)  ## good guess
         else:
             self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
             self.frameHidden = True
+            self.move(p.x(), p.y()+28)  ## keep the frame stationary
         self.show()
                               
 ### --------------------------------------------------------         

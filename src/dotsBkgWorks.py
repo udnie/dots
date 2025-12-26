@@ -99,7 +99,8 @@ class BkgWorks:
             if erat > 0: rate = erat  ## fixes not carrying over rate from a file
      
             bkg.rate = rate 
-            self.bkgScrollWrks.setTrackerRate(bkg)          
+            self.bkgScrollWrks.setTrackerRate(bkg)     
+      
         return rate
     
 ### --------------------------------------------------------
