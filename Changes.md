@@ -7,7 +7,7 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
-**December 26 2025**  
+**December 25 2025**  
 Made a change to the **FramelessWindowHint** toggle in **slideshow** so it no longer jumps up or down depending if it's set to visible or not. Updated **python** to **3.13.10** and **PyQt6** and **PySide6** to **6.10.1**. Fixed a bug in **clipsMaker** if running 'Nth' frame.    
 
 
