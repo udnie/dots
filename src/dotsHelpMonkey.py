@@ -29,6 +29,7 @@ bkgHelpKeys = {
     ' E ':      'Eye-Dropper',  
     ' F ':      'Flop It', 
     ' H ':      'This Help Menu',
+    ' M ':      'Matte',
     ' T ':      'Toggle Lock',
     ' \\ ':     'Background Tag',
     'del':      'delete from screen',  
@@ -151,7 +152,7 @@ class BkgHelp:
         self.table = TableWidgetSetUp(65, 180, len(bkgHelpKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 251, 517
+        width, height = 251, 552
         
         self.table.setFixedSize(width, height)  
         self.table.setRow(0, 0, f'{"Background Help Menu":<22}',QL,True,True,2)

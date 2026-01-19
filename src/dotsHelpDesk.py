@@ -20,7 +20,7 @@ storyKeys = {   ## storyHelp2
     'U':    'UnSelect - End',     
 }
 
-pathKeys = {     ## pathHelp2
+pathKeys = {     ## pathHelpMenu2
     '>':    'Shift WayPts +5%',
     '<':    'Shift WayPts -5%',
     '!':    'Half Path Size',
@@ -36,7 +36,7 @@ pathKeys = {     ## pathHelp2
     '</>':  'Toggle Size',  
 }
 
-PathStr = ('>', '<', '!', '@','/','{','}')  ## wired up
+PathStr = ('>', '<', '!', '@','/','{','}')  ## wired up - the rest manual
 
 ### --------------------- dotsHelpDesk --------------------- 
 ''' classes: StoryHelp2, PathHelp2,  '''

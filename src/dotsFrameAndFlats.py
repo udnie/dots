@@ -31,7 +31,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
     def __init__(self, parent, canvas, off=0, str='', switch=''):
         super().__init__()  
         
-        self.eitherOne = parent  ## can be either
+        self.parent = parent  ## can be either
         self.canvas = canvas
         self.switch = switch
     
@@ -71,7 +71,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help == '\\': help = 'tag'
                 if help != 'H' and help in sharedKeys:
-                    self.eitherOne.shared(help)
+                    self.parent.shared(help)
             except:
                 None
         self.closeMenu()
@@ -114,13 +114,19 @@ class Flat(QGraphicsPixmapItem):
     @pyqtSlot(str)  ## updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
-         
+    
     def mousePressEvent(self, e):  
-        if e.button() == Qt.MouseButton.RightButton:
+        if self.key == '' and self.canvas.openPlayFile == 'menu':
+            self.canvas.openPlayFile = ''
+            self.canvas.clear()
+            return
+        
+        elif e.button() == Qt.MouseButton.RightButton:
             if self.canvas.openPlayFile != 'menu' and self.canvas.videoPlayer == None:
                 self.openMenu()  
+                
         elif self.key in sharedKeys and not self.canvas.pathMakerOn: 
-            self.shared(self.key)                       
+            self.shared(self.key)             
         e.accept()
         
     def mouseReleaseEvent(self, e):
@@ -130,24 +136,30 @@ class Flat(QGraphicsPixmapItem):
     def shared(self, key):  ## used with help menu
         match key:
             case 'del':   
-                self.delete()               
+                self.delete()       
+                        
             case 'shift':       ## to the back
                 self.setZValue(self.canvas.bkgMaker.toBack())
                 time.sleep(.10)       
                 self.canvas.bkgMaker.renumZvals()     
                 time.sleep(.10) 
+                
             case 'B':           ## not actually tracked
                 self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
-                    else self.bkgtrackers.tracker.bye()     
+                    else self.bkgtrackers.tracker.bye()  
+                       
             case 'H':  
                 self.openMenu()      
+                
             case 'tag':          ## '\' tag key
                 self.tagThis()
+                
             case 'enter' | 'return':
                 if self.zValue() == common['bkgZ']:
                     return
                 self.canvas.bkgMaker.front(self)        
                 time.sleep(.10)   
+                
             case 'T':     
                 self.setLock() if self.locked == False else self.setUnlock()
                 self.tagThis()
@@ -235,15 +247,20 @@ class Frame(QGraphicsPixmapItem):
     def shared(self, key):  ## key can come from help as well
         match key:
             case 'del':    
-                self.delete()      
+                self.delete()  
+                    
             case 'shift':   ## back one
-                self.setZValue(self.zValue()-1)   
+                self.setZValue(self.zValue()-1)  
+                 
             case 'H':  
-                self.openMenu()      
+                self.openMenu()    
+                  
             case 'tag':     ## '\' tag key
                 self.tagThis() 
+                
             case 'enter'| 'return': # send to front
-                self.setZValue(self.mapper.toFront(1))    
+                self.setZValue(self.mapper.toFront(1))  
+                  
             case 'T':     
                 self.setLock() if self.locked == False else self.setUnLock()
                 self.tagThis()

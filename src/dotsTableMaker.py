@@ -27,6 +27,7 @@ ColumnWidths = [2,3,4,5,8,9,10,11,12,13,14,15]  ## set these columns width to 85
 Columns = {  ## set widths by number of columns
     21:  1605,
     18:  1505,
+    17:  1500,
     16:  1415,
     12:  1065,
      8:   715,
@@ -173,7 +174,7 @@ class TableView:  ## formats a json .play file to display missing files or not
                
 ### --------------------------------------------------------                            
     def resetColumnWidths(self, width):  
-        self.tableView.setColumnWidth(0, 65)
+        self.tableView.setColumnWidth(0, 65)  ## for row number
         self.tableView.setColumnWidth(1, 135)
         for i in range(1, self.cols):  
             if i in ColumnWidths:  ## reduce column widths for these
@@ -189,9 +190,13 @@ class TableView:  ## formats a json .play file to display missing files or not
         else:
             self.showWorks.saveToPlays(self.data)  ## retains remaining missing files when saved
  
-    def reposition(self, height):
-        g = getCtr()  ## reposition viewer if column number changes  
-        c = Columns[self.cols]  ## replacing dictionary value prior to math
+    def reposition(self, height):   ## reposition tableWidget if column number changes 
+        g = getCtr()                ## added missing a 17 column entry in Columns 
+        try:         
+            c = Columns[self.cols]  ## maximum number of columns 
+        except:
+            MsgBox('error on reposition')
+            return
         x = int(g.x() - int(c/2))
         y = int(g.y() - int(height/2)-100)
         return QPoint(x, y)

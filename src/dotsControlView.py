@@ -13,8 +13,11 @@ from dotsSideCar2       import SideCar2
 from dotsMapMaker       import MapMaker
 
 ### ------------------ dotsControlView ---------------------
-''' dotsControlView: Base class to create the control view adds drag and 
-    drop. Thanks to tpoveda @ https://gist.github.com/tpoveda for posting''' 
+''' A class used to create the control view, adding drag and drop, 
+    processing keyboard entry, special characters and those with 
+    modifiers. Exception - when a widget grabs the keyboard.
+    Thanks to tpoveda@ https://gist.github.com/tpoveda for posting
+    - got me started. ''' 
 ### --------------------------------------------------------
 class ControlView(QGraphicsView):
 ### --------------------------------------------------------
@@ -47,7 +50,7 @@ class ControlView(QGraphicsView):
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setFocus()
 
-        self.grabKeyboard()  ## happy days
+        self.grabKeyboard() 
       
 ### --------------------------------------------------------
     def dragMoveEvent(self, e):
@@ -57,7 +60,7 @@ class ControlView(QGraphicsView):
         if e.mimeData().hasUrls():
       
             if self.canvas.control != '' or self.canvas.animation == True: 
-                e.setAccepted(False)
+                e.setAccepted(False)  
                 return
             
             m = e.mimeData()
@@ -102,7 +105,7 @@ class ControlView(QGraphicsView):
     def sendIt(self, key, mod):
 
 ### --------------------------------------------------------
-    ## single keys without modifiers
+    ## single keys without modifiers - mainly special charaters 
 ### --------------------------------------------------------     
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
@@ -119,10 +122,8 @@ class ControlView(QGraphicsView):
                 self.setKey('C')  ## clear canvas and storyboard, pathmaker if no edits
             
             elif key == Qt.Key.Key_F:
-                if self.canvas.pathMakerOn == False:  
-                    self.sideCar2.flopSelected()         
-                else:
-                    self.canvas.sideCar2.sendPixKeys('F')
+                self.sideCar2.flopSelected() if self.canvas.pathMakerOn == False\
+                    else self.canvas.sideCar2.sendPixKeys('F')
                             
             elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
                 self.setKey('del')
@@ -147,30 +148,23 @@ class ControlView(QGraphicsView):
                     else:
                         self.sideCar2.bkgStuff()
                                                             
-            elif key == Qt.Key.Key_D:
-                if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn:
-                    self.setKey('delPts')  ## delete selected pts in pathmaker
-                    
-                else: 
-                    self.setKey('D')
+            elif key == Qt.Key.Key_D:    ## delete selected pts in pathmaker
+                 self.setKey('delPts') if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn\
+                    else self.setKey('D')
                                                         
             elif key == Qt.Key.Key_H:  ## toggles hides/unhides selections 
                 self.sideCar.toggleSelections() if mod & Qt.KeyboardModifier.ShiftModifier else\
                     self.setKey('H')  ## help 
                     
-            elif key == Qt.Key.Key_L:
-                if mod & Qt.KeyboardModifier.ShiftModifier:  ##  ## toggles sprites locked on/off
-                    self.sideCar.toggleSpriteLocks()  ## this lets 'L' pass  
-                else:
-                    self.setKey('L')  ## used by pathmaker to toggle lasso 
+            elif key == Qt.Key.Key_L:   ## this lets 'L' pass -- toggles sprites locked on/off
+                self.sideCar.toggleSpriteLocks() if mod & Qt.KeyboardModifier.ShiftModifier \
+                    else self.setKey('L')  ## used by pathmaker to toggle lasso 
            
         elif key in (Qt.Key.Key_M, Qt.Key.Key_R, Qt.Key.Key_S, Qt.Key.Key_T, Qt.Key.Key_U):       
            
             if key == Qt.Key.Key_M:
-                if mod & Qt.KeyboardModifier.ShiftModifier:  
-                    self.sideCar.dump()   
-                else:
-                    self.setKey('M')
+                self.sideCar.dump() if mod & Qt.KeyboardModifier.ShiftModifier \
+                    else self.setKey('M')
                     
             elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadowsand bkgs
                 self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else\
@@ -184,7 +178,7 @@ class ControlView(QGraphicsView):
                     self.setKey('S')  
                                                             
             elif key == Qt.Key.Key_T:  ## toggles tags both link and lock
-                if self.canvas.pathMakerOn == True:
+                if self.canvas.pathMakerOn:
                     self.setKey('T')
                     
                 elif mod & Qt.KeyboardModifier.ShiftModifier or self.canvas.control !='':
@@ -193,10 +187,8 @@ class ControlView(QGraphicsView):
                     self.canvas.sideCar2.sendPixKeys('T') 
 
             elif key == Qt.Key.Key_U:  ## unlocks all sceneItems     
-                if mod & Qt.KeyboardModifier.ShiftModifier:
-                    self.canvas.sideCar2.unlockAll()  
-                else:
-                    self.setKey('U')  
+                self.canvas.sideCar2.unlockAll() if mod & Qt.KeyboardModifier.ShiftModifier \
+                    else self.setKey('U')  
 
         ## apple option key and cmd key - used by scroll panel to scroll tiles
         elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and \

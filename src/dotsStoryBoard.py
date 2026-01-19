@@ -199,7 +199,7 @@ class StoryBoard(QWidget):
             self.canvas.sideCar.videoOff()
         time.sleep(.10) 
             
-        if self.control != '' or self.animation == True:
+        if self.control != '' or self.animation:
             self.showbiz.showtime.stop('clear')  
             time.sleep(.10)  ## otherwise an error report and lockup
         

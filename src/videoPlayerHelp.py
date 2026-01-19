@@ -48,6 +48,7 @@ slideMenuKeys = {  ## slideShow
     '<,  _,  [':        'Scale Down',
     'Shift-B':          'Buttons Show/Hide', 
     'Shift-F':          'Frameless Hint', 
+    'Shift-S':          'Select Files',
     'X, Q, Escape':     'Quit/Exit',
 }
 
@@ -56,7 +57,7 @@ QL = QColor(230,230,230)  ## 10% gray
 QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
 
-SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-B','Shift-F')
+SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-B','Shift-F','Shift-S')
 
 ### -------------------------------------------------------- 
 class VideoHelpWidget(QWidget):
@@ -259,7 +260,7 @@ class SlideShowHelp(QWidget):
         self.table = TableWidgetSetUp(115, 145, len(slideMenuKeys)+2)
         self.table.itemClicked.connect(self.clicked)
 
-        width, height = 267, 517
+        width, height = 267, 547
         self.table.setFixedSize(width, height)  
          
         self.table.setRow(0, 0, f'{"SlideShow":<15}',QL,True, True, 2) 

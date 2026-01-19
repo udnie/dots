@@ -118,6 +118,7 @@ class PathMaker(QWidget):
         self.chooser = None
         self.newPath = None 
         self.pathTestNode = None
+        self.pathHelpMenu2 = None
                                
 ### ---------------------- key handler ---------------------
     @pyqtSlot(str)  ## there's no signal - using the decorator to speed things up
@@ -140,11 +141,11 @@ class PathMaker(QWidget):
                 self.edits.editPointsOff()
                 self.edits.editPoints()
             
-        elif self.key == 'L' and self.editingPts == True:  ## turn lasso on/off
+        elif self.key == 'L' and self.editingPts:  ## turn lasso on/off
             self.edits.newLasso() if self.lassoOn == False \
                 else self.edits.deleteLasso()
                                                                
-        elif self.key in self.editKeys and self.editingPts == True:
+        elif self.key in self.editKeys and self.editingPts:
             self.editKeys[self.key]()  
 
         elif self.key in self.noPathKeysSet:  
@@ -209,7 +210,7 @@ class PathMaker(QWidget):
     def delete(self):
         self.pathWorks.stopPathTest()
         
-        if self.canvas.animation == True:  ## turns off video as well
+        if self.canvas.animation:  ## turns off video as well
             self.canvas.showbiz.showtime.stop('clear') 
         elif self.canvas.videoPlayer != None:  ## make sure it's stopped
             self.canvas.videoPlayer.stopVideo()
@@ -307,7 +308,7 @@ class PathMaker(QWidget):
         self.pathSet = True
     
     def removePath(self):       
-        if self.pathSet == True:
+        if self.pathSet:
             self.pathWays.removeWayPtTags()
             if self.path != None:
                 self.scene.removeItem(self.path)

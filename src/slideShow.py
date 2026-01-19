@@ -25,24 +25,24 @@ Width, Height     = 1200,  750      ## choose one you like and delete the rest
 ViewW, ViewH      = 1150,  700      ## starting viewport
 MaxW, MaxH, MaxV  =  950,  500, 550 ## max image size within the ViewW/H
 
-# Width, Height     = 1500, 1000    ## widget size  
-# ViewW, ViewH      = 1450,  950    ## scene size
-# MaxW, MaxH, MaxV  = 1200,  650, 800 
+# Width, Height     = 1350,  850  
+# ViewW, ViewH      = 1300,  800 
+# MaxW, MaxH, MaxV  = 1100,  550, 650  
 
 # Width, Height     = 1450,  900  
 # ViewW, ViewH      = 1350,  850
 # MaxW, MaxH, MaxV  = 1150,  625, 725 
- 
-# Width, Height     = 1350,  850  
-# ViewW, ViewH      = 1300,  800 
-# MaxW, MaxH, MaxV  = 1100,  550, 650  
+
+# Width, Height     = 1500, 1000   
+# ViewW, ViewH      = 1450,  950  
+# MaxW, MaxH, MaxV  = 1200,  650, 800 
 
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 
 ### --------------------- slideShow.py ---------------------
 ''' Reads and displays .png, .jpg, .jpeg, .tif, .tiff, and .webp files.
-    '>' ,'+', ']' scales up, '<', '_', scales down,. retaining the
-    same aspect ratio - width to height.
+    '>' ,'+', ']' scales up, '<', '_', '[', scales down retaining
+    the same aspect ratio - width to height.
     The helpMenu and slideMenuKeys are in videoPlayerHelp '''
 ### --------------------------------------------------------
 class SlideShow(QWidget): 
@@ -75,7 +75,7 @@ class SlideShow(QWidget):
                 "color: rgb(250,250,250);\n"      
                 "}")
           
-        self.init()  ## default True, add False to hide
+        self.init()  ## default True shows buttons, False to hide
  
         ## in qt5 framelessWindow won't resize with mouse - use zoom keys instead
         if self.frameHidden:  ## set WindowHint to Frameless
@@ -103,26 +103,27 @@ class SlideShow(QWidget):
         self.show()
              
 ### --------------------------------------------------------
-    def init(self, buttons=True):  ## on each new directory
+    def init(self, buttons=True):  ## on each new files action
         self.files       = []   
-        self.player = 'slides'
+        self.player     = 'slides'
         self.txtlst     = ''
         self.rotters    = {}
         self.fileName    = ''
         self.path       = Path
         self.current    = 0
         self.rot        = 0
-        self.running    = False  ## used by slideshow
+        self.running    = False 
         self.save       = QPointF()
         self.pixItem    = None 
         self.textItem   = None
         self.helpMenu   = None
+        self.timer      = None
         self.helpFlag   = False
         self.buttonsVisible = buttons
         self.frameHidden = False  
-        self.aspect  = 0.0
-        self.saveW = 0
-        self.saveH = 0
+        self.aspect = 0.0
+        self.saveW  = 0
+        self.saveH  = 0
  
 ### --------------------------------------------------------
     def keyPressEvent(self, e):  
@@ -140,6 +141,9 @@ class SlideShow(QWidget):
             
         elif key == Qt.Key.Key_F and mod & Qt.KeyboardModifier.ShiftModifier:
             self.toggleFrameless()  
+            
+        elif key == Qt.Key.Key_S and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.selectFiles()  
             
         elif  key in (Qt.Key.Key_B, Qt.Key.Key_Left):
             self.slideMenuKeys('B')      
@@ -189,6 +193,8 @@ class SlideShow(QWidget):
                 self.toggleButtons()
             case 'Shift-F':
                 self.toggleFrameless()
+            case 'Shift-S':
+                self.selectFiles()
             case 'W':
                 if self.path != '': self.msgbox(self.path)        
             case 'X':
@@ -245,7 +251,7 @@ class SlideShow(QWidget):
          
         self.saveW, self.saveH = img.width(), img.height()
         self.aspect = math.floor((img.width()/img.height()) * 100)/100.0
-   
+        
         if rot := self.rotters.get(file): 
             self.rot = rot
                                            
@@ -317,7 +323,7 @@ class SlideShow(QWidget):
             self.addPixmap(self.files[self.current])   
         e.accept()       
            
-    def openingLayout(self):
+    def openingLayout(self):  ## refresh to start
         if self.pixItem != None:
             self.setScene() 
             x, H = int(self.ctr.x() - (Width)/2), Height
@@ -366,11 +372,8 @@ class SlideShow(QWidget):
         
     def textXY(self):   
         self.setScene()  
-        w, W = self.textItem.boundingRect().width(),  int(self.width())  
-        h, H = self.textItem.boundingRect().height(), int(self.height()) 
-        x, y = int((W - w)/2), int(H-h)
-        y = self.height() - 140 if self.buttonsVisible else self.height() - 80
-        return QPointF(x-15, y)
+        W = int((self.width() - self.textItem.boundingRect().width())/2)
+        return QPointF(W-15, self.view.height()-35)
     
     def updTextItem(self):
         if self.setTags == True and self.textItem != None:
@@ -379,11 +382,16 @@ class SlideShow(QWidget):
     
     def tagIt(self):   
         try:
-            file, width, height = self.txtlst, self.saveW, self.saveH   
+            width, height = self.saveW, self.saveH   
             asp = math.floor(width/height *100)/100.0  
         except:
             self.msgbox('tagIt: problem with ' + file)
             return None
+        
+        file = os.path.basename(self.fileName)
+        dir = os.path.basename(os.path.dirname(self.fileName) )
+        file = (f"../{dir}/{file}")
+        
         if self.rot in (90, 270):  ## recalc for rotation
             asp = math.floor(height/width *100)/100.0    
             s = (f"{file}   {(height)}X{int(width)}   asp {asp}")           
@@ -430,7 +438,10 @@ class SlideShow(QWidget):
     def clearScene(self):
         self.closeHelpMenu()
         self.scene.clear()  
+        self.timerStop()
+        hold = self.frameHidden
         self.init() 
+        self.frameHidden = hold
             
     def msgbox(self, str):
         msg = QMessageBox()
@@ -458,44 +469,44 @@ class SlideShow(QWidget):
         self.timer.start(self.delay)
   
     def timerStop(self):
-        self.timer.stop()
+        if self.timer != None:
+            self.timer.stop()
         self.running = False
         
 ### --------------------------------------------------------
-    def fileChooser(self):
-        if path := self.selectDirectory():
+    def fileChooser(self):  ## from button or menu
+        if path := self.selectDirectory():  ## only
             self.path = path
             self.openFiles(path)
                           
-    def openFiles(self, path=''):
-        self.clearScene()  ## calls self.init() 
-        if path != '':  
-            os.chdir(path);  self.path = os.getcwd() 
-        if list := self.getPathList():      
-            files = self.getFileNames(list)
-            if files != None:
-                self.files = sorted(files)
-                self.addPixmap(self.files[0]) 
-                if len(self.files) == 1:
-                    self.msgbox('openFiles: Only One Matching File')
-        
     def selectDirectory(self):
         path = QFileDialog.getExistingDirectory(self, '') 
         if path == None or path == '':
             return 
         os.chdir(path)
-        return os.getcwd()
-                            
+        return os.getcwd()                      
+                                    
+    def openFiles(self, path=''):  ## default - calls self.init()  
+        self.startUp(path)   
+        if list := self.getPathList():      
+            files = self.getFileNames(list)  ##  makes sure they're image files
+            self.setImageFiles(files)
+   
+    def startUp(self, path=''):
+        self.clearScene()  
+        if path != '':  
+            os.chdir(path);  self.path = os.getcwd() 
+   
     def getPathList(self):
         if len(sys.argv) > 1:  ## set starting directory
             self.path = sys.argv[1]
         elif self.path == '':
             self.path = os.getcwd()  
         else:
-            files = os.listdir(self.path)  ## path set with default directory
-            return files
-       
-    def getFileNames(self, files):       
+            files = os.listdir(self.path)  
+            return files 
+   
+    def getFileNames(self, files):  ## make sure it's viewable  
         filenames = []
         for file in files: 
             path = os.path.join(self.path, file)
@@ -508,7 +519,24 @@ class SlideShow(QWidget):
             self.msgbox('getFileNames: No Files Found')
             return None
         return filenames
-                                         
+  
+    def setImageFiles(self, files):
+        if files != None:
+            self.files = sorted(files)
+            self.addPixmap(self.files[0]) 
+            if len(self.files) == 1:
+                self.msgbox('openFiles: Only One Matching File')                 
+                       
+    def selectFiles(self):
+        self.startUp()
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.FileMode.ExistingFiles) 
+        if dialog.exec() == QFileDialog.DialogCode.Accepted:
+            filenames = dialog.selectedFiles()
+            if filenames != None:
+                files = self.getFileNames(filenames)  
+                self.setImageFiles(files)       
+                                                                
 ### --------------------------------------------------------    
     def setButtons(self): 
         self.buttonGroup = QLabel()

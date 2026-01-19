@@ -1,7 +1,7 @@
 
 
 from PyQt6.QtCore       import Qt, QRectF
-from PyQt6.QtGui        import QColor, QPen, QPainter                   
+from PyQt6.QtGui        import QColor, QPen, QPainter, QFont                 
 from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
                                 QPushButton, QVBoxLayout
                
@@ -24,15 +24,13 @@ MaxWid, MaxHgt = 1800, 1065
 
 VertW = 525  ## minimum vertical width on open
 VertH = 100  ## vertical starting height
-HorzH = 200
+HorzH = 225  ## horizontal starting height 
 
-MinWid = 300  ## minimum widget width
-MinHgt = 400  ## minimum widget height
-
+MinWid  = 300  ## minimum widget width
+MinHgt  = 400  ## minimum widget height
 AspKeys = list(Keys.keys())
 
 VideoMenuKeys = AspKeys + ['L','O','X','C','M',']','[','Shift-S','Aspect','Settings','Clips']
-
 WID, HGT, PAD = 40, 140, 30 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
 ### --------------------------------------------------------        
@@ -46,9 +44,19 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.switch = switch
 
         self.WidgetW, self.WidgetH = 505.0, 300.0
-           
-        hbox = QHBoxLayout() 
-        hbox.addWidget(self.sliderGroup())  
+                 
+        vbox = QVBoxLayout()
+        vbox.addSpacing(20) 
+ 
+        label = QLabel('ClipsMaker Settings', alignment=Qt.AlignmentFlag.AlignHCenter)
+        label.setFont(QFont("Arial", 14))
+        vbox.addWidget(label)
+        
+        vbox.addWidget(self.sliderGroup())
+        vbox.addSpacing(50) 
+      
+        hbox = QHBoxLayout()    
+        hbox.addLayout(vbox)
         hbox.addWidget(self.buttonGroup(), alignment=Qt.AlignmentFlag.AlignVCenter)
         hbox.addSpacing(10)   
       
@@ -189,6 +197,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         nhbox.addWidget(self.rnfValue)
         
         vbox = QVBoxLayout()
+        vbox.addSpacing(5)       
         vbox.addLayout(fhbox) 
         vbox.addSpacing(5)  
         vbox.addLayout(mhbox) 
@@ -199,6 +208,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         
         groupBox.setLayout(vbox)
         return groupBox     
+    
 ### -------------------------------------------------------- 
     def buttonGroup(self):
         groupBox = QGroupBox()
@@ -209,31 +219,31 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
       
         self.aspBtn = QPushButton('AutoAspect')   ## buttons true/false set in clipsmaker
-        if self.clips.AutoAspect == True: 
+        if self.clips.AutoAspect: 
             self.aspBtn.setText('AutoAspectOn')
         
         self.clpsBtn = QPushButton('MakeClips') 
-        if self.clips.MakeClips == True:
+        if self.clips.MakeClips:
             self.clpsBtn.setText('MakeClipsOn')
             
         self.skipBtn = QPushButton("Nth'Frame") 
-        if self.clips.SkipFrames == True:
+        if self.clips.SkipFrames:
             self.skipBtn.setText("Nth'FrameOn")
             
         self.firstBtn = QPushButton('FirstFrame') 
-        if self.clips.FirstFrame == True:
+        if self.clips.FirstFrame:
             self.firstBtn.setText('FirstFrameOn')
             
         self.filterBtn = QPushButton('Filter') 
-        if self.clips.FilterOn == True:
+        if self.clips.FilterOn:
             self.filterBtn.setText('FilterOn')
                         
         self.playBtn = QPushButton('PlayVideo')
-        if self.clips.PlayVideo == True:
+        if self.clips.PlayVideo:
             self.playBtn.setText('PlayVideoOn')
         
         self.nameBtn = QPushButton('FileName')
-        if self.clips.AddFileName == True:
+        if self.clips.AddFileName:
             self.nameBtn.setText('FileNameOn')
         
         self.quitBtn = QPushButton('Close')

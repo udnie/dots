@@ -25,7 +25,7 @@ pathKeys = {
     'D':    'Clears/Deletes Scene',
     'E':    'Edit Path Points', 
     'M':    'This Help Menu',
-    'Menu': 'PathMakerHelp Menu 2',
+    'Menu': 'HelpMenu2',
     'Menus':'Help Menus',
     'N':    'New Path and Close Path',
     'P':    'Path Chooser',
@@ -54,9 +54,7 @@ class PathHelp:
         
         self.canvas = canvas
         self.switch = switch
-        
-        self.pathHelp2 = None
-        
+               
         self.table = TableWidgetSetUp(55, 185, len(pathKeys)+6, 0, NS)
         self.table.itemClicked.connect(self.clicked)    
     
@@ -102,7 +100,7 @@ class PathHelp:
                  ## show help menus  
                 elif help == 'Menu':  ## menu2
                     QTimer.singleShot(10, self.closeMenu) 
-                    self.pathHelp2 = PathHelp2(self.canvas)  ## dotsHelpDesk
+                    self.canvas.pathMaker.pathHelpMenu2 = PathHelp2(self.canvas)
                 self.table.close()
             except:
                 None
@@ -155,8 +153,11 @@ class PathWorks:
         self.pathMaker.pathChooserOff()
         self.pathMaker.pathChooser()
  
-    def openMenu(self):
+    def openMenu(self):  ## triggered by help button
         self.closeWidget()
+        if self.pathMaker.pathHelpMenu2 != None:
+            self.pathMaker.pathHelpMenu2.closeMenu()
+            self.pathMaker.pathHelpMenu2 = None
         self.help = PathHelp(self, self.canvas)  
         
  ### --------------------------------------------------------    
@@ -233,7 +234,7 @@ class PathWorks:
                           
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
-        if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet == True:
+        if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet:
             if self.pathMaker.pathTestSet == False:
                 self.ball = Ball(paths['imagePath'] + 'ball.png', self.canvas)
                 self.node = Node(self.ball)

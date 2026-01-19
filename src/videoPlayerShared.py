@@ -58,7 +58,8 @@ class MediaPlayer(QMediaPlayer):
         self.audioOut = QAudioOutput()  ## 6
         self.mediaPlayer.setAudioOutput(self.audioOut)  ## 6
   
-        self.mediaPlayer.setLoops(-1)  ## 6
+        if self.parent.player == "one":  ## 6
+            self.mediaPlayer.setLoops(-1)  ## 6
         
 ### -----------------------------------------------------------------
     def setFileName(self, fileName): 
@@ -171,7 +172,7 @@ class Shared:
         if self.parent.clips.MakeClips == False: 
             self.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
             return      
-        if self.parent.clips.SkipFrames == True:
+        if self.parent.clips.SkipFrames:
             self.parent.clips.openFile(True)   ## <- "one"
         else:
             path = QFileDialog.getExistingDirectory(self.parent, '')
@@ -183,7 +184,7 @@ class Shared:
   
 ### --------------------------------------------------------
     def openHelpMenu(self):
-        if self.parent.helpFlag == True:
+        if self.parent.helpFlag:
             self.closeHelpMenu()
         else:
             self.parent.helpMenu = VideoHelp(self.parent)
@@ -195,7 +196,7 @@ class Shared:
             self.parent.helpMenu.close()
             self.parent.helpFlag = False
             time.sleep(.03)
-            if self.helpMenus == True:
+            if self.helpMenus:
                 self.closeVideoSlideMenus()
             
     def openVideoSlideMenus(self):
@@ -206,7 +207,7 @@ class Shared:
         self.slidehelp = SlideShowHelp(self.parent, 425, 'aaa')
     
     def closeVideoSlideMenus(self):
-        if self.helpMenus == True:    
+        if self.helpMenus:    
             self.settings.close()
             self.videohelp.table.close()
             self.slidehelp.table.close()
@@ -218,7 +219,7 @@ class Shared:
         if self.parent.mediaPlayer != None:
             self.parent.mediaPlayer.playVideo()
       
-    def stopVideo(self):
+    def stopVideo(self):  
         if self.parent.mediaPlayer != None:
             self.parent.mediaPlayer.stopVideo()
             time.sleep(.03)
@@ -228,11 +229,11 @@ class Shared:
             self.parent.mediaPlayer.setPosition(position)
     
     def positionChanged(self, position):  
-        if self.parent.sliderVisible == True:  
+        if self.parent.sliderVisible:  
             self.parent.slider.setValue(position)     
             
     def durationChanged(self, duration):
-        if self.parent.sliderVisible == True: 
+        if self.parent.sliderVisible: 
             self.parent.slider.setRange(0, duration)  
   
 ### --------------------------------------------------------

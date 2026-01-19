@@ -11,7 +11,6 @@ from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
                        
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
-from dotsBkgMatte       import Matte
 from dotsBkgScrollWrks  import BkgScrollWrks
 
 from dotsAnimation      import Node
@@ -212,7 +211,7 @@ class BkgWorks:
 
     def setMirroring(self):
         if self.bkgItem.scrollable:                                  
-            if self.bkgItem.mirroring == True: 
+            if self.bkgItem.mirroring: 
                 self.bkgItem.mirroring = False ## continuous
             else:
                 self.bkgItem.mirroring = True  ## mirrored                                    
@@ -221,20 +220,11 @@ class BkgWorks:
         if self.bkgMaker.newTracker[fileName]:  
             self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
             self.canvas.sideCar2.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 
-         
-    def openMatte(self):  ## runs from bkgWidget - starts here
-        self.bkgItem.widget = False
-        self.bkgMaker.closeWidget()
-        if self.bkgItem.matte != None:
-            self.bkgItem.matte.close()
-        self.bkgItem.matte = Matte(self.bkgItem)
-        
+          
     def closeWidget(self):
-        if self.bkgItem.matte != None:
-            self.bkgItem.matte.close()  
-            self.bkgItem.matte.matteHelp.closeMenu()      
-        self.bkgMaker.closeWidget()
-                                                                                                                                              
+        self.bkgMaker.closeWidget()   
+        self.bkgMaker.closeMatteWidget()
+                                                                                                                      
 ### --------------------- dotsBkgWorks ---------------------
 
 

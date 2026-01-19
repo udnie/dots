@@ -168,7 +168,7 @@ class TagsAndPaths: ## handles more than one request
         
         if pix.type in ('pix','bkg','frame'):
 
-            if pix.locked == True:
+            if pix.locked:
                 tag = 'Locked ' + tag 
             else:
                 tag = 'UnLocked ' + tag 
@@ -189,7 +189,7 @@ class TagsAndPaths: ## handles more than one request
            
         elif pix.type == 'shadow':
             color = 'lightgreen'
-            if pix.maker.linked == True:
+            if pix.maker.linked:
                 tag = 'Linked ' + tag
             else:
                 tag = 'UnLinked ' + tag

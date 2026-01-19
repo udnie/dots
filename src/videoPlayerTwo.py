@@ -26,8 +26,11 @@ class VideoPlayer(QWidget):
         super().__init__()
         self.setWindowTitle("Video Player Two")
                 
-        self.setMinimumHeight(MinHgt);   self.setMinimumWidth(MinWid)
-        self.setMaximumHeight(MaxHgt);   self.setMaximumWidth(MaxWid)
+        self.setMinimumHeight(MinHgt)
+        self.setMinimumWidth(MinWid)
+        
+        self.setMaximumHeight(MaxHgt)
+        self.setMaximumWidth(MaxWid)
         
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
@@ -274,7 +277,7 @@ class VideoPlayer(QWidget):
    
 ### --------------------------------------------------------   
     def resizeEvent(self, e):
-        if self.flag == True:
+        if self.flag:
             self.flag = False
             return 
         elif self.aspect > 0: 

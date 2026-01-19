@@ -27,9 +27,7 @@ class BkgWidget(QWidget):
      
             self.bkgWorks = BkgWorks(self.bkgItem)
             self.bkgScrollWrks = self.bkgWorks.bkgScrollWrks  
-            
-            self.bkgItem.widgetOn = True 
-             
+               
         self.canvas = parent
             
         self.type = 'widget'
@@ -124,7 +122,6 @@ class BkgWidget(QWidget):
             
     def mouseDoubleClickEvent(self, e):
         if self.switch == '':
-            self.bkgItem.widgetOn = False
             self.bkgMaker.closeWidget()
             e.accept()
  
@@ -265,7 +262,7 @@ class BkgWidget(QWidget):
             runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))  ## run a scroller  
             self.lockBtn.clicked.connect(self.bkgScrollWrks.toggleBkgLocks)   
             flopBtn.clicked.connect(lambda: self.bkgMaker.flopIt(self.bkgItem))  
-            matteBtn.clicked.connect(self.bkgWorks.openMatte)
+            matteBtn.clicked.connect(lambda: self.bkgMaker.openMatte(self.bkgItem))  ## only place its called
             centerBtn.clicked.connect(self.bkgWorks.centerBkg)   
             deleteBtn.clicked.connect(lambda: self.bkgMaker.deleteBkg(self.bkgItem))  
             quitBtn.clicked.connect(self.bkgWorks.closeWidget) 

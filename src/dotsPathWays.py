@@ -66,7 +66,7 @@ class PathWays:
         self.editingPtsSet()  
 
     def halfPath(self, full=False):  ## reduces number of points in half
-        if self.pathMaker.pathTestSet == True:
+        if self.pathMaker.pathTestSet:
             self.pathMaker.pathWorks.stopPathTest()
         tmp = []
         lnn = len(self.pathMaker.pts) if full else int(len(self.pathMaker.pts)/2) + 1       
@@ -124,7 +124,7 @@ class PathWays:
             self.pathMaker.edits.redrawPoints()
          
     def editingPtsSet(self):
-        if self.pathMaker.editingPts == True:
+        if self.pathMaker.editingPts:
             self.pathMaker.edits.updatePath()
                             
 ### ----------------- load and save paths ------------------

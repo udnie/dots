@@ -209,7 +209,7 @@ class ScreenHelp:  ## screens are from dotsScreens
             self.canvas.setKeys('N')
       
     def switchKey(self, key):           
-        if self.displayChk(key) == True:
+        if self.displayChk(key):
             self.canvas.clear()   
             self.canvas.dots.switch(key) 
         else:

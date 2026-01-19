@@ -229,12 +229,12 @@ def tagBkg(bkg, pos):
        
     if bkg.type == 'shadow': 
         color = 'lightgreen'   
-        if bkg.maker.linked == True:
+        if bkg.maker.linked:
             tag = 'Linked' 
         else: 
             tag = 'Unlinked' 
     else:    
-        if bkg.locked == True:
+        if bkg.locked:
             text = 'Locked' 
         else:
             text = 'Unlocked'

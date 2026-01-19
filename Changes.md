@@ -7,9 +7,15 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
-**December 26 2025**  
-Made a change to the **FramelessWindowHint** toggle in **slideshow** so it no longer jumps up or down depending if it's set to visible or not. Updated **python** to **3.13.10** and **PyQt6** and **PySide6** to **6.10.1**. Fixed a bug in **clipsMaker** if running 'Nth' frame.    
+**January 19 2026**   
+Added **'Select Files'**, meaning individual files, to **SlideShow** triggered by a **'Shift-S'**  or selected from its help menu. Fixed a few bugs having to do mostly with menus. **BkgMatte's**  menu is now operational - no longer silent.  I'm not sure why I had disabled it other than to prevent accidentally moving scene items around??.  I would suggest reading over the November and December entries as they should fill in whatever I may have left out in the video.  
 
+New Video:  <https://youtu.be/W2OrZz24YAM>
+
+---
+
+**December 25 2025**  
+Made a change to the **FramelessWindowHint** toggle in **slideshow** so it no longer jumps up or down depending if it's set to visible or not. Updated **python** to **3.13.10** and **PyQt6** and **PySide6** to **6.10.1**. Fixed a bug in **clipsMaker** if running 'Nth' frame.    
 
 ---
 
@@ -44,7 +50,7 @@ Looping a video no longer blips in  **VideoPlayerOne** when using either **PyQt6
 **November 29 2025**   
 Using a **Shift-B** hides or shows the **slideShow** button group while a **Shift-F** toggles the window title bar off and on. See the July 5th entry for adjusting the look of slideShow.  Loops will work in **dotsVideoPlayer** and **PyQt5** as long as shadows aren't present.  **VideoPlayerOne** now can be resized by simply dragging down or up from the bottom of the app or from the bottom corners - the top and its corners have not been touched - they'll do something. A **Shift-S** will toggle the slider off and on (visible).
 
-**VideoPlayerTwo** came about as a way to try things out without causing undue harm and is a mix of **dotsVideoPlayer** and **VideoPlayerOne**. It differs in that it uses a **GraphicsVideoItem** rather than a **VideoWidget** used by **videoPlayerOne**. All three videoPlayers now share a common **MediaPlayer** class and have been overhauled to eliminate a range of no-longer needed comments having to do with maintaining the differences between a PyQt5 mediaPlayer and one for PyQt6.  There are now only six lines of PyQt6 and five lines of PyQt5 that may be affected when converting one to the other.
+**VideoPlayerTwo** came about as a way to try things out without causing undue harm and is a mix of **dotsVideoPlayer** and **VideoPlayerOne**. It differs in that it uses a **GraphicsVideoItem** rather than a **VideoWidget** used by **videoPlayerOne**. All three videoPlayers now share a common **MediaPlayer** class and have been overhauled to eliminate a range of no-longer needed comments having to do with maintaining the differences between a PyQt5 mediaPlayer and one for PyQt6.  There are now only seven lines of PyQt6 and five lines of PyQt5 that may be affected when converting one to the other.
  
 New video:  <https://youtu.be/ydgb43BSDv8>
 

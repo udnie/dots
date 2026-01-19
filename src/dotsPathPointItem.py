@@ -88,7 +88,7 @@ class PointItem(QGraphicsEllipseItem):
     def mouseMoveEvent(self, e):
         if self.pointTag: self.removePointTag()
         if self.pathMaker.pathWays.tagCount() == 0:
-            if self.pathMaker.editingPts == True:
+            if self.pathMaker.editingPts:
                 self.dragCnt += 1
                 if self.dragCnt % 5 == 0:        
                     pos = self.mapToScene(e.pos())
@@ -105,7 +105,7 @@ class PointItem(QGraphicsEllipseItem):
         e.accept()
              
     def mouseReleaseEvent(self, e):
-        if self.pathMaker.editingPts == True:        
+        if self.pathMaker.editingPts:        
             if self.dragCnt > 0:
                 self.pathMaker.pts[self.idx] = self.mapToScene(e.pos())                
                 self.edits.updatePath()  ## rewrites pointItems as well

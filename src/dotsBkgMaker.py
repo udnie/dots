@@ -17,6 +17,7 @@ from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
 from dotsBkgTrackers    import BkgTrackers
 from dotsHelpDesk       import StoryHelp2
+from dotsBkgMatte       import Matte
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -36,10 +37,11 @@ class BkgMaker(QWidget):
         self.init()
       
     def init(self):
-        self.flat    = None
-        self.widget = None  ## there is only one
+        self.flat = None
+        self.widget = None  ## there is only one 
         
-        self.storyHelp2 = None  ## do it here as there's no storyboard
+        self.matteWidget = None  
+        self.storyHelp2  = None  ## do it here as there's no storyboard
         
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False
@@ -139,7 +141,8 @@ class BkgMaker(QWidget):
     def addWidget(self, bkg):  ## background widget
         self.closeWidget()  
         if bkg.type == 'flat':
-            return          
+            return         
+        self.closeMatteWidget() 
         self.widget = BkgWidget(bkg, self) 
         self.lockBkg(bkg)
         p = common['widgetXY']
@@ -165,7 +168,18 @@ class BkgMaker(QWidget):
             self.canvas.helpButton.storyHelp.closeMenu()
             self.canvas.helpButton.storyFlag = False
             self.canvas.helpButton.storyHelp = None
-                    
+            
+    def openMatte(self, bkg):  ## runs only from bkgWidget
+        self.closeWidget()  ## closes matteWidget as well
+        self.matteWidget = Matte(self.canvas, bkg)
+            
+    def closeMatteWidget(self):
+        if self.matteWidget != None:
+            if self.matteWidget.matteHelpMenu != None:
+                self.matteWidget.matteHelpMenu.closeMenu()  
+            self.matteWidget.close() 
+            self.matteWidget = None
+               
     def closeWidget(self):
         if self.widget != None:
             self.closeStoryHelp()
@@ -209,9 +223,9 @@ class BkgMaker(QWidget):
         if self.widget:
             self.closeWidget()
              
-        if bkg.matte != None:
-            bkg.matte.bye()
-            bkg.matte = None
+        if self.matteWidget != None:
+            self.matteWidget.bye()
+            self.matteWidget = None
            
         self.scene.removeItem(bkg)
         bkg = None

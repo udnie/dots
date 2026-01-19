@@ -21,6 +21,7 @@ class QVD(QGraphicsVideoItem):  ## added type to track it better
           super().__init__()          
          
           self.type = 'video'
+          self.fileName = 'Breathless'
 
 ### ------------------ dotsVideoPlayer ---------------------        
 class VideoPlayer(QMediaPlayer): 
@@ -39,7 +40,7 @@ class VideoPlayer(QMediaPlayer):
         self.backdrop = None
         self.loopSet = False
         
-        if self.loops == True:
+        if self.loops:
             self.loopSet = True
             self.canvas.btnLoop.setText('LoopOn')
          
@@ -90,7 +91,7 @@ class VideoPlayer(QMediaPlayer):
             if self.canvas.animation == False and  \
                 self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):            
                 self.canvas.showWorks.enablePlay()  
-        elif self.loopSet == True:
+        elif self.loopSet:
             self.playVideo() 
    
     def setBackDrop(self):   

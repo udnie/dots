@@ -13,7 +13,7 @@ from dotsBkgScrollWrks  import BkgScrollWrks
 from dotsHelpMonkey     import BkgHelp
 from dotsAnimation      import Node
 
-BkgSharedKeys = ('B','E','F','H','T','del','tag','shift','enter','return', 'down', 'up') 
+BkgSharedKeys = ('B','E','F','H','M','T','del','tag','shift','enter','return', 'down', 'up') 
 
 ### ---------------------- dotsBkgItem ---------------------                   
 ''' Background Class - there can be more than one background in a scene '''
@@ -35,16 +35,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.bkgWorks       = BkgWorks(self)  
         self.bkgScrollWrks  = BkgScrollWrks(self)
         
-        self.widgetOn = False  
-       
         self.ViewW = common['ViewW']
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
         self.path = paths['bkgPath'] 
-        
-        self.matte = None  
-        
+
         self.fileName = os.path.basename(fileName) 
         self.sharedKeys = BkgSharedKeys  ## shared with bkgMenu
         
@@ -96,7 +92,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.anime = None 
         self.addedScroller = False
         
-        self.help = None
+        self.helpMenu = None
            
         self.direction = ''  ## direction of travel: left <<--, right -->>
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
@@ -139,7 +135,11 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
     def mousePressEvent(self, e): 
         if not self.canvas.pathMakerOn:       
-            if e.button() == Qt.MouseButton.RightButton:   
+            if e.button() == Qt.MouseButton.RightButton: 
+                if self.bkgMaker.matteWidget != None:
+                    return
+                elif self.helpMenu != None:
+                    self.closeMenu()
                 self.bkgMaker.addWidget(self)   
                 if self.direction == '':
                     self.bkgMaker.bkgtrackers.resetTracker(self)
@@ -176,7 +176,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 case  'F':          ## flip it
                     self.setMirrored(False) if self.flopped else self.setMirrored(True)  
                 case  'H':  
-                    self.openMenu()
+                    self.openMenu()                           
+                case 'M':
+                    self.bkgMaker.openMatte(self)      
                 case  'T':     
                     self.bkgMaker.lockBkg(self) if self.locked == False \
                         else self.bkgMaker.unlockBkg(self)
@@ -188,12 +190,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
           
     def openMenu(self):
         self.bkgMaker.closeWidget()    
-        self.help = BkgHelp(self) 
+        self.helpMenu = BkgHelp(self) 
         
     def closeMenu(self):
-        if self.help != None:
-            self.help.closeMenu()
-            self.help = None
+        if self.helpMenu != None:
+            self.helpMenu.closeMenu()
+            self.helpMenu = None
         
 ### -------------------------------------------------------- 
     ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''

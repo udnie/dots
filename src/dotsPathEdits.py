@@ -28,7 +28,7 @@ class PathEdits(QWidget):
 ### --------------------- event filter ----------------------          
     def eventFilter(self, source, e):  ## used by lasso    
         if self.canvas.pathMakerOn:
-            if self.pathMaker.editingPts == True and self.pathMaker.lassoOn == True:
+            if self.pathMaker.editingPts and self.pathMaker.lassoOn:
                          
                 if e.type() == QEvent.Type.MouseButtonPress and \
                     e.buttons() == Qt.MouseButton.LeftButton:
@@ -47,7 +47,7 @@ class PathEdits(QWidget):
      
 ### ---------------------- new path ------------------------  
     def toggleNewPath(self):  ## changed - use delete instead or 'N'
-        if self.pathMaker.addingNewPath == True:
+        if self.pathMaker.addingNewPath:
             if len(self.pathMaker.pts) == 0:  ## nothing there - delete it
                 self.deleteNewPath()
             else:

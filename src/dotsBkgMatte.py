@@ -32,18 +32,19 @@ matteKeys = {
 SharedKeys = ('B','C', 'D', 'G', 'H', 'P', 'Q', 'R', 'S', 'V', 'W', 'X', 'Space', '<', '>')
 
 ### --------------------- dotsBkgMatte ---------------------     
-''' '+, >, ]' scales the Matte up in both directions and 
-    '_, <, [' scales it down.  Calling the bkgWidget reset the 
-    matte's border'''
+''' '+, >, ]' scales the Matte up in both directions and '_, <, ['
+    scales it down.  The menu now works - for some reason I had it 
+    configured to avoid moving screen items by accident when clicking
+    on a action. '''
 ### --------------------------------------------------------      
 class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, bkg):
         super().__init__()
 
-        self.bkgItem = parent 
-        self.canvas   = self.bkgItem.canvas
-      
+        self.canvas = parent
+        self.bkgItem = bkg
+        
         self.type = 'widget' 
         self.setAccessibleName('widget')
    
@@ -52,9 +53,9 @@ class Matte(QWidget):  ## opens itself
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.FramelessWindowHint|\
             Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.NoDropShadowWindowHint|\
-            Qt.WindowType.WindowStaysOnTopHint) 
-
+            Qt.WindowType.NoDropShadowWindowHint)
+            ##Qt.WindowType.WindowStaysOnTopHint)  ## caused it to stopped accepting menu clicks
+  
         self.setStyleSheet('background-color: rgba(0,0,0,0)')
         
         p = self.canvas.mapToGlobal(QPoint())
@@ -80,13 +81,14 @@ class Matte(QWidget):  ## opens itself
         self.resize(common['ViewW']+100, common['ViewH']+100) 
         
         self.move(self.x, self.y)  ## 0,0 for canvas relative to actual screen format
-    
         self.show()
         
-        self.help = False
-        self.matteHelp = MatteHelp(self.canvas, self) 
+        self.helpMenu = False
+        
+        self.matteHelpMenu = None    
+        self.matteHelpMenu = MatteHelp(self.canvas, self) 
           
-        self.grabKeyboard()  ## note !!!
+        self.grabKeyboard()  
    
 ### --------------------------------------------------------
     def paintEvent(self, e):            
@@ -126,7 +128,7 @@ class Matte(QWidget):  ## opens itself
         mod = e.modifiers()   
   
         if key in ('E',  Qt.Key.Key_Enter, Qt.Key.Key_Return):
-            self.matteHelp.closeMenu()
+            self.matteHelpMenu.closeMenu()
                            
         elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
@@ -151,37 +153,50 @@ class Matte(QWidget):  ## opens itself
                 self.pix = None           
         match key: 
             case 'B':     
-                self.brush = self.black    
+                self.brush = self.black  
+                  
             case 'C':      ## change color
-                self.brush = self.lst[random.randint(0,2)]     
+                self.brush = self.lst[random.randint(0,2)] 
+                    
             case 'D':      ## delete background    
-                self.bkgItem.bkgMaker.deleteBkg(self.bkgItem)                  
+                self.bkgItem.bkgMaker.deleteBkg(self.bkgItem)
+                                  
             case 'G':      # 
                 self.brush = self.grey  
+                
             case 'H': 
-                if self.help == False:  
-                    self.matteHelp = MatteHelp(self.canvas, self) 
-                elif self.help == True:   
-                    self.matteHelp.closeMenu()                    
+                if self.helpMenu == False:  
+                    self.matteHelpMenu = MatteHelp(self.canvas, self) 
+                elif self.helpMenu == True:   
+                    self.matteHelpMenu.closeMenu()  
+                                      
             case 'P':
                 if self.pix == None:    
                     self.pix = self.img  ## something to initialize it       
                 elif self.pix != None: 
                     self.pix = None
-                    self.brush = self.lst[random.randint(0,2)]      
+                    self.brush = self.lst[random.randint(0,2)]  
+                        
             case 'R': 
                  self.canvas.showbiz.showtime.run()
+                 
             case 'Space':          
                 self.canvas.showbiz.showtime.pause()   
+                
             case 'S':  
-                self.canvas.showbiz.showtime.stop()                           
+                self.canvas.showbiz.showtime.stop() 
+                                          
             case 'V':      ## set screen format ratio to around .61 - midway between 16:9 and 3:2 
-                self.ratio = self.altRatio if self.ratio == 1.0 else 1.0          
+                self.ratio = self.altRatio if self.ratio == 1.0 else 1.0   
+                       
             case 'W':      
                 self.brush = self.white  
+                
             case '>':     
-                self.scaleUp()           
+                self.scaleUp()    
+                       
             case '<':   
+                
                 self.scaleDown()   
                                                                                            
         self.update() if key not in ('Q','X') else self.bye()
@@ -206,14 +221,17 @@ class Matte(QWidget):  ## opens itself
         border = (self.border - self.step) - 2          
         if self.border == self.step or border < self.step and \
             border > 5 or border == 1:  ## 30-2-27
-                border = 12            
+                border = 12    
+                        
         elif border <= 5:
             border = 5
         self.border = border
  
-    ## stops the matte from losing focus by trapping mouse clicks           
-    def mousePressEvent(self, e):   
+    # stops the matte from losing focus by trapping mouse clicks           
+    def mousePressEvent(self, e):  
         self.save = e.globalPosition()
+        if e.button() == Qt.MouseButton.RightButton:
+            self.shared('H')  
         e.accept()
             
     def mouseDoubleClickEvent(self, e): 
@@ -221,29 +239,27 @@ class Matte(QWidget):  ## opens itself
         e.accept()   
             
     def bye(self):   
-        self.matteHelp.closeMenu()     
+        self.matteHelpMenu.closeMenu()     
         self.canvas.view.grabKeyboard()     
-        self.close()       
+        self.bkgItem.bkgMaker.closeMatteWidget()       
     
 ### --------------------------------------------------------     
-class MatteHelp:  
+class MatteHelp: 
 ### -------------------------------------------------------- 
-    def __init__(self, parent, mat, off=0, switch = ''):  ## decided to center it 
+    def __init__(self, parent, matte=None, off=0, switch=''): 
         super().__init__()  
    
         self.canvas = parent
-        self.matte = mat
-        
+        self.matte  = matte 
         self.switch = switch
-        self.off = off
-        
+    
         if self.switch == '':
-            self.matte.help = True  ## lets the widget know the help menu is open
+            self.matte.helpMenu = True  ## lets the widget know the help menu is open
 
-        self.table = TableWidgetSetUp(75, 170, len(matteKeys)+4,0,28)
-        self.table.itemClicked.connect(self.clicked)         
-  
-        width, height = 252, 541
+        self.table = TableWidgetSetUp(75, 170, len(matteKeys)+4)
+        self.table.itemClicked.connect(self.clicked) 
+         
+        width, height = 252, 576
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f"{' Matte KeyBoard Help ':<23}",QL,True,True,2)
@@ -261,8 +277,8 @@ class MatteHelp:
                 self.table.setRow(row, 0, k, QL, True,True)  ## highlight
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1
-     
-        self.table.setRow(row,     0, f'{"Enter Key or Select From Above "}',QH,True,True, 2) 
+    
+        self.table.setRow(row,     0, f'{"Enter A Key From Above "}',QH,True,True, 2) 
         self.table.setRow(row + 1, 0, f'{"Click Here to Close Menu  ":<26}' ,'',True,True, 2)
    
         x, y = getVuCtr(self.canvas)    
@@ -289,7 +305,7 @@ class MatteHelp:
           
     def closeMenu(self): 
         if self.switch == '': 
-            self.matte.help = False
+            self.matte.helpMenu = False
         self.table.close()
         if self.switch != '':
             self.canvas.setKeys('N')

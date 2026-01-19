@@ -77,18 +77,18 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
                         self.canvas.clear()
                         
             if len(self.scene.items()) == 0:
-                if self.canvasFlag == True:
+                if self.canvasFlag:
                     self.canvasHelp.closeMenu() 
                 else:
                     self.canvas.clear()
                     self.canvasHelp = CanvasHelp(self, self.canvas)
             else:
-                if self.storyFlag == True:
+                if self.storyFlag:
                     self.storyHelp.closeMenu() 
                 else:
                     self.storyHelp = StoryHelp(self, self.canvas) 
         else:
-            if self.pathFlag == True:
+            if self.pathFlag:
                 self.pathHelp.closeMenu() 
             else:
                 self.pathHelp = PathHelp(self, self.canvas)
@@ -96,12 +96,12 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
     
     def closeMenus(self,):  ## used by showbiz not menus
         if self.canvas.pathMakerOn == False:
-            if self.canvasFlag == True:
+            if self.canvasFlag:
                 self.canvasHelp.closeMenu() 
-            elif self.storyFlag == True:
+            elif self.storyFlag:
                 self.storyHelp.closeMenu() 
         else:  
-            if self.pathFlag == True:
+            if self.pathFlag:
                 self.pathHelp.closeMenu() 
                      
 ### --------------------------------------------------------

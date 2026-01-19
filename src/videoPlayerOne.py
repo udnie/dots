@@ -31,11 +31,15 @@ from videoPlayerShared      import *
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
     def __init__(self):
-        super(VideoPlayer, self).__init__()    
+        super(VideoPlayer, self).__init__()  
+          
         self.setWindowTitle("Video Player One")
           
-        self.setMinimumHeight(MinWid+100);  self.setMinimumWidth(MinWid)
-        self.setMaximumHeight(1200);        self.setMaximumWidth(1850)
+        self.setMinimumHeight(MinWid+100)
+        self.setMinimumWidth(MinWid)
+        
+        self.setMaximumHeight(1200)
+        self.setMaximumWidth(1850)
     
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
@@ -61,7 +65,7 @@ class VideoPlayer(QWidget):
        
         self.setLayout(vbox)            
    
-        self.shared.openPlayer(self.key)   ## open full frame - 3:2
+        self.shared.openPlayer(self.key)  ## open full frame - 3:2
          
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()
         self.move(x-int((ViewW+WID)/2), HorzH)  
@@ -252,7 +256,7 @@ class VideoPlayer(QWidget):
             else self.aspButton.hide()
     
 ### -------------------------------------------------------- 
-    def zoom(self, zoom): 
+    def zoom(self, zoom):  ## maintain current aspect ratio
         if self.mediaPlayer != None:  
             if int(self.height() * zoom) > 1280 or int(self.height()* zoom) < 300:
                 return  
@@ -288,8 +292,8 @@ class VideoPlayer(QWidget):
             self.showHideAspectBtn() 
                                                                                                                                
 ### --------------------------------------------------------   
-    def resizeEvent(self, e):
-        if self.flag == True:
+    def resizeEvent(self, e):  ## maintains current aspect ratio
+        if self.flag:
             self.flag = False
             return 
         elif self.aspect > 0:    
