@@ -59,7 +59,7 @@ class ShowBiz:
                 case'K':  
                     self.canvas.keysPanel.toggleKeysMenu()
                 case'R':    
-                    if self.canvas.control != '' or self.canvas.animation == True:  ## something's running
+                    if self.canvas.control != '' or self.canvas.animationRunning:  ## something's running
                         return
                     else:
                         self.showRunner.runThese() 
@@ -68,7 +68,7 @@ class ShowBiz:
 ### --------------------------------------------------------    
     ## animations running
 ### --------------------------------------------------------               
-            if key in ('P', 'S', 'space') and self.canvas.control != '' or self.canvas.animation == True: 
+            if key in ('P', 'S', 'space') and self.canvas.control != '' or self.canvas.animationRunning: 
                 match key:
                     case 'P': 
                         self.mapper.tagsAndPaths.togglePaths()                                                                                    
@@ -80,7 +80,7 @@ class ShowBiz:
 ### --------------------------------------------------------    
     ## no animations running - from storyboard menu
 ### --------------------------------------------------------  
-            elif self.canvas.control == '' or self.canvas.animation == False:                     
+            elif self.canvas.control == '' or self.canvas.animationRunning == False:                     
                 if key in ('A', 'D', 'J', 'L', 'M', 'N', 'O', 'S', 'U', 'V', 'W'):           
                     match key:
                         case 'A':            

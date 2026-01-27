@@ -153,7 +153,12 @@ class ShowRunner:
                               
                 elif tmp['type'] == 'bkg':       
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
-                    self.showFiles.addPixToScene(pix, tmp, bkgz )  
+                    
+                    if 'useThis' in tmp.keys():  ## catch it here
+                        atmp = self.useThis(tmp) 
+                        self.showFiles.addPixToScene(pix, atmp, bkgz )     
+                    else:
+                        self.showFiles.addPixToScene(pix, tmp, bkgz ) 
                     
                 pix.bkgMaker.lockBkg(pix)  
                 bkgz -= 1   
@@ -163,7 +168,18 @@ class ShowRunner:
                  
         del dlist
         self.cleanup(ns, kix)  ## add shadows
-  
+        
+    def useThis(self, tmp):  ## was removed
+        atmp, add = {}, False
+        for k, v in tmp.items(): 
+            if k == 'useThis':
+                if v != '':  ## rate dictionary to use
+                    add = True
+                continue
+            atmp[k] = v    
+        if add: atmp['scrollable'] = True  
+        return atmp
+
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
         fileName = os.path.basename(self.canvas.openPlayFile) 
@@ -174,12 +190,12 @@ class ShowRunner:
                 self.dots.statusBar.showMessage(f"{fileName} - Number of Pixitems: {kix}")
                 
             elif ns > 0:  ## there must be shadows
-                if self.addedVideo == True:  ## first frame capture in progress
+                if self.addedVideo:  ## first frame capture in progress
                     time.sleep(.10)  
                     
                 QTimer.singleShot(200, self.addShadows)
                 t = int(1 + (ns * .25))
-                if self.showFiles.errorOnShadows == True:  ## will try and add if shadowMaker is on
+                if self.showFiles.errorOnShadows:  ## will try and add if shadowMaker is on
                     MsgBox('Error Loading some Shadows...', 5)
                     self.showFiles.errorOnShadows = False  ## may need it again
                 else:

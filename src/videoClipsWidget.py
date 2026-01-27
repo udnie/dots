@@ -20,7 +20,7 @@ Keys  = {
 }
 
 ViewW,  ViewH  =  790,  525  ## starting video size
-MaxWid, MaxHgt = 1800, 1065
+MaxWid, MaxHgt = 1800, 1165
 
 VertW = 525  ## minimum vertical width on open
 VertH = 100  ## vertical starting height
@@ -30,7 +30,7 @@ MinWid  = 300  ## minimum widget width
 MinHgt  = 400  ## minimum widget height
 AspKeys = list(Keys.keys())
 
-VideoMenuKeys = AspKeys + ['L','O','X','C','M',']','[','Shift-S','Aspect','Settings','Clips']
+VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Shift-S','Aspect','Settings','Clips']
 WID, HGT, PAD = 40, 140, 30 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
 ### --------------------------------------------------------        
@@ -43,7 +43,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.clips  = self.parent.clips
         self.switch = switch
 
-        self.WidgetW, self.WidgetH = 505.0, 300.0
+        self.WidgetW, self.WidgetH = 505.0, 325.0
                  
         vbox = QVBoxLayout()
         vbox.addSpacing(20) 
@@ -222,7 +222,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         if self.clips.AutoAspect: 
             self.aspBtn.setText('AutoAspectOn')
         
-        self.clpsBtn = QPushButton('MakeClips') 
+        self.clpsBtn = QPushButton('MakeClipsOff') 
         if self.clips.MakeClips:
             self.clpsBtn.setText('MakeClipsOn')
             
@@ -245,6 +245,8 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.nameBtn = QPushButton('FileName')
         if self.clips.AddFileName:
             self.nameBtn.setText('FileNameOn')
+            
+        self.makeClipsBtn = QPushButton('Make a Clip')
         
         self.quitBtn = QPushButton('Close')
         
@@ -255,6 +257,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
             self.skipBtn.clicked.connect(lambda: self.clips.setWidgetButtons("skip"))
             self.filterBtn.clicked.connect(lambda: self.clips.setWidgetButtons("filter"))
             self.playBtn.clicked.connect(lambda: self.clips.setWidgetButtons("play"))
+            self.makeClipsBtn.clicked.connect(self.parent.shared.openDirectory)
             self.nameBtn.clicked.connect(lambda: self.clips.setWidgetButtons("name"))
             self.quitBtn.clicked.connect(self.clips.closeSettings)
         else:
@@ -263,19 +266,13 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         hbox = QVBoxLayout(self)
               
         hbox.addWidget(self.aspBtn)
-        hbox.addSpacing(5)  
-        hbox.addWidget(self.clpsBtn)
-        hbox.addSpacing(5)  
+        hbox.addWidget(self.clpsBtn) 
         hbox.addWidget(self.firstBtn)
-        hbox.addSpacing(5)
         hbox.addWidget(self.skipBtn)
-        hbox.addSpacing(5)  
-        hbox.addWidget(self.filterBtn)
-        hbox.addSpacing(5)  
-        hbox.addWidget(self.nameBtn)
-        hbox.addSpacing(5)     
-        hbox.addWidget(self.playBtn)
-        hbox.addSpacing(5)   
+        hbox.addWidget(self.filterBtn) 
+        hbox.addWidget(self.nameBtn)   
+        hbox.addWidget(self.playBtn) 
+        hbox.addWidget(self.makeClipsBtn)  
         hbox.addWidget(self.quitBtn)
         hbox.addSpacing(10) 
   

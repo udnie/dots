@@ -210,7 +210,7 @@ class PathMaker(QWidget):
     def delete(self):
         self.pathWorks.stopPathTest()
         
-        if self.canvas.animation:  ## turns off video as well
+        if self.canvas.animationRunning:  ## turns off video as well
             self.canvas.showbiz.showtime.stop('clear') 
         elif self.canvas.videoPlayer != None:  ## make sure it's stopped
             self.canvas.videoPlayer.stopVideo()

@@ -139,7 +139,7 @@ class VideoPlayer(QWidget):
         if key in VideoMenuKeys:
             self.VideoMenuKeys(key)
   
-    def VideoMenuKeys(self,key):  
+    def VideoMenuKeys(self,key):    
         if key in AspKeys:
             self.shared.openPlayer(key)     
         else: 
@@ -163,6 +163,8 @@ class VideoPlayer(QWidget):
                     self.shared.toggleSlider()
                 case 'M':
                     self.shared.openVideoSlideMenus()  
+                case 'W':
+                    self.msgbox(self.path) if self.path != '' else self.shared.msgbox(os.getcwd())  
                 case 'X' | 'Q':
                     self.bye()   
                 case _:
@@ -352,7 +354,7 @@ class VideoPlayer(QWidget):
         self.shared.closeHelpMenu()
         self.clips.closeSettings()
         self.close()
-    
+   
 ### --------------------------------------------------------  
 if __name__ == '__main__':
     app = QApplication(sys.argv)

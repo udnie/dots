@@ -210,7 +210,7 @@ class BkgScrollWrks:
                                                                        
     def notScrollable(self):
         MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
-        self.bkgItem.scrollable = False  
+        self.bkgItem.scrollable = False 
         return  
             
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     

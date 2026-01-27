@@ -9,7 +9,7 @@ from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox, tagBkg
 from dotsHelpMonkey     import PixHelp
 
-##from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
+## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
 from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
 
 from dotsAnimation      import fin
@@ -135,7 +135,7 @@ class PixItem(QGraphicsPixmapItem):
                     self.moveThis(MoveKeys[key])
                     
     def mousePressEvent(self, e):    
-        if self.canvas.animation == False:  ## 'resume', 'pause' - animation running
+        if self.canvas.animationRunning == False:  ## 'resume', 'pause' - animation running
             ## right mouse clk triggers Animation menu (context menu) on selected screen items
             if e.button() == Qt.MouseButton.RightButton:
                 if len(self.scene.selectedItems()) == 0:
@@ -214,7 +214,7 @@ class PixItem(QGraphicsPixmapItem):
 
 ### --------------------------------------------------------
     def itemChange(self, change, value):  ## continue to updatePath when animated
-        if self.shadowMaker != None and self.shadowMaker.isActive and self.shadowMaker.linked == True:
+        if self.shadowMaker != None and self.shadowMaker.isActive and self.shadowMaker.linked:
             if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
                 self.shadowMaker.shadow.setPos(self.pos()+ self.offset)      
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
@@ -232,7 +232,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setLockBtnText()
 
     def addShadow(self):  ## from pixwidget 
-        if self.shadowMaker != None and self.shadowMaker.isActive == True:
+        if self.shadowMaker != None and self.shadowMaker.isActive:
             if 'bat-pivot' in self.fileName:
                 self.works.closeWidget()
                 MsgBox("No Shadows for BatWings", 4)
@@ -283,7 +283,7 @@ class PixItem(QGraphicsPixmapItem):
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, True) 
    
     def deletePix(self):
-        if self.shadowMaker != None and self.shadowMaker.isActive == True:
+        if self.shadowMaker != None and self.shadowMaker.isActive:
             self.shadowMaker.works.deleteShadow()
         self.works.closeWidget()
         self.anime 

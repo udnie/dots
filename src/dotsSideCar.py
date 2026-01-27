@@ -84,7 +84,7 @@ class SideCar:
             self.canvas.showWorks.disablePlay()  ## enables pause/resume/stop   
             self.canvas.control = ''  ## otherwise it won't run
             
-        elif self.canvas.pathMakerOn == True:  ## no animation
+        elif self.canvas.pathMakerOn:  ## no animation
              self.canvas.showWorks.enablePlay()
                   
         for itm in self.scene.items(Qt.SortOrder.AscendingOrder):  
@@ -129,7 +129,7 @@ class SideCar:
             elif itm.zValue() > -50:
                 break   
         if self.canvas.control == '' and \
-            self.canvas.animation == False or  \
+            self.canvas.animationRunning == False or  \
             self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):  
             if len(self.scene.items()) > 0:                         
                 self.canvas.showWorks.enablePlay() 
@@ -160,7 +160,7 @@ class SideCar:
     def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker != None and \
-                pix.shadowMaker.isActive == True:
+                pix.shadowMaker.isActive:
                     pix.shadowMaker.works.toggleOutline()  ## where it happens
                                   
     def toggleSpriteLocks(self):  ## lock/unlock sprites - from controlview
@@ -215,13 +215,13 @@ class SideCar:
     def hideOutlines(self):  ## runs from showRunner and ShowTime
         for pix in self.scene.items():
             if pix.type == 'pix'and pix.shadowMaker != None and \
-                pix.shadowMaker.isActive == True:
+                pix.shadowMaker.isActive:
                     pix.shadowMaker.works.hideOutline()
          
     def showOutlines(self):  ## runs showRunner
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker != None and \
-                pix.shadowMaker.isActive == True:
+                pix.shadowMaker.isActive:
                     pix.shadowMaker.works.showOutline()
                                   
     def toggleSelections(self):  ## hides/unhides selections 
@@ -242,7 +242,7 @@ class SideCar:
         if len(self.scene.items()) > 0:
             for pix in self.scene.items():
                 if pix.type == 'pix' and pix.part not in ('pivot', 'left','right'):
-                    if pix.isHidden == True:
+                    if pix.isHidden:
                         pix.setSelected(True)
                         pix.isHidden = False
                 elif pix.zValue() <= common['pathZ']:

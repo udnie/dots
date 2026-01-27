@@ -253,7 +253,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
                   
     scale.setStartValue(pix.scale)
     if pix.canvas.openPlayFile == 'hats' and \
-        pix.shadowMaker.isActive == True:
+        pix.shadowMaker.isActive:
         scale.setEndValue(1.0)   
     else:    
         scale.setEndValue(pix.scale)
@@ -263,7 +263,7 @@ def reprise(pix):  ## reposition pixitems to starting x,y, etc.
     opacity.setStartValue(pix.opacity())  ## reset to 1.0
     
     if pix.canvas.openPlayFile == 'hats' and \
-        pix.shadowMaker.isActive == True:
+        pix.shadowMaker.isActive:
         opacity.setEndValue(.001)
     else:
         opacity.setEndValue(pix.opacity())

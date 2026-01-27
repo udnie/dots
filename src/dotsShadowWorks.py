@@ -49,10 +49,9 @@ class PointItem(QGraphicsEllipseItem):
         
         self.setPen(QPen(QColor('gray'), 1))
         
-        if self.ptStr in ('topLeft','topRight'):
-            self.setBrush(QColor('yellow'))
-        else:
-            self.setBrush(QColor('lime'))
+        self.setBrush(QColor('yellow'))\
+            if self.ptStr in ('topLeft','topRight')\
+                else self.setBrush(QColor('lime'))
             
         self.setAcceptHoverEvents(True)
                         
@@ -188,7 +187,7 @@ class Works:  ## small functions that were in ShadowMaker
         
     def toggleOutline(self):  ## called by sideCar thru toggleOutlines
         if self.maker.outline != None:
-            if self.maker.outline.isVisible() == True:
+            if self.maker.outline.isVisible():
                 self.hideOutline()
                 self.maker.dblclk = False
             elif self.maker.outline.isVisible() == False:

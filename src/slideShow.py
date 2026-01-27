@@ -23,19 +23,19 @@ OneColor = False  ## sets frame same as background
 
 Width, Height     = 1200,  750      ## choose one you like and delete the rest
 ViewW, ViewH      = 1150,  700      ## starting viewport
-MaxW, MaxH, MaxV  =  950,  500, 550 ## max image size within the ViewW/H
+MaxW, MaxH, MaxV  =  950,  550, 575 ## max image size within the ViewW/H
 
 # Width, Height     = 1350,  850  
 # ViewW, ViewH      = 1300,  800 
-# MaxW, MaxH, MaxV  = 1100,  550, 650  
+# MaxW, MaxH, MaxV  = 1100,  650, 675 
 
 # Width, Height     = 1450,  900  
 # ViewW, ViewH      = 1350,  850
-# MaxW, MaxH, MaxV  = 1150,  625, 725 
+# MaxW, MaxH, MaxV  = 1150,  675, 700
 
 # Width, Height     = 1500, 1000   
 # ViewW, ViewH      = 1450,  950  
-# MaxW, MaxH, MaxV  = 1200,  650, 800 
+# MaxW, MaxH, MaxV  = 1200,  750, 800 
 
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 
@@ -82,11 +82,13 @@ class SlideShow(QWidget):
             self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
         self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
-        x = self.ctr.x() - int(Width/2) 
-        
+        self.hgt = QGuiApplication.primaryScreen().availableGeometry().height()
+          
+        x = self.ctr.x() - int(Width/2)  
+     
         if self.buttonsVisible: H = Height + Hpad
         self.setGeometry(x, SetY, Width, H)  
-          
+ 
         self.delay   = 2000  ## slide show timer
         self.setTags = True  ## toggle textItems on/off
   
@@ -196,7 +198,7 @@ class SlideShow(QWidget):
             case 'Shift-S':
                 self.selectFiles()
             case 'W':
-                if self.path != '': self.msgbox(self.path)        
+               self.msgbox(self.path) if self.path != '' else self.msgbox(os.getcwd())  
             case 'X':
                 self.clearScene();  
                 self.close()  
@@ -278,7 +280,7 @@ class SlideShow(QWidget):
         self.pixItem.setScale(1.0)
      
         self.scene.addItem(self.pixItem)
-        if self.setTags == True and self.view.height() > CutOff:   
+        if self.setTags and self.view.height() > CutOff:   
             self.addTextItem()           
         del img
         self.update()   
@@ -288,6 +290,8 @@ class SlideShow(QWidget):
         if self.helpFlag:
             self.closeHelpMenu()
         else:
+            if self.running:
+                self.timerStop()
             self.helpMenu = SlideShowHelp(self)
             self.helpFlag = True
        
@@ -301,7 +305,7 @@ class SlideShow(QWidget):
     def centerPixItem(self):  ## center within view which can change
         self.setScene()                                                                                                                                                                       
         x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
-        y = int((self.view.height() - self.pixItem.boundingRect().height())/2)   
+        y = int((self.view.height() - self.pixItem.boundingRect().height())/2)           
         return QPointF(x, y)
 
     def setScene(self):
@@ -315,8 +319,12 @@ class SlideShow(QWidget):
             p, width = self.pos(), self.width()        
             self.resize(int(self.width() * zoom), int(self.height() * zoom)) 
             dif = int((self.width() - width)/2) 
-            self.move(p.x()-dif, p.y())
+            self.move(p.x()-dif, self.getY(p))
 
+    def getY(self, p): 
+        hgt = int((self.hgt - self.height())/2)    
+        return int(SetY*.40) if hgt < 135 else p.y()
+    
     def resizeEvent(self, e):  
         if self.pixItem != None:  
             self.pixItem.setScale(self.scaleW)  
@@ -330,7 +338,7 @@ class SlideShow(QWidget):
             if self.buttonsVisible: H = Height + Hpad
             self.setGeometry(x, SetY, Width, H) 
             self.addPixmap(self.files[self.current])  ## refresh  
-       
+        
 ### --------------------------------------------------------                  
     def rotateThis(self, r=0):
         if self.pixItem != None:  
@@ -376,7 +384,7 @@ class SlideShow(QWidget):
         return QPointF(W-15, self.view.height()-35)
     
     def updTextItem(self):
-        if self.setTags == True and self.textItem != None:
+        if self.setTags and self.textItem != None:
             if int(self.view.height()) > CutOff: 
                 self.textItem.setPos(self.textXY()) 
     

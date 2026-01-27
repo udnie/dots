@@ -24,12 +24,13 @@ helpMenuKeys = {   ## videoplayers
     'C':    'To Clear',
     'L':    'Loop On/Off',
     'M':    'Menus',
+    'W':    'Where am I?', 
     '>,  +,  ]':    'Scale Up',
     '<,  _,  [':    'Scale Down',
     'X, Q Escape':  'Quit/Exit',
     'Shift-S':      'Hide/Show Slider',
     'Aspect':       'Set Aspect (Button)',
-    'Settings':     'Clip Settings',
+    'Settings':     'ClipsMaker Settings',
     'Clips':        'Make a Clip',    
 }
 
@@ -182,7 +183,7 @@ class VideoHelp(QWidget):
         self.table = TableWidgetSetUp(100, 150, len(helpMenuKeys)+4)
         self.table.itemClicked.connect(self.clicked)
     
-        width, height = 257, 636
+        width, height = 257, 666
         self.table.setFixedSize(width, height)
     
         str = "VideoPlayerOne" if self.parent.player == "one" else \
@@ -192,7 +193,7 @@ class VideoHelp(QWidget):
         
         row = 1  
         for k,  val in helpMenuKeys.items():
-            if self.parent.player == "two" and row in (11,12,15):
+            if self.parent.player == "two" and row in (12,13,16):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)
             else:

@@ -36,7 +36,7 @@ class ShowTime:
     def run(self):  ## runs whatever is in scene that can be animated
         if self.canvas.control != '':
             return  
-        
+      
         self.mapper.clearMap()
         self.mapper.clearPathsandTags()  
         self.canvas.sideCar2.unSelect()
@@ -71,8 +71,7 @@ class ShowTime:
                 elif pix.type == 'bkg': 
                     if pix.tag == 'scroller':      
                         if self.canvas.videoPlayer != None:
-                            continue  
-                                        
+                            continue                
                         pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem 
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag. \
                             ItemSendsScenePositionChanges, True)
@@ -92,7 +91,7 @@ class ShowTime:
             if "play" in file:
                 self.canvas.dots.statusBar.showMessage(file + ' - ' + \
                     'Number of Pixitems: {}'.format(k))  
-            self.canvas.animation = True
+            self.canvas.animationRunning = True
             
         if self.canvas.videoPlayer != None: 
             self.canvas.videoPlayer.playVideo()
@@ -177,7 +176,7 @@ class ShowTime:
         if len(scrolling) > 0:  ## used by tracker to remove the 'next' bkg 
             self.showWorks.cleanUpScrollers(self.canvas.scene)
             
-        self.canvas.animation = False
+        self.canvas.animationRunning = False
         self.showWorks.enablePlay() 
         self.canvas.btnPause.setText( 'Pause' )
         del scrolling  
@@ -193,7 +192,7 @@ class ShowTime:
             MsgBox("Can't Save " + demo + " as a Play File", 5)  ## seconds
             return   
                       
-        if self.canvas.pathMakerOn == True:  ## using load in pathMaker
+        if self.canvas.pathMakerOn:  ## using load in pathMaker
             self.pathMaker.pathWays.savePath()
             return     
                       
@@ -211,7 +210,7 @@ class ShowTime:
             except Exception:
                 MsgBox('Error saving file...', 5)         
         del dlist
-        if self.showFiles.errorOnShadows == True:
+        if self.showFiles.errorOnShadows:
             MsgBox('Error on Saving Some Shadows...', 5)
                             
     def updlist(self):  ## saves to play file

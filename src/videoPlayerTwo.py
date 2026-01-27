@@ -143,12 +143,14 @@ class VideoPlayer(QWidget):
                     self.shared.closeHelpMenu()  ## improvised clear
                     if self.mediaPlayer:
                         self.mediaPlayer.stop()        
-                case 'Clips':     
+                case 'Clips':   
                     self.shared.openDirectory()  ## if MakeClipsOn sets path to folder
                 case 'Shift-S':
                     self.shared.toggleSlider()
                 case 'M':
                     self.shared.openVideoSlideMenus()  
+                case 'W':
+                    self.msgbox(self.path) if self.path != '' else self.shared.msgbox(os.getcwd())  
                 case 'X' | 'Q':
                     self.bye()   
                 case _:
@@ -199,8 +201,10 @@ class VideoPlayer(QWidget):
             self.shared.msgbox('error opening file')
             return      
         if fileName != '':
+            path = self.path
             self.closeMediaPlayer()
             self.init()
+            self.path = path
             time.sleep(.03)
             self.setMediaPlayer(fileName)
         else:
@@ -336,11 +340,12 @@ class VideoPlayer(QWidget):
     def setFileName(self, x=''): ## for videoplayerOne
         pass 
                                           
-    def bye(self):  
-        self.shared.closeHelpMenu()   
-        self.scene.clear() 
-        self.close()    
-
+    def bye(self): 
+        self.shared.closeHelpMenu()
+        self.clips.closeSettings()
+        self.scene.clear()  ## only in "two"
+        self.close()
+        
 ### -------------------------------------------------------- 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

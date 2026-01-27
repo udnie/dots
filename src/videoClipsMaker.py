@@ -80,7 +80,7 @@ class Clips:
                     self.settings.clpsBtn.setText('MakeClipsOn')
                 else: 
                     self.MakeClips = False
-                    self.settings.clpsBtn.setText('MakeClips')
+                    self.settings.clpsBtn.setText('MakeClipsOff')
            
             case 'first':
                 if self.FirstFrame == False:

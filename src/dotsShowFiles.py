@@ -51,7 +51,7 @@ class ShowFiles:
         pix = self.setAll(pix, tmp)  ## sets all shared named variables
         if pix.type == 'frame':  ## nothing to add
             self.scene.addItem(pix)         
-                  
+    
         if pix.type == 'flat':
             pix = self.setFlat(pix, tmp) 
             self.scene.addItem(pix) 
@@ -75,7 +75,7 @@ class ShowFiles:
             pix = self.setShadow(pix, tmp)  
                  
         elif pix.type == 'bkg':  ## adding the rest of it
-            pix = self.setBackGround(pix, tmp)  ## checking if a dupe
+            pix = self.setBackGround(pix, tmp)  ## checking if a dupe 
             if pix != None:
                 self.scene.addItem(pix)     
                 if pix.tag == 'scroller':  ## replace transformPix.. action
@@ -110,7 +110,7 @@ class ShowFiles:
         pix.y   = float(f"{tmp['y']:.2f}")  
                      
         if pix.type not in ('flat', 'frame'):   
-            pix.setMirrored(tmp['mirror']),             
+            pix.setMirrored(tmp['mirror'])      
        
         if pix.type not in ('bkg', 'flat', 'frame'):   
             pix.rotation = tmp['rotation']
@@ -142,7 +142,7 @@ class ShowFiles:
         return pix
    
     ## doing this only if missing in .play file otherwise gets the default   
-    def setBackGround(self, bkg, tmp):  ## pix is a stand_in for bkg   
+    def setBackGround(self, bkg, tmp):  ## pix is a stand_in for bkg    
         if 'anime' not in tmp.keys(): 
             tmp['anime'] = None     
         if 'scrollable' not in tmp.keys(): 
@@ -159,7 +159,7 @@ class ShowFiles:
             tmp['showtime'] = 0
         if 'path' not in tmp.keys(): 
             tmp['path'] = ''
-
+            
         bkg.locked      = tmp['locked']                 
         bkg.anime       = tmp['anime']
         bkg.scrollable  = tmp['scrollable']
@@ -169,7 +169,7 @@ class ShowFiles:
         bkg.rate        = tmp['rate']
         bkg.showtime    = tmp['showtime']
         bkg.path        = tmp['path']
-                          
+                  
         result = self.bkgMaker.bkgtrackers.addTracker(bkg)  
         
         if result == False:  ## must be a dupe
@@ -252,7 +252,7 @@ class ShowFiles:
     def saveBkgnd(self, pix):
         p = pix.boundingRect()      
         tmp = {
-            'fileName':     os.path.basename(pix.fileName),
+            'fileName':      os.path.basename(pix.fileName),
             'type':         'bkg',
             'x':            float(f'{pix.x:.2f}'),
             'y':            float(f'{pix.y:.2f}'),

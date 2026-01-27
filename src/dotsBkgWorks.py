@@ -147,7 +147,7 @@ class BkgWorks:
         
         bkg.node = Node(bkg)
         path = QPropertyAnimation(bkg.node, b'pos')
-        
+  
         if bkg.direction == 'left':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact))) 
             path.setStartValue(QPoint(0,0)) 
@@ -165,7 +165,7 @@ class BkgWorks:
             
         group = QParallelAnimationGroup()
         group.addAnimation(path)
-
+        
         return group
     
     def setStartingPos(self, bkg):

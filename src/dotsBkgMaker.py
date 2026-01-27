@@ -164,7 +164,7 @@ class BkgMaker(QWidget):
             self.storyHelp2 = None  
               
     def closeStoryHelp(self):
-        if self.canvas.helpButton.storyFlag == True:
+        if self.canvas.helpButton.storyFlag:
             self.canvas.helpButton.storyHelp.closeMenu()
             self.canvas.helpButton.storyFlag = False
             self.canvas.helpButton.storyHelp = None
@@ -191,7 +191,7 @@ class BkgMaker(QWidget):
     def updateWidget(self, bkg):
         self.canvas.sideCar2.setMirrorBtnText(bkg, self.widget)
         self.canvas.sideCar2.setBtns(bkg, self.widget)
-        self.setLocksText(bkg) 
+        self.setLockBtnText(bkg) 
                 
 ### --------------------------------------------------------
     def resetSliders(self, bkg):
@@ -205,7 +205,7 @@ class BkgMaker(QWidget):
             self.widget.showtimeSlider.setValue(bkg.showtime)
             self.widget.showtimeValue.setText(f'{bkg.showtime:3}')
                                                                  
-    def setLocksText(self, bkg):
+    def setLockBtnText(self, bkg):
         if bkg == None:
             return
         self.widget.lockBtn.setText('UnLocked') if bkg.locked == False \

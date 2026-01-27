@@ -5,13 +5,13 @@ import time
 from PyQt6.QtCore       import Qt, QPoint, pyqtSlot
 from PyQt6.QtWidgets    import QWidget, QAbstractItemView, QHBoxLayout, \
                                 QTableWidget, QPushButton, QVBoxLayout, QTableWidgetItem
-                          
-from dotsSideGig        import getVuCtr
-from dotsSideGig        import MsgBox
+                        
+from dotsSideGig        import getVuCtr, MsgBox
 
 RowHt = 30
-HdrStr =  ["filename", "zvalue",  "direction", "mirrored", "rate", "showtime",\
-            "screenrate", "directory"]                                                                                         
+HeaderStr = ["filename", "zvalue",  "direction", "mirrored", "rate", "showtime",\
+            "screenrate", "directory"]  
+                                                                                       
 ### ------------------- dotsBkgTrackers --------------------
 ''' Tracker related code - tracker tableWidget'''
 ### --------------------------------------------------------
@@ -50,7 +50,7 @@ class Trackers(QWidget):
 
         self.tableWidget.itemSelectionChanged.connect(self.selectionChanged)   ## google ai
 
-        self.tableWidget.setHorizontalHeaderLabels(HdrStr) 
+        self.tableWidget.setHorizontalHeaderLabels(HeaderStr) 
         self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
             'background-color: rgb(115,225,225)}')	 
             
@@ -219,7 +219,7 @@ class BkgTrackers:
         
     def addBkgLabels(self, bkg): 
         fileName = bkg.fileName       
-        if bkg.locked == True:
+        if bkg.locked:
             locked = 'Locked' 
         else:
             locked = 'UnLocked' 
@@ -239,7 +239,7 @@ class BkgTrackers:
                 
         if bkg.mirroring == False:
             mirror = 'Continuous'
-        elif bkg.mirroring == True:
+        elif bkg.mirroring:
             mirror = 'Mirrored'
         elif bkg.direction == '' and bkg.scrollable == False:
             mirror = 'Not Scrollable'    

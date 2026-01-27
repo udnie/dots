@@ -42,11 +42,11 @@ class StoryBoard(QWidget):
         self.setFixedSize(common['ViewW']+2, common['ViewH']+2)
         
         self.control = ''           ## variables are shared across some classes
-        self.pathMakerOn = False    ## shared
         self.openPlayFile = ''      ## shared 
         self.pathList = []          ## used by animations and animation menu
         self.videoPlayer = None     ## holds mediaplayer reference
-        self.animation = False      ## set by showtime
+        self.animationRunning = False   ## set by showtime
+        self.pathMakerOn  = False   ## shared
     
         self.canvas = self 
         
@@ -130,7 +130,7 @@ class StoryBoard(QWidget):
                     self.sideCar2.unSelect()  
                                 
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
-                    if self.animation == False:
+                    if self.animationRunning == False:
                         self.mapper.updatePixItemPos()   
                             
             ##  enter 'cmd' before you move the mouse and the rubberband kicks in, but not after
@@ -144,7 +144,7 @@ class StoryBoard(QWidget):
                 elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                     
-                elif self.animation == False:  ## no animations running
+                elif self.animationRunning == False:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary    
                                
             elif e.type() == QEvent.Type.MouseButtonRelease:
@@ -199,7 +199,7 @@ class StoryBoard(QWidget):
             self.canvas.sideCar.videoOff()
         time.sleep(.10) 
             
-        if self.control != '' or self.animation:
+        if self.control != '' or self.animationRunning:
             self.showbiz.showtime.stop('clear')  
             time.sleep(.10)  ## otherwise an error report and lockup
         
@@ -223,7 +223,7 @@ class StoryBoard(QWidget):
         self.sideCar.gridGroup = None
         self.openPlayFile = ''
         self.video = None
-        self.animation = False  
+        self.animationRunning = False  
         self.view.grabKeyboard()
         self.canvas.setFocus()
 

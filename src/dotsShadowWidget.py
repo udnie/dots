@@ -56,10 +56,8 @@ class ShadowWidget(QWidget):
         if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')
-            if self.switch == 'on':
-                self.move(x+75, y-303)
-            else:
-                self.move(x-360,y-160)
+            self.move(x+75, y-303) if self.switch == 'on'\
+                else self.move(x-360,y-160)
         
 ### --------------------------------------------------------                                   
     def paintEvent(self, e):

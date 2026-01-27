@@ -232,7 +232,7 @@ class Hats:  ## hats - was abstract
         pix.setScale(1.0)   
         pix.tag = path   
          
-        if pix.shadowMaker.isActive == True:
+        if pix.shadowMaker.isActive:
             self.shadows = True
             pix.setOpacity(0.001) 
         self.scene.addItem(pix)
@@ -243,7 +243,7 @@ class Hats:  ## hats - was abstract
         start = time.time()
         loop  = asyncio.new_event_loop() 
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadowMaker.isActive == True: 
+            if pix.type == 'pix' and pix.shadowMaker.isActive: 
                 tasks.append(loop.create_task(self.newShadow(pix)))
                  
         if len(tasks) > 0:

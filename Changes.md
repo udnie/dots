@@ -7,6 +7,12 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**January 27 2026**   
+Added an action to **SlideShow** to move it closer to the top of the screen if its height goes over 1000 pixels. Added a **'Make a Clip' button** to **ClipsMaker Settings** eliminating having to close the widget, do a right-mouse click to open the help menu and then click on **Make a Clip**.  Did, what I guess you'd call, some refactoring and found an interesting bug resulting from my switch to a single dictionary used in scrolling backgrounds.  
+
+I had the **json/play file viewer** crash because I hadn't updated a dictionary used to set the table width as there was one less column and no corresponding value. That was fixed in the last update and I added some additional code in this update now that I knew what to look for. It worked on the one scrolling play file in **dots** download without an issue - I had also tested it beforehand against 20 plus files. I found in very few cases where the background widget appeared not to have been updated. If that's the issue clicking on a direction button may help to refresh the sliders and dial data. Worse case, delete the background and re-enter the scrolling data.
+
+---
 **January 19 2026**   
 Added **'Select Files'**, meaning individual files, to **SlideShow** triggered by a **'Shift-S'**  or selected from its help menu. Fixed a few bugs having to do mostly with menus. **BkgMatte's**  menu is now operational - no longer silent.  I'm not sure why I had disabled it other than to prevent accidentally moving scene items around??.  I would suggest reading over the November and December entries as they should fill in whatever I may have left out in the video.  
 

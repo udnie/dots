@@ -167,7 +167,7 @@ class Matte(QWidget):  ## opens itself
             case 'H': 
                 if self.helpMenu == False:  
                     self.matteHelpMenu = MatteHelp(self.canvas, self) 
-                elif self.helpMenu == True:   
+                elif self.helpMenu:   
                     self.matteHelpMenu.closeMenu()  
                                       
             case 'P':

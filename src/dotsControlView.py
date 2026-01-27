@@ -59,7 +59,7 @@ class ControlView(QGraphicsView):
     def dragEnterEvent(self, e):
         if e.mimeData().hasUrls():
       
-            if self.canvas.control != '' or self.canvas.animation == True: 
+            if self.canvas.control != '' or self.canvas.animationRunning: 
                 e.setAccepted(False)  
                 return
             
@@ -129,7 +129,7 @@ class ControlView(QGraphicsView):
                 self.setKey('del')
                     
             elif key == Qt.Key.Key_Space:
-                if self.canvas.control != '' or self.canvas.animation == True or self.canvas.videoPlayer != None:
+                if self.canvas.control != '' or self.canvas.animationRunning or self.canvas.videoPlayer != None:
                     self.sideCar.pause()  ## SpaceBar - pause/resume
                                 
 ### --------------------------------------------------------                                                        

@@ -65,7 +65,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
     def itemChange(self, change, value):  ## continue to updatePath when animated
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
             if self.maker.linked: 
-                if self.maker.outline.isVisible() == True: 
+                if self.maker.outline.isVisible(): 
                     self.maker.works.hideOutline()
                 self.dragCnt += 1
                 if self.dragCnt % 5 == 0:  

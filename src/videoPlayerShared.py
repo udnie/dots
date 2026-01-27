@@ -167,6 +167,9 @@ class Shared:
                      
 ### --------------------------------------------------------
     def openDirectory(self):  ## in clips - point to a directory to read from  
+        if self.parent.clips.settings != None:
+            self.parent.clips.closeSettings()
+        
         self.parent.closeMediaPlayer() if self.parent.player == 'two' else\
             self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
         if self.parent.clips.MakeClips == False: 
@@ -267,7 +270,7 @@ class Shared:
             self.parent.sliderVisible = True
             self.parent.resize(self.parent.width(), self.parent.height()+PAD)
             time.sleep(.03)    
-                                  
+                                           
 ### -------------------------------------------------------           
 def getDirection(self):  ## left out top, topleft and topright - feel free to add them
     corner, which = 5, ''      
@@ -316,7 +319,7 @@ def setSlider(self):
 def setButtons(self):
     self.buttonGroup = QLabel()
     self.buttonGroup.setFixedHeight(45)
-        
+
     self.openButton = QPushButton("Files")
     self.playButton = QPushButton("Play")  
     if self.player == "one":            

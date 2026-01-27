@@ -113,7 +113,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.save = QPointF()  
  
         play, rot = '', 0
-        
+    
         if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':   
             self.path = paths['demo']
         else:
@@ -213,7 +213,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     self.addNextScroller()  ## the scroller factory
                     self.addedScroller = True        
                                                        
-            elif self.addedScroller == True:  ## test if nolonger in view
+            elif self.addedScroller:  ## test if nolonger in view
                 
                 if self.direction   == 'left'  and abs((value.x())) >= self.width or \
                     self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
@@ -230,7 +230,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def addNextScroller(self): 
         item = BkgItem(self.fileName, self.canvas, common['bkgZ'], self.imgFile) 
                                          
-        if self.mirroring == True:
+        if self.mirroring:
             item.setMirrored(False) if self.flopped else item.setMirrored(True)   
                                
         item.tag = 'scroller'
@@ -258,11 +258,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             MsgBox('setScrollerPath: Error Setting Path ...')
             return          
                 
-        elif bkg.direction in ('left', 'right') and bkg.width < common['ViewW'] or\
-            bkg.direction == 'vertical' and bkg.height < common['ViewH']:
-            self.bkgScrollWrks.notScrollable()  
-            return 
- 
+        elif bkg.direction in ('left', 'right') and bkg.width <= common['ViewW'] + 10 or\
+            bkg.direction == 'vertical' and bkg.height <= common['ViewH'] + 10:
+                self.bkgScrollWrks.notScrollable()  
+                return 
+        
+        if self.direction != '': bkg.scrollable = True  ## must be true - just in case
+        
         self.bkgWorks.setStartingPos(bkg)  ## not the scrolling position      
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration

@@ -144,7 +144,7 @@ class ShadowMaker:
         self.addPoints() 
         self.updateShadow()
  
-        if self.linked == True: self.shadow.linkShadow()
+        if self.linked: self.shadow.linkShadow()
      
         self.shadow.setOpacity(self.alpha)
                                                                                                                                          
@@ -269,7 +269,7 @@ class ShadowMaker:
             self.shadow.save = val      
             if self.linked == False:    ## updated by shadow
                 self.shadow.setPos(self.shadow.pos()+dif) 
-                if self.dblclk == True: ## turns on outline and points    
+                if self.dblclk: ## turns on outline and points    
                     self.works.updateOutline()    
                 else:
                     self.works.hideOutline()  ## hides points as well
