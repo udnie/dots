@@ -138,10 +138,13 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                 val = self._data[index.row()][index.column()]  
                 
                 if index.column() == 0:
-                    return Qt.AlignmentFlag.AlignRight
+                    return Qt.AlignmentFlag.AlignRight + Qt.AlignmentFlag.AlignVCenter
+                
+                elif index.column() == 2:  ## types
+                    return Qt.AlignmentFlag.AlignCenter
         
                 if self.rowMiss.get(index.row()):  
-                    if  isinstance(val, bool):
+                    if isinstance(val, bool):
                         return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter
                     
                     elif isinstance(val, int) or isinstance(val, float) or val[0] == '#':
@@ -155,10 +158,16 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                     
             if role == Qt.ItemDataRole.TextAlignmentRole:  
                 val = self._data[index.row()][index.column()] 
-                      
-                if self.rowheaders.get(index.row()): ## center 'type' header titles    
+              
+                if self.rowheaders.get(index.row()): ## center 'type' header titles 
                     return Qt.AlignmentFlag.AlignCenter    
-                  
+                 
+                if index.column() == 2:  ## types
+                    return Qt.AlignmentFlag.AlignCenter
+                
+                elif index.column() == 1 and val == 'flat':
+                    return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter 
+                 
                 elif  isinstance(val, bool):  ## non-header alignments
                     return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter   
                      
@@ -170,6 +179,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                    
                 elif not isinstance(val, str):
                     return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter    
+                
         except:
             return  ## required for forcing the column width 
                       

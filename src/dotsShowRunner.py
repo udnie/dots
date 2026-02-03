@@ -153,13 +153,13 @@ class ShowRunner:
                               
                 elif tmp['type'] == 'bkg':       
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
-                    
+         
                     if 'useThis' in tmp.keys():  ## catch it here
                         atmp = self.useThis(tmp) 
                         self.showFiles.addPixToScene(pix, atmp, bkgz )     
                     else:
                         self.showFiles.addPixToScene(pix, tmp, bkgz ) 
-                    
+                              
                 pix.bkgMaker.lockBkg(pix)  
                 bkgz -= 1   
                                   
@@ -177,7 +177,7 @@ class ShowRunner:
                     add = True
                 continue
             atmp[k] = v    
-        if add: atmp['scrollable'] = True  
+        if add and atmp['tag'] == 'scroller': atmp['scrollable'] = True  
         return atmp
 
 ### --------------------------------------------------------                         

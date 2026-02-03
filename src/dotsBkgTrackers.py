@@ -217,12 +217,10 @@ class BkgTrackers:
             MsgBox('Error in dumpTrackers')
             return None
         
-    def addBkgLabels(self, bkg): 
-        fileName = bkg.fileName       
-        if bkg.locked:
-            locked = 'Locked' 
-        else:
-            locked = 'UnLocked' 
+    def addBkgLabels(self, bkg):  ## used by dumpTrackers
+        fileName = bkg.fileName 
+              
+        locked = 'Locked' if bkg.locked else 'UnLocked' 
             
         if bkg.direction == 'left':
             direction = 'Left'
@@ -230,19 +228,12 @@ class BkgTrackers:
             direction = 'Right'     
         elif self.canvas.dots.Vertical:  ## don't forget dots.
             direction = 'Vertical'
-            
         else:
             if self.bkgMaker.newTracker[fileName]:   
                 direction = self.bkgMaker.newTracker[fileName]['direction']     
-            if direction == '':
-                direction = 'NoDirection'
-                
-        if bkg.mirroring == False:
-            mirror = 'Continuous'
-        elif bkg.mirroring:
-            mirror = 'Mirrored'
-        elif bkg.direction == '' and bkg.scrollable == False:
-            mirror = 'Not Scrollable'    
+       
+        mirror = 'Continuous' if bkg.mirroring == False else 'Mirrored' 
+
         return fileName.capitalize(), direction, mirror, locked
               
 ### -------------------------------------------------------- 

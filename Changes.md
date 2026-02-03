@@ -7,6 +7,18 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**February 2 2026**  
+A round of bug fixes for **scrolling backgrounds** and the **json/play file viewer**. I found a problem with non-scrolling backgrounds where a background could be marked as scrollable even if it wasn't. This became noticeable as I continued testing last weeks changes just to make sure I hadn't missed anything.  I had relied on a boolean variable that should have been a function and up until last week hadn't experienced many noticeable issues as the backgrounds I mostly worked with had no problems scrolling.  The main issue with the non-scrolling backgrounds was their **tag** property could be set to **'scroller'**, what I use as a trigger to inform **dots** to run it as a scrolling background. This could cause a problem - as in not having a way to stop a running animation and forcing you clear the screen or exit entirely.
+
+With this round of changes you may get some messages after opening a **.play** file alerting you to the photo being non-scrollable and recommending you to save the play file. That should reset the tag and any data surrounding it.  
+
+The **file viewer** had a problem with matching the correct header to its data. That can happen sometimes when you cut and paste a line or two of code.  The bug was right there on the screen but it took a long while to finally see it.
+
+Last, clicking on the direction buttons as a suggestion from January 27 won't work unless it's actually scrollable.  And also from that post, worse case - delete and reload the background or sprite.
+
+****Happy Groundhog's Day****
+
+---
 **January 27 2026**   
 Added an action to **SlideShow** to move it closer to the top of the screen if its height goes over 1000 pixels. Added a **'Make a Clip' button** to **ClipsMaker Settings** eliminating having to close the widget, do a right-mouse click to open the help menu and then click on **Make a Clip**.  Did, what I guess you'd call, some refactoring and found an interesting bug resulting from my switch to a single dictionary used in scrolling backgrounds.  
 

@@ -31,12 +31,19 @@ class ShowTime:
         self.animation = Animation(self.canvas)
         
         self.pathMaker = self.canvas.pathMaker
-     
+   
 ### --------------------------------------------------------        
-    def run(self):  ## runs whatever is in scene that can be animated
-        if self.canvas.control != '':
+    def run(self):  ## runs whatever is in scene that can be animated   
+        if self.canvas.control != '' or self.canvas.animationRunning:
             return  
-      
+
+        for pix in self.scene.items():  ## test for non-scrollers
+            if pix.type == 'bkg' and pix.tag == 'scroller':
+                if pix.isScrollable() == False:
+                    pix.bkgScrollWrks.clearBkgScrolling()
+                    MsgBox('one or more backgrounds not scrollable, resave to clear')
+                    return   
+
         self.mapper.clearMap()
         self.mapper.clearPathsandTags()  
         self.canvas.sideCar2.unSelect()
@@ -47,18 +54,19 @@ class ShowTime:
                 self.canvas.showbiz.tableView.bye()    
                                
         if not self.canvas.pathList:  ## should already exist - moved from animations
-            self.canvas.pathList = getPathList(True) 
+            self.canvas.pathList = getPathList(True)  ## makes a list of available files
             if len(self.canvas.pathList) == 0:
                 MsgBox('getPathList: No Paths Found!', 5)
                 return 
-                        
-        b, k = 0, 0  ## counts bats and pixitems  
-        for pix in self.scene.items():  ## main loop - sets and runs animations
+                                                        
+        b, k, bkgflag = 0, 0, False  ## counts bats and pixitems  
+        ## main loop - sets and runs animations by reading scene items
+        for pix in self.scene.items(): 
             if pix.type in( 'point', 'poly') or \
                 isinstance(pix, QGraphicsPolygonItem):
                 continue
            
-            if pix.type in ('pix', 'bkg') and pix.tag:    
+            if pix.type in ('pix', 'bkg') and pix.tag != '':  
                 ## if random, slice to length, display actual anime if paused 
                 if 'Random' in pix.tag:
                     pix.tag = pix.tag[0:len('Random')]                  
@@ -66,25 +74,34 @@ class ShowTime:
                 if pix.type == 'pix':
                     pix.anime = self.animation.setAnimation(          
                         pix.tag, 
-                        pix)     
-                       
-                elif pix.type == 'bkg': 
-                    if pix.tag == 'scroller':      
+                        pix) 
+                    self.canvas.animationRunning = True
+            
+                elif pix.type == 'bkg':
+                    if pix.tag == 'scroller':  ## <- determines if it scrolls  
                         if self.canvas.videoPlayer != None:
-                            continue                
-                        pix.anime = pix.setScrollerPath(pix, 'first')  ## in bkgItem 
-                        pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag. \
-                            ItemSendsScenePositionChanges, True)
+                            continue 
+                          
+                        ## only place setScrollPath is used - the demos have their own   
+                        pix.anime = pix.setScrollerPath(pix, 'first')  ## set in bkgItem   
+                        if pix.anime != None:
+                            pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag. \
+                                ItemSendsScenePositionChanges, True)
+                        else:
+                            return
                     if pix.locked:
                         pix.setFlag(QGraphicsPixmapItem.GraphicsItemFlag. \
-                            ItemIsMovable,False)
-                         
+                            ItemIsMovable,False)   
                 k += 1  ## k = number of pixitems - bats count as three
+     
                 if pix.anime == None:  ## not animated
                     continue
                 else:  ## staggering the start 
-                    QTimer.singleShot(100 + (k * 35), pix.anime.start)    
-   
+                    QTimer.singleShot(100 + (k * 35), pix.anime.start)  
+                    
+            elif pix.type == 'bkg' and pix.tag == '':
+                bkgflag = True
+               
         if k > 0:
             self.showWorks.disablePlay()  ## sets pause/resume/stop
             file = os.path.basename(self.canvas.openPlayFile)
@@ -92,12 +109,16 @@ class ShowTime:
                 self.canvas.dots.statusBar.showMessage(file + ' - ' + \
                     'Number of Pixitems: {}'.format(k))  
             self.canvas.animationRunning = True
-            
+ 
         if self.canvas.videoPlayer != None: 
             self.canvas.videoPlayer.playVideo()
             if k == 0: 
                 self.showWorks.disablePlay()
-               
+                
+        if bkgflag and k == 0: 
+            MsgBox('background not scrollable')
+            return 
+                           
 ### -------------------------------------------------------                                 
     def pause(self):
         self.mapper.clearPathsandTags()  
@@ -182,8 +203,8 @@ class ShowTime:
         del scrolling  
                                 
 ### --------------------------------------------------------
-    def savePlay(self):   
-        if self.canvas.control in ControlKeys:  ## there's an animation running - needs to be stopped first
+    def savePlay(self):  ## there's an animation running - needs to be stopped first
+        if self.canvas.control in ControlKeys or self.canvas.animationRunning:
             return 
         
         if self.canvas.openPlayFile in Demos:

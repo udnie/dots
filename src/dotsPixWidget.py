@@ -94,25 +94,28 @@ class PixWidget(QWidget):
      
 ### -------------------------------------------------------- 
     def Rotate(self, val): 
-        self.pix.setOriginPt() 
-        self.pix.setRotation(val) 
-        self.pix.rotation = val    
-        self.rotateValue.setText(f'{val:3}')
+        if self.switch == '':
+            self.pix.setOriginPt() 
+            self.pix.setRotation(val) 
+            self.pix.rotation = val    
+            self.rotateValue.setText(f'{val:3}')
   
     def Scale(self,val):
-        self.pix.setOriginPt() 
-        op = (val/100)
-        self.pix.setScale(op)
-        self.pix.scale = op
-        self.scaleValue.setText(f'{op:.2f}')
+        if self.switch == '':
+            self.pix.setOriginPt() 
+            op = (val/100)
+            self.pix.setScale(op)
+            self.pix.scale = op
+            self.scaleValue.setText(f'{op:.2f}')
   
     def Opacity(self, val):
-        op = (val/100)
-        if op <= 0.001:  ## necessary to animate shadows          
-            op = 0.001
-        self.pix.setOpacity(op)
-        self.pix.alpha2 = op
-        self.opacityValue.setText(f'{op:.2f}') 
+        if self.switch == '':
+            op = (val/100)
+            if op <= 0.001:  ## necessary to animate shadows          
+                op = 0.001
+            self.pix.setOpacity(op)
+            self.pix.alpha2 = op
+            self.opacityValue.setText(f'{op:.2f}') 
                                         
 ### -------------------------------------------------------- 
     def sliderGroup(self):

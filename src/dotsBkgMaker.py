@@ -83,7 +83,7 @@ class BkgMaker(QWidget):
    
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.setXY(bkg)
-            
+    
         self.bkgtrackers.addTracker(bkg)  ## always - even if not a scroller   
         self.lockBkg(bkg)  ## always lock it
                         
@@ -189,7 +189,7 @@ class BkgMaker(QWidget):
             self.view.grabKeyboard()
   
     def updateWidget(self, bkg):
-        self.canvas.sideCar2.setMirrorBtnText(bkg, self.widget)
+        bkg.bkgScrollWrks.setMirrorBtnText(bkg, self.widget)
         self.canvas.sideCar2.setBtns(bkg, self.widget)
         self.setLockBtnText(bkg) 
                 
@@ -223,9 +223,10 @@ class BkgMaker(QWidget):
         if self.widget:
             self.closeWidget()
              
-        if self.matteWidget != None:
-            self.matteWidget.bye()
-            self.matteWidget = None
+        if bkg.tag != 'scroller':
+            if self.matteWidget != None:
+                self.matteWidget.bye()
+                self.matteWidget = None
            
         self.scene.removeItem(bkg)
         bkg = None

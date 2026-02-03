@@ -33,42 +33,36 @@ class BkgWorks:
         self.bkgScrollWrks = BkgScrollWrks(self.bkgItem)
      
 ### --------------------------------------------------------                                                                                
-    def setDirection(self, key):  ## from keybooard or widget - sets 'first'    
-        if math.fabs(self.bkgItem.runway) < self.bkgItem.showtime:
-            self.bkgScrollWrks.notScrollable()   
-            return     
+    def setDirection(self, key):   
+        if key == "" or self.bkgItem.isScrollable() == False:
+            return  
+  
+        self.bkgItem.direction = 'vertical' if self.canvas.dots.Vertical else key
+  
+        self.bkgItem.rate = 0    
+        self.bkgItem.showtime = 0 
+                
+        self.bkgItem.path = paths['demo'] if self.canvas.openPlayFile != '' and \
+            self.canvas.openPlayFile == 'snakes'\
+                else paths['bkgPath']
+                        
+        fileName = self.bkgItem.fileName             
+        if self.bkgMaker.newTracker[fileName]: 
+            self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
+            self.bkgItem.rate = self.getScreenRate(self.bkgItem)  ## blank it's first  
+            self.bkgMaker.newTracker[fileName]['showtime'] = self.bkgItem.showtime
+            self.bkgMaker.newTracker[fileName]['rate'] = self.bkgItem.rate
+            self.bkgMaker.newTracker[fileName]['path'] = self.bkgItem.path 
         
-        if self.bkgItem.scrollable:  ## only place where scroller is set except demos 
-            
-            if self.canvas.dots.Vertical:   ## no direction equals 'not scrollable'
-                self.bkgItem.direction = 'vertical'
-            else:
-                self.bkgItem.direction = key
-                
-            self.bkgItem.tag = 'scroller'    
-            self.bkgItem.rate = 0     
-                
-            if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':    
-                self.bkgItem.path = paths['demo']
-            else:
-                self.bkgItem.path = paths['bkgPath']
-                      
-            fileName = self.bkgItem.fileName               
-            if self.bkgMaker.newTracker[fileName]: 
-                self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
-                self.bkgItem.rate = self.getScreenRate(self.bkgItem)  ## blank it's first  
-                self.bkgMaker.newTracker[fileName]['showtime'] = self.bkgItem.showtime
-                self.bkgMaker.newTracker[fileName]['rate'] = self.bkgItem.rate
-                self.bkgMaker.newTracker[fileName]['path'] = self.bkgItem.path 
-         
-            if self.bkgItem.rate == 0:
-                return
-            
-            self.bkgMaker.lockBkg(self.bkgItem)  ## locks the background to begin 
-     
-            if self.bkgMaker.widget != None:
-                self.bkgMaker.updateWidget(self.bkgItem)      
-                QTimer.singleShot(100, partial(self.bkgItem.bkgMaker.resetSliders, self.bkgItem))
+        if self.bkgItem.rate == 0:
+            return
+        
+        self.bkgItem.tag = 'scroller'   ## trigger needed to run scrolling bkg set here
+        self.bkgMaker.lockBkg(self.bkgItem)  ## locks the background to begin 
+        
+        if self.bkgMaker.widget != None:
+            self.bkgMaker.updateWidget(self.bkgItem)      
+            QTimer.singleShot(100, partial(self.bkgItem.bkgMaker.resetSliders, self.bkgItem))
                                                   
 ### --------------------------------------------------------  
     ''' reads twice - returns 'next' rate first, returns 'first' rate next, 
@@ -209,18 +203,6 @@ class BkgWorks:
             self.bkgItem.y = (common['ViewH']- height)/2
             self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
 
-    def setMirroring(self):
-        if self.bkgItem.scrollable:                                  
-            if self.bkgItem.mirroring: 
-                self.bkgItem.mirroring = False ## continuous
-            else:
-                self.bkgItem.mirroring = True  ## mirrored                                    
-        fileName = self.bkgItem.fileName         
-             
-        if self.bkgMaker.newTracker[fileName]:  
-            self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
-            self.canvas.sideCar2.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 
-          
     def closeWidget(self):
         self.bkgMaker.closeWidget()   
         self.bkgMaker.closeMatteWidget()

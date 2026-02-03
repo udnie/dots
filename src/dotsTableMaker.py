@@ -27,7 +27,7 @@ ColumnWidths = [2,3,4,5,8,9,10,11,12,13,14,15]  ## set these columns width to 85
 Columns = {  ## set widths by number of columns
     21:  1605,
     18:  1505,
-    17:  1500,
+    17:  1555,
     16:  1415,
     12:  1065,
      8:   715,
@@ -174,7 +174,7 @@ class TableView:  ## formats a json .play file to display missing files or not
                
 ### --------------------------------------------------------                            
     def resetColumnWidths(self, width):  
-        self.tableView.setColumnWidth(0, 65)  ## for row number
+        self.tableView.setColumnWidth(0, 65)
         self.tableView.setColumnWidth(1, 135)
         for i in range(1, self.cols):  
             if i in ColumnWidths:  ## reduce column widths for these
@@ -200,7 +200,7 @@ class TableView:  ## formats a json .play file to display missing files or not
         x = int(g.x() - int(c/2))
         y = int(g.y() - int(height/2)-100)
         return QPoint(x, y)
- 
+
     def bye(self): 
         self.tableView.setModel(None)  ## clears the table - a must do
         self.tableView.close() 
@@ -243,7 +243,7 @@ class TableView:  ## formats a json .play file to display missing files or not
                         self.cols = len(tmp.keys()) 
         self.unpackIt(dlist)
     
-### -------------------------------------------------------- 
+### --------------------------------------------------------   
     def unpackIt(self, dlist):
         ## unpack dictionary values and save them as a list in data
         data, hdrs, miss, k, first, x = [], [],[], 0, '', []
@@ -260,11 +260,10 @@ class TableView:  ## formats a json .play file to display missing files or not
                     if typ.type != first:
                         if first == '':
                             self.hdr = typ.hdr  ## make this the top header 
-                            self.hdr.insert(0, 'row')
+                            self.hdr.insert(0, 'row')  ## there can be only one
                         else:
-                            self.hdr = typ.hdr  ## make this the top header 
-                            self.hdr.insert(0, 'row')
-                            data.append(self.hdr)  ## do this when the type changes 
+                            typ.hdr.insert(0, 'row')
+                            data.append(typ.hdr)  ## do this when the type changes 
                             hdrs.append(k)  ## keep track of hdr row index
                             k += 1
                         first = typ.type   

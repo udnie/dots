@@ -74,7 +74,6 @@ class SideCar2:
     def bkgStuff(self):
         self.canvas.bkgMaker.openBkgFiles() if self.hasBackGround() == 0 \
             else self.sendPixKeys('B')
-                 
     def newTracker(self):  
         if self.hasBackGround() > 0:
             self.canvas.bkgMaker.bkgtrackers.trackThis() if self.canvas.bkgMaker.bkgtrackers.tracker == None \
@@ -82,18 +81,18 @@ class SideCar2:
                             
     def mirrorBkg(self, switch):  ## either 1 default or -1, flip it
         if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only a background
-            wuf = None
+            bkgtmp = None
             for bkg in self.scene.items():  
                 if bkg.type == 'bkg':
-                    wuf = bkg
+                    bkgtmp = bkg
                     break  
-            if wuf == None: return  
+            if bkgtmp == None: return  
             
             bkg.setMirrored(bkg.flopped, switch)    
             x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
             bkg.setPos(x , 0)   
 
-            akg = BkgItem(wuf.fileName, self.canvas, common['bkgZ'], wuf.imgFile)
+            akg = BkgItem(bkgtmp.fileName, self.canvas, common['bkgZ'], bkgtmp.imgFile)
             if akg == None:
                 return
             
@@ -188,19 +187,6 @@ class SideCar2:
                         break
             else:
                 self.canvas.setKeys('F')
-    
-    def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
-        if bkg:  ## shouldn't need this but - could have just started to clear        
-            if self.canvas.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
-                self.canvas.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
-                bkg.scrollable = True    
-                                                  
-            if bkg.scrollable == False:
-                widget.mirrorBtn.setText('Not Scrollable')  
-                bkg.direction = ''    
-                          
-            widget.mirrorBtn.setText('Continuous') if bkg.mirroring == False else \
-                widget.mirrorBtn.setText('Mirrored')
 
     def setBtns(self, bkg, widget):  ## from bkgMaker widget
         match bkg.direction:  

@@ -203,7 +203,7 @@ class Matte(QWidget):  ## opens itself
             
 ### --------------------------------------------------------
     def scaleUp(self):      
-        wuf = self.border    ## self.border = 30  
+        border30 = self.border    ## self.border = 30  
         if self.border == 5:
             self.border = 12     
             
@@ -214,7 +214,7 @@ class Matte(QWidget):  ## opens itself
             self.border += (self.step + 2)   
                             
         if self.y-(self.border*self.ratio) < self.stop-10:  ## self.stop = 50 = (min y.() - Max Headroom) 
-            self.border = wuf  ## back it off - top of screen display
+            self.border = border30  ## back it off - top of screen display
             MsgBox('  Max Headroom  ', 5)  ## can vary 
                    
     def scaleDown(self):     

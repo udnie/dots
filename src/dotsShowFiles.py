@@ -20,7 +20,7 @@ class ShowFiles:
         self.bkgMaker = self.canvas.bkgMaker
  
         self.errorOnShadows = False
-       
+     
 ### -------------------------------------------------------- 
     def fileNotFound(self, tmp):  ## look in the paths set by types - used by dictionaries
         if 'fname' in list(tmp.keys()):  ## just to make sure
@@ -78,17 +78,19 @@ class ShowFiles:
             pix = self.setBackGround(pix, tmp)  ## checking if a dupe 
             if pix != None:
                 self.scene.addItem(pix)     
+               
                 if pix.tag == 'scroller':  ## replace transformPix.. action
                     if pix.direction == 'right':
                         pix.setPos(QPointF(pix.runway, 0))  ## offset to right 
                     elif pix.direction == 'vertical':
-                        pix.setPos(QPointF(0.0, float(pix.runway)))                                     
+                        pix.setPos(QPointF(0.0, float(pix.runway)))   
+                                                          
         del tmp                                                                                            
         ## adds pix to the scene and performs any transforms - used by other classes
         if pix != None and pix.type == 'pix': 
             self.canvas.sideCar.transFormPixItem(pix, pix.rotation, pix.scale, pix.alpha2)
         del pix
-               
+                 
 ### --------------------------------------------------------
     def setAll(self, pix, tmp):  ## used by showbiz - sets shared variables                         
         pix.type = tmp['type']           
@@ -160,6 +162,12 @@ class ShowFiles:
         if 'path' not in tmp.keys(): 
             tmp['path'] = ''
             
+        if tmp['tag'] == '':   ## definitely not a 'scroller' 
+            tmp['direction'] = ''
+            tmp['rate'] = 0
+            tmp['showtime'] = 0
+            tmp['scrollable'] = False
+             
         bkg.locked      = tmp['locked']                 
         bkg.anime       = tmp['anime']
         bkg.scrollable  = tmp['scrollable']
@@ -169,7 +177,7 @@ class ShowFiles:
         bkg.rate        = tmp['rate']
         bkg.showtime    = tmp['showtime']
         bkg.path        = tmp['path']
-                  
+                
         result = self.bkgMaker.bkgtrackers.addTracker(bkg)  
         
         if result == False:  ## must be a dupe

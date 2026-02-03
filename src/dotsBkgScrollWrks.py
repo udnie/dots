@@ -17,7 +17,7 @@ showtime = {   ## trigger a new background based on the number of pixels left in
     'vertical': 17,  ## trying this out 
 }
 
-# screentimes = {  ## may not be current
+# screenrates = {  ## not current - updated in ../plays/screenrates.dict
 #     '800': [10.0, 22.76, 0.0], 
 #     '900': [10.0, 23.2, 0.0], 
 #     '912': [10.0, 21.1, 0.0],
@@ -34,13 +34,12 @@ showtime = {   ## trigger a new background based on the number of pixels left in
 #     '1536': [10.0, 18.65, 18.92], 
 # }
 
-## read and dump the current screen rates
-# with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
-#     screenrate = json.load(fp) 
-
-# for k, vals in screenrate.items():
-#     print( f'{k.rjust(5)} {str(vals[0]).rjust(6)}  {vals[1]:6.2f}  {vals[2]:5.2f} ') 
- 
+''' use these to read and dump the current screen rates
+    with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
+        screenrates = json.load(fp) 
+    for k, vals in screenrates.items():
+        print( f'{k.rjust(5)} {str(vals[0]).rjust(6)}  {vals[1]:6.2f}  {vals[2]:5.2f} ') 
+ '''
 ### ------------------ dotsBkgScrollWrks -------------------  
 ''' updateDictionary, tracker and scrolling functions '''
 ### --------------------------------------------------------        
@@ -100,8 +99,7 @@ class BkgScrollWrks:
         except:
             MsgBox('Error Updating Rates Dictionary', 5)
             return
-      
-     
+       
 ### --------------------------------------------------------
     ## snakes need more time - the rest vary to build and position and comes before vertical  
     def setShowTime(self): 
@@ -153,53 +151,76 @@ class BkgScrollWrks:
             self.bkgItem.runway = int(common['ViewW'] - self.bkgItem.width)  ## pixels outside of view
         else:
             self.bkgItem.runway = int(common['ViewH'] - self.bkgItem.height) 
-                   
-    def setLeft(self):
-        if self.bkgItem.scrollable:
-            self.bkgItem.bkgWorks.setDirection('left')      
-        else:
-            self.notScrollable() 
-               
-    def setRight(self):
-        if self.bkgItem.scrollable: 
-            self.bkgItem.bkgWorks.setDirection('right')             
-        else:
-            self.notScrollable()
-    
+   
+    def setMirroring(self):
+        if self.bkgItem.scrollable:                                  
+            if self.bkgItem.mirroring: 
+                self.bkgItem.mirroring = False ## continuous
+            else:
+                self.bkgItem.mirroring = True  ## mirrored   
+                                                 
+        fileName = self.bkgItem.fileName         
+             
+        if self.bkgMaker.newTracker[fileName]:  
+            self.bkgMaker.newTracker[fileName]['mirroring'] = self.bkgItem.mirroring                            
+            self.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 
+                            
+    def setLeft(self):     
+        self.bkgItem.bkgWorks.setDirection('left') if self.bkgItem.isScrollable()\
+            else self.bkgItem.notScrollable()  
+
+    def setRight(self): 
+        self.bkgItem.bkgWorks.setDirection('right') if self.bkgItem.isScrollable()\
+            else self.bkgItem.notScrollable()  
+                    
     def setWidthHeight(self, img):     
         if img == None:
             return   
         imf = img.scaledToHeight(self.bkgItem.ViewH, Qt.TransformationMode.SmoothTransformation) 
-        if imf.width() > self.bkgItem.ViewW:  ## its scrollable enough
+        if imf.width() > (self.bkgItem.ViewW + 10):  ## its scrollable enough
             self.bkgItem.imgFile = imf
             self.bkgItem.scrollable = True               
-        else:   
+        else:  
             try:
                 self.bkgItem.imgFile = img.scaled(  ## fill to width or height
                     self.bkgItem.ViewW, 
                     self.bkgItem.ViewH,
                     Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
             except:
-                del img
-                del imf
+                self.clearBkgScrolling() 
+        del img
+        del imf
                  
     def setVertical(self, img):  
         if img == None:
             return
         imf = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
-        self.bkgItem.imgFile = imf       
-        if imf.height() > self.bkgItem.ViewH:  ## its scrollable enough
+        self.bkgItem.imgFile = imf  
+             
+        if imf.height() > (self.bkgItem.ViewH+10):  ## its scrollable enough
             self.bkgItem.scrollable = True  
+        else:
+            self.clearBkgScrolling()
+            
         del img 
         del imf
+   
+    def clearBkgScrolling(self):
+        self.bkgItem.scrollable = False 
+        self.bkgItem.tag = ''
+        self.bkgItem.direction = ''
+        self.bkgItem.rate = 0
+        self.bkgItem.showtime = 0
+        if self.bkgMaker.newTracker.get(self.bkgItem.fileName):
+            self.bkgMaker.newTracker[self.bkgItem.fileName]['direction'] = 0
+            self.bkgMaker.newTracker[self.bkgItem.fileName]['rate'] = 0
                 
 ### --------------------------------------------------------
     def toggleBkgLocks(self):
         if self.bkgItem:
-            if self.bkgItem.locked == False:
-                self.bkgMaker.lockBkg(self.bkgItem) 
-            else:
-                self.bkgMaker.unlockBkg(self.bkgItem)  
+            self.bkgMaker.lockBkg(self.bkgItem) if self.bkgItem.locked == False\
+                else self.bkgMaker.unlockBkg(self.bkgItem)  
+                
             if self.bkgMaker.widget != None:     
                 p = self.canvas.mapFromGlobal(QCursor.pos())  
                 tagBkg(self.bkgItem, QPoint(int(p.x())+200,int(p.y())+50))
@@ -207,12 +228,20 @@ class BkgScrollWrks:
                                                                                                
     def filePixX(self, file, bkg):  ## also see dumpTrackers
         print(f'tracker {bkg.fileName}\t{bkg.direction}\t{bkg.mirroring}\t{bkg.rate}\t{bkg.factor}\t{bkg.zValue()}')
-                                                                       
-    def notScrollable(self):
-        MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
-        self.bkgItem.scrollable = False 
-        return  
-            
+                                                                                   
+    def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
+        if bkg:  ## shouldn't need this but - could have just started to clear        
+            if self.canvas.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
+                self.canvas.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
+                bkg.scrollable = True    
+                                                  
+            if bkg.scrollable == False:
+                widget.mirrorBtn.setText('Not Scrollable')  
+                self.clearBkgScrolling()
+                          
+            widget.mirrorBtn.setText('Continuous') if bkg.mirroring == False else \
+                widget.mirrorBtn.setText('Mirrored')
+              
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     
              
              

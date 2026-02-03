@@ -90,7 +90,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         
         self.tag = ''  
         self.anime = None 
-        self.addedScroller = False
+        self.addedScroller = False  ## used by itemChange 
         
         self.helpMenu = None
            
@@ -104,6 +104,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                                    
         self.ratio = self.height/9
         self.ratio = int(self.width/self.ratio)
+          
+        self.scrollable = self.isScrollable()
                     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)                                 
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)  ## locked
@@ -198,7 +200,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.helpMenu = None
         
 ### -------------------------------------------------------- 
-    ''' 'first' has already set its setScrollerPath - ## value equals self.pos() '''
+    ''' first' has already set its setScrollerPath - ## value equals self.pos() 
+        itemChange drives the scrolling background '''
 ### -------------------------------------------------------- 
     def itemChange(self, change, value):   
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
@@ -207,16 +210,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                      
             elif self.addedScroller == False:  ## check if its showtime    
                 
-                if self.direction  == 'left'  and int(value.x()-self.runway) <= self.showtime or\
-                    self.direction == 'right' and int(value.x()) >= -self.showtime or\
+                if self.direction  == 'left'     and int(value.x()-self.runway) <= self.showtime or\
+                    self.direction == 'right'    and int(value.x()) >= -self.showtime or\
                     self.direction == 'vertical' and int(value.y())-self.runway <= self.showtime:  
                     self.addNextScroller()  ## the scroller factory
                     self.addedScroller = True        
                                                        
             elif self.addedScroller:  ## test if nolonger in view
                 
-                if self.direction   == 'left'  and abs((value.x())) >= self.width or \
-                    self.direction  == 'right' and abs(int(value.x())) >= common['ViewW'] or \
+                if self.direction   == 'left'     and abs((value.x())) >= self.width or \
+                    self.direction  == 'right'    and abs(int(value.x())) >= common['ViewW'] or \
                     self.direction  == 'vertical' and int(value.y()) >= self.height:
                     self.anime.stop()
                     self.bkgMaker.deleteBkg(self, 'nope')  ## don't delete tracker
@@ -252,24 +255,31 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def setScrollerPath(self, bkg, which): ## which = first
         if bkg.direction == '':   
             return  
-            
+        
+        elif bkg.isScrollable() == False:
+            bkg.bkgScrollWrks.clearBkgScrolling()
+            return None
+
         node = Node(bkg)  ## bkg property used in animation                      
-        if node == None:          ## being ignored - just for pyside
+        if node == None:  ## being ignored - just for pyside
             MsgBox('setScrollerPath: Error Setting Path ...')
-            return          
-                
-        elif bkg.direction in ('left', 'right') and bkg.width <= common['ViewW'] + 10 or\
-            bkg.direction == 'vertical' and bkg.height <= common['ViewH'] + 10:
-                self.bkgScrollWrks.notScrollable()  
-                return 
-        
-        if self.direction != '': bkg.scrollable = True  ## must be true - just in case
-        
-        self.bkgWorks.setStartingPos(bkg)  ## not the scrolling position      
+            return  
+
+        bkg.bkgWorks.setStartingPos(bkg)  ## not the scrolling position      
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
-        return self.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
-                       
-    def setMirrored(self, bool, switch=1):
+        return bkg.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
+     
+    def isScrollable(self):  
+        if self.direction in ('right', 'left') and self.width > (common['ViewW'] + 10) or \
+            self.direction == 'vertical' and self.height > (common['ViewH'] + 10):
+            return True
+        return False
+    
+    def notScrollable(self):
+        MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
+        self.bkgScrollWrks.clearBkgScrolling()
+                  
+    def setMirrored(self, bool, switch=1):  ## mirrors this
         self.flopped = bool  
         if not self.dots.Vertical:
             if self.flopped:

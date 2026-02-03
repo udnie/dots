@@ -296,7 +296,7 @@ class BkgWidget(QWidget):
         self.rightBtn  = QPushButton('Left to Right')
         
         if self.switch == '':
-            self.mirrorBtn.clicked.connect(self.bkgWorks.setMirroring)
+            self.mirrorBtn.clicked.connect(self.bkgScrollWrks.setMirroring)
             self.leftBtn.clicked.connect(self.bkgScrollWrks.setLeft)
             self.rightBtn.clicked.connect(self.bkgScrollWrks.setRight)
         
