@@ -7,6 +7,11 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+
+**February 3 2026**    
+A dumb bug fix on scrollable.
+
+---
 **February 2 2026**  
 A round of bug fixes for **scrolling backgrounds** and the **json/play file viewer**. I found a problem with non-scrolling backgrounds where a background could be marked as scrollable even if it wasn't. This became noticeable as I continued testing last weeks changes just to make sure I hadn't missed anything.  I had relied on a boolean variable that should have been a function and up until last week hadn't experienced many noticeable issues as the backgrounds I mostly worked with had no problems scrolling.  The main issue with the non-scrolling backgrounds was their **tag** property could be set to **'scroller'**, what I use as a trigger to inform **dots** to run it as a scrolling background. This could cause a problem - as in not having a way to stop a running animation and forcing you clear the screen or exit entirely.
 

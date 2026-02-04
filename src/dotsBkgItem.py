@@ -270,8 +270,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         return bkg.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
      
     def isScrollable(self):  
-        if self.direction in ('right', 'left') and self.width > (common['ViewW'] + 10) or \
-            self.direction == 'vertical' and self.height > (common['ViewH'] + 10):
+        if self.canvas.dots.Vertical and self.height > (common['ViewH'] + 10) or \
+            self.width > (common['ViewW'] + 10):
             return True
         return False
     

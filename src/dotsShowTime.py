@@ -99,7 +99,7 @@ class ShowTime:
                 else:  ## staggering the start 
                     QTimer.singleShot(100 + (k * 35), pix.anime.start)  
                     
-            elif pix.type == 'bkg' and pix.tag == '':
+            elif pix.type == 'bkg' and pix.tag == '':  ## you hit the run button
                 bkgflag = True
                
         if k > 0:

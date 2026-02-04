@@ -337,7 +337,7 @@ six20 = {   ## 1102 - must be a string not a number
 
 ### ----------------------------------------------------- 
 def pathMod(fileName):
-    fileName = fileName[-24:]
+    fileName = fileName[-17:]
     if fileName.find('/') > 0:
         fileName = '..' + fileName[fileName.find('/'):]
     return fileName
