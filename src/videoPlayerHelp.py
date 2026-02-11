@@ -208,11 +208,11 @@ class VideoHelp(QWidget):
         pwidth, pheight = self.parent.width(), self.parent.height() 
   
         if self.switch == '':   ## default
-            p = self.parent.pos() 
+            p = self.parent.pos()  
             x = int(p.x() + (pwidth/2)) - int(width/2)   
-            y = int(p.y() + (pheight/2)) - int(height/2) + 50  ## looks better for default
+            y = int(p.y() + (pheight/2)) - int(height/2) + 30 
         else:
-            x, y = int(pwidth/2), int(pheight/2)  ## from other source - dots
+            x, y = int(pwidth/2), int(pheight/2)  ## copied over from dots
             p = self.parent.mapToGlobal(QPoint(x,y))
             x, y = int(p.x()), p.y()
             if off != 0: x += off
@@ -283,11 +283,11 @@ class SlideShowHelp(QWidget):
             if off != 0: x += off
             x = int(x - (width /2)) 
             y = int(y - (height /2)) 
-        else:       
+        else:     
             p = self.parent.pos() 
             x = int(p.x() + (pwidth/2)) - int(width/2)   
-            y = int(p.y() + (pheight/2)) - int(height/2)  
-        
+            y = int(p.y() + (pheight/2)) - int(height/2) + 30 
+ 
         self.table.move(x,y)  
         self.table.show()
         

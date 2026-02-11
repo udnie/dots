@@ -7,7 +7,10 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**February 10 2026**    
+Another look into how and where scrollable was being set.  There's only one source now, isScrollable sets scrollable - done. Added hide the window title bar, **Shift-F frameless hint toggle**, to **videoPlayerTwo** and moved some code to now a function.  
 
+---
 **February 3 2026**    
 A dumb bug fix on scrollable.
 

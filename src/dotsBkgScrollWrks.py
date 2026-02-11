@@ -154,10 +154,8 @@ class BkgScrollWrks:
    
     def setMirroring(self):
         if self.bkgItem.scrollable:                                  
-            if self.bkgItem.mirroring: 
-                self.bkgItem.mirroring = False ## continuous
-            else:
-                self.bkgItem.mirroring = True  ## mirrored   
+            self.bkgItem.mirroring = False if self.bkgItem.mirroring \
+                else True  ## it's mirrored   
                                                  
         fileName = self.bkgItem.fileName         
              
@@ -176,10 +174,9 @@ class BkgScrollWrks:
     def setWidthHeight(self, img):     
         if img == None:
             return   
-        imf = img.scaledToHeight(self.bkgItem.ViewH, Qt.TransformationMode.SmoothTransformation) 
-        if imf.width() > (self.bkgItem.ViewW + 10):  ## its scrollable enough
-            self.bkgItem.imgFile = imf
-            self.bkgItem.scrollable = True               
+        img = img.scaledToHeight(self.bkgItem.ViewH, Qt.TransformationMode.SmoothTransformation) 
+        if img.width() > (self.bkgItem.ViewW + 10):  ## isScrollable doesn't work here
+            self.bkgItem.imgFile = img  ## width and height haven't been set yet - based on img.size
         else:  
             try:
                 self.bkgItem.imgFile = img.scaled(  ## fill to width or height
@@ -188,22 +185,21 @@ class BkgScrollWrks:
                     Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
             except:
                 self.clearBkgScrolling() 
+                return None
         del img
-        del imf
-                 
+              
     def setVertical(self, img):  
         if img == None:
             return
-        imf = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
-        self.bkgItem.imgFile = imf  
-             
-        if imf.height() > (self.bkgItem.ViewH+10):  ## its scrollable enough
-            self.bkgItem.scrollable = True  
-        else:
-            self.clearBkgScrolling()
-            
+        try:
+            img = img.scaledToWidth(self.bkgItem.ViewW, Qt.TransformationMode.SmoothTransformation)
+            self.bkgItem.imgFile = img     
+            if img.height() < (self.bkgItem.ViewH+10):  ## isScrollable won't work here - see above
+                self.clearBkgScrolling()   
+        except:
+            self.clearBkgScrolling() 
+            return None
         del img 
-        del imf
    
     def clearBkgScrolling(self):
         self.bkgItem.scrollable = False 

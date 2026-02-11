@@ -206,9 +206,7 @@ class SlideShow(QWidget):
                 self.zoom(1.05)  
             case '[':    
                 self.zoom(0.95)
-            case _:
-                return
-
+       
 ### --------------------------------------------------------          
     def mousePressEvent(self, e):
         self.save = e.globalPosition()  
@@ -237,55 +235,61 @@ class SlideShow(QWidget):
             del self.pixItem
             
         if self.helpMenu != None: self.closeHelpMenu()  ## close help menu   
-              
-        self.fileName = self.path + '/' + file  
+        if self.path == '':  self.path = os.getcwd()
+          
+        self.fileName = file
         try:
             img = QImage(self.fileName) 
         except:
-            self.msgbox('addPixMap: problem with ' + file)
+            self.msgbox('addPixMap: problem with ' +   self.fileName)
             return
       
         self.scaleW = self.view.width()/ViewW  ## how width and height vary from ViewW/H
         self.scaleH = self.view.height()/ViewH   
-        
-        maxH = MaxH   
-        self.txtlst = file
-         
+     
         self.saveW, self.saveH = img.width(), img.height()
         self.aspect = math.floor((img.width()/img.height()) * 100)/100.0
-        
-        if rot := self.rotters.get(file): 
-            self.rot = rot
-                                           
-        if self.rot in (90, 270) and abs(img.width() - img.height()) > 5: ## swap width to height for rotation
-            img = img.scaled(int(MaxV * self.scaleH), int(MaxH * self.scaleH),
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation) 
-        else:
-            if img.height() > img.width() and abs(img.width() - img.height()) > 5:
-                maxH = MaxV  
-        
-            img = img.scaled(int(MaxW * self.scaleW), int(maxH * self.scaleH),
-                Qt.AspectRatioMode.KeepAspectRatio,       
-                Qt.TransformationMode.SmoothTransformation)  
-
+      
         self.pixItem = QGraphicsPixmapItem()          
-        self.pixItem.setPixmap(QPixmap(img))  
-        
+        self.pixItem.setPixmap(QPixmap(self.addImage(img))) 
+
         self.pixItem.setZValue(0)
         self.pixItem.setPos(self.centerPixItem())
         
         self.setOrigin()             
         self.pixItem.setRotation(self.rot) 
-        self.pixItem.setScale(1.0)
-     
+        
+        self.pixItem.setScale(1.0) 
         self.scene.addItem(self.pixItem)
+        
         if self.setTags and self.view.height() > CutOff:   
-            self.addTextItem()           
+            self.addTextItem()    
+                 
         del img
+            
         self.update()   
         
-### --------------------------------------------------------           
+### --------------------------------------------------------
+    def addImage(self, img):
+        maxH = MaxH   
+        if rot := self.rotters.get(self.fileName): 
+            self.rot = rot                                 
+        if self.rot in (90, 270) and abs(img.width() - img.height()) > 5: ## swap width to height for rotation
+            img = img.scaled(
+                int(MaxV * self.scaleH), 
+                int(MaxH * self.scaleH),
+                Qt.AspectRatioMode.KeepAspectRatio,
+                Qt.TransformationMode.SmoothTransformation) 
+        else:
+            if img.height() > img.width() and abs(img.width() - img.height()) > 5:
+                maxH = MaxV  
+            img = img.scaled(
+                int(MaxW * self.scaleW), 
+                int(maxH * self.scaleH),
+                Qt.AspectRatioMode.KeepAspectRatio,       
+                Qt.TransformationMode.SmoothTransformation) 
+        return img 
+
     def openHelpMenu(self):
         if self.helpFlag:
             self.closeHelpMenu()
@@ -345,7 +349,7 @@ class SlideShow(QWidget):
             r = r + self.rot
             if r > 270: r = 0
             self.rot = r
-            self.rotters[self.txtlst] = self.rot  ## seems to work
+            self.rotters[self.fileName] = self.rot  ## seems to work
             self.addPixmap(self.files[self.current])  ## refresh  
                                  
     def nextSlide(self):
@@ -397,8 +401,9 @@ class SlideShow(QWidget):
             return None
         
         file = os.path.basename(self.fileName)
-        dir = os.path.basename(os.path.dirname(self.fileName) )
-        file = (f"../{dir}/{file}")
+        dir = os.path.basename(self.path)
+    
+        file = (f"../{dir}/{file}") if dir else (f"../{file}")
         
         if self.rot in (90, 270):  ## recalc for rotation
             asp = math.floor(height/width *100)/100.0    

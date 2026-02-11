@@ -162,7 +162,7 @@ class BkgTrackers:
   ### --------------------------------------------------------   
     def addTracker(self, bkg):  ## always - either loading a play file or adding from backgrounds
         fileName = bkg.fileName
-        
+
         if len(self.bkgMaker.newTracker) == 0:  ## add the first one as its unique
             self.bkgMaker.newTracker[fileName] = self.addNewTracker(bkg)  
             return True

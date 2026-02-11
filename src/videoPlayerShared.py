@@ -109,7 +109,8 @@ class Shared:
         self.parent = parent
         self.player = 'shared'
         self.helpMenus = False
-
+        self.firstRightClk = False
+        
 ### --------------------------------------------------------
     def openPlayer(self, key):  ## from keyboard or helpMenu - default on open      
         self.closeHelpMenu() 
@@ -187,13 +188,19 @@ class Shared:
   
 ### --------------------------------------------------------
     def openHelpMenu(self):
+        p = self.parent.pos()
         if self.parent.helpFlag:
             self.closeHelpMenu()
         else:
             self.parent.helpMenu = VideoHelp(self.parent)
             self.parent.helpFlag = True
-            
+            if self.parent.player == "two" and self.parent.frameHidden:
+                if self.firstRightClk == False:
+                    self.parent.move(p.x(), p.y()-28)
+                    self.firstRightClk = True
+         
     def closeHelpMenu(self):
+        p = self.parent.pos()
         if self.parent.helpMenu != None: 
             self.parent.helpMenu.tableClose()
             self.parent.helpMenu.close()
@@ -201,7 +208,11 @@ class Shared:
             time.sleep(.03)
             if self.helpMenus:
                 self.closeVideoSlideMenus()
-            
+            if self.parent.player == "two" and self.parent.frameHidden:
+                if self.firstRightClk:
+                    self.parent.move(p.x(), p.y())
+                    self.firstRightClk = False
+                
     def openVideoSlideMenus(self):
         self.helpMenus = True
         self.vwidget   = VideoHelpWidget(self.parent)

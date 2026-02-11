@@ -75,7 +75,7 @@ class BkgMaker(QWidget):
             self.mapper.removeMap()
 
         bkg = BkgItem(file, self.canvas)  ## the real deal
-        if bkg.type == None:
+        if bkg == None:
             return
             
         bkg.setZValue(common['bkgZ'])  ## always on top              
@@ -83,7 +83,7 @@ class BkgMaker(QWidget):
    
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.setXY(bkg)
-    
+  
         self.bkgtrackers.addTracker(bkg)  ## always - even if not a scroller   
         self.lockBkg(bkg)  ## always lock it
                         

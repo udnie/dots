@@ -18,7 +18,7 @@ from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, \
 from videoClipsMaker     import Clips
 from videoClipsWidget    import *
 from videoPlayerShared   import *
-        
+
 ### --------------------------------------------------------         
 class VideoPlayer(QWidget): 
 ### -------------------------------------------------------
@@ -75,7 +75,7 @@ class VideoPlayer(QWidget):
         self.grabKeyboard() 
                                                      
         self.show()
-        
+   
         QTimer.singleShot(50, self.shared.toggleSlider)  ## hides slider on open
         
 ### --------------------------------------------------------
@@ -94,6 +94,7 @@ class VideoPlayer(QWidget):
         self.saveH = self.height()
         self.save = QPoint()   
         self.flag = False
+        self.frameHidden = False
   
     def dragEnterEvent(self, e):  
         if e.mimeData().hasUrls():   
@@ -118,7 +119,10 @@ class VideoPlayer(QWidget):
                      
         elif key == Qt.Key.Key_S and mod & Qt.KeyboardModifier.ShiftModifier:
             self.shared.toggleSlider() 
-                      
+            
+        elif key == Qt.Key.Key_F and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.toggleFrameless()       
+                    
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.bye()  
                       
@@ -279,6 +283,20 @@ class VideoPlayer(QWidget):
         # self.backdrop.setOpacity(.50)  ## also for test
         self.scene.addItem(self.backdrop)
    
+    def toggleFrameless(self):  ## from a google prompt
+        p = self.pos()
+        if self.frameHidden:  ## make it visible 
+            self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
+            self.frameHidden = False
+            self.shared.firstRightClk = False if self.shared.firstRightClk \
+                else self.move(p.x(), p.y()-28)  ## good guess
+        else:
+            self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
+            self.frameHidden = True
+            self.move(p.x(), p.y()+28)  ## keep the frame stationary
+            self.shared.firstRightClk = False
+        self.show()
+        
 ### --------------------------------------------------------   
     def resizeEvent(self, e):
         if self.flag:
@@ -293,6 +311,13 @@ class VideoPlayer(QWidget):
             maxwid = int((MaxHgt-hgt) * self.aspect)+WID  
             which  = getDirection(self)
             
+            
+            if self.mediaPlayer != None:
+                if self.backdrop == None:
+                    self.shared.msgbox('backdrop not found')
+                    return
+                else:
+                    self.backdrop.setScale((self.width()-WID)/self.videoWidth) 
             if self.mediaPlayer != None:
                 self.backdrop.setScale((self.width()-WID)/self.videoWidth) if self.backdrop \
                 else self.shared.msgbox('backdrop not found')

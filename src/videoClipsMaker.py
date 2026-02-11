@@ -39,16 +39,16 @@ class Clips:
 
         self.Fps = 5    ## frames per second - less than 5 and the video won't play
         self.Max = 25   ## max number of photos to read/write  
-        self.Wpr = 3    ## writes per read
+        self.Wpr = 4    ## writes per read
         self.Rnf = 1    ## read every 'n frame - just to make sure 
                        
-        self.AutoAspect  = False     ## True reads the video metadata to set the aspect ratio and resize the widget
+        self.AutoAspect  = False      ## True reads the video metadata to set the aspect ratio and resize the widget
                                      ## requires that getVideoWidthHeight is working                                     
         self.MakeClips   = False     ## True - from photos - requires having opencv installed and import cv2 uncommented
         self.FirstFrame  = False     ## True - read only the first frame of a video       
         self.SkipFrames  = False     ## True - read the Nth frame of a video 
         self.FilterOn    = False     ## True - image aspect matches self.aspect (parent)
-        self.PlayVideo   = False     ## True plays video upon loading
+        self.PlayVideo   = False    ## True plays video upon loading
         self.AddFileName = False     ## True add to frame
    
 ### --------------------------------------------------------       
@@ -142,7 +142,7 @@ class Clips:
             if self.parent.mediaPlayer != None:
                 self.parent.shared.stopVideo()
             time.sleep(.03)
-       
+ 
     def looperOff(self):
         self.parent.loopSet = False
         self.parent.loopButton.setText('Loop')

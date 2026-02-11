@@ -61,10 +61,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 ### --------------------------------------------------------   
     def init(self, copy):    
         self.imgFile = None      
-        self.scrollable = False
-        
+   
         if copy == None:          
-            try:   ## sets if scrollable and self.imgfile if not already set
+            try:   ## sets the self.imgfile if not already set in copy
                 if not self.dots.Vertical: 
                     self.bkgScrollWrks.setWidthHeight(QImage(self.path + self.fileName)) 
                 else:
@@ -105,7 +104,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.ratio = self.height/9
         self.ratio = int(self.width/self.ratio)
           
-        self.scrollable = self.isScrollable()
+        self.scrollable = self.isScrollable()  ## once width and height set
                     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)                                 
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)  ## locked
@@ -122,10 +121,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.path = paths['bkgPath']  
             play = os.path.basename(self.canvas.openPlayFile)
          
-        if  self.width > self.height:
-            rot = self.width/self.height
-        else:
-            rot = self.height/self.width
+        rot = self.width/self.height if self.width > self.height \
+            else self.height/self.width
             
         fn = f'{play}   {self.fileName}   {self.width}   {self.height}   {rot:.2f}'
         self.canvas.dots.statusBar.showMessage(fn, 12000) 
@@ -269,7 +266,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return bkg.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
      
-    def isScrollable(self):  
+    def isScrollable(self):  ## only after height and width are set
         if self.canvas.dots.Vertical and self.height > (common['ViewH'] + 10) or \
             self.width > (common['ViewW'] + 10):
             return True
@@ -279,7 +276,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
         self.bkgScrollWrks.clearBkgScrolling()
                   
-    def setMirrored(self, bool, switch=1):  ## mirrors this
+    def setMirrored(self, bool, switch=1):  ## mirrors this background not text
         self.flopped = bool  
         if not self.dots.Vertical:
             if self.flopped:
