@@ -8,7 +8,7 @@ from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
 storyKeys = {   ## storyHelp2
     'F':    'Flop Selected',
     'P':    'Toggle Paths - Animation',
-    'T':    'ToggleTags - Animation',
+    'T':    'ToggleTags Animations/Selected',
     'Shift-H': 'Hide Selected Outlines',    
     'Shift-L': 'Toggle Sprite Locks',
     'Shift-R': 'Unlink, Unlock, UnSelect',
@@ -41,15 +41,15 @@ PathStr = ('>', '<', '!', '@','/','{','}')  ## wired up - the rest manual
 ### --------------------- dotsHelpDesk --------------------- 
 ''' classes: StoryHelp2, PathHelp2,  '''
 ### --------------------------------------------------------
-    ## Animation Menu in pixWork
+    ## Animation Menu in pixWorks
     ## Canvas and StoryBoard Menus in helpButtons
     ## Demos, Screens Menus in helpMenus 
     ## Frames and Flats Menu in frames and flats
     ## Matte Menu in bkgMatte    
     ## PathMaker Menu in pathWorks
     ## StoryHelp2 in helpDesk    
-    ## Sprites, Background and Shadow Menus in helpMonkey
-    ## Widgets for Pixitems, Backgrounds., in helpMaker                                    
+    ## Sprites (PixItem), Background and Shadow Menus in helpMonkey
+    ## Widgets for Pixitems (Sprites), Backgrounds., in helpMaker                                    
 ### --------------------------------------------------------     
 class StoryHelp2: 
 ### -------------------------------------------------------- 
@@ -59,10 +59,10 @@ class StoryHelp2:
         self.canvas = parent
         self.switch = switch
 
-        self.table = TableWidgetSetUp(65, 185, len(storyKeys)+4)
+        self.table = TableWidgetSetUp(65, 210, len(storyKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 257, 486
+        width, height = 282, 486
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}',QL,True,True,2)

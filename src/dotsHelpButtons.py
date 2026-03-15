@@ -5,7 +5,7 @@ from PyQt6.QtCore       import QTimer
 
 from dotsSideGig        import getVuCtr
 from dotsShared         import PlayKeys 
-from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
+from dotsTableModel     import TableWidgetSetUp, QC, QL, QH, SD
 from dotsPathWorks      import PathHelp
 
 canvasKeys = {
@@ -23,29 +23,29 @@ canvasKeys = {
 }
 
 storyKeys = {
-    'A':    'Select All',  
+    'A':    'Toggles Selection on/off',  
     'C':    'Clear Canvas',
-    'D':    'Delete Selected',
+    'D/delete':  'Delete Selected',
     'J':    'JSON Play File Viewer',
     'L':    'Load Play File',
     'M':    'This Help Menu',
-    'Menu2': 'StoryBoard Help Menu 2',
-    'Menus': 'Help Menus',
+    'Menu2':    'StoryBoard Help Menu 2',
+    'Menus':    'Help Menus',
     'O':    'Toggle Shadow Outlines', 
     'S':    'Save Play File',    
     'U':    'UnSelect All Sprites',
     'V':    'Delete the Video',
     'W':    'Clear Widgets',
     'X':    'X, Q, Escape to Quit',
-    'R':    'Run What\'s There',
-    'SpaceBar': 'Pause/Resume', 
-    'S ':    'Stop Animation',        
+    'R':    '    Run What\'s There',
+    'SpaceBar': 'Start/Pause/Resume', 
+    'S ':   'Stop Animation',        
 }
 
 ### ------------------- dotsHelpButtons -------------------- 
 ''' classes: ButtonHelp, CanvasHelp and StoryBoardHelp '''
 ### --------------------------------------------------------
-    ## Animation Menu in pixWork
+    ## Animation Menu in pixWorks
     ## Canvas and StoryBoard Menus in helpButtons
     ## Demos, Screens Menus in helpMenus 
     ## Frames and Flats Menu in frames and flats
@@ -69,7 +69,7 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
          
 ## --------------------------------------------------------
     def openMenus(self):   
-        if self.canvas.pathMakerOn == False:
+        if not self.canvas.pathMakerOn:
   
             if self.canvas.openPlayFile == 'menu':  ##  left over 
                 if sum(pix.type == 'flat' for pix in self.scene.items()) == 1 and \
@@ -95,7 +95,7 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
         self.canvas.setFocus()
     
     def closeMenus(self,):  ## used by showbiz not menus
-        if self.canvas.pathMakerOn == False:
+        if not self.canvas.pathMakerOn:
             if self.canvasFlag:
                 self.canvasHelp.closeMenu() 
             elif self.storyFlag:
@@ -118,18 +118,22 @@ class CanvasHelp:
     
         self.switch = switch
 
-        self.table = TableWidgetSetUp(50, 190, len(canvasKeys)+5)
+        self.table = TableWidgetSetUp(60, 190, len(canvasKeys)+5)
         self.table.itemClicked.connect(self.clicked)   
         
-        width, height = 246, 487
+        width, height = 256, 487
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f'{"   Canvas Help Menu ":<20}',QL,True,True,2)
         
         row = 1
         for k , val in canvasKeys.items():
-            self.table.setRow(row, 0, k,'',True,True)
-            self.table.setRow(row, 1, "  " + val,'','',True)
+            if k ==  'Menus':
+                self.table.setRow(row, 0, k,SD,True,True)
+                self.table.setRow(row, 1, "  " + val,SD,'',True)
+            else:
+                self.table.setRow(row, 0, k,'',True,True)
+                self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
                   
         c = '"cmd"'; d = '"opt" '; e = "or "  ## for quotes
@@ -175,10 +179,10 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
         self.canvas = canvas
         self.switch = switch
         
-        self.table = TableWidgetSetUp(70, 190, len(storyKeys)+5,0, 27)
+        self.table = TableWidgetSetUp(80, 185, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 267, 603
+        width, height = 272, 602
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}',QL, True,True,2)
@@ -186,8 +190,12 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
         row = 1
         for k, val in storyKeys.items():
             if row < 15:
-                self.table.setRow(row, 0, k, '', True,True)
-                self.table.setRow(row, 1, "  " + val, '', '',True)      
+                if k ==  'Menus':
+                    self.table.setRow(row, 0, k,SD,True,True)
+                    self.table.setRow(row, 1, "  " + val,SD,'',True)
+                else:
+                    self.table.setRow(row, 0, k, '', True,True)
+                    self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
                 if row == 15:
@@ -219,7 +227,9 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
                         QTimer.singleShot(10, self.closeMenu) 
                         self.storyHelp2 = self.canvas.bkgMaker.addStoryHelp2()     
                     case 'SpaceBar': 
-                        help = 'space'                 
+                        help = 'space'
+                    case 'D/delete': 
+                        help = 'del'
                 if help in PlayKeys:  ## in Shared
                     QTimer.singleShot(10, partial(self.canvas.setKeys, help))
                 self.table.close()  

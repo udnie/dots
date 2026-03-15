@@ -34,7 +34,7 @@ class KeysPanel(QWidget):
             
 ### --------------------------------------------------------
     def toggleKeysMenu(self):  ## called thru showbiz 'K' key
-        self.setStoryKeys() if self.pathKeysSet == True else self.setPathKeys()
+        self.setStoryKeys() if self.pathKeysSet else self.setPathKeys()
  
     def setStoryKeys(self):
         self.setTableModel(self.storyKeys)

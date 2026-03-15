@@ -29,7 +29,7 @@ class PointItem(QGraphicsEllipseItem):
         super().__init__()
 
         self.maker = parent
-        self.maker.path  = self.maker.path   
+        self.maker.corners = self.maker.corners  
         self.ptStr = ptStr
         
         self.type = 'point'
@@ -93,24 +93,24 @@ class PointItem(QGraphicsEllipseItem):
             self.botLeft(x, y)
         else:  
             i = PathStr.index(self.ptStr)  ## move only 
-            self.maker.path[i] = QPointF(x,y)                  
+            self.maker.corners[i] = QPointF(x,y)                  
         
     def topLeft(self, x, y):
         w, y1 = self.current(0,1)            
-        self.maker.path[0] = QPointF(x,y) 
-        self.maker.path[1] = QPointF(x+w,y1)
+        self.maker.corners[0] = QPointF(x,y) 
+        self.maker.corners[1] = QPointF(x+w,y1)
         self.maker.topRight.setRect(x+(w-V*.5), y1-V*.5, V,V)  
         
     def botLeft(self, x, y):
         w, y1 = self.current(3,2)            
-        self.maker.path[3] = QPointF(x,y) 
-        self.maker.path[2] = QPointF(x+w,y1)
+        self.maker.corners[3] = QPointF(x,y) 
+        self.maker.corners[2] = QPointF(x+w,y1)
         self.maker.botRight.setRect(x+(w-V*.5), y1-V*.5, V,V)          
         
     def current(self,a,b):
-        l = self.maker.path[a].x()
-        r = self.maker.path[b].x()
-        return r - l,  self.maker.path[b].y()
+        l = self.maker.corners[a].x()
+        r = self.maker.corners[b].x()
+        return r - l,  self.maker.corners[b].y()
                        
 ### --------------------------------------------------------
 class Works:  ## small functions that were in ShadowMaker
@@ -163,8 +163,7 @@ class Works:  ## small functions that were in ShadowMaker
     def addPointsToScene(self, hide=True):
         for p in self.maker.points:   
             p.setZValue(self.maker.shadow.zValue()+10)
-            if self.maker.isHidden or \
-                self.maker.linked == True or hide == False:
+            if self.maker.isHidden or self.maker.linked or not hide:
                 p.hide()                          
             self.scene.addItem(p)
                              
@@ -175,11 +174,11 @@ class Works:  ## small functions that were in ShadowMaker
         self.maker.points.clear()
 
 ### --------------------------------------------------------
-    def updateOutline(self, hide=''): 
+    def updateOutline(self, showit=''):
         self.deleteOutline()
         self.maker.outline = Outline(self.makeOutline()) 
         self.maker.outline.setPen(QPen(QColor('lime'), 2, Qt.PenStyle.DotLine))    
-        if self.maker.linked == True or hide != '':  ## used throughout shadow and updateShadow
+        if self.maker.linked or showit != '':  
             self.hideOutline()  
             self.maker.dblclk = False
         self.maker.outline.setZValue(self.maker.shadow.zValue()+5)   
@@ -190,7 +189,7 @@ class Works:  ## small functions that were in ShadowMaker
             if self.maker.outline.isVisible():
                 self.hideOutline()
                 self.maker.dblclk = False
-            elif self.maker.outline.isVisible() == False:
+            elif not self.maker.outline.isVisible():
                 self.showOutline()
                 self.maker.dblclk = True
         if self.maker.widget != None: self.closeWidget()
@@ -202,13 +201,13 @@ class Works:  ## small functions that were in ShadowMaker
                       
     def makeOutline(self):  
         outline = QPolygonF()   
-        for p in self.maker.path:  
+        for p in self.maker.corners:  
             outline.append(QPointF(p))
         return outline 
                 
     def hidePoints(self, hide=True): 
         for p in self.maker.points:       
-            p.hide() if hide == True else p.show()  
+            p.hide() if hide else p.show()  
                               
     def hideOutline(self):
         if self.maker.outline != None:
@@ -242,13 +241,13 @@ class Works:  ## small functions that were in ShadowMaker
     def flip(self):          
         self.deleteOutline() 
                         
-        x, t, b = self.maker.path[0].x(), self.maker.path[0].y(), self.maker.path[3].y()
+        x, t, b = self.maker.corners[0].x(), self.maker.corners[0].y(), self.maker.corners[3].y()
         y = b + (b - t)
-        self.maker.path[0] = QPointF(x,y)  
+        self.maker.corners[0] = QPointF(x,y)  
         
-        x1, t, b = self.maker.path[1].x(), self.maker.path[1].y(), self.maker.path[2].y()
+        x1, t, b = self.maker.corners[1].x(), self.maker.corners[1].y(), self.maker.corners[2].y()
         y1 = b + (b - t)
-        self.maker.path[1] = QPointF(x1, y1) 
+        self.maker.corners[1] = QPointF(x1, y1) 
            
         self.maker.addPoints()
         self.maker.updatePoints(0, x, y)     
@@ -257,46 +256,46 @@ class Works:  ## small functions that were in ShadowMaker
         QTimer.singleShot(100, self.maker.updateShadow)
         
     def flopPath(self):                                               
-        x0, y0 = self.maker.path[0].x(), self.maker.path[0].y()
-        x1, y1 = self.maker.path[1].x(), self.maker.path[1].y()
+        x0, y0 = self.maker.corners[0].x(), self.maker.corners[0].y()
+        x1, y1 = self.maker.corners[1].x(), self.maker.corners[1].y()
         d = x1 - x0
 
-        self.maker.path[0] = QPointF(x1 - d, y1)
-        self.maker.path[1] = QPointF(x0 + d, y0)
+        self.maker.corners[0] = QPointF(x1 - d, y1)
+        self.maker.corners[1] = QPointF(x0 + d, y0)
 
-        x2, y2 = self.maker.path[2].x(), self.maker.path[2].y()
-        x3, y3 = self.maker.path[3].x(), self.maker.path[3].y()
+        x2, y2 = self.maker.corners[2].x(), self.maker.corners[2].y()
+        x3, y3 = self.maker.corners[3].x(), self.maker.corners[3].y()
         d = x3 - x2
 
-        self.maker.path[2] = QPointF(x3 - d,y3)
-        self.maker.path[3] = QPointF(x2 + d, y2)
+        self.maker.corners[2] = QPointF(x3 - d,y3)
+        self.maker.corners[3] = QPointF(x2 + d, y2)
                  
         self.maker.addPoints() 
-        x, y = self.maker.path[0].x(),  self.maker.path[0].y()
+        x, y = self.maker.corners[0].x(),  self.maker.corners[0].y()
         self.maker.updatePoints(0, x, y)    
         
-        x, y = self.maker.path[1].x(),  self.maker.path[1].y()
+        x, y = self.maker.corners[1].x(),  self.maker.corners[1].y()
         self.maker.updatePoints(1, x, y)
         
 ### --------------------------------------------------------            
     def rotateScale(self, per, inc):  ## uses path rather than pts 
         self.maker.shadow.setOriginPt() 
         
-        x, y, w, h = getCrop(self.maker.path)   ## uses getCrop 
+        x, y, w, h = getCrop(self.maker.corners)   ## uses getCrop 
         centerX, centerY = x + w/2, y + h/2
           
         self.maker.shadow.setTransformOriginPoint(centerX, centerY)
         self.maker.shadow.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-           
+ 
         for i in range(4):  ## if you don't get 4 points...  
-            dist = distance(self.maker.path[i].x(), centerX, self.maker.path[i].y(), centerY) 
+            dist = distance(self.maker.corners[i].x(), centerX, self.maker.corners[i].y(), centerY) 
               
             xdist, ydist = dist, dist      
             xdist = dist + (dist * per)              
             ydist = xdist
            
-            deltaX = self.maker.path[i].x() - centerX
-            deltaY = self.maker.path[i].y() - centerY
+            deltaX = self.maker.corners[i].x() - centerX
+            deltaY = self.maker.corners[i].y() - centerY
 
             angle = math.degrees(math.atan2(deltaX, deltaY))
             angle = angle + math.ceil( angle / 360) * 360
@@ -304,7 +303,7 @@ class Works:  ## small functions that were in ShadowMaker
             plotX = centerX + xdist * math.sin(math.radians(angle + inc))
             plotY = centerY + ydist * math.cos(math.radians(angle + inc))
            
-            self.maker.path[i] = QPointF(plotX, plotY)
+            self.maker.corners[i] = QPointF(plotX, plotY)
             self.maker.updatePoints(i, plotX, plotY)
                  
         self.maker.updateShadow('nope')  ## entering a string turns off the outline

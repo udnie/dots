@@ -1,15 +1,14 @@
 
+
 import os
 import time
 import math  
 import subprocess
 
-from functools          import partial
-
 from PyQt6.QtCore       import Qt, QTimer, QPoint, QRect, QSizeF, QUrl
 from PyQt6.QtGui        import QGuiApplication, QCursor
-from PyQt6.QtWidgets    import QSlider, QHBoxLayout, QLabel, QFileDialog, \
-                                QPushButton, QFrame, QSizePolicy, QMessageBox
+from PyQt6.QtWidgets    import QSlider, QHBoxLayout, QLabel, QFrame, \
+                                QPushButton, QSizePolicy, QMessageBox
 
 from PyQt6.QtMultimedia         import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets  import QVideoWidget, QGraphicsVideoItem
@@ -19,6 +18,8 @@ from PyQt6.QtMultimediaWidgets  import QVideoWidget, QGraphicsVideoItem
 from videoClipsWidget   import *
 from videoClipsMaker    import Ext  
 from videoPlayerHelp    import VideoHelp, SlideShowHelp, VideoHelpWidget
+
+WID, HGT, PAD = 40, 140, 100 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
 ### -------------------------------------------------------- 
 ''' The function getMetaData and code shared by both videoPlayers 
@@ -33,6 +34,7 @@ class MediaPlayer(QMediaPlayer):
         super().__init__()
         
         self.parent = parent
+        self.shared = parent.shared
     
         self.mediaPlayer = QMediaPlayer(self) ## 6
         # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5 
@@ -51,7 +53,7 @@ class MediaPlayer(QMediaPlayer):
             
         self.mediaPlayer.mediaStatusChanged[QMediaPlayer.MediaStatus].connect(self.mediaStateChanged) 
        
-        if self.parent.sliderVisible:  ## you'll need to load a file to kickstart the slider if it won't move
+        if self.shared.sliderVisible:  ## you'll need to load a file to kickstart the slider if it won't move
             self.mediaPlayer.positionChanged.connect(self.parent.shared.positionChanged)
             self.mediaPlayer.durationChanged.connect(self.parent.shared.durationChanged)
              
@@ -88,7 +90,7 @@ class MediaPlayer(QMediaPlayer):
             self.stopVideo() 
 
     def stopVideo(self):  
-        if self.parent.loopSet == False: 
+        if not self.shared.loopSet: 
             self.mediaPlayer.stop()
             self.setPosition(0) 
             self.mediaPlayer.pause() 
@@ -108,19 +110,26 @@ class Shared:
         
         self.parent = parent
         self.player = 'shared'
-        self.helpMenus = False
-        self.firstRightClk = False
         
+        self.helpMenus = False
+        self.videoPlaying = False
+        self.loopSet = False
+        
+        self.frameVisible = True
+        self.sliderVisible = True 
+      
 ### --------------------------------------------------------
-    def openPlayer(self, key):  ## from keyboard or helpMenu - default on open      
-        self.closeHelpMenu() 
+    def openPlayer(self, key):  ## from keyboard or helpMenu - default on open     
+        self.closeHelpMenu()    
+        if key == 'S' and self.videoPlaying:
+            self.stopVideo()  ## next 'S' is the square format 
+            return   
         if self.parent.player == "two": 
-            self.parent.closeMediaPlayer()  ## <- "two"
-   
-        if key in AspKeys:    
+            self.parent.closeMediaPlayer()  
+        try:  
             self.parent.clips.setDefaultSizes(key)  ## sets self.aspect
-            self.parent.shared.setScreenFormat()  ## just resize it
-        else:
+            self.setScreenFormat()  ## just resize it
+        except:
             self.msgbox('Unknown key entered')
             return
 
@@ -146,6 +155,18 @@ class Shared:
             self.msgbox("setAspectRatio: error reading getMetaData")
             return False  
     
+    def setFileNameInMediaPlayer(self, fileName):
+        if not self.parent.mediaPlayer.setFileName(fileName): 
+            self.msgbox('error setting mediaPlayer')
+            return False  
+        return True 
+        
+    def setAutoAspect(self, fileName):
+        if self.parent.clips.AutoAspect and not self.parent.clips.MakeClips:
+            if not self.setAspectRatio(fileName): ## skip it and open without
+                return
+        return  ## hasn't been updated
+    
     def moveAndSet(self):
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()
         y = VertH if self.parent.aspect < 1.0 else HorzH
@@ -156,51 +177,44 @@ class Shared:
   
     ## if 'O', ctr on background requires more than just the video size
     def setVideoWH(self):  ## from setDisplaySize
-        hgt = HGT if self.parent.sliderVisible == True else HGT-PAD   
+        hgt = HGT if self.sliderVisible else HGT-PAD   
         self.parent.VideoH = int((self.parent.height()-hgt) * 1.20)
         self.parent.VideoW = int(self.parent.VideoH * self.parent.aspect)
   
     def setScreenFormat(self):  ## just resize it - single key format
         self.parent.flag = True
-        hgt = HGT if self.parent.sliderVisible == True else HGT-PAD  
+        hgt = HGT if self.sliderVisible else HGT-PAD  
         self.parent.resize(self.parent.ViewW+WID, self.parent.ViewH+hgt) 
         self.moveAndSet()  
                      
-### --------------------------------------------------------
-    def openDirectory(self):  ## in clips - point to a directory to read from  
-        if self.parent.clips.settings != None:
-            self.parent.clips.closeSettings()
-        
-        self.parent.closeMediaPlayer() if self.parent.player == 'two' else\
-            self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler 
-        if self.parent.clips.MakeClips == False: 
-            self.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
-            return      
-        if self.parent.clips.SkipFrames:
-            self.parent.clips.openFile(True)   ## <- "one"
-        else:
-            path = QFileDialog.getExistingDirectory(self.parent, '')
-            if path == None or path == '':
-                return  
-            title = self.parent.clips.setTitle(path)    
-            self.parent.setFileName(title)      
-            QTimer.singleShot(20, partial(self.parent.clips.assembler, os.getcwd(), title))
-  
+  ### --------------------------------------------------------          
+    def looper(self): 
+        if not self.loopSet:
+            self.loopSet = True
+            self.parent.loopButton.setText('LoopOn')
+            self.parent.stopButton.setEnabled(False)
+            time.sleep(.03)   
+        elif self.loopSet:
+            self.looperOff()
+            if self.parent.mediaPlayer != None:
+                self.parent.shared.stopVideo()
+            time.sleep(.03)
+ 
+    def looperOff(self):
+        self.loopSet = False
+        self.parent.loopButton.setText('Loop')
+        self.parent.stopButton.setEnabled(True)
+                   
 ### --------------------------------------------------------
     def openHelpMenu(self):
-        p = self.parent.pos()
         if self.parent.helpFlag:
             self.closeHelpMenu()
         else:
             self.parent.helpMenu = VideoHelp(self.parent)
             self.parent.helpFlag = True
-            if self.parent.player == "two" and self.parent.frameHidden:
-                if self.firstRightClk == False:
-                    self.parent.move(p.x(), p.y()-28)
-                    self.firstRightClk = True
-         
+            time.sleep(.03)
+ 
     def closeHelpMenu(self):
-        p = self.parent.pos()
         if self.parent.helpMenu != None: 
             self.parent.helpMenu.tableClose()
             self.parent.helpMenu.close()
@@ -208,21 +222,18 @@ class Shared:
             time.sleep(.03)
             if self.helpMenus:
                 self.closeVideoSlideMenus()
-            if self.parent.player == "two" and self.parent.frameHidden:
-                if self.firstRightClk:
-                    self.parent.move(p.x(), p.y())
-                    self.firstRightClk = False
-                
-    def openVideoSlideMenus(self):
+         
+    def videoSliderMenus(self):  ## from videoplayerhelp
         self.helpMenus = True
         self.vwidget   = VideoHelpWidget(self.parent)
-        self.settings  = Settings(self.parent, 'aaa')
+        self.settings  = Settings(self.parent, 'aaa', 10)
         self.videohelp = VideoHelp(self.parent, -415, 'aaa')
-        self.slidehelp = SlideShowHelp(self.parent, 425, 'aaa')
+        self.slidehelp = SlideShowHelp(self.parent, 428, 'aaa')
     
     def closeVideoSlideMenus(self):
         if self.helpMenus:    
             self.settings.close()
+            time.sleep(.03)
             self.videohelp.table.close()
             self.slidehelp.table.close()
             self.vwidget.close() 
@@ -232,22 +243,26 @@ class Shared:
     def playVideo(self):  ## setButtons and setSlider don't know about mediaPlayer
         if self.parent.mediaPlayer != None:
             self.parent.mediaPlayer.playVideo()
+            self.videoPlaying = True
       
     def stopVideo(self):  
         if self.parent.mediaPlayer != None:
+            if self.loopSet:
+                self.looperOff()
             self.parent.mediaPlayer.stopVideo()
             time.sleep(.03)
+            self.videoPlaying = False
             
     def setPosition(self, position):  ## called by slider if finger pull
         if self.parent.mediaPlayer != None:
             self.parent.mediaPlayer.setPosition(position)
     
     def positionChanged(self, position):  
-        if self.parent.sliderVisible:  
+        if self.sliderVisible:  
             self.parent.slider.setValue(position)     
             
     def durationChanged(self, duration):
-        if self.parent.sliderVisible: 
+        if self.sliderVisible: 
             self.parent.slider.setRange(0, duration)  
   
 ### --------------------------------------------------------
@@ -269,40 +284,56 @@ class Shared:
                 return k
         return None
    
-    def toggleSlider(self):
+    def toggleSlider(self):  ## now all
         self.parent.flag = True
-        if self.parent.sliderVisible and self.parent.height() > MinHgt+PAD: 
-            self.parent.sliderVisible = False  
+        self.toggleFrameless()
+        if self.sliderVisible and self.parent.height() > MinHgt+PAD: 
+            self.sliderVisible = False  
             self.parent.slider.hide()
+            self.parent.buttons.hide()
             self.parent.resize(self.parent.width(), self.parent.height()-PAD)
             time.sleep(.03)      
-        elif self.parent.sliderVisible == False:
+        elif not self.sliderVisible:
             self.parent.slider.show()
-            self.parent.sliderVisible = True
+            self.parent.buttons.show()
+            self.sliderVisible = True
             self.parent.resize(self.parent.width(), self.parent.height()+PAD)
-            time.sleep(.03)    
-                                           
+            time.sleep(.03) 
+
+    def toggleFrameless(self):  ## from toggleSlider
+        p = self.parent.pos()
+        if not self.frameVisible:  ## make it visible 
+            self.parent.setWindowFlags(self.parent.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
+            self.frameVisible = True
+            self.parent.move(p.x(), p.y()-28) 
+        else:
+            self.parent.setWindowFlags(self.parent.windowFlags() | Qt.WindowType.FramelessWindowHint)
+            self.frameVisible = False
+            self.parent.move(p.x(), p.y()+28)  ## keep the frame stationary
+        self.closeHelpMenu()
+        self.parent.show()
+        
 ### -------------------------------------------------------           
-def getDirection(self):  ## left out top, topleft and topright - feel free to add them
-    corner, which = 5, ''      
-    pos = self.mapFromGlobal(QCursor.pos())
-    
-    bottomLeft  = self.rect().bottomLeft()
-    bottomRight = self.rect().bottomRight()
+    def getDirection(self):  ## left out top, topleft and topright - feel free to add them
+        corner, which = 6, ''      
+        pos = self.parent.mapFromGlobal(QCursor.pos())
         
-    if QRect(QPoint(bottomLeft.x()-(1*corner), bottomLeft.y()-(3*corner)),
-        QPoint(bottomLeft.x()+(3*corner), bottomLeft.y()+(1*corner))).contains(pos):
-        which = 'botleft'
-        
-    elif QRect(QPoint(bottomRight.x()-(3*corner), bottomRight.y()-(3*corner)),
-        QPoint(bottomRight.x()+(1*corner), bottomRight.y()+(1*corner))).contains(pos):
-        which = 'botright'
-        
-    elif QRect(QPoint( bottomLeft.x()-(2*corner), bottomLeft.y()-(3*corner)),
-        QPoint(bottomRight.x()+(2*corner), bottomRight.y()+(1*corner))).contains(pos):
-        which = 'bottom'
-                    
-    return which
+        bottomLeft  = self.parent.rect().bottomLeft()
+        bottomRight = self.parent.rect().bottomRight()
+            
+        if QRect(QPoint(bottomLeft.x()-(1*corner), bottomLeft.y()-(3*corner)),
+            QPoint(bottomLeft.x()+(3*corner), bottomLeft.y()+(1*corner))).contains(pos):
+            which = 'botleft'
+            
+        elif QRect(QPoint(bottomRight.x()-(3*corner), bottomRight.y()-(3*corner)),
+            QPoint(bottomRight.x()+(1*corner), bottomRight.y()+(1*corner))).contains(pos):
+            which = 'botright'
+            
+        elif QRect(QPoint( bottomLeft.x()-(2*corner), bottomLeft.y()-(3*corner)),
+            QPoint(bottomRight.x()+(2*corner), bottomRight.y()+(1*corner))).contains(pos):
+            which = 'bottom'
+                        
+        return which
 
 ### --------------------------------------------------------
 def setSlider(self):
@@ -339,13 +370,13 @@ def setButtons(self):
     self.stopButton = QPushButton("Stop")
     self.byeButton  = QPushButton("Quit")
     
-    self.openButton.clicked.connect(self.clips.openFile) if self.player == "one"\
+    self.openButton.clicked.connect(self.openFile) if self.player == "one"\
         else self.openButton.clicked.connect(self.openFile)         ## <- "two"
     
     self.playButton.clicked.connect(self.shared.playVideo)
     if self.player == "one":
         self.aspButton.clicked.connect(self.setAspButton)
-    self.loopButton.clicked.connect(self.clips.looper)
+    self.loopButton.clicked.connect(self.shared.looper)
     self.stopButton.clicked.connect(self.shared.stopVideo)
     self.byeButton.clicked.connect(self.bye)
 
@@ -366,16 +397,16 @@ def setButtons(self):
     hbox = QHBoxLayout(self)
     hbox.addWidget(self.buttonGroup)
 
-    self.bGroup = QLabel()
+    self.buttons = QLabel()
     self.buttonGroup.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-    self.bGroup.setFixedHeight(60)
-    self.bGroup.setLayout(hbox)
+    self.buttons.setFixedHeight(60)
+    self.buttons.setLayout(hbox)
     
-    return self.bGroup
+    return self.buttons
     
 ### --------------------------------------------------------
 ### detect video width and height to set aspect ratio 
-### --------------------------------------------------------
+### --------------------------------------------------------      
 def getMetaData(path):    
     ''' requires opencv-python - may not always report width/height correctly 
         for non 9:16 verticals - initial method - not mac specific '''

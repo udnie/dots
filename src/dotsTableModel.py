@@ -3,13 +3,13 @@ from PyQt6.QtCore       import Qt, QAbstractTableModel
 from PyQt6.QtGui        import QColor, QFont
 from PyQt6.QtWidgets    import QTableWidget, QTableWidgetItem, QAbstractItemView
 
-CTR = True
-
 QL = QColor(230,230,230)  ## 10% gray
 QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
-
+SD = QColor(115,252,214,125)  ## spindrift-lite
 RH = 30
+
+CTR = True
 
 Types = ['frame', 'pix', 'video', 'bkg', 'flat']  ## used by tableMaker
 
@@ -113,14 +113,14 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                 if index.column() == 0:
                     return index.row()
     
-                if isinstance(val, bool) and index.column() == 12:  ## scroller
-                    if str(val) == 'True':        
-                        return 'mirrored'
-                    else:
-                        return 'continuous' 
-                    
+                if index.column() == 13 and isinstance(val, bool):
+                    return 'mirrored' if str(val) == 'True' else  'continuous' 
+                 
                 elif isinstance(val, str) and val[-1] == '/':
                     return val[5:-1]
+                
+                elif isinstance(val, list) and index.column() > 15:
+                    return val[1]  ## pathXY - corners
                 
                 return self._data[index.row()][index.column()]
     
@@ -161,10 +161,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
               
                 if self.rowheaders.get(index.row()): ## center 'type' header titles 
                     return Qt.AlignmentFlag.AlignCenter    
-                 
-                if index.column() == 2:  ## types
-                    return Qt.AlignmentFlag.AlignCenter
-                
+            
                 elif index.column() == 1 and val == 'flat':
                     return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter 
                  
@@ -172,6 +169,9 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
                     return Qt.AlignmentFlag.AlignLeft + Qt.AlignmentFlag.AlignVCenter   
                      
                 elif isinstance(val, int) or isinstance(val, float) or val[0] == '#':
+                    return Qt.AlignmentFlag.AlignRight + Qt.AlignmentFlag.AlignVCenter  
+                
+                elif index.column() > 15 and isinstance(val, list):
                     return Qt.AlignmentFlag.AlignRight + Qt.AlignmentFlag.AlignVCenter  
                     
                 elif val in Types and index.column() == 1:
@@ -191,7 +191,7 @@ class TableModel(QAbstractTableModel):  ## used by tableMaker
        
     def setHdrColor(self, row, color):  ## happens in tableView - tags a row by index
         self.rowheaders[row] = color
-        
+      
     def setHdrFonts(self, row, font):  
         self.rowfonts[row] = font 
         

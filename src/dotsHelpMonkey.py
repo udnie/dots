@@ -8,16 +8,16 @@ from dotsSideGig        import *
 from dotsTableModel     import TableWidgetSetUp, QL, QC, QH
 
 pixKeys = {  ## sprites
-    ' F ':      'Flop It',   
-    ' H ':      'This Help Menu',
-    ' T ':      'Toggle Lock',
+    ' F ':  'Flop It',   
+    ' H ':  'This Help Menu',
+    ' T ':  'Toggle Lock',
     ' \\ ':     'Background Tag',
-    'del':      'delete from screen', 
+    'delete':   'Delete from screen', 
     'enter':    'move to the front',
     'return':   'move to the front',   
     'shift':    'move back one ZValue', 
     'opt':      'drag Mouse to Clone', 
-     '_/+':  'Rotate 1 deg',  
+     '_/+': 'Rotate 1 deg',  
     '-/=':  'Rotate 15 deg',
     '[/]':  'Rotate 45 deg',
     '{/}':  'Rotate 90 deg',
@@ -32,7 +32,7 @@ bkgHelpKeys = {
     ' M ':      'Matte',
     ' T ':      'Toggle Lock',
     ' \\ ':     'Background Tag',
-    'del':      'delete from screen',  
+    'delete':   'delete from screen',  
     'enter':    'move to the front',
     'return':   'move to the front',    
     'shift':    'move to the back',
@@ -46,7 +46,7 @@ shadowKeys = {
     ' T ':      'Toggles Link', 
     ' / ':      'Refresh Shadow',
     ' \\ ':     'Background Tag',
-    'del':      'Delete from screen', 
+    'delete':   'Delete from screen', 
     'enter':    'Move to the front',
     'return':   'Move to the front',   
     'shift':    'Move back 3 zvalues',  ## otherwise it still covers the sprite
@@ -126,6 +126,8 @@ class PixHelp:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help == '\\': 
                     help = 'tag'
+                elif help == 'delete': 
+                    help = 'del'
                 elif help == 'H':
                     self.closeMenu()        ## pixiitem has its own sharedkeys
                 if help != 'H' and help in self.pixitem.sharedKeys:
@@ -179,6 +181,8 @@ class BkgHelp:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help == '\\': 
                     help = 'tag'    
+                elif help == 'delete': 
+                    help = 'del'
                 elif help == 'option':
                     help = 'opt'  
                 if help != 'H' and help in self.bkgItem.sharedKeys:
@@ -247,13 +251,14 @@ class ShadowHelp:
         self.table.move(x, y)          
         self.table.show() 
  
- 
     def clicked(self):
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
                 if help == '\\': 
                     help = 'tag'
+                elif help == 'delete': 
+                    help = 'del'
                 if help != 'H' and help in SharedKeys:
                     QTimer.singleShot(25, partial(self.maker.shadow.shared, help))
             except:

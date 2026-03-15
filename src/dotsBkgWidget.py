@@ -262,7 +262,7 @@ class BkgWidget(QWidget):
             runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))  ## run a scroller  
             self.lockBtn.clicked.connect(self.bkgScrollWrks.toggleBkgLocks)   
             flopBtn.clicked.connect(lambda: self.bkgMaker.flopIt(self.bkgItem))  
-            matteBtn.clicked.connect(lambda: self.bkgMaker.openMatte(self.bkgItem))  ## only place its called
+            matteBtn.clicked.connect(lambda: self.bkgWorks.openMatte(self.bkgItem))   ## only place its called
             centerBtn.clicked.connect(self.bkgWorks.centerBkg)   
             deleteBtn.clicked.connect(lambda: self.bkgMaker.deleteBkg(self.bkgItem))  
             quitBtn.clicked.connect(self.bkgWorks.closeWidget) 

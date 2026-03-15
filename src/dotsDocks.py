@@ -104,7 +104,7 @@ def addScrollBtnGroup(self):
     self.scrollGroup = QGroupBox("Scroll Panel")  ## just that  
     self.scrollGroup.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
-    if self.dots.Vertical == False or common['Screen'] == 'SQV':  ## set in dotsQt    
+    if not self.dots.Vertical and common['Screen'] != 'SQH':     
         btnTop = QPushButton("Top")
         btnBottom = QPushButton("Bottom")
         btnClear = QPushButton("Clear")
@@ -135,7 +135,7 @@ def addScrollBtnGroup(self):
     
         self.scrollGroup.setLayout(layout)
     else:   
-        if common['Screen'] != '912': 
+        if common['Screen'] not in ('912', '960V'):
             self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])  ## 1024,1102 ... 
         else:
             self.scrollGroup.setFixedWidth(vert900['scrollGrp']) 
@@ -168,11 +168,11 @@ def addPlayBtnGroup(self):
     if not self.dots.Vertical:  ## nothing changes but the width
         self.playGroup.setFixedWidth(docks['playGrp'])
         
-    elif common['Screen'] != '912':
+    elif common['Screen'] not in ('912', '960V','SQH', 'SQV'): 
         self.playGroup.setFixedWidth(newWidths['playGrp'])
         
     else:
-        self.scrollGroup.setFixedWidth(vert900['playGrp']) 
+        self.scrollGroup.setFixedWidth(vert900['playGrp']-20) 
                
     btnLoad  = QPushButton("Load")
     self.btnRun   = QPushButton("Run")  
@@ -246,7 +246,7 @@ def addCanvasBtnGroup(self):
     bkg = self.bkgMaker
     pathMaker = self.pathMaker
 
-    if self.dots.Vertical == False and common['Screen'] != 'SQH':
+    if not self.dots.Vertical:
         btnClrCanvas = QPushButton("Clear")
         self.btnPathMaker = QPushButton("PathMaker")
         btnSnapShot = QPushButton("Shapshot")  
@@ -274,11 +274,14 @@ def addCanvasBtnGroup(self):
         else:
             self.canvasGroup.setFixedWidth(vert900['canvasGrp'])
         
+        if common['Screen'] == '960V':
+            self.canvasGroup.setFixedWidth(newWidths['canvasGrp']-30)
+           
         btnClrCanvas = QPushButton("Clear")  ## add background, remove pixtext   
         self.btnAddBkg  = QPushButton("BackGround")
         self.btnPathMaker = QPushButton("PathMaker") 
         btnExit = QPushButton("Exit")
-         
+        
         layout = QHBoxLayout()  
     
         layout.addWidget(btnClrCanvas) 

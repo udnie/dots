@@ -142,8 +142,8 @@ class PathMaker(QWidget):
                 self.edits.editPoints()
             
         elif self.key == 'L' and self.editingPts:  ## turn lasso on/off
-            self.edits.newLasso() if self.lassoOn == False \
-                else self.edits.deleteLasso()
+            self.edits.newLasso() if not self.lassoOn else \
+                self.edits.deleteLasso()
                                                                
         elif self.key in self.editKeys and self.editingPts:
             self.editKeys[self.key]()  
@@ -153,7 +153,7 @@ class PathMaker(QWidget):
             if len(self.selections) > 0:
                 self.edits.updatePath()
 
-        elif self.pathWays.tagCount() == 0 and self.addingNewPath == False:
+        elif self.pathWays.tagCount() == 0 and not self.addingNewPath:
             if self.key in self.direct:
                 self.direct[self.key]() 
 
@@ -194,7 +194,7 @@ class PathMaker(QWidget):
 
 ### --------------------------------------------------------
     def initPathMaker(self):  ## from docks button
-        if len(self.scene.items()) > 0 and self.canvas.pathMakerOn == False:
+        if len(self.scene.items()) > 0 and not self.canvas.pathMakerOn:
             MsgBox('Clear Scene First to run PathMaker', 5)
             return
         if self.canvas.pathMakerOn:
@@ -202,7 +202,7 @@ class PathMaker(QWidget):
         else:
             self.canvas.pathMakerOn = True 
             self.initThis()
-            if self.canvas.keysPanel.pathKeysSet == False:
+            if not self.canvas.keysPanel.pathKeysSet:
                 self.canvas.keysPanel.setPathKeys()
             self.pathWorks.turnGreen()
             self.pathWorks.addWidget()  ## on start up 
@@ -215,7 +215,7 @@ class PathMaker(QWidget):
         elif self.canvas.videoPlayer != None:  ## make sure it's stopped
             self.canvas.videoPlayer.stopVideo()
 
-        self.editingPts == False
+        self.editingPts = False
         self.edits.deleteLasso()    ## reset cursor
         self.edits.deleteNewPath()  ## turns green if nothing else
         self.edits.removeNewPath()

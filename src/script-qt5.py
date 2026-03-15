@@ -5,7 +5,8 @@
 ### -------------------------------------------------------
 import os
 
-files = ["dotsHelpMenus.py", \
+files = ["dotsBkgMatte.py",\
+        "dotsHelpMenus.py", \
         "dotsHelpMaker.py", \
         "dotsVideoPlayer.py", \
         "dotsTableMaker.py", \
@@ -16,8 +17,30 @@ for file in files:
     lines = []
     with open(file, 'r') as fp: 
         for line in fp:
-            
-            if file == "dotsHelpMenus.py":  
+    
+            if file == "dotsBkgMatte.py": 
+                if  '## 5' in line:
+                    if 'NoDropShadow' in line:
+                        if '## 5' in line:
+                            i = line.index('## 5') 
+                            line = line[0:i].rstrip()
+                            i = line.index('Hint')  
+                            line = line[0:i+4]
+                            line = line + '|\\' + '\n'
+                    
+                    if 'StaysOnTop' in line:
+                        if '## 5' in line:
+                            i = line.index('## 5') 
+                            line = line[0:i].rstrip()
+                            i = line.index('#')
+                            line = line[0:i] + line[i+2:] + '\n'
+                        
+                elif '##-5' in line:
+                    i = line.index('##-5') 
+                    line = line[0:i].rstrip()
+                    line = line[0:7] + line[9:] + '\n'
+                     
+            elif file == "dotsHelpMenus.py":  
                 if '45' in line:
                     i = line.index('45') 
                     line = line[0:i] + '59' + line[i+2:]

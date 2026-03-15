@@ -52,6 +52,7 @@ class ShowBiz:
     def keysInPlay(self, key):
         if key == 'X':  ## from help menus
             self.canvas.exit()    
+
         if key in ('G', 'K', 'R'):
             match key:
                 case'G':
@@ -80,13 +81,17 @@ class ShowBiz:
 ### --------------------------------------------------------    
     ## no animations running - from storyboard menu
 ### --------------------------------------------------------  
-            elif self.canvas.control == '' or self.canvas.animationRunning == False:                     
-                if key in ('A', 'D', 'J', 'L', 'M', 'N', 'O', 'S', 'U', 'V', 'W'):           
+            elif self.canvas.control == '' or not self.canvas.animationRunning:                     
+                if key in ('A', 'D', 'J', 'L', 'M', 'N', 'O', 'S','T', 'U', 'V', 'W', 'del'):           
                     match key:
                         case 'A':            
-                            self.sideCar2.selectAll()               
-                        case 'D':
-                            self.sideCar2.deleteSelected()              
+                            self.sideCar2.unSelect() if self.scene.selectedItems() else \
+                                self.sideCar2.selectAll()    
+                        case 'D'|'del':
+                            if self.scene.selectedItems():
+                                self.sideCar2.deleteSelected() 
+                            elif len(self.scene.items()) > 0:
+                                self.sideCar2.sendPixKeys('del')         
                         case 'J':                   ## view a play file's records
                             if dlist := self.showRunner.openPlay(self.canvas.openPlayFile):  
                                 self.showRunner.makeTableView(dlist, 'view')   
@@ -102,6 +107,8 @@ class ShowBiz:
                             self.sideCar.toggleOutlines()   ## run from shadowWorks                    
                         case 'S':
                             self.showtime.savePlay()
+                        case 'T':
+                            self.mapper.toggleSelectedSceneItems()    
                         case 'U':                           ## unselect for storyBoard
                             self.sideCar2.unSelect()            
                         case 'V':
@@ -109,13 +116,12 @@ class ShowBiz:
                                 self.canvas.videoPlayer.ask2deleteVideo() 
                         case 'W':              
                             self.sideCar.clearWidgets() 
-    
+                            
 ### --------------------------------------------------------                      
     ## canvas single key commands - no screenitems
 ### --------------------------------------------------------  
         elif len(self.scene.items()) == 0:    
-              
-            if self.demoAvailable:  ## always clear unless deleted
+            if self.demoAvailable:  ## does the demo directory exist 
                 self.canvas.clear()  
             if key in ('A', 'D', 'J', 'L', 'M', 'P', 'S'):                 
                 match key:

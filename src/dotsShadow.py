@@ -27,7 +27,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         self.maker   = parent  ## shadowMaker
         self.canvas  = self.maker.canvas
         self.pixitem = self.maker.pixitem
-        self.path    = self.maker.path
+        self.corners = self.maker.corners
         self.mapper  = self.canvas.mapper
        
         self.setZValue(self.pixitem.zValue()-1) 
@@ -93,13 +93,13 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                 self.setZValue(self.zValue()-3)
             case 'enter' | 'return':    # send to front
                 self.setZValue(self.mapper.toFront(1))  
-            case 'tag':                  ## '\' backslash
+            case 'tag':                  ## '\' backslash just show it 
                 self.tagThis()
             case 'H':  
                 self.maker.openMenu() 
             case 'T':     
-                self.linkShadow() if self.maker.linked == False \
-                    else self.unlinkShadow()
+                self.linkShadow() if not self.maker.linked else \
+                    self.unlinkShadow()
                 self.tagThis() 
             case '/':  ## fixes cut off shadow if partial offscreen
                 self.maker.updateShadow('nope') 
@@ -111,7 +111,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
          
     def mouseMoveEvent(self, e):
-        if self.maker.linked == False:
+        if not self.maker.linked:
             self.dragCnt += 1
             if self.dragCnt % 5 == 0:  ## updatePath handles dblclk           
                 self.maker.updatePath(self.mapToScene(e.pos()))  
@@ -119,16 +119,17 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                           
     def mouseReleaseEvent(self, e): 
         self.key = '' 
-        if self.maker.linked == False:  
+        if not self.maker.linked:  
             self.maker.updatePath(self.mapToScene(e.pos()))            
-            if self.maker.dblclk == False:  
-                self.maker.works.hideOutline()                
+            if not self.maker.dblclk:  
+                self.maker.works.hideOutline()  
+        self.mapper.clearTagGroup()              
         e.accept()
    
     def mouseDoubleClickEvent(self, e):  ## if 'resume', 'pause', animation running
         if self.canvas.control not in ControlKeys and \
             self.key not in self.sharedKeys:    
-            if self.maker.linked == False:
+            if not self.maker.linked:
                 self.maker.works.toggleOutline()
             else:
                 self.tagThis()
@@ -179,7 +180,7 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
   
 ### --------------------------------------------------------        
     def initPoints(self):  ## initial path and points setting from maker.addShadow         
-        self.path = []
+        self.corners = []  ## the outline corners hi-lighted by points 
         self.maker.outline = None
         
         if self.canvas.openPlayFile == 'hats':  ## not needed 
@@ -239,10 +240,10 @@ def initShadow(file, w, h, flop):  ## replace all colors with grey
     return img, width, height, bytesPerLine
 
 ### --------------------------------------------------------          
-def setPerspective(path, w, h, cpy, viewW, viewH):  ## update gray copy based on path xy's         
+def setPerspective(corners, w, h, cpy, viewW, viewH):  ## update gray copy based on path xy's         
     p = []                      
     for i in range(4):  ## get current location of points from path
-        x,y = int(path[i].x()), int(path[i].y()) 
+        x,y = int(corners[i].x()), int(corners[i].y()) 
         p.append([x,y])
             
     dst = np.float32([p[0], p[1], p[3], p[2]])        

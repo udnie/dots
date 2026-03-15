@@ -61,7 +61,7 @@ class ShowWorks:
         p.path      = path
            
         p.setZValue(z)   
-        p.locked == True
+        p.locked = True
         p.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)          
    
 ### --------------------------------------------------------      

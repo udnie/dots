@@ -29,7 +29,7 @@ class PixWidget(QWidget):
         self.setAccessibleName('widget')
         
         self.save = QPointF()
-        self.WidgetW, self.WidgetH = 340.0, 265.0
+        self.WidgetW, self.WidgetH = 360.0, 285.0
                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
@@ -50,14 +50,14 @@ class PixWidget(QWidget):
                                                      
         self.show()
            
-        if self.switch in('on', 'all'):
+        if self.switch in('on', 'all'):  ## widget pos() set by pixitem
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')      
             if self.switch == 'on':
-                self.move(x-405,y-305)
+                self.move(x-420,y-320)
             else:
                 self.move(x-375,y-130)
-                      
+                   
 ### --------------------------------------------------------              
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -99,6 +99,11 @@ class PixWidget(QWidget):
             self.pix.setRotation(val) 
             self.pix.rotation = val    
             self.rotateValue.setText(f'{val:3}')
+                     
+    def Speed(self, val): 
+        if self.switch == '':
+            self.pix.speed = val    
+            self.speedValue.setText(f'{val:3}')
   
     def Scale(self,val):
         if self.switch == '':
@@ -121,7 +126,7 @@ class PixWidget(QWidget):
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')
         
-        groupBox.setFixedWidth(170)
+        groupBox.setFixedWidth(190)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
         groupBox.setStyleSheet('background: rgb(240, 240, 240)')
    
@@ -129,14 +134,25 @@ class PixWidget(QWidget):
         self.rotaryDial = QDial()
         self.rotaryDial.setMinimum(0)
         self.rotaryDial.setMaximum(360)
-        self.rotaryDial.setSingleStep(1)
-        self.rotaryDial.setValue(0)
-        self.rotaryDial.setFixedWidth(60)
+        self.rotaryDial.setSingleStep(5)
+        self.rotaryDial.setValue(5)
+        self.rotaryDial.setFixedHeight(55)
         self.rotaryDial.setWrapping(False)
         self.rotaryDial.setNotchesVisible(True)
-        self.rotaryDial.setNotchTarget(45.0)
+        self.rotaryDial.setNotchTarget(6.0)
         self.rotaryDial.valueChanged.connect(self.Rotate)
-     
+        
+        self.speedValue = QLabel('1', alignment=Qt.AlignmentFlag.AlignCenter)
+        self.speedDial = QDial()
+        self.speedDial.setMinimum(1)
+        self.speedDial.setMaximum(5)
+        self.speedDial.setSingleStep(1)
+        self.speedDial.setValue(0)
+        self.speedDial.setFixedHeight(50)
+        self.speedDial.setWrapping(False)
+        self.speedDial.setNotchesVisible(True)
+        self.speedDial.valueChanged.connect(self.Speed)   
+ 
         self.scaleValue = QLabel('1.00', alignment=Qt.AlignmentFlag.AlignRight)
         self.scaleSlider = QSlider(Qt.Orientation.Vertical)
         self.scaleSlider.setMinimum(25)
@@ -158,10 +174,19 @@ class PixWidget(QWidget):
         self.opacitySlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.opacitySlider.setTickInterval(16)  
         self.opacitySlider.valueChanged.connect(self.Opacity)
-                  
+      
+        abox = QVBoxLayout()  
+        abox.addSpacing(-5)    
+        abox.addWidget(self.rotaryDial)  
+        abox.addSpacing(5) 
+        abox.addWidget(self.rotateValue)         
+        abox.addSpacing(0) 
+        abox.addWidget(QLabel('Speed', alignment=Qt.AlignmentFlag.AlignCenter))
+        abox.addWidget(self.speedDial)  
+   
         sbox = QHBoxLayout()  ## sliders 
         sbox.addSpacing(-10)         
-        sbox.addWidget(self.rotaryDial)  
+        sbox.addLayout(abox)
         sbox.addSpacing(10)       
         sbox.addWidget(self.scaleSlider) 
         sbox.addSpacing(10)                
@@ -169,7 +194,7 @@ class PixWidget(QWidget):
         
         vabox = QHBoxLayout()  ## values
         vabox.addSpacing(0) 
-        vabox.addWidget(self.rotateValue)        
+        vabox.addWidget(self.speedValue)  
         vabox.addSpacing(0) 
         vabox.addWidget(self.scaleValue)     
         vabox.addSpacing(0) 

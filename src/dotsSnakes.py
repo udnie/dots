@@ -208,7 +208,7 @@ class Snakes:
             self.scroller.setPos(QPointF(0, self.scroller.runway))
                       
         if what in ('vertical', 'left'): 
-            self.scroller.addedScroller == False   
+            self.scroller.addedScroller = False   
             self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
             self.scene.addItem(self.scroller)
             

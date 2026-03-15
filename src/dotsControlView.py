@@ -122,15 +122,15 @@ class ControlView(QGraphicsView):
                 self.setKey('C')  ## clear canvas and storyboard, pathmaker if no edits
             
             elif key == Qt.Key.Key_F:
-                self.sideCar2.flopSelected() if self.canvas.pathMakerOn == False\
-                    else self.canvas.sideCar2.sendPixKeys('F')
+                self.sideCar2.flopSelected() if not self.canvas.pathMakerOn else \
+                    self.canvas.sideCar2.sendPixKeys('F')
                             
             elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
                 self.setKey('del')
                     
             elif key == Qt.Key.Key_Space:
-                if self.canvas.control != '' or self.canvas.animationRunning or self.canvas.videoPlayer != None:
-                    self.sideCar.pause()  ## SpaceBar - pause/resume
+                self.sideCar.pause() if self.canvas.control != '' or self.canvas.animationRunning \
+                    else self.canvas.sideCar.run()
                                 
 ### --------------------------------------------------------                                                        
     ## keys with modifiers
@@ -141,21 +141,21 @@ class ControlView(QGraphicsView):
                 if not self.canvas.pathMakerOn:
                     if mod & Qt.KeyboardModifier.ShiftModifier:
                         self.sideCar2.mirrorBkg(1) 
-                        
+                             
                     elif mod & Qt.KeyboardModifier.AltModifier:
                         self.sideCar2.mirrorBkg(-1) 
-                                                        
+                                                                
                     else:
                         self.sideCar2.bkgStuff()
                                                             
             elif key == Qt.Key.Key_D:    ## delete selected pts in pathmaker
                  self.setKey('delPts') if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn\
                     else self.setKey('D')
-                                                        
+                                                                  
             elif key == Qt.Key.Key_H:  ## toggles hides/unhides selections 
                 self.sideCar.toggleSelections() if mod & Qt.KeyboardModifier.ShiftModifier else\
-                    self.setKey('H')  ## help 
-                    
+                    self.setKey('H')  ## help     
+                           
             elif key == Qt.Key.Key_L:   ## this lets 'L' pass -- toggles sprites locked on/off
                 self.sideCar.toggleSpriteLocks() if mod & Qt.KeyboardModifier.ShiftModifier \
                     else self.setKey('L')  ## used by pathmaker to toggle lasso 
@@ -164,43 +164,48 @@ class ControlView(QGraphicsView):
            
             if key == Qt.Key.Key_M:
                 self.sideCar.dump() if mod & Qt.KeyboardModifier.ShiftModifier \
-                    else self.setKey('M')
-                    
+                    else self.setKey('M')    
+                        
             elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadowsand bkgs
                 self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else\
                     self.setKey('R')
                                                        
-            elif key == Qt.Key.Key_S:  ## toggles shadows linked on/off        
+            elif key == Qt.Key.Key_S:    
                 if mod & Qt.KeyboardModifier.ShiftModifier and \
-                    self.canvas.control == '':
-                        self.sideCar.toggleShadowLinks()  ## does them all                       
+                    self.canvas.control == '':   ## toggles shadows linked on/off     
+                        self.sideCar.toggleShadowLinks()  ## does them all     
+                        
+                elif mod & Qt.KeyboardModifier.AltModifier:
+                    self.sideCar2.playschk()           
                 else:
                     self.setKey('S')  
                                                             
             elif key == Qt.Key.Key_T:  ## toggles tags both link and lock
                 if self.canvas.pathMakerOn:
-                    self.setKey('T')
+                    self.setKey('T')        
                     
                 elif mod & Qt.KeyboardModifier.ShiftModifier or self.canvas.control !='':
                     self.mapper.toggleTagItems('all')       
+                       
                 else:
-                    self.canvas.sideCar2.sendPixKeys('T') 
+                    self.setKey('T') if self.canvas.scene.selectedItems() else \
+                        self.canvas.sideCar2.sendPixKeys('T') 
 
             elif key == Qt.Key.Key_U:  ## unlocks all sceneItems     
                 self.canvas.sideCar2.unlockAll() if mod & Qt.KeyboardModifier.ShiftModifier \
                     else self.setKey('U')  
 
         ## apple option key and cmd key - used by scroll panel to scroll tiles
-        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and \
-            self.canvas.pathMakerOn == False:
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and not self.canvas.pathMakerOn:
                 
             if mod & Qt.KeyboardModifier.AltModifier:  
                 self.sideCar.pageDown('1') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('-1')  ## scroll one tile   
-                                       
+                    self.sideCar.pageDown('-1')  ## scroll one tile         
+                                          
             elif mod & Qt.KeyboardModifier.ControlModifier:  
                 self.sideCar.pageDown('down') if key == Qt.Key.Key_Down else \
-                    self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1                            
+                    self.sideCar.pageDown('up')  ## scroll visibile tiles minus 1    
+                                            
             else:                  
                 self.setKey(singleKeys[key])  ## everyone else 
                                            

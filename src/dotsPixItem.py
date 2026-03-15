@@ -71,9 +71,10 @@ class PixItem(QGraphicsPixmapItem):
         self.part = ""  ## used by wings 
         self.sharedKeys = SharedKeys
   
-        self.alpha2  = 1.0  ## alpha was already being used and opacity can be a function
-        self.scale   = 1.0
-        self.rotation  = 0
+        self.alpha2 = 1.0  ## alpha was already being used and opacity can be a function
+        self.scale  = 1.0
+        self.rotation = 0
+        self.speed = 1  ## used by animation to modify duration 
              
         self.setZValue(self.id+100) if self.id < 100 else self.setZValue(self.id)
              
@@ -126,7 +127,7 @@ class PixItem(QGraphicsPixmapItem):
         if self.canvas.bkgMaker.widget != None:  ## so the widget can use movekwys to set rates
             return                               ## handled in bkgitem as well
         elif self.isHidden or self.isSelected():
-            if self.locked == False:
+            if not self.locked:
                 if key in RotateKeys:
                     self.works.rotateThis(key)
                 elif key in ("<",">"):
@@ -134,8 +135,8 @@ class PixItem(QGraphicsPixmapItem):
                 elif key in MoveKeys:
                     self.moveThis(MoveKeys[key])
                     
-    def mousePressEvent(self, e):    
-        if self.canvas.animationRunning == False:  ## 'resume', 'pause' - animation running
+    def mousePressEvent(self, e):   
+        if not self.canvas.animationRunning: ## 'resume', 'pause' - animation running
             ## right mouse clk triggers Animation menu (context menu) on selected screen items
             if e.button() == Qt.MouseButton.RightButton:
                 if len(self.scene.selectedItems()) == 0:
@@ -147,21 +148,20 @@ class PixItem(QGraphicsPixmapItem):
             self.dragAnchor = self.mapToScene(e.pos())
         e.accept()
 
-    def shared(self, key):  ## with help menu
+    def shared(self, key):  ## with help menu 
         match key:
-            case 'del':    
+            case 'del':   
                 self.deletePix()        
             case 'shift': 
-                self.setZValue(self.zValue()-1)      
-            case 'enter' | 'return':     # send to front
+                self.setZValue(self.zValue()-1)       
+            case 'tag':   
+                self.tagThis()   
+            case 'enter' | 'return':            ## send to front
                 self.setZValue(self.mapper.toFront(1))
-            case 'tag':                 ## '\' backslash
-                p = QCursor.pos()       ## tagBkg handles individual requests
-                tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20)))  
-            case 'T':   
-                self.lockSprite() if self.locked == False else self.unlockSprite()
-                tagBkg(self, self.pos())                        
-            case 'F':           ## flop it
+            case 'T':                    ## '\' backslash
+                self.lockSprite() if not self.locked else self.unlockSprite()
+                self.tagThis()                        
+            case 'F':                           ## flop it
                 self.setMirrored(False) if self.flopped else self.setMirrored(True)  
             case 'H':  
                 self.openMenu()     
@@ -196,7 +196,7 @@ class PixItem(QGraphicsPixmapItem):
         if self.canvas.control not in ControlKeys:  ## 'resume', 'pause' - animation running
             if self.canvas.key == 'noMap':   ## consumed map's dblclk need to set it back 
                 self.canvas.setKeys('')      
-                if self.isHidden == False or self.isSelected():
+                if not self.isHidden or self.isSelected():
                     self.setSelected(True) 
                     return      
             if self.key in self.sharedKeys:
@@ -205,7 +205,7 @@ class PixItem(QGraphicsPixmapItem):
                 self.setSelected(True) 
                 self.isHidden = False  
             elif self.canvas.key not in self.sharedKeys:
-                if self.isSelected() == False:
+                if not self.isSelected():
                     self.setSelected(True)  
                 elif self.isSelected():
                     self.setSelected(False)
@@ -222,12 +222,16 @@ class PixItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
     def addWidget(self):  ## won't work in works 
         self.works.closeWidget()
-        self.widget = PixWidget(self)      
-        x, y = self.works.makeXY()     
-        x = int(x - int(self.widget.WidgetW)-20)
-        y = int(y - int(self.widget.WidgetH)*.20)
+        self.widget = PixWidget(self)   
+         
+        x, y = self.works.makeXY()  ## uses maptoGlobal   
+        
+        x = x - int(self.widget.WidgetW + 15)
+        y = y - int(self.widget.WidgetH*.20)
+   
         self.widget.save = QPointF(x,y)
-        self.widget.setGeometry(x, y, int(self.widget.WidgetW), int(self.widget.WidgetH))
+        self.widget.move(x,y)
+        
         self.works.resetSliders()
         self.setLockBtnText()
 
@@ -245,14 +249,16 @@ class PixItem(QGraphicsPixmapItem):
                 self.shadow = self.shadowMaker.shadow  
                                                      
     def setMirrored(self, bool): 
-        self.flopped = bool
-        if self.flopped:
-            transform = QTransform().scale(-1,1)
-        else:
-            transform = QTransform().scale(1,1)
+        self.flopped = bool   
+        transform = QTransform().scale(-1,1) if self.flopped \
+            else QTransform().scale(1,1)
         pix = QPixmap.fromImage(self.imgFile)
         self.setPixmap(pix.transformed(transform))
         self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
+        
+    def tagThis(self):
+        p = QCursor.pos()
+        tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
 
 ### --------------------------------------------------------       
     def moveThis(self, key):
@@ -271,7 +277,7 @@ class PixItem(QGraphicsPixmapItem):
      
     def setLockBtnText(self):
         if self.widget != None:
-            self.widget.lockBtn.setText('Lock') if self.locked == False else \
+            self.widget.lockBtn.setText('Lock') if not self.locked else \
                 self.widget.lockBtn.setText('UnLock')    
         
     def lockSprite(self):

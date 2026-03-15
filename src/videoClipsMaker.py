@@ -67,7 +67,7 @@ class Clips:
     def setWidgetButtons(self, str):
         match str:
             case 'asp':
-                if self.AutoAspect == False:
+                if not self.AutoAspect:
                     self.AutoAspect = True
                     self.settings.aspBtn.setText('AutoAspectOn')
                 else: 
@@ -75,7 +75,7 @@ class Clips:
                     self.settings.aspBtn.setText('AutoAspect')
            
             case 'clips':
-                if self.MakeClips == False:
+                if not self.MakeClips:
                     self.MakeClips = True
                     self.settings.clpsBtn.setText('MakeClipsOn')
                 else: 
@@ -83,7 +83,7 @@ class Clips:
                     self.settings.clpsBtn.setText('MakeClipsOff')
            
             case 'first':
-                if self.FirstFrame == False:
+                if not self.FirstFrame:
                     self.FirstFrame = True
                     self.settings.firstBtn.setText('FirstFrameOn')  
                     if self.SkipFrames:
@@ -94,7 +94,7 @@ class Clips:
                     self.settings.firstBtn.setText('FirstFrame')
                          
             case 'skip':
-                if self.SkipFrames == False:
+                if not self.SkipFrames:
                     self.SkipFrames = True
                     self.settings.skipBtn.setText("NthFrameOn")
                     if self.FirstFrame:
@@ -105,7 +105,7 @@ class Clips:
                     self.settings.skipBtn.setText("NthFrame")                    
                          
             case 'filter':
-                if self.FilterOn == False:
+                if not self.FilterOn:
                     self.FilterOn = True
                     self.settings.filterBtn.setText('FilterOn')
                 else: 
@@ -113,7 +113,7 @@ class Clips:
                     self.settings.filterBtn.setText('Filter')       
             
             case 'play':
-                if self.PlayVideo == False:
+                if not self.PlayVideo:
                     self.PlayVideo = True
                     self.settings.playBtn.setText('PlayVideoOn')
                 else: 
@@ -121,7 +121,7 @@ class Clips:
                     self.settings.playBtn.setText('PlayVideo')  
                     
             case 'name':
-                if self.AddFileName == False:
+                if not self.AddFileName:
                     self.AddFileName = True
                     self.settings.nameBtn.setText('FileNameOn')
                 else: 
@@ -130,28 +130,30 @@ class Clips:
             case _:
                     return
                     
-### --------------------------------------------------------          
-    def looper(self): 
-        if self.parent.loopSet == False:
-            self.parent.loopSet = True
-            self.parent.loopButton.setText('LoopOn')
-            self.parent.stopButton.setEnabled(False)
-            time.sleep(.03)   
-        elif self.parent.loopSet:
-            self.looperOff()
-            if self.parent.mediaPlayer != None:
-                self.parent.shared.stopVideo()
-            time.sleep(.03)
- 
-    def looperOff(self):
-        self.parent.loopSet = False
-        self.parent.loopButton.setText('Loop')
-        self.parent.stopButton.setEnabled(True)
-        
-### --------------------------------------------------------  
-    def openFile(self, open=False):  ## opens one file, open=False, from the keyboard or helpMenu
+### --------------------------------------------------------
+    def closeThese(self):  
+        self.closeSettings() 
         self.parent.closeMediaPlayer() if self.parent.player == 'two' else\
-            self.parent.closeOnOpen()  ##  display as usual, open=True and SkipFrames, open the file in assembler   
+            self.parent.closeOnOpen()
+              
+    def makingClips(self):  ## by reading one or all files - "both"
+        if not self.MakeClips: 
+            self.parent.shared.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
+            return        
+        self.closeThese()         ## read every 'nth frame
+        self.skipFrames() if self.SkipFrames\
+            else self.readAll()
+            
+    def skipFrames(self):  ## read a file reading every N'th frame - "both"
+        if fileName := self.returnFileName():   
+            path = os.path.dirname(fileName)  
+            fileName = os.path.basename(fileName)
+            title = self.setTitle(path)
+            if self.parent.player == "one": self.parent.shared.setFileNameInMediaPlayer(fileName)
+            QTimer.singleShot(20, partial(self.assembler, path, title, fileName)) 
+
+    def returnFileName(self):  
+        self.closeThese()  ## select a single file - open for "one" or make clips for "both"  
         path = os.getcwd() if self.parent.path == '' \
             else self.parent.path    
         try:
@@ -159,24 +161,16 @@ class Clips:
                 path, "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
         except:
             self.parent.shared.msgbox('error opening file')
-            return 
-        if fileName != '': 
-            if self.SkipFrames == True and open:  ## read only one file every Nth frame
-                path = os.path.dirname(fileName)  
-                fileName = os.path.basename(fileName)
-                title = self.setTitle(path)
-                self.parent.setFileName(title) 
-                QTimer.singleShot(20, partial(self.assembler, path, title, fileName))
-            else:       ## play a video
-                self.parent.path = os.path.dirname(fileName)    
-                self.parent.setFileName(fileName)
-                if self.parent.mediaPlayer != None:
-                    self.parent.mediaPlayer.setPosition(0)  ## shows first frame
-                    self.parent.mediaPlayer.pause()    
-                if self.PlayVideo:  QTimer.singleShot(100, self.parent.shared.playVideo)   ## up to you
-        else:
-            return
-                     
+            return None
+        return fileName 
+             
+    def readAll(self):  
+        path = QFileDialog.getExistingDirectory(self.parent, '') 
+        if path == None or path == '':
+            return  
+        title = self.setTitle(path)    
+        QTimer.singleShot(20, partial(self.parent.clips.assembler, os.getcwd(), title))
+                                            
     def setTitle(self, path):  ## directory and name of clips *.mov there
         os.chdir(path)
         title = os.path.basename(path) + '.mov'  ## uses .mp4 codec - works on my mac
@@ -203,9 +197,9 @@ class Clips:
 ### --------------------------------------------------------
     def assembler(self, path, outputVideo, fileName=''):
         self.parent.setWindowTitle(outputVideo)
- 
-        reads = 0;  frameCount = 0;  dim = (self.parent.VideoW, self.parent.VideoH)
 
+        reads = 0;  frameCount = 0;  dim = (self.parent.VideoW, self.parent.VideoH)
+        
         try:  
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4 and .mov
             out = cv2.VideoWriter(outputVideo, fourcc, self.Fps, dim)
@@ -216,7 +210,7 @@ class Clips:
      
         # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
      
-        if self.SkipFrames == False:
+        if not self.SkipFrames:
             if self.FirstFrame:  
                 images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos
             else:
@@ -243,7 +237,7 @@ class Clips:
                 if not ret:
                     self.parent.shared.msgbox("assembler: Could not read the first frame.")
                     return
-                if self.FilterOn and self.aspMatch(img) == False:
+                if self.FilterOn and not self.aspMatch(img):
                     continue     
                 reads = self.writeOut(img, image_name, out, reads)
                 if reads >= self.Max:
@@ -254,7 +248,7 @@ class Clips:
                     ret, img = cap.read()
                     if not ret:  # end of video
                         break   
-                    if self.FilterOn and self.aspMatch(img) == False:
+                    if self.FilterOn and not self.aspMatch(img):
                         continue
                     if frameCount % self.Rnf == 0:  ## default one, every frame - set in widget
                         reads = self.writeOut(img, image_name, out, reads)
@@ -267,7 +261,7 @@ class Clips:
                 if img is None:
                     self.parent.shared.msgbox(f"assembler Could not read file {image_name}")
                     continue  
-                if self.FilterOn and self.aspMatch(img) == False:
+                if self.FilterOn and not self.aspMatch(img):
                     continue
                 reads = self.writeOut(img, image_name, out, reads)
                 if reads >= self.Max:       
@@ -275,13 +269,13 @@ class Clips:
               
         if reads > 0:
             if self.FirstFrame or self.SkipFrames: cap.release()
-            out.release()
+            out.release()   
             self.parent.shared.msgbox(f"Video: {outputVideo} frames: {reads}")
-            fileName = os.getcwd() + '/' + outputVideo 
-               
-            self.parent.setFileName(fileName) if self.parent.player == 'one' else\
-                self.parent.setMediaPlayer(fileName, 'assembler')  ## keep them separate
-                
+            fileName = os.getcwd() + '/' + outputVideo    
+            
+            self.parent.setMediaPlayer(fileName) if self.parent.player == 'one' else\
+                self.parent.setMediaPlayer(fileName, 'addToScene')  ## setMediaPlayer is unique by parent
+            
             if self.parent.mediaPlayer:
                 self.parent.mediaPlayer.setPosition(0)
                 self.parent.mediaPlayer.pause()
@@ -300,8 +294,8 @@ class Clips:
         return True
  
     def writeOut(self, img, image_name, out, k):     
-        # img = cv2.rotate(img, cv2.ROTATE_180)    ## just in case they're upsidedown - and ROTATE_90_CLOCKWISE) etc. 
-        img = self.ctrOnBackground(img, image_name)     
+        # img = cv2.rotate(img, cv2.ROTATE_180)  ## just in case they're upsidedown 
+        img = self.ctrOnBackground(img, image_name)  ## or ROTATE_90_CLOCKWISE) etc...
         if self.AddFileName:
             self.addFileName(img, image_name)
         if isinstance(img, np.ndarray):

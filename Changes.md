@@ -7,6 +7,16 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**March 15 2026**  
+Many things starting with the **Shift-B** in **SlideShow** now hides both the button and title bar. The **Shift-S** I used in the video players to toggle the slider now includes toggling the buttons and title bar as one. In **dots** a right-mouse click in **canvas** will trigger the help menu which now has a highlighted row to access all the help menus. Added a new attribute to sprites and consequently updated the json/play file viewer, **TableMaker**, along with a number of small additions. 
+
+In **Sprites/PixItems**  aded a **speed** dial to the **PixItem** widget to introduce a bit more variation to the **stage-left** and **stage-right** animations.  The speed value applies a multiplier to the duration which increases the time it takes a sprite to cross the screen.   
+
+Work on **BkgMatte** to ignore any mouse clicks outside of the the matte and a right mouse click to toggle the menu - selections now work with either keys or mouse clicks.  Updated **screen formats** and its menu and how screen heights are set, see **DotQty** and **Screens**, as well as further work on menus and tags.  Fixed a long standing issue with **VHX**'s cursor. 
+
+New Video:  <https://youtu.be/fW8V4639t5w>
+
+---
 **February 10 2026**    
 Another look into how and where scrollable was being set.  There's only one source now, isScrollable sets scrollable - done. Added hide the window title bar, **Shift-F frameless hint toggle**, to **videoPlayerTwo** and moved some code to now a function.  
 

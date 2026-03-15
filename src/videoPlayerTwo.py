@@ -13,16 +13,17 @@ from PyQt6.QtCore       import Qt, QTimer, QPoint, QSizeF, QRect, QSize
 from PyQt6.QtGui        import QGuiApplication, QPixmap
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, \
                                 QSizePolicy,  QGraphicsView, QGraphicsScene, \
-                                QFileDialog, QGraphicsPixmapItem
+                                QGraphicsPixmapItem
                                                                         
-from videoClipsMaker     import Clips
-from videoClipsWidget    import *
-from videoPlayerShared   import *
+from videoClipsMaker    import Clips
+from videoClipsWidget   import *
+from videoPlayerShared  import *
+from videoPlayerHelp    import VideoMenuKeys
 
 ### --------------------------------------------------------         
 class VideoPlayer(QWidget): 
 ### -------------------------------------------------------
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
         self.setWindowTitle("Video Player Two")
                 
@@ -52,7 +53,6 @@ class VideoPlayer(QWidget):
         self.clips = Clips(self)
         self.shared = Shared(self)
   
-        self.sliderVisible = True 
         self.addMediaPlayer() 
 
         if len(sys.argv) > 1: 
@@ -76,26 +76,22 @@ class VideoPlayer(QWidget):
                                                      
         self.show()
    
-        QTimer.singleShot(50, self.shared.toggleSlider)  ## hides slider on open
-        
 ### --------------------------------------------------------
     def init(self):
-        self.key = 'F'  ## only place it's used - change default open format
+        self.key = 'F'  ##  to change default open format
         self.player = 'two'
         self.path = ''
         self.fileName = ''
-        self.aspect = 0.0
+        self.aspect  = 0.0
         self.videoWidth = 0.0 
-        self.loopSet = False 
+        self.flag = False
         self.helpFlag = False 
         self.helpMenu = None
         self.backdrop = None
+        self.save  = QPoint() 
         self.saveW = self.width()
         self.saveH = self.height()
-        self.save = QPoint()   
-        self.flag = False
-        self.frameHidden = False
-  
+
     def dragEnterEvent(self, e):  
         if e.mimeData().hasUrls():   
             m = e.mimeData()
@@ -113,7 +109,8 @@ class VideoPlayer(QWidget):
 ### --------------------------------------------------------       
     def keyPressEvent(self, e):
         key = e.key()
-        mod = e.modifiers()            
+        mod = e.modifiers()   
+          
         if key == Qt.Key.Key_Space:  ## spacebar to pause/resume
             self.shared.playVideo()  
                      
@@ -121,7 +118,7 @@ class VideoPlayer(QWidget):
             self.shared.toggleSlider() 
             
         elif key == Qt.Key.Key_F and mod & Qt.KeyboardModifier.ShiftModifier:
-            self.toggleFrameless()       
+            self.openFile()       
                     
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.bye()  
@@ -134,27 +131,30 @@ class VideoPlayer(QWidget):
         if key in VideoMenuKeys:
             self.VideoMenuKeys(key)
   
-    def VideoMenuKeys(self,key):  
+    def VideoMenuKeys(self,key): 
         if key in AspKeys:
             self.shared.openPlayer(key)     
         else: 
-            match key:
+            match key:    
+                case 'Spacebar':
+                    self.shared.playVideo()
                 case 'L':
-                    self.clips.looper()  
+                    self.shared.looper()  
                 case 'Settings':
                     self.clips.toggleSettings(self)  ## clipMaker settings
                 case 'C':
                     self.shared.closeHelpMenu()  ## improvised clear
-                    if self.mediaPlayer:
-                        self.mediaPlayer.stop()        
+                    self.closeMediaPlayer()     
                 case 'Clips':   
-                    self.shared.openDirectory()  ## if MakeClipsOn sets path to folder
+                    self.clips.makingClips()  ## if MakeClipsOn sets path to folder
                 case 'Shift-S':
                     self.shared.toggleSlider()
+                case 'Shift-F':
+                    self.openFile()
                 case 'M':
-                    self.shared.openVideoSlideMenus()  
+                    self.shared.videoSliderMenus()  
                 case 'W':
-                    self.msgbox(self.path) if self.path != '' else self.shared.msgbox(os.getcwd())  
+                    self.shared.msgbox(self.path) if self.path != '' else self.shared.msgbox(os.getcwd())  
                 case 'X' | 'Q':
                     self.bye()   
                 case _:
@@ -165,8 +165,8 @@ class VideoPlayer(QWidget):
         self.save = e.globalPosition()
         if e.button() == Qt.MouseButton.RightButton:
             if self.clips.settings == None:
-                self.shared.closeHelpMenu() if self.helpFlag == True \
-                    else self.shared.openHelpMenu() 
+                self.shared.closeHelpMenu() if self.helpFlag else \
+                    self.shared.openHelpMenu() 
         else:
             self.shared.closeHelpMenu()
         e.accept() 
@@ -195,16 +195,8 @@ class VideoPlayer(QWidget):
         e.accept()
         
 ### --------------------------------------------------------
-    def openFile(self):  ## from button     "<- two"
-        if self.path == '':   ## can be set on open
-            self.path = os.getcwd()               
-        try:    
-            fileName, _ = QFileDialog.getOpenFileName(self, "Select Media", \
-                self.path, "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
-        except:
-            self.shared.msgbox('error opening file')
-            return      
-        if fileName != '':
+    def openFile(self): 
+        if fileName := self.clips.returnFileName():
             path = self.path
             self.closeMediaPlayer()
             self.init()
@@ -214,28 +206,26 @@ class VideoPlayer(QWidget):
         else:
             return
               
-    def setMediaPlayer(self, fileName, where=''):  
-        if self.clips.AutoAspect == True and self.clips.MakeClips == False:
-            if not self.shared.setAspectRatio(fileName): ## else skip it and open without
-                return 
-        if self.mediaPlayer.setFileName(fileName) == False:  
-            self.shared.msgbox('error setting mediaPlayer')
-            return
-        if where == '':
-            if self.shared.setAspectRatio(fileName):
-                self.addToScene(fileName)  
-        elif where == 'assembler':  ## bypasses setAspectRatio if from assembler
-            hgt = HGT if self.sliderVisible == True else HGT-PAD   
+    def setMediaPlayer(self, fileName, where=''):   
+        if not self.shared.setFileNameInMediaPlayer(fileName):
+            return False     
+        if where == '':   
+            self.shared.setAutoAspect(fileName)  ## won't stop it from playing  
+            self.addToScene(fileName) 
+            return True                  
+        elif where == 'addToScene':    ## bypasses setAspectRatio if from assembler
+            hgt = HGT if self.shared.sliderVisible else HGT-PAD   
             self.videoItem.setSize(QSizeF(float(self.width()-WID), float(self.height()-hgt)))
             self.addToScene(fileName) 
-                             
+        return True
+                                     
     def addToScene(self, fileName): 
         self.fileName = fileName  ## needs to be set to play
         self.setBackDrop()
-                                              
+                                      
     def setDisplaySize(self, key): 
         self.flag, height = True, 0
-        hgt = HGT if self.sliderVisible == True else HGT-PAD 
+        hgt = HGT if self.shared.sliderVisible else HGT-PAD 
         if key in AspKeys:
             self.videoItem.setSize(QSizeF(self.ViewH*self.aspect, self.ViewH))
             self.resize(self.ViewW+WID, self.ViewH+hgt) 
@@ -260,7 +250,7 @@ class VideoPlayer(QWidget):
         if self.mediaPlayer != None and self.backdrop != None:
             self.shared.stopVideo() 
             time.sleep(.03)  
-            self.clips.looperOff()
+            self.shared.looperOff()
             self.scene.removeItem(self.backdrop)
             self.scene.removeItem(self.videoItem)
             self.backdrop = None
@@ -276,27 +266,13 @@ class VideoPlayer(QWidget):
         QTimer.singleShot(300,self.copyFrame) ## at least this much for qt5
    
     def copyFrame(self): 
-        hgt = HGT if self.sliderVisible == True else HGT-PAD
+        hgt = HGT if self.shared.sliderVisible else HGT-PAD
         pix = self.view.grab(QRect(QPoint(0,0),QSize(self.width()-WID, self.height()-hgt)))
         self.backdrop = QGraphicsPixmapItem(QPixmap(pix.toImage())) 
         self.backdrop.setZValue(0)  ## set to 300 to test - to make sure it's there
         # self.backdrop.setOpacity(.50)  ## also for test
         self.scene.addItem(self.backdrop)
-   
-    def toggleFrameless(self):  ## from a google prompt
-        p = self.pos()
-        if self.frameHidden:  ## make it visible 
-            self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
-            self.frameHidden = False
-            self.shared.firstRightClk = False if self.shared.firstRightClk \
-                else self.move(p.x(), p.y()-28)  ## good guess
-        else:
-            self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
-            self.frameHidden = True
-            self.move(p.x(), p.y()+28)  ## keep the frame stationary
-            self.shared.firstRightClk = False
-        self.show()
-        
+      
 ### --------------------------------------------------------   
     def resizeEvent(self, e):
         if self.flag:
@@ -304,13 +280,12 @@ class VideoPlayer(QWidget):
             return 
         elif self.aspect > 0: 
     
-            hgt = HGT if self.sliderVisible == True else HGT-PAD
+            hgt = HGT if self.shared.sliderVisible else HGT-PAD
             
             width  = int((self.height()-hgt) * self.aspect)+WID
             height = int((self.width()-WID) / self.aspect)+hgt  
             maxwid = int((MaxHgt-hgt) * self.aspect)+WID  
-            which  = getDirection(self)
-            
+            which  = self.shared.getDirection() 
             
             if self.mediaPlayer != None:
                 if self.backdrop == None:
@@ -361,10 +336,10 @@ class VideoPlayer(QWidget):
             self.saveW, self.saveH = self.width(), self.height()        
         e.accept() 
 
-### ------------------------------------------------------    
-    def setFileName(self, x=''): ## for videoplayerOne
+### ------------------------------------------------------
+    def setFileName(self, x=''):  ## fake from shared for two
         pass 
-                                          
+                                     
     def bye(self): 
         self.shared.closeHelpMenu()
         self.clips.closeSettings()

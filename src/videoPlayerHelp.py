@@ -2,11 +2,12 @@
 from PyQt6.QtCore       import Qt, QTimer, QPoint
 from PyQt6.QtGui        import QColor, QFont                      
 from PyQt6.QtWidgets    import QWidget, QTableWidget, QAbstractItemView, \
-                                QTableWidgetItem
+                                QTableWidgetItem, QLabel, QPushButton, QHBoxLayout, \
+                                QVBoxLayout
 
 from functools          import partial
 
-from videoClipsWidget   import *
+from videoClipsWidget   import AspKeys
 
 ### ------------------ videoPlayerHelp.py -----------------
 ''' Tablewidgetsetup and help for videoPlayers and slideShow.
@@ -15,23 +16,25 @@ from videoClipsWidget   import *
 
 helpMenuKeys = {   ## videoplayers
     'A':    'Apple/Academy 4X3',  
+    'C':    'To Clear',
     'F':    'Full Screen 3X2',
     'H':    'Horiztonal HD 16X9',
-    'S':    'Square',
+    'L':    'Loop On/Off',
+    'M':    'Menus',
+    'S':    'Square/Stop Video',
     'T':    'Vertical 2X3',
     'U':    'Apple 3X4 Vertical',                  
     'V':    'Vertical 9X16',
-    'C':    'To Clear',
-    'L':    'Loop On/Off',
-    'M':    'Menus',
-    'W':    'Where am I?', 
-    '>,  +,  ]':    'Scale Up',
-    '<,  _,  [':    'Scale Down',
+    'W':    'Where am I?',
     'X, Q Escape':  'Quit/Exit',
-    'Shift-S':      'Hide/Show Slider',
-    'Aspect':       'Set Aspect (Button)',
+    'Spacebar':     'Play/Pause/Resume',
+    'Shift-F':      'Open File',
+    'Shift-S':      'Hide/Show All',
+    '>,  +,  ]':    'Scale Up',
+    '<,  _,  [':    'Scale Down',  
+    'Aspect':       'Set Aspect (Button)',   
     'Settings':     'ClipsMaker Settings',
-    'Clips':        'Make a Clip',    
+    'Clips':        'Make a Clip',
 }
 
 slideMenuKeys = {  ## slideShow
@@ -45,12 +48,12 @@ slideMenuKeys = {  ## slideShow
     'S, SpaceBar':      'Slide Show',
     'T':                'Text On/Off',  
     'W':                'Where am I?', 
-    '>,  +,  ]':        'Scale Up',
-    '<,  _,  [':        'Scale Down',
+    'X, Q, Escape':     'Quit/Exit',
     'Shift-B':          'Buttons Show/Hide', 
     'Shift-F':          'Frameless Hint', 
-    'Shift-S':          'Select Files',
-    'X, Q, Escape':     'Quit/Exit',
+    'Shift-S':          'Select Files',    
+    '>,  +,  ]':        'Scale Up',
+    '<,  _,  [':        'Scale Down',
 }
 
 RH = 30
@@ -58,7 +61,8 @@ QL = QColor(230,230,230)  ## 10% gray
 QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
 
-SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-B','Shift-F','Shift-S')
+SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-A','Shift-B','Shift-F','Shift-S')
+VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Spacebar','Shift-F','Shift-S','Aspect','Settings','Clips']
 
 ### -------------------------------------------------------- 
 class VideoHelpWidget(QWidget):
@@ -180,10 +184,10 @@ class VideoHelp(QWidget):
             Qt.WindowType.FramelessWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
     
-        self.table = TableWidgetSetUp(100, 150, len(helpMenuKeys)+4)
+        self.table = TableWidgetSetUp(115, 165, len(helpMenuKeys)+4)
         self.table.itemClicked.connect(self.clicked)
     
-        width, height = 257, 666
+        width, height = 287, 726
         self.table.setFixedSize(width, height)
     
         str = "VideoPlayerOne" if self.parent.player == "one" else \
@@ -193,7 +197,7 @@ class VideoHelp(QWidget):
         
         row = 1  
         for k,  val in helpMenuKeys.items():
-            if self.parent.player == "two" and row in (12,13,16):
+            if self.parent.player == "two" and row in (16,17,18):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)
             else:
@@ -201,7 +205,7 @@ class VideoHelp(QWidget):
                 self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
                    
-        self.table.setRow(row,     0,  f"{"Scale and Setting Aspect":<12}",QC,True,True, 2)
+        self.table.setRow(row,     0,  f"{"Scaling Up/Down and Setting Aspect":<12}",QC,True,True, 2)
         self.table.setRow(row + 1, 0,  f"{"Don't Work in VideoPlayerTwo":<12}",QC,True,True, 2)
         self.table.setRow(row + 2, 0,  f"{'Right-Click or Click Here to Close':<12}",QL,True,True, 2)
         
@@ -210,14 +214,14 @@ class VideoHelp(QWidget):
         if self.switch == '':   ## default
             p = self.parent.pos()  
             x = int(p.x() + (pwidth/2)) - int(width/2)   
-            y = int(p.y() + (pheight/2)) - int(height/2) + 30 
+            y = int(p.y() + (pheight/2)) - int(height/2) + 35
         else:
             x, y = int(pwidth/2), int(pheight/2)  ## copied over from dots
             p = self.parent.mapToGlobal(QPoint(x,y))
             x, y = int(p.x()), p.y()
             if off != 0: x += off
             x = int(x - (width /2)) 
-            y = int(y - (height /2)) 
+            y = int(y - (height /2)) +25
  
         self.table.move(x,y)  
         self.table.show()
@@ -231,7 +235,7 @@ class VideoHelp(QWidget):
                 case ('>,  +,  ]'):
                     help = ']'
                 case ('<,  _,  ['): 
-                    help = '['     
+                    help = '['                                  
             if help in VideoMenuKeys: 
                 try:
                     QTimer.singleShot(25, partial(self.parent.VideoMenuKeys, help))
@@ -242,7 +246,7 @@ class VideoHelp(QWidget):
             self.parent.shared.closeVideoSlideMenus()
   
     def tableClose(self):
-        self.parent.helpFlag == False
+        self.parent.helpFlag = False
         self.table.close()   
           
 ### --------------------------------------------------------     

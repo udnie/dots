@@ -10,7 +10,7 @@ from dotsShared         import RotateKeys, paths, common, Ball
 
 from dotsSideGig        import distance, getColorStr, getVuCtr
 from dotsPathWidget     import PathWidget
-from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
+from dotsTableModel     import TableWidgetSetUp, QC, QL, QH, SD
 from dotsHelpDesk       import PathHelp2
 
 ScaleRotate = ('<', '>', '+', '-')  ## sent from keyboard
@@ -25,7 +25,7 @@ pathKeys = {
     'D':    'Clears/Deletes Scene',
     'E':    'Edit Path Points', 
     'M':    'This Help Menu',
-    'Menu': 'HelpMenu2',
+    'Menu': 'PathMaker Help Menu2',
     'Menus':'Help Menus',
     'N':    'New Path and Close Path',
     'P':    'Path Chooser',
@@ -55,10 +55,10 @@ class PathHelp:
         self.canvas = canvas
         self.switch = switch
                
-        self.table = TableWidgetSetUp(55, 185, len(pathKeys)+6, 0, NS)
+        self.table = TableWidgetSetUp(65, 185, len(pathKeys)+6, 0, NS)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 246, 656
+        width, height = 256, 656
         self.table.setFixedSize(width, height)
   
         self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}',QL,True, True, 2)
@@ -66,8 +66,12 @@ class PathHelp:
         row = 1
         for k, val in pathKeys.items():
             if row < 14:
-                self.table.setRow(row, 0, k,'',True,True)
-                self.table.setRow(row, 1, "  " + val,'','',True)
+                if k ==  'Menus':
+                    self.table.setRow(row, 0, k,SD,True,True)
+                    self.table.setRow(row, 1, "  " + val,SD,'',True)
+                else:
+                    self.table.setRow(row, 0, k, '', True,True)
+                    self.table.setRow(row, 1, "  " + val, '', '',True)      
                 row += 1
             else:
                 if row == 14:
@@ -138,7 +142,7 @@ class PathWorks:
             self.pathMaker.edits.editBtn('ClosePath')
         if self.pathMaker.openPathFile != None:
             self.widget.label.setText(self.pathMaker.openPathFile)
-        self.pathMaker.editingPts == False
+        self.pathMaker.editingPts = False
         self.pathMaker.edits.deleteLasso()
         return self.widget
             
@@ -235,7 +239,7 @@ class PathWorks:
 ### ---------------------- pathTest ------------------------
     def pathTest(self):
         if len(self.pathMaker.pts) > 0 and self.pathMaker.pathSet:
-            if self.pathMaker.pathTestSet == False:
+            if not self.pathMaker.pathTestSet:
                 self.ball = Ball(paths['imagePath'] + 'ball.png', self.canvas)
                 self.node = Node(self.ball)
                 self.ball.setZValue(self.findTop()+10)

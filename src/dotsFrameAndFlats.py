@@ -15,9 +15,9 @@ from dotsTableModel     import TableWidgetSetUp, QL
 
 flatKeys = {  
     ' H ':     'Help Menu',
-    ' T ':     'Toggle Lock',
+    ' T ':     'Toggles Lock on/off',
     ' \\ ':    'Background Tag',
-    'del':     'delete from screen', 
+    'delete':  'delete from screen', 
     'enter':   'move to the front',
     'return':  'move to the front',   
     'shift':   'move to the back',
@@ -69,7 +69,10 @@ class FlatHelp:  ## flat and frame keyboard help for both
         if self.switch == '':
             try:
                 help = self.table.item(self.table.currentRow(), 0).text().strip()
-                if help == '\\': help = 'tag'
+                if help == '\\': 
+                    help = 'tag'
+                elif help == 'delete':
+                    help = 'del'
                 if help != 'H' and help in sharedKeys:
                     self.parent.shared(help)
             except:
@@ -114,7 +117,7 @@ class Flat(QGraphicsPixmapItem):
     @pyqtSlot(str)  ## updated by storyboard
     def setPixKeys(self, key):
         self.key = key  
-    
+ 
     def mousePressEvent(self, e):  
         if self.key == '' and self.canvas.openPlayFile == 'menu':
             self.canvas.openPlayFile = ''
@@ -135,35 +138,26 @@ class Flat(QGraphicsPixmapItem):
 
     def shared(self, key):  ## used with help menu
         match key:
-            case 'del':   
-                self.delete()       
-                        
+            case 'del':
+                self.delete()                       
             case 'shift':       ## to the back
                 self.setZValue(self.canvas.bkgMaker.toBack())
                 time.sleep(.10)       
                 self.canvas.bkgMaker.renumZvals()     
-                time.sleep(.10) 
-                
+                time.sleep(.10)     
+            case  'T'|'tag':  ## doesn't lock
+                self.tagThis()   
             case 'B':           ## not actually tracked
                 self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
-                    else self.bkgtrackers.tracker.bye()  
-                       
+                    else self.bkgtrackers.tracker.bye()               
             case 'H':  
-                self.openMenu()      
-                
-            case 'tag':          ## '\' tag key
-                self.tagThis()
-                
+                self.openMenu()          
             case 'enter' | 'return':
                 if self.zValue() == common['bkgZ']:
                     return
                 self.canvas.bkgMaker.front(self)        
-                time.sleep(.10)   
-                
-            case 'T':     
-                self.setLock() if self.locked == False else self.setUnlock()
-                self.tagThis()
-     
+                time.sleep(.10)       
+         
     def setLock(self):
         self.locked = True     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)
@@ -246,23 +240,18 @@ class Frame(QGraphicsPixmapItem):
  
     def shared(self, key):  ## key can come from help as well
         match key:
-            case 'del':    
-                self.delete()  
-                    
+            case 'del':  
+                self.delete()     
             case 'shift':   ## back one
                 self.setZValue(self.zValue()-1)  
-                 
+            case  'tag':    
+                self.tagThis()
             case 'H':  
-                self.openMenu()    
-                  
-            case 'tag':     ## '\' tag key
-                self.tagThis() 
-                
+                self.openMenu()     
             case 'enter'| 'return': # send to front
-                self.setZValue(self.mapper.toFront(1))  
-                  
+                self.setZValue(self.mapper.toFront(1))   
             case 'T':     
-                self.setLock() if self.locked == False else self.setUnLock()
+                self.setLock() if not self.locked else self.setUnLock()
                 self.tagThis()
       
     def setLock(self):

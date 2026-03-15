@@ -9,6 +9,7 @@ from PyQt6.QtWidgets    import QMessageBox, QGraphicsLineItem
      
 from dotsShared         import common, paths, pathcolors, TextItem
 
+
 ### ---------------------- dotsSideGig ---------------------
 ''' class: MsgBox, Grid, and misc  ...'''                       
 ### --------------------------------------------------------
@@ -78,7 +79,7 @@ class Grid:  ## moved from sideCar
         
 ### -------------------------------------------------------                                        
     def toggleGrid(self):
-        self.removeGrid() if self.gridSet == True else self.addGrid()
+        self.removeGrid() if self.gridSet else self.addGrid()
  
     def addGrid(self):   
         self.gridSet = True 
@@ -156,11 +157,8 @@ def getPts(file, scalor=1.0, inc=0):  ## also used by pathChooser
         MsgBox('getPts: Error reading pts file', 5)
         
 def DemoAvailable():
-    if os.path.exists(paths['demo']):  ## note
-        return True
-    else:
-        return False
-    
+    return True if os.path.exists(paths['demo']) else False
+
 def getVuCtr(self):  ## used by menus and widgets - maps view center to global
     x,y = int(common['ViewW']/2), int(common['ViewH']/2) 
     p = self.canvas.mapToGlobal(QPoint(x,y))
@@ -221,41 +219,34 @@ def getCrop(path):  ## from path - bounding size and position
 def tagBkg(bkg, pos):  
     x, y, z = pos.x(), pos.y(), bkg.zValue()   
     text = TextItem() 
-              
-    src = 'bkg'  
+                
+    src = str(bkg.type)  
     color = 'orange'
     
     topZVal = bkg.canvas.mapper.toFront()
        
     if bkg.type == 'shadow': 
         color = 'lightgreen'   
-        if bkg.maker.linked:
-            tag = 'Linked' 
-        else: 
-            tag = 'Unlinked' 
+        tag = 'Linked' if bkg.maker.linked else 'Unlinked'
     else:    
-        if bkg.locked:
-            text = 'Locked' 
-        else:
-            text = 'Unlocked'
+        text = 'Locked' if bkg.locked else 'Unlocked'
         fileName = os.path.basename(bkg.fileName)  ## other than shadows
         tag = fileName + " " + text     
-    
+      
     if bkg.type == 'bkg':
         if bkg.direction == ' left':
             tag = tag + ' Left'
         elif bkg.direction == 'right': 
             tag = tag + ' Right'
         color = 'AQUA'
-           
+        
     elif bkg.type in ('pix', 'frame') and z == topZVal:
         color = 'yellow' 
-        src = 'pix'  
-            
+        
     if 'frame' in bkg.fileName: 
         x, y = common['ViewW']*.47, common['ViewH']-35
-   
-    bkg.canvas.mapper.tagsAndPaths.TagItTwo('bkg', tag,  QColor(color), x, y, z, src)
+
+    bkg.canvas.mapper.tagsAndPaths.TagItTwo(bkg, tag,  QColor(color), x, y, z, src)
     
 ### --------------------- dotsSideGig ----------------------
    

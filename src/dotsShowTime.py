@@ -39,7 +39,7 @@ class ShowTime:
 
         for pix in self.scene.items():  ## test for non-scrollers
             if pix.type == 'bkg' and pix.tag == 'scroller':
-                if pix.isScrollable() == False:
+                if not pix.isScrollable():
                     pix.bkgScrollWrks.clearBkgScrolling()
                     MsgBox('one or more backgrounds not scrollable, resave to clear')
                     return   
@@ -64,7 +64,7 @@ class ShowTime:
         for pix in self.scene.items(): 
             if pix.type in( 'point', 'poly') or \
                 isinstance(pix, QGraphicsPolygonItem):
-                continue
+                    continue
            
             if pix.type in ('pix', 'bkg') and pix.tag != '':  
                 ## if random, slice to length, display actual anime if paused 
@@ -128,12 +128,12 @@ class ShowTime:
             for pix in self.scene.items(): 
                 if pix.type in( 'point', 'poly', 'flat', 'frame') or \
                     isinstance(pix, QGraphicsPolygonItem):
-                    continue   
+                        continue   
                          
                 elif pix.type in ('pix', 'snake', 'bkg'):  
                     if pix.anime != None and pix.anime.state() == \
                         QAbstractAnimation.State.Running:  ## running
-                        pix.anime.pause() 
+                            pix.anime.pause() 
                         
             self.showWorks.setPauseKey()
             if self.canvas.videoPlayer != None:
@@ -143,12 +143,12 @@ class ShowTime:
         for pix in self.scene.items():  
             if pix.type in( 'point', 'poly', 'flat', 'frame') or \
                 isinstance(pix, QGraphicsPolygonItem):
-                continue   
+                    continue   
             
             elif pix.type in ('pix', 'snake', 'bkg'):
                 if pix.anime != None and pix.anime.state() == \
                     QAbstractAnimation.State.Paused:
-                    pix.anime.resume() 
+                        pix.anime.resume() 
                                       
         self.showWorks.setPauseKey()  
         if self.canvas.videoPlayer != None:  ## toggles pause and play
@@ -167,7 +167,7 @@ class ShowTime:
         for pix in self.scene.items():      
             if pix.type in( 'point', 'poly', 'flat', 'frame') or \
                 isinstance(pix, QGraphicsPolygonItem):
-                 continue                                   
+                    continue                                   
      
             elif pix.type in ('pix', 'snake', 'bkg'):                   
                 if pix.anime != None and pix.anime.state() != \

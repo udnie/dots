@@ -206,7 +206,7 @@ class Hats:  ## hats - was abstract
         if self.direction == 'right':
             self.scroller.setPos(QPointF(self.scroller.runway, 0))  ## offset to right    
   
-        self.scroller.addedScroller == False   
+        self.scroller.addedScroller = False   
         self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
         self.scene.addItem(self.scroller)  
   

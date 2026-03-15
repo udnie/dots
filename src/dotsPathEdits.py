@@ -152,7 +152,7 @@ class PathEdits(QWidget):
 
     def editPoints(self):
         if len(self.pathMaker.pts) > 0:
-            if self.pathMaker.editingPts == False:
+            if not self.pathMaker.editingPts:
                 self.pathWorks.closeWidget()
                 self.pathMaker.editingPts = True
                 self.pathMaker.selections.clear() 

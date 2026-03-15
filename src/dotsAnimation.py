@@ -16,6 +16,14 @@ Spins     = ('Spin Left', 'Spin Right')
 
 AnimeList += OneOffs
 
+Slow = {
+    1:  1.0,
+    2:  1.2,
+    3:  1.3,
+    4:  1.4,
+    5:  1.5,
+}
+
 ### -------------------- dotsAnimation ---------------------
 ''' classes: Node, Animation. Many basic animations '''
 ### --------------------------------------------------------
@@ -50,10 +58,10 @@ class Node(QObject):
         except RuntimeError:
             return None
 
-    pos =  pyqtProperty(QPointF, fset=_setPos)
-    scale =  pyqtProperty(float, fset=_setScale) 
-    rotate =  pyqtProperty(int, fset=_setRotate) 
-    opacity =  pyqtProperty(float, fset=_setOpacity)
+    pos = pyqtProperty(QPointF, fset=_setPos)
+    scale = pyqtProperty(float,  fset=_setScale) 
+    rotate = pyqtProperty(int,  fset=_setRotate) 
+    opacity = pyqtProperty(float, fset=_setOpacity)
 
 ### -------------------------------------------------------- 
 class Animation:
@@ -103,7 +111,7 @@ class Animation:
 ### --------------------------------------------------------
     def _random(self):  
         random.seed()
-        r = AnimeList + self.canvas.pathList 
+        r = AnimeList + self.canvas.pathList
         return r[random.randint(0,len(r)-1)]
 
 ### --------------------------------------------------------
@@ -303,37 +311,35 @@ def stage(pix, which):  ## left or right
     pix.setOriginPt()
     pix.node = Node(pix)
               
-    x = int(pos.x())
-    ViewW = common["ViewW"]
-
-    left = x+pix.width*3
-    right = ViewW+pix.width*3
+    left  = int(pos.x())+pix.width*3
+    right = common["ViewW"]+pix.width*3
 
     if which.endswith('Left'):
-        stage1, stage2 = stageLeft(pix.node, pos, left, right)
+        stage1, stage2 = stageLeft(pix.node, pos, left, right, pix.speed)
     else:
-        stage1, stage2 = stageRight(pix.node, pos, left, right)
+        stage1, stage2 = stageRight(pix.node, pos, left, right, pix.speed)
    
     stage = QSequentialAnimationGroup()
     stage.addAnimation(stage1)
     stage.addAnimation(stage2)
-
     stage.setLoopCount(-1) 
 
     return stage
 
 ### --------------------------------------------------------
-def stageLeft(node, pos, left, right):    
+def stageLeft(node, pos, left, right, speed):  
+    duration = random.randint(16, 23) * 110  
+    dura = int(Slow[speed] * duration)
+    val = (random.randint(7, 13) * 5) / 125 
+    
     stage1 = QPropertyAnimation(node, b'pos')
-    stage1.setDuration(random.randint(16, 23) * 110)
-    val = (random.randint(7, 13) * 5) / 125
+    stage1.setDuration(dura)      
     stage1.setStartValue(pos)
     stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
     stage1.setEndValue(pos + QPointF(-left, 0))
 
-    stage2 = QPropertyAnimation(node, b'pos')
-    stage2.setDuration(random.randint(16, 23) * 100)
-    val = (random.randint(7, 13) * 5) / 125
+    stage2 = QPropertyAnimation(node, b'pos')   
+    stage2.setDuration(dura) 
     stage2.setStartValue(QPointF(right, 0))
     stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
     stage2.setEndValue(pos) 
@@ -341,17 +347,19 @@ def stageLeft(node, pos, left, right):
     return stage1, stage2
 
 ### --------------------------------------------------------
-def stageRight(node, pos, left, right):   
-    stage1 = QPropertyAnimation(node, b'pos')
-    stage1.setDuration(random.randint(14, 23) * 75)
+def stageRight(node, pos, left, right, speed):   
+    duration = random.randint(14, 23) * 75
+    dura = int(Slow[speed] * duration)
     val = (random.randint(7, 13) * 5) / 100
+
+    stage1 = QPropertyAnimation(node, b'pos')
+    stage1.setDuration(dura)   
     stage1.setStartValue(pos)
     stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))
     stage1.setEndValue(pos + QPointF(right, 0))
 
-    stage2 = QPropertyAnimation(node, b'pos')
-    stage2.setDuration(random.randint(14, 23) * 75)
-    val = (random.randint(7, 13) * 5) / 100
+    stage2 = QPropertyAnimation(node, b'pos')  
+    stage2.setDuration(dura)
     stage2.setStartValue(pos + QPointF(-left, 0))
     stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
     stage2.setEndValue(pos)
@@ -364,16 +372,12 @@ def spin(pix, anime):  ## rotate
     pix.node = Node(pix)
    
     sync = random.randint(14, 23) * 50
-    rot  = 360 
-
-    if anime.endswith('Left'): rot = -360
+    rot = -360 if anime.endswith('Left') else 360
 
     spin = QPropertyAnimation(pix.node, b'rotate')
-    
     spin.setDuration(int(sync))
     spin.setStartValue(pix.rotation)
     spin.setEndValue(pix.rotation+rot)
-
     spin.setLoopCount(-1)  
     
     group = QParallelAnimationGroup()

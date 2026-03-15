@@ -94,13 +94,13 @@ class ShadowWidget(QWidget):
         
 ### --------------------------------------------------------
     def Rotate(self, val): 
-        if self.maker.linked == False:
+        if not self.maker.linked:
             self.maker.shadow.setOriginPt()
             self.works.rotateShadow(val)
             self.rotateValue.setText(f'{val:3}') 
              
     def Scale(self, val):  
-        if self.maker.linked == False:
+        if not self.maker.linked:
             self.maker.shadow.setOriginPt()
             op = (val/100)
             self.works.scaleShadow(op) 

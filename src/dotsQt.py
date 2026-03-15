@@ -54,12 +54,14 @@ class DotsQt(QMainWindow):
                                
         self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)
-
-        ## adjusted for app size and display, see getY() for '900' screen
-        vert = 50 if self.Vertical == True else 150 ## was 150
-        if common['Screen'] == 'SQV': vert = 150
-        self.move(getX(), vert)   ###getY()-int(vert/4))  ## functions in screens 
-
+       
+        if hgt := vheights.get(common['Screen']):  ## in screens  
+            self.move(getX(), hgt)   
+        elif common['ViewH'] == 720:
+            self.move(getX(), 225)
+        else:
+            self.move(getX(), 175)
+      
         ## can't all happen at once
         QTimer.singleShot(100, self.canvas.scroll.loadSprites)
         QApplication.setQuitOnLastWindowClosed(True)  ## always

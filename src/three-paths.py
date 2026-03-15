@@ -108,7 +108,7 @@ class Test(QWidget):
         self.animation.start()
   
     def pathThree(self):
-        if self.three == True:
+        if self.three:
             self.three = False
             self.animation.stop()  
             self.pix.setPos(0, 0)

@@ -83,12 +83,12 @@ class VideoPlayer(QMediaPlayer):
             self.stopVideo() 
              
     def stopVideo(self):
-        if self.loopSet == False: 
+        if not self.loopSet: 
             self.mediaPlayer.stop()
             self.mediaPlayer.setPosition(0) 
             self.mediaPlayer.pause() 
             self.canvas.btnRun.setText('Run') 
-            if self.canvas.animationRunning == False and  \
+            if not self.canvas.animationRunning and  \
                 self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):            
                 self.canvas.showWorks.enablePlay()  
         elif self.loopSet:

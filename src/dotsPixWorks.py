@@ -23,7 +23,7 @@ PixSizes = {  ## match up on base filename using 5 characters - sometimes called
 ### --------------------------------------------------------  
 ''' shared with canvas.contextMenu and with pixitem thru pixwidget '''
 ### --------------------------------------------------------    
-class AnimationHelp: 
+class AnimationHelp:
 ### --------------------------------------------------------
     def __init__(self, parent, pos, token='', off=0):
         super().__init__()
@@ -118,10 +118,7 @@ class AnimationHelp:
              
         for pix in self.scene.selectedItems(): 
             if pix.type in( 'pix', 'shadow'):     
-                if tag == 'Clear Tags':
-                    pix.tag = ''
-                else:
-                    pix.tag = tag
+                pix.tag = '' if tag == 'Clear Tags' else tag
                 pix.anime = None  ## set by play
                 pix.setSelected(False)  ## when tagged    
                            
@@ -152,6 +149,9 @@ class Works:  ## extends pixitem and pixwidget
         
         self.pix.widget.rotaryDial.setValue(int(self.pix.rotation))
         self.pix.widget.rotateValue.setText(f'{self.pix.rotation:3}')
+        
+        self.pix.widget.speedDial.setValue(int(self.pix.speed))
+        self.pix.widget.speedValue.setText(f'{self.pix.speed:3}')
                            
     def removeThis(self):
         self.pix.clearFocus() 

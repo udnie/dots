@@ -102,9 +102,9 @@ class  MainMenu:
             
             match help:            
                 case 'buttons':
-                    self.canvasHelp = CanvasHelp(self, self.canvas, -350, 'on')
+                    self.canvasHelp = CanvasHelp(self, self.canvas, -315, 'on')
                     self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on')
-                    self.pathHelp   = PathHelp(self, self.canvas, 350, 'on')
+                    self.pathHelp   = PathHelp(self, self.canvas, 315, 'on')
                     
                 case 'widgets': 
                     bkg    = BkgWidget(self.canvas, None, 'on')
@@ -128,13 +128,13 @@ class  MainMenu:
                     self.frameHelp = FlatHelp(self, self.canvas, 350, 'frame', 'on')
                     
                 case 'story':  
-                    self.pixHelp    = PixHelp(self.canvas, 0, 'all') 
-                    self.storyHelp  = StoryHelp(self, self.canvas, -355, 'on') 
-                    self.storyHelp2 = StoryHelp2(self.canvas, 355, 'on')
+                    self.pixHelp    = PixHelp(self.canvas, -320, 'all') 
+                    self.storyHelp  = StoryHelp(self, self.canvas, 0, 'on') 
+                    self.storyHelp2 = StoryHelp2(self.canvas, 335, 'on')
                   
                 case 'path':
                     self.pathWidget = PathWidget(self.canvas, '', 'all')
-                    self.pathHelp   = PathHelp(self, self.canvas, 25, 'all')   
+                    self.pathHelp   = PathHelp(self, self.canvas, 30, 'all')   
                     self.pathHelpMenu2  = PathHelp2(self.canvas, 365, 'all')  
                                 
                 case 'bkg':   

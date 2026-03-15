@@ -78,7 +78,7 @@ class SlideShow(QWidget):
         self.init()  ## default True shows buttons, False to hide
  
         ## in qt5 framelessWindow won't resize with mouse - use zoom keys instead
-        if self.frameHidden:  ## set WindowHint to Frameless
+        if not self.frameVisible:  ## set WindowHint to Frameless
             self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
         self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
@@ -93,19 +93,19 @@ class SlideShow(QWidget):
         self.setTags = True  ## toggle textItems on/off
   
         vbox = QVBoxLayout()      
-        vbox.addWidget(self.view)
-        if self.buttonsVisible: vbox.addWidget(self.setButtons())  ## default if True adds setButtons to layout
+        vbox.addWidget(self.view)           ## default - if True adds setButtons to layout
+        if self.buttonsVisible: vbox.addWidget(self.setButtons()) 
         self.setLayout(vbox)
     
         self.grabKeyboard()
         
-        QTimer.singleShot(25, self.fileChooser) if self.buttonsVisible == False else \
-              QTimer.singleShot(25, self.openFiles)  ## current directory or command line
+        QTimer.singleShot(25, self.fileChooser) if not self.buttonsVisible else \
+              QTimer.singleShot(25, self.openFiles)     ## current directory or command line
 
         self.show()
              
 ### --------------------------------------------------------
-    def init(self, buttons=True):  ## on each new files action
+    def init(self):  ## on each new files action
         self.files       = []   
         self.player     = 'slides'
         self.txtlst     = ''
@@ -121,8 +121,8 @@ class SlideShow(QWidget):
         self.helpMenu   = None
         self.timer      = None
         self.helpFlag   = False
-        self.buttonsVisible = buttons
-        self.frameHidden = False  
+        self.buttonsVisible = True
+        self.frameVisible = True
         self.aspect = 0.0
         self.saveW  = 0
         self.saveH  = 0
@@ -219,7 +219,7 @@ class SlideShow(QWidget):
         e.accept()
      
     def mouseReleaseEvent(self, e):
-        if self.frameHidden: return
+        if self.frameVisible: return
         self.moveThis(e)
         e.accept()       
       
@@ -254,8 +254,14 @@ class SlideShow(QWidget):
         self.pixItem.setPixmap(QPixmap(self.addImage(img))) 
 
         self.pixItem.setZValue(0)
-        self.pixItem.setPos(self.centerPixItem())
         
+        # self.setScene()                                                                                                                                                                  
+        x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
+        y = int((self.view.height() - self.pixItem.boundingRect().height())/2)
+        
+        self.pixItem.setPos(QPointF(x, y-5)) if self.setTags else \
+            self.pixItem.setPos(QPointF(x, y))  ## center it
+            
         self.setOrigin()             
         self.pixItem.setRotation(self.rot) 
         
@@ -310,7 +316,7 @@ class SlideShow(QWidget):
         self.setScene()                                                                                                                                                                       
         x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
         y = int((self.view.height() - self.pixItem.boundingRect().height())/2)           
-        return QPointF(x, y)
+        return QPointF(x-5, y)
 
     def setScene(self):
         self.scene.setSceneRect(0, 0, self.view.width(), self.view.height())
@@ -417,44 +423,47 @@ class SlideShow(QWidget):
     
     def toggleText(self):   
         if self.pixItem != None:    
-            if self.setTags == False:
+            if not self.setTags:
                 self.setTags = True
                 self.addTextItem()
             elif self.textItem != None:
                 self.scene.removeItem(self.textItem)
                 self.textItem = None
                 self.setTags = False
-                
+   
     def toggleButtons(self):
+        self.toggleFrameless()
         if self.buttonsVisible:
-            self.buttonGroup.hide()
             self.buttonsVisible = False
+            self.buttonGroup.hide()
             self.resize(self.width(), self.height()-Hpad)
-        elif self.buttonsVisible == False:
+            time.sleep(.03) 
+        elif not self.buttonsVisible:
             self.buttonGroup.show()
             self.buttonsVisible = True
             self.resize(self.width(), self.height()+Hpad)
+            time.sleep(.03) 
     
     def toggleFrameless(self):  ## from a google prompt
         p = self.pos()
-        if self.frameHidden:  ## make it visible 
+        if not self.frameVisible:  ## make it visible 
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
-            self.frameHidden = False
-            self.move(p.x(), p.y()-28)  ## good guess
+            self.frameVisible = True
+            self.move(p.x(), p.y()-28) 
         else:
             self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
-            self.frameHidden = True
+            self.frameVisible = False
             self.move(p.x(), p.y()+28)  ## keep the frame stationary
         self.show()
-                              
+                                 
 ### --------------------------------------------------------         
     def clearScene(self):
         self.closeHelpMenu()
         self.scene.clear()  
         self.timerStop()
-        hold = self.frameHidden
+        hold = self.frameVisible
         self.init() 
-        self.frameHidden = hold
+        self.frameVisible = hold
             
     def msgbox(self, str):
         msg = QMessageBox()
@@ -473,7 +482,7 @@ class SlideShow(QWidget):
         self.pixItem.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
                                                                                                                  
     def slideShow(self):     
-        self.showtime() if self.running == False else self.timerStop()
+        self.showtime() if not self.running else self.timerStop()
       
     def showtime(self):
         self.running = True

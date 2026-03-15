@@ -73,7 +73,7 @@ class BkgScrollWrks:
             rate[1] = self.bkgItem.rate
             test = True  
               
-        if test == False:
+        if not test:
             MsgBox("Screen Rates Haven't Changed", 5)
             return   
     
@@ -111,7 +111,7 @@ class BkgScrollWrks:
             show = showtime['snakes']    
                  
         elif self.bkgItem.direction == 'vertical':  ## see vertical in bkgWorks - there's a kludge
-            show = showtime['vertical']     
+            show = showtime['vertical']   ## uses 'snakes_912.jpg'
               
         elif self.bkgItem.direction == 'left':   
             show = showtime['left']
@@ -214,8 +214,8 @@ class BkgScrollWrks:
 ### --------------------------------------------------------
     def toggleBkgLocks(self):
         if self.bkgItem:
-            self.bkgMaker.lockBkg(self.bkgItem) if self.bkgItem.locked == False\
-                else self.bkgMaker.unlockBkg(self.bkgItem)  
+            self.bkgMaker.lockBkg(self.bkgItem) if not self.bkgItem.locked else\
+                self.bkgMaker.unlockBkg(self.bkgItem)  
                 
             if self.bkgMaker.widget != None:     
                 p = self.canvas.mapFromGlobal(QCursor.pos())  
@@ -227,15 +227,15 @@ class BkgScrollWrks:
                                                                                    
     def setMirrorBtnText(self, bkg, widget):  ## if added - from bkgMaker widget
         if bkg:  ## shouldn't need this but - could have just started to clear        
-            if self.canvas.dots.Vertical == False and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
-                self.canvas.dots.Vertical == True and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
+            if not self.canvas.dots.Vertical and bkg.imgFile.width() >= bkg.showtime + bkg.ViewW or \
+                self.canvas.dots.Vertical and bkg.imgFile.height() >= bkg.showtime + bkg.ViewH:  
                 bkg.scrollable = True    
                                                   
-            if bkg.scrollable == False:
+            if not bkg.isScrollable():
                 widget.mirrorBtn.setText('Not Scrollable')  
                 self.clearBkgScrolling()
                           
-            widget.mirrorBtn.setText('Continuous') if bkg.mirroring == False else \
+            widget.mirrorBtn.setText('Continuous') if not bkg.mirroring else \
                 widget.mirrorBtn.setText('Mirrored')
               
 ### ------------------ dotsBkgScrollWrks -------------------                                                                                                     

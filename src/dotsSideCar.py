@@ -43,7 +43,7 @@ class SideCar:
         pix.setOpacity(pix.alpha2)
                                                               
         self.scene.addItem(pix)
-                              
+         
 ### --------------------------------------------------------
     def pixTest(self):  ## randomly places 10 apples on the canvas to play with 
         if not self.canvas.pathMakerOn:  
@@ -99,7 +99,7 @@ class SideCar:
     
     def looper(self):
         if self.canvas.videoPlayer != None:  
-            if self.canvas.videoPlayer.loopSet == False:   
+            if not self.canvas.videoPlayer.loopSet:   
                 self.canvas.videoPlayer.loopSet = True
                 self.canvas.btnLoop.setText('LoopOn')
             else:
@@ -129,7 +129,7 @@ class SideCar:
             elif itm.zValue() > -50:
                 break   
         if self.canvas.control == '' and \
-            self.canvas.animationRunning == False or  \
+            not self.canvas.animationRunning or  \
             self.canvas.openPlayFile not in ('snakes', 'bats', 'hats'):  
             if len(self.scene.items()) > 0:                         
                 self.canvas.showWorks.enablePlay() 
@@ -157,6 +157,9 @@ class SideCar:
     def pause(self):  ## called thru controlview spacebar as well
         self.canvas.showbiz.showtime.pause() 
         
+    def run(self):
+        self.canvas.showbiz.showtime.run()
+        
     def toggleOutlines(self):  ## runs from O as in Ohio
         for pix in self.scene.items():
             if pix.type == 'pix' and pix.shadowMaker != None and \
@@ -167,16 +170,16 @@ class SideCar:
         self.mapper.addTagGroup()
         for pix in self.scene.items():
             if pix.type == 'pix':
-                pix.lockSprite() if pix.locked == False \
-                    else pix.unlockSprite()    
+                pix.lockSprite() if not pix.locked else \
+                    pix.unlockSprite()    
                 self.mapper.tagsAndPaths.tagThis('',  pix)
                                          
     def toggleShadowLinks(self):  ## link/unlink shadows - from controlview
         self.mapper.addTagGroup()
         for pix in self.scene.items():
             if pix.type == 'shadow':
-                pix.linkShadow() if pix.maker.linked == False \
-                    else pix.unlinkShadow()    
+                pix.linkShadow() if not pix.maker.linked else \
+                    pix.unlinkShadow()    
                 self.mapper.tagsAndPaths.tagThis('',  pix)
                                                                                                    
     def resetAll(self):  ## from controlview

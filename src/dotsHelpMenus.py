@@ -1,5 +1,6 @@
 
 from functools          import partial
+from os import close
 
 from PyQt6.QtCore       import QTimer
 from PyQt6.QtGui        import QGuiApplication
@@ -47,10 +48,19 @@ class HelpMenus:  ## demos and snakes
 
     def setMenu(self, key):
         if key == 'D':
-            self.demoHelp = DemoHelp(self.canvas) 
+            if self.demoHelp == None:
+                self.demoHelp = DemoHelp(self.canvas)
+            else:
+                 self.demoHelp.closeMenu()
+                 self.demoHelp = None
+                 
         elif key == 'S':
-             self.screenHelp = ScreenHelp(self.canvas)  ## in screens 
-          
+            if  self.screenHelp == None:
+                self.screenHelp = ScreenHelp(self.canvas)  ## in screens 
+            else:
+                self.screenHelp.closeMenu()
+                self.screenHelp = None
+             
 ### --------------------------------------------------------     
 class DemoHelp:  
 ### --------------------------------------------------------
@@ -121,7 +131,6 @@ class DemoHelp:
             
         elif key == 'snakes':
             self.canvas.bkgMaker.newTracker.clear()
-            
             self.runSnakes('vertical') if self.dots.Vertical else\
                 self.runSnakes('left')   
                     
@@ -133,8 +142,7 @@ class DemoHelp:
             if self.dots.Vertical:     
                 MsgBox('Not Implemented for Vertical Format')
                 return            
-            self.canvas.bkgMaker.newTracker.clear()
-            
+            self.canvas.bkgMaker.newTracker.clear()    
             self.hats.makeHatsDemo('left') if key == 'left' else\
                 self.hats.makeHatsDemo('right') ## left to right - direction of travel
       
@@ -172,7 +180,7 @@ class ScreenHelp:  ## screens are from dotsScreens
         self.table = TableWidgetSetUp(60, 95, 60, len(screens)+3)
         self.table.itemClicked.connect(self.clicked)   
         
-        width, height = 222, 546
+        width, height = 222, 486
         self.table.setFixedSize(width, height)
         
         self.table.setRow(0, 0, f'{"Screen Formats":<14}',QL,True,True,3)

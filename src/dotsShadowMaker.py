@@ -39,7 +39,7 @@ class ShadowMaker:
         self.botLeft  = None
         self.botRight = None
         
-        self.path = [] 
+        self.corners = [] 
         self.points = []  
    
         self.flopped   = False
@@ -51,7 +51,7 @@ class ShadowMaker:
 
         self.alpha  = .50
         self.scalor = 1.0
-        self.rotate =   0
+        self.rotate = 0
         
         self.cpy     = None  ## saved original grey image 
         self.flopCpy  = None
@@ -113,8 +113,8 @@ class ShadowMaker:
         for k in range(4):
             x = self.pixitem.shadow['pathX'][k]
             y = self.pixitem.shadow['pathY'][k]
-            self.path.append(QPointF(x,y))
-         
+            self.corners.append(QPointF(x,y))
+      
         self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
 
         file, w, h = self.works.pixWidthHeight()   
@@ -150,8 +150,8 @@ class ShadowMaker:
                                                                                                                                          
 ### --------------------------------------------------------
     ## if rotated, scaled or points moved or loaded from a play file   
-    def updateShadow(self, what=''):    
-        if self.path != None and len(self.path) == 0:
+    def updateShadow(self, what=''):  ## if what != '' don't show outoutline
+        if self.corners != None and len(self.corners) == 0:
             return
                     
         cpy = self.flopCpy if self.flopped else self.cpy  ## called by shadow and pointitem
@@ -159,17 +159,17 @@ class ShadowMaker:
         linked = self.linked       ## these 2 aren't carried over and need to be restored
         save   = self.shadow.save  ## used if linked for storing current position
                   
-        img, width, height, bytesPerLine = setPerspective(
-            self.path, 
+        img, width, height, bytesPerLine = setPerspective(   ## in shadow
+            self.corners, 
             self.width, 
             self.height,
             cpy, 
             self.viewW, self.viewH)   
         img = QImage(img.data, width, height, bytesPerLine, QImage.Format.Format_ARGB32) 
         
-        x, y, w, h = getCrop(self.path)        
+        x, y, w, h = getCrop(self.corners)        
         img = img.copy(x, y, w, h) 
-                         
+                          
         pixmap = QPixmap.fromImage(img)          
         self.works.removeShadow()
           
@@ -182,7 +182,7 @@ class ShadowMaker:
         self.linked = linked  ## back to shadow
         self.shadow.save = save  
                             
-        if linked == True and self.restore == False:
+        if linked and not self.restore:
             self.shadow.setX(self.last.x())  
             self.shadow.setY(self.last.y()) 
         else:
@@ -200,12 +200,10 @@ class ShadowMaker:
             self.works.closeWidget()
         self.widget = ShadowWidget(self, self.shadow, self.switch)  
         
-        if self.linked == False:  ## not linked
-            self.widget.linkBtn.setText('Link') 
-        else:      
-            self.widget.linkBtn.setText('UnLink')  ## link == True
+        self.widget.linkBtn.setText('Link') if not self.linked else \
+            self.widget.linkBtn.setText('UnLink')
                
-        if self.path != None and len(self.path) > 0:       
+        if self.corners != None and len(self.corners) > 0:       
             p = self.shadow.sceneBoundingRect()     
                                            
             x, y = int(p.x()), int(p.y())  
@@ -226,14 +224,14 @@ class ShadowMaker:
     def addPoints(self, hide=True): 
         self.works.deletePoints()  ## cleared points
 
-        if len(self.path) == 0:
+        if len(self.corners) == 0:
             for i in range(4): 
-                self.path.append(QPointF())
+                self.corners.append(QPointF())
    
-        self.topLeft  = PointItem(self.path[0], 'topLeft', self)
-        self.topRight = PointItem(self.path[1], 'topRight', self)
-        self.botRight = PointItem(self.path[2], 'botRight', self)
-        self.botLeft  = PointItem(self.path[3], 'botLeft', self)
+        self.topLeft  = PointItem(self.corners[0], 'topLeft', self)
+        self.topRight = PointItem(self.corners[1], 'topRight', self)
+        self.botRight = PointItem(self.corners[2], 'botRight', self)
+        self.botLeft  = PointItem(self.corners[3], 'botLeft', self)
                 
         self.points.append(self.topLeft)  
         self.points.append(self.topRight)  
@@ -254,20 +252,20 @@ class ShadowMaker:
 
 ### --------------------------------------------------------
     def setPath(self, b, p):  ## boundingRect and position
-        self.path.clear()
-        self.path.append(p)  
-        self.path.append(QPointF(p.x() + b.width(), p.y()))  
-        self.path.append(QPointF(p.x() + b.width(), p.y() + b.height()))         
-        self.path.append(QPointF(p.x(), p.y() + b.height()))
+        self.corners.clear()  ## shadow points
+        self.corners.append(p)  
+        self.corners.append(QPointF(p.x() + b.width(), p.y()))  
+        self.corners.append(QPointF(p.x() + b.width(), p.y() + b.height()))         
+        self.corners.append(QPointF(p.x(), p.y() + b.height()))
  
     def updatePath(self, val):  ## see shadow for ItemSendsScenePositionChanges 
-        if self.path != None and len(self.path) > 0:    
+        if self.corners != None and len(self.corners) > 0:    
             dif = val - self.shadow.save          
             for i in range(4):
-                self.path[i] = self.path[i] + dif
-                self.updatePoints(i, self.path[i].x(), self.path[i].y())              
+                self.corners[i] = self.corners[i] + dif
+                self.updatePoints(i, self.corners[i].x(), self.corners[i].y())              
             self.shadow.save = val      
-            if self.linked == False:    ## updated by shadow
+            if not self.linked:    ## updated by shadow
                 self.shadow.setPos(self.shadow.pos()+dif) 
                 if self.dblclk: ## turns on outline and points    
                     self.works.updateOutline()    
@@ -294,9 +292,9 @@ class ShadowMaker:
                          
     def toggleWidgetLink(self): 
         if self.shadow != None:
-            if self.linked == False and self.widget.linkBtn.text() == 'Link': 
+            if not self.linked and self.widget.linkBtn.text() == 'Link': 
                 self.shadow.linkShadow()   
-            elif self.linked == True and self.widget.linkBtn.text() == 'UnLink':
+            elif self.linked and self.widget.linkBtn.text() == 'UnLink':
                 self.shadow.unlinkShadow()  
                                                                                                              
 ### --------------------------------------------------------                                                              

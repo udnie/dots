@@ -93,7 +93,7 @@ class ShowRunner:
                 try:
                     self.makeTableView(dlist, src)  ## display any missing files or what's there if 'table'
                     ## src = 'table' if run from canvas when typing 'j'
-                    if self.showbiz.tableView.loadingError == True or src == 'table':
+                    if self.showbiz.tableView.loadingError or src == 'table':
                         return
                     self.updateStoryBoard(dlist) 
                 except:
@@ -131,7 +131,7 @@ class ShowRunner:
                 self.showFiles.addPixToScene(pix, tmp, lnn)  ## finish unpacking tmp 
                 lnn -= 1            
                 ## found a shadow - see if shadows are turned on, yes == '', no == 'pass'
-                if pix.shadowMaker.isActive == True and 'scalor' in tmp.keys(): 
+                if pix.shadowMaker.isActive and 'scalor' in tmp.keys(): 
                     ns += 1                        
             
             elif 'bat' in tmp['fileName']:  ## make a bat - not from demoMenu, adds self to scene

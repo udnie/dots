@@ -28,15 +28,13 @@ HorzH = 225  ## horizontal starting height
 
 MinWid  = 300  ## minimum widget width
 MinHgt  = 400  ## minimum widget height
-AspKeys = list(Keys.keys())
 
-VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Shift-S','Aspect','Settings','Clips']
-WID, HGT, PAD = 40, 140, 30 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
+AspKeys = list(Keys.keys())
 
 ### --------------------------------------------------------        
 class Settings(QWidget):  ## settings for clipsMaker and autoAspect
 ### -------------------------------------------------------- 
-    def __init__(self, parent, switch=''): 
+    def __init__(self, parent, switch='', off=0): 
         super().__init__()
 
         self.parent = parent
@@ -49,7 +47,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         vbox.addSpacing(20) 
  
         label = QLabel('ClipsMaker Settings', alignment=Qt.AlignmentFlag.AlignHCenter)
-        label.setFont(QFont("Arial", 14))
+        label.setFont(QFont("Arial", 15))
         vbox.addWidget(label)
         
         vbox.addWidget(self.sliderGroup())
@@ -74,7 +72,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         x = int(p.x() + (self.parent.width()/2)) - int(self.WidgetW/2)
         y = int(p.y() + (self.parent.height()/2)) - int(self.WidgetH/2)   
         
-        self.move(x, y)
+        self.move(x+off, y)
                                                                             
         self.show()
 
@@ -108,7 +106,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
 ### --------------------------------------------------------      
     def sliderGroup(self):
         groupBox = QGroupBox()   
-        groupBox.setFixedHeight(150)         
+        groupBox.setFixedHeight(165)         
         groupBox.setFixedWidth(int(300))
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
     
@@ -246,8 +244,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         if self.clips.AddFileName:
             self.nameBtn.setText('FileNameOn')
             
-        self.makeClipsBtn = QPushButton('Make a Clip')
-        
+        self.makeClipsBtn = QPushButton('Make a Clip')  
         self.quitBtn = QPushButton('Close')
         
         if self.switch == '':
@@ -257,7 +254,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
             self.skipBtn.clicked.connect(lambda: self.clips.setWidgetButtons("skip"))
             self.filterBtn.clicked.connect(lambda: self.clips.setWidgetButtons("filter"))
             self.playBtn.clicked.connect(lambda: self.clips.setWidgetButtons("play"))
-            self.makeClipsBtn.clicked.connect(self.parent.shared.openDirectory)
+            self.makeClipsBtn.clicked.connect(self.parent.clips.makingClips)
             self.nameBtn.clicked.connect(lambda: self.clips.setWidgetButtons("name"))
             self.quitBtn.clicked.connect(self.clips.closeSettings)
         else:

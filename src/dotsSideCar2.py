@@ -13,7 +13,7 @@ from dotsBkgItem        import BkgItem
 
 ### --------------------- dotsSideCar2 ---------------------
 ''' no class: snapShot,dumptrackers, addBkgLabels, setMirroredBtnText,
-    setBtns, tagBkg and files from storyboard - no connection to pathMaker'''   
+    tagBkg and files from storyboard - no connection to pathMaker '''   
 ### --------------------------------------------------------
 class SideCar2:
 ### --------------------------------------------------------
@@ -23,12 +23,14 @@ class SideCar2:
         self.canvas = parent
         self.scene  = self.canvas.scene
         self.mapper = MapMaker(self.canvas)
-  
+        
+        self.qtstring = 'PyQt6'  ## updated by scripts to reflect framework
+      
 ### --------------------------------------------------------      
     def snapShot(self, pathMaker):  ## screen capture
         if self.hasBackGround() > 0 or self.scene.items():
             self.unSelect()  ## turn off any select borders
-            if self.canvas.pathMakerOn == False:
+            if not self.canvas.pathMakerOn:
                 if self.mapper.isMapSet():
                     self.mapper.removeMap()
                     
@@ -91,15 +93,14 @@ class SideCar2:
             bkg.setMirrored(bkg.flopped, switch)    
             x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
             bkg.setPos(x , 0)   
-
-            akg = BkgItem(bkgtmp.fileName, self.canvas, common['bkgZ'], bkgtmp.imgFile)
-            if akg == None:
-                return
             
-            self.scene.addItem(akg)  
-            akg.setMirrored(True, switch) if bkg.flopped == False else akg.setMirrored(False, switch) 
-            akg.setPos(int(common['ViewW']/2), 0)  ## start center screen
-        
+            akg = BkgItem(bkgtmp.fileName, self.canvas, common['bkgZ'], bkgtmp.imgFile)
+            if akg == None:  
+                return
+            else:
+                self.scene.addItem(akg)  
+                akg.setMirrored(True, switch) if not bkg.flopped else akg.setMirrored(False, switch) 
+                akg.setPos(int(common['ViewW']/2), 0)  ## start center screen
         self.delDupes()
                                        
     def delDupes(self):  ## otherwise they can build up
@@ -110,7 +111,16 @@ class SideCar2:
                     i += 1 
                     if i >= 3:
                         self.scene.removeItem(bkg)
-
+                                
+    def playschk(self):  ## run it directly from dots when switching from pyqt to pyside or back
+        if len(self.canvas.scene.items()) == 0:    
+            str = './plays-type-desc.sh' if self.qtstring == 'PySide6' else \
+                './plays-desc-type.sh'
+            try:  
+                os.system(str)             
+            except:
+                MsgBox("./plays failed")
+                
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
         if self.canvas.bkgMaker.bkgtrackers.tracker != None and \
@@ -141,7 +151,6 @@ class SideCar2:
             if pix.type in ('pix', 'shadow'):
                 pix.setSelected(True)
                 pix.isHidden = False
-                
             elif pix.zValue() <= common['pathZ']:
                 break
  
@@ -177,7 +186,7 @@ class SideCar2:
                 self.canvas.bkgMaker.unlockBkg(itm)
         
     def flopSelected(self):    
-        if self.canvas.pathMakerOn == False:
+        if not self.canvas.pathMakerOn:
             if len(self.scene.selectedItems()) > 0:
                 for pix in self.scene.items():
                     if pix.type == 'pix':
@@ -188,23 +197,6 @@ class SideCar2:
             else:
                 self.canvas.setKeys('F')
 
-    def setBtns(self, bkg, widget):  ## from bkgMaker widget
-        match bkg.direction:  
-            case 'right': 
-                widget.rightBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                widget.leftBtn.setStyleSheet(
-                    'background-color: None') 
-            case 'left': 
-                widget.leftBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                widget.rightBtn.setStyleSheet(
-                    'background-color: None')
-            case 'vertical':
-                widget.leftBtn.setText('Vertical')   
-                widget.leftBtn.setStyleSheet(
-                    'background-color: LIGHTGREY')
-                                              
 ### --------------------- dotsSideCar2 ---------------------
 
 

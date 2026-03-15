@@ -9,28 +9,37 @@ MaxWidth = 1680  ##  position dock to screen bottom for max default display widt
 MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
 
 screens = {  ## used by helpmenus and dots
-     '960':  ('960X720',  '4:3'),           
+    'SQH':  ('720X720',   '1:1'), 
+    '960':  ('960X720',   '4:3'),           
     '1080': ('1080X720',  '3:2'),
     '1280': ('1280X720', '16:9'), 
-  
-     'SQH':  ('800X800',  '1:1'),
+    
     '108O': ('1080X810',  '4:3'),     
     '1215': ('1215X810',  '3:2'),
-    '1440': ('1440X810', '16:9'),
+    '1440': ('1440X810', '16:9'), 
     
-    '1296': ('1296X864',  '3:2'),
-    '1536': ('1536X864', '16:9'),
+    # '1296': ('1296X864',  '3:2'),
+    # '1536': ('1536X864', '16:9'),
     
+     'SQV':  ('720X720',  '1:1'),
      '800':  ('600X800',  '3:4'),
-     'SQV':  ('800X800',  '1:1'),
      '900':  ('600X900',  '2:3'), 
-     '912':  ('513X912', '9:16'), 
-      
-    '1024': ('576X1024', '9:16'),  
-    '1066': ('600X1066', '9:16'),    
-    # '1102': ('620X1102', '9:16'),
+     
+    '960V':  ('540X960',  '9:16'), 
+    # '1024': ('576X1024', '9:16'),    
+    '1066':  ('600X1066', '9:16'),  
+    '1102':  ('620X1102', '9:16'),
 }
-          
+
+vheights = {
+     '800':  205,
+     '900':  165,
+    '960V':  135, 
+    # '1024':  115,    
+    '1066':  105,  
+    '1102':   65,
+}
+
 ### -------------------- dotsScreens -----------------------
 ''' no class: screen formats and functions '''     
 ### -------------------------------------------------------- 
@@ -96,11 +105,16 @@ def setCommon(format=''):
             common.update(vert)
             common.update(sqv00)              
             return screens['SQV'] 
-         
+        
         case '912':       ## 513X912 - 9:16
             common.update(vert)
             common.update(nine12)              
             return screens['912'] 
+         
+        case '960V':       ## 540X960 - 9:16
+            common.update(vert)
+            common.update(nine60V)              
+            return screens['960V'] 
         
         case '1024':       ## 576X1024 - 9:16
             common.update(vert)
@@ -173,16 +187,27 @@ eight10 = {  ## used by both 1215X810 and 140X810px
 }
 
 sqh00 = {  ## 800X800 - 1:1
-    'Screen':    'SQH',  
-    'DotsW':     1140,
-    'DotsH':      902,   
-    'ViewW':      800, 
-    'ViewH':      800,   
-    'margin1':     10,  
-    'scaleX':    1.05,   
-    'ScrollH':    769,
-    'SliderH':    762, 
-    'gridSize':  32.0,
+    'Screen':    'SQH', 
+    'DotsW':     1030,
+    'DotsH':      822,  
+    'ViewW':      720, 
+    'ViewH':      720,   
+    'margin1':     10,    
+    'ScrollH':    677,
+    'SliderH':    682, 
+    'gridSize':  30.0,
+} 
+
+sqv00 = {  ## 800X800 - 1:1
+    'Screen':    'SQV',  
+    'DotsW':     1030,
+    'DotsH':      822,  
+    'ViewW':      720, 
+    'ViewH':      720,   
+    'margin1':     10,    
+    'ScrollH':    677,
+    'SliderH':    679, 
+    'gridSize':  30.0,
 }
 
 ten81 = {  ## 1080X810 - 4:3 format 
@@ -203,7 +228,7 @@ twelve15 = {    ## 1215X810 - 3:2 format
     
 fourteen40 = {  ## 1440X810 - 16:9 
     'Screen':  '1440',         
-    'DotsW':     1743,
+    'DotsW':     1747,
     'ViewW':     1440,
     'gridSize':    30, 
     'scaleX':    1.30,
@@ -252,19 +277,19 @@ vert = {
 
 six80 = {  ## 600X800  - 3:4
     'Screen':    '800',  
-    'DotsW':      940,
+    'DotsW':      920,
     'DotsH':      902,  
     'ViewW':      600, 
     'ViewH':      800,   
     'margin1':     10,    
-    'ScrollH':    767,
+    'ScrollH':    771,
     'SliderH':    762, 
     'gridSize':   28.5,
 }
 
 six90 = {  ## 600X900 - 2:3
     'Screen':    '900',  
-    'DotsW':      940,
+    'DotsW':      920,
     'DotsH':     1002,  
     'ViewW':      600, 
     'ViewH':      900,   
@@ -274,16 +299,28 @@ six90 = {  ## 600X900 - 2:3
     'gridSize':  30.0,
 }
 
-sqv00 = {  ## 800X800 - 1:1
-    'Screen':    'SQV',  
-    'DotsW':     1140,
-    'DotsH':      902,  
-    'ViewW':      800, 
-    'ViewH':      800,   
-    'margin1':     10,    
-    'ScrollH':    769,
-    'SliderH':    762, 
-    'gridSize':  32.0,
+ten66 = {  ## 600X1066 - so it doesn't conflict
+    'Screen':   '1066',  
+    'DotsW':      930,
+    'DotsH':     1126,  
+    'ViewW':      600, 
+    'ViewH':     1024,   
+    'margin1':     15,    
+    'ScrollH':    968,
+    'SliderH':    979, 
+    'gridSize':  30.0,
+}
+
+nine60V = {  ## 540X960
+    'Screen':   '960V',  
+    'DotsW':      860,
+    'DotsH':     1062,  
+    'ViewW':      540, 
+    'ViewH':      960,   
+    'margin1':     20,    
+    'ScrollH':    878,
+    'SliderH':    894, 
+    'gridSize':  30.0,
 }
 
 nine12 = {  ## 513X912
@@ -300,7 +337,7 @@ nine12 = {  ## 513X912
 
 ten24 = {  ## 576X1024
    'Screen':    '1024',  
-    'DotsW':      920,
+    'DotsW':      935,
     'DotsH':     1126,  
     'ViewW':      576, 
     'ViewH':     1024,   
@@ -308,18 +345,6 @@ ten24 = {  ## 576X1024
     'ScrollH':    965,
     'SliderH':    972, 
     'gridSize':  32.0,
-}
-
-ten66 = {  ## 600X1066 - so it doesn't conflict
-    'Screen':   '1066',  
-    'DotsW':      940,
-    'DotsH':     1168,  
-    'ViewW':      600, 
-    'ViewH':     1024,   
-    'margin1':     10,    
-    'ScrollH':    965,
-    'SliderH':    972, 
-    'gridSize':  30.0,
 }
 
 six20 = {   ## 1102 - must be a string not a number
@@ -352,16 +377,14 @@ def getCtr():  ## adjusted for app size and display
 
 def getX():  ## adjusted for app size and display
     ctr = QGuiApplication.primaryScreen().availableGeometry().center()
-    return int(((ctr.x() * 2 ) - common['DotsW'])/2)
+    return int(ctr.x()  - (common['DotsW']/2))
 
 def getY():
     ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
-    if common['Screen'] in Verts:   
-        return 0  ## gets set to 50
-    else:
-        return int((((ctr.y() * 2 ) - common['DotsH'])/2)*.45)   
+    return int(ctr.y() - (common['DotsH']/2))
    
 ### -------------------- dotsScreens -----------------------
+
 
 
 

@@ -19,7 +19,7 @@ class TagIt(TextItem):  ## called in pathItem, pathWays and this
         super().__init__()
   
         self.type = 'tag'
-  
+
         if token == 'paths':
             color = 'lime'
             if 'Locked Random' in tag:
@@ -56,10 +56,8 @@ class TagIt(TextItem):  ## called in pathItem, pathWays and this
             self.color = QColor(color)
 
         if zval != None and token != 'paths':
-            if type(tag) == str and len(tag) > 0:  
-                tag = tag + ': ' + str(zval)
-            else:
-                tag = str(zval)
+             tag = tag + ': ' + str(zval) if type(tag) == str and len(tag) > 0 \
+                else str(zval)
     
         if token == 'points':
             self.type = 'ptTag'  ## changed from 'pt'
@@ -79,7 +77,7 @@ class TagIt(TextItem):  ## called in pathItem, pathWays and this
  
         self.rect = QRectF(0, 0, p+13, 19)
         self.waypt = 0
-            
+
     def boundingRect(self):
         return self.rect
     
@@ -125,8 +123,8 @@ class TagsAndPaths: ## handles more than one request
                     
                 elif pid == 'anime' and pix.type == 'pix' and pix.tag in self.alst \
                     or 'path' in pix.tag:  
-                    self.tagThis('',pix) 
-                    k += 1   
+                        self.tagThis('',pix) 
+                        k += 1   
                             
                 elif pid == 'all':
                     if alltags != pix.tag:  ## only one per snake
@@ -151,7 +149,10 @@ class TagsAndPaths: ## handles more than one request
  
 ### --------------------------------------------------------        
     def tagThis(self, token, pix):  ## used by tagWorks
-        
+        color = ''
+        tag = pix.tag
+        topZVal = self.mapper.toFront()
+       
         if pix.type != 'shadow': 
             p = pix.sceneBoundingRect()
             x = p.x() + p.width()*.45
@@ -160,19 +161,10 @@ class TagsAndPaths: ## handles more than one request
             p = pix.maker.shadow.sceneBoundingRect()
             x = p.x() + 50.0
             y = p.y() + 50.0
-            
-        topZVal = self.mapper.toFront()
-
-        tag = pix.tag
-        color = ''
-        
+ 
         if pix.type in ('pix','bkg','frame'):
 
-            if pix.locked:
-                tag = 'Locked ' + tag 
-            else:
-                tag = 'UnLocked ' + tag 
-    
+            tag = 'Locked ' + tag if pix.locked else 'UnLocked ' + tag
             color = 'orange'
             zval = pix.zValue()
           
@@ -189,37 +181,37 @@ class TagsAndPaths: ## handles more than one request
            
         elif pix.type == 'shadow':
             color = 'lightgreen'
-            if pix.maker.linked:
-                tag = 'Linked ' + tag
-            else:
-                tag = 'UnLinked ' + tag
+            
+            tag = 'Linked ' + tag if pix.maker.linked else 'UnLinked ' + tag
             zval = pix.zValue()
    
         if token == 'paths':
             y = y - 20
         else:
             token = self.canvas.control
-          
-        if pix.zValue() == topZVal:  ## set to front ZValue
-            color = 'yellow'
-             
+               
         if 'frame' in pix.fileName: 
             x, y = common['ViewW']*.47, common['ViewH']-35
-               
+              
+        if pix.zValue() == topZVal:  ## set to front ZValue
+            color = 'yellow'
+        
         self.TagItTwo(token, tag, color, x, y, zval)
         
 ### --------------------------------------------------------       
     ## this way I can stretch it for backgrounds and pixitems
     def TagItTwo(self, token, tag, color, x, y, z, src=''):
+  
         tag = TagIt(token, tag, color, z)         
         tag.setZValue(self.mapper.toFront(45.0))
-        
-        if src in ('bkg', 'pix'):  ## single selections
+
+        if src in ('bkg', 'pix','shadow', 'flat','frame'):  ## single selections         
             tag.setPos(x-50.0, y-10.0)  ## position it near cursor
             self.scene.addItem(tag)
         else:
-            tag.setPos(x,y)
-            self.mapper.tagGroup.addToGroup(tag)
+            if tag != None:
+                tag.setPos(x,y)
+                self.mapper.tagGroup.addToGroup(tag)
         self.mapper.tagSet = True
 
 ### -------------------- mostly paths ----------------------

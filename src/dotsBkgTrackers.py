@@ -232,7 +232,7 @@ class BkgTrackers:
             if self.bkgMaker.newTracker[fileName]:   
                 direction = self.bkgMaker.newTracker[fileName]['direction']     
        
-        mirror = 'Continuous' if bkg.mirroring == False else 'Mirrored' 
+        mirror = 'Continuous' if not bkg.mirroring else 'Mirrored' 
 
         return fileName.capitalize(), direction, mirror, locked
               

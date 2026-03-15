@@ -27,13 +27,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def __init__(self, fileName, parent, z=common['bkgZ'], copy=None):
         super().__init__()
 
-        self.canvas   = parent
-        self.dots     = self.canvas.dots
-        self.scene    = self.canvas.scene
+        self.canvas = parent
+        self.dots   = self.canvas.dots
+        self.scene  = self.canvas.scene
+        
         self.bkgMaker = self.canvas.bkgMaker
-
-        self.bkgWorks       = BkgWorks(self)  
-        self.bkgScrollWrks  = BkgScrollWrks(self)
+        self.bkgWorks = BkgWorks(self)  
+        self.bkgScrollWrks = BkgScrollWrks(self)
         
         self.ViewW = common['ViewW']
         self.ViewH = common['ViewH']
@@ -92,7 +92,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.addedScroller = False  ## used by itemChange 
         
         self.helpMenu = None
-           
+        self.matteWidget = None
+        
         self.direction = ''  ## direction of travel: left <<--, right -->>
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
         self.factor    = self.bkgMaker.factor    ## sets default 
@@ -135,9 +136,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def mousePressEvent(self, e): 
         if not self.canvas.pathMakerOn:       
             if e.button() == Qt.MouseButton.RightButton: 
-                if self.bkgMaker.matteWidget != None:
+                
+                if self.matteWidget != None:
+                    self.matteWidget.shared('H')
                     return
-                elif self.helpMenu != None:
+             
+                if self.helpMenu != None:
                     self.closeMenu()
                 self.bkgMaker.addWidget(self)   
                 if self.direction == '':
@@ -165,9 +169,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                         self.setZValue(self.bkgMaker.toBack()) 
                         self.bkgMaker.renumZvals()  
                 case  'enter' | 'return':   ## to front     
-                    self.bkgMaker.front(self)    
-                case  'tag':                ## '\' <- tagKey
-                    self.tagThis()
+                    self.bkgMaker.front(self)           
+                case  'tag':     
+                    self.tagThis()    
                 case  'B': 
                     self.bkgMaker.bkgtrackers.trackThis()
                 case  'E':   
@@ -177,10 +181,10 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 case  'H':  
                     self.openMenu()                           
                 case 'M':
-                    self.bkgMaker.openMatte(self)      
+                    self.bkgWorks.openMatte(self)      
                 case  'T':     
-                    self.bkgMaker.lockBkg(self) if self.locked == False \
-                        else self.bkgMaker.unlockBkg(self)
+                    self.bkgMaker.lockBkg(self) if not self.locked else \
+                        self.bkgMaker.unlockBkg(self)
                     self.tagThis()
                  
     def tagThis(self):
@@ -195,6 +199,15 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if self.helpMenu != None:
             self.helpMenu.closeMenu()
             self.helpMenu = None
+    
+    def closeMatteWidget(self):
+        if self.matteWidget != None:   
+            if self.matteWidget.skynet != None:
+                self.matteWidget.skynet.close()        
+                self.matteWidget.skynet = None
+            self.matteWidget.close() 
+            self.matteWidget = None
+            self.bkgMaker.view.grabKeyboard()
         
 ### -------------------------------------------------------- 
     ''' first' has already set its setScrollerPath - ## value equals self.pos() 
@@ -205,7 +218,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             if self.direction == '':
                 return            
                      
-            elif self.addedScroller == False:  ## check if its showtime    
+            elif not self.addedScroller:  ## check on the distance to showtime
                 
                 if self.direction  == 'left'     and int(value.x()-self.runway) <= self.showtime or\
                     self.direction == 'right'    and int(value.x()) >= -self.showtime or\
@@ -253,7 +266,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         if bkg.direction == '':   
             return  
         
-        elif bkg.isScrollable() == False:
+        elif not bkg.isScrollable():
             bkg.bkgScrollWrks.clearBkgScrolling()
             return None
 
@@ -266,7 +279,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
         return bkg.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
      
-    def isScrollable(self):  ## only after height and width are set
+    def isScrollable(self):  ## once screen height and width are set 
         if self.canvas.dots.Vertical and self.height > (common['ViewH'] + 10) or \
             self.width > (common['ViewW'] + 10):
             return True

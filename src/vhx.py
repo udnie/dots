@@ -1,8 +1,9 @@
 
 import sys
 
-from PyQt6.QtCore       import Qt, QPointF
-from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, QFontMetrics, QFont
+from PyQt6.QtCore       import Qt, QPointF, QPoint
+from PyQt6.QtGui        import QGuiApplication, QPainter, QColor, QPen, \
+                                QFontMetrics, QFont
 from PyQt6.QtWidgets    import QApplication, QWidget
 
 Ticks = (100,50,10)  ## how many pixels apart to draw a line and size
@@ -10,10 +11,11 @@ RWidth, RSize, RHeight = 1800, 70, 1000  ## startup
 
 ### ------------------------- vhx --------------------------
 ''' '+, >, ]' expands, scales up, the ruler either horizontally or 
-    vertically and  '_, <, [' scales it down - contracts. A mouse-press 
-    to the ruler's left or top-most end, if vertical, will anchor it, 
-    limiting its expansion or contraction to the ruler's opposite end
-    rather than the default - both ends it once. '''
+    vertically and  '_, <, [' scales it down - contracts. Square brackets
+    only need one finger. A mouse-press to the ruler's left or top-most end, 
+    if vertical, will anchor it, limiting its expansion or contraction 
+    to the ruler's opposite end rather than the default - both ends it once.
+    A little help from google a.i. with the mouse cursor '''
 ### --------------------------------------------------------
 class VHX(QWidget):  ## yet another screen pixel ruler 
 ### --------------------------------------------------------
@@ -33,9 +35,7 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         self.setAccessibleName('widget')
 
         self.widget = QWidget(self)
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.setFocus()
-        
+    
         self.initXY = self.pos()
         self.horizontal = True 
         self.switch = 0
@@ -46,7 +46,7 @@ class VHX(QWidget):  ## yet another screen pixel ruler
         self.font = QFont()
         self.font.setFamily("Helvetica")
         self.font.setPointSize(13)
-                
+                    
         self.show()
 
 ### --------------------------------------------------------
@@ -80,38 +80,41 @@ class VHX(QWidget):  ## yet another screen pixel ruler
             self.close()
                 
     def mousePressEvent(self, e):
-        self.initXY = e.globalPosition()
+        self.initXY = e.globalPosition().toPoint()
         self.switch = 1
         e.accept()
 
-    def mouseMoveEvent(self, e):
-        delta = QPointF(e.globalPosition() - self.initXY)
+    def mouseMoveEvent(self, e): 
+        delta = QPoint(e.globalPosition().toPoint() - self.initXY)
+        x, y = self.moveThis(delta)
+        self.move(x, y)
+        self.initXY = e.globalPosition().toPoint()  
+        e.accept()
+
+    def mouseReleaseEvent(self, e):
+        self.switch = 0
+        self.releaseMouse()   
+        e.accept()
+
+    def mouseDoubleClickEvent(self, e):
+        self.close()  
+        
+    def moveThis(self, delta):
         x = self.x() + delta.x()
         y = self.y() + delta.y()
-        ## leave some pixels on the screen -- 200px 
         if self.horizontal:
             x = constrain(x, self.width(), self.scrnWidth, 200)
         else:
             y = constrain(y, self.height(), self.scrnHeight, 200)
-        ## so it doesn't get lost and go off screen
-        if self.horizontal:
+        if self.horizontal:   ## so it doesn't get lost and go off screen
             if y >= self.scrnHeight - RSize/2:
                 y = int(self.scrnHeight - RSize/2)
         else:
             if x >= self.scrnWidth - self.width()/2:
                 x = int(self.scrnWidth - self.width()/2)
             elif x <= self.width()/2:
-                x = int(self.width()/2)
-        self.move(int(x),int(y))
-        self.initXY = e.globalPosition()
-        e.accept()
-
-    def mouseReleaseEvent(self, e):
-        self.switch = 0
-        e.accept()
-
-    def mouseDoubleClickEvent(self, e):
-        self.close()  
+                x = int(self.width()/2) 
+        return int(x), int(y)
     
 ### --------------------------------------------------------
     def paintEvent(self, event):
@@ -198,6 +201,11 @@ class VHX(QWidget):  ## yet another screen pixel ruler
             x = int(ctr.x()-self.width()/2)
             self.move(x, y-50)
 
+def point(pt, st=""):  ## for debug
+    if isinstance(pt, QPointF):
+        pt = pt.toPoint()   
+    return f'{pt.x(), pt.y()}' if st == '' else  f'{st}: {pt.x(), pt.y()}'
+
 def getScreenSize():
     d = QGuiApplication.primaryScreen().availableGeometry()
     return d.x() + d.width(), d.y() + d.height()
@@ -205,10 +213,8 @@ def getScreenSize():
 def constrain(xy, objSize, screenSize, px):
     if xy >= screenSize - px:    ## chk right
         return int(screenSize - px)   
-     
     elif xy <= -(objSize - px):  ## chk left
         return int(-(objSize - px))
-
     else:
         return int(xy)
 
@@ -219,4 +225,6 @@ if __name__ == '__main__':
     sys.exit(app.exec())
 
 ### ------------------------- vhx --------------------------
+
+
 

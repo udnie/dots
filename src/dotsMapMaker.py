@@ -3,8 +3,10 @@ from PyQt6.QtCore    import Qt, QTimer, QSize, QRectF, QRect, QAbstractAnimation
 from PyQt6.QtGui     import QColor, QPen
 from PyQt6.QtWidgets import QGraphicsItem, QGraphicsPixmapItem
 
+from dotsShadow import Shadow
 from dotsShared         import common, ItemsGroup
 from dotsTagsAndPaths   import TagsAndPaths
+from dotsSideGig        import tagBkg
 
 ### --------------------- dotsMapMaker ---------------------
 ''' Classes: MapItem, MapMaker and various tags and path functions
@@ -134,7 +136,7 @@ class MapMaker:
         self.mapRect = QRectF()
 
     def toggleMap(self):  ## not based on rubberband geometry
-        if self.isMapSet() == False:  ## runs directly from controlview uses 'M' key
+        if not self.isMapSet():  ## runs directly from controlview uses 'M' key
             self.selections = []      ## not the same as in PathEdits
             for pix in self.scene.selectedItems():  ## only items selected
                 self.selections.append(pix.id)
@@ -181,7 +183,7 @@ class MapMaker:
         self.tagGroup.setZValue(self.tagZ)     
         self.scene.addItem(self.tagGroup)
 
-    def toggleTagItems(self, pid):  
+    def toggleTagItems(self, pid): ## mainly animated
         if self.canvas.pathMakerOn: 
             return  
         elif self.tagCount() > 0 and pid != 'anime':  ## don't clear these
@@ -195,6 +197,21 @@ class MapMaker:
                 QTimer.singleShot(200, self.clearPaths)
             self.addTagGroup()
             self.tagsAndPaths.tagWorks(pid)
+            
+    def toggleSelectedSceneItems(self):  ## from controlview - display all tags
+        if self.canvas.pathMakerOn: 
+            return  
+        elif self.tagCount() > 0:
+            self.clearTagGroup()
+            self.clearPaths() 
+            return
+        elif self.isMapSet():
+            self.clearMap()
+        if len(self.scene.items()) > 0:
+            self.addTagGroup() 
+            for pix in self.scene.items():
+                if pix.type in('pix','bkg','shadow','frame','flat'):
+                    tagBkg(pix, pix.pos())
         
     def clearTagGroup(self):     
         if self.tagCount() > 0: 
@@ -207,9 +224,7 @@ class MapMaker:
             for pix in self.scene.items():
                 if pix.type in ('pathsItem', 'text'):
                     self.scene.removeItem(pix)
-                # elif isinstance(pix, QGraphicsSimpleTextItem):
-                #    self.scene.removeItem(pix)
-                   
+     
             for pix in self.scene.items():
                 if pix.type in ('pix', 'snake') and not pix.tag.endswith('.path'):
                     if pix.anime and pix.anime.state() ==  QAbstractAnimation.State.Paused:

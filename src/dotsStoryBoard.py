@@ -34,9 +34,11 @@ class StoryBoard(QWidget):
     def __init__(self, parent):
         super().__init__()
 
-        self.dots  = parent 
+        self.dots = parent 
+        self.canvas = self
+        
         self.scene = QGraphicsScene(0, 0, common['ViewW'], common['ViewH'])
-        self.view  = ControlView(self)
+        self.view = ControlView(self)
         
         self.view.setGeometry(QRect(0,0,common['ViewW']+2, common['ViewH']+2))
         self.setFixedSize(common['ViewW']+2, common['ViewH']+2)
@@ -45,11 +47,9 @@ class StoryBoard(QWidget):
         self.openPlayFile = ''      ## shared 
         self.pathList = []          ## used by animations and animation menu
         self.videoPlayer = None     ## holds mediaplayer reference
+        self.pathMakerOn = False    ## shared
         self.animationRunning = False   ## set by showtime
-        self.pathMakerOn  = False   ## shared
     
-        self.canvas = self 
-        
         self.sideCar   = SideCar(self)    ## extends canvas
         self.sideCar2  = SideCar2(self)   ## same
           
@@ -103,7 +103,7 @@ class StoryBoard(QWidget):
                 
         elif self.pathMakerOn:                            
             ## send MoveKeys to PathItem selections in PathEdits
-            if self.pathMaker.edits.ifpointItemsSet() == True and \
+            if self.pathMaker.edits.ifpointItemsSet() and \
                 self.pathMaker.selections and self.key in MoveKeys:  ## Keys in shared.py
                     self.sideCar2.sendPixKeys(self.key)  ## pointItems get messaged    
                                    
@@ -130,8 +130,12 @@ class StoryBoard(QWidget):
                     self.sideCar2.unSelect()  
                                 
                 elif self.sideCar.hasHiddenPix() or self.mapper.selections:
-                    if self.animationRunning == False:
+                    if not self.animationRunning:
                         self.mapper.updatePixItemPos()   
+                             
+                elif e.button() == Qt.MouseButton.RightButton:
+                    if len(self.scene.items()) == 0:
+                        self.helpButton.openMenus()  ## opens canvas help menu
                             
             ##  enter 'cmd' before you move the mouse and the rubberband kicks in, but not after
             elif e.type() == QEvent.Type.MouseMove:  
@@ -144,11 +148,11 @@ class StoryBoard(QWidget):
                 elif self.mapper.isMapSet() and not self.scene.selectedItems():
                     self.mapper.removeMap()
                     
-                elif self.animationRunning == False:  ## no animations running
+                elif not self.animationRunning:  ## no animations running
                     self.mapper.updatePixItemPos()  ## costly but necessary    
                                
             elif e.type() == QEvent.Type.MouseButtonRelease:
-                if self.mapper.isMapSet() == False:
+                if not self.mapper.isMapSet():
                     self.rubberBand.hide()  ## supposes something is selected
                     self.mapper.addSelectionsFromCanvas()  
                              

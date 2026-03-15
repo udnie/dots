@@ -125,9 +125,15 @@ class ShowFiles:
         pix.locked = tmp['locked']   
         if pix.locked: 
             self.canvas.showbiz.locks += 1  
+            
+        if 'speed' not in tmp.keys():
+            tmp['speed'] = 1 
+        pix.speed = tmp['speed']     
+            
         if 'frame' not in pix.fileName:
             pix.part = tmp['part']  
-        pix = self.canvas.showWorks.lookForStrays(pix)     
+  
+        pix = self.canvas.showWorks.lookForStrays(pix)   
         return pix 
       
     def setFlat(self, pix, tmp):
@@ -180,7 +186,7 @@ class ShowFiles:
                 
         result = self.bkgMaker.bkgtrackers.addTracker(bkg)  
         
-        if result == False:  ## must be a dupe
+        if not result:  ## must be a dupe
             del bkg  ## not yet added to scene
             return None      
         else:
@@ -231,10 +237,11 @@ class ShowFiles:
             'rotation':     pix.rotation,
             'scale':        float(f'{pix.scale:.2f}'),
             'alpha2':       float(f'{pix.alpha2:.2f}'),
+            'speed':        pix.speed,
             'part':         pix.part,
         }   
         ## pix.shadowMaker maintains shadow data over shadow updates
-        if pix.shadowMaker != None and pix.shadowMaker.isActive == True and pix.shadowMaker.shadow != None: 
+        if pix.shadowMaker != None and pix.shadowMaker.isActive and pix.shadowMaker.shadow != None: 
             try:
                 shadow = {  
                     'alpha':    float(f'{pix.shadowMaker.alpha:.2f}'),
@@ -244,11 +251,11 @@ class ShowFiles:
                     'height':   pix.shadowMaker.height,
                     'flopped':   pix.shadowMaker.flopped,
                     'linked':   pix.shadowMaker.linked,            
-                    'pathX':    [float(f'{pix.shadowMaker.path[k].x():.2f}')
+                    'pathX':    [float(f'{pix.shadowMaker.corners[k].x():.2f}')
                                     for k in range(4)],
-                    'pathY':    [float(f'{pix.shadowMaker.path[k].y():.2f}')
+                    'pathY':    [float(f'{pix.shadowMaker.corners[k].y():.2f}')
                                     for k in range(4)],
-                }
+                }          
                 tmp.update(shadow)  
             except Exception:
                 self.errorOnShadows = True  

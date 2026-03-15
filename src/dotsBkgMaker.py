@@ -17,7 +17,6 @@ from dotsScreens        import *
 from dotsFrameAndFlats  import Flat
 from dotsBkgTrackers    import BkgTrackers
 from dotsHelpDesk       import StoryHelp2
-from dotsBkgMatte       import Matte
 
 ### --------------------- dotsBkgMaker ---------------------
 ''' class: BkgMaker - creates and supports BkgItem '''       
@@ -40,8 +39,7 @@ class BkgMaker(QWidget):
         self.flat = None
         self.widget = None  ## there is only one 
         
-        self.matteWidget = None  
-        self.storyHelp2  = None  ## do it here as there's no storyboard
+        self.storyHelp2 = None  ## do it here as there's no storyboard
         
         self.factor = 1.0  ## sets the factor and mirroring defaults in bkgItem
         self.mirroring = False
@@ -54,7 +52,7 @@ class BkgMaker(QWidget):
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats 
         if self.canvas.control in ControlKeys and \
-            self.canvas.pathMakerOn == False:  ## animation
+            not self.canvas.pathMakerOn:  ## animation
             return
         Q = QFileDialog()   ## open only background  
         Q.Option.DontUseNativeDialog
@@ -117,7 +115,7 @@ class BkgMaker(QWidget):
                 return  
 
     def saveBkgColor(self):  ## write to .bkg file
-        if self.canvas.pathMakerOn == False:
+        if not self.canvas.pathMakerOn:
             Q = QFileDialog()
             Q.Option.DontUseNativeDialog
             Q.setDirectory(paths['bkgPath'])
@@ -142,7 +140,7 @@ class BkgMaker(QWidget):
         self.closeWidget()  
         if bkg.type == 'flat':
             return         
-        self.closeMatteWidget() 
+        bkg.closeMatteWidget()  ## only reference
         self.widget = BkgWidget(bkg, self) 
         self.lockBkg(bkg)
         p = common['widgetXY']
@@ -168,18 +166,7 @@ class BkgMaker(QWidget):
             self.canvas.helpButton.storyHelp.closeMenu()
             self.canvas.helpButton.storyFlag = False
             self.canvas.helpButton.storyHelp = None
-            
-    def openMatte(self, bkg):  ## runs only from bkgWidget
-        self.closeWidget()  ## closes matteWidget as well
-        self.matteWidget = Matte(self.canvas, bkg)
-            
-    def closeMatteWidget(self):
-        if self.matteWidget != None:
-            if self.matteWidget.matteHelpMenu != None:
-                self.matteWidget.matteHelpMenu.closeMenu()  
-            self.matteWidget.close() 
-            self.matteWidget = None
-               
+                
     def closeWidget(self):
         if self.widget != None:
             self.closeStoryHelp()
@@ -190,7 +177,7 @@ class BkgMaker(QWidget):
   
     def updateWidget(self, bkg):
         bkg.bkgScrollWrks.setMirrorBtnText(bkg, self.widget)
-        self.canvas.sideCar2.setBtns(bkg, self.widget)
+        bkg.bkgWorks.setBtns(bkg, self.widget)
         self.setLockBtnText(bkg) 
                 
 ### --------------------------------------------------------
@@ -208,8 +195,8 @@ class BkgMaker(QWidget):
     def setLockBtnText(self, bkg):
         if bkg == None:
             return
-        self.widget.lockBtn.setText('UnLocked') if bkg.locked == False \
-            else self.widget.lockBtn.setText('Locked')         
+        self.widget.lockBtn.setText('UnLocked') if not bkg.locked else \
+            self.widget.lockBtn.setText('Locked')         
                                      
 ### --------------------------------------------------------                                           
     def deleteBkg(self, bkg, where=''):  ## delete tracker as well   
@@ -219,15 +206,7 @@ class BkgMaker(QWidget):
             return
         elif where == '' and bkg.type == 'bkg':
             self.bkgtrackers.delTracker(bkg)
-            
-        if self.widget:
-            self.closeWidget()
-             
-        if bkg.tag != 'scroller':
-            if self.matteWidget != None:
-                self.matteWidget.bye()
-                self.matteWidget = None
-           
+        self.closeWidget()
         self.scene.removeItem(bkg)
         bkg = None
         try:

@@ -12,7 +12,7 @@ from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
 from dotsBkgScrollWrks  import BkgScrollWrks
-
+from dotsBkgMatte       import Matte
 from dotsAnimation      import Node
 
 ### --------------------- dotsBkgWorks --------------------- 
@@ -34,7 +34,7 @@ class BkgWorks:
      
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):   
-        if key == "" or self.bkgItem.isScrollable() == False:
+        if key == "" or not self.bkgItem.isScrollable():
             return  
   
         self.bkgItem.direction = 'vertical' if self.canvas.dots.Vertical else key
@@ -82,11 +82,7 @@ class BkgWorks:
         elif bkg.rate == 0:  ## sets tracker rate for 'next'
             
             rate = self.getThisRate(bkg)  
-           
-            if bkg.direction == 'right':
-                rate = rate[2]
-            else:
-                rate = rate[1]     
+            rate = rate[2] if bkg.direction == 'right' else rate[1]     
                 
             erat = self.bkgScrollWrks.getTrackerRate(bkg)
             if erat > 0: rate = erat  ## fixes not carrying over rate from a file
@@ -170,6 +166,23 @@ class BkgWorks:
         else:
             bkg.setPos(QPointF(0.0, float(bkg.runway)))
                      
+    def setBtns(self, bkg, widget):  ## from bkgMaker widget
+        match bkg.direction:  
+            case 'right': 
+                widget.rightBtn.setStyleSheet(
+                    'background-color: LIGHTGREY')
+                widget.leftBtn.setStyleSheet(
+                    'background-color: None') 
+            case 'left': 
+                widget.leftBtn.setStyleSheet(
+                    'background-color: LIGHTGREY')
+                widget.rightBtn.setStyleSheet(
+                    'background-color: None')
+            case 'vertical':
+                widget.leftBtn.setText('Vertical')   
+                widget.leftBtn.setStyleSheet(
+                    'background-color: LIGHTGREY')
+                                                            
 ### -------------------------------------------------------- 
     def spotColor(self, p):
         x, y = int(p.x()), int(p.y())                   
@@ -202,11 +215,15 @@ class BkgWorks:
             self.bkgItem.x = (common['ViewW']- width)/2
             self.bkgItem.y = (common['ViewH']- height)/2
             self.bkgItem.setPos(self.bkgItem.x, self.bkgItem.y) 
-
+                                        
+    def openMatte(self, bkg):  ## runs from bkgWidget
+        self.closeWidget()  ## closes matteWidget as well
+        self.bkgItem.matteWidget = Matte(bkg)
+        
     def closeWidget(self):
-        self.bkgMaker.closeWidget()   
-        self.bkgMaker.closeMatteWidget()
-                                                                                                                      
+        self.bkgMaker.closeWidget()  ## no matte
+        self.bkgItem.closeMatteWidget()    
+                                                                                                                                                                                                  
 ### --------------------- dotsBkgWorks ---------------------
 
 
