@@ -128,6 +128,8 @@ class ShowFiles:
             
         if 'speed' not in tmp.keys():
             tmp['speed'] = 1 
+        elif tmp['speed'] == 0:
+            tmp['speed'] = 1
         pix.speed = tmp['speed']     
             
         if 'frame' not in pix.fileName:

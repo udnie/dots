@@ -38,9 +38,10 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         super().__init__()
 
         self.parent = parent
-        self.clips  = self.parent.clips
         self.switch = switch
-
+              
+        self.clips  = self.parent.clips
+  
         self.WidgetW, self.WidgetH = 505.0, 325.0
                  
         vbox = QVBoxLayout()
@@ -113,7 +114,15 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.fpslabel = QLabel('FPS')   
         self.fpslabel.setFixedWidth(40)
         self.fpsValue = QLabel(str(self.clips.Fps), alignment=Qt.AlignmentFlag.AlignRight)  
-        
+           
+        style = """ QSlider::handle:horizontal {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                stop:0 #e4e4e4, stop:1 #4f4f4f);
+            border: 1px solid rgb(115,115,115);
+            width: 11px;
+            margin: -7px 0;
+            border-radius: 3px;} """
+ 
         self.fpsSlider =  QSlider(Qt.Orientation.Horizontal)    
         self.fpsSlider.setMinimum(5)
         self.fpsSlider.setMaximum(30)  ## <<-------- max number of frames per second
@@ -123,8 +132,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.fpsSlider.setFixedWidth(180)
         self.fpsSlider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.fpsSlider.valueChanged.connect(self.setFpsVal)
-        self.fpsSlider.setStyleSheet(""" QSlider::handle:horizontal {background: rgb(200,200,200); 
-            border: 2px solid rgb(220,220,220); border-radius: 2px;} """)
+        self.fpsSlider.setStyleSheet(style)
             
         self.maxlabel = QLabel('MAX') 
         self.maxlabel.setFixedWidth(40)  
@@ -140,8 +148,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.maxSlider.setFixedWidth(180)
         self.maxSlider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.maxSlider.valueChanged.connect(self.setMaxVal)
-        self.maxSlider.setStyleSheet(""" QSlider::handle:horizontal {background: rgb(200,200,200); 
-            border: 2px solid rgb(220,220,220); border-radius: 2px;} """)
+        self.maxSlider.setStyleSheet(style)
  
         self.waitlabel = QLabel('WPR') 
         self.waitlabel.setFixedWidth(40)
@@ -156,8 +163,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.waitSlider.setFixedWidth(180)
         self.waitSlider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.waitSlider.valueChanged.connect(self.setWaitVal)
-        self.waitSlider.setStyleSheet(""" QSlider::handle:horizontal {background: rgb(200,200,200); 
-            border: 2px solid rgb(220,220,220); border-radius: 2px;} """)
+        self.waitSlider.setStyleSheet(style)
         
         self.rnflabel = QLabel("RNF") 
         self.rnflabel.setFixedWidth(40)
@@ -171,8 +177,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.rnfSlider.setFixedWidth(180)
         self.rnfSlider.setTickPosition(QSlider.TickPosition.TicksBelow)
         self.rnfSlider.valueChanged.connect(self.setRnfVal)
-        self.rnfSlider.setStyleSheet(""" QSlider::handle:horizontal {background: rgb(200,200,200); 
-            border: 2px solid rgb(220,220,220); border-radius: 2px;} """)
+        self.rnfSlider.setStyleSheet(style)
          
         fhbox = QHBoxLayout()  
         fhbox.addWidget(self.fpslabel)

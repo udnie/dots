@@ -30,6 +30,7 @@ class Wings:
 
         if common['Screen'] in ('1215', '1440'):
             self.height = self.pivot.height/7  ## drops too low otherwise
+            
         elif common['Screen'] in ('1536', '1296'):
             self.height = self.pivot.height/9  
           

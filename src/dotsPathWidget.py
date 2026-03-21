@@ -2,7 +2,7 @@
 import os.path
 
 from PyQt6.QtCore       import Qt, QPoint, QRectF, QPointF
-from PyQt6.QtGui        import QColor, QPen, QPainter, QPen
+from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                QHBoxLayout, QVBoxLayout, QPushButton, QVBoxLayout
 
@@ -31,7 +31,7 @@ class PathWidget(QWidget):
         self.save  = QPointF()
         self.label = QLabel('', alignment=Qt.AlignmentFlag.AlignCenter)
               
-        self.WidgetW, self.WidgetH = 330.0, 285.0
+        self.WidgetW, self.WidgetH = 345.0, 285.0
         
         self.rotate = 0
         self.scale  = 1.0
@@ -58,7 +58,7 @@ class PathWidget(QWidget):
         if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')
-            self.move(x+75, y+5) if self.switch == 'on' \
+            self.move(x+75, y) if self.switch == 'on' \
                 else self.move(x-500,y-130)
                         
 ### -------------------------------------------------------- 
@@ -66,7 +66,7 @@ class PathWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
-        painter.setPen(QPen(QColor(0,65,255), 5, Qt.PenStyle.SolidLine,            
+        painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,            
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
         painter.setBrush(SpinDrift)
         painter.drawRoundedRect(rect, 15, 15)
@@ -139,8 +139,7 @@ class PathWidget(QWidget):
               
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox('Rotate    Scale  Seconds' )
-        
+        groupBox = QGroupBox('Rotate    Scale  Seconds   ')
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
@@ -218,12 +217,15 @@ class PathWidget(QWidget):
 
 ### -------------------------------------------------------- 
     def buttonGroup(self):
-        groupBox = QGroupBox('PathMaker ')
-        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
+        groupBox = QGroupBox('PathMaker   ')
+        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        groupBox.setFixedWidth(115)
+        groupBox.setStyleSheet(
+            'background: rgb(245, 245, 245);\n'
+            'font-size: 14pt;\n'
+            'font-family: Arial;'
+            ) 
         
-        groupBox.setFixedWidth(103)
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
-                     
         waysBtn = QPushButton('WayPts') 
         helpBtn = QPushButton('Help')                      
         saveBtn = QPushButton('Save')

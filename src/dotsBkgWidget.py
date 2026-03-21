@@ -34,14 +34,14 @@ class BkgWidget(QWidget):
         self.setAccessibleName('widget')
     
         self.save = QPointF()
-        self.WidgetW, self.WidgetH = 370.0, 300.0
+        self.WidgetW, self.WidgetH = 380.0, 300.0
                   
         vbox = QVBoxLayout()  
           
         hbox = QHBoxLayout()
         hbox.addSpacing(0)   
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignTop)
-        hbox.addSpacing(0) 
+        hbox.addSpacing(5) 
         hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignTop)
         
         sbox = QHBoxLayout()
@@ -57,7 +57,7 @@ class BkgWidget(QWidget):
         
         self.setFixedHeight(int(self.WidgetH)) 
         self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
-        self.setContentsMargins(-5, 0, 0, 0) 
+        self.setContentsMargins(0, 0, 5, 0) 
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
@@ -70,7 +70,7 @@ class BkgWidget(QWidget):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName  goes Here')
             if self.switch == 'on':
-                self.move(x-425, y-5)
+                self.move(x-425, y)
             else:
                 self.move(x-400,y-150)
                 
@@ -98,7 +98,7 @@ class BkgWidget(QWidget):
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)
         painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,  ## border
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
-        painter.setBrush(QColor(175,175,175))  ## grayish
+        painter.setBrush(QColor(200,200,200))  ## grayish
         painter.drawRoundedRect(rect, 15, 15)
               
     def mousePressEvent(self, e):
@@ -240,11 +240,14 @@ class BkgWidget(QWidget):
 
 ### -------------------------------------------------------- 
     def buttonGroup(self):
-        groupBox = QGroupBox('BackGrounds  ')
-        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
-        
-        groupBox.setFixedWidth(115)
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
+        groupBox = QGroupBox('BackGrounds   ')
+        groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
+        groupBox.setFixedWidth(115)  
+        groupBox.setStyleSheet(
+            'background: rgb(245, 245, 245);\n'
+            'font-size: 14pt;\n'
+            'font-family: Arial;'
+            ) 
       
         resetBtn  = QPushButton('Reset')               
         runBtn    = QPushButton('Run')

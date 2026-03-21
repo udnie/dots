@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt6.QtCore       import QPointF, pyqtSlot, QRect, QRectF
+from PyQt6.QtCore       import QPointF, pyqtSlot, QRectF
 from PyQt6.QtGui        import QColor
 from PyQt6.QtWidgets    import QGraphicsEllipseItem
 
@@ -11,8 +11,7 @@ from dotsTagsAndPaths   import TagIt
 V = 8.0  ## the diameter of a pointItem
 
 ### ---------------- dotsPathPointItem ---------------------
-''' classes:  PointItem - represents a point - lassoing a selected 
-    point unselects it '''                                                                                                                                                                  
+''' Represents a point - lassoing a selected point unselects it '''                                                                                                                                                                  
 ### --------------------------------------------------------
 class PointItem(QGraphicsEllipseItem):
 ### --------------------------------------------------------
@@ -30,21 +29,18 @@ class PointItem(QGraphicsEllipseItem):
         self.setZValue(adto)
         
         self.selections = self.pathMaker.selections  ## less to type
-        
+    
+        self.type = 'pt'    
         self.pointTag = ''
-
-        self.type = 'pt'
-        self.fileName = None  ## just to make sure if referenced
+        self.fileName  = None  ## just to make sure if referenced
      
         ## -V*.5 so it's centered on the path 
         self.x = pt.x()-V*.5
         self.y = pt.y()-V*.5
         self.setRect(self.x, self.y, V, V)  
         
-        if len(self.selections) > 0 and idx in self.selections:
-            self.setBrush(QColor('lime'))
-        else:
-            self.setBrush(QColor('white'))   
+        self.setBrush(QColor('lime')) if len(self.selections) > 0 and idx in \
+            self.selections else self.setBrush(QColor('white'))   
                
         self.maptos = QPointF()
         self.dragCnt = 0

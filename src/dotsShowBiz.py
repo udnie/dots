@@ -38,7 +38,7 @@ class ShowBiz:
         self.showRunner = ShowRunner(self.canvas, self)
    
         self.helpMaker   = HelpMaker(self.canvas)
-        self.helpMenus   = HelpMenus(self.canvas)
+        self.helpMenus   = HelpMenus(self.canvas)  ## can be demo or screens
         self.helpButtons = ButtonHelp(self.canvas)
         
         self.grid = Grid(self.canvas)
@@ -127,19 +127,19 @@ class ShowBiz:
                 match key:
                     case 'A': 
                         self.bkgMaker.openBkgFiles() 
-                    case 'D':                   ## runs demo menu in canvas
-                        if self.demoAvailable:   
+                    case 'D':                   
+                        if self.demoAvailable:  ## displays demo menu in canvas
                             self.helpMenus.setMenu(key)
                     case 'J':                   ## view a play file's records
                         self.showRunner.loadPlay('table')  
                     case 'L':                   ## load a play file
                         self.showRunner.loadPlay()  
                     case 'M':
-                        self.helpMaker.menuHelp()       ## show help menus
+                        self.helpMaker.menuHelp()       ## show help menus(all)
                     case 'P':  
                         self.pathMaker.initPathMaker()  ## switch to pathmaker
                     case 'S':   
-                        self.helpMenus.setMenu(key)     ## screen menu
+                        self.helpMenus.setMenu(key)     ## displays screen menu in canvas
                      
 ### ---------------------- dotsShowBiz --------------------
 

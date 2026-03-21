@@ -25,7 +25,7 @@ pathKeys = {
     'D':    'Clears/Deletes Scene',
     'E':    'Edit Path Points', 
     'M':    'This Help Menu',
-    'Menu': 'PathMaker Help Menu2',
+    'Menu': 'PathMaker Help Menu 2',
     'Menus':'Help Menus',
     'N':    'New Path and Close Path',
     'P':    'Path Chooser',
@@ -89,7 +89,7 @@ class PathHelp:
         x, y = getVuCtr(self.canvas)   
         if off != 0: x += off 
         
-        self.table.move(int(x - (width /2)), int(y - (height /2)))
+        self.table.move(int(x - (width /2)), int((y - (height /2))+15))  ## note
         self.table.show() 
               
     def clicked(self):
@@ -291,21 +291,22 @@ class PathWorks:
         if self.pathMaker.poly != None:
             self.scene.removeItem(self.pathMaker.poly)
         self.pathMaker.poly = None
-            
+           
     def turnGreen(self):
         self.canvas.btnPathMaker.setStyleSheet(
-            'background-color: rgb(115,252,214);\n'
-            'border:  1px solid rgb(240,240,240); \n'
+            'background-color: rgba(115,252,214,125);\n'
+            'border:  1px solid white; \n'
             'border-width: 1px; \n'
             'font-size: 13px;')      
         self.canvas.showWorks.disablePlay()
          
-    def turnBlue(self):
+    def turnBlue(self):  ## editing
         self.canvas.btnPathMaker.setStyleSheet(
-            'background-color: rgb(165,215,255);\n'
-            'border:  1px solid rgb(80,80,80); \n'
+            'background-color: rgba(0,125,255,125);\n'
+            'border:  1px solid white; \n'
             'border-width: 1px; \n'
-            'font-size: 13px;')
+            'font-size: 13px; \n'
+            'color:  white;')
                                        
     def findTop(self):
         ## save

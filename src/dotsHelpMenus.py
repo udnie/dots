@@ -51,8 +51,7 @@ class HelpMenus:  ## demos and snakes
             if self.demoHelp == None:
                 self.demoHelp = DemoHelp(self.canvas)
             else:
-                 self.demoHelp.closeMenu()
-                 self.demoHelp = None
+                self.closeDemoMenu()
                  
         elif key == 'S':
             if  self.screenHelp == None:
@@ -60,7 +59,14 @@ class HelpMenus:  ## demos and snakes
             else:
                 self.screenHelp.closeMenu()
                 self.screenHelp = None
-             
+                
+    def closeDemoMenu(self):
+        try:
+            self.demoHelp.closeMenu()
+            self.demoHelp = None
+        except:
+            None
+        
 ### --------------------------------------------------------     
 class DemoHelp:  
 ### --------------------------------------------------------
@@ -125,7 +131,8 @@ class DemoHelp:
         if self.switch != '':
             self.canvas.setKeys('N')
     
-    def run(self, key):                           
+    def run(self, key):     
+        self.canvas.showbiz.helpMenus.closeDemoMenu()                      
         if key == 'blue':
             self.runSnakes('blue') 
             
@@ -138,14 +145,14 @@ class DemoHelp:
             if self.bats.makeBats() == None:
                 self.closeMenu() 
            
-        elif key in ('left', 'right'):
+        elif key in ('left', 'right'):  ## hats and bats
             if self.dots.Vertical:     
                 MsgBox('Not Implemented for Vertical Format')
-                return            
+                return   
             self.canvas.bkgMaker.newTracker.clear()    
-            self.hats.makeHatsDemo('left') if key == 'left' else\
+            self.hats.makeHatsDemo('left') if key == 'left' else \
                 self.hats.makeHatsDemo('right') ## left to right - direction of travel
-      
+         
     def runSnakes(self, what): 
         if what in ('blue', 'snakes'): 
             self.snakes.delSnakes()  

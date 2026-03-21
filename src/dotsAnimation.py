@@ -102,7 +102,7 @@ class Animation:
         elif anime == 'Flapper':  ## bat wings
             return sidePath.flapper(pix)
          
-        elif 'demo' in anime:  ## from BatsAndHats
+        elif 'demo' in anime:  ## from original demo
             return sidePath.demo(pix, anime)
         
         elif anime in self.canvas.pathList:

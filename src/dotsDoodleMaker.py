@@ -1,7 +1,7 @@
 
 import os
 
-from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QEvent, QRectF, QRect
+from PyQt6.QtCore       import Qt, QPointF, QPoint, QSize, QEvent, QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter, QPolygonF, QFontMetrics, QFont, QBrush
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QPushButton, QScrollArea, QLabel, \
                                 QGridLayout, QVBoxLayout

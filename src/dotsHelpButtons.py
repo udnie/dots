@@ -103,7 +103,7 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
         else:  
             if self.pathFlag:
                 self.pathHelp.closeMenu() 
-                     
+                    
 ### --------------------------------------------------------
 class CanvasHelp: 
 ### -------------------------------------------------------- 

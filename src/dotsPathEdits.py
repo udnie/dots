@@ -7,7 +7,7 @@ from dotsShared         import common, Outline
 from dotsPathPointItem  import PointItem
 
 ### ------------------- dotsPathEdits ---------------------
-''' class: PathEdits, functions; newPath, lasso '''
+''' PathEdits, functions; newPath, lasso '''
 ### --------------------------------------------------------
 class PathEdits(QWidget):
 ### --------------------------------------------------------
@@ -56,12 +56,11 @@ class PathEdits(QWidget):
             self.addNewPath()
 
     def addNewPath(self):
-        self.canvas.btnPathMaker.setStyleSheet( 
-            'background-color: rgb(215,165,255);\n'
-            'border:  1px solid rgb(80,80,80); \n'
+        self.canvas.btnPathMaker.setStyleSheet(   ## new path - purple
+            'background-color: rgba(215,165,255,125);\n'
+            'border:  1px solid white;\n'
             'border-width: 1px; \n'
             'font-size: 13px;')
-        
         self.pathMaker.addingNewPath = True
         self.pathMaker.newPath = None
         self.pathMaker.npts = 0

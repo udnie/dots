@@ -85,12 +85,12 @@ class KeysPanel(QWidget):
             header[1] = 'PathMaker '
             self.tableView.horizontalHeader().setStyleSheet(
                 'QHeaderView::section{\n'
-                'background-color: rgb(115,252,214);\n'
+                'background-color: rgba(115,222,214,100);\n'
                 'border:  1px solid rgb(240,240,240); \n'
                 'font-size: 11px;\n'
                 '}')  
             self.tableView.setStyleSheet('QTableView {\n'
-                'alternate-background-color: rgb(115,252,214);\n'
+                'alternate-background-color: rgba(115,222,214,125);\n'
                 'font-size: 11px;\n'
                 '}')  
         else:
@@ -138,14 +138,30 @@ class TableModel(QAbstractTableModel):
   
   ### -------------------------------------------------------- 
 def storyBoard():
-    menu = [     ## a mix of canvas, storyboard, pixitems and bkgItems    
+    menu = [     ## a mix of canvas, storyboard, pixitems and bkgItems   
+        ['-', 'Canvas Commands'], 
+        ['A', 'Add a Background'], 
+        ['D', 'Display Demo Menu'],
+        ['G', 'Toggle Grid'],
+        ['J', 'JSON Viewer'],
+        ['K', 'Toggle KeysPanel'],
+        ['L', 'Load a Play File'], 
+        ['P', 'Switch to PathMaker'], 
+        ['S', 'Stop/SceenMenu'],   
+        ['X, Q', 'Escape to Quit'],   
+        ['-', 'StoryBoard Commands'],     
+        ['A', 'Select All'],  
+        ['C', 'Clear Canvas'],
+        ['D', 'Delete Selected'],
         ['F', 'Flop Selected'],
-        ['G', 'Add/Hide Grid'],
         ['H', '+Shift Hide/UnHide'],
         ['M', 'Map Selected'],
         ['O', '+ShiftToggle Outlines'],
         ['P', 'Toggle Paths'],
+        ['R', 'Run'],
         ['T', 'Toggle Tags'],
+        ['U', 'UnSelect All'],
+        ['W', 'Clear Widgets'],  
         ['L/R', 'Arrow Keys'],
         ['U/D', 'Arrow Keys'],
         ['Cmd', 'Drag to Select'],
@@ -167,25 +183,26 @@ def storyBoard():
         ['-/=', 'Rotate 15 deg'],
         ['[/]', 'Rotate 45 deg'],
         ['</>', 'Toggle Size'],     
-        ['\\',  'Show this Tag'],
-        ['A', 'Add a Background'], 
-        ['A', 'Select All'],  
-        ['C', 'Clear Canvas'],
-        ['D', 'Display the Demo Menu'],
-        ['D', 'Delete Selected'],
-        ['J', 'JSON Viewer'],
-        ['L', 'Load Play'], 
-        ['P', 'Switch to PathMaker'], 
-        ['R', 'Run/DemoHelp'],
-        ['S', 'Stop/SceenMenu'],   
-        ['U', 'UnSelect All'],
-        ['W', 'Clear Widgets'],  
-        ['X, Q', 'Escape to Quit'],     
+        ['\\',  'Show this Tag'],    
     ]
     return menu
       
 def pathMaker():
     menu = [
+        ['C',   'Center Path'],
+        ['D',   'Delete Screen'], 
+        ['E',   'Edit Points'],
+        ['L',   'Lasso'], 
+        ['N',   'New Path'],
+        ['N',   'Closes Path'],   
+        ['P',   'PathChooser'],
+        ['R',   'Reverse Path'],
+        ['S',   'Save Path'],
+        ['T',   'Test'],
+        ['U',   'UnSelect Points'], 
+        ['del', 'Delete a Point'],     
+        ['opt', 'Add a Point'], 
+        ['Shift',   'D Deletes Selected Pts'],
         ['Shift', '+W Way Pts'],
         ['>',   'Shift WayPts +5%'],
         ['<',   'Shift WayPts -5%'],
@@ -202,20 +219,6 @@ def pathMaker():
         ['_/+', 'Rotate 1 deg'],  
         ['-/=', 'Rotate 15 deg'],
         ['[/]', 'Rotate 45 deg'],
-        ['E',   'Edit Points'],
-        ['del', 'Delete a Point'],     
-        ['opt', 'Add a Point'], 
-        ['shift',   'D Deletes Selected Pts'],
-        ['L',   'Lasso'], 
-        ['U',   'UnSelect Points'], 
-        ['C',   'Center Path'],
-        ['D',   'Delete Screen'], 
-        ['N',   'New Path'],
-        ['N',   'Closes Path'],   
-        ['P',   'PathChooser'],
-        ['R',   'Reverse Path'],
-        ['S',   'Save Path'],
-        ['T',   'Test'],
     ]
     return menu
 

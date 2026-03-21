@@ -29,7 +29,7 @@ class PixWidget(QWidget):
         self.setAccessibleName('widget')
         
         self.save = QPointF()
-        self.WidgetW, self.WidgetH = 360.0, 285.0
+        self.WidgetW, self.WidgetH = 365.0, 285.0
                    
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
@@ -63,7 +63,7 @@ class PixWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)
-        painter.setPen(QPen(QColor(0,125,255), 5, Qt.PenStyle.SolidLine, 
+        painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine, 
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
         painter.setBrush(QColor(255,255,0,255))  ## yellow 
         painter.drawRoundedRect(rect, 15, 15)
@@ -124,8 +124,7 @@ class PixWidget(QWidget):
                                         
 ### -------------------------------------------------------- 
     def sliderGroup(self):
-        groupBox = QGroupBox('Rotate     Scale   Opacity   ')
-        
+        groupBox = QGroupBox('Rotate     Scale   Opacity ')   
         groupBox.setFixedWidth(190)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
         groupBox.setStyleSheet('background: rgb(240, 240, 240)')
@@ -216,12 +215,15 @@ class PixWidget(QWidget):
     
 ### -------------------------------------------------------- 
     def buttonGroup(self):
-        groupBox = QGroupBox('Pixitem ')
+        groupBox = QGroupBox('Pixitems  ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
+        groupBox.setFixedWidth(115)        
+        groupBox.setStyleSheet(
+            'background: r rgb(245, 245, 245);\n'
+            'font-size: 14pt;\n'
+            'font-family: Arial;'
+            ) 
         
-        groupBox.setFixedWidth(110)
-        groupBox.setStyleSheet('background: rgb(240, 240, 240)')
-                     
         shadowBtn = QPushButton('Shadow')
         flopBtn    = QPushButton('Flop')
         cloneBtn  = QPushButton('Clone')

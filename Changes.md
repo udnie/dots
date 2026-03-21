@@ -7,6 +7,11 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**March 21 2026**   
+Fixed a bug with the speed attribute when loading the .play file. The default should be 1 and not 0 as from the original setup and a small fix to the **demoMenu** resetting it to None when running a demo.  Also cosmetic updates to widgets, pathMaker, keysPanel and menus.
+
+---
+
 **March 15 2026**  
 Many things starting with the **Shift-B** in **SlideShow** now hides both the button and title bar. The **Shift-S** I used in the video players to toggle the slider now includes toggling the buttons and title bar as one. In **dots** a right-mouse click in **canvas** will trigger the help menu which now has a highlighted row to access all the help menus. Added a new attribute to sprites and consequently updated the json/play file viewer, **TableMaker**, along with a number of small additions. 
 

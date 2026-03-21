@@ -149,11 +149,11 @@ class ControlView(QGraphicsView):
                         self.sideCar2.bkgStuff()
                                                             
             elif key == Qt.Key.Key_D:    ## delete selected pts in pathmaker
-                 self.setKey('delPts') if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn\
+                 self.setKey('delPts') if mod & Qt.KeyboardModifier.ShiftModifier and self.canvas.pathMakerOn \
                     else self.setKey('D')
                                                                   
             elif key == Qt.Key.Key_H:  ## toggles hides/unhides selections 
-                self.sideCar.toggleSelections() if mod & Qt.KeyboardModifier.ShiftModifier else\
+                self.sideCar.toggleSelections() if mod & Qt.KeyboardModifier.ShiftModifier else \
                     self.setKey('H')  ## help     
                            
             elif key == Qt.Key.Key_L:   ## this lets 'L' pass -- toggles sprites locked on/off

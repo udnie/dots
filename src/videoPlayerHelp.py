@@ -11,7 +11,8 @@ from videoClipsWidget   import AspKeys
 
 ### ------------------ videoPlayerHelp.py -----------------
 ''' Tablewidgetsetup and help for videoPlayers and slideShow.
-    The Menus selection isn't avaiable in SlideShow '''
+    The Menus selection isn't available in SlideShow as there's no
+    guarantee a videoPlayer will be running. '''
 ### --------------------------------------------------------
 
 helpMenuKeys = {   ## videoplayers
@@ -38,11 +39,11 @@ helpMenuKeys = {   ## videoplayers
 }
 
 slideMenuKeys = {  ## slideShow
+    'B, Left Arrow':    'Previous Slide',           
     'C':                'Clear Screen',  
     'F ':               'File Chooser', 
     'H ':               'Help Menu On/Off',
-    'Right Arrow, N':   'Next Slide',
-    'Left Arrow, B':    'Previous Slide',
+    'N, Right Arrow':   'Next Slide',
     'O':                'Opening Layout',
     'L, R':             'Rotate 90.0',
     'S, SpaceBar':      'Slide Show',
@@ -60,6 +61,7 @@ RH = 30
 QL = QColor(230,230,230)  ## 10% gray
 QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
+SD = QColor(115,252,214,125)  ## spindrift-lite
 
 SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-A','Shift-B','Shift-F','Shift-S')
 VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Spacebar','Shift-F','Shift-S','Aspect','Settings','Clips']
@@ -196,10 +198,15 @@ class VideoHelp(QWidget):
         self.table.setRow(0, 0, f'{str:<15}',QL,True, True, 2)
         
         row = 1  
-        for k,  val in helpMenuKeys.items():
-            if self.parent.player == "two" and row in (16,17,18):
+        for k,  val in helpMenuKeys.items():   
+            if row == 6:
+                self.table.setRow(row, 0, k, SD,True,True)
+                self.table.setRow(row, 1, "  " + val,SD,'',True)
+                
+            elif self.parent.player == "two" and row in (16,17,18):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)
+                
             else:
                 self.table.setRow(row, 0, k, '',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)

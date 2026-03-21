@@ -27,7 +27,7 @@ class ShadowWidget(QWidget):
         self.setAccessibleName('widget')
          
         self.save = QPointF()
-        self.WidgetW, self.WidgetH = 330.0, 245.0
+        self.WidgetW, self.WidgetH = 345.0, 285.0
                 
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())
@@ -56,7 +56,7 @@ class ShadowWidget(QWidget):
         if self.switch in('on', 'all'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName goes Here')
-            self.move(x+75, y-303) if self.switch == 'on'\
+            self.move(x+75, y-320) if self.switch == 'on'\
                 else self.move(x-360,y-160)
         
 ### --------------------------------------------------------                                   
@@ -115,7 +115,6 @@ class ShadowWidget(QWidget):
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')
-        
         groupBox.setFixedWidth(170)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
@@ -188,12 +187,15 @@ class ShadowWidget(QWidget):
     
 ### --------------------------------------------------------   
     def buttonGroup(self):
-        groupBox = QGroupBox(' Shadows')
+        groupBox = QGroupBox('Shadows  ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
-        
-        groupBox.setFixedWidth(103)
-        groupBox.setStyleSheet('background: rgb(245, 245, 245)')
-                     
+        groupBox.setFixedWidth(115)
+        groupBox.setStyleSheet(
+            'background: rgb(245, 245, 245);\n'
+            'font-size: 14pt;\n'
+            'font-family: Arial;'
+            ) 
+                 
         hideBtn = QPushButton('Outline')
         helpBtn   = QPushButton('Help')
         flipBtn  = QPushButton('Flip')

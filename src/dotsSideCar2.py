@@ -120,6 +120,8 @@ class SideCar2:
                 os.system(str)             
             except:
                 MsgBox("./plays failed")
+                return
+            MsgBox("./plays updating...")
                 
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
