@@ -106,8 +106,7 @@ class ShowTime:
             self.showWorks.disablePlay()  ## sets pause/resume/stop
             file = os.path.basename(self.canvas.openPlayFile)
             if "play" in file:
-                self.canvas.dots.statusBar.showMessage(file + ' - ' + \
-                    'Number of Pixitems: {}'.format(k))  
+                self.canvas.dots.statusBar.showMessage(f'{file} - Number of Pixitems: {k}')
             self.canvas.animationRunning = True
  
         if self.canvas.videoPlayer != None: 

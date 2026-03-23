@@ -126,7 +126,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             else self.height/self.width
             
         fn = f'{play}   {self.fileName}   {self.width}   {self.height}   {rot:.2f}'
-        self.canvas.dots.statusBar.showMessage(fn, 12000) 
+        self.canvas.dots.statusBar.showMessage(fn, 5000) 
              
 ### --------------------------------------------------------
     @pyqtSlot(str)

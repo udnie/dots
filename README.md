@@ -1,11 +1,11 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify them, set backgrounds using photos, videos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds.  
 
-As of **December 2025**, **dots** runs in **Python 3.13.10** using either **PyQt6.10.1**, **PyQt5.15.11** or **PySide6.10.1.** on a **MacBookPro**, **arm64** . See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
+As of **March 2026**, **Dots** is now running in **Python 3.14.3** along with **PyQt6 6.10.2**, **PyQt5 5.15.11**, **PySide6 6.10.2.** and  **opencv-python 4.13** on a **MacBookPro**, **arm64**. See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
 
-**August 2024** had **dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.  
+**August 2024** had **Dots** up and running including **shadows** in **Windows 11**. Some of the type wasn't showing as well as it does on my Mac - otherwise it seemed to run fine.  
 
-You'll need to install **opencv-python 4.12** or above to run the **videoClipsMaker** portion of **videoPlayerOne** and **Two**, and possibly to run **videoPlayerTwo** if you're not on a Mac.  Once you've installed opencv it's an simple edit to turn on **Shadows** in **dots** as well.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  And there are demos and videos.
+You'll need to install **opencv-python 4.12** or above to run the **videoClipsMaker** portion of **videoPlayerOne** and **Two**, and possibly to run **videoPlayerTwo** if you're not on a Mac.  Once you've installed opencv it's an simple edit to turn on **Shadows** in **Dots** as well.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  And there are demos and videos.
 
 
 	  
@@ -14,7 +14,7 @@ The code can change over time and it does.  One of the few coding decisions I ma
 
 Sprites/clip-art can average up to 500-600 pixels per side and aren't necessarily square.  I reduce everything from drag and drop to somewhere around %30-%40 of its original size when displaying it. You can also set the starting width and height for any Sprite, see **dotsPixItem**.
 
-The **background** image needs to reside in the **backgrounds** folder as **dots** only looks in the **background** and **demo** folders for backgrounds. I'd recommend making any changes, mainly sizing and orientation, prior to deploying it. 
+The **background** image needs to reside in the **backgrounds** folder as **Dots** only looks in the **background** and **demo** folders for backgrounds. I'd recommend making any changes, mainly sizing and orientation, prior to deploying it. 
 
 Flat colors will be saved to the backgrounds folder using the save button in the **backgrounds** button dock. The file name is up to you with **'.bkg'** as the file extension.  Saving a **background** to a **'.play'** file will preserve any settings you might have made, such as for scrolling and a flat color without needing to save the color.
 

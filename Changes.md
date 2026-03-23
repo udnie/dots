@@ -7,6 +7,7 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+
 **March 21 2026**   
 Fixed a bug with the speed attribute when loading the .play file. The default should be 1 and not 0 as from the original setup and a small fix to the **demoMenu** resetting it to None when running a demo.  Also cosmetic updates to widgets, pathMaker, keysPanel and menus.
 
@@ -912,4 +913,3 @@ Added two new buttons. The save button maps the canvas items, pixItems and backg
  
 **June 2020**  
 Initial posting followed by minor bug fixes and fussy changes. The original video that illustrates some of the features of this app. <https://youtu.be/rd4LtR88UjE> 
-≠≠≠

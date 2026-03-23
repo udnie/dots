@@ -203,8 +203,8 @@ class ShowRunner:
                              
             elif self.locks > 0:
                 MsgBox('Some screen items are locked', 5)  ## seconds
-                self.mapper.toggleTagItems('all')                                                      
-        QTimer.singleShot(17000, partial(self.dots.statusBar.showMessage, fileName)) 
+                self.mapper.toggleTagItems('all')                                               
+        QTimer.singleShot(10000, partial(self.dots.statusBar.showMessage, fileName)) 
 
 ### --------------------------------------------------------                                                  
     def addShadows(self):  ## add shadows after adding pixitems     
@@ -222,7 +222,7 @@ class ShowRunner:
                
         self.sideCar.showOutlines()  ## turns them on      
         QTimer.singleShot(2000, self.sideCar.hideOutlines)          
-        str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
+        str = f'Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
         self.dots.statusBar.showMessage(str, 10000)   
 
 ### ---------------------- dotsShowBiz --------------------

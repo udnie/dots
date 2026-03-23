@@ -187,7 +187,6 @@ class Works:  ## extends pixitem and pixwidget
             if key in p:
                 val = PixSizes.get(key)
                 return val[0], val[1]
-        # print(p, "{0:.2f}".format(newW), "{0:.2f}".format(newH))
         if newW < 100 or newH < 100:
             newW, newH = 200, 200 
         elif newW > 400 or newH > 400:

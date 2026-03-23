@@ -50,6 +50,8 @@ class Clips:
         self.FilterOn    = False     ## True - image aspect matches self.aspect (parent)
         self.PlayVideo   = False    ## True plays video upon loading
         self.AddFileName = False     ## True add to frame
+        
+        # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
    
 ### --------------------------------------------------------       
     def toggleSettings(self, parent):
@@ -207,8 +209,6 @@ class Clips:
             self.parent.shared.msgbox('assembler: error setting output' +  '\n' + 
                                       'check if opencv installed or uncommented')
             return
-     
-        # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
      
         if not self.SkipFrames:
             if self.FirstFrame:  
