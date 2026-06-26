@@ -17,6 +17,8 @@ I've a new app **wrapper** which makes a wrap-around photo for use as a continuo
 
 There's more. The two scrolling demos have a new background with it's own **screenrates** dictionary/json file accessed through the it's background widget.  The json **demorates** file along with the background photo are in the **demo** directory.  You may need to make adjustments to the screen rates as the values are based on what works on my mac. It's a clothesline with shadows if you look close enough.
  
+New video:  <https://youtu.be/fhKTW_m-gaI?si=TBuxp1mpwGIiFpGI>
+ 
 ---
 
 **March 21 2026**   
