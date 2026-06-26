@@ -2,6 +2,8 @@
 import os
 import os.path
 import random
+import subprocess
+import sys
 
 from PyQt6.QtCore       import QAbstractAnimation, QPoint, QSize, QRect
 from PyQt6.QtWidgets    import QFileDialog
@@ -76,33 +78,44 @@ class SideCar2:
     def bkgStuff(self):
         self.canvas.bkgMaker.openBkgFiles() if self.hasBackGround() == 0 \
             else self.sendPixKeys('B')
+            
     def newTracker(self):  
         if self.hasBackGround() > 0:
             self.canvas.bkgMaker.bkgtrackers.trackThis() if self.canvas.bkgMaker.bkgtrackers.tracker == None \
                 else self.canvas.bkgMaker.bkgtrackers.tracker.bye()  
-                            
-    def mirrorBkg(self, switch):  ## either 1 default or -1, flip it
+               
+    def aye(self):
+        for bkg in self.scene.items():  
+            if bkg.type == 'bkg':
+                self.canvas.dots.statusBar.showMessage(bkg.fileName, 5000)
+                break
+            
+    def mirrorBkg(self, switch):  ## either 1 mirrored default or -1, flip it and mirrored
         if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only a background
             bkgtmp = None
             for bkg in self.scene.items():  
                 if bkg.type == 'bkg':
                     bkgtmp = bkg
                     break  
-            if bkgtmp == None: return  
-            
-            bkg.setMirrored(bkg.flopped, switch)    
+            if bkgtmp == None: 
+                return   
+            bkg.setMirrored(bkg.flopped, switch)   
+             
             x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
             bkg.setPos(x , 0)   
-            
             akg = BkgItem(bkgtmp.fileName, self.canvas, common['bkgZ'], bkgtmp.imgFile)
             if akg == None:  
-                return
-            else:
-                self.scene.addItem(akg)  
+                return       
+            self.scene.addItem(akg)  
+            
+            akg.setPos(int(common['ViewW']/2), 0)  ## start center screen  
+            if switch < 2:         
                 akg.setMirrored(True, switch) if not bkg.flopped else akg.setMirrored(False, switch) 
-                akg.setPos(int(common['ViewW']/2), 0)  ## start center screen
+            else:
+                akg.setMirrored(False, switch) 
+   
         self.delDupes()
-                                       
+                                   
     def delDupes(self):  ## otherwise they can build up
         if self.hasBackGround() >= 3:
             i = 0
@@ -112,17 +125,17 @@ class SideCar2:
                     if i >= 3:
                         self.scene.removeItem(bkg)
                                 
-    def playschk(self):  ## run it directly from dots when switching from pyqt to pyside or back
+    def typedesc(self):  ## run it directly from dots when switching from pyqt to pyside or back
         if len(self.canvas.scene.items()) == 0:    
             str = './plays-type-desc.sh' if self.qtstring == 'PySide6' else \
                 './plays-desc-type.sh'
             try:  
-                os.system(str)             
+                subprocess.run(["sh", str])             
             except:
                 MsgBox("./plays failed")
                 return
             MsgBox("./plays updating...")
-                
+    
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
         if self.canvas.bkgMaker.bkgtrackers.tracker != None and \

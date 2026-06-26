@@ -97,26 +97,27 @@ class PathMaker(QWidget):
         self.color = 'DODGERBLUE'
            
         self.key = ''
-        self.openPathFile = '' 
         self.tag = ''
- 
+        self.openPathFile = '' 
+    
         self.npts = 0  ## used by addNewPathPts
         self.last = 0
              
-        self.addingNewPath = False
         self.pathSet = False
-        self.pathChooserSet = False
-        
-        self.editingPts = False
         self.pathTestSet = False
-        self.lassoOn = False
-         
+        self.addingNewPath = False
+        self.pathChooserSet = False
+      
+        self.lassoOn = False  
+        self.editingPts = False
+     
         self.ball = None
         self.path = None                 
         self.poly = None
         
         self.chooser = None
         self.newPath = None 
+        
         self.pathTestNode = None
         self.pathHelpMenu2 = None
                                
@@ -262,19 +263,21 @@ class PathMaker(QWidget):
                   
 ### --------------------------------------------------------
     def pathChooser(self, where=''):
-        if not self.pathChooserSet and not self.addingNewPath:
+        if not self.pathChooserSet and not self.addingNewPath:    
             if not self.editingPts:
                 paths = getPathList()
                 if len(paths) == 0:
                     MsgBox('getPathList: No Paths Found!', 5)
                     return None 
                 self.preCleanUp()
+                self.pathWorks.closeWidget() 
+                self.pathWorks.closeMenu()             
                 if where != 'Path Menu':  where = 'pathMaker'  ## used by Doodle
                 self.chooser = DoodleMaker(self.canvas, where) 
                 b = getCtr(-270,-350)      
                 self.chooser.move(int(b.x()), int(b.y()))
                 self.chooser.show() 
-                self.pathChooserSet = True 
+                self.pathChooserSet = True   
         else:  
             self.pathChooserOff()
             

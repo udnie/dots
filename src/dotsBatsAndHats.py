@@ -1,6 +1,7 @@
 
 import os
 import random
+import sys
 
 import asyncio
 import time
@@ -37,7 +38,7 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1024':  'bats_1066.jpg', 
     '1102':  'bats_1066.jpg',
 }
-    
+
 ### -------------------- dotsBatsAndHats -------------------
 class Bats:    ## backGrounds only used here 
 ### --------------------------------------------------------
@@ -174,29 +175,36 @@ class Hats:  ## hats - was abstract
         self.scroller = None
         
 ### --------------------------------------------------------      
-    def makeHatsDemo(self, direction):
+    def makeHatsDemo(self, direction):     
+        if 'cv2' not in sys.modules:
+            MsgBox('No Shadows - OpenCV not Imported', 5)
+            return
+               
         self.direction = direction
-        self.canvas.openPlayFile = 'hats'     
-                                      
-        self.setBackGround()  
+        self.canvas.openPlayFile = 'hats'        
+                       
+        if self.setBackGround() == None:
+            return  
         self.setHats()        
         
-        if self.shadows:
+        if self.shadows:   
             MsgBox('Adding Shadows,  please wait...', int(1 + (self.hats * .25)))
             self.addShadows()
-                   
+   
         QTimer.singleShot(200, self.scroller.anime.start)  ## run scrolling background  
         self.run()  
         self.showWorks.disablePlay()
 
 ### --------------------------------------------------------            
     def setBackGround(self):
-        self.scroller = BkgItem(paths['bkgPath'] + 'bluestone.jpg', self.canvas)
-   
+        self.scroller = BkgItem('shadows-wrp.jpg', self.canvas)
+        if self.scroller.type == None: 
+            return None
+    
         self.scroller.direction = self.direction       
-        self.scroller.path = paths['bkgPath']  
+        self.scroller.path = paths['demo']  
         self.scroller.tag = 'scroller'
-        self.scroller.mirroring = True  
+        self.scroller.mirroring = False  
             
         self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)  
         self.scroller.bkgWorks.setDirection(self.scroller.direction)
@@ -208,7 +216,9 @@ class Hats:  ## hats - was abstract
   
         self.scroller.addedScroller = False   
         self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
-        self.scene.addItem(self.scroller)  
+        self.scene.addItem(self.scroller) 
+        
+        return True 
   
     def setHats(self): 
         apaths = getPathList()  ## from sideGig  
@@ -229,34 +239,33 @@ class Hats:  ## hats - was abstract
         pix.x = random.randrange(200, common['ViewW']-300)
         pix.y = random.randrange(200, common['ViewH']-300)
         pix.setPos(pix.x, pix.y)  
-        pix.setScale(1.0)   
+        pix.setScale(1.05)   
         pix.tag = path   
          
-        if pix.shadowMaker.isActive:
+        if pix.shadowMaker.isActive and pix.shadowMaker.isOpenCV:
             self.shadows = True
             pix.setOpacity(0.001) 
         self.scene.addItem(pix)
            
-### --------------------------------------------------------             
+### --------------------------------------------------------         
     def addShadows(self):  ## add shadows after adding pixitems     
         tasks = []        
         start = time.time()
         loop  = asyncio.new_event_loop() 
         for pix in self.scene.items():
-            if pix.type == 'pix' and pix.shadowMaker.isActive: 
-                tasks.append(loop.create_task(self.newShadow(pix)))
-                 
+            if pix.type == 'pix' and pix.shadowMaker.isActive:  
+                tasks.append(loop.create_task(self.newShadow(pix)))     
         if len(tasks) > 0:
             loop.run_until_complete(asyncio.wait(tasks))
         loop.close()  
         str = f' Number of Shadows: {len(tasks)}   seconds: {time.time() - start:.2f}'
         self.canvas.dots.statusBar.showMessage(str, 10000)
-                              
+                            
     async def newShadow(self, pix): 
-        pix.addShadow() 
+        pix.addShadow()
         pix.shadowMaker.shadow.setPos(self.setXY(), self.setXY())
-        pix.shadowMaker.shadow.setParentItem(pix) 
-              
+        pix.shadowMaker.shadow.setParentItem(pix)  
+          
     def setXY(self):  ## randomize x, y values
         return random.randint(-7,7)*5
            

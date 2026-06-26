@@ -4,7 +4,7 @@ import os
 import math
 import time
 
-from PyQt6.QtCore       import Qt, QPoint, QPointF, QTimer
+from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtGui        import QImage, QPixmap, QGuiApplication, QFont
 from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, \
                                 QGraphicsScene, QGraphicsPixmapItem, QLabel, \
@@ -14,20 +14,20 @@ from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, \
 from videoPlayerHelp    import SlideShowHelp, SlideShowKeys
 
 ### --------------------------------------------------------
-Path  = ''       ## set a default directory
-SetY  = 175      ## Y position of slideShow   
-Hpad  = 60       ## padding for buttons added to height
+Path  = ''      ## set a default directory
+SetY  = 150     ## Y position of slideShow   
+Hpad  = 60      ## padding for buttons added to height
 
-CutOff   = 550    ## when to stop showing text  
-OneColor = False  ## sets frame same as background
+CutOff   = 550      ## when to stop showing text  
+OneColor = False    ## sets frame same as background
 
-Width, Height     = 1200,  750      ## choose one you like and delete the rest
-ViewW, ViewH      = 1150,  700      ## starting viewport
-MaxW, MaxH, MaxV  =  950,  550, 575 ## max image size within the ViewW/H
+# Width, Height     = 1200,  750      ## choose one you like and delete the rest
+# ViewW, ViewH      = 1150,  700      ## starting viewport
+# MaxW, MaxH, MaxV  =  950,  550, 575 ## max image size within the ViewW/H
 
-# Width, Height     = 1350,  850  
-# ViewW, ViewH      = 1300,  800 
-# MaxW, MaxH, MaxV  = 1100,  650, 675 
+Width, Height     = 1350,  850  
+ViewW, ViewH      = 1300,  800 
+MaxW, MaxH, MaxV  = 1100,  650, 675 
 
 # Width, Height     = 1450,  900  
 # ViewW, ViewH      = 1350,  850
@@ -43,66 +43,19 @@ Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
 ''' Reads and displays .png, .jpg, .jpeg, .tif, .tiff, and .webp files.
     '>' ,'+', ']' scales up, '<', '_', '[', scales down retaining
     the same aspect ratio - width to height.
-    The helpMenu and slideMenuKeys are in videoPlayerHelp '''
+    In qt5 framelessWindow won't resize with mouse - use zoom keys 
+    instead. The helpMenu and slideMenuKeys are in videoPlayerHelp '''
 ### --------------------------------------------------------
 class SlideShow(QWidget): 
 ### --------------------------------------------------------
     def __init__(self, parent=None):
         super().__init__()
-    
         self.setWindowTitle("SlideShow")
-            
-        self.view = QGraphicsView(self)
-        self.scene = QGraphicsScene(0, 0, ViewW, ViewH)
-        
-        self.setMinimumHeight(350);   self.setMinimumWidth(350)
-        self.setMaximumHeight(1200);  self.setMaximumWidth(1850)
-        
-        self.view.setScene(self.scene)                 
-
-        self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)     
-        self.view.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground)
-        
-        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus);  self.setFocus()
-
-        if OneColor:   ##  makes widget one color
-            self.setStyleSheet("QWidget {\n" 
-                "background-color: rgb(250,250,250);\n"
-                "border: 1px solid rgb(250,250,250);\n"
-                "color: rgb(250,250,250);\n"      
-                "}")
           
-        self.init()  ## default True shows buttons, False to hide
- 
-        ## in qt5 framelessWindow won't resize with mouse - use zoom keys instead
-        if not self.frameVisible:  ## set WindowHint to Frameless
-            self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-
-        self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
-        self.hgt = QGuiApplication.primaryScreen().availableGeometry().height()
-          
-        x = self.ctr.x() - int(Width/2)  
-     
-        if self.buttonsVisible: H = Height + Hpad
-        self.setGeometry(x, SetY, Width, H)  
- 
-        self.delay   = 2000  ## slide show timer
-        self.setTags = True  ## toggle textItems on/off
-  
-        vbox = QVBoxLayout()      
-        vbox.addWidget(self.view)           ## default - if True adds setButtons to layout
-        if self.buttonsVisible: vbox.addWidget(self.setButtons()) 
-        self.setLayout(vbox)
-    
-        self.grabKeyboard()
-        
-        QTimer.singleShot(25, self.fileChooser) if not self.buttonsVisible else \
-              QTimer.singleShot(25, self.openFiles)     ## current directory or command line
-
+        self.setUI()     
         self.show()
+        
+        self.setAcceptDrops(True) 
              
 ### --------------------------------------------------------
     def init(self):  ## on each new files action
@@ -115,18 +68,39 @@ class SlideShow(QWidget):
         self.current    = 0
         self.rot        = 0
         self.running    = False 
-        self.save       = QPointF()
+  
         self.pixItem    = None 
         self.textItem   = None
         self.helpMenu   = None
         self.timer      = None
+        
         self.helpFlag   = False
         self.buttonsVisible = True
         self.frameVisible = True
+    
         self.aspect = 0.0
         self.saveW  = 0
         self.saveH  = 0
- 
+        
+        self.delay   = 2200  ## slide show timer
+        self.setTags = True  ## toggle textItems on/off
+     
+### --------------------------------------------------------   
+    def dragEnterEvent(self, e):  ## one-shot - can't resize
+        if e.mimeData().hasUrls():
+            m = e.mimeData()
+            fileName = m.urls()[0].toLocalFile()       
+            ext = fileName[fileName.rfind('.'):].lower()      
+            if ext in Ext:  
+                self.addPixItem(fileName)   
+                self.files.append(fileName)
+                e.setAccepted(True)
+            else:
+                e.ignore()
+
+    def dragLeaveEvent(self, e):
+        e.accept()
+
 ### --------------------------------------------------------
     def keyPressEvent(self, e):  
         key = e.key()
@@ -206,42 +180,26 @@ class SlideShow(QWidget):
                 self.zoom(1.05)  
             case '[':    
                 self.zoom(0.95)
-       
-### --------------------------------------------------------          
+         
     def mousePressEvent(self, e):
-        self.save = e.globalPosition()  
         self.openHelpMenu() if e.button() == Qt.MouseButton.RightButton \
             else self.closeHelpMenu()
         e.accept()
 
-    def mouseMoveEvent(self, e):
-        self.moveThis(e)
-        e.accept()
-     
-    def mouseReleaseEvent(self, e):
-        if self.frameVisible: return
-        self.moveThis(e)
-        e.accept()       
-      
-    def moveThis(self, e):
-        dif = e.globalPosition() - self.save      
-        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-        self.save = e.globalPosition()
-      
 ### --------------------------------------------------------       
-    def addPixmap(self, file):  ## the scene is cleared each new file  
+    def addPixItem(self, file):  ## the scene is cleared each new file  
         if self.pixItem != None:
             self.scene.removeItem(self.pixItem)
             del self.pixItem
             
         if self.helpMenu != None: self.closeHelpMenu()  ## close help menu   
         if self.path == '':  self.path = os.getcwd()
-          
+   
         self.fileName = file
         try:
             img = QImage(self.fileName) 
         except:
-            self.msgbox('addPixMap: problem with ' +   self.fileName)
+            self.msgbox('addPixItem: problem with ' +   self.fileName)
             return
       
         self.scaleW = self.view.width()/ViewW  ## how width and height vary from ViewW/H
@@ -255,13 +213,13 @@ class SlideShow(QWidget):
 
         self.pixItem.setZValue(0)
         
-        # self.setScene()                                                                                                                                                                  
+        self.setScene()                                                                                                                                                                  
         x = int((self.view.width() - self.pixItem.boundingRect().width())/2)
         y = int((self.view.height() - self.pixItem.boundingRect().height())/2)
         
         self.pixItem.setPos(QPointF(x, y-5)) if self.setTags else \
             self.pixItem.setPos(QPointF(x, y))  ## center it
-            
+     
         self.setOrigin()             
         self.pixItem.setRotation(self.rot) 
         
@@ -293,7 +251,7 @@ class SlideShow(QWidget):
                 int(MaxW * self.scaleW), 
                 int(maxH * self.scaleH),
                 Qt.AspectRatioMode.KeepAspectRatio,       
-                Qt.TransformationMode.SmoothTransformation) 
+                Qt.TransformationMode.SmoothTransformation)    
         return img 
 
     def openHelpMenu(self):
@@ -325,7 +283,7 @@ class SlideShow(QWidget):
         if self.pixItem != None:           
             if self.width() *zoom > 1920 or self.height() * zoom < 350:
                 return    
-            self.setScene()     
+            # self.setScene()     
             p, width = self.pos(), self.width()        
             self.resize(int(self.width() * zoom), int(self.height() * zoom)) 
             dif = int((self.width() - width)/2) 
@@ -338,16 +296,16 @@ class SlideShow(QWidget):
     def resizeEvent(self, e):  
         if self.pixItem != None:  
             self.pixItem.setScale(self.scaleW)  
-            self.addPixmap(self.files[self.current])   
+            self.addPixItem(self.files[self.current])   
         e.accept()       
            
     def openingLayout(self):  ## refresh to start
         if self.pixItem != None:
-            self.setScene() 
+            # self.setScene() 
             x, H = int(self.ctr.x() - (Width)/2), Height
             if self.buttonsVisible: H = Height + Hpad
             self.setGeometry(x, SetY, Width, H) 
-            self.addPixmap(self.files[self.current])  ## refresh  
+            self.addPixItem(self.files[self.current])  ## refresh  
         
 ### --------------------------------------------------------                  
     def rotateThis(self, r=0):
@@ -356,7 +314,7 @@ class SlideShow(QWidget):
             if r > 270: r = 0
             self.rot = r
             self.rotters[self.fileName] = self.rot  ## seems to work
-            self.addPixmap(self.files[self.current])  ## refresh  
+            self.addPixItem(self.files[self.current])  ## refresh  
                                  
     def nextSlide(self):
         if length := len(self.files):
@@ -365,7 +323,7 @@ class SlideShow(QWidget):
                 if self.current == length:  ## wrap it
                     self.current = 0   
             self.rot = 0
-            self.addPixmap(self.files[self.current])
+            self.addPixItem(self.files[self.current])
             
     def backOne(self):
         if length := len(self.files):
@@ -374,20 +332,19 @@ class SlideShow(QWidget):
                 if self.current < 0:
                     self.current = length -1
             self.rot = 0
-            self.addPixmap(self.files[self.current])
+            self.addPixItem(self.files[self.current])
    
 ### --------------------------------------------------------
     def addTextItem(self):   
         if self.textItem != None:
             self.scene.removeItem(self.textItem)
-            del self.textItem       
-        self.textItem = self.tagIt()   
-        if self.textItem == None: 
-            return         
-        self.textItem.setZValue(100) 
-        self.textItem.setPos(self.textXY()) 
-        self.scene.addItem(self.textItem)
-        
+            self.textItem = None    
+        if txt := self.tagIt():
+            self.textItem = txt
+            self.textItem.setZValue(100) 
+            self.textItem.setPos(self.textXY()) 
+            self.scene.addItem(self.textItem)
+ 
     def textXY(self):   
         self.setScene()  
         W = int((self.width() - self.textItem.boundingRect().width())/2)
@@ -408,14 +365,14 @@ class SlideShow(QWidget):
         
         file = os.path.basename(self.fileName)
         dir = os.path.basename(self.path)
-    
         file = (f"../{dir}/{file}") if dir else (f"../{file}")
         
         if self.rot in (90, 270):  ## recalc for rotation
             asp = math.floor(height/width *100)/100.0    
             s = (f"{file}   {(height)}X{int(width)}   asp {asp}")           
         else:
-            s = (f"{file}   {int(width)}X{int(height)}   asp {asp}")   
+            s = (f"{file}   {int(width)}X{int(height)}   asp {asp}")  
+             
         textItem = QGraphicsTextItem(s.strip())
         font = QFont("Arial", 14)
         textItem .setFont(font)
@@ -450,10 +407,14 @@ class SlideShow(QWidget):
             self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
             self.frameVisible = True
             self.move(p.x(), p.y()-28) 
+            self.resize(self.width(), self.height())
+            time.sleep(.03) 
         else:
             self.setWindowFlags(self.windowFlags() | Qt.WindowType.FramelessWindowHint)
             self.frameVisible = False
             self.move(p.x(), p.y()+28)  ## keep the frame stationary
+            self.resize(self.width(), self.height())
+            time.sleep(.03) 
         self.show()
                                  
 ### --------------------------------------------------------         
@@ -465,12 +426,12 @@ class SlideShow(QWidget):
         self.init() 
         self.frameVisible = hold
             
-    def msgbox(self, str):
+    def msgbox(self, str, intv=3):
         msg = QMessageBox()
         msg.setText(str)
         timer = QTimer(msg)
         timer.setSingleShot(True)
-        timer.setInterval(5000)
+        timer.setInterval(intv*1000)
         timer.timeout.connect(msg.close)
         timer.start()
         msg.exec() 
@@ -545,7 +506,7 @@ class SlideShow(QWidget):
     def setImageFiles(self, files):
         if files != None:
             self.files = sorted(files)
-            self.addPixmap(self.files[0]) 
+            self.addPixItem(self.files[0]) 
             if len(self.files) == 1:
                 self.msgbox('openFiles: Only One Matching File')                 
                        
@@ -559,7 +520,47 @@ class SlideShow(QWidget):
                 files = self.getFileNames(filenames)  
                 self.setImageFiles(files)       
                                                                 
-### --------------------------------------------------------    
+### -------------------------------------------------------- 
+    def setUI(self):      
+        self.view = QGraphicsView(self)
+        self.scene = QGraphicsScene(0, 0, ViewW, ViewH)
+        
+        self.setMinimumHeight(350);   self.setMinimumWidth(350)
+        self.setMaximumHeight(1200);  self.setMaximumWidth(1850)
+
+        self.view.setScene(self.scene)                 
+
+        self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)     
+        self.view.setCacheMode(QGraphicsView.CacheModeFlag.CacheBackground)
+        
+        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus);  self.setFocus()
+
+        if OneColor:   ##  makes widget one color
+            self.setStyleSheet("QWidget {\n" 
+                "background-color: rgb(250,250,250);\n"
+                "border: 1px solid rgb(250,250,250);\n"
+                # "color: rgb(250,250,250);\n"      
+                "}")
+          
+        self.init()
+  
+        self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
+        self.hgt = QGuiApplication.primaryScreen().availableGeometry().height()
+          
+        x = self.ctr.x() - int(Width/2)
+        self.move(x,SetY)
+  
+        vbox = QVBoxLayout()      
+        vbox.addWidget(self.view)           ## default - if True adds setButtons to layout
+        vbox.addWidget(self.setButtons()) 
+       
+        self.setLayout(vbox)
+        self.grabKeyboard()
+
+### -------------------------------------------------------- 
     def setButtons(self): 
         self.buttonGroup = QLabel()
         self.buttonGroup.setFixedHeight(50)
@@ -570,26 +571,26 @@ class SlideShow(QWidget):
             "font-size:    13px;\n"
             "}")   
         
-        self.filesBtn = QPushButton("Files")  
-        self.helpBtn = QPushButton("Help")
-        self.clearBtn = QPushButton("Clear")
-        self.quitBtn = QPushButton("Quit")        
+        filesBtn = QPushButton("Files")  
+        helpBtn = QPushButton("Help")
+        clearBtn = QPushButton("Clear")
+        quitBtn = QPushButton("Quit")        
           
-        self.filesBtn.clicked.connect(self.fileChooser)
-        self.helpBtn.clicked.connect(lambda: self.slideMenuKeys('H'))
-        self.clearBtn.clicked.connect(self.clearScene)
-        self.quitBtn.clicked.connect(lambda: self.slideMenuKeys('X'))
+        filesBtn.clicked.connect(self.fileChooser)
+        helpBtn.clicked.connect(lambda: self.slideMenuKeys('H'))
+        clearBtn.clicked.connect(self.clearScene)
+        quitBtn.clicked.connect(lambda: self.slideMenuKeys('X'))
         
         hbox = QHBoxLayout(self)
         
         hbox.addSpacing(50)       
-        hbox.addWidget(self.filesBtn)
+        hbox.addWidget(filesBtn)
         hbox.addSpacing(50)        
-        hbox.addWidget(self.helpBtn)
+        hbox.addWidget(helpBtn)
         hbox.addSpacing(50)       
-        hbox.addWidget(self.clearBtn)
+        hbox.addWidget(clearBtn)
         hbox.addSpacing(50)
-        hbox.addWidget(self.quitBtn)
+        hbox.addWidget(quitBtn)
             
         self.buttonGroup.setLayout(hbox)
         self.buttonGroup.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Plain)

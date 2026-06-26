@@ -18,58 +18,23 @@ import math
     Size detection doesn't work if clips are on.'''
 ### -------------------------------------------------------- 
 
-from PyQt6.QtCore       import Qt, QPoint
+from PyQt6.QtCore       import Qt
 from PyQt6.QtGui        import QGuiApplication
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, QSizePolicy
                                     
-from videoClipsMaker        import Clips
-from videoClipsWidget       import *
-from videoPlayerShared      import *
-from videoPlayerHelp        import VideoMenuKeys
+from videoClipsMaker    import Clips
+from videoClipsWidget   import *
+from videoPlayerShared  import *
+from videoPlayerHelp    import VideoMenuKeys
 
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
     def __init__(self):
         super(VideoPlayer, self).__init__()         
-        self.setWindowTitle("Video Player One")
-          
-        self.setMinimumHeight(MinWid+100)
-        self.setMinimumWidth(MinWid)
-        
-        self.setMaximumHeight(1200)
-        self.setMaximumWidth(1850)
-    
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
-             
-        self.init()  
-         
-        self.clips = Clips(self) 
-        self.shared = Shared(self)
+        self.setWindowTitle("VideoPlayerOne and ClipsMaker")
            
-        self.mediaPlayer = MediaPlayer(self)
-        self.videoWidget = self.mediaPlayer.videoWidget
-             
-        if len(sys.argv) > 1: 
-            self.path = sys.argv[1]
-         
-        vbox = QVBoxLayout() 
-        
-        vbox.addWidget(self.videoWidget)
-        vbox.addWidget(setButtons(self))
-        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignCenter) 
-       
-        self.setLayout(vbox)            
-   
-        self.shared.openPlayer(self.key)  ## open full frame - 3:2
-         
-        x = QGuiApplication.primaryScreen().availableGeometry().center().x()
-        self.move(x-int((ViewW+WID)/2), HorzH)  
-  
-        self.setAcceptDrops(True)  
-        self.grabKeyboard() 
-            
+        self.setUI()
         self.show()
               
 ### --------------------------------------------------------        
@@ -82,7 +47,7 @@ class VideoPlayer(QWidget):
         self.flag = False
         self.helpFlag = False 
         self.helpMenu = None
-        self.save  = QPoint()
+
         self.saveW = self.width()
         self.saveH = self.height()
                                                                
@@ -170,29 +135,15 @@ class VideoPlayer(QWidget):
                     return
            
 ### --------------------------------------------------------                                                                              
-    def mousePressEvent(self, e):  ## takes two fingers on my mac and a double-click
-        self.save = e.globalPosition()  
+    def mousePressEvent(self, e): 
         if e.button() == Qt.MouseButton.RightButton:
             if self.clips.settings == None:
-                self.shared.closeHelpMenu() if self.helpFlag else\
+                self.shared.closeHelpMenu() if self.helpFlag else \
                     self.shared.openHelpMenu() 
         else:
             self.shared.closeHelpMenu()
         e.accept() 
    
-    def mouseMoveEvent(self, e):
-        self.moveThis(e)
-        e.accept()
-     
-    def mouseReleaseEvent(self, e):
-        self.moveThis(e)
-        e.accept()       
-      
-    def moveThis(self, e):
-        dif = e.globalPosition() - self.save      
-        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-        self.save = e.globalPosition()
-
     def mouseDoubleClickEvent(self, e): 
         if self.fileName != '':  
             self.shared.msgbox(self.fileName + '\n' + 'aspect: ' + str(self.aspect))
@@ -247,8 +198,11 @@ class VideoPlayer(QWidget):
         else:
             self.aspect = 0
             self.aspButton.setText("Set Aspect")
-            
-### -------------------------------------------------------- 
+       
+    def showHideAspectBtn(self):  ## also called from clipsMaker
+        self.aspButton.show() if self.width() > VertW \
+            else self.aspButton.hide()
+                       
     def closeOnOpen(self):  
         self.shared.closeHelpMenu();   
         self.clips.closeSettings()
@@ -256,11 +210,45 @@ class VideoPlayer(QWidget):
         self.shared.looperOff() 
         if self.mediaPlayer != None:
             self.shared.stopVideo()
-    
-    def showHideAspectBtn(self):  ## also called from clipsMaker
-        self.aspButton.show() if self.width() > VertW \
-            else self.aspButton.hide()
-    
+ 
+### --------------------------------------------------------
+    def setUI(self):
+        self.setMinimumHeight(MinWid+100)
+        self.setMinimumWidth(MinWid)
+        
+        self.setMaximumHeight(1200)
+        self.setMaximumWidth(1850)
+        
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
+             
+        self.init()  
+         
+        self.clips = Clips(self) 
+        self.shared = Shared(self)
+           
+        self.mediaPlayer = MediaPlayer(self)
+        self.videoWidget = self.mediaPlayer.videoWidget
+     
+        if len(sys.argv) > 1: 
+            self.path = sys.argv[1]
+         
+        vbox = QVBoxLayout() 
+     
+        vbox.addWidget(self.videoWidget, Qt.AlignmentFlag.AlignCenter)
+        vbox.addWidget(setButtons(self), Qt.AlignmentFlag.AlignCenter)
+        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignHCenter)
+   
+        self.setLayout(vbox)            
+   
+        self.shared.openPlayer(self.key)  ## open full frame - 3:2
+         
+        x = QGuiApplication.primaryScreen().availableGeometry().center().x()
+        self.move(x-int((ViewW+WID)/2), HorzH)  
+  
+        self.setAcceptDrops(True)  
+        self.grabKeyboard() 
+   
 ### -------------------------------------------------------- 
     def zoom(self, zoom):  ## maintain current aspect ratio
         if self.mediaPlayer != None:  

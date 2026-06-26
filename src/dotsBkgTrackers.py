@@ -20,70 +20,8 @@ class Trackers(QWidget):
     def __init__(self, parent, dump): 
         super().__init__() 
 
-        self.bkgtrackers = parent
-        self.canvas = self.bkgtrackers.canvas
-             
-        self.setWindowTitle('trackers') 
-        
-        self.type = 'widget'
-        self.setAccessibleName('widget')
+        self.setUI(parent, dump)
 
-        self.tableWidget = QTableWidget()    
-        self.tableWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)         
-    
-        c = len(dump[0])
-    
-        self.tableWidget.setColumnCount(c)
-        self.tableWidget.setRowCount(len(dump))
-
-        self.width, self.height = c*110, (len(dump)+1) * RowHt
-        self.tableWidget.setFixedSize(self.width, self.height)
-        
-        self.tableWidget.setColumnWidth(0, 135)    
- 
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-           
-        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.tableWidget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)  ## google ai
-
-        self.tableWidget.itemSelectionChanged.connect(self.selectionChanged)   ## google ai
-
-        self.tableWidget.setHorizontalHeaderLabels(HeaderStr) 
-        self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
-            'background-color: rgb(115,225,225)}')	 
-            
-        self.upBtn = QPushButton("Move Up One")
-        self.upBtn.clicked.connect(self.up)
-        self.upBtn.setMaximumWidth(200)  
-              
-        self.closeBtn = QPushButton("This Button to Close")
-        self.closeBtn.clicked.connect(self.bye)
-        self.closeBtn.setMaximumWidth(200)              
-              
-        self.downBtn = QPushButton("Move Down One")
-        self.downBtn.clicked.connect(self.down)
-        self.downBtn.setMaximumWidth(200) 
-    
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.tableWidget)
-        
-        hbox = QHBoxLayout()     
-        hbox.addWidget(self.upBtn)
-        hbox.addWidget(self.closeBtn)
-        hbox.addWidget(self.downBtn) 
-        
-        vbox.addLayout(hbox) 
-        self.setLayout(vbox)
-            
-        x, y = getVuCtr(self.canvas)
-        pos = QPoint(x, int(y - (self.height/2)))
-        
-        self.move(int(pos.x()-(self.width/2)), int(pos.y())-50)
-          
-        self.createTable(dump)
- 
 ### ------------------------------------------------------- 
     @pyqtSlot(str) 
     def setPixKeys(self, key):  ## from sideCar2
@@ -147,7 +85,74 @@ class Trackers(QWidget):
             self.tableWidget.close()
             self.tableWidget = None 
             self.bkgtrackers.closeTracker()
+    
+### -------------------------------------------------------- 
+    def setUI(self, parent, dump): 
+               
+        self.bkgtrackers = parent
+        self.canvas = self.bkgtrackers.canvas
+             
+        self.setWindowTitle('trackers') 
         
+        self.type = 'widget'
+        self.setAccessibleName('widget')
+
+        self.tableWidget = QTableWidget()    
+        self.tableWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)         
+    
+        c = len(dump[0])
+    
+        self.tableWidget.setColumnCount(c)
+        self.tableWidget.setRowCount(len(dump))
+
+        self.width, self.height = c*110, (len(dump)+1) * RowHt
+        self.tableWidget.setFixedSize(self.width, self.height)
+        
+        self.tableWidget.setColumnWidth(0, 135)    
+ 
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.tableWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+           
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)  ## google ai
+
+        self.tableWidget.itemSelectionChanged.connect(self.selectionChanged)   ## google ai
+
+        self.tableWidget.setHorizontalHeaderLabels(HeaderStr) 
+        self.tableWidget.horizontalHeader().setStyleSheet('QHeaderView::section{\n'
+            'background-color: rgb(115,225,225)}')	 
+            
+        upBtn = QPushButton("Move Up One")
+        upBtn.clicked.connect(self.up)
+        upBtn.setMaximumWidth(200)  
+              
+        closeButton = QPushButton("This Button to Close")
+        closeButton.clicked.connect(self.bye)
+        closeButton.setMaximumWidth(200)              
+              
+        downBtn = QPushButton("Move Down One")
+        downBtn.clicked.connect(self.down)
+        downBtn.setMaximumWidth(200) 
+    
+        vbox = QVBoxLayout()
+        vbox.addWidget(self.tableWidget)
+        
+        hbox = QHBoxLayout()     
+        hbox.addWidget(upBtn)
+        hbox.addWidget(closeButton)
+        hbox.addWidget(downBtn) 
+        
+        vbox.addLayout(hbox) 
+        self.setLayout(vbox)
+            
+        x, y = getVuCtr(self.canvas)
+        pos = QPoint(x, int(y - (self.height/2)))
+        
+        self.move(int(pos.x()-(self.width/2)), int(pos.y())-50)
+          
+        self.createTable(dump)
+ 
 ### --------------------------------------------------------
 class BkgTrackers: 
 ### -------------------------------------------------------- 
@@ -281,7 +286,7 @@ class BkgTrackers:
             "scrollable": bkg.scrollable,
         }
         return tmp
-                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                         
 ### ------------------- dotsBkgTrackers --------------------
              
 

@@ -25,55 +25,9 @@ class VideoPlayer(QWidget):
 ### -------------------------------------------------------
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Video Player Two")
-                
-        self.setMinimumHeight(MinHgt)
-        self.setMinimumWidth(MinWid)
+        self.setWindowTitle("VideoPlayerTwo and ClipsMaker")
         
-        self.setMaximumHeight(MaxHgt)
-        self.setMaximumWidth(MaxWid)
-        
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
-                 
-        self.setStyleSheet("QGraphicsView {\n"  ## seems to work better positioned here
-            "background-color: black;\n"        ## matches "one"s look
-            "border: 1px solid rgb(125,125,125);\n"
-            "color: rgb(125,125,125);\n"
-            "}")
-
-        self.scene = QGraphicsScene(self)   
-        self.view = QGraphicsView(self.scene)
-        
-        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-         
-        self.init()
-        
-        self.clips = Clips(self)
-        self.shared = Shared(self)
-  
-        self.addMediaPlayer() 
-
-        if len(sys.argv) > 1: 
-            self.path = sys.argv[1]
-    
-        vbox = QVBoxLayout() 
-          
-        vbox.addWidget(self.view, Qt.AlignmentFlag.AlignCenter)
-        vbox.addWidget(setButtons(self), Qt.AlignmentFlag.AlignCenter)
-        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignCenter) 
-            
-        self.setLayout(vbox)         
-        
-        self.shared.openPlayer(self.key)   ## open full frame - 3:2
-          
-        x = QGuiApplication.primaryScreen().availableGeometry().center().x()
-        self.move(x-int((ViewW+WID)/2), int(HorzH)) 
-        
-        self.setAcceptDrops(True)  
-        self.grabKeyboard() 
-                                                     
+        self.setUI()                                       
         self.show()
    
 ### --------------------------------------------------------
@@ -88,7 +42,6 @@ class VideoPlayer(QWidget):
         self.helpFlag = False 
         self.helpMenu = None
         self.backdrop = None
-        self.save  = QPoint() 
         self.saveW = self.width()
         self.saveH = self.height()
 
@@ -162,7 +115,6 @@ class VideoPlayer(QWidget):
     
 ### -------------------------------------------------------                     
     def mousePressEvent(self, e):  
-        self.save = e.globalPosition()
         if e.button() == Qt.MouseButton.RightButton:
             if self.clips.settings == None:
                 self.shared.closeHelpMenu() if self.helpFlag else \
@@ -170,21 +122,7 @@ class VideoPlayer(QWidget):
         else:
             self.shared.closeHelpMenu()
         e.accept() 
-          
-    def mouseMoveEvent(self, e):
-        self.moveThis(e)
-        e.accept()
-     
-    def mouseReleaseEvent(self, e):
-        self.moveThis(e)
-        e.accept()       
-      
-    def moveThis(self, e):
-        dif = e.globalPosition() - self.save      
-        self.move(self.pos() + QPoint(int(dif.x()), int(dif.y())))
-        self.save = e.globalPosition()
-        e.accept()
-        
+       
     def mouseDoubleClickEvent(self, e): 
         if self.fileName != '':  
             self.shared.msgbox(self.fileName + '\n' + 'aspect: ' + str(self.aspect))
@@ -273,6 +211,54 @@ class VideoPlayer(QWidget):
         # self.backdrop.setOpacity(.50)  ## also for test
         self.scene.addItem(self.backdrop)
       
+### --------------------------------------------------------  
+    def setUI(self):
+        self.setMinimumHeight(MinHgt)
+        self.setMinimumWidth(MinWid)
+        
+        self.setMaximumHeight(MaxHgt)
+        self.setMaximumWidth(MaxWid)
+        
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
+                 
+        self.setStyleSheet("QGraphicsView {\n"  ## seems to work better positioned here
+            "background-color: black;\n"        ## matches "one"s look
+            "border: 1px solid rgb(125,125,125);\n"
+            "color: rgb(125,125,125);\n"
+            "}")
+
+        self.scene = QGraphicsScene(self)   
+        self.view = QGraphicsView(self.scene)
+        
+        self.view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+         
+        self.init()
+        
+        self.clips = Clips(self)
+        self.shared = Shared(self)
+  
+        self.addMediaPlayer() 
+
+        if len(sys.argv) > 1: 
+            self.path = sys.argv[1]
+    
+        vbox = QVBoxLayout() 
+          
+        vbox.addWidget(self.view, Qt.AlignmentFlag.AlignCenter)
+        vbox.addWidget(setButtons(self), Qt.AlignmentFlag.AlignCenter)
+        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignHCenter)
+            
+        self.setLayout(vbox)                
+        self.shared.openPlayer(self.key)   ## open full frame - 3:2
+          
+        x = QGuiApplication.primaryScreen().availableGeometry().center().x()
+        self.move(x-int((ViewW+WID)/2), int(HorzH)) 
+        
+        self.setAcceptDrops(True)  
+        self.grabKeyboard()     
+        
 ### --------------------------------------------------------   
     def resizeEvent(self, e):
         if self.flag:

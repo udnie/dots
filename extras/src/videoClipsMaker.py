@@ -1,7 +1,7 @@
 
 import math
 import time
-# import cv2   ## required <<<----- 4.12.0 or above
+import cv2  ## 4.12.0 or above
 
 import os.path
 import numpy as np  
@@ -10,9 +10,9 @@ import numpy as np
 ''' Source for assembler, ctrOnBackground, a single-file dialog.
     and a number of functions including setDefaultSizes and those 
     used by Settings. 
-    Import cv2 needs to be uncommented once opencv is installed
-    to run assembler. It may also be required by getMetaData, 
-    videoPlayerShared, to set the video aspect-ratio on opening.
+    Opencv is required to run assembler and by getMetaData in 
+    videoPlayerShared to set the video aspect-ratio on opening if
+    self.AutoAspect is True.
     The videoClipsWidget defaults(Settings) are set here. '''
 ### --------------------------------------------------------
     
@@ -42,13 +42,13 @@ class Clips:
         self.Wpr = 4    ## writes per read
         self.Rnf = 1    ## read every 'n frame - just to make sure 
                        
-        self.AutoAspect  = False      ## True reads the video metadata to set the aspect ratio and resize the widget
+        self.AutoAspect  = True      ## True reads the video metadata to set the aspect ratio and resize the widget
                                      ## requires that getVideoWidthHeight is working                                     
         self.MakeClips   = False     ## True - from photos - requires having opencv installed and import cv2 uncommented
         self.FirstFrame  = False     ## True - read only the first frame of a video       
         self.SkipFrames  = False     ## True - read the Nth frame of a video 
         self.FilterOn    = False     ## True - image aspect matches self.aspect (parent)
-        self.PlayVideo   = False    ## True plays video upon loading
+        self.PlayVideo   = True      ## True plays video upon loading
         self.AddFileName = False     ## True add to frame
         
         # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
@@ -209,7 +209,7 @@ class Clips:
             self.parent.shared.msgbox('assembler: error setting output' +  '\n' + 
                                       'check if opencv installed or uncommented')
             return
-     
+       
         if not self.SkipFrames:
             if self.FirstFrame:  
                 images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos

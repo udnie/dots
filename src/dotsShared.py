@@ -80,7 +80,7 @@ CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,sp
 
 PathStr = "B,C,D,E,H,L,N,M,P,R,S,T,U,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
-PlayKeys = ('A','C','D','G','J','K','L','M','N','O','P','R','S','T','U','V','W','Y','X','space','del') 
+PlayKeys = ('A','C','D','G','I','J','K','L','M','N','O','P','R','S','T','U','V','W','Y','X','space','del') 
 
 Verts = ('800','SQV', '900','912','960V','1024','1066','1102')
 
@@ -163,6 +163,7 @@ singleKeys = {  ## wish I had done this earlier
     Qt.Key.Key_F: 'F',
     Qt.Key.Key_G: 'G',
     Qt.Key.Key_H: 'H', 
+    Qt.Key.Key_I: 'I', 
     Qt.Key.Key_J: 'J', 
     Qt.Key.Key_K: 'K',  
     Qt.Key.Key_L: 'L',   

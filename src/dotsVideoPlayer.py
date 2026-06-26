@@ -14,6 +14,8 @@ from PyQt6.QtMultimediaWidgets  import QGraphicsVideoItem
 from dotsSideGig        import MsgBox
 from dotsShared         import common, Ball, paths
 
+''' PythonQt5 can't run an animation and loop a video at the  
+    same time. The video only runs once.''' 
 ### --------------------------------------------------------
 class QVD(QGraphicsVideoItem):  ## added type to track it better
 ### --------------------------------------------------------

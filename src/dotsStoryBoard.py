@@ -52,17 +52,17 @@ class StoryBoard(QWidget):
     
         self.sideCar   = SideCar(self)    ## extends canvas
         self.sideCar2  = SideCar2(self)   ## same
-          
-        self.keysPanel = KeysPanel(self)     ## artifact - replaced by help menu(s)
+        
         self.scroll    = ScrollPanel(self)   ## scrolling visual list of sprites  
         self.pathMaker = PathMaker(self)     ## create and edit a path
-
-        self.mapper    = MapMaker(self)    ## misc screen stuff
-        self.bkgMaker  = BkgMaker(self)    ## background hub
-                   
-        self.showbiz    = ShowBiz(self)     ## single key dispatch 
+        
+        self.mapper    = MapMaker(self)     ## misc screen stuff
+        self.bkgMaker  = BkgMaker(self)     ## background hub
+        self.showbiz   = ShowBiz(self)      ## single key dispatch 
+        
         self.showWorks  = ShowWorks(self)   ## saves play files - manages play keys
-        self.helpButton = ButtonHelp(self)  ## launch help menu(s)
+        self.helpButton = ButtonHelp(self)  ## launch help menu(s)   
+        self.keysPanel  = KeysPanel(self)   ## artifact - replaced by help menu(s)
      
         addScrollDock(self) 
         addKeysDock(self)

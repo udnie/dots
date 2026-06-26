@@ -253,6 +253,7 @@ class PathEdits(QWidget):
             if idx <= self.pathMaker.selections[0]:  ## test for first
                 if idx == self.pathMaker.selections[0]: 
                     self.pathMaker.selections.pop(0)  
+                    
                 for i in range(len(self.pathMaker.selections)):
                     self.pathMaker.selections[i] += -1  
                     

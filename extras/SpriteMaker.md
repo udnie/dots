@@ -1,4 +1,7 @@
-## Changes      
+## Changes        
+**May 2026:**  
+Now runs in **PyQt5** and **PySide6**. Added a **help menu** as it seemed like a good thing to do. Also overhauled the **loupe magnifier** again so it locks its position by simply pressing the **shift key**. The frame changes to a darker gray when locked. Press it again to unlock. Reposition it or simply select another set of points to edit. The arrow keys are hopefully more intuitive.
+
 **April 2024:**  
 Did some work on the Loupe Magnifier, fixed a bug, and general maintenance. The most interesting thing about spriteMaker is having two views of the same screen open and in sync. No plans for PyQt5 or PySide. The **shift** key stops/resumes the widget from moving, **double-click** closes the widget. Look at keypress for the rest, insert, delete.
 

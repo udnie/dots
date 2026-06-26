@@ -250,7 +250,6 @@ def addCanvasBtnGroup(self):
         btnClrCanvas = QPushButton("Clear")
         self.btnPathMaker = QPushButton("PathMaker")
         btnSnapShot = QPushButton("Shapshot")  
-        btnPixTest = QPushButton("PixTest")
         btnExit = QPushButton("Exit")
 
         layout = QHBoxLayout()    
@@ -258,13 +257,11 @@ def addCanvasBtnGroup(self):
         layout.addWidget(btnClrCanvas) 
         layout.addWidget(self.btnPathMaker)  
         layout.addWidget(btnSnapShot)      
-        layout.addWidget(btnPixTest)
         layout.addWidget(btnExit)
   
         self.btnPathMaker.clicked.connect(pathMaker.initPathMaker)      
         btnClrCanvas.clicked.connect(canvas.clear)   
         btnSnapShot.clicked.connect(lambda: self.canvas.sideCar2.snapShot(pathMaker))
-        btnPixTest.clicked.connect(canvas.sideCar.pixTest)
         btnExit.clicked.connect(canvas.exit)
         
         self.canvasGroup.setLayout(layout)         

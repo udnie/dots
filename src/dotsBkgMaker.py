@@ -5,8 +5,8 @@ import os.path
 from functools          import partial
        
 from PyQt6.QtCore       import QPoint, QPointF, QTimer
-from PyQt6.QtGui        import QColor, QCursor
-from PyQt6.QtWidgets    import QWidget, QFileDialog, QGraphicsPixmapItem, \
+from PyQt6.QtGui        import QColor
+from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem, \
                                 QColorDialog
 
 from dotsShared         import common, paths, ControlKeys
@@ -19,9 +19,9 @@ from dotsBkgTrackers    import BkgTrackers
 from dotsHelpDesk       import StoryHelp2
 
 ### --------------------- dotsBkgMaker ---------------------
-''' class: BkgMaker - creates and supports BkgItem '''       
+''' Adds BkgItems, Flats and the background Widget.'''       
 ### --------------------------------------------------------
-class BkgMaker(QWidget):  
+class BkgMaker:  
 ### --------------------------------------------------------
     def __init__(self, parent, file =''):
         super().__init__()
@@ -182,7 +182,8 @@ class BkgMaker(QWidget):
                 
 ### --------------------------------------------------------
     def resetSliders(self, bkg):
-        if bkg != None and bkg.type == 'bkg':                                
+        if bkg != None and bkg.type == 'bkg':    
+    
             self.widget.factorDial.setValue(int(bkg.factor*100))
             self.widget.factorValue.setText(f'{bkg.factor:.2f}')
             
@@ -229,10 +230,6 @@ class BkgMaker(QWidget):
 ### --------------------------------------------------------            
     def showtime(self, bkg):  ## 'run' from widget button
         self.closeWidget()
-        
-        p = QCursor.pos()
-        QCursor.setPos(int(p.x()+220), int(p.y()+650.0))  ## works for 720
-     
         self.canvas.showbiz.showtime.run()
      
     def flopIt(self, bkg):  ## used by widget 

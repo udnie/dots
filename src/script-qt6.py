@@ -5,16 +5,13 @@
 ### -------------------------------------------------------
 import os
 
-files = ["videoPlayerShared.py", "dotsVideoPlayer.py"]
+files = ["dotsVideoPlayer.py"]
 for file in files:
     lines = []
     with open(file, 'r') as fp: 
         for line in fp:
             
-            if line.startswith('import cv2'):
-                line = '# ' + line
-                
-            elif 'aspect/ratio' in line:  ## there is only one
+            if 'aspect/ratio' in line:  ## there is only one
                 i = line.index('s')  ## self.set
                 line = line[0:i] + '# ' + line[i:]
            

@@ -9,39 +9,50 @@ from PyQt6.QtWidgets    import QMessageBox
 from dotsShared         import common, paths                             
 from dotsSideGig        import MsgBox, tagBkg
 
-
-showtime = {   ## trigger a new background based on the number of pixels left in runway
+''' trigger a new scrolling background based on the number 
+    of pixels remaining in runway '''
+showtime = {   
     'snakes':   15,  ## also used by vertical 
-    'left':     11, 
-    'right':    15,  
-    'vertical': 17,  ## trying this out 
+    'left':     10, 
+    'right':    10,  
+    'vertical': 15,  ## trying this out 
 }
 
-# screenrates = {  ## not current - updated in ../plays/screenrates.dict
-#     '800': [10.0, 22.76, 0.0], 
-#     '900': [10.0, 23.2, 0.0], 
-#     '912': [10.0, 21.1, 0.0],
-#     '960': [10.0, 16.75, 16.75], 
-#     '1080': [10.0, 17.57, 17.72], 
-#     '108O': [10.0, 16.79, 16.79],
-#     '1066': [10.0, 21.84, 0.0], 
-#     '1024': [10.0, 21.31, 0.0], 
-#     '1102': [10.0, 21.3, 0.0], 
-#     '1215': [10.0, 17.35, 17.4], 
-#     '1280': [10.0, 18.92, 19.07], 
-#     '1296': [10.0, 17.5, 17.45],
-#     '1440': [10.0, 18.7, 18.82],  
-#     '1536': [10.0, 18.65, 18.92], 
-# }
+''' screenrates not current - updated in ../plays/screenrates.dict
+screenrates = {
+    '800':  [10.0, 22.76,   0.0], 
+    '900':  [10.0, 23.2,    0.0], 
+    '912':  [10.0, 21.1,    0.0],
+    '960':  [10.0, 16.75, 16.75], 
+    '1080': [10.0, 17.57, 17.72], 
+    '108O': [10.0, 16.79, 16.79],
+    '1066': [10.0, 21.84,   0.0], 
+    '1024': [10.0, 21.31,   0.0], 
+    '1102': [10.0, 21.3,    0.0], 
+    '1215': [10.0, 17.35, 17.40], 
+    '1280': [10.0, 18.92, 19.07], 
+    '1440': [10.0, 18.7,  18.82],  
+} 
 
-''' use these to read and dump the current screen rates
-    with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
-        screenrates = json.load(fp) 
-    for k, vals in screenrates.items():
-        print( f'{k.rjust(5)} {str(vals[0]).rjust(6)}  {vals[1]:6.2f}  {vals[2]:5.2f} ') 
- '''
+screenrates for hats demo - in ../demo with shadow-wrp.jpg 
+shadows = { 
+    "SQH":  [10.0, 13.20, 13.20],   ##  1:1  
+    "960":  [10.0, 14.75, 14.75],   ##  4:3 
+    "1080": [10.0, 14.75, 14.75],   ##  3:2
+    "1280": [10.0, 15.60, 15.60],   ## 16:9
+    "108O": [10.0, 14.25, 14.25],   ##  4:3
+    "1215": [10.0, 14.75, 14.75],   ##  3:2
+    "1440": [10.0, 15.65, 15.65],   ## 16:9
+}  '''
+
+''' use these to read and dump the current screen rates '''
+# with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
+#     screenrates = json.load(fp) 
+# for k, vals in screenrates.items():
+#     print( f'{k.rjust(5)} {str(vals[0]).rjust(6)}  {vals[1]:6.2f}  {vals[2]:5.2f} ') 
+
 ### ------------------ dotsBkgScrollWrks -------------------  
-''' updateDictionary, tracker and scrolling functions '''
+''' screen rates examples, updateDictionary, tracker and scrolling functions '''
 ### --------------------------------------------------------        
 class BkgScrollWrks: 
 ### --------------------------------------------------------
@@ -56,11 +67,11 @@ class BkgScrollWrks:
     def updateDictionary(self):
         test = False
         rate = self.bkgMaker.screenrate.get(common['Screen'])   
-        
+  
         if rate == None:
             MsgBox("Error Reading ScreenRates", 5)
             return   
-      
+
         if self.bkgItem.direction == 'right' and rate[2] != self.bkgItem.rate:
             rate[2] = self.bkgItem.rate
             test = True
@@ -91,14 +102,23 @@ class BkgScrollWrks:
 
         if answer == msgbox.StandardButton.No:
             return   
-        try:
-            with open(paths['playPath'] +  "screenrates.dict", 'w') as fp:  
-                json.dump(self.bkgMaker.screenrate, fp)
-            MsgBox('Rates Dictionary Updated' ,5)
-            return
-        except:
-            MsgBox('Error Updating Rates Dictionary', 5)
-            return
+         
+        if self.canvas.openPlayFile == 'hats':
+            try:  
+                with open(paths['demo'] +  "demorates.dict", 'w') as fp:
+                    json.dump(self.bkgMaker.screenrate, fp)
+            except:
+                MsgBox('Error Updating Rates Dictionary', 5)
+                return
+        else:
+            try:
+                with open(paths['playPath'] +  "screenrates.dict", 'w') as fp:  
+                    json.dump(self.bkgMaker.screenrate, fp)
+            except:
+                MsgBox('Error Updating Rates Dictionary', 5)
+                return 
+        MsgBox('Rates Dictionary Updated' ,5)
+        return
        
 ### --------------------------------------------------------
     ## snakes need more time - the rest vary to build and position and comes before vertical  

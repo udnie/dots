@@ -187,7 +187,7 @@ class BkgHelp:
                     help = 'opt'  
                 if help != 'H' and help in self.bkgItem.sharedKeys:
                     QTimer.singleShot(25, partial(self.bkgItem.shared, help)) 
-                elif help in ('Shift-B', 'Shift-U'):
+                elif help in ('Shift-B', 'Shift-U'):  ## catches it from menu and keyboard thru controlView
                     self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)  
                 elif help == 'Option-B':
                     self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.AltModifier)

@@ -3,7 +3,7 @@ from PyQt6.QtCore       import Qt
 from PyQt6.QtGui        import QKeySequence
 
 from dotsSideGig        import getVuCtr
-from dotsTableModel     import TableWidgetSetUp, QC, QL, QH
+from dotsTableModel     import TableWidgetSetUp, QC, QL, QH, SD
 
 storyKeys = {   ## storyHelp2
     'F':    'Flop Selected',
@@ -59,10 +59,10 @@ class StoryHelp2:
         self.canvas = parent
         self.switch = switch
 
-        self.table = TableWidgetSetUp(65, 210, len(storyKeys)+4)
+        self.table = TableWidgetSetUp(65, 210, len(storyKeys)+5)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 282, 486
+        width, height = 282, 516
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu 2":<30}',QL,True,True,2)
@@ -81,8 +81,9 @@ class StoryHelp2:
                 self.table.setRow(row, 1, "  " + val, QL, False, True)                 
                 row += 1
  
-        self.table.setRow(row,     0, f'{"Enter Key or Select From Above "}',QH,True,True, 2) 
-        self.table.setRow(row + 1, 0, f"{'Click Here to Close':<22}",'',True,True, 2)
+        self.table.setRow(row,     0, f'{"Back to Menu"}',SD,True,True, 2)
+        self.table.setRow(row + 1, 0, f'{"Enter Key or Select From Above "}',QH,True,True, 2) 
+        self.table.setRow(row + 2, 0, f"{'Click Here to Close':<22}",'',True,True, 2)
   
         x, y = getVuCtr(self.canvas)  
         if off != 0: x += off  
@@ -97,6 +98,8 @@ class StoryHelp2:
                 self.canvas.view.sendIt(QKeySequence(help), None)
             elif  help == 'P':
                 self.canvas.setKeys('P')
+            elif help == 'Back to Menu':
+                self.canvas.showbiz.helpButtons.openMenus() 
             else:  ## send last char and modifier
                 self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)
         self.closeMenu()

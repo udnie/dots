@@ -1,5 +1,5 @@
 
-import cv2
+import cv2  ## 4.12.0 or above
 import numpy as np
 import os.path
 
@@ -218,9 +218,9 @@ class Shadow(QGraphicsPixmapItem):  ## initPoints, initShadow, setPerspective
                                                                                                   
 ### --------------------------------------------------------        
 def initShadow(file, w, h, flop):  ## replace all colors with grey  
-    file = paths['spritePath'] + os.path.basename(file)         
+    file = paths['spritePath'] + os.path.basename(file)   
     img = cv2.imread(file, cv2.IMREAD_UNCHANGED)  
-     
+    
     if flop: img = cv2.flip(img, 1)  ## works after the read   
     rows, cols, _ = img.shape
 

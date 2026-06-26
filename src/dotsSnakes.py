@@ -169,14 +169,14 @@ class Snakes:
 ### -------------------------------------------------------- 
     def setSelection(self, what):  ## no right scrolling for snakes
         if what == 'blue':
-            color  = QColor(QColor(0,84,127) )  ## ocean blue                                
+            color = QColor(QColor(0,84,127) )  ## ocean blue                                
             self.canvas.bkgMaker.setBkgColor(QColor(color))  
             
         if self.scroller != None:
-            self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
+            self.scroller = BkgItem('snakes.jpg', self.canvas)
             
         elif what == 'left':
-            self.scroller = BkgItem(paths['demo'] + 'snakes.jpg', self.canvas)
+            self.scroller = BkgItem('snakes.jpg', self.canvas)
             
             self.scroller.direction = 'left' 
             self.scroller.path = paths['demo']  
@@ -190,8 +190,8 @@ class Snakes:
             
         elif what == 'vertical':
             
-            self.scroller = BkgItem(paths['demo'] + 'snakes_1102.jpg', self.canvas) if common['Screen'] == '1102' \
-                else BkgItem(paths['demo'] + 'snakes_912.jpg', self.canvas)    
+            self.scroller = BkgItem('snakes_1102.jpg', self.canvas) if common['Screen'] == '1102' \
+                else BkgItem('snakes_912.jpg', self.canvas)    
                  
             self.scroller.direction = 'vertical'   
             self.scroller.path = paths['demo'] 

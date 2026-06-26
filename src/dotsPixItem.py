@@ -9,17 +9,14 @@ from dotsPixWidget      import PixWidget
 from dotsSideGig        import MsgBox, tagBkg
 from dotsHelpMonkey     import PixHelp
 
-## from dotsShadowMaker    import ShadowMaker  ## uncomment to add shadows otherwise comment out
-from dotsShadow_Dummy    import ShadowMaker  ## uncomment turns off shadows - you need to do both
-
+from dotsShadowMaker    import ShadowMaker  ## imports opencv thru Shadow
 from dotsAnimation      import fin
 
 TagKeys = ('/','enter','return') 
 SharedKeys = ('F','H','T','del','tag','shift','enter','return')
 
 ### --------------------- dotsPixItem ----------------------
-''' dotsPixItem: primary dots screen object - like a sprite 
-                    helpMenu in HelpDeck '''
+''' Primary dots screen object - a sprite, helpMenu in HelpMonkey '''
 ### --------------------------------------------------------
 class PixItem(QGraphicsPixmapItem):
 ### --------------------------------------------------------
@@ -241,13 +238,13 @@ class PixItem(QGraphicsPixmapItem):
                 self.works.closeWidget()
                 MsgBox("No Shadows for BatWings", 4)
                 return 
-            if self.shadowMaker.shadow == None:
+            if self.shadowMaker.shadow == None and self.shadowMaker.isOpenCV:
                 self.shadowMaker.works.cleanUpShadow()
-                self.shadowMaker.init()  ## this holds much of the shadows state              
+                self.shadowMaker.init()  ## this holds much of the shadows state   
                 self.shadowMaker.addShadow(self.x, self.y, common["ViewW"],common["ViewH"])
                 self.works.closeWidget()   
-                self.shadow = self.shadowMaker.shadow  
-                                                     
+                self.shadow = self.shadowMaker.shadow 
+                                                    
     def setMirrored(self, bool): 
         self.flopped = bool   
         transform = QTransform().scale(-1,1) if self.flopped \

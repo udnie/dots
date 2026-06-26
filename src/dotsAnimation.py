@@ -335,13 +335,13 @@ def stageLeft(node, pos, left, right, speed):
     stage1 = QPropertyAnimation(node, b'pos')
     stage1.setDuration(dura)      
     stage1.setStartValue(pos)
-    stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))
+    # stage1.setKeyValueAt(val, pos + QPointF(-left/2, 0))  ## leave for now
     stage1.setEndValue(pos + QPointF(-left, 0))
 
     stage2 = QPropertyAnimation(node, b'pos')   
     stage2.setDuration(dura) 
-    stage2.setStartValue(QPointF(right, 0))
-    stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
+    stage2.setStartValue(pos + QPointF(right, 0))
+    # stage2.setKeyValueAt(val, pos + QPointF(right/2, 0))
     stage2.setEndValue(pos) 
     
     return stage1, stage2
@@ -355,15 +355,15 @@ def stageRight(node, pos, left, right, speed):
     stage1 = QPropertyAnimation(node, b'pos')
     stage1.setDuration(dura)   
     stage1.setStartValue(pos)
-    stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))
+    # stage1.setKeyValueAt(val, pos + QPointF(right/2, 0))  ## leave for now
     stage1.setEndValue(pos + QPointF(right, 0))
-
+     
     stage2 = QPropertyAnimation(node, b'pos')  
     stage2.setDuration(dura)
     stage2.setStartValue(pos + QPointF(-left, 0))
-    stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
+    # stage2.setKeyValueAt(val, pos + QPointF(-left/2, 0))
     stage2.setEndValue(pos)
-
+    
     return stage1, stage2
 
 ### --------------------------------------------------------

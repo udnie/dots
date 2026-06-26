@@ -94,7 +94,7 @@ class AnimationHelp:
         self.table.show() 
  
 ### --------------------------------------------------------         
-    def clicked(self):  
+    def clicked(self):  ## animations - add a path
         if self.token == 'pix':     
             try:        
                 tag = self.table.item(self.table.currentRow(), 0).text().strip()   

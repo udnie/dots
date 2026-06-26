@@ -41,100 +41,14 @@ SharedKeys = ('B','C', 'del', 'G', 'H', 'P', 'Q', 'R', 'S', 'V', 'W', 'X', 'Spac
     that's why the '## 5' and '##-5' tokens.
 '''
 ### --------------------------------------------------------      
-class SkyNet(QWidget):  
-### --------------------------------------------------------
-    def __init__(self, parent):
-        super().__init__()
-
-        self.parent = parent
-
-        self.type = 'widget' 
-        self.setAccessibleName('widget')
-   
-        self.setWindowFlags(Qt.WindowType.Window|\
-            Qt.WindowType.FramelessWindowHint|\
-            Qt.WindowType.CustomizeWindowHint|\
-            Qt.WindowType.NoDropShadowWindowHint)
-    
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-        self.resize(common['DotsW']+100, common['DotsH']+100) 
-    
-        p = parent.canvas.dots.pos() 
-        self.move(p.x()-50, p.y()-25)
-         
-        self.show()
-    
-    def mousePressEvent(self, e):  ## doesn't work in qt5
-        if e.button() == Qt.MouseButton.RightButton:
-            self.parent.shared('H')
-        e.accept() 
-        
-    def mouseReleaseEvent(self, e): 
-        self.parent.setFocus() 
-        e.accept()      
-
-    def mouseDoubleClickEvent(self, e): 
-        self.parent.shared('H')
-        e.accept() 
-        
-### --------------------------------------------------------      
 class Matte(QWidget):  ## opens itself
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
-
-        self.bkgItem  = parent
-        self.bkgWorks = self.bkgItem.bkgWorks
-        self.canvas   = self.bkgItem.canvas
         
-        self.type = 'widget' 
-        self.setAccessibleName('widget')
-        
-        self.setWindowFlags(Qt.WindowType.Window|\
-            Qt.WindowType.FramelessWindowHint|\
-            Qt.WindowType.CustomizeWindowHint|\
-            Qt.WindowType.NoDropShadowWindowHint)## 5
-            ##Qt.WindowType.WindowStaysOnTopHint)## 5
-  
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-        
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.setFocus()
-        
-        self.skynet = SkyNet(self)
-
-        p = self.canvas.mapToGlobal(QPoint())
-        self.x = p.x()
-        self.y = p.y()
-    
-        self.black = QBrush(QColor('black'))
-        self.grey  = QBrush(QColor(150,150,150))
-        self.white = QBrush(QColor(250,250,250))
-        
-        self.lst = [self.white, self.grey, self.black]
-        
-        self.pix = None
-        self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## photo used by matte
-    
-        self.border = 30  ## inital
-        self.step   = 27
-        self.stop   = 50  ## min y.() - Max Headroom
-        self.brush  = self.white  ## default   
-          
-        self.ratio = 1.0     ## see below
-        self.altRatio = .77  ## less than (.55 of 16:9) 
-        self.resize(common['ViewW']+100, common['ViewH']+100) 
-        
-        self.move(self.x, self.y)  ## 0,0 for canvas relative to actual screen format
+        self.setUI(parent)
         self.show()
-      
-        self.helpMenu = True      
-        self.matteHelpMenu = MatteHelp(self.canvas, self) 
- 
-        self.grabKeyboard() 
-         
-        self.show()
-                          
+
 ### --------------------------------------------------------
     def paintEvent(self, e):            
         qp = QPainter()
@@ -288,6 +202,95 @@ class Matte(QWidget):  ## opens itself
         self.releaseKeyboard()
         QTimer.singleShot(50, self.bkgItem.closeMatteWidget)   
   
+  ## -------------------------------------------------------- 
+    def setUI(self, parent):  
+        self.bkgItem  = parent
+        self.bkgWorks = self.bkgItem.bkgWorks
+        self.canvas   = self.bkgItem.canvas
+        
+        self.type = 'widget' 
+        self.setAccessibleName('widget')
+        
+        self.setWindowFlags(Qt.WindowType.Window|\
+            Qt.WindowType.FramelessWindowHint|\
+            Qt.WindowType.CustomizeWindowHint|\
+            Qt.WindowType.NoDropShadowWindowHint)## 5
+            ##Qt.WindowType.WindowStaysOnTopHint)## 5
+  
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
+        
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setFocus()
+        
+        self.skynet = SkyNet(self)
+
+        p = self.canvas.mapToGlobal(QPoint())
+        self.x = p.x()
+        self.y = p.y()
+    
+        self.black = QBrush(QColor('black'))
+        self.grey  = QBrush(QColor(150,150,150))
+        self.white = QBrush(QColor(250,250,250))
+        
+        self.lst = [self.white, self.grey, self.black]
+        
+        self.pix = None
+        self.img = QImage(paths['bkgPath'] + 'bluestone.jpg')  ## photo used by matte
+    
+        self.border = 30  ## inital
+        self.step   = 27
+        self.stop   = 50  ## min y.() - Max Headroom
+        self.brush  = self.white  ## default   
+          
+        self.ratio = 1.0     ## see below
+        self.altRatio = .77  ## less than (.55 of 16:9) 
+        self.resize(common['ViewW']+100, common['ViewH']+100) 
+        
+        self.move(self.x, self.y)  ## 0,0 for canvas relative to actual screen format
+        self.show()
+      
+        self.helpMenu = True      
+        self.matteHelpMenu = MatteHelp(self.canvas, self) 
+ 
+        self.grabKeyboard() 
+         
+### --------------------------------------------------------      
+class SkyNet(QWidget):  
+### --------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__()
+
+        self.parent = parent
+
+        self.type = 'widget' 
+        self.setAccessibleName('widget')
+   
+        self.setWindowFlags(Qt.WindowType.Window|\
+            Qt.WindowType.FramelessWindowHint|\
+            Qt.WindowType.CustomizeWindowHint|\
+            Qt.WindowType.NoDropShadowWindowHint)
+    
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
+        self.resize(common['DotsW']+100, common['DotsH']+100) 
+    
+        p = parent.canvas.dots.pos() 
+        self.move(p.x()-50, p.y()-25)
+         
+        self.show()
+    
+    def mousePressEvent(self, e):  ## doesn't work in qt5
+        if e.button() == Qt.MouseButton.RightButton:
+            self.parent.shared('H')
+        e.accept() 
+        
+    def mouseReleaseEvent(self, e): 
+        self.parent.setFocus() 
+        e.accept()      
+
+    def mouseDoubleClickEvent(self, e): 
+        self.parent.shared('H')
+        e.accept() 
+        
 ### --------------------------------------------------------     
 class MatteHelp(QWidget):
 ### -------------------------------------------------------- 

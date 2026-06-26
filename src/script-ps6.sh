@@ -1,7 +1,7 @@
 
 ## ------------------- script-ps6.sh ----------------------
-##  Cleans up comments, code and tokens in videoplayer files
-##  Takes care of the usual suspects - required 
+##  Converts py-Qt6 to PySide6.  Cleans up comments, code and tokens 
+#   in videoplayer files. Takes care of the usual suspects - required 
 #   Replaces 'type' with 'desc' for description in code and .play files
 ## -------------------------------------------------------
 
@@ -39,3 +39,8 @@ sed -i -- "s/type/desc/g" *.play
 
 rm *.play--
 
+cd ../extras/src 
+
+./script-ps6.sh
+
+echo $'fin'

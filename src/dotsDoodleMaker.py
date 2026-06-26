@@ -14,36 +14,8 @@ class DoodleMaker(QWidget): ## my file display of path files
     def __init__(self, parent, where=''):  ## can come from 'Path Menu'
         super().__init__()
 
-        self.canvas = parent 
-        self.pathMaker = self.canvas.pathMaker
-       
-        self.type = 'widget'              
-        self.setAccessibleName('widget')
-        
-        self.save = QPointF()
-                
-        self.rotate = 0
-        self.scale  = 0
-        self.where  = where
-  
-        self.WidgetW, self.WidgetH = 530, 400
-        
-        self.setFixedSize(self.WidgetW, self.WidgetH)
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-    
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)
-                                
-        vbox = QVBoxLayout()
-        vbox.addSpacing(0)
-        vbox.addWidget(self.addGrid())
-        vbox.addSpacing(0)
-        vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
-        
-        self.setLayout(vbox)  
-                                                                     
+        self.setUI(parent, where)
+                                                                       
 ### --------------------------------------------------------                                          
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -81,7 +53,8 @@ class DoodleMaker(QWidget): ## my file display of path files
            
     def closeWidget(self):  ## from close button
         self.canvas.pathMaker.pathChooserOff()
-      
+    
+### --------------------------------------------------------    
     def addGrid(self):     
         widget = QWidget()
         
@@ -108,7 +81,37 @@ class DoodleMaker(QWidget): ## my file display of path files
         for file in getPathList():    
             df = Doddle(self.canvas, self.where, file)
             self.gLayout.addWidget(df)  
-             
+                     
+    def setUI(self, parent, where):         
+        self.canvas = parent 
+        self.pathMaker = self.canvas.pathMaker
+       
+        self.type = 'widget'              
+        self.setAccessibleName('widget')
+        
+        self.save = QPointF()
+                
+        self.rotate = 0
+        self.scale  = 0
+        self.where  = where
+        self.WidgetW, self.WidgetH = 530, 400
+        
+        self.setFixedSize(self.WidgetW, self.WidgetH)
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
+    
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
+                                
+        vbox = QVBoxLayout()
+        vbox.addSpacing(0)
+        vbox.addWidget(self.addGrid())
+        vbox.addSpacing(0)
+        vbox.addWidget(self.addClose(), alignment=Qt.AlignmentFlag.AlignCenter)
+        
+        self.setLayout(vbox)   
+    
 ### --------------------------------------------------------
 class Doddle(QLabel):  ## small drawing of path file content with filename
 ### --------------------------------------------------------

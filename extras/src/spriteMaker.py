@@ -1,5 +1,6 @@
 
 import sys
+import time
 
 from PyQt6.QtCore       import Qt, QPointF, QEvent
 from PyQt6.QtGui        import QColor, QGuiApplication, QPen, QPainterPath, QCursor                             
@@ -7,34 +8,331 @@ from PyQt6.QtWidgets    import QSlider, QWidget, QApplication, QGraphicsView, QG
                                QGraphicsScene, QLabel, QGraphicsPathItem, QGraphicsEllipseItem, \
                                QSlider, QHBoxLayout,  QVBoxLayout, QPushButton 
                        
-from spriteWorks        import Works
-from spriteLoupe        import Loupe
-from spritePoints       import PointItem, SaveTxy, constrain, getColorStr, distance, Fixed
-
-ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
-DispWidth, DispHeight = 720, 720
+from spriteMakerWorks       import Works
+from spriteMakerLoupe       import Loupe, ViewW, ViewH
+from spriteMakerPoints      import PointItem, SaveTxy, getColorStr, distance, constrainXY
+    
 Btns = 820
-Width, Height = 860, 840
+Width, Height = 860, 835
 
-### ------------------- dotsSpriteMaker --------------------                                                                                                                                                                                                                                                                           
+### ------------------- dotsSpriteMaker -------------------- 
+''' If you're planning to use a .png file for your sprite you'll 
+    need to save your output to some other file name otherwise 
+    it will be written over. Using a file with a .jpg extension 
+    won't have this problem.  '''  
+### --------------------------------------------------------                                                                                                                                                                                                                                                                       
 class SpriteMaker(QWidget):  
-### -------------------------------------------------------- 
-        
-    def __init__(self, parent=None):
+### --------------------------------------------------------        
+    def __init__(self):
         super().__init__()
-              
+        
+        self.setUI()
+        self.show()  
+         
+### --------------------------------------------------------             
+    def init(self):
+        self.file = ''
+        self.key = ''    
+
+        self.pts  = []
+        self.npts = 0 
+        self.last = QPointF()
+ 
+        self.outline = None 
+        self.pixItem  = None
+        self.pathColorDot = None
+          
+        self.outlineSet = False 
+        self.slidersSet = False
+        self.pathClosed = False
+        
+        self.helpFlag  = False
+        self.helpMenu  = None
+       
+        self.color  = "lime"                  
+        self.rotate = 0.0
+        self.scale  = 1.0 
+        
+        self.btnStyle = None 
+        self.loupeWidget = None
+                     
+### --------------------- event filter ----------------------                
+    def eventFilter(self, source, e):          
+        if self.outlineSet:  ## used to draw outline      
+            if e.type() == QEvent.Type.MouseButtonPress and \
+                e.button() == Qt.MouseButton.LeftButton:
+                    self.npts = 0  
+                    self.addPoints(e.position())
+                    self.last = constrainXY(e.position(), 1) 
+                                               
+            elif e.type() == QEvent.Type.MouseMove and \
+                e.buttons() == Qt.MouseButton.LeftButton:
+                    self.addPoints(e.position())
+                    
+            elif e.type() == QEvent.Type.MouseButtonRelease and \
+                e.button() == Qt.MouseButton.LeftButton:
+                    pt = constrainXY(e.position(), 1)     
+                    if self.last != pt:  ## else too many points
+                        self.last = pt   
+                        self.pts.append(pt)
+                    self.updateOutline()     
+                              
+        elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupeWidget != None:
+            self.loupe.closeLoupe()                       
+        return QWidget.eventFilter(self, source, e)
+    
+    def mousePressEvent(self, e):  
+        if e.button() == Qt.MouseButton.RightButton:
+            if not self.outlineSet: 
+                self.works.closeHelpMenu() if self.helpFlag else \
+                    self.works.openHelpMenu() 
+        else:
+            self.works.closeHelpMenu()
+        e.accept() 
+
+### --------------------------------------------------------                                                             
+    def keyPressEvent(self, e):
+        key = e.key()  
+        if key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
+            self.bye()   
+        elif key in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete): 
+            self.setKey('del')  ## delete a point   
+        elif key == Qt.Key.Key_Alt:
+            self.setKey('opt')  ## add a point  
+        elif key in (Qt.Key.Key_Space, Qt.Key.Key_Shift):  ## lock magnifier
+            self.loupe.holdIt() 
+        elif key in (Qt.Key.Key_Up, Qt.Key.Key_Right):
+            self.shared('last')
+        elif key in (Qt.Key.Key_Down, Qt.Key.Key_Left):
+            self.shared('next')  
+        else:
+            try:
+                key = chr(key) 
+            except:
+                return
+            self.shared(key)
+                  
+    def shared(self, key):  ## from helpMenu and keyboard
+        match key:
+            case 'X' |'Q': 
+                self.bye()   
+            case 'F':
+                self.works.openFiles() 
+            case 'O': 
+                self.addOutLine()
+            case 'P': 
+                self.changePathColor()    
+            case 'E': 
+                self.works.edit()   
+            case 'B':
+                self.works.background()
+            case 'H':
+                self.works.openHelpMenu()
+            case 'C':
+                self.clear()           
+            case 'delete':  ## can vary
+                self.setKey('del')  ## delete a point        
+            case 'option':
+                self.setKey('opt')  ## add a point       
+            case 'shift':  ## lock magnifier
+                self.loupe.holdIt()    
+            case 'next' | 'last':
+                if self.loupeWidget != None:
+                    self.loupe.nextPoint(key) 
+            case 'S':
+                self.saveTxy.saveSprite()
+        
+    def setKey(self, key): 
+        self.key = key
+       
+    def keyReleaseEvent(self,e):  
+        self.key = ''
+                                                         
+### --------------------------------------------------------
+    def addPoints(self, pt): 
+        if self.npts == 0:
+            self.pts.append(pt)
+        self.npts += 1
+        if self.npts % 5 == 0: 
+            self.pointCheck(pt)  ## look for overlaping points     
+
+    def pointCheck(self, pt):  ## make sure points don't go off the screen
+        pt = constrainXY(pt, 1)  
+        if distance(pt.x(), self.last.x(), pt.y(), self.last.y()) > 15.0:
+            self.last = pt     
+            self.pts.append(pt)
+            self.updateOutline()
+        elif distance(pt.x(), self.last.x(), pt.y(), self.last.y()) < 2.5:
+            return
+   
+    def setPathColorDot(self):  ## set path color
+        if self.pathColorDot: self.scene.removeItem(dot)
+        dot = QGraphicsEllipseItem()
+        V = 15.0
+        dot.setBrush(QColor(self.color))      
+        dot.setRect(700, 700, V, V)  ## right hand corner
+        dot.setZValue(300)
+        self.scene.addItem(dot)
+                                                                               
+    def addOutLine(self):
+        if self.pathClosed:
+            return
+        if len(self.pts) == 0 and self.slidersSet and not self.outlineSet:
+            self.outlineSet = True
+            self.setCursor(QCursor(Qt.CursorShape.CrossCursor))
+            self.setPathColorDot()      
+            self.addBtn.setStyleSheet('background-color: rgba(0,125,255,80);')
+            self.addBtn.setText("Close Outline")
+            
+        elif self.outlineSet and not self.pathClosed:      
+            self.addBtn.setStyleSheet('background-color: rgba(220,220,220,220);')
+            self.closeOutLine()
+            self.addBtn.setText("Outline")
+            
+    def closeOutLine(self):
+        self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))     
+        self.outlineSet = False 
+        self.pathClosed = True
+        self.updateOutline()  ## close it         
+        self.redrawPoints(True)  ## True - constrain XY at close
+        self.works.editingOn = True     
+        self.addBtn.setEnabled(False)
+        
+    def finalizePixmap(self):  ## the set button in sliders
+        if self.pixItem != None:
+            self.loupe.removeFrame()
+            self.works.replacePixitem() 
+            self.sliders.setEnabled(False)
+            self.slidersSet = True
+            self.addBtn.setEnabled(True)
+   
+    def changePathColor(self):
+        self.loupe.removeFrame()
+        self.color = getColorStr()
+        self.setPathColorDot()
+        self.updateOutline()
+        if self.loupeWidget != None:
+            self.loupe.loupeit(self.loupe.idx)
+            self.removePointItems()
+            self.works.editingOn = False
+
+    def updateOutline(self):  ## make a path from pathMaker pts
+        self.deleteOutline()
+        w = 1.5  
+        if self.outlineSet:
+            w = 2.5   
+        self.outline = QGraphicsPathItem(self.setPaintPath(self.pathClosed))
+        self.outline.setPen(QPen(QColor(self.color), w, Qt.PenStyle.SolidLine))
+        self.outline.setZValue(100) 
+        self.scene.addItem(self.outline)
+        self.setPathColorDot()
+            
+    def deleteOutline(self): 
+        if len(self.pts) > 0 and self.outline != None:
+            self.scene.removeItem(self.outline)
+            self.outline = None
+                           
+    def setPaintPath(self, bool=False): 
+        path = QPainterPath()
+        for pt in self.pts: 
+            if not path.elementCount():
+                path.moveTo(QPointF(pt))
+            path.lineTo(QPointF(pt)) 
+        if bool: 
+            path.closeSubpath()
+        return path
+                                      
+### --------------------------------------------------------  
+    def addPointItems(self, final=False):  ## final check using constraints
+        idx = 200  ## Zvalues
+        for i in range(0, len(self.pts)):  
+            if final: self.pts[i] = constrainXY(self.pts[i],1)
+            self.scene.addItem(PointItem(self.pts[i], i, idx, self))
+            idx += 1
+       
+    def redrawPoints(self, final=False): 
+        if self.works.editingOn:
+            self.removePointItems()
+        self.addPointItems(final)
+    
+    def removePointItems(self): 
+        for p in self.scene.items():
+            if p.zValue() >= 200 and p.type == 'pt':  ## should only be points
+                self.scene.removeItem(p)
+                                                                                                                                                                                             
+### --------------------------------------------------------          
+    def setOrigin(self):  
+        if self.pixItem:
+            b = self.pixItem.boundingRect()
+            op = QPointF(b.width()/2, b.height()/2)
+            self.pixItem.setTransformOriginPoint(op)
+                       
+    def center(self):
+        x = (ViewW - self.pixItem.width())/2
+        y = (ViewH - self.pixItem.height())/2
+        self.pixItem.setPos(x, y)
+  
+    def clear(self):
+        self.scene.clear()
+        self.init() 
+        self.works.init()
+        self.loupe.closeWidget()
+        self.loupe.init()
+          
+### -------------------------------------------------------- 
+    def enableSliders(self, bool=False): 
+        self.rotationSlider.setValue(0)
+        self.scaleSlider.setValue(100)
+        self.sliders.setEnabled(bool)
+                  
+    def resetSliders(self):
+        self.rotationSlider.setValue(int(self.rotate))
+        self.scaleSlider.setValue(int(self.scale*100))  
+        
+    def setRotation(self, val):
+        self.setOrigin()
+        if val < 0:
+            val= 0
+        self.rotate = val
+        self.pixItem.setRotation(val)
+                                                      
+    def Rotation(self, val):
+        if self.pixItem != None:
+            op = (val)
+            self.setRotation(op)
+            self.rotationValue.setText(f"{op:.2f}") 
+     
+    def setScale(self, val):
+        self.setOrigin()
+        self.scale = val
+        self.pixItem.setScale(val)
+                                
+    def Scale(self, val):
+        if self.pixItem:
+            op = (val/100)
+            self.setScale(op)
+            self.scaleValue.setText(f"{op:.2f}") 
+
+    def bye(self):  
+        QGuiApplication.restoreOverrideCursor() 
+        self.works.closeHelpMenu()
+        self.loupe.closeWidget()  
+        self.close()
+
+### -------------------------------------------------------- 
+    def setUI(self):
         self.view = QGraphicsView(self)
         self.scene = QGraphicsScene()
         self.view.setScene(self.scene)
                       
         ctr = QGuiApplication.primaryScreen().availableGeometry().center()
         x = int(((ctr.x() * 2 ) - Width)/2)
-        self.setGeometry(x,35,Width,Height)
+        self.setGeometry(x, 200,Width,Height)
         
         self.setFixedSize(Width,Height)     
         self.setWindowTitle("spriteMaker")
         
-        self.scene.setSceneRect(0,0,DispWidth,DispHeight-2) 
+        self.scene.setSceneRect(0,0,ViewW,ViewH-2) 
      
         self.setStyleSheet("QGraphicsView {\n"
             "background-color: rgb(250,250,250);\n"
@@ -64,261 +362,16 @@ class SpriteMaker(QWidget):
         self.view.viewport().installEventFilter(self)  
         self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)   
          
-        self.enableSliders()  ## off 
+        self.enableSliders()  ## default false
         self.addBtn.setDisabled(True)   
-        self.closeBtn.setDisabled(True)
-        
+    
         self.setMouseTracking(True)
         self.grabKeyboard() 
      
-        self.show()  
-         
-### --------------------------------------------------------             
-    def init(self):
-        self.file = ''
-        self.key = ''    
-
-        self.pts  = []
-        self.npts = 0 
-        self.last = QPointF()
- 
-        self.big = None
-        self.outline = None 
-        self.pixmap  = None
-          
-        self.outlineSet = False 
-        self.slidersSet = False
-        self.pathClosed = False
-       
-        self.color  = "lime"                  
-        self.rotate = 0.0
-        self.scale  = 1.0        
-                      
-### --------------------- event filter ----------------------                
-    def eventFilter(self, source, e):          
-        if self.outlineSet:  ## used to draw outline      
-            if e.type() == QEvent.Type.MouseButtonPress and \
-                e.button() == Qt.MouseButton.LeftButton:
-                    self.npts = 0  
-                    self.addPoints(e.pos())
-                    self.last = self.constrainXY(e.pos(), 1) 
-                    
-            elif e.type() == QEvent.Type.MouseMove and \
-                e.buttons() == Qt.MouseButton.LeftButton:
-                    self.addPoints(e.pos())
-                    
-            elif e.type() == QEvent.Type.MouseButtonRelease and \
-                e.button() == Qt.MouseButton.LeftButton:
-                    pt = self.constrainXY(e.pos(), 1)     
-                    if self.last != pt:  ## else too many points
-                        self.last = pt   
-                        self.pts.append(pt)
-                    self.updateOutline()     
-                                       
-        elif e.type() == QEvent.Type.MouseButtonDblClick and self.loupe.widget:
-            self.loupe.close()                       
-        return QWidget.eventFilter(self, source, e)
-
-### --------------------------------------------------------                                                             
-    def keyPressEvent(self, e):
-        if e.key() in ExitKeys:
-            self.aclose()
-        elif e.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete):  ## can vary
-            self.setKey('del')  ## delete a point
-        elif e.key() == Qt.Key.Key_Alt:
-            self.setKey('opt')  ## add a point
-        elif e.key() == Qt.Key.Key_Control:  ## apple command
-            self.works.edit()    
-        elif e.key() == Qt.Key.Key_Shift:  ## lock magnifier
-            self.loupe.holdIt()    
-        elif e.key() == Qt.Key.Key_P:  ## toggle background
-            self.works.background()       
-        elif self.loupe.widget:        ## follow the arrows
-            if e.key() == Qt.Key.Key_Up:
-                self.loupe.nextPoint('up')
-            elif e.key() == Qt.Key.Key_Down:
-                self.loupe.nextPoint('down')
-         
-    def setKey(self, key): 
-        self.key = key
-       
-    def keyReleaseEvent(self,e):  
-        self.key = ''
-                                                         
-### --------------------------------------------------------
-    def addPoints(self, pt): 
-        if self.npts == 0:
-            self.pts.append(pt)
-        self.npts += 1
-        # self.setBigPtOff() if self.npts > 5 else self.setBigPt()
-        if self.npts % 5 == 0: 
-            self.pointCheck(pt)  ## look for overlaping points     
-
-    def pointCheck(self, pt):  ## make sure points don't go off the screen
-        pt = self.constrainXY(pt, 1)  
-        if distance(pt.x(), self.last.x(), pt.y(), self.last.y()) > 15.0:
-            self.last = pt     
-            self.pts.append(pt)
-            self.updateOutline()
-        elif distance(pt.x(), self.last.x(), pt.y(), self.last.y()) < 2.5:
-            return
-   
-    def setBigPt(self):
-        if self.big: self.scene.removeItem(big)
-        big = QGraphicsEllipseItem()
-        V = 15.0
-        big.setBrush(QColor(self.color))      
-        big.setRect(700, 700, V, V) 
-        big.setZValue(300)
-        self.scene.addItem(big)
-                                                                               
-    def addOutLine(self):
-        if self.outlineSet:
-            return
-        if len(self.pts) == 0 and self.slidersSet == True:
-            self.outlineSet = True
-            self.setCursor(QCursor(Qt.CursorShape.CrossCursor))
-            self.setBigPt()
-                     
-    def finalizePixmap(self):  ## the set button in sliders
-        if self.pixmap: 
-            self.works.replacePixmap() 
-            self.sliders.setEnabled(False)
-            self.slidersSet = True
-            self.addBtn.setEnabled(True)
-            self.closeBtn.setEnabled(True)
-          
-    def closeOutLine(self):
-         if self.outlineSet:
-            self.setCursor(QCursor(Qt.CursorShape.ArrowCursor))     
-            self.outlineSet = False 
-            self.pathClosed = True
-            self.updateOutline()  ## close it         
-            self.redrawPoints(True)  ## True - constrain XY at close
-            self.works.editingOn = True     
-            self.addBtn.setEnabled(False)
-            self.closeBtn.setEnabled(False)
-      
-    def changePathColor(self):
-        self.color = getColorStr()
-        self.setBigPt()
-        self.updateOutline()
-        if self.loupe.widget:
-            self.loupe.loupeIt(self.loupe.idx)
-            self.removePointItems()
-            self.works.editingOn = False
-
-    def updateOutline(self):  ## make a path from pathMaker pts
-        self.deleteOutline()
-        w = 1.5  
-        if self.outlineSet:
-            w = 2.5   
-        self.outline = QGraphicsPathItem(self.setPaintPath(self.pathClosed))
-        self.outline.setPen(QPen(QColor(self.color), w, Qt.PenStyle.SolidLine))
-        self.outline.setZValue(100) 
-        self.scene.addItem(self.outline)
-        self.setBigPt()
-            
-    def deleteOutline(self): 
-        if len(self.pts) > 0 and self.outline:
-            self.scene.removeItem(self.outline)
-            self.outline = None
-                             
-    def setPaintPath(self, bool=False): 
-        path = QPainterPath()
-        for pt in self.pts: 
-            if not path.elementCount():
-                path.moveTo(QPointF(pt))
-            path.lineTo(QPointF(pt)) 
-        if bool: 
-            path.closeSubpath()
-        return path
-                                      
-    def constrainXY(self, p, v):  
-        x = int(constrain(p.x(), v, Fixed, 15))
-        y = int(constrain(p.y(), v, Fixed, 15))
-        return QPointF(x, y)
-    
-### --------------------------------------------------------  
-    def addPointItems(self, final=False):  ## final check using constraints
-        idx = 200  ## Zvalues
-        for i in range(0, len(self.pts)):  
-            if final: self.pts[i] = self.constrainXY(self.pts[i],1)
-            self.scene.addItem(PointItem(self.pts[i], i, idx, self))
-            idx += 1
-       
-    def redrawPoints(self, final=False): 
-        if self.works.editingOn:
-            self.removePointItems()
-        self.addPointItems(final)
-    
-    def removePointItems(self): 
-        for p in self.scene.items():
-            if p.zValue() >= 200 and p.type == 'pt':  ## should only be points
-                self.scene.removeItem(p)
-                                                                                                                                                                                             
-### --------------------------------------------------------          
-    def setOrigin(self):  
-        if self.pixmap:
-            b = self.pixmap.boundingRect()
-            op = QPointF(b.width()/2, b.height()/2)
-            self.pixmap.setTransformOriginPoint(op)
-                       
-    def center(self):
-        x = (DispWidth - self.pixmap.width())/2
-        y = (DispHeight - self.pixmap.height())/2
-        self.pixmap.setPos(x, y)
-  
-    def clear(self):
-        self.scene.clear()
-        self.init() 
-        self.works.init()
-        self.loupe.closeWidget()
-        self.loupe.init()
-          
-    def aclose(self):  ## too many .close()
-        QGuiApplication.restoreOverrideCursor() 
-        self.loupe.close()   
-        self.close()
-
-### -------------------------------------------------------- 
-    def enableSliders(self, bool=False): 
-        self.rotationSlider.setValue(0)
-        self.scaleSlider.setValue(100)
-        self.sliders.setEnabled(bool)
-
-    def setRotation(self, val):
-        self.setOrigin()
-        if val < 0:
-            val= 0
-        self.rotate = val
-        self.pixmap.setRotation(val)
-
-    def setScale(self, val):
-        self.setOrigin()
-        self.scale = val
-        self.pixmap.setScale(val)
-                                                 
-    def resetSliders(self):
-        self.rotationSlider.setValue(int(self.rotate))
-        self.scaleSlider.setValue(int(self.scale*100))
-        
-    def Rotation(self, val):
-        if self.pixmap:
-            op = (val)
-            self.setRotation(op)
-            self.rotationValue.setText("{0:.2f}".format(op)) 
-        
-    def Scale(self, val):
-        if self.pixmap:
-            op = (val/100)
-            self.setScale(op)
-            self.scaleValue.setText("{0:.2f}".format(op))  
-
 ### -------------------------------------------------------- 
     def setSliders(self):
         groupBox = QGroupBox()
-        groupBox.setFixedSize(80,DispHeight)
+        groupBox.setFixedSize(80, ViewH+5)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         
         groupBox.setStyleSheet("QGroupBox {\n"
@@ -387,47 +440,52 @@ class SpriteMaker(QWidget):
             "background-color: rgb(230,230,230);\n"
             "border: 1px solid rgb(125,125,125);\n"
             "}")
-        
-        self.filesBtn = QPushButton("Files")      
-        self.filesBtn.clicked.connect(self.works.openFiles)
+            
+        self.setStyleSheet("QPushButton { min-width: 10px; }")
+            
+        filesBtn = QPushButton("Files")      
+        filesBtn.clicked.connect(self.works.openFiles)
                 
         self.addBtn = QPushButton("Outline")
         self.addBtn.clicked.connect(self.addOutLine)
-        
-        self.closeBtn = QPushButton("Close")
-        self.closeBtn.clicked.connect(self.closeOutLine)
-        
-        self.changeBtn = QPushButton("Path Color")
-        self.changeBtn.clicked.connect(self.changePathColor)
+  
+        changeBtn = QPushButton("Path Color")
+        changeBtn.clicked.connect(self.changePathColor)
 
-        self.previewBtn = QPushButton("Preview")
-        self.previewBtn.clicked.connect(self.works.background)
+        backgroundsBtn = QPushButton("Background")
+        backgroundsBtn.clicked.connect(self.works.background)
 
-        self.editBtn = QPushButton("Edit")
-        self.editBtn.clicked.connect(self.works.edit)
+        editBtn = QPushButton("Edit")
+        editBtn.clicked.connect(self.works.edit)
         
-        self.clearBtn = QPushButton("Clear")
-        self.clearBtn.clicked.connect(self.clear)
+        helpBtn = QPushButton("Help")
+        helpBtn.clicked.connect(self.works.openHelpMenu)
+        
+        clearBtn = QPushButton("Clear")
+        clearBtn.clicked.connect(self.clear)
          
-        self.saveBtn = QPushButton("Save")
-        self.saveBtn.clicked.connect(self.saveTxy.saveSprite)
+        saveBtn = QPushButton("Save")
+        saveBtn.clicked.connect(self.saveTxy.saveSprite)
     
-        quitBtn = QPushButton("Quit")
-        quitBtn.clicked.connect(self.aclose)
+        quitBtn= QPushButton("Quit")
+        quitBtn.clicked.connect(self.bye)
         
         hbox = QHBoxLayout(self)
-        hbox.addWidget(self.filesBtn)
+        
+        hbox.addWidget(filesBtn)
         hbox.addWidget(self.addBtn)
-        hbox.addWidget(self.closeBtn)
-        hbox.addWidget(self.changeBtn)
-        hbox.addWidget(self.previewBtn)
-        hbox.addWidget(self.editBtn)
-        hbox.addWidget(self.clearBtn)   
-        hbox.addWidget(self.saveBtn)
+        hbox.addWidget(changeBtn)
+        hbox.addWidget(backgroundsBtn)
+        hbox.addWidget(helpBtn)
+        hbox.addWidget(editBtn)
+        hbox.addWidget(clearBtn)   
+        hbox.addWidget(saveBtn)
         hbox.addWidget(quitBtn)
             
         self.buttonGroup.setLayout(hbox)
-  
+        
+        self.btnStyle = helpBtn.styleSheet() ## works
+   
         return self.buttonGroup
               
 ### -------------------------------------------------------- 

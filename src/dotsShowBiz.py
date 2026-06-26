@@ -82,7 +82,7 @@ class ShowBiz:
     ## no animations running - from storyboard menu
 ### --------------------------------------------------------  
             elif self.canvas.control == '' or not self.canvas.animationRunning:                     
-                if key in ('A', 'D', 'J', 'L', 'M', 'N', 'O', 'S','T', 'U', 'V', 'W', 'del'):           
+                if key in ('A', 'D', 'I', 'J', 'L', 'M', 'N', 'O', 'S','T', 'U', 'V', 'W', 'del'):          
                     match key:
                         case 'A':            
                             self.sideCar2.unSelect() if self.scene.selectedItems() else \
@@ -91,7 +91,9 @@ class ShowBiz:
                             if self.scene.selectedItems():
                                 self.sideCar2.deleteSelected() 
                             elif len(self.scene.items()) > 0:
-                                self.sideCar2.sendPixKeys('del')         
+                                self.sideCar2.sendPixKeys('del')   
+                        case 'I':                 
+                            self.sideCar2.aye()            
                         case 'J':                   ## view a play file's records
                             if dlist := self.showRunner.openPlay(self.canvas.openPlayFile):  
                                 self.showRunner.makeTableView(dlist, 'view')   

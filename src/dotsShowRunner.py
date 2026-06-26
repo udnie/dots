@@ -2,7 +2,8 @@
 import json
 import time
 import asyncio
-import os      
+import os  
+import sys    
 
 from functools          import partial
 from PyQt6.QtCore       import QTimer
@@ -183,13 +184,19 @@ class ShowRunner:
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
         fileName = os.path.basename(self.canvas.openPlayFile) 
+        shadows = True
         
+        if 'cv2' not in sys.modules:
+            MsgBox('No Shadows - OpenCV not Imported', 5)
+            shadows = False
+            
         if 'play' in fileName:  ## could be something else
             self.canvas.showWorks.enablePlay() 
             if ns == 0 and self.locks == 0:
                 self.dots.statusBar.showMessage(f"{fileName} - Number of Pixitems: {kix}")
                 
-            elif ns > 0:  ## there must be shadows
+            elif ns > 0 and shadows:  ## there must be shadows
+     
                 if self.addedVideo:  ## first frame capture in progress
                     time.sleep(.10)  
                     

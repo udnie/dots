@@ -18,9 +18,10 @@ BkgSharedKeys = ('B','E','F','H','M','T','del','tag','shift','enter','return', '
 ### ---------------------- dotsBkgItem ---------------------                   
 ''' Background Class - there can be more than one background in a scene '''
 ### --------------------------------------------------------
-''' The screentimes and moretimes dictionaries have been moved to screenrates.dict
-    in the play directory. See 'Rates and Background Widget Controls' in Start Here
-    for details. '''
+''' The screenrates are in the screenrates.dict in the play directory
+    and demorates are in the demo directory as demorates.dict.
+    See 'Rates and Background Widget Controls' in Start Here
+    for details and BkgScrollWrks for examples. '''
 ### --------------------------------------------------------
 class BkgItem(QGraphicsPixmapItem):  ## background
 ### --------------------------------------------------------
@@ -39,17 +40,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.ViewH = common['ViewH']
 
         self.type = 'bkg'
-        self.path = paths['bkgPath'] 
+        self.path = paths['bkgPath']  ## default
 
         self.fileName = os.path.basename(fileName) 
         self.sharedKeys = BkgSharedKeys  ## shared with bkgMenu
         
-        if self.canvas.openPlayFile != '':
-            if self.canvas.openPlayFile == 'snakes':      
-                self.path = paths['demo']
-            elif self.dots.Vertical and self.canvas.openPlayFile == 'bats':
-                self.path = paths['demo']
-                
+        if self.canvas.openPlayFile in ('snakes', 'hats'):    
+            self.path = paths['demo']
+        elif self.dots.Vertical and self.canvas.openPlayFile == 'bats':
+            self.path = paths['demo']
+           
         if not os.path.exists(self.path + self.fileName):
             self.type = None        
             MsgBox(f'BkgItem Error: {self.fileName} Not Found', 5)
@@ -143,12 +143,16 @@ class BkgItem(QGraphicsPixmapItem):  ## background
              
                 if self.helpMenu != None:
                     self.closeMenu()
+                    
                 self.bkgMaker.addWidget(self)   
+                
                 if self.direction == '':
                     self.bkgMaker.bkgtrackers.resetTracker(self)
                     self.bkgMaker.resetSliders(self)  
+                    
             elif self.key in self.sharedKeys:
                 self.shared(self.key) 
+                
             self.initX, self.initY = self.x, self.y  
             self.dragCnt = self.mapToScene(e.pos())                               
         e.accept()   
@@ -275,8 +279,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             MsgBox('setScrollerPath: Error Setting Path ...')
             return  
 
-        bkg.bkgWorks.setStartingPos(bkg)  ## not the scrolling position      
+        bkg.bkgWorks.setStartingPos(bkg)  ## not the scrolling position   
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
+    
         return bkg.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
      
     def isScrollable(self):  ## once screen height and width are set 
@@ -291,15 +296,20 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                   
     def setMirrored(self, bool, switch=1):  ## mirrors this background not text
         self.flopped = bool  
+        
         if not self.dots.Vertical:
-            if self.flopped:
-                transform = QTransform().scale(-1, switch)
+            if switch < 2:
+                if self.flopped:
+                    transform = QTransform().scale(-1, switch)
+                else:
+                    transform = QTransform().scale(1, switch)
             else:
-                transform = QTransform().scale(1, switch)
+                transform = QTransform().scale(1, 1)
+            
             pix = QPixmap.fromImage(self.imgFile)
             self.setPixmap(pix.transformed(transform))
-            self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
-                                                                                                                                                                      
+            self.setTransformationMode(Qt.TransformationMode.SmoothTransformation)                                                                                                                                                                
+
 ### ---------------------- dotsBkgItem ---------------------
 
 

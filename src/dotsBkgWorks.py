@@ -45,7 +45,7 @@ class BkgWorks:
         self.bkgItem.path = paths['demo'] if self.canvas.openPlayFile != '' and \
             self.canvas.openPlayFile == 'snakes'\
                 else paths['bkgPath']
-                        
+                                  
         fileName = self.bkgItem.fileName             
         if self.bkgMaker.newTracker[fileName]: 
             self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
@@ -53,7 +53,7 @@ class BkgWorks:
             self.bkgMaker.newTracker[fileName]['showtime'] = self.bkgItem.showtime
             self.bkgMaker.newTracker[fileName]['rate'] = self.bkgItem.rate
             self.bkgMaker.newTracker[fileName]['path'] = self.bkgItem.path 
-        
+            
         if self.bkgItem.rate == 0:
             return
         
@@ -88,21 +88,26 @@ class BkgWorks:
             if erat > 0: rate = erat  ## fixes not carrying over rate from a file
      
             bkg.rate = rate 
-            self.bkgScrollWrks.setTrackerRate(bkg)     
-      
+            self.bkgScrollWrks.setTrackerRate(bkg)  
+            
         return rate
     
 ### --------------------------------------------------------
     ## rates can vary within a scene by background width
-    def getThisRate(self, bkg):       
-        try:  
-            if len(self.bkgMaker.screenrate) == 0:  ## fewer reads
-                with open(paths['playPath'] +  "screenrates.dict", 'r') as fp:
-                    self.bkgMaker.screenrate = json.load(fp)  
+    def getThisRate(self, bkg): 
+            try:  
+                if self.canvas.openPlayFile == 'hats':
+                    if len(self.bkgMaker.screenrate) == 0:  ## fewer reads
+                        with open(paths['demo'] +  "demorates.dict", 'r') as fp:
+                            self.bkgMaker.screenrate = json.load(fp)             
+                else:
+                    if len(self.bkgMaker.screenrate) == 0:  
+                        with open(paths['playPath'] +  "screenrates.dict", 'r') as fp: 
+                            self.bkgMaker.screenrate = json.load(fp)  
+            except:
+                 return 0             
             return self.bkgMaker.screenrate[common['Screen']]      
-        except:
-            return 0
-        
+   
 ### --------------------------------------------------------
     ## rate times screen long side = milliseconds needed to clear the scene end to end
     def setNextPath(self, bkg):  

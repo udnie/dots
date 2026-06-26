@@ -37,11 +37,43 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
     def __init__(self, parent, switch='', off=0): 
         super().__init__()
 
+        self.setUI(parent, switch, off)                                                                  
+        self.show()
+
+### --------------------------------------------------------
+    def paintEvent(self, e):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
+        rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
+        painter.setPen(QPen(QColor(0, 80, 255), 5, Qt.PenStyle.SolidLine,            
+            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
+        painter.setBrush(QColor(225, 100, 30, 255))
+        painter.drawRoundedRect(rect, 15, 15)
+  
+    def setFpsVal(self, val):
+        self.clips.Fps = val
+        self.fpsValue.setText(f'{val:5}')
+        
+    def setMaxVal(self, val):
+        v = int(val/25); val = v * 25
+        self.clips.Max = val
+        self.maxValue.setText(f'{val:5}')
+        
+    def setWaitVal(self, val):
+        self.clips.Wpr = val
+        self.waitValue.setText(f'{val:5}')
+        
+    def setRnfVal(self, val):
+        self.clips.Rnf = val
+        self.rnfValue.setText(f'{val:5}')
+    
+### --------------------------------------------------------     
+    def setUI(self, parent, switch, off):
+        
         self.parent = parent
         self.switch = switch
               
         self.clips  = self.parent.clips
-  
         self.WidgetW, self.WidgetH = 505.0, 325.0
                  
         vbox = QVBoxLayout()
@@ -74,36 +106,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         y = int(p.y() + (self.parent.height()/2)) - int(self.WidgetH/2)   
         
         self.move(x+off, y)
-                                                                            
-        self.show()
 
-### --------------------------------------------------------
-    def paintEvent(self, e):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
-        rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
-        painter.setPen(QPen(QColor(0, 80, 255), 5, Qt.PenStyle.SolidLine,            
-            Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
-        painter.setBrush(QColor(225, 100, 30, 255))
-        painter.drawRoundedRect(rect, 15, 15)
-  
-    def setFpsVal(self, val):
-        self.clips.Fps = val
-        self.fpsValue.setText(f'{val:5}')
-        
-    def setMaxVal(self, val):
-        v = int(val/25); val = v * 25
-        self.clips.Max = val
-        self.maxValue.setText(f'{val:5}')
-        
-    def setWaitVal(self, val):
-        self.clips.Wpr = val
-        self.waitValue.setText(f'{val:5}')
-        
-    def setRnfVal(self, val):
-        self.clips.Rnf = val
-        self.rnfValue.setText(f'{val:5}')
-        
 ### --------------------------------------------------------      
     def sliderGroup(self):
         groupBox = QGroupBox()   
@@ -138,8 +141,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.maxlabel.setFixedWidth(40)  
         self.maxValue = QLabel(str(self.clips.Max), alignment=Qt.AlignmentFlag.AlignRight) 
         
-        self.maxSlider = QSlider(Qt.Orientation.Horizontal
-                                 )  
+        self.maxSlider = QSlider(Qt.Orientation.Horizontal)  
         self.maxSlider.setMinimum(25)
         self.maxSlider.setMaximum(650)  ## <<----------- max number to read and write
         self.maxSlider.setSingleStep(25)

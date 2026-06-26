@@ -11,8 +11,7 @@ files = ["dotsBkgMatte.py",\
         "dotsVideoPlayer.py", \
         "dotsTableMaker.py", \
         "dotsPixItem.py",\
-        "dotsSideGig.py",\
-        "videoPlayerShared.py"]
+        "dotsSideGig.py"]
 for file in files:
     lines = []
     with open(file, 'r') as fp: 
@@ -61,31 +60,19 @@ for file in files:
                     i = line.index('47') 
                     line = line[0:i] + '23' + line[i+2:]
                             
-            elif file == "dotsPixItem.py":
-                if line.startswith('from dotsShadowMaker'):
-                    line = '# ' + line
-                
-                elif 'dotsShadow_Dummy' in line:
-                    i = line.index('f')  ## self.set
-                    line = line[i:]   
-      
             elif file == "dotsTableMaker.py":
+                
                 if 'QtGui' in line and line.find(', QShortcut') > 0:
                     line = line[0:line.find(', QShortcut')] + '\n'
                 
                 elif 'QtWidgets' in line:
                     line = line.strip() + ', QShortcut' + '\n'
                            
-            elif file in ("dotsVideoPlayer.py", "videoPlayerShared.py"):
-                if line.startswith('import cv2'):
-                    line = '# ' + line
-                
-                elif 'aspect/ratio' in line:  ## there is only one
+            elif file == "dotsVideoPlayer.py":
+       
+                if 'aspect/ratio' in line:  ## there is only one
                     i = line.index('s')  ## self.set
                     line = line[0:i] + '# ' + line[i:]
-           
-                if file == "videoPlayerOne.py" and 'setLoops(-1)' in line:
-                    continue
            
                 # if '## 6' in line:     
                 #     for i, c in enumerate(line):  

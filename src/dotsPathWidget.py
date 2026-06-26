@@ -15,52 +15,10 @@ class PathWidget(QWidget):
 ### -------------------------------------------------------- 
     def __init__(self, parent, side='', switch=''):
         super().__init__()
-                             
-        self.switch = switch           
-
-        if self.switch == '':
-            self.pathMaker = parent
-            self.pathWays  = self.pathMaker.pathWays
-            self.sideCar = side
-        else:
-            self.canvas = parent
-        
-        self.type = 'widget' 
-        self.setAccessibleName('widget')
-          
-        self.save  = QPointF()
-        self.label = QLabel('', alignment=Qt.AlignmentFlag.AlignCenter)
-              
-        self.WidgetW, self.WidgetH = 345.0, 285.0
-        
-        self.rotate = 0
-        self.scale  = 1.0
-                    
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.sliderGroup())
-        hbox.addSpacing(5) 
-        hbox.addWidget(self.buttonGroup())
-        self.setLayout(hbox)
-              
-        self.setFixedHeight(int(self.WidgetH))
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-        self.setContentsMargins(0,15,0,-15)
-             
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)
-        
-        self.resetSliders()
-                                         
+                                        
+        self.setUI(parent, side, switch) 
         self.show()
-                
-        if self.switch in('on', 'all'):
-            x, y = getVuCtr(self.canvas)  
-            self.label.setText('FileName goes Here')
-            self.move(x+75, y) if self.switch == 'on' \
-                else self.move(x-500,y-130)
-                        
+             
 ### -------------------------------------------------------- 
     def paintEvent(self, e):
         painter = QPainter(self)
@@ -95,7 +53,7 @@ class PathWidget(QWidget):
             self.pathMaker.pathWorks.closeWidget()
             e.accept()
   
- ### --------------------------------------------------------    
+### --------------------------------------------------------    
     def resetSliders(self):
         self.rotate = 0
         self.scale  = 1.0 
@@ -136,7 +94,52 @@ class PathWidget(QWidget):
         if self.switch == '':
             if len(self.pathMaker.pts) > 0: 
                 self.pathMaker.pathWorks.scaleRotate('A', per, inc)  ## used by other classes as well
+       
+### -------------------------------------------------------- 
+    def setUI(self, parent, side, switch):   
+        self.switch = switch           
+
+        if self.switch == '':
+            self.pathMaker = parent
+            self.pathWays  = self.pathMaker.pathWays
+            self.sideCar = side
+        else:
+            self.canvas = parent
+        
+        self.type = 'widget' 
+        self.setAccessibleName('widget')
+          
+        self.save  = QPointF()
+        self.label = QLabel('', alignment=Qt.AlignmentFlag.AlignCenter)
               
+        self.WidgetW, self.WidgetH = 345.0, 285.0
+        
+        self.rotate = 0
+        self.scale  = 1.0
+                    
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.sliderGroup())
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.buttonGroup())
+        self.setLayout(hbox)
+              
+        self.setFixedHeight(int(self.WidgetH))
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
+        self.setContentsMargins(0,15,0,-15)
+             
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
+        
+        self.resetSliders()
+                                                 
+        if self.switch in('on', 'all'):
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName goes Here')
+            self.move(x+75, y) if self.switch == 'on' \
+                else self.move(x-500,y-130)
+               
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate    Scale  Seconds   ')
@@ -238,7 +241,7 @@ class PathWidget(QWidget):
         
         if self.switch == '':
             waysBtn.clicked.connect(self.pathWays.toggleWayPtTags)    ## called from controlview
-            helpBtn.clicked.connect(self.pathMaker.pathWorks.openMenu)  ## only place it's used
+            helpBtn.clicked.connect(self.pathMaker.pathWorks.openHelpMenu)  ## only place it's used
             saveBtn.clicked.connect(self.pathMaker.pathWays.savePath)
             editBtn.clicked.connect(self.pathMaker.edits.editPoints)
             centerBtn.clicked.connect(self.pathMaker.pathWays.centerPath)

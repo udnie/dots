@@ -57,8 +57,6 @@ class DotsQt(QMainWindow):
        
         if hgt := vheights.get(common['Screen']):  ## in screens  
             self.move(getX(), hgt)   
-        elif common['ViewH'] == 720:
-            self.move(getX(), 200)
         else:
             self.move(getX(), 175)
       

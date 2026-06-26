@@ -15,7 +15,9 @@ Demos = ('snakes', 'bats', 'hats')
 
 ### ---------------------- dotsShowTime --------------------
 ''' ShowTime: functions to run .play animations, pause, stop,
-                  and save them to a .play file  '''        
+    and save them to a .play file.
+    PythonQt5 can't run an animation and loop a video at the  
+    same time. The video only runs once.'''           
 ### --------------------------------------------------------
 class ShowTime:
 ### --------------------------------------------------------
@@ -33,7 +35,8 @@ class ShowTime:
         self.pathMaker = self.canvas.pathMaker
    
 ### --------------------------------------------------------        
-    def run(self):  ## runs whatever is in scene that can be animated   
+    def run(self):  ## runs whatever is in scene that can be animated 
+        
         if self.canvas.control != '' or self.canvas.animationRunning:
             return  
 

@@ -1,5 +1,5 @@
 
-## ------------------ script-pyqt5.sh ---------------------
+## ------------------ script-psqt5.sh ---------------------
 ##  Takes care of the usual suspects - required 
 ##  Cleans up comments, code and tokens in videoplayer files
 ## -------------------------------------------------------
@@ -11,9 +11,3 @@ sed -i -- 's/e.position()/e.pos()/g' *.py
 python3 ./script-qt5.py
 
 rm *.py--
-
-cd ../extras/src 
-
-./script-pyqt5.sh
-
-echo $'fin'

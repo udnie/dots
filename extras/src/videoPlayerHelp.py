@@ -63,8 +63,12 @@ QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
 SD = QColor(115,252,214,125)  ## spindrift-lite
 
-SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X','[',']','Shift-A','Shift-B','Shift-F','Shift-S')
-VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Spacebar','Shift-F','Shift-S','Aspect','Settings','Clips']
+SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X', 'S, SpaceBar', \
+                    '[',']', '>,  +,  ]', '<,  _,  [', 'Shift-B','Shift-F','Shift-S', \
+                    'N, Right Arrow', 'B, Left Arrow', 'X, Q, Escape', 'L, R')
+
+VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Spacebar','Shift-F',\
+                    'Shift-S','Aspect','Settings','Clips']
 
 ### -------------------------------------------------------- 
 class VideoHelpWidget(QWidget):
@@ -186,30 +190,41 @@ class VideoHelp(QWidget):
             Qt.WindowType.FramelessWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
     
-        self.table = TableWidgetSetUp(115, 165, len(helpMenuKeys)+4)
+        extras, width, height = 4, 287, 726
+        if self.parent.player == "two":
+            extras, height = 1, 636
+                
+        self.table = TableWidgetSetUp(115, 165, len(helpMenuKeys)+extras)
         self.table.itemClicked.connect(self.clicked)
-    
-        width, height = 287, 726
+                 
         self.table.setFixedSize(width, height)
-    
+       
         str = "VideoPlayerOne" if self.parent.player == "one" else \
             "VideoPlayerTwo"
-               
         self.table.setRow(0, 0, f'{str:<15}',QL,True, True, 2)
-        
+    
         row = 1  
-        for k,  val in helpMenuKeys.items():   
+        for k,  val in helpMenuKeys.items(): 
+            if self.parent.player == "two":
+                if k in (">,  +,  ]",   "<,  _,  [", "Aspect"):
+                    continue
+              
             if row == 6:
                 self.table.setRow(row, 0, k, SD,True,True)
                 self.table.setRow(row, 1, "  " + val,SD,'',True)
                 
-            elif self.parent.player == "two" and row in (16,17,18):
+            elif self.parent.player == "one" and row in (16,17,18):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)
                 
+            elif self.parent.player == "two" and row in (14,15):
+                self.table.setRow(row, 0, k, QL,True,True)
+                self.table.setRow(row, 1, "  " + val,QL,'',True)  
+            
             else:
                 self.table.setRow(row, 0, k, '',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)
+     
             row += 1
                    
         self.table.setRow(row,     0,  f"{"Scaling Up/Down and Setting Aspect":<12}",QC,True,True, 2)
@@ -279,8 +294,12 @@ class SlideShowHelp(QWidget):
         
         row = 1   
         for k,  val in slideMenuKeys.items():
-            self.table.setRow(row, 0, k, '',True,True)
-            self.table.setRow(row, 1, "  " + val,'','',True)
+            if 'Shift' in k:
+                self.table.setRow(row, 0, k, QL,True,True)
+                self.table.setRow(row, 1, "  " + val,QL,'',True)  
+            else:
+                self.table.setRow(row, 0, k, '',True,True)
+                self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
                   
         self.table.setRow(row, 0,  f"{'Right-Click or Click Here to Close':<12}",QL,True,True, 2)
@@ -305,23 +324,24 @@ class SlideShowHelp(QWidget):
     def clicked(self):
         if self.switch == '':
             help = self.table.item(self.table.currentRow(), 0).text().strip()
-            if help == 'H': help = 'skip'  ## don't send it to shared
-            match help:    
-                case 'S, SpaceBar':  
-                    help = 'S'
-                case 'L, R':        
-                    help = 'R'
-                case 'Right Arrow, N':
-                    help = 'N'
-                case 'Left Arrow, B': 
-                    help = 'B'               
-                case '>,  +,  ]':
-                    help = ']'
-                case '<,  _,  [':  
-                    help = '['
-                case 'X, Q, Escape':
-                    help = 'X'    
+            if help == 'H': 
+                help = 'skip'  ## don't send it to shared
             if help in SlideShowKeys:
+                match help:    
+                    case 'S, SpaceBar':  
+                        help = 'S'
+                    case 'L, R':        
+                        help = 'R'
+                    case 'N, Right Arrow':
+                        help = 'N'
+                    case 'B, Left Arrow': 
+                        help = 'B'               
+                    case '>,  +,  ]':
+                        help = ']'
+                    case '<,  _,  [':  
+                        help = '['
+                    case 'X, Q, Escape':
+                        help = 'X'    
                 try:
                     QTimer.singleShot(25, partial(self.parent.slideMenuKeys, help))
                 except:

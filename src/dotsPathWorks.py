@@ -25,8 +25,8 @@ pathKeys = {
     'D':    'Clears/Deletes Scene',
     'E':    'Edit Path Points', 
     'M':    'This Help Menu',
-    'Menu': 'PathMaker Help Menu 2',
-    'Menus':'Help Menus',
+    'Menu2':    'PathMaker Help Menu 2',
+    'Menus':    'Help Menus',
     'N':    'New Path and Close Path',
     'P':    'Path Chooser',
     'R':    'Reverse Path',
@@ -36,8 +36,8 @@ pathKeys = {
     'X':    'X, Q, Escape to Quit',
     'L':    '**Lasso Points**',
     'U':    ' **UnSelect Points**',   
-    'del':    '**Delete a Point**',     
-    'opt':    '**Add a Point**', 
+    'del':  '**Delete a Point**',     
+    'opt':  '**Add a Point**', 
     'Shift-D':  '**Deletes Selected Pts**',  
 }
 
@@ -51,7 +51,7 @@ class PathHelp:
           
         self.helpButton = parent  ## canvas
         self.helpButton.pathFlag = True
-        
+          
         self.canvas = canvas
         self.switch = switch
                
@@ -68,7 +68,11 @@ class PathHelp:
             if row < 14:
                 if k ==  'Menus':
                     self.table.setRow(row, 0, k,SD,True,True)
-                    self.table.setRow(row, 1, "  " + val,SD,'',True)
+                    self.table.setRow(row, 1, "  " + val,SD,'',True)       
+                elif k == "Menu2":
+                    self.table.setRow(row, 0, k,QL,True,True)
+                    self.table.setRow(row, 1, "  " + val,QL,'',True)
+                         
                 else:
                     self.table.setRow(row, 0, k, '', True,True)
                     self.table.setRow(row, 1, "  " + val, '', '',True)      
@@ -128,6 +132,9 @@ class PathWorks:
         self.sideCar   = self.canvas.sideCar
          
         self.widget = self.pathMaker.widget
+        
+        self.pathHelp = None
+        self.pathHelpFlag = False   
    
 ### -------------------------------------------------------- 
     def addWidget(self, str=''):  ## split code
@@ -146,23 +153,32 @@ class PathWorks:
         self.pathMaker.edits.deleteLasso()
         return self.widget
             
-    def closeWidget(self):
-        if self.widget != None:
-            self.widget.close()
-            self.widget = None  
-  
     def deleteDoodle(self, this):  ## remove doodle and path from pathChooser widget
         os.remove(this.file)
         self.pathMaker.removePath()  
         self.pathMaker.pathChooserOff()
         self.pathMaker.pathChooser()
  
-    def openMenu(self):  ## triggered by help button
+    def openHelpMenu(self): ## triggered by help button
         self.closeWidget()
+        self.closeMenu() 
+        self.pathMaker.pathChooserOff()
+        self.pathHelp = PathHelp(self, self.canvas)  
+
+    def closeMenu(self):
+        self.canvas.showbiz.helpButtons.closeMenus('path') 
         if self.pathMaker.pathHelpMenu2 != None:
             self.pathMaker.pathHelpMenu2.closeMenu()
-            self.pathMaker.pathHelpMenu2 = None
-        self.help = PathHelp(self, self.canvas)  
+            self.pathMaker.pathHelpMenu2 = None   
+        if self.pathMaker.pathChooserSet:
+            self.pathMaker.pathChooserOff()
+            
+    def closeWidget(self):
+        try:
+            self.widget.close()
+            self.widget = None  
+        except:
+            self.widget = None 
         
  ### --------------------------------------------------------    
     def scaleRotate(self, key, per=0, inc=0):  ## also used by pathWidget

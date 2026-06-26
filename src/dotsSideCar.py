@@ -14,8 +14,10 @@ from dotsMapMaker       import MapMaker
 from dotsVideoPlayer    import VideoPlayer
 
 ### ---------------------- dotsSideCar ---------------------
-''' no class: pixTest, transFormPixitem,  clearWidgets, videoPlayer, 
-    toggles, small functions and a few from showbiz '''   
+''' no class: transFormPixitem,  clearWidgets, videoPlayer, 
+    toggles, small functions and a few from showbi .
+    PythonQt5 can't run an animation and loop a video at the  
+    same time. The video only runs once.'''   
 ### --------------------------------------------------------
 class SideCar:
 ### --------------------------------------------------------
@@ -43,26 +45,7 @@ class SideCar:
         pix.setOpacity(pix.alpha2)
                                                               
         self.scene.addItem(pix)
-         
-### --------------------------------------------------------
-    def pixTest(self):  ## randomly places 10 apples on the canvas to play with 
-        if not self.canvas.pathMakerOn:  
-            self.canvas.pixCount = self.canvas.mapper.toFront()
-            for _ in range(10):
-                self.canvas.pixCount += 1
-                pix = PixItem(paths['spritePath'] + 'apple.png', self.canvas.pixCount, 0, 0, 
-                        self.canvas)
-                ## note -> self.xy()
-                pix.x = int(constrain(self.xy(common['ViewW']), pix.width, common['ViewW'], 
-                        pix.width * -common['factor']))  ## factor from screens
-                pix.y = int(constrain(self.xy(common['ViewH']), pix.height, common['ViewH'],
-                        pix.height * -common['factor']))
-                pix.setPos(pix.x, pix.y)
-                rotation = random.randrange(-5, 5) * 5
-                scale = random.randrange(90, 110)/100.0
-                pix.locked = False;  pix.tag = ''
-                self.transFormPixItem(pix, rotation, scale, 1.0)
-                                                                 
+                                                           
     def clearWidgets(self):                             
         for widget in QApplication.allWidgets():  ## note!!
             if widget.accessibleName() == 'widget':  ## shadow and pixitems widgets

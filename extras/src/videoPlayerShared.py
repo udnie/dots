@@ -26,7 +26,8 @@ WID, HGT, PAD = 40, 140, 100 ## pixels added to videowidget size when resizing v
     and some singletons relocated here to help reduce file sizes 
     and make files less packed and easier to read. I've added a 
     visual aid to point out files or code specific to videoPlayer 
-    one or two... ## <- "one", ## <- "two". Easy to search for. '''
+    one or two... ## <- "one", ## <- "two". Easy to search for. 
+    '''
 ### --------------------------------------------------------   
 class MediaPlayer(QMediaPlayer): 
 ### --------------------------------------------------------
@@ -343,7 +344,7 @@ def setSlider(self):
     
     self.slider.setStyleSheet("""                                        
         QSlider::groove:horizontal {
-            background-color: #ccc;
+            background-color: #ccc;      
             height: 3px;
         }     
         QSlider::handle:horizontal {
@@ -362,33 +363,33 @@ def setButtons(self):
     self.buttonGroup = QLabel()
     self.buttonGroup.setFixedHeight(45)
 
-    self.openButton = QPushButton("Files")
+    openButton = QPushButton("Files")
     self.playButton = QPushButton("Play")  
     if self.player == "one":            
         self.aspButton   = QPushButton("Aspect")
     self.loopButton = QPushButton("Loop")
     self.stopButton = QPushButton("Stop")
-    self.byeButton  = QPushButton("Quit")
+    byeButton  = QPushButton("Quit")
     
-    self.openButton.clicked.connect(self.openFile) if self.player == "one"\
-        else self.openButton.clicked.connect(self.openFile)         ## <- "two"
+    openButton.clicked.connect(self.openFile) if self.player == "one"\
+        else openButton.clicked.connect(self.openFile)         ## <- "two"
     
     self.playButton.clicked.connect(self.shared.playVideo)
     if self.player == "one":
         self.aspButton.clicked.connect(self.setAspButton)
     self.loopButton.clicked.connect(self.shared.looper)
     self.stopButton.clicked.connect(self.shared.stopVideo)
-    self.byeButton.clicked.connect(self.bye)
+    byeButton.clicked.connect(self.bye)
 
     hbox = QHBoxLayout(self)
             
-    hbox.addWidget(self.openButton)  
+    hbox.addWidget(openButton)  
     hbox.addWidget(self.playButton)    
     if self.player == "one":       
         hbox.addWidget(self.aspButton)
     hbox.addWidget(self.loopButton)    
     hbox.addWidget(self.stopButton)  
-    hbox.addWidget(self.byeButton)
+    hbox.addWidget(byeButton)
     
     self.buttonGroup.setLayout(hbox)
     self.buttonGroup.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Plain)
@@ -424,24 +425,24 @@ def getMetaData(path):
     #     return 0, 0
     ''' uses mdls - mac only - reports non 9:16 vertical width and height correctly -- 
         drag and drop doesn't work in pyqt5 on desktop '''  
-    # try:  
-    #     result = subprocess.run(
-    #         ['mdls', '-name', 'kMDItemPixelWidth', '-name', 'kMDItemPixelHeight', path],
-    #         capture_output=True,
-    #         text=True,
-    #         check=True
-    #         )
-    #     output = result.stdout
-    #     width, height = None, None
-    #     for line in output.splitlines():
-    #         if 'kMDItemPixelWidth' in line:
-    #             width = int(line.split('=')[-1].strip())
-    #         elif 'kMDItemPixelHeight' in line:
-    #             height = int(line.split('=')[-1].strip())
-    #         del line
-    #     return width, height
-    # except Exception:
-    #     return 0, 0
+    try:  
+        result = subprocess.run(
+            ['mdls', '-name', 'kMDItemPixelWidth', '-name', 'kMDItemPixelHeight', path],
+            capture_output=True,
+            text=True,
+            check=True
+            )
+        output = result.stdout
+        width, height = None, None
+        for line in output.splitlines():
+            if 'kMDItemPixelWidth' in line:
+                width = int(line.split('=')[-1].strip())
+            elif 'kMDItemPixelHeight' in line:
+                height = int(line.split('=')[-1].strip())
+            del line
+        return width, height
+    except Exception:
+        return 0, 0
     ''' uses ffprobe -- may not always report width/height correctly for non 9:16 verticals
         and blows up if run from mac desktop -- works well in vscode '''
     # try: 
@@ -462,4 +463,4 @@ def getMetaData(path):
 ### ---------------------- that's all ---------------------- 
  
 
-
+  

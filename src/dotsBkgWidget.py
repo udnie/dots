@@ -17,63 +17,10 @@ class BkgWidget(QWidget):
 ### -------------------------------------------------------- 
     def __init__(self, parent, maker, switch=''):
         super().__init__()
-             
-        self.switch = switch
-                           
-        if self.switch == '':         
-            self.bkgItem  = parent     
-            self.bkgMaker = maker
-            self.canvas   = self.bkgItem.canvas
-     
-            self.bkgWorks = BkgWorks(self.bkgItem)
-            self.bkgScrollWrks = self.bkgWorks.bkgScrollWrks  
-               
-        self.canvas = parent
-            
-        self.type = 'widget'
-        self.setAccessibleName('widget')
-    
-        self.save = QPointF()
-        self.WidgetW, self.WidgetH = 380.0, 300.0
-                  
-        vbox = QVBoxLayout()  
-          
-        hbox = QHBoxLayout()
-        hbox.addSpacing(0)   
-        hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignTop)
-        hbox.addSpacing(5) 
-        hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignTop)
         
-        sbox = QHBoxLayout()
-        sbox.addWidget(self.scrollButtons(), Qt.AlignmentFlag.AlignBottom)
-        vbox.addLayout(hbox)    
-        vbox.addLayout(sbox) 
-        
-        self.setLayout(vbox)
-    
-        if self.switch == '':
-            self.label.setText(self.bkgItem.fileName)
-            self.bkgItem.canvas.dots.statusBar.showMessage(self.bkgItem.fileName)  
-        
-        self.setFixedHeight(int(self.WidgetH)) 
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
-        self.setContentsMargins(0, 0, 5, 0) 
-        
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)    
-                                                                                                   
+        self.setUI(parent, maker, switch)
         self.show()
-        
-        if self.switch in('on', 'all'):
-            x, y = getVuCtr(self.canvas)  
-            self.label.setText('FileName  goes Here')
-            if self.switch == 'on':
-                self.move(x-425, y)
-            else:
-                self.move(x-400,y-150)
-                
+
 ### --------------------------------------------------------
     def setKeys(self, key):  ## updated thru bkgItem - did use grabkey - not good idea
         self.key = key 
@@ -148,6 +95,62 @@ class BkgWidget(QWidget):
             self.bkgScrollWrks.setTrackerFactor(self.bkgItem)
      
 ### --------------------------------------------------------
+    def setUI(self, parent, maker, switch):           
+        self.switch = switch
+                    
+        if self.switch == '':         
+            self.bkgItem  = parent     
+            self.bkgMaker = maker
+            self.canvas   = self.bkgItem.canvas
+     
+            self.bkgWorks = BkgWorks(self.bkgItem)
+            self.bkgScrollWrks = self.bkgWorks.bkgScrollWrks  
+               
+        self.canvas = parent
+            
+        self.type = 'widget'
+        self.setAccessibleName('widget')
+    
+        self.save = QPointF()
+        self.WidgetW, self.WidgetH = 380.0, 300.0
+                  
+        vbox = QVBoxLayout()  
+          
+        hbox = QHBoxLayout()
+        hbox.addSpacing(0)   
+        hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignTop)
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignTop)
+        
+        sbox = QHBoxLayout()
+        sbox.addWidget(self.scrollButtons(), Qt.AlignmentFlag.AlignBottom)
+        vbox.addLayout(hbox)    
+        vbox.addLayout(sbox) 
+        
+        self.setLayout(vbox)
+    
+        if self.switch == '':
+            self.label.setText(self.bkgItem.fileName)
+            self.bkgItem.canvas.dots.statusBar.showMessage(self.bkgItem.fileName)  
+        
+        self.setFixedHeight(int(self.WidgetH)) 
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
+        self.setContentsMargins(0, 0, 5, 0) 
+        
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)    
+                                                                                                   
+        if self.switch in('on', 'all'):
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName  goes Here')
+            if self.switch == 'on':
+                self.move(x-425, y)
+            else:
+                self.move(x-400,y-150)
+
+### --------------------------------------------------------
     def sliderGroup(self):
         groupBox = QGroupBox('ScreenRate  Showtime  Factor ')
         groupBox.setFixedWidth(205) 
@@ -195,7 +198,8 @@ class BkgWidget(QWidget):
                   
         button = QPushButton('Update', self) 
         button.setFixedWidth(65)
-        if self.switch == '':
+   
+        if self.switch == '': 
             button.clicked.connect(self.bkgScrollWrks.updateDictionary)
                                           
         sbox = QHBoxLayout()  ## sliders and dial  

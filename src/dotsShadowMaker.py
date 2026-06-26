@@ -1,6 +1,7 @@
 
 import os
 import time
+import sys
 
 from PyQt6.QtCore       import QPoint, QPointF, QTimer
 from PyQt6.QtGui        import QImage, QPixmap
@@ -9,7 +10,7 @@ from dotsShared         import common, paths
 from dotsShadow         import *                  
 from dotsShadowWidget   import ShadowWidget
 from dotsShadowWorks    import Works, PointItem
-from dotsSideGig        import getCrop
+from dotsSideGig        import MsgBox, getCrop
 from dotsHelpMonkey     import ShadowHelp
 
 V = common['V']  ## the diameter of a pointItem, same as in ShadowWidget
@@ -48,6 +49,7 @@ class ShadowMaker:
         self.linked   = False
         self.restore  = False
         self.dblclk   = False
+        self.isOpenCV = True
 
         self.alpha  = .50
         self.scalor = 1.0
@@ -68,14 +70,20 @@ class ShadowMaker:
         self.last = QPointF()
  
 ### --------------------------------------------------------
-    def addShadow(self, w, h, viewW, viewH):  ## from scatch      
+    def addShadow(self, w, h, viewW, viewH):  ## from scatch   
         if self.shadow != None:
-            return        
+            return 
+           
+        if 'cv2' not in sys.modules:
+            MsgBox('No Shadows - OpenCV not Imported', 5)
+            self.isOpenCV = False
+            return
+    
         file, w, h = self.works.pixWidthHeight()  ## returns file as well as width and height      
         file = paths['spritePath'] + os.path.basename(file) 
-                                 
+                             
         img, width, height, bytesPerLine = initShadow(file, w, h, self.pixitem.flopped)
-       
+
         self.cpy = img   ## save it for later  
         self.flopCpy = cv2.flip(img, 1)  ## use this if shadow is flopped
                          
@@ -104,6 +112,8 @@ class ShadowMaker:
         self.scene.addItem(self.shadow)  
    
         QTimer.singleShot(100, self.shadow.initPoints)  ## sets outline on open
+        
+        return True
                                                                                                                                                     
 ### --------------------------------------------------------                         
     async def restoreShadow(self):  ## reads from pixitem.shadow, a copy of the shadow data from the .play file

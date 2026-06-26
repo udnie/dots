@@ -13,52 +13,10 @@ class ShadowWidget(QWidget):
 ### -------------------------------------------------------- 
     def __init__(self, parent, shadow, switch=''):
         super().__init__()
-                  
-        self.switch = switch          
+        
+        self.setUI(parent, switch)          
+        self.show()         
               
-        if self.switch == '':                     
-            self.maker  = parent       
-            self.canvas = self.maker.canvas                   
-            self.works  = self.maker.works
-     
-        self.canvas = parent
-     
-        self.type = 'widget'
-        self.setAccessibleName('widget')
-         
-        self.save = QPointF()
-        self.WidgetW, self.WidgetH = 345.0, 285.0
-                
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.sliderGroup())
-        hbox.addSpacing(5) 
-        hbox.addWidget(self.buttonGroup())
-        self.setLayout(hbox)
-        
-        if self.switch == '':
-            file = os.path.basename(self.maker.pixitem.fileName)
-        else:
-            file = 'Shadow Widget'
-            
-        self.label.setText(file)
-        
-        self.setFixedHeight(int(self.WidgetH))
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-        self.setContentsMargins(0,15,0,-15)
-             
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)
-                                
-        self.show()
-        
-        if self.switch in('on', 'all'):
-            x, y = getVuCtr(self.canvas)  
-            self.label.setText('FileName goes Here')
-            self.move(x+75, y-320) if self.switch == 'on'\
-                else self.move(x-360,y-160)
-        
 ### --------------------------------------------------------                                   
     def paintEvent(self, e):
         painter = QPainter(self)
@@ -112,6 +70,51 @@ class ShadowWidget(QWidget):
         self.maker.alpha = op
         self.opacityValue.setText(f'{op:.2f}')        
               
+### --------------------------------------------------------
+    def setUI(self, parent, switch):   
+        self.switch = switch  
+                        
+        if self.switch == '':                     
+            self.maker  = parent       
+            self.canvas = self.maker.canvas                   
+            self.works  = self.maker.works
+     
+        self.canvas = parent
+    
+        self.type = 'widget'
+        self.setAccessibleName('widget')
+         
+        self.save = QPointF()
+        self.WidgetW, self.WidgetH = 345.0, 285.0
+                
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.sliderGroup())
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.buttonGroup())
+        self.setLayout(hbox)
+        
+        if self.switch == '':
+            file = os.path.basename(self.maker.pixitem.fileName)
+        else:
+            file = 'Shadow Widget'
+            
+        self.label.setText(file)
+        
+        self.setFixedHeight(int(self.WidgetH))
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
+        self.setContentsMargins(0,15,0,-15)
+             
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
+  
+        if self.switch in('on', 'all'):
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName goes Here')
+            self.move(x+75, y-320) if self.switch == 'on'\
+                else self.move(x-360,y-160)
+                  
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity   ')

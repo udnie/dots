@@ -13,6 +13,7 @@ There is only one codebase and it's written in **pyqt6**.  These scripts will ma
 
 
 Scripts should be run in the **dots** source code directory.   A **unix/linux bash/zsh** shell is required to run the  **sed** command in **script-pyqt5.sh** to do the necessary and in **script-ps6.sh** to do the search and replace of 'type' to 'desc' inorder to run **pyside6**.
+Running a conversion script in **dots** will run the same named script in **dots/extras/src**. The scripts in **extras** and apps can be run without needing **dots** to be installed.
 
 ## Edits for Converting Dots from PyQt6 to PyQt5
 
@@ -30,7 +31,6 @@ The shell script **script-pyqt5.sh** handles all the above work required to conv
 ## Edits for Converting Dots from PyQt6 to PySide6
 
 The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the videoPlayer files and then the **sed** commands are used to replace **'type'** with **'desc'** in the **.py** and **.play** files - and any required as well.  See **February 6**.
-
 #
 ## Help and Stuff
 **Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command in **dots** are now accessible from the help button menus in Canvas, StoryBoard and PathMaker - the scenes that make up **dots**.  A **right mouse click** will launch a widget for most of the storyboard screen items.

@@ -90,19 +90,23 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
         else:
             if self.pathFlag:
                 self.pathHelp.closeMenu() 
+                self.pathFag = False
             else:
+                self.canvas.pathMaker.pathWorks.closeMenu() 
                 self.pathHelp = PathHelp(self, self.canvas)
+                self.pathFag = True
         self.canvas.setFocus()
     
-    def closeMenus(self,):  ## used by showbiz not menus
+    def closeMenus(self,src=''):  ## used by showbiz not menus
         if not self.canvas.pathMakerOn:
             if self.canvasFlag:
                 self.canvasHelp.closeMenu() 
             elif self.storyFlag:
                 self.storyHelp.closeMenu() 
         else:  
-            if self.pathFlag:
-                self.pathHelp.closeMenu() 
+            if src == 'path' or self.pathFlag:
+                if self.canvas.pathMaker.pathWorks.pathHelp != None:
+                    self.canvas.pathMaker.pathWorks.pathHelp.closeMenu() 
                     
 ### --------------------------------------------------------
 class CanvasHelp: 
@@ -193,6 +197,9 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
                 if k ==  'Menus':
                     self.table.setRow(row, 0, k,SD,True,True)
                     self.table.setRow(row, 1, "  " + val,SD,'',True)
+                elif k == "Menu2":
+                    self.table.setRow(row, 0, k,QL,True,True)
+                    self.table.setRow(row, 1, "  " + val,QL,'',True)
                 else:
                     self.table.setRow(row, 0, k, '', True,True)
                     self.table.setRow(row, 1, "  " + val, '', '',True)      

@@ -1,11 +1,22 @@
 ## Changes: 
 
-See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**.  There are **scripts** in the **/src** directory both in python and those that require a **linux/unix shell** and the **sed** command to take care of the conversions for you.
+See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**. Additional changes:  running a conversion script in **dots** will run the same named script in **dots/extras/src**.  The scripts and apps in **extras** can be run without needing **dots** to be installed. 
 
 ---
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
+---
+
+**June 2026**  
+Moved all the non-dots apps to the **extras** directory which leaves only **dots.py** files and four script files in the **dots/src** directory. Some minor changes moving code around and the usual menu updates and fixes.  In **dots/extras/src** I've updated the files originally there to make sure they'll run in **PyQt5** and **PySide6**.  There are included scripts to handle that - see above. 
+
+Also and most important - the training wheels are off wherever **opencv** is required. The import statement is no longer commented out.  If you haven't installed **opencv-python 4.12+** by now you will most probably experience what happens if it isn't found.
+
+I've a new app **wrapper** which makes a wrap-around photo for use as a continuous scrolling background by blending the opposite ends of the photo together and providing an alternate cropping method to make it easier to retouch if necessary. Another **opencv** project with assists from **Gemini Pro** and **Claude** and a new **opencv** function, through google prompts,  to replace one originally written in **pygame** for use in **outline.py**. The only reason **pygame** was referenced. Also added drag and drop to **slideShow** and **wrapper**.
+
+There's more. The two scrolling demos have a new background with it's own **screenrates** dictionary/json file accessed through the it's background widget.  The json **demorates** file along with the background photo are in the **demo** directory.  You may need to make adjustments to the screen rates as the values are based on what works on my mac. It's a clothesline with shadows if you look close enough.
+ 
 ---
 
 **March 21 2026**   

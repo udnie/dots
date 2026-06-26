@@ -146,7 +146,7 @@ class PathWays:
     def savePath(self):
         if len(self.pathMaker.pts) > 0:
             if self.pathMaker.addingNewPath != False: 
-                MsgBox("savePath: Close the new path using 'cmd'", 5)  
+                MsgBox("savePath: You Must Close the New Path First using 'N', new,", 5)  
                 return     
             if self.pathMaker.openPathFile == '':
                 self.pathMaker.openPathFile = paths['paths'] + 'tmp.path'          

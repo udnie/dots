@@ -1,8 +1,7 @@
 
-import os
 import time
 
-from PyQt6.QtCore       import Qt, pyqtSignal, QTimer
+from PyQt6.QtCore       import Qt, pyqtSignal
 from PyQt6.QtGui        import QPainter
 from PyQt6.QtWidgets    import QGraphicsView
 
@@ -143,8 +142,11 @@ class ControlView(QGraphicsView):
                         self.sideCar2.mirrorBkg(1) 
                              
                     elif mod & Qt.KeyboardModifier.AltModifier:
-                        self.sideCar2.mirrorBkg(-1) 
-                                                                
+                        self.sideCar2.mirrorBkg(-1)
+                        
+                    elif mod & Qt.KeyboardModifier.ControlModifier:
+                        self.sideCar2.mirrorBkg(2)
+                                                            
                     else:
                         self.sideCar2.bkgStuff()
                                                             
@@ -167,7 +169,7 @@ class ControlView(QGraphicsView):
                     else self.setKey('M')    
                         
             elif key == Qt.Key.Key_R:   ## unlink. unlock, unselect - sprites and shadowsand bkgs
-                self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else\
+                self.sideCar.resetAll() if mod & Qt.KeyboardModifier.ShiftModifier else \
                     self.setKey('R')
                                                        
             elif key == Qt.Key.Key_S:    
@@ -176,7 +178,7 @@ class ControlView(QGraphicsView):
                         self.sideCar.toggleShadowLinks()  ## does them all     
                         
                 elif mod & Qt.KeyboardModifier.AltModifier:
-                    self.sideCar2.playschk()           
+                    self.sideCar2.typedesc()           
                 else:
                     self.setKey('S')  
                                                             
@@ -194,7 +196,7 @@ class ControlView(QGraphicsView):
             elif key == Qt.Key.Key_U:  ## unlocks all sceneItems     
                 self.canvas.sideCar2.unlockAll() if mod & Qt.KeyboardModifier.ShiftModifier \
                     else self.setKey('U')  
-
+  
         ## apple option key and cmd key - used by scroll panel to scroll tiles
         elif key in (Qt.Key.Key_Down, Qt.Key.Key_Up) and not self.canvas.pathMakerOn:
                 

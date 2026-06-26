@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import QSlider, QWidget, QApplication, QGraphicsView, \
                             QGraphicsDropShadowEffect, QFileDialog, QFrame
 
 ExitKeys = (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape)
-DispWidth, DispHeight = 425, 425
+ViewW, ViewH = 425, 425
 Width, Height = 870, 475 
 Blur, Xoff, Yoff, Scale, Rotate, Rgb, Alpha = 11, 8, 8, 100, 0, 125, 125
 Color = QColor(Rgb, Rgb, Rgb, Alpha) 
@@ -19,79 +19,37 @@ Color = QColor(Rgb, Rgb, Rgb, Alpha)
 ### --------------------------------------------------------
 class DropShadow(QWidget): 
 ### --------------------------------------------------------
-    def __init__(self, parent=None):
+    def __init__(self):
         super().__init__()
    
-        self.view = QGraphicsView(self)
-        self.scene = QGraphicsScene()
-        self.view.setScene(self.scene)
-
-        ctr = QGuiApplication.primaryScreen().availableGeometry().center()
-        x = int(((ctr.x() * 2 ) - Width)/2)
-        self.setGeometry(x,75,Width,Height)
-
-        self.setFixedSize(Width,Height)
-        self.setWindowTitle("a pyqt dropshadow visualizer")
-
-        self.scene.setSceneRect(0,0,DispWidth,DispHeight-2)   
-        
-        self.pixmap = None 
-        self.shadow = None 
-        self._rgb, self._alpha = 0, 0
-        
-        self.sliders = self.setSliders() 
-        self.grid    = self.setGrid()
-        self.buttons = self.setButtons()
-        
-        hbox = QHBoxLayout()  
-        hbox.addWidget(self.view)
- 
-        vbox = QVBoxLayout()      
-        vbox.addSpacing(0)
-        vbox.addWidget(self.sliders, Qt.AlignmentFlag.AlignTop)
-        vbox.addWidget(self.grid, Qt.AlignmentFlag.AlignTop)
-        vbox.addSpacing(10)
-        vbox.addWidget(self.buttons, Qt.AlignmentFlag.AlignBottom)
-    
-        hbox.addLayout(vbox)    
-        self.setLayout(hbox)
-        
-        self.setStyleSheet("QGraphicsView {\n"  ## seems to work better positioned here
-            "background-color: rgb(250,250,250);\n"
-            "border: 1px solid rgb(125,125,125);\n"
-            "color: rgb(125,125,125);\n"
-            "}")
- 
-        self.enableSliders()  ## false to start
-        self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)
-          
+        self.setUI()          
         self.show()     
 
 ### --------------------------------------------------------       
-    def addPixmap(self, img):  ## the scene is cleared each new image file                       
+    def addPixitem(self, img):  ## the scene is cleared each new image file                       
         img = QImage(img)             
         img = img.scaled(250, 250,  ## keep it small
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation)
      
-        self.pixmap = QGraphicsPixmapItem()     
-        self.pixmap.setPixmap(QPixmap(img))    
+        self.pixItem = QGraphicsPixmapItem()     
+        self.pixItem.setPixmap(QPixmap(img))    
         
-        self.pixmap.setX((DispWidth-img.width())/2)  ## center it
-        self.pixmap.setY((DispHeight-img.height())/2)
+        self.pixItem.setX((ViewW-img.width())/2)  ## center it
+        self.pixItem.setY((ViewH-img.height())/2)
         
         QTimer.singleShot(100, self.addShadow)  ## just to be sure          
-        self.scene.addItem(self.pixmap)
+        self.scene.addItem(self.pixItem)
              
     def addShadow(self):
         self.shadow = QGraphicsDropShadowEffect(blurRadius=Blur, xOffset=Xoff, yOffset=Yoff)
         self.shadow.setColor(Color)
-        self.pixmap.setGraphicsEffect(self.shadow)
+        self.pixItem.setGraphicsEffect(self.shadow)
         self.defaultSliderVals()  ## sets the default slider values - seven in all
              
     def clearScene(self):
         self.shadow = None  
-        self.pixmap = None   
+        self.pixItem = None   
         self.scene.clear()  
         self.resetSliderVals()  ## sets slider values to 1
               
@@ -121,20 +79,20 @@ class DropShadow(QWidget):
     def scale(self, val):
         val = val/100.0    
         self.setOriginPt() 
-        if self.pixmap != None: self.pixmap.setScale(val)   
+        if self.pixItem != None: self.pixItem.setScale(val)   
         self.scaleValue.setText(f'{val:>4.2f}%')
             
     def rotate(self, val):
         self.setOriginPt() 
-        if self.pixmap != None: self.pixmap.setRotation(val)   
+        if self.pixItem != None: self.pixItem.setRotation(val)   
         self.rotateValue.setText(f'{val:>4}')       
                  
     def setOriginPt(self):  
-        if self.pixmap != None:   
-            b = self.pixmap.boundingRect()
+        if self.pixItem != None:   
+            b = self.pixItem.boundingRect()
             op = QPointF(b.width()/2, b.height()/2)
-            self.pixmap.setTransformOriginPoint(op)
-            self.pixmap.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
+            self.pixItem.setTransformOriginPoint(op)
+            self.pixItem.setTransformationMode(Qt.TransformationMode.SmoothTransformation)
         
 ### -------------------------------------------------------- 
     def enableSliders(self, bool=False): 
@@ -158,6 +116,51 @@ class DropShadow(QWidget):
         self.scaleSlider.setValue(100)
         self.rotateSlider.setValue(1)
 
+### --------------------------------------------------------        
+    def setUI(self):
+        self.view = QGraphicsView(self)
+        self.scene = QGraphicsScene()
+        self.view.setScene(self.scene)
+
+        ctr = QGuiApplication.primaryScreen().availableGeometry().center()
+        x = int(((ctr.x() * 2 ) - Width)/2)
+        self.setGeometry(x,200,Width,Height)
+
+        self.setFixedSize(Width,Height)
+        self.setWindowTitle("a pyqt dropshadow visualizer")
+
+        self.scene.setSceneRect(0,0,ViewW,ViewH-2)   
+        
+        self.pixItem = None 
+        self.shadow = None 
+        self._rgb, self._alpha = 0, 0
+        
+        self.sliders = self.setSliders() 
+        self.grid    = self.setGrid()
+        self.buttons = self.setButtons()
+        
+        hbox = QHBoxLayout()  
+        hbox.addWidget(self.view)
+ 
+        vbox = QVBoxLayout()      
+        vbox.addSpacing(0)
+        vbox.addWidget(self.grid, Qt.AlignmentFlag.AlignTop)
+        vbox.addSpacing(10)
+        vbox.addWidget(self.buttons, Qt.AlignmentFlag.AlignBottom)
+    
+        hbox.addLayout(vbox)    
+        self.setLayout(hbox)
+        
+        self.setStyleSheet("QGraphicsView {\n"  ## seems to work better positioned here
+            "background-color: rgb(250,250,250);\n"
+            "border: 1px solid rgb(125,125,125);\n"
+            "color: rgb(125,125,125);\n"
+            "}")
+ 
+        self.enableSliders()  ## false to start
+        self.view.viewport().setAttribute(Qt.WidgetAttribute.WA_AcceptTouchEvents, False)
+  
+### --------------------------------------------------------       
     def setSliders(self):     
         self.sliderGroup = QLabel()
         self.sliderGroup.setFixedSize(385,365)
@@ -255,21 +258,21 @@ class DropShadow(QWidget):
         self.buttonGroup = QLabel()
         self.buttonGroup.setFixedSize(385,50)
         
-        self.filesBtn = QPushButton("Files")      
-        self.filesBtn.clicked.connect(self.openFiles)
+        filesBtn = QPushButton("Files")      
+        filesBtn.clicked.connect(self.openFiles)
         
-        self.clearBtn = QPushButton("Clear")
-        self.clearBtn.clicked.connect(self.clearScene)
+        clearBtn = QPushButton("Clear")
+        clearBtn.clicked.connect(self.clearScene)
         
-        self.quitBtn = QPushButton("Quit")
-        self.quitBtn.clicked.connect(self.close)
+        quitBtn = QPushButton("Quit")
+        quitBtn.clicked.connect(self.close)
         
         hbox = QHBoxLayout(self)
-        hbox.addWidget(self.filesBtn)
+        hbox.addWidget(filesBtn)
         hbox.addSpacing(50)        
-        hbox.addWidget(self.clearBtn)
+        hbox.addWidget(clearBtn)
         hbox.addSpacing(50)
-        hbox.addWidget(self.quitBtn)
+        hbox.addWidget(quitBtn)
             
         self.buttonGroup.setLayout(hbox)
         self.buttonGroup.setFrameStyle(QFrame.Shape.Box|QFrame.Shadow.Plain)
@@ -285,7 +288,7 @@ class DropShadow(QWidget):
         if file and file.lower().endswith('.png') or file.lower().endswith('.jpg'):
             self.scene.clear()
             self.enableSliders(True)  ## sets defaults
-            self.addPixmap(file)
+            self.addPixitem(file)
               
     def keyPressEvent(self, e):
         if e.key() in ExitKeys:
