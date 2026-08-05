@@ -83,7 +83,7 @@ class  MainMenu:
         self.table.setRow(row, 0,f'{"Select From Above":<57}',QL,True,True, 2)   ## :<23 in qt5 <<---
         self.table.setRow(row + 1, 0,f'{"Click Here to Close":<20}','',True,True, 2)    ## :<23 in qt5 <<---
           
-        self.table.setFixedSize(267, 307)
+        self.table.setFixedSize(267, 306)
         
         x, y = getVuCtr(self.canvas)      
         if self.canvas.dots.Vertical:

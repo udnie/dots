@@ -31,7 +31,8 @@ class TableWidgetSetUp(QTableWidget):  ## used by help menus not by tablemodel
     def __init__(self, a, b, c, cols3=0, fontSize=0):  ##  a, b, c - column widths 
         super().__init__()   
         
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window| Qt.WindowType.FramelessWindowHint \
+            | Qt.WindowType.WindowStaysOnTopHint)
                       
         self.horizontalHeader().setVisible(False)
         self.verticalHeader().setVisible(False)

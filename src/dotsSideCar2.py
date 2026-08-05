@@ -76,14 +76,11 @@ class SideCar2:
         return sum(pix.type == 'bkg' for pix in self.scene.items())
                    
     def bkgStuff(self):
-        self.canvas.bkgMaker.openBkgFiles() if self.hasBackGround() == 0 \
-            else self.sendPixKeys('B')
-            
-    def newTracker(self):  
-        if self.hasBackGround() > 0:
-            self.canvas.bkgMaker.bkgtrackers.trackThis() if self.canvas.bkgMaker.bkgtrackers.tracker == None \
-                else self.canvas.bkgMaker.bkgtrackers.tracker.bye()  
-               
+        if self.gotFlats() or len(self.canvas.bkgMaker.newTracker) > 0:
+            self.sendPixKeys('B')
+        elif self.hasBackGround() == 0:
+            self.canvas.bkgMaker.openBkgFiles()
+        
     def aye(self):
         for bkg in self.scene.items():  
             if bkg.type == 'bkg':
@@ -138,9 +135,9 @@ class SideCar2:
     
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
-        if self.canvas.bkgMaker.bkgtrackers.tracker != None and \
+        if self.canvas.bkgMaker.trackerWidget != None and \
             key in ('up', 'down'):  ## to trackers
-                self.canvas.bkgMaker.bkgtrackers.tracker.setPixKeys(key) 
+                self.canvas.bkgMaker.trackerWidget.setPixKeys(key) 
                 return
             
         elif self.canvas.bkgMaker.widget != None and key in ('up', 'down','right','left'):

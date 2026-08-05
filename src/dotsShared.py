@@ -80,9 +80,9 @@ CanvasStr = "A,B,C,D,E,F,H,J,L,M,P,R,S,T,W,\",<,>,[,],{,},_,+,/,-,=,;,.,,lock,sp
 
 PathStr = "B,C,D,E,H,L,N,M,P,R,S,T,U,V,W,{,},[,],/,!,@,;,\',,<,>,:,\",_,+,-,=,cmd,left,right,up,down,del,opt,shift,delPts"
 
-PlayKeys = ('A','C','D','G','I','J','K','L','M','N','O','P','R','S','T','U','V','W','Y','X','space','del') 
+PlayKeys = ('A','B','C','D','G','I','J','K','L','M','N','O','P','R','S','T','U','V','W','Y','X','space','del')  ## used by showbiz
 
-Verts = ('800','SQV', '900','912','960V','1024','1066','1102')
+Verts = ('800','SQV', '900','960V','1024','1102')
 
 ## use this and make sure your editor points to the right directory
 paths = {          

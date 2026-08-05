@@ -1,5 +1,18 @@
-**June 2026**
+**Note:**  
+For **wrapper** I recommend a minimum image size of **1280X640 pixels** for horizontals and **640X1280** for verticals or resizing with the height/width to **640 pixels** as long as the long side is greater than 1280 pixels afterwards - both the app and the cropping guide work better by doing so.  The cropping guide doesn't go beyond the center of the blendWidth.
 
+
+---
+
+**August 2026**  
+Added three filters to **wrapper** based on the sliders.  Added a delete to **slideShow** that removes the current photo from those selected. See **Changes.md** for a more detailed write-up and video.
+
+I turned off the guides popping up in **wrapper** when opening a new file and now have them showing when you're ready to save the image unless they're already up.
+
+---
+
+
+**June 2026**  
 I've moved **slideShow, videoPlayer**, and **vhx** to **extras** from **dots** and added a new app, **wrapper**.  I removed **castShadow.py** from extras  as there's a more up to date version in **dots**.  Added drag and drop to **slideShow** and **wrapper**.
 
 Current apps in **extras**:
@@ -16,7 +29,6 @@ Current apps in **extras**:
  
 
   *opencv 
-
 
 Plus four scripts, similar to the four in **dots**. One pair for converting the **PyQt6** code to run in **PyQt5** - **script-pyqt5.sh**, the other pair to convert **PyQt6** to run in **PySide6** - **script-ps6.sh**.  A unix/linux is operating system is required to run the **.sh** files.
 

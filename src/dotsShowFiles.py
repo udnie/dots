@@ -81,9 +81,9 @@ class ShowFiles:
                
                 if pix.tag == 'scroller':  ## replace transformPix.. action
                     if pix.direction == 'right':
-                        pix.setPos(QPointF(pix.runway, 0))  ## offset to right 
+                        pix.setPos(QPointF(pix.runWay, 0))  ## offset to right 
                     elif pix.direction == 'vertical':
-                        pix.setPos(QPointF(0.0, float(pix.runway)))   
+                        pix.setPos(QPointF(0.0, float(pix.runWay)))   
                                                           
         del tmp                                                                                            
         ## adds pix to the scene and performs any transforms - used by other classes
@@ -108,8 +108,8 @@ class ShowFiles:
         if 'z' not in tmp.keys():
             tmp['z'] = 0 
   
-        pix.x   = float(f"{tmp['x']:.2f}")
-        pix.y   = float(f"{tmp['y']:.2f}")  
+        pix.x = float(f"{tmp['x']:.2f}")
+        pix.y = float(f"{tmp['y']:.2f}")  
                      
         if pix.type not in ('flat', 'frame'):   
             pix.setMirrored(tmp['mirror'])      
@@ -165,17 +165,14 @@ class ShowFiles:
             tmp['factor'] = self.bkgMaker.factor             
         if 'rate' not in tmp.keys(): 
             tmp['rate'] = 0
-        if 'showtime' not in tmp.keys(): 
-            tmp['showtime'] = 0
         if 'path' not in tmp.keys(): 
             tmp['path'] = ''
             
         if tmp['tag'] == '':   ## definitely not a 'scroller' 
             tmp['direction'] = ''
             tmp['rate'] = 0
-            tmp['showtime'] = 0
             tmp['scrollable'] = False
-             
+
         bkg.locked      = tmp['locked']                 
         bkg.anime       = tmp['anime']
         bkg.scrollable  = tmp['scrollable']
@@ -183,10 +180,9 @@ class ShowFiles:
         bkg.direction   = tmp['direction']
         bkg.factor      = tmp['factor']
         bkg.rate        = tmp['rate']
-        bkg.showtime    = tmp['showtime']
         bkg.path        = tmp['path']
                 
-        result = self.bkgMaker.bkgtrackers.addTracker(bkg)  
+        result = self.bkgMaker.bkgTrackers.addTracker(bkg)  
         
         if not result:  ## must be a dupe
             del bkg  ## not yet added to scene
@@ -212,8 +208,10 @@ class ShowFiles:
                 pix.shadow['flopped'] = None
             else:
                 pix.shadow['flopped'] = tmp['flopped']
+                
             if 'fileName' not in tmp.keys(): 
                 pix.shadow['fileName'] = 'shadow' 
+                
             if 'linked' not in tmp.keys(): 
                 pix.shadow['linked'] = False
             else:
@@ -283,8 +281,7 @@ class ShowFiles:
             'direction':    pix.direction,
             'mirroring':    pix.mirroring,
             'factor':       pix.factor,
-            'rate':         pix.rate,
-            'showtime':     pix.showtime,  
+            'rate':         pix.rate, 
             'path':         pix.path,    
         }     
         return tmp

@@ -47,7 +47,7 @@ class ShowRunner:
        
 ### --------------------------------------------------------          
     def runThese(self):   
-        if self.showbiz.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'): 
+        if self.showbiz.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):  
             if self.showbiz.helpMenus.demoHelp != None:
                 self.showbiz.helpMenus.demoHelp.runThese() 
         else:
@@ -154,33 +154,16 @@ class ShowRunner:
                               
                 elif tmp['type'] == 'bkg':       
                     pix = BkgItem(paths['bkgPath'] + tmp['fileName'], self.canvas, bkgz)
-         
-                    if 'useThis' in tmp.keys():  ## catch it here
-                        atmp = self.useThis(tmp) 
-                        self.showFiles.addPixToScene(pix, atmp, bkgz )     
-                    else:
-                        self.showFiles.addPixToScene(pix, tmp, bkgz ) 
+                    self.showFiles.addPixToScene(pix, tmp, bkgz ) 
                               
                 pix.bkgMaker.lockBkg(pix)  
-                bkgz -= 1   
-                                  
+                bkgz -= 1  
+                                           
             del tmp              
-        ## end for loop   
-                 
+                
         del dlist
         self.cleanup(ns, kix)  ## add shadows
-        
-    def useThis(self, tmp):  ## was removed
-        atmp, add = {}, False
-        for k, v in tmp.items(): 
-            if k == 'useThis':
-                if v != '':  ## rate dictionary to use
-                    add = True
-                continue
-            atmp[k] = v    
-        if add and atmp['tag'] == 'scroller': atmp['scrollable'] = True  
-        return atmp
-
+    
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
         fileName = os.path.basename(self.canvas.openPlayFile) 

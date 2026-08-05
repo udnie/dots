@@ -45,7 +45,6 @@ class ShowWorks:
         direction = p.direction
         mirroring = p.mirroring
         factor    = p.factor
-        showtime  = p.showtime
         rate      = p.rate
         path      = p.path
         z         = p.zValue()
@@ -56,7 +55,6 @@ class ShowWorks:
         p.direction = direction 
         p.mirroring = mirroring
         p.factor    = factor
-        p.showtime  = showtime 
         p.rate      = rate
         p.path      = path
            
@@ -69,9 +67,11 @@ class ShowWorks:
         if self.canvas.control == 'pause': 
             self.canvas.btnPause.setText( 'Resume' );
             self.canvas.control = 'resume'
+            
         elif self.canvas.control == 'resume':
             self.canvas.btnPause.setText( 'Pause' );
             self.canvas.control = 'pause' 
+            
         elif self.canvas.control != '':
             if self.canvas.videoPlayer != None:
                 self.canvas.videoPlayer.pause()  
@@ -111,6 +111,7 @@ class ShowWorks:
         Q.accept()
         if not f[0]: 
             return     
+        
         if not f[0].lower().endswith('.play'):
             MsgBox("saveToPlays: Wrong file extention - use '.play'", 5)  
             return

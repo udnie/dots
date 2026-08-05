@@ -23,7 +23,7 @@ flatKeys = {
     'shift':   'move to the back',
 }
 
-sharedKeys =  ('H','T','del','tag','shift','enter','return')
+sharedKeys =  ('H','T','B','del','tag','shift','enter','return')
         
  ### --------------------------------------------------------     
 class FlatHelp:  ## flat and frame keyboard help for both
@@ -90,10 +90,10 @@ class Flat(QGraphicsPixmapItem):
     def __init__(self, color, parent, z=common['bkgZ']):
         super().__init__()
 
-        self.bkgMaker = parent
-        self.canvas   = self.bkgMaker.canvas 
-        self.scene    = self.bkgMaker.scene
-        self.mapper   = self.canvas.mapper
+        self.canvas = parent
+        self.bkgMaker  = parent.bkgMaker
+        self.scene    =  parent.scene
+        self.mapper   =  parent.mapper
             
         self.fileName = 'flat'
         self.type    = 'flat'
@@ -146,12 +146,12 @@ class Flat(QGraphicsPixmapItem):
                 self.canvas.bkgMaker.renumZvals()     
                 time.sleep(.10)     
             case  'T'|'tag':  ## doesn't lock
-                self.tagThis()   
-            case 'B':           ## not actually tracked
-                self.bkgtrackers.trackThis() if self.bkgtrackers.tracker == None \
-                    else self.bkgtrackers.tracker.bye()               
+                self.tagThis()           
             case 'H':  
-                self.openMenu()          
+                self.openMenu()     
+            case 'B': 
+                if len(self.canvas.bkgMaker.newTracker) > 0:
+                    self.canvas.bkgMaker.bkgTrackers.trackThis()
             case 'enter' | 'return':
                 if self.zValue() == common['bkgZ']:
                     return

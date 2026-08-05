@@ -14,7 +14,7 @@ docks = {
     "spacer":      10,  ## forces buttons closer together
 }
 
-newWidths = {     ## if vertical 1102, 912, 1024
+newWidths = {     ## if vertical 1102, 1024
     "fixedHgt":     70, 
     "scrollGrp":  200,  
     "playGrp":    360,
@@ -135,7 +135,7 @@ def addScrollBtnGroup(self):
     
         self.scrollGroup.setLayout(layout)
     else:   
-        if common['Screen'] not in ('912', '960V'):
+        if common['Screen'] != '960V':
             self.scrollGroup.setFixedWidth(newWidths['scrollGrp'])  ## 1024,1102 ... 
         else:
             self.scrollGroup.setFixedWidth(vert900['scrollGrp']) 
@@ -168,7 +168,7 @@ def addPlayBtnGroup(self):
     if not self.dots.Vertical:  ## nothing changes but the width
         self.playGroup.setFixedWidth(docks['playGrp'])
         
-    elif common['Screen'] not in ('912', '960V','SQH', 'SQV'): 
+    elif common['Screen'] not in ('960V','SQH', 'SQV'): 
         self.playGroup.setFixedWidth(newWidths['playGrp'])
         
     else:

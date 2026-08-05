@@ -109,6 +109,9 @@ class SlideShow(QWidget):
         if key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.slideMenuKeys('X')       
             
+        elif key in (Qt.Key.Key_D, 16777219):   ## 16777219 - delete key 
+            self.slideMenuKeys('D')  
+
         elif key in (Qt.Key.Key_N, Qt.Key.Key_Right):
             self.slideMenuKeys('N')        
             
@@ -148,7 +151,9 @@ class SlideShow(QWidget):
             case 'B': 
                 self.backOne()
             case 'C':
-                self.clearScene()   
+                self.clearScene()  
+            case 'D':
+                self.removeCurrentSlide()
             case 'F': 
                 self.fileChooser()   
             case 'H':
@@ -315,22 +320,38 @@ class SlideShow(QWidget):
             self.rot = r
             self.rotters[self.fileName] = self.rot  ## seems to work
             self.addPixItem(self.files[self.current])  ## refresh  
-                                 
+            
+    def removeCurrentSlide(self):
+        if len(self.files) > 0:     
+            self.files.pop(self.current)   
+            time.sleep(.02) 
+            if len(self.files) == 0:
+                self.scene.removeItem(self.pixItem)
+                if self.textItem:
+                    self.scene.removeItem(self.textItem)
+            elif len(self.files) >= 1:
+                self.nextSlide()
+                time.sleep(.02) 
+     
     def nextSlide(self):
         if length := len(self.files):
-            if self.current >= 0 and self.current < length:
-                self.current += 1
-                if self.current == length:  ## wrap it
-                    self.current = 0   
+            if length == 0:
+                return
+            elif length == 1 or self.current + 1 > length -1:
+                self.current = 0       
+            else:
+                self.current += 1        
             self.rot = 0
             self.addPixItem(self.files[self.current])
             
     def backOne(self):
         if length := len(self.files):
-            if self.current >= 0 and self.current <= length:
+            if length == 0:
+                return
+            elif self.current >= 0 and self.current <= length:
                 self.current -= 1
                 if self.current < 0:
-                    self.current = length -1
+                    self.current = length -1                     
             self.rot = 0
             self.addPixItem(self.files[self.current])
    

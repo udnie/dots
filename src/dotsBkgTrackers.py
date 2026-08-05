@@ -1,4 +1,5 @@
 
+from ast import Return
 import os
 import time
 
@@ -9,7 +10,7 @@ from PyQt6.QtWidgets    import QWidget, QAbstractItemView, QHBoxLayout, \
 from dotsSideGig        import getVuCtr, MsgBox
 
 RowHt = 30
-HeaderStr = ["filename", "zvalue",  "direction", "mirrored", "rate", "showtime",\
+HeaderStr = ["filename", "zvalue",  "direction", "mirrored", "rate", \
             "screenrate", "directory"]  
                                                                                        
 ### ------------------- dotsBkgTrackers --------------------
@@ -19,6 +20,8 @@ class Trackers(QWidget):
 ### -------------------------------------------------------- 
     def __init__(self, parent, dump): 
         super().__init__() 
+
+        self.bkgMaker = parent
 
         self.setUI(parent, dump)
 
@@ -49,7 +52,7 @@ class Trackers(QWidget):
             self.tableWidget.setCurrentCell(selectedRow - 1, self.tableWidget.currentColumn())  
             self.swap_cells(selectedRow - 1, 1, selectedRow, 1)
             
-            self.bkgtrackers.swapZvals(self.save, 
+            self.bkgMaker.bkgTrackers.swapZvals(self.save, 
                 self.tableWidget.item(self.row[0], 1).text(),
                 self.tableWidget.item(self.row[0]+1, 0).text(),
                 self.tableWidget.item(self.row[0]+1, 1).text())
@@ -61,7 +64,7 @@ class Trackers(QWidget):
             self.tableWidget.setCurrentCell(selectedRow + 1, self.tableWidget.currentColumn())  
             self.swap_cells(selectedRow + 1, 1, selectedRow, 1)
                
-            self.bkgtrackers.swapZvals(self.save, 
+            self.bkgMaker.bkgTrackers.swapZvals(self.save, 
                 self.tableWidget.item(self.row[0], 1).text(), 
                 self.tableWidget.item(self.row[0]-1, 0).text(),
                 self.tableWidget.item(self.row[0]-1, 1).text())           
@@ -84,15 +87,17 @@ class Trackers(QWidget):
         if self.tableWidget != None:        
             self.tableWidget.close()
             self.tableWidget = None 
-            self.bkgtrackers.closeTracker()
+            self.bkgMaker.bkgTrackers.closeTracker()
     
 ### -------------------------------------------------------- 
     def setUI(self, parent, dump): 
                
-        self.bkgtrackers = parent
-        self.canvas = self.bkgtrackers.canvas
-             
-        self.setWindowTitle('trackers') 
+        self.canvas = parent
+        
+              
+        self.setWindowTitle('trackers')  
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.WindowStaysOnTopHint)
         
         self.type = 'widget'
         self.setAccessibleName('widget')
@@ -100,11 +105,13 @@ class Trackers(QWidget):
         self.tableWidget = QTableWidget()    
         self.tableWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)         
     
-        c = len(dump[0])
-    
-        self.tableWidget.setColumnCount(c)
-        self.tableWidget.setRowCount(len(dump))
-
+        if c := len(dump[0]):
+            self.tableWidget.setColumnCount(c)
+            self.tableWidget.setRowCount(len(dump))
+        else:
+            MsgBox('Error on Tracker Widget', 5)
+            Return
+            
         self.width, self.height = c*110, (len(dump)+1) * RowHt
         self.tableWidget.setFixedSize(self.width, self.height)
         
@@ -162,12 +169,9 @@ class BkgTrackers:
         self.bkgMaker = parent 
         self.canvas   = self.bkgMaker.canvas 
   
-        self.tracker  = None
-                
   ### --------------------------------------------------------   
     def addTracker(self, bkg):  ## always - either loading a play file or adding from backgrounds
         fileName = bkg.fileName
-
         if len(self.bkgMaker.newTracker) == 0:  ## add the first one as its unique
             self.bkgMaker.newTracker[fileName] = self.addNewTracker(bkg)  
             return True
@@ -177,31 +181,35 @@ class BkgTrackers:
                 return True
             else:   
                 return False
-    
-    def trackThis(self):
-        if self.tracker == None:  
-            self.tracker = Trackers(self, self.dumpTrackers())
-            self.tracker.show()   
-           
+             
     def swapZvals(self, saved, savedZ, other, otherZ):
         for itm in self.canvas.scene.items():
             if itm.type == 'bkg':
                 if itm.fileName == saved.lower():   
                     itm.setZValue(float(savedZ))  
-                    time.sleep(.05) 
-                    
+                    time.sleep(.05)   
                 elif itm.fileName == other.lower():
                     itm.setZValue(float(otherZ)) 
                     time.sleep(.05)  
   
     def closeTracker(self):
-        self.tracker.close()
-        self.tracker = None 
-                                       
-    def delTracker(self, bkg):  
-        if self.bkgMaker.newTracker.get(bkg.fileName):
-            del self.bkgMaker.newTracker[bkg.fileName]
-                       
+        if  self.bkgMaker.trackerWidget != None:
+            self.bkgMaker.trackerWidget.close()
+            self.bkgMaker.trackerWidget = None 
+                                         
+    def trackThis(self):
+        self.closeTracker()   
+        if len(self.bkgMaker.newTracker) > 0:
+            if dump := self.dumpTrackers():
+                self.bkgMaker.trackerWidget = Trackers(self.bkgMaker, dump)
+                self.bkgMaker.trackerWidget.show() 
+                           
+    def delTracker(self, fileName):  
+        if self.bkgMaker.newTracker.get(fileName):
+            self.bkgMaker.newTracker.pop(fileName)
+            if self.bkgMaker.trackerWidget != None:
+                self.trackThis()
+           
     def dumpTrackers(self):  ## used by bkgItem - 'B' in BkgHelp menu
         dump = []  
         for bkg in self.canvas.scene.items(): ## need a bkg referernce for bkglabels
@@ -211,8 +219,8 @@ class BkgTrackers:
                     if trk := self.canvas.bkgMaker.newTracker[fileName]: 
                         zval = bkg.zValue()
                         fileName, direction, mirroring, locked = self.addBkgLabels(bkg)
-                        rate, showtime, path = str(trk['rate']), str(trk['showtime']), trk['path']
-                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {showtime} {path[5:-1]}"
+                        rate, path = str(trk['rate']), trk['path']
+                        s = f"{fileName} {zval} {direction} {mirroring} {rate} {path[5:-1]}"
                         dump.append(s.split())
                 except:
                     None            
@@ -224,7 +232,6 @@ class BkgTrackers:
         
     def addBkgLabels(self, bkg):  ## used by dumpTrackers
         fileName = bkg.fileName 
-              
         locked = 'Locked' if bkg.locked else 'UnLocked' 
             
         if bkg.direction == 'left':
@@ -247,7 +254,6 @@ class BkgTrackers:
             bkg.direction  = tmp['direction']           
             bkg.mirroring  = tmp['mirroring']
             bkg.factor     = tmp['factor']
-            bkg.showtime   = tmp['showtime']
             bkg.rate       = tmp['rate']
             bkg.path       = tmp['path']
             bkg.scrollable = tmp['scrollable']
@@ -258,7 +264,6 @@ class BkgTrackers:
             tmp['direction']  = ''
             tmp['mirroring']  = False
             tmp['factor']     = 1.0
-            tmp['showtime']   = 0
             tmp['rate']       = 0
             tmp['scrollable'] = False
             tmp['path']       = bkg.path
@@ -266,7 +271,6 @@ class BkgTrackers:
         bkg.direction  = ''             
         bkg.mirroring  = False
         bkg.factor     = 1.0
-        bkg.showtime   = 0   
         bkg.rate       = 0
         bkg.scrollable = False    
         bkg.path       = ''
@@ -281,7 +285,6 @@ class BkgTrackers:
             "mirroring":  bkg.mirroring,
             "factor":     bkg.factor,
             "rate":       bkg.rate,
-            "showtime":   bkg.showtime,
             "path":       bkg.path,
             "scrollable": bkg.scrollable,
         }

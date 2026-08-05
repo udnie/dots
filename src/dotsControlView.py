@@ -76,22 +76,26 @@ class ControlView(QGraphicsView):
                 if self.canvas.pathMakerOn:  
                     e.setAccepted(False)
                     MsgBox("Can't add sprites to PathMaker", 5)
-                    return    
+                    return   
                 else:             
                     e.setAccepted(True)
                     self.dragOver = True
             else:
                 e.setAccepted(False)
-
+                         
     def dropEvent(self, e):
         m = e.mimeData()  ## works for sprites
         if m.hasUrls():
-            fileName = m.urls()[0].toLocalFile()
-            ## None = clone source, False = mirror right/left
-            self.canvas.pixCount = self.mapper.toFront(0)
-            self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  
-                None, False)
-            
+            fileName = m.urls()[0].toLocalFile() 
+            if '-wrp' in fileName:     
+                MsgBox('Add file to /backgrounds to scroll it')
+                e.ignore()
+            else:
+                ## None = clone source, False = mirror right/left
+                self.canvas.pixCount = self.mapper.toFront(0)
+                self.canvas.addPixItem(fileName, e.position().x(), e.position().y(),  
+                    None, False)
+              
     def dragLeaveEvent(self, e):
         e.accept()
 

@@ -175,7 +175,7 @@ class Works(QWidget):
             [0, -1, 0],
             [-1, 5,-1],
             [0, -1, 0]])
-        ## try shapening overall - then blur edges
+        ## try shapening overall - then blur edge
         img = cv2.filter2D(src=img, ddepth=-1, kernel=kernel)
         img = cv2.GaussianBlur(img,(3,3),cv2.BORDER_DEFAULT)
                     

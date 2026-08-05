@@ -82,11 +82,13 @@ class ShowBiz:
     ## no animations running - from storyboard menu
 ### --------------------------------------------------------  
             elif self.canvas.control == '' or not self.canvas.animationRunning:                     
-                if key in ('A', 'D', 'I', 'J', 'L', 'M', 'N', 'O', 'S','T', 'U', 'V', 'W', 'del'):          
+                if key in ('A', 'B','D', 'I', 'J', 'L', 'M', 'N', 'O', 'S','T', 'U', 'V', 'W', 'del'):          
                     match key:
                         case 'A':            
                             self.sideCar2.unSelect() if self.scene.selectedItems() else \
-                                self.sideCar2.selectAll()    
+                                self.sideCar2.selectAll()  
+                        case 'B':
+                            self.canvas.bkgMaker.bkgColor()
                         case 'D'|'del':
                             if self.scene.selectedItems():
                                 self.sideCar2.deleteSelected() 

@@ -47,7 +47,8 @@ class BkgMaker:
         self.screenrate = {}
         self.newTracker = {}
         
-        self.bkgtrackers = BkgTrackers(self)
+        self.bkgTrackers = BkgTrackers(self)
+        self.trackerWidget = None
            
 ### --------------------------------------------------------
     def openBkgFiles(self):  ## opens both background and flats 
@@ -75,14 +76,14 @@ class BkgMaker:
         bkg = BkgItem(file, self.canvas)  ## the real deal
         if bkg == None:
             return
-            
+    
         bkg.setZValue(common['bkgZ'])  ## always on top              
         self.scene.addItem(bkg)    
    
         self.updateZvals(bkg)  ## update other bkg zvalues 
         self.setXY(bkg)
   
-        self.bkgtrackers.addTracker(bkg)  ## always - even if not a scroller   
+        self.bkgTrackers.addTracker(bkg)  ## always - even if not a scroller   
         self.lockBkg(bkg)  ## always lock it
                         
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
@@ -103,7 +104,7 @@ class BkgMaker:
 
     def setBkgColor(self, color):  ## add a flat color to canvas
         if color.isValid():
-            self.flat = Flat(color, self) 
+            self.flat = Flat(color, self.canvas) 
             self.flat.setZValue(common['bkgZ'])  ## always on top       
             self.scene.addItem(self.flat) 
             self.updateZvals(self.flat)   ## update other bkg, frame zvalues 
@@ -149,7 +150,7 @@ class BkgMaker:
         self.widget.setGeometry(p.x(), p.y(), int(self.widget.WidgetW), \
             int(self.widget.WidgetH))
         self.resetSliders(bkg)
-        self.bkgtrackers.restoreFromTrackers(bkg)
+        self.bkgTrackers.restoreFromTrackers(bkg)
         self.updateWidget(bkg)
            
     def addStoryHelp2(self):
@@ -189,10 +190,7 @@ class BkgMaker:
             
             self.widget.rateSlider.setValue(int(bkg.rate*100))
             self.widget.rateValue.setText(f'{bkg.rate:.2f}')
-            
-            self.widget.showtimeSlider.setValue(bkg.showtime)
-            self.widget.showtimeValue.setText(f'{bkg.showtime:3}')
-                                                                 
+                                                         
     def setLockBtnText(self, bkg):
         if bkg == None:
             return
@@ -205,8 +203,10 @@ class BkgMaker:
             self.scene.removeItem(bkg)
             bkg = None
             return
-        elif where == '' and bkg.type == 'bkg':
-            self.bkgtrackers.delTracker(bkg)
+        
+        if where == '' and bkg.type == 'bkg':
+            self.bkgTrackers.delTracker(bkg.fileName)
+            
         self.closeWidget()
         self.scene.removeItem(bkg)
         bkg = None

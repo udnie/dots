@@ -58,7 +58,7 @@ class PathHelp:
         self.table = TableWidgetSetUp(65, 185, len(pathKeys)+6, 0, NS)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 256, 656
+        width, height = 256, 654
         self.table.setFixedSize(width, height)
   
         self.table.setRow(0, 0, f'{" PathMaker Help Menu":<22}',QL,True, True, 2)
@@ -106,7 +106,7 @@ class PathHelp:
                     QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
                     self.canvas.pathMaker.pathMakerOff()
                  ## show help menus  
-                elif help == 'Menu':  ## menu2
+                elif help == 'Menu2':  ## menu2
                     QTimer.singleShot(10, self.closeMenu) 
                     self.canvas.pathMaker.pathHelpMenu2 = PathHelp2(self.canvas)
                 self.table.close()
@@ -130,7 +130,7 @@ class PathWorks:
         self.canvas    = self.pathMaker.canvas
         self.scene     = self.canvas.scene
         self.sideCar   = self.canvas.sideCar
-         
+               
         self.widget = self.pathMaker.widget
         
         self.pathHelp = None

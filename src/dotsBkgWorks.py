@@ -1,23 +1,28 @@
 
-import math
-import json
-
 from functools          import partial
 
 from PyQt6.QtCore       import QPoint, QTimer, QParallelAnimationGroup, \
-                                QPropertyAnimation, QPointF
+                                QPropertyAnimation, QPointF                               
 from PyQt6.QtGui        import QColor, QPen
 from PyQt6.QtWidgets    import QGraphicsEllipseItem, QColorDialog
                        
 from dotsShared         import common, paths
-from dotsSideGig        import MsgBox
-from dotsBkgScrollWrks  import BkgScrollWrks
 from dotsBkgMatte       import Matte
 from dotsAnimation      import Node
 
+Ten = 10.0  ## the 'first' scrolling background rate - it's always 10
+ShowTime = 4  ## at number of pixels remaining add the next background 
+
+''' These first two values are for verticals - You may need to change them 
+    if there are gaps or overlaps.
+    '''
+RWY =   40     ## if vertical modifies runWay changing its starting position
+VT5 = 1.05     ## if vertical modifies 'first' Ten value to slow it 
+LRF = 1.00     ## modifies 'left' 'right' 'first' Ten value if necessary - not used
+
 ### --------------------- dotsBkgWorks --------------------- 
-''' setDirection, getScreenRate, some scrolling and menu functions '''    
-### ------------------------------------------------------- 
+''' setDirection, getScreenRate, some scrolling and menu functions '''
+### --------------------------------------------------------
 class BkgWorks:  
 ### --------------------------------------------------------
     def __init__(self, parent):  
@@ -30,33 +35,27 @@ class BkgWorks:
         self.point = None 
         self.target = None
         
-        self.bkgScrollWrks = BkgScrollWrks(self.bkgItem)
-     
 ### --------------------------------------------------------                                                                                
     def setDirection(self, key):   
         if key == "" or not self.bkgItem.isScrollable():
             return  
-  
+        
         self.bkgItem.direction = 'vertical' if self.canvas.dots.Vertical else key
-  
         self.bkgItem.rate = 0    
-        self.bkgItem.showtime = 0 
-                
+           
         self.bkgItem.path = paths['demo'] if self.canvas.openPlayFile != '' and \
             self.canvas.openPlayFile == 'snakes'\
                 else paths['bkgPath']
-                                  
+                     
         fileName = self.bkgItem.fileName             
-        if self.bkgMaker.newTracker[fileName]: 
-            self.bkgItem.showtime = self.bkgScrollWrks.setShowTime()
+        if self.bkgMaker.newTracker[fileName]:   
             self.bkgItem.rate = self.getScreenRate(self.bkgItem)  ## blank it's first  
-            self.bkgMaker.newTracker[fileName]['showtime'] = self.bkgItem.showtime
             self.bkgMaker.newTracker[fileName]['rate'] = self.bkgItem.rate
             self.bkgMaker.newTracker[fileName]['path'] = self.bkgItem.path 
             
         if self.bkgItem.rate == 0:
             return
-        
+
         self.bkgItem.tag = 'scroller'   ## trigger needed to run scrolling bkg set here
         self.bkgMaker.lockBkg(self.bkgItem)  ## locks the background to begin 
         
@@ -65,111 +64,94 @@ class BkgWorks:
             QTimer.singleShot(100, partial(self.bkgItem.bkgMaker.resetSliders, self.bkgItem))
                                                   
 ### --------------------------------------------------------  
-    ''' reads twice - returns 'next' rate first, returns 'first' rate next, 
-        but only once per scrolling background - rates can vary in a scene '''
+    ''' reads twice - returns 'first' and 'next' rates and only 
+        once per scrolling background  '''
 ### --------------------------------------------------------  
     def getScreenRate(self, bkg, which =''): 
-        rate = self.getThisRate(bkg) 
-         
-        if rate == 0:
-            MsgBox(f'Error Loading Screen Rates File', 5)
-            self.bkgMaker.screenrate.clear()
-            return 0  
-
         if which == 'first':
-            rate = rate[0]   ## same for 'first'   
-                
-        elif bkg.rate == 0:  ## sets tracker rate for 'next'
+            rate = Ten
+            if bkg.direction == 'vertical':
+                rate = Ten * VT5
+            else:
+                rate = Ten * LRF  
+         
+        elif bkg.rate == 0:  ## sets rate for 'next' used by tracker
             
-            rate = self.getThisRate(bkg)  
-            rate = rate[2] if bkg.direction == 'right' else rate[1]     
-                
-            erat = self.bkgScrollWrks.getTrackerRate(bkg)
-            if erat > 0: rate = erat  ## fixes not carrying over rate from a file
-     
-            bkg.rate = rate 
-            self.bkgScrollWrks.setTrackerRate(bkg)  
-            
+            if bkg.direction in ('left', 'right'):
+                calculated_rate = Ten * (1.0 + (common['ViewW'] / bkg.width))  
+                      
+            elif bkg.direction == 'vertical':
+                calculated_rate = Ten * (1.0 + (bkg.height / common['ViewH'])) 
+                     
+            rate = round(calculated_rate, 2)           
+            bkg.rate = rate      
+            bkg.bkgScrollWrks.setTrackerRate(bkg)   
+                  
         return rate
     
-### --------------------------------------------------------
-    ## rates can vary within a scene by background width
-    def getThisRate(self, bkg): 
-            try:  
-                if self.canvas.openPlayFile == 'hats':
-                    if len(self.bkgMaker.screenrate) == 0:  ## fewer reads
-                        with open(paths['demo'] +  "demorates.dict", 'r') as fp:
-                            self.bkgMaker.screenrate = json.load(fp)             
-                else:
-                    if len(self.bkgMaker.screenrate) == 0:  
-                        with open(paths['playPath'] +  "screenrates.dict", 'r') as fp: 
-                            self.bkgMaker.screenrate = json.load(fp)  
-            except:
-                 return 0             
-            return self.bkgMaker.screenrate[common['Screen']]      
-   
-### --------------------------------------------------------
-    ## rate times screen long side = milliseconds needed to clear the scene end to end
-    def setNextPath(self, bkg):  
-        fact = bkg.factor      
-        
-        bkg.node = Node(bkg)
-        path = QPropertyAnimation(bkg.node, b'pos')
-        
-        if bkg.direction == 'left':   
-            path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))    
-            path.setStartValue(QPoint(common['ViewW'], 0))
-            path.setEndValue(QPoint(int(-bkg.width), 0))
-            
-        elif bkg.direction == 'right':
-            path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))  
-            path.setStartValue(QPoint(-bkg.width, 0))
-            path.setEndValue(QPoint(int(common['ViewW']), 0))
-            
-        elif bkg.direction == 'vertical':
-            path.setDuration(int(common['ViewH'] * (bkg.rate*fact))) 
-            ## current kludge advances background into scene before starting - verticals seem to take longer to start
-            path.setStartValue(QPoint(0, common['ViewH']-int(bkg.showtime*.75)))
-            path.setEndValue(QPoint(0, -bkg.height))
-                  
-        group = QParallelAnimationGroup()
-        group.addAnimation(path)
-
-        return group
-          
+## --------------------------------------------------------        
     def setFirstPath(self, path, bkg):  ## 'first' is already filling the scene  
-        fact = bkg.factor  
-        
+        fact = bkg.factor      
         bkg.node = Node(bkg)
         path = QPropertyAnimation(bkg.node, b'pos')
   
         if bkg.direction == 'left':
-            path.setDuration(int(common['ViewW'] * (bkg.rate*fact))) 
+            path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))  
             path.setStartValue(QPoint(0,0)) 
             path.setEndValue(QPoint(-int(bkg.width), 0))
             
         elif bkg.direction == 'right':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))
-            path.setStartValue(QPoint(bkg.runway, 0))
+            path.setStartValue(QPoint(bkg.runWay, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
-            
-        elif bkg.direction == 'vertical':   
-            path.setDuration(int(common['ViewH'] * (bkg.rate*fact)))  ## rate time equals time to clear   
-            path.setStartValue(QPoint(0, bkg.runway))
+              
+        elif bkg.direction == 'vertical':  
+            path.setDuration(int(common['ViewH'] * (bkg.rate*fact)))  ## rate time equals time to clear     
+            path.setStartValue(QPoint(0, bkg.runWay + RWY))  ## RWY shortens the number of pixels to ShowTime
             path.setEndValue(QPoint(0, -bkg.height)) 
+       
+        group = QParallelAnimationGroup()
+        group.addAnimation(path)
+    
+        return group
+
+### --------------------------------------------------------
+    ## rate times screen long side = milliseconds needed to clear the scene end to end
+    def setNextPath(self, bkg):  
+        fact = bkg.factor           
+        bkg.node = Node(bkg)
+        path = QPropertyAnimation(bkg.node, b'pos')
+   
+        if bkg.direction == 'left':   
+            path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))    
+            path.setStartValue(QPoint(common['ViewW'], 0))
+            path.setEndValue(QPoint(int(-bkg.width), 0))
+       
+        elif bkg.direction == 'right':
+            path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))  
+            path.setStartValue(QPoint(-bkg.width, 0))
+            path.setEndValue(QPoint(int(common['ViewW']), 0))
+        
+        elif bkg.direction == 'vertical':
+            path.setDuration(int(common['ViewH'] * (bkg.rate*fact))) 
+            path.setStartValue(QPoint(0, common['ViewH']))
+            path.setEndValue(QPoint(0, -bkg.height))
             
         group = QParallelAnimationGroup()
         group.addAnimation(path)
         
         return group
-    
+     
+### --------------------------------------------------------   
     def setStartingPos(self, bkg):
         if bkg.direction == 'right':  ## gets it pointed in the right direction -->>
-            bkg.setPos(QPointF(bkg.runway, 0)) 
-        elif bkg.direction == 'left':  ## <<--
+            bkg.setPos(QPointF(bkg.runWay, 0)) 
+            
+        elif bkg.direction == 'left': 
             bkg.setPos(QPointF())
+            
         else:
-            bkg.setPos(QPointF(0.0, float(bkg.runway)))
+            bkg.setPos(QPointF(0.0, float(bkg.runWay + RWY)))
                      
     def setBtns(self, bkg, widget):  ## from bkgMaker widget
         match bkg.direction:  

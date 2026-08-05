@@ -23,7 +23,8 @@ canvasKeys = {
 }
 
 storyKeys = {
-    'A':    'Toggles Selection on/off',  
+    'A':    'Toggles Selection on/off', 
+    'B':    'Add Background Color', 
     'C':    'Clear Canvas',
     'D/delete':  'Delete Selected',
     'J':    'JSON Play File Viewer',
@@ -90,11 +91,11 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
         else:
             if self.pathFlag:
                 self.pathHelp.closeMenu() 
-                self.pathFag = False
+                self.pathFlag = False
             else:
                 self.canvas.pathMaker.pathWorks.closeMenu() 
                 self.pathHelp = PathHelp(self, self.canvas)
-                self.pathFag = True
+                self.pathFlag = True
         self.canvas.setFocus()
     
     def closeMenus(self,src=''):  ## used by showbiz not menus
@@ -125,7 +126,7 @@ class CanvasHelp:
         self.table = TableWidgetSetUp(60, 190, len(canvasKeys)+5)
         self.table.itemClicked.connect(self.clicked)   
         
-        width, height = 256, 487
+        width, height = 256, 486
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f'{"   Canvas Help Menu ":<20}',QL,True,True,2)
@@ -186,7 +187,7 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
         self.table = TableWidgetSetUp(80, 185, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 272, 602
+        width, height = 272, 628
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}',QL, True,True,2)
@@ -225,8 +226,8 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
     def clicked(self):
         if self.switch == '':
             try:
-                help = self.table.item(self.table.currentRow(), 0).text().strip()
-                match help:
+                help = self.table.item(self.table.currentRow(), 0).text().strip() 
+                match help:  
                     case 'Menus': 
                         QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
                         self.canvas.clear()

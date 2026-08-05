@@ -7,22 +7,21 @@ from PyQt6.QtGui        import QGuiApplication
 
 from dotsSideGig        import MsgBox, getVuCtr, getCtr
 from dotsScreens        import MaxWidth, MaxScreens, screens
-from dotsTableModel     import TableWidgetSetUp, QL, QC
+from dotsTableModel     import TableWidgetSetUp, QL
 
 from dotsSnakes         import Snakes
 from dotsBatsAndHats    import Bats, Hats
 
 demoKeys = {  
     'bats':   'Original BatWings',
-    'blue':   'Snakes Blue Background',
-    'left':   'Right to Left Scrolling',  
+    'left':   'Right to Left Scrolling',  ## scrolls in that direction
     'right':  'Left to Right Scrolling',  
     'snakes': 'Snakes Scrolling Background',    
 }
 
 # MaxWidth = 1680  ##  position dock to screen bottom for max default display width
 #                  ##  on my mac with dock on left side, not on bottom
-# MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
+# MaxScreens = ('1440','1102')  ## requires 1920X1280 display size
 
 ### ---------------------- dotsMenus ----------------------- 
 ''' classes: HelpMenus, DemoHelp, ScreenHelp '''
@@ -93,12 +92,12 @@ class DemoHelp:
         
         self.table.setRow(0, 0, f'{"Demos Menu":<60}',QL,True,True,2)  ## :<59 in qt5 <<---
 
-        row = 1; self.lst = [] 
+        row = 1; self.demos = [] 
         for k, val in demoKeys.items():
             if self.dots.Vertical and k in ('left', 'right'):  ## wings follow pivots
                 continue
             else:
-                self.lst.append(k)
+                self.demos.append(k)
                 self.table.setRow(row, 0, "  " + val,'',False,True, 2)
             row += 1
    
@@ -109,9 +108,9 @@ class DemoHelp:
         if off != 0: x += off
             
         if self.dots.Vertical:
-            self.table.setFixedSize(222, 189) 
+            self.table.setFixedSize(222, 156) 
         else:
-            self.table.setFixedSize(222, 246)
+            self.table.setFixedSize(222, 216)
         self.table.move(x-110, y-100)     
               
         self.table.show()
@@ -120,8 +119,9 @@ class DemoHelp:
         if self.switch == '':
             try:
                 p = self.table.currentRow() - 1  ## position in lst to key
-                if p+1 <= len(demoKeys): 
-                    QTimer.singleShot(25, partial(self.run, self.lst[p]))
+                if p+1 <= len(self.demos): 
+                    help = self.demos[p]
+                    QTimer.singleShot(25, partial(self.run, help))
             except:
                 None
         self.closeMenu()
@@ -131,14 +131,10 @@ class DemoHelp:
         if self.switch != '':
             self.canvas.setKeys('N')
     
-    def run(self, key):     
-        self.canvas.showbiz.helpMenus.closeDemoMenu()                      
-        if key == 'blue':
-            self.runSnakes('blue') 
-            
-        elif key == 'snakes':
+    def run(self, key):  
+        if key == 'snakes':
             self.canvas.bkgMaker.newTracker.clear()
-            self.runSnakes('vertical') if self.dots.Vertical else\
+            self.runSnakes('vertical') if self.dots.Vertical else \
                 self.runSnakes('left')   
                     
         elif key == 'bats':
@@ -154,7 +150,7 @@ class DemoHelp:
                 self.hats.makeHatsDemo('right') ## left to right - direction of travel
          
     def runSnakes(self, what): 
-        if what in ('blue', 'snakes'): 
+        if what == 'snakes': 
             self.snakes.delSnakes()  
              
         if what != '': 
@@ -184,16 +180,19 @@ class ScreenHelp:  ## screens are from dotsScreens
         self.switch = switch
        
   ### --------------------------------------------------------   
-        self.table = TableWidgetSetUp(60, 95, 60, len(screens)+3)
+        self.table = TableWidgetSetUp(60, 95, 60, len(screens)+4)
         self.table.itemClicked.connect(self.clicked)   
         
-        width, height = 222, 486
+        width, height = 222, 516
         self.table.setFixedSize(width, height)
         
         self.table.setRow(0, 0, f'{"Screen Formats":<14}',QL,True,True,3)
         
         row = 1
         for k , val in screens.items():
+            if row == 8:
+                self.table.setRow(row, 0,f'{"Verticals":<10}',QL,True,True, 3)
+                row += 1
             self.table.setRow(row, 0, f'{k}'.rjust(7),'',True, True)
             self.table.setRow(row, 1,  f'{val[0]}'.rjust(13), '','', True)
             self.table.setRow(row, 2,  f'{val[1]}','',True, True)

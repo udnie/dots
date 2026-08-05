@@ -4,7 +4,7 @@ import random
 import random
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
-from PyQt6.QtGui        import QColor, QImage, QPixmap
+from PyQt6.QtGui        import QImage, QPixmap
 from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsAnimation      import reprise
@@ -101,12 +101,11 @@ class Snakes:
         }
       
         self.scroller = None  
+        self.scroller2 = None  
+        
         snakes = 3  ## ## if scrolling make these many and quit
-        
-        if what == 'blue':  ## not scrolling
-            snakes = 4  
-        
-        if what not in ('blue', 'left', 'vertical'):
+     
+        if what not in ('left', 'vertical'):
             MsgBox('Something wrong with Snakes')
             return
                
@@ -162,55 +161,84 @@ class Snakes:
             
             if k == snakes:        
                 self.canvas.showWorks.disablePlay()  ## turns off play - turns on pause/resume/stop
-                if what in ('vertical', 'left'):     ## run the scrolling background
-                    if self.scroller.anime: QTimer.singleShot(200, self.scroller.anime.start)                                      
+                
+                if what ==  'left':     ## run the scrolling background
+                    if self.scroller.anime: QTimer.singleShot(200, self.scroller.anime.start)
+                       
+                elif self.scroller2.direction == 'vertical':  
+                     
+                    if self.scroller.anime: QTimer.singleShot(200, self.scroller.anime.start)  
+                    if self.scroller2.anime: QTimer.singleShot(180, self.scroller2.anime.start)                                   
                 break
     
 ### -------------------------------------------------------- 
-    def setSelection(self, what):  ## no right scrolling for snakes
-        if what == 'blue':
-            color = QColor(QColor(0,84,127) )  ## ocean blue                                
-            self.canvas.bkgMaker.setBkgColor(QColor(color))  
-            
+    def setSelection(self, what):  ## no right scrolling for snakes  
         if self.scroller != None:
-            self.scroller = BkgItem('snakes.jpg', self.canvas)
+            self.scroller = BkgItem('snakes-43-wrp.jpg', self.canvas)
             
         elif what == 'left':
-            self.scroller = BkgItem('snakes.jpg', self.canvas)
+            self.scroller = BkgItem('snakes-43-wrp.jpg', self.canvas)
             
             self.scroller.direction = 'left' 
             self.scroller.path = paths['demo']  
             self.scroller.tag = 'scroller'
-            self.scroller.mirroring = True  
+            self.scroller.mirroring = False
         
-            self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)
+            self.canvas.bkgMaker.bkgTrackers.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## the first background 
             
-        elif what == 'vertical':
-            
-            self.scroller = BkgItem('snakes_1102.jpg', self.canvas) if common['Screen'] == '1102' \
-                else BkgItem('snakes_912.jpg', self.canvas)    
-                 
+        elif what == 'vertical':    
+            # color = QColor(0,60,125)   ## ocean blue                                
+            # self.canvas.bkgMaker.setBkgColor(QColor(color))  
+       
+            self.scroller = BkgItem('bubbles-wrp.jpg', self.canvas)    
             self.scroller.direction = 'vertical'   
             self.scroller.path = paths['demo'] 
             self.scroller.tag = 'scroller'
+            self.scroller.factor = .90
             
-            self.scroller.mirroring = False if common['Screen'] in ('800','900', '1066') else True
+            self.scroller.mirroring = False ###  if common['Screen'] in ('800','900') else True
                 
-            self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)
+            self.canvas.bkgMaker.bkgTrackers.addTracker(self.scroller)
             self.scroller.bkgWorks.setDirection(self.scroller.direction)
             
             self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  ## it's always the first - it sets the 2nd
             
-            self.scroller.runway = int(common['ViewH'] - self.scroller.height)  
-            self.scroller.setPos(QPointF(0, self.scroller.runway))
+            self.scroller.runWay = int(common['ViewH'] - self.scroller.height)  
+            self.scroller.setPos(QPointF(0, self.scroller.runWay))
                       
         if what in ('vertical', 'left'): 
             self.scroller.addedScroller = False   
             self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
             self.scene.addItem(self.scroller)
+            
+            if what == 'vertical':
+                self.scroller2 = self.addBubblesPng()   
+                self.scroller2.addedScroller = False    
+                self.scroller2.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)   
+                self.scene.addItem(self.scroller2)
+              
+    def addBubblesPng(self):
+        self.scroller2 = BkgItem('bubbles-scaled.png', self.canvas)    
+        self.scroller2.direction = 'vertical'   
+        self.scroller2.path = paths['demo'] 
+        self.scroller2.tag = 'scroller'
+        
+        self.scroller2.setZValue(500)
+        self.scroller2.factor = .65
+        self.scroller2.mirroring = False
+     
+        self.canvas.bkgMaker.bkgTrackers.addTracker(self.scroller2)
+        self.scroller2.bkgWorks.setDirection(self.scroller2.direction)
+        
+        self.scroller2.anime = self.scroller2.setScrollerPath(self.scroller2, 'first')  ## it's always the first - it sets the 2nd
+        
+        self.scroller2.runWay = int(common['ViewH'] - self.scroller2.height)  
+        self.scroller2.setPos(QPointF(0, self.scroller2.runWay))
+    
+        return self.scroller2
             
  ### -------------------------------------------------------- 
     def addSnakes(self, idx, fileName, waypts, sync):                                                                                  
@@ -243,9 +271,9 @@ class Snakes:
     def rerun(self, what): 
         self.mapper.clearTagGroup()
         self.mapper.clearPaths()
-        if what != 'blue':
-            self.canvas.bkgMaker.bkgtrackers.delTracker(self.scroller) 
-        self.delSnakes()        
+        self.canvas.bkgMaker.bkgTrackers.delTracker(self.scroller) 
+        self.canvas.bkgMaker.bkgTrackers.delTracker(self.scroller2) 
+        self.delSnakes()      
         self.makeSnakes(what)
               
     def delSnakes(self):

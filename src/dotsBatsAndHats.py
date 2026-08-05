@@ -30,11 +30,10 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1296':  'montreaux.jpg',    
     '1536':  'montreaux-1280.jpg',
     
-     '800':  'bats_800.jpg',   ## 3X4
-     'SQV':  'bats_800.jpg',   ## 1X1
-     '900':  'bats_900.jpg',   ## 2X3
-     '912':  'bats_1066.jpg',  ## 9:16
-    '1066':  'bats_1066.jpg',
+     '800':  'bats_900.jpg',   ## 3X4
+     'SQV':  'bats_900.jpg',   ## 1X1
+     '900':  'bats_900.jpg',    ## 2X3
+    '960V':  'bats_1066.jpg',
     '1024':  'bats_1066.jpg', 
     '1102':  'bats_1066.jpg',
 }
@@ -114,11 +113,11 @@ class Bats:    ## backGrounds only used here
         pix.setScale(.65)   
         
         match common['Screen']: 
-            case '912':
+            case '900':
                 pix.tag = 'demo-' + '900' + '.path' 
             case 'SQV':
                 pix.tag = 'demo-' + '800' + '.path' 
-            case '960':
+            case '960V':
                 pix.tag = 'demo-' + '1080' + '.path'  
             case _:
                 pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory   
@@ -206,13 +205,13 @@ class Hats:  ## hats - was abstract
         self.scroller.tag = 'scroller'
         self.scroller.mirroring = False  
             
-        self.canvas.bkgMaker.bkgtrackers.addTracker(self.scroller)  
+        self.canvas.bkgMaker.bkgTrackers.addTracker(self.scroller)  
         self.scroller.bkgWorks.setDirection(self.scroller.direction)
 
         self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  
     
         if self.direction == 'right':
-            self.scroller.setPos(QPointF(self.scroller.runway, 0))  ## offset to right    
+            self.scroller.setPos(QPointF(self.scroller.runWay, 0))  ## offset to right    
   
         self.scroller.addedScroller = False   
         self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
@@ -283,7 +282,7 @@ class Hats:  ## hats - was abstract
     def rerunAbstract(self, direction):       
         clearPaths(self)
         self.delHats() 
-        self.canvas.bkgMaker.bkgtrackers.delTracker(self.scroller) 
+        self.canvas.bkgMaker.bkgTrackers.delTracker(self.scroller) 
         self.makeHatsDemo(direction) 
       
     def delHats(self):

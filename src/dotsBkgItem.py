@@ -8,7 +8,7 @@ from PyQt6.QtWidgets    import QGraphicsPixmapItem
 
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox, tagBkg
-from dotsBkgWorks       import BkgWorks
+from dotsBkgWorks       import BkgWorks, ShowTime
 from dotsBkgScrollWrks  import BkgScrollWrks
 from dotsHelpMonkey     import BkgHelp
 from dotsAnimation      import Node
@@ -35,10 +35,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.bkgMaker = self.canvas.bkgMaker
         self.bkgWorks = BkgWorks(self)  
         self.bkgScrollWrks = BkgScrollWrks(self)
-        
-        self.ViewW = common['ViewW']
-        self.ViewH = common['ViewH']
-
+  
         self.type = 'bkg'
         self.path = paths['bkgPath']  ## default
 
@@ -47,6 +44,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         
         if self.canvas.openPlayFile in ('snakes', 'hats'):    
             self.path = paths['demo']
+            
         elif self.dots.Vertical and self.canvas.openPlayFile == 'bats':
             self.path = paths['demo']
            
@@ -57,7 +55,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
         self.setZValue(z)      
         self.init(copy)  ## reuse QImage for 'next' backgrounds - self.imgFile
-                   
+
 ### --------------------------------------------------------   
     def init(self, copy):    
         self.imgFile = None      
@@ -76,7 +74,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.imgFile = copy
                     
         self.setPixmap(QPixmap.fromImage(self.imgFile)) 
-                                                       
+                                  
         self.flopped = False
         self.locked = False
          
@@ -96,16 +94,17 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         
         self.direction = ''  ## direction of travel: left <<--, right -->>
         self.mirroring = self.bkgMaker.mirroring ## sets default - false equals continuous
-        self.factor    = self.bkgMaker.factor    ## sets default 
-        self.showtime  = 0  ## the number of pixels to showtime before the runway goes to zero
+        self.factor    = self.bkgMaker.factor    ## sets default from slider value
         self.rate      = 0
-        self.runway    = 0  ## what's not visible     
+        self.runWay    = 0  ## what's not visible 
+         
         self.bkgScrollWrks.setRunWay()  
                                    
         self.ratio = self.height/9
         self.ratio = int(self.width/self.ratio)
           
         self.scrollable = self.isScrollable()  ## once width and height set
+        self.pathWatcher = None 
                     
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)                                 
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)  ## locked
@@ -113,7 +112,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.key = ''    
         self.dragCnt = 0
         self.save = QPointF()  
- 
+        
         play, rot = '', 0
     
         if self.canvas.openPlayFile != '' and self.canvas.openPlayFile == 'snakes':   
@@ -140,14 +139,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 if self.matteWidget != None:
                     self.matteWidget.shared('H')
                     return
-             
                 if self.helpMenu != None:
-                    self.closeMenu()
+                    self.closeMenu() 
                     
                 self.bkgMaker.addWidget(self)   
-                
                 if self.direction == '':
-                    self.bkgMaker.bkgtrackers.resetTracker(self)
+                    self.bkgMaker.bkgTrackers.resetTracker(self)
                     self.bkgMaker.resetSliders(self)  
                     
             elif self.key in self.sharedKeys:
@@ -177,7 +174,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 case  'tag':     
                     self.tagThis()    
                 case  'B': 
-                    self.bkgMaker.bkgtrackers.trackThis()
+                    self.bkgMaker.bkgTrackers.trackThis()
                 case  'E':   
                     self.bkgWorks.spotColor(self.canvas.mapFromGlobal(QCursor.pos()))   
                 case  'F':          ## flip it
@@ -190,7 +187,8 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     self.bkgMaker.lockBkg(self) if not self.locked else \
                         self.bkgMaker.unlockBkg(self)
                     self.tagThis()
-                 
+    
+### --------------------------------------------------------             
     def tagThis(self):
         p = QCursor.pos()
         tagBkg(self, self.canvas.mapFromGlobal(QPoint(p.x(), p.y()-20))) 
@@ -214,24 +212,26 @@ class BkgItem(QGraphicsPixmapItem):  ## background
             self.bkgMaker.view.grabKeyboard()
         
 ### -------------------------------------------------------- 
-    ''' first' has already set its setScrollerPath - ## value equals self.pos() 
-        itemChange drives the scrolling background '''
+    ''' first' has already set its setScrollerPath and value equals self.pos(). 
+        ItemChange drives the scrolling background - scrolling to the right triggers the
+        'next' background based on pixels remaining, the reason for -ShowTime whereas
+        scrolling to the left and vertical are based on '''
 ### -------------------------------------------------------- 
-    def itemChange(self, change, value):   
+    def itemChange(self, change, value): 
         if change == QGraphicsPixmapItem.GraphicsItemChange.ItemScenePositionHasChanged: 
             if self.direction == '':
-                return            
-                     
-            elif not self.addedScroller:  ## check on the distance to showtime
-                
-                if self.direction  == 'left'     and int(value.x()-self.runway) <= self.showtime or\
-                    self.direction == 'right'    and int(value.x()) >= -self.showtime or\
-                    self.direction == 'vertical' and int(value.y())-self.runway <= self.showtime:  
-                    self.addNextScroller()  ## the scroller factory
+                return   
+                       
+            elif not self.addedScroller:  ## check on the distance to showtime   
+                          
+                if self.direction   == 'left'     and int(value.x()-self.runWay) <= ShowTime or \
+                    self.direction  == 'right'    and int(value.x()) >= -ShowTime or \
+                    self.direction  == 'vertical' and int(value.y())-self.runWay <= ShowTime:  
+                    self.addNextScroller()  ## the next scroller factory                     
                     self.addedScroller = True        
-                                                       
-            elif self.addedScroller:  ## test if nolonger in view
-                
+                                       
+            elif self.addedScroller:  ## test if nolonger in view     
+        
                 if self.direction   == 'left'     and abs((value.x())) >= self.width or \
                     self.direction  == 'right'    and abs(int(value.x())) >= common['ViewW'] or \
                     self.direction  == 'vertical' and int(value.y()) >= self.height:
@@ -239,9 +239,9 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                     self.bkgMaker.deleteBkg(self, 'nope')  ## don't delete tracker
                                                     
         return super(QGraphicsPixmapItem, self).itemChange(change, value)
- 
+  
 ### -------------------------------------------------------- 
-    ''' add the 'next' scrolling background - passing on the imgFile means 
+    ''' add the 'next' scrolling background - passing on the imgFile means  
         no longer needing to re-read the .jpg/.png file  '''       
 ### -------------------------------------------------------- 
     def addNextScroller(self): 
@@ -253,7 +253,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         item.tag = 'scroller'
         item.setZValue(self.zValue())  
                                     
-        self.bkgMaker.bkgtrackers.restoreFromTrackers(item)  
+        self.bkgMaker.bkgTrackers.restoreFromTrackers(item)  
     
         item.node = Node(item)  ## sets property used in animation        
         item.anime = self.bkgWorks.setNextPath(item) 
@@ -267,7 +267,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     ''' used by 'first' to set its path and rates - rates set for 'next' as well '''
 ### --------------------------------------------------------   
     def setScrollerPath(self, bkg, which): ## which = first
-        if bkg.direction == '':   
+        if bkg.direction == '':  
             return  
         
         elif not bkg.isScrollable():
@@ -281,7 +281,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
 
         bkg.bkgWorks.setStartingPos(bkg)  ## not the scrolling position   
         bkg.rate = bkg.bkgWorks.getScreenRate(bkg, which)  ## also sets tracker rate for 'next' 
-    
+
         return bkg.bkgWorks.setFirstPath(node, bkg)  ## sets the paths duration
      
     def isScrollable(self):  ## once screen height and width are set 
@@ -291,7 +291,7 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         return False
     
     def notScrollable(self):
-        MsgBox('Not Scrollable and Unable to Fulfill your Request...', 6) 
+        MsgBox('Not Scrollable and Unable to Fulfill your Request...', 5) 
         self.bkgScrollWrks.clearBkgScrolling()
                   
     def setMirrored(self, bool, switch=1):  ## mirrors this background not text

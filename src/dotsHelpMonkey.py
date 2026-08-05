@@ -82,7 +82,7 @@ class PixHelp:
         self.table = TableWidgetSetUp(60, 180, len(pixKeys)+6)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 247, 607
+        width, height = 247, 606
         self.table.setFixedSize(width, height)
                           
         self.table.setRow(0, 0, f'{"Sprite/PixItem Help Menu":<25}',QL,True, True, 2)
@@ -154,7 +154,7 @@ class BkgHelp:
         self.table = TableWidgetSetUp(65, 180, len(bkgHelpKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 251, 552
+        width, height = 251, 546
         
         self.table.setFixedSize(width, height)  
         self.table.setRow(0, 0, f'{"Background Help Menu":<22}',QL,True,True,2)
@@ -213,7 +213,7 @@ class ShadowHelp:
         self.table = TableWidgetSetUp(50, 165, len(SharedKeys)+3)
         self.table.itemClicked.connect(self.clicked)   
  
-        width, height = 221, 368
+        width, height = 221, 366
         self.table.setFixedSize(width, height)
 
         self.table.setRow(0, 0, f'{" Shadow Help Menu":<20}',QL,True,True, 2)

@@ -4,18 +4,14 @@ import time
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
 from PyQt6.QtWidgets    import QApplication
-
-                                                 
-from dotsShared         import common, paths
-from dotsSideGig        import constrain
-
-from dotsPixItem        import PixItem
+                                            
+from dotsSideGig        import common
 from dotsMapMaker       import MapMaker
 from dotsVideoPlayer    import VideoPlayer
 
 ### ---------------------- dotsSideCar ---------------------
 ''' no class: transFormPixitem,  clearWidgets, videoPlayer, 
-    toggles, small functions and a few from showbi .
+    toggles, small functions and a few from showbiz.
     PythonQt5 can't run an animation and loop a video at the  
     same time. The video only runs once.'''   
 ### --------------------------------------------------------
@@ -57,7 +53,7 @@ class SideCar:
         for itm in self.canvas.scene.items():
             if itm.type in ('bkg', 'flat', 'video'):       
                 print(f'{itm.type.strip()}\t{itm.zValue()}\t{itm.fileName}')  
-                                       
+                                                                                     
 ### --------------------------------------------------------         
     def addVideo(self, fileName, src='', loops=False):  ## plays if 'dnd'  
         if  self.canvas.videoPlayer != None:
@@ -75,7 +71,7 @@ class SideCar:
                 itm.setZValue(itm.zValue()-1)  
             elif itm.zValue() > -50:
                 break    
-                   
+            
         self.canvas.videoPlayer = VideoPlayer(self.canvas, fileName, src, loops)   
         self.scene.addItem(self.canvas.videoPlayer.videoItem)  ## zValue set to cover screen  
         QTimer.singleShot(300, self.canvas.videoPlayer.setBackDrop) 
@@ -92,7 +88,7 @@ class SideCar:
                 self.canvas.videoPlayer.stopVideo()
                 if self.canvas.control != '':   ## animation running
                     self.canvas.showbiz.showtime.stop()
-         
+                                                                                                         
     def videoOff(self):  ## also called from storyboard in clear()
         if  self.canvas.videoPlayer == None:
             return 

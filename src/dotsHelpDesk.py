@@ -1,5 +1,5 @@
 
-from PyQt6.QtCore       import Qt
+from PyQt6.QtCore       import Qt, QTimer
 from PyQt6.QtGui        import QKeySequence
 
 from dotsSideGig        import getVuCtr
@@ -99,7 +99,8 @@ class StoryHelp2:
             elif  help == 'P':
                 self.canvas.setKeys('P')
             elif help == 'Back to Menu':
-                self.canvas.showbiz.helpButtons.openMenus() 
+                QTimer.singleShot(5, self.closeMenu)        
+                QTimer.singleShot(10, self.canvas.showbiz.helpButtons.openMenus)
             else:  ## send last char and modifier
                 self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)
         self.closeMenu()
@@ -117,13 +118,13 @@ class PathHelp2:
  
         self.canvas = parent
         self.switch = switch
-   
+        
         self.maker = self.canvas.pathMaker
 
-        self.table = TableWidgetSetUp(50, 200, len(pathKeys)+5, 0, 28)
+        self.table = TableWidgetSetUp(50, 200, len(pathKeys)+6, 0, 28)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 256, 512
+        width, height = 256, 538
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{" PathMaker Help Menu 2":<27}',QL,True,True,2)
@@ -142,9 +143,10 @@ class PathHelp2:
                 self.table.setRow(row, 1, "  " + val, QL,'','')                
                 row += 1
 
-        self.table.setRow(row,      0, f"{'Use Arrow Keys to Move Path':<15}",QC,True,True, 2)
-        self.table.setRow(row + 1,  0, f'{"  Enter Key or Select From Above "}',QH,True,True, 2)
-        self.table.setRow(row + 2,  0, f"{'Click Here to Close':<22}",'',True,True, 2)
+        self.table.setRow(row,      0, f'{"Back to Menu"}',SD,True,True, 2)
+        self.table.setRow(row + 1,  0, f"{'Use Arrow Keys to Move Path':<15}",QC,True,True, 2)
+        self.table.setRow(row + 2,  0, f'{"  Enter Key or Select From Above "}',QH,True,True, 2)
+        self.table.setRow(row + 3,  0, f"{'Click Here to Close':<22}",'',True,True, 2)
   
         x, y = getVuCtr(self.canvas)  
         if off != 0: x = x + off  
@@ -155,8 +157,12 @@ class PathHelp2:
     def clicked(self): 
         if self.switch == '':
             key = self.table.item(self.table.currentRow(), 0).text().strip()      
-            if key in PathStr:
-                self.canvas.setKeys(key)
+            if key == 'Back to Menu':
+                QTimer.singleShot(5, self.closeMenu)        
+                QTimer.singleShot(10, self.maker.pathWorks.openHelpMenu)
+            else:
+                if key in PathStr:
+                    self.canvas.setKeys(key)
         self.closeMenu()
        
     def closeMenu(self):  

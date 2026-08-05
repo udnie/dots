@@ -6,7 +6,7 @@ from dotsShared         import Verts, common
 
 MaxWidth = 1680  ##  position dock to screen bottom for max default display width
                  ##  on my mac with dock on left side, not on bottom
-MaxScreens = ('1440','1536', '1102')  ## requires 1920X1280 display size
+MaxScreens = ('1440', '1102')  ## requires 1920X1280 display size
 
 screens = {  ## used by helpmenus and dots
     'SQH':  ('720X720',   '1:1'), 
@@ -17,26 +17,21 @@ screens = {  ## used by helpmenus and dots
     '108O': ('1080X810',  '4:3'),     
     '1215': ('1215X810',  '3:2'),
     '1440': ('1440X810', '16:9'), 
-    
-    # '1296': ('1296X864',  '3:2'),
-    # '1536': ('1536X864', '16:9'),
-    
+
      'SQV':  ('720X720',  '1:1'),
      '800':  ('600X800',  '3:4'),
      '900':  ('600X900',  '2:3'), 
      
-    '960V':  ('540X960',  '9:16'), 
-    # '1024': ('576X1024', '9:16'),    
-    '1066':  ('600X1066', '9:16'),  
+    '960V':  ('540X960',  '9:16'),  
+    '1024':  ('576X1024', '9:16'),  
     '1102':  ('620X1102', '9:16'),
 }
 
-vheights = {
+vheights = {  ## heights from y=0
      '800':  205,
      '900':  165,
-    '960V':  135, 
-    # '1024':  115,    
-    '1066':  105,  
+    '960V':  135,    
+    '1024':  105,  
     '1102':   65,
 }
 
@@ -79,17 +74,7 @@ def setCommon(format=''):
             common.update(fourteen40) 
             common.update(eight10) 
             return screens['1440'] 
-        
-        case '1296':     ## 1296X864 - 3:2
-            common.update(twelve96)  
-            common.update(eight64) 
-            return screens['1296']       
-    
-        case '1536':      ## 1536X864 - 16:9
-            common.update(fifteen36) 
-            common.update(eight64) 
-            return screens['1536']   
-            
+             
         ## verticals   
         case '800':       ## 600X800 - 3:4
             common.update(vert)
@@ -105,12 +90,7 @@ def setCommon(format=''):
             common.update(vert)
             common.update(sqv00)              
             return screens['SQV'] 
-        
-        case '912':       ## 513X912 - 9:16
-            common.update(vert)
-            common.update(nine12)              
-            return screens['912'] 
-         
+          
         case '960V':       ## 540X960 - 9:16
             common.update(vert)
             common.update(nine60V)              
@@ -120,12 +100,7 @@ def setCommon(format=''):
             common.update(vert)
             common.update(ten24)              
             return screens['1024']
-        
-        case '1066':     ## 600X1066 - 9:16
-            common.update(vert)
-            common.update(ten66)              
-            return screens['1066']  
-        
+         
         case '1102':       ## 620X1102 - 9:16
             common.update(vert)
             common.update(six20)              
@@ -234,37 +209,6 @@ fourteen40 = {  ## 1440X810 - 16:9
     'scaleX':    1.30,
 }
 
-### ---------- used by both 1296X864 and 1536X864px -------- 
-eight64 = { 
-    'DotsH':     966,     
-    'ViewH':     864,    
-    'ScrollH':   787,  ## scroll panel height
-    'SliderH':   803,    
-    'margin1':    23,  ## scroll panel top margin
-    'margin2':     0,
-    'scaleY':   1.15,
-    'factor':   0.38,  ## scales pixitems by format
-    'steps':       8, 
-}
-
-### ------------------ 1264X864 - 3:2 ----------------------
-twelve96 = {  
-    'Screen':   '1296',  
-    'DotsW':     1597,
-    'ViewW':     1296,  
-    'gridSize':    36, 
-    'scaleX':   1.123,
-}
-
-### ------------------ 1536X864 - 16:9 ---------------------
-fifteen36 = {      
-    'Screen':  '1536',   ## think about 1560X878 in 1920X1080
-    'DotsW':     1837, 
-    'ViewW':     1536,      
-    'gridSize':    32,  
-    'scaleX':    1.40,
-}
-
 ### ---------------------------------------------------------
 ###                         verticals
 ### ---------- used by both 600X900px and 620X1102px -------- 
@@ -299,18 +243,6 @@ six90 = {  ## 600X900 - 2:3
     'gridSize':  30.0,
 }
 
-ten66 = {  ## 600X1066 - so it doesn't conflict
-    'Screen':   '1066',  
-    'DotsW':      930,
-    'DotsH':     1126,  
-    'ViewW':      600, 
-    'ViewH':     1024,   
-    'margin1':     15,    
-    'ScrollH':    968,
-    'SliderH':    979, 
-    'gridSize':  30.0,
-}
-
 nine60V = {  ## 540X960
     'Screen':   '960V',  
     'DotsW':      860,
@@ -321,18 +253,6 @@ nine60V = {  ## 540X960
     'ScrollH':    878,
     'SliderH':    894, 
     'gridSize':  30.0,
-}
-
-nine12 = {  ## 513X912
-    'Screen':    '912',  
-    'DotsW':      860,
-    'DotsH':     1015,  
-    'ViewW':      513, 
-    'ViewH':      912,   
-    'margin1':     10,    
-    'ScrollH':    867,
-    'SliderH':    862, 
-    'gridSize':  28.5,
 }
 
 ten24 = {  ## 576X1024

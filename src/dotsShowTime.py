@@ -36,9 +36,11 @@ class ShowTime:
    
 ### --------------------------------------------------------        
     def run(self):  ## runs whatever is in scene that can be animated 
-        
         if self.canvas.control != '' or self.canvas.animationRunning:
             return  
+        elif self.canvas.openPlayFile in Demos:
+            self.canvas.showbiz.showRunner.runThese()
+            return
 
         for pix in self.scene.items():  ## test for non-scrollers
             if pix.type == 'bkg' and pix.tag == 'scroller':

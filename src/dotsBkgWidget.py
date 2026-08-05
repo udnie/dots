@@ -1,17 +1,14 @@
 
-import os.path
-import math
-
 from PyQt6.QtCore       import Qt, QPoint, QPointF,QRectF
 from PyQt6.QtGui        import QColor, QPen, QPainter
 from PyQt6.QtWidgets    import QSlider, QWidget, QGroupBox, QDial, QLabel, \
                                 QSlider, QHBoxLayout, QVBoxLayout, QPushButton
-                            
+                                                
 from dotsBkgWorks       import BkgWorks
 from dotsSideGig        import getVuCtr
 
 ShiftKeys = (Qt.Key.Key_Up, Qt.Key.Key_Down) 
-      
+  
 ### ------------------- dotsShadowWidget -------------------                                                                                                                                                            
 class BkgWidget(QWidget):  
 ### -------------------------------------------------------- 
@@ -20,7 +17,7 @@ class BkgWidget(QWidget):
         
         self.setUI(parent, maker, switch)
         self.show()
-
+        
 ### --------------------------------------------------------
     def setKeys(self, key):  ## updated thru bkgItem - did use grabkey - not good idea
         self.key = key 
@@ -74,19 +71,12 @@ class BkgWidget(QWidget):
  
 ### --------------------------------------------------------                                             
     def setBkgRateValue(self, val): 
-        if self.bkgItem != None and self.bkgItem.type == 'bkg':                         
+        if self.bkgItem != None and self.bkgItem.type == 'bkg': 
             self.bkgItem.rate = val/100  
             self.rateSlider.setValue(val)    
             self.rateValue.setText(f'{val/100:.2f}')   
             self.bkgScrollWrks.setTrackerRate(self.bkgItem)
                        
-    def setBkgShowtimeValue(self, val):
-        if self.bkgItem != None and self.bkgItem.type == 'bkg':  
-            self.bkgItem.showtime = val   
-            self.showtimeSlider.setValue(val)   
-            self.showtimeValue.setText(f'{val:2}')
-            self.bkgScrollWrks.setShowTimeTrackers(self.bkgItem)
-            
     def setBkgFactorValue(self, val):
         if self.bkgItem != None and self.bkgItem.type == 'bkg':  
             self.bkgItem.factor = val/100
@@ -104,7 +94,7 @@ class BkgWidget(QWidget):
             self.canvas   = self.bkgItem.canvas
      
             self.bkgWorks = BkgWorks(self.bkgItem)
-            self.bkgScrollWrks = self.bkgWorks.bkgScrollWrks  
+            self.bkgScrollWrks = self.bkgItem.bkgScrollWrks  
                
         self.canvas = parent
             
@@ -152,14 +142,14 @@ class BkgWidget(QWidget):
 
 ### --------------------------------------------------------
     def sliderGroup(self):
-        groupBox = QGroupBox('ScreenRate  Showtime  Factor ')
+        groupBox = QGroupBox('  ScreenRate     Speed Factor')
         groupBox.setFixedWidth(205) 
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
             
         self.factorValue = QLabel('1.00',  alignment=Qt.AlignmentFlag.AlignHCenter)
         self.factorValue.setFixedWidth(40)
         self.factorDial = QDial()
-        self.factorDial.setFixedWidth(55)
+        self.factorDial.setFixedHeight(90)
         self.factorDial.setMinimum(50)
         self.factorDial.setMaximum(150)
         self.factorDial.setValue(100)
@@ -181,54 +171,29 @@ class BkgWidget(QWidget):
         self.rateSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.rateSlider.setTickInterval(250) 
         if self.switch == '': 
-            self.rateSlider.valueChanged.connect(self.setBkgRateValue)   
-        
-        self.showtimeValue = QLabel('', alignment=Qt.AlignmentFlag.AlignRight)
-        self.showtimeValue.setFixedWidth(25)
-        self.showtimeSlider = QSlider(Qt.Orientation.Vertical)
-        self.showtimeSlider.setMinimum(5)
-        self.showtimeSlider.setMaximum(30)
-        self.showtimeSlider.setSingleStep(1)
-        self.showtimeSlider.setValue(5)
-        self.showtimeSlider.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-        self.showtimeSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.showtimeSlider.setTickInterval(5)  
-        if self.switch == '':
-            self.showtimeSlider.valueChanged.connect(self.setBkgShowtimeValue)
+            self.rateSlider.valueChanged.connect(self.setBkgRateValue)  
                   
-        button = QPushButton('Update', self) 
-        button.setFixedWidth(65)
-   
-        if self.switch == '': 
-            button.clicked.connect(self.bkgScrollWrks.updateDictionary)
-                                          
+                                 
         sbox = QHBoxLayout()  ## sliders and dial  
         sbox.addSpacing(20)       
         sbox.addWidget(self.rateSlider) 
         sbox.addSpacing(20)                
-        sbox.addWidget(self.showtimeSlider) 
-        sbox.addSpacing(-5)   
-        
+   
         dbox = QVBoxLayout()  ## stack dial and value     
         dbox.addSpacing(5)    
         dbox.addWidget(self.factorDial, alignment=Qt.AlignmentFlag.AlignLeft)  
+        dbox.addSpacing(15)   
         dbox.addWidget(self.factorValue, alignment=Qt.AlignmentFlag.AlignHCenter)
-        dbox.addSpacing(15)      
-     
-        sbox.addSpacing(5)
+
         sbox.addLayout(dbox,Qt.AlignmentFlag.AlignHCenter)    
  
         hbox = QHBoxLayout()  ## slider values and update button
         hbox.addSpacing(5)       
         hbox.addWidget(self.rateValue, Qt.AlignmentFlag.AlignLeft)     
-        hbox.addSpacing(20) 
-        hbox.addWidget(self.showtimeValue, Qt.AlignmentFlag.AlignRight) 
-        hbox.addSpacing(5) 
-        hbox.addWidget(button, Qt.AlignmentFlag.AlignRight)
-        hbox.addSpacing(10)
-            
+        hbox.addSpacing(125) 
+         
         fbox = QHBoxLayout()  
-        self.label = QLabel('file name goes here', alignment=Qt.AlignmentFlag.AlignCenter)
+        self.label = QLabel('file name goes here', alignment=Qt.AlignmentFlag.AlignHCenter)
         fbox.addWidget(self.label)
          
         vbox = QVBoxLayout()   
@@ -264,7 +229,7 @@ class BkgWidget(QWidget):
         quitBtn   = QPushButton('Close')
               
         if self.switch == '':
-            resetBtn.clicked.connect(lambda: self.bkgMaker.bkgtrackers.resetTracker(self.bkgItem))
+            resetBtn.clicked.connect(lambda: self.bkgMaker.bkgTrackers.resetTracker(self.bkgItem))
             helpBtn.clicked.connect(self.bkgItem.openMenu)
             runBtn.clicked.connect(lambda: self.bkgMaker.showtime(self.bkgItem))  ## run a scroller  
             self.lockBtn.clicked.connect(self.bkgScrollWrks.toggleBkgLocks)   

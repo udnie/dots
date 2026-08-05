@@ -30,8 +30,8 @@ class PathMaker(QWidget):
         self.canvas    = parent  
         self.scene     = self.canvas.scene
         self.view      = self.canvas.view
-        self.dots      = self.canvas.dots  
-        
+        self.dots      = self.canvas.dots 
+       
         self.mapper    = MapMaker(self.canvas)
          
         self.widget  = None
