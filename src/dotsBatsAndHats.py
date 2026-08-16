@@ -30,9 +30,9 @@ backGrounds = {  ## scaled up as needed - 1280.jpg and bats_vert in demo directo
     '1296':  'montreaux.jpg',    
     '1536':  'montreaux-1280.jpg',
     
-     '800':  'bats_900.jpg',   ## 3X4
-     'SQV':  'bats_900.jpg',   ## 1X1
-     '900':  'bats_900.jpg',    ## 2X3
+     'SQV':  'bats_800.jpg',   ## 1X1
+     '800':  'bats_800.jpg',   ## 3X4
+     '900':  'bats_900.jpg',   ## 2X3
     '960V':  'bats_1066.jpg',
     '1024':  'bats_1066.jpg', 
     '1102':  'bats_1066.jpg',

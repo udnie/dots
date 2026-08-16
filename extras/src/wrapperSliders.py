@@ -7,8 +7,8 @@ from wrapperWorks       import Works, ViewH, ViewW
 
 BtnsW, Max = ViewW, 200  
  
-MinLimit = 5
-MaxLimit = 95
+MinLimit = 3
+MaxLimit = 97
 
 ### ----------------------- Sliders ------------------------                                                                                                                                                                                                                                                                           
 class Sliders: ## and buttons
@@ -99,7 +99,7 @@ class Sliders: ## and buttons
         self.topEndSlider = QSlider(Qt.Orientation.Vertical)
         self.topEndSlider.setFixedSize(50,180)  
         self.topEndSlider.setRange(0,100)
-        self.topEndSlider.setValue(50)
+        self.topEndSlider.setValue(0)
         
         self.topEndSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.topEndSlider.setTickInterval(10)  
@@ -117,7 +117,7 @@ class Sliders: ## and buttons
         self.bottomSlider = QSlider(Qt.Orientation.Vertical)
         self.bottomSlider.setFixedSize(50,180)    
         self.bottomSlider.setRange(0,100)                  
-        self.bottomSlider.setValue(50)
+        self.bottomSlider.setValue(0)
         
         self.bottomSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.bottomSlider.setTickInterval(10)      
@@ -135,7 +135,7 @@ class Sliders: ## and buttons
         self.EdgesSlider = QSlider(Qt.Orientation.Vertical)
         self.EdgesSlider.setFixedSize(50,180)    
         self.EdgesSlider.setRange(0,100)                  
-        self.EdgesSlider.setValue(50)
+        self.EdgesSlider.setValue(0)
         
         self.EdgesSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.EdgesSlider.setTickInterval(10)      

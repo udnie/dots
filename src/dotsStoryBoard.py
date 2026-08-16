@@ -49,6 +49,7 @@ class StoryBoard(QWidget):
         self.videoPlayer = None     ## holds mediaplayer reference
         self.pathMakerOn = False    ## shared
         self.animationRunning = False   ## set by showtime
+        self.offMenuClick = None
     
         self.sideCar   = SideCar(self)    ## extends canvas
         self.sideCar2  = SideCar2(self)   ## same
@@ -87,7 +88,8 @@ class StoryBoard(QWidget):
 ### ---------------------- send keys -----------------------
     @pyqtSlot(str)   ## sends keys to canvas, storyboard, pathMaker and sceneItems
     def setKeys(self, key): 
-        self.key = key     
+        self.key = key 
+    
         if not self.pathMakerOn: 
             if self.key == 'C':
                 self.clear()   
@@ -136,7 +138,12 @@ class StoryBoard(QWidget):
                 elif e.button() == Qt.MouseButton.RightButton:
                     if len(self.scene.items()) == 0:
                         self.helpButton.openMenus()  ## opens canvas help menu
-                            
+                        
+                elif e.button() == Qt.MouseButton.LeftButton and \
+                    self.canvas.offMenuClick != None:
+                        self.canvas.offMenuClick.closeMenu() 
+                        self.canvas.offMenuClick = None
+                    
             ##  enter 'cmd' before you move the mouse and the rubberband kicks in, but not after
             elif e.type() == QEvent.Type.MouseMove:  
                 if self.key == 'cmd' and self.origin != QPoint(0,0):
@@ -237,6 +244,7 @@ class StoryBoard(QWidget):
             if self.animeHelp != None:
                 self.animeHelp == None
             self.animeHelp = AnimationHelp(self.canvas, QCursor.pos(), 'story')  
+            self.animeHelp = self.animeHelp
         e.accept()
         
 ### -------------------- dotsStoryBoard --------------------

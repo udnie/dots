@@ -132,7 +132,7 @@ class SideCar2:
                 MsgBox("./plays failed")
                 return
             MsgBox("./plays updating...")
-    
+            
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
         if self.canvas.bkgMaker.trackerWidget != None and \

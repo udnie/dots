@@ -7,7 +7,19 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
-**August 2026**  
+
+**August 15 2026**  
+Found an interesting bug having to do with **clipsMaker**. It looks like a bit of code I thought was working wasn't. **ClipsMaker** stopped using the name of the directory plus .mov as the output file name when reading all the files but worked correctly if reading the **Nth** frame. It was dropping the directory name and leaving the .mov file which would be invisible on a mac's screen.
+
+I looked through my recent time machine backups to see if I could find any .mov files and to check the modify dates on any files I may have created using **clipsMaker**. No .mov's and the most recent date was the end of June for one file. Sorry for the problem - wish I had caught it earlier.
+
+Added a left-mouse-click to close an open help menu in **dots** by clicking anywhere on the screen and a clear screen button to **videoPlayerTwo**.
+
+Lastly, I've updated to **python 3.14.7**, **pyqt6 6.11** and **opencv 4.12.0.88**.  I wasn't able to include  **pyside6 6.11** in the update as currently I haven't been able to get it to run animations in **dots** using **pyside6 6.11**. There's no problem however running **pyside6 6.10** in the current mix.
+
+---
+
+**August 5 2026**  
 Updates to **wrapper** and **dots scrolling backgrounds**.  Added to **wrapper**, what I am calling **filters**, functions that can modify the **blendedImage** using the sliders. They're located in **wrapperFilters.py** - each filter has a description of proposed intent as provided by **google gemini**, the source behind the function's **opencv** code. The **edges** slider can also work on non-filtered backgrounds.  The only other noticeable change to **wrapper**, now that the sliders actually do something, are the **guides** appearing when you're ready to save the **blendedImage** - if they're not already visible. A reminder that they're there rather than popping them up at the start.
 
 The biggest change is to **dots scrolling backgrounds** having done away with the need to manually set the **rate** for each screen format and demo by hand and repetition. The **rate** is used in determining the time a background requires to scroll itself across a screen. **Gemini** was able to replace two **.json** files and possibly 70-100 lines of code that made it all work before with just four lines of code.  In addition are three variables that may require some adjustment, also in **bkgWorks**.  The **ShowTime** constant  which triggers the **next** background and two variables, **RWY** and **VT5**, used by the **"first"** background if it's **"vertical"**.  That's it.  Seems to work...

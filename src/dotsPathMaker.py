@@ -187,10 +187,15 @@ class PathMaker(QWidget):
                     self.updateNewPath() 
                
             ## add pathWidget - right mouse click
-            if e.type() == QEvent.Type.MouseButtonPress and \
-                e.button() == Qt.MouseButton.RightButton:
-                self.pathWorks.addWidget()
-
+            if e.type() == QEvent.Type.MouseButtonPress:
+                if e.button() == Qt.MouseButton.RightButton:
+                    self.pathWorks.addWidget()
+                
+                elif e.button() == Qt.MouseButton.LeftButton and \
+                    self.canvas.offMenuClick != None:
+                        self.canvas.offMenuClick.closeMenu() 
+                        self.canvas.offMenuClick = None
+                
         return QWidget.eventFilter(self, source, e)
 
 ### --------------------------------------------------------

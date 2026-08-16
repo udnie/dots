@@ -106,9 +106,10 @@ class PathHelp:
                     QTimer.singleShot(10, self.canvas.showbiz.helpMaker.menuHelp) 
                     self.canvas.pathMaker.pathMakerOff()
                  ## show help menus  
-                elif help == 'Menu2':  ## menu2
+                elif help == 'Menu2':  ## menu2 in helpdesk
                     QTimer.singleShot(10, self.closeMenu) 
-                    self.canvas.pathMaker.pathHelpMenu2 = PathHelp2(self.canvas)
+                    self.canvas.pathMaker.pathHelpMenu2 = PathHelp2(self.canvas) 
+                    self.canvas.offMenuClick = self.canvas.pathMaker.pathHelpMenu2 
                 self.table.close()
             except:
                 None
@@ -163,13 +164,15 @@ class PathWorks:
         self.closeWidget()
         self.closeMenu() 
         self.pathMaker.pathChooserOff()
-        self.pathHelp = PathHelp(self, self.canvas)  
+        self.pathHelp = PathHelp(self, self.canvas)
+        self.canvas.offMenuClick = self.pathHelp
 
     def closeMenu(self):
         self.canvas.showbiz.helpButtons.closeMenus('path') 
         if self.pathMaker.pathHelpMenu2 != None:
             self.pathMaker.pathHelpMenu2.closeMenu()
             self.pathMaker.pathHelpMenu2 = None   
+            self.canvas.offMenuClick = None
         if self.pathMaker.pathChooserSet:
             self.pathMaker.pathChooserOff()
             

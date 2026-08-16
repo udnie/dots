@@ -8,7 +8,6 @@ import time
     button. Uses a GraphicsVideoItem which I refresh along with 
     the mediaPlayercfor each new file - unlike videoPlayerOne.'''
 ### -------------------------------------------------------- 
-
 from PyQt6.QtCore       import Qt, QTimer, QPoint, QSizeF, QRect, QSize
 from PyQt6.QtGui        import QGuiApplication, QPixmap
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, \
@@ -29,7 +28,7 @@ class VideoPlayer(QWidget):
         
         self.setUI()                                       
         self.show()
-   
+
 ### --------------------------------------------------------
     def init(self):
         self.key = 'F'  ##  to change default open format
@@ -96,8 +95,7 @@ class VideoPlayer(QWidget):
                 case 'Settings':
                     self.clips.toggleSettings(self)  ## clipMaker settings
                 case 'C':
-                    self.shared.closeHelpMenu()  ## improvised clear
-                    self.closeMediaPlayer()     
+                    self.shared.clearScreen()   
                 case 'Clips':   
                     self.clips.makingClips()  ## if MakeClipsOn sets path to folder
                 case 'Shift-S':
@@ -146,11 +144,13 @@ class VideoPlayer(QWidget):
               
     def setMediaPlayer(self, fileName, where=''):   
         if not self.shared.setFileNameInMediaPlayer(fileName):
-            return False     
+            return False  
+           
         if where == '':   
             self.shared.setAutoAspect(fileName)  ## won't stop it from playing  
             self.addToScene(fileName) 
-            return True                  
+            return True      
+                    
         elif where == 'addToScene':    ## bypasses setAspectRatio if from assembler
             hgt = HGT if self.shared.sliderVisible else HGT-PAD   
             self.videoItem.setSize(QSizeF(float(self.width()-WID), float(self.height()-hgt)))
@@ -244,11 +244,15 @@ class VideoPlayer(QWidget):
         if len(sys.argv) > 1: 
             self.path = sys.argv[1]
     
-        vbox = QVBoxLayout() 
-          
+        vbox = QVBoxLayout()     
         vbox.addWidget(self.view, Qt.AlignmentFlag.AlignCenter)
         vbox.addWidget(setButtons(self), Qt.AlignmentFlag.AlignCenter)
-        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignHCenter)
+        
+        hbox = QHBoxLayout()
+        hbox.addSpacing(10)
+        hbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignHCenter)
+        hbox.addSpacing(15)
+        vbox.addLayout(hbox)
             
         self.setLayout(vbox)                
         self.shared.openPlayer(self.key)   ## open full frame - 3:2
@@ -264,8 +268,8 @@ class VideoPlayer(QWidget):
         if self.flag:
             self.flag = False
             return 
-        elif self.aspect > 0: 
     
+        if self.aspect > 0: 
             hgt = HGT if self.shared.sliderVisible else HGT-PAD
             
             width  = int((self.height()-hgt) * self.aspect)+WID

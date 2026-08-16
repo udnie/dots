@@ -1,5 +1,5 @@
 
-from os import path
+import os 
 
 from PyQt6.QtCore       import QAbstractAnimation
 from PyQt6.QtWidgets    import QGraphicsPolygonItem, QGraphicsPixmapItem
@@ -38,6 +38,7 @@ class ShowTime:
     def run(self):  ## runs whatever is in scene that can be animated 
         if self.canvas.control != '' or self.canvas.animationRunning:
             return  
+        
         elif self.canvas.openPlayFile in Demos:
             self.canvas.showbiz.showRunner.runThese()
             return
@@ -81,7 +82,7 @@ class ShowTime:
                         pix.tag, 
                         pix) 
                     self.canvas.animationRunning = True
-            
+         
                 elif pix.type == 'bkg':
                     if pix.tag == 'scroller':  ## <- determines if it scrolls  
                         if self.canvas.videoPlayer != None:
@@ -176,7 +177,8 @@ class ShowTime:
             elif pix.type in ('pix', 'snake', 'bkg'):                   
                 if pix.anime != None and pix.anime.state() != \
                     QAbstractAnimation.State.Stopped:       
-                    pix.anime.stop()                                           
+                    pix.anime.stop()   
+                                             
                     if pix.tag == 'scroller':  ## can be more than one
                         if self.canvas.videoPlayer != None:
                             continue 

@@ -167,6 +167,7 @@ class PixItem(QGraphicsPixmapItem):
         self.works.closeWidget()
         x, y = self.works.makeXY()  
         self.help = PixHelp(self, x, 'pix')
+        self.canvas.offMenuClick = self.help
             
 ### --------------------------------------------------------
     def mouseMoveEvent(self, e):

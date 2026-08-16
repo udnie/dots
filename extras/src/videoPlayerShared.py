@@ -144,6 +144,7 @@ class Shared:
             width, height = getMetaData(fileName)  ## it's here
         except:   
             None    
+       
         if width > 0 and height > 0: 
             self.parent.aspect = math.floor((width/height) * 100)/100.0    
             if key := self.returnKey(self.parent.aspect): 
@@ -165,8 +166,8 @@ class Shared:
     def setAutoAspect(self, fileName):
         if self.parent.clips.AutoAspect and not self.parent.clips.MakeClips:
             if not self.setAspectRatio(fileName): ## skip it and open without
-                return
-        return  ## hasn't been updated
+                return False
+            return  ## hasn't been updated
     
     def moveAndSet(self):
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()
@@ -285,6 +286,10 @@ class Shared:
                 return k
         return None
    
+    def clearScreen(self):
+        self.closeHelpMenu()  ## improvised clear
+        self.parent.closeMediaPlayer()  
+   
     def toggleSlider(self):  ## now all
         self.parent.flag = True
         self.toggleFrameless()
@@ -366,12 +371,13 @@ def setButtons(self):
     openButton = QPushButton("Files")
     self.playButton = QPushButton("Play")  
     if self.player == "one":            
-        self.aspButton   = QPushButton("Aspect")
+        self.aspButton = QPushButton("Aspect")
     self.loopButton = QPushButton("Loop")
     self.stopButton = QPushButton("Stop")
+    if self.player == "two":  
+        self.clearButton = QPushButton("Clear")
     byeButton  = QPushButton("Quit")
-    
-    openButton.clicked.connect(self.openFile) if self.player == "one"\
+    openButton.clicked.connect(self.openFile) if self.player == "one" \
         else openButton.clicked.connect(self.openFile)         ## <- "two"
     
     self.playButton.clicked.connect(self.shared.playVideo)
@@ -379,16 +385,19 @@ def setButtons(self):
         self.aspButton.clicked.connect(self.setAspButton)
     self.loopButton.clicked.connect(self.shared.looper)
     self.stopButton.clicked.connect(self.shared.stopVideo)
+    if self.player == "two":
+        self.clearButton.clicked.connect(self.shared.clearScreen)
     byeButton.clicked.connect(self.bye)
 
-    hbox = QHBoxLayout(self)
-            
+    hbox = QHBoxLayout(self)        
     hbox.addWidget(openButton)  
     hbox.addWidget(self.playButton)    
     if self.player == "one":       
         hbox.addWidget(self.aspButton)
     hbox.addWidget(self.loopButton)    
     hbox.addWidget(self.stopButton)  
+    if self.player == "two":       
+        hbox.addWidget(self.clearButton)
     hbox.addWidget(byeButton)
     
     self.buttonGroup.setLayout(hbox)
@@ -411,38 +420,38 @@ def setButtons(self):
 def getMetaData(path):    
     ''' requires opencv-python - may not always report width/height correctly 
         for non 9:16 verticals - initial method - not mac specific '''
-    # try:  
-    #     import cv2  ## <<---------------------  
-    #     try:
-    #         cap = cv2.VideoCapture(path) 
-    #     except:
-    #         return 0,0
-    #     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    #     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    #     cap.release()
-    #     return width, height
-    # except:
-    #     return 0, 0
+    try:  
+        import cv2  ## <<---------------------  
+        try:
+            cap = cv2.VideoCapture(path) 
+        except:
+            return 0,0
+        width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        cap.release()
+        return width, height
+    except:
+        return 0, 0
     ''' uses mdls - mac only - reports non 9:16 vertical width and height correctly -- 
         drag and drop doesn't work in pyqt5 on desktop '''  
-    try:  
-        result = subprocess.run(
-            ['mdls', '-name', 'kMDItemPixelWidth', '-name', 'kMDItemPixelHeight', path],
-            capture_output=True,
-            text=True,
-            check=True
-            )
-        output = result.stdout
-        width, height = None, None
-        for line in output.splitlines():
-            if 'kMDItemPixelWidth' in line:
-                width = int(line.split('=')[-1].strip())
-            elif 'kMDItemPixelHeight' in line:
-                height = int(line.split('=')[-1].strip())
-            del line
-        return width, height
-    except Exception:
-        return 0, 0
+    # try:  
+    #     result = subprocess.run(
+    #         ['mdls', '-name', 'kMDItemPixelWidth', '-name', 'kMDItemPixelHeight', path],
+    #         capture_output=True,
+    #         text=True,
+    #         check=True
+    #         )
+    #     output = result.stdout
+    #     width, height = None, None
+    #     for line in output.splitlines():
+    #         if 'kMDItemPixelWidth' in line:
+    #             width = int(line.split('=')[-1].strip())
+    #         elif 'kMDItemPixelHeight' in line:
+    #             height = int(line.split('=')[-1].strip())
+    #         del line
+    #     return width, height
+    # except Exception:
+    #     return 0, 0
     ''' uses ffprobe -- may not always report width/height correctly for non 9:16 verticals
         and blows up if run from mac desktop -- works well in vscode '''
     # try: 

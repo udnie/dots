@@ -132,7 +132,10 @@ class ShowBiz:
                     case 'A': 
                         self.bkgMaker.openBkgFiles() 
                     case 'D':                   
-                        if self.demoAvailable:  ## displays demo menu in canvas
+                        if self.demoAvailable:  ## displays demo menu in canvas      
+                            if self.helpMenus.demoHelp != None:
+                                self.helpMenus.demoHelp.closeMenu()
+                                self.helpMenus.demoHelp = None
                             self.helpMenus.setMenu(key)
                     case 'J':                   ## view a play file's records
                         self.showRunner.loadPlay('table')  

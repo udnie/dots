@@ -108,6 +108,7 @@ class AnimationHelp:
         self.closeMenu()
 
     def closeMenu(self):   
+        self.canvas.offMenuClick = None
         self.table.close()
         if self.token == 'on':
             self.canvas.setKeys('N')
@@ -165,6 +166,7 @@ class Works:  ## extends pixitem and pixwidget
         if self.canvas.animeHelp != None:
             self.canvas.animeHelp = None
         self.canvas.animeHelp = AnimationHelp(self.pix, QPoint(x,y), 'pix')
+        self.canvas.offMenuClick = self.canvas.animeHelp
    
     def makeXY(self):  
         p = self.pix.pos()

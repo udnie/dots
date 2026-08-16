@@ -137,6 +137,7 @@ class PixHelp:
         self.closeMenu()
 
     def closeMenu(self): 
+        self.canvas.offMenuClick = None
         self.table.close()
         if self.switch != '' and self.switch != 'pix':
             self.canvas.setKeys('N')
@@ -196,6 +197,7 @@ class BkgHelp:
         self.closeMenu()
        
     def closeMenu(self):
+        self.canvas.offMenuClick = None
         self.table.close()
         if self.switch != '':
             self.canvas.setKeys('N')

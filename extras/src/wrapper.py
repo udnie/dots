@@ -252,7 +252,7 @@ class Wrapper(QWidget):
         msg.setText(str)
         timer = QTimer(msg)
         timer.setSingleShot(True)
-        timer.setInterval(7000)
+        timer.setInterval(6000)
         timer.timeout.connect(msg.close)
         timer.start()
         msg.exec()
@@ -306,7 +306,7 @@ class Wrapper(QWidget):
         self.sliders.resetSliders()
         
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()  
-        self.move(int(((x * 2 ) - Width)/2), 220) ## 125
+        self.move(int(((x * 2 ) - Width)/2), 125) ## 125
        
         self.grabKeyboard() 
  

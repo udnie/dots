@@ -99,7 +99,7 @@ class ControlView(QGraphicsView):
     def dragLeaveEvent(self, e):
         e.accept()
 
-### --------------------------------------------------------
+### --------------------------------------------------------      
     def keyPressEvent(self, e):
         key = e.key() 
         mod = e.modifiers()     
@@ -108,7 +108,7 @@ class ControlView(QGraphicsView):
     def sendIt(self, key, mod):
 
 ### --------------------------------------------------------
-    ## single keys without modifiers - mainly special charaters 
+    ## single keys without modifiers - special characters('!','@')
 ### --------------------------------------------------------     
         if key in (33, 64) and self.canvas.pathMakerOn:
             if key == 33:  ## special keys - may differ in another OS
@@ -118,7 +118,11 @@ class ControlView(QGraphicsView):
 
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
                 self.canvas.exit() 
-             
+     
+### --------------------------------------------------------
+    ## single keys without modifiers - ('C','F',BackSpace,Delete,Space)
+### --------------------------------------------------------     
+            
         elif key in (Qt.Key.Key_C, Qt.Key.Key_F, Qt.Key.Key_Backspace, Qt.Key.Key_Delete, Qt.Key.Key_Space):
              
             if key == Qt.Key.Key_C: 

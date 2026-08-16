@@ -1,6 +1,5 @@
 
 from functools          import partial
-from os import close
 
 from PyQt6.QtCore       import QTimer
 from PyQt6.QtGui        import QGuiApplication
@@ -49,23 +48,19 @@ class HelpMenus:  ## demos and snakes
         if key == 'D':
             if self.demoHelp == None:
                 self.demoHelp = DemoHelp(self.canvas)
+                self.canvas.offMenuClick = self.demoHelp
             else:
-                self.closeDemoMenu()
+                self.demoHelp.closeMenu()
+                self.demoHelp = None
                  
         elif key == 'S':
             if  self.screenHelp == None:
                 self.screenHelp = ScreenHelp(self.canvas)  ## in screens 
+                self.canvas.offMenuClick = self.screenHelp
             else:
                 self.screenHelp.closeMenu()
-                self.screenHelp = None
-                
-    def closeDemoMenu(self):
-        try:
-            self.demoHelp.closeMenu()
-            self.demoHelp = None
-        except:
-            None
-        
+                self.screenHelp = None       
+             
 ### --------------------------------------------------------     
 class DemoHelp:  
 ### --------------------------------------------------------

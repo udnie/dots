@@ -142,6 +142,7 @@ class Matte(QWidget):  ## opens itself
                 if not self.helpMenu:  
                     self.matteHelpMenu = MatteHelp(self.canvas, self) 
                     self.helpMenu = True 
+                    self.canvas.offMenuClick = self.matteHelpMenu
                 elif self.helpMenu:   
                     self.matteHelpMenu.closeMenu() 
                     self.matteHelpMenu = None
@@ -250,7 +251,8 @@ class Matte(QWidget):  ## opens itself
         self.show()
       
         self.helpMenu = True      
-        self.matteHelpMenu = MatteHelp(self.canvas, self) 
+        self.matteHelpMenu = MatteHelp(self.canvas, self)
+        self.canvas.offMenuClick = self.matteHelpMenu
  
         self.grabKeyboard() 
          

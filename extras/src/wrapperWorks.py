@@ -56,16 +56,7 @@ class Works:
         else:
             return fileName
         
-### --------------------------------------------------------                           
-    def flip(self):
-        if self.parent.flipped == False:
-            self.parent.flipped = True
-            self.parent.sliders.flipBtn.setText('Flipped')
-        else:
-            self.parent.flipped = False
-            self.parent.sliders.flipBtn.setText('Flip')
-        self.parent.wrapIt()
-   
+### --------------------------------------------------------                            
     def swap(self, which):
         if self.parent.leftSide == None:
             return
@@ -107,14 +98,11 @@ class Works:
     def wrapper(self, img_left_path):  ## gemini pro 3.0
         img1 = cv2.imread(img_left_path)  ## Load images (OpenCV loads as BGR)  
         img2 = cv2.imread(img_left_path)  
-    
+ 
         if img1 is None or img2 is None:
             self.parent.works.box("wrapper: Could not load images")
             return
-        
-        # if self.parent.flipped:  ## maybe later
-        #     img1, img2 = img2, img1
-            
+      
         blendWidth = self.parent.blendWidth
              
         # 1. Match heights (standardize to img1's height)
@@ -143,17 +131,20 @@ class Works:
         alpha = np.linspace(0, 1, blendWidth).reshape(1, blendWidth, 1)
         blended = (strip1 * (1 - alpha) + strip2 * alpha).astype(np.uint8)
 
-        if self.parent.filtered in ('8','9'):
-            match self.parent.filtered:
-                case '8':
-                    blended = self.parent.filters.Filter8(strip1, strip2)
-                case '9':
-                    blended = self.parent.filters.Filter9(strip1, strip2)
-                                        
-        mid_val = int(self.parent.edgesValue) 
+        if self.parent.filtered == '8':
+            blended = self.parent.filters.Filter8(strip1, strip2)
+            
+        elif self.parent.filtered == '9':
+            blended = self.parent.filters.Filter9(strip1, strip2)
+                                              
+        mid_val = int(self.parent.edgesValue)   
+    
         if mid_val > 5:   
             blended = self.parent.filters.EdgesSlider(mid_val, blended, strip1, strip2)
 
+        # blended is based on rows and columns - select all rows[:,
+        # select all the columns starting at w1 minus the blendWidth
+        # paste blended starting there
         final_img[:, w1 - blendWidth:w1] = blended 
          
         del blended, strip1, strip2, img1, img2

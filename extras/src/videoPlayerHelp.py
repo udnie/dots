@@ -62,6 +62,7 @@ QL = QColor(230,230,230)  ## 10% gray
 QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
 SD = QColor(115,252,214,125)  ## spindrift-lite
+QR = QColor(225,100,30,210)   ## clipsMaker
 
 SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X', 'S, SpaceBar', \
                     '[',']', '>,  +,  ]', '<,  _,  [', 'Shift-B','Shift-F','Shift-S', \
@@ -182,7 +183,7 @@ class VideoHelp(QWidget):
 ### -------------------------------------------------------- 
     def __init__(self, parent, off=0, switch=''): 
         super().__init__()  
-        
+         
         self.parent = parent
         self.switch = switch
         
@@ -190,7 +191,7 @@ class VideoHelp(QWidget):
             Qt.WindowType.FramelessWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
     
-        extras, width, height = 4, 287, 726
+        extras, width, height = 4, 286, 726
         if self.parent.player == "two":
             extras, height = 1, 636
                 
@@ -220,7 +221,11 @@ class VideoHelp(QWidget):
             elif self.parent.player == "two" and row in (14,15):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)  
-            
+                
+            elif k in ('Settings', 'Clips'):
+                self.table.setRow(row, 0, k, QR, True,True)
+                self.table.setRow(row, 1, "  " + val, QR, '',True)
+          
             else:
                 self.table.setRow(row, 0, k, '',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)

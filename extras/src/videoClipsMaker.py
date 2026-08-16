@@ -44,11 +44,11 @@ class Clips:
                        
         self.AutoAspect  = True      ## True reads the video metadata to set the aspect ratio and resize the widget
                                      ## requires that getVideoWidthHeight is working                                     
-        self.MakeClips   = False     ## True - from photos - requires having opencv installed and import cv2 uncommented
+        self.MakeClips   = False     ## set on from widget only when making a clip - interferes with autoAspect
         self.FirstFrame  = False     ## True - read only the first frame of a video       
         self.SkipFrames  = False     ## True - read the Nth frame of a video 
         self.FilterOn    = False     ## True - image aspect matches self.aspect (parent)
-        self.PlayVideo   = True      ## True plays video upon loading
+        self.PlayVideo   = False     ## True plays video upon loading
         self.AddFileName = False     ## True add to frame
         
         # print(cv2.__version__)  ## just to make sure - needs to be 4.12 or better
@@ -135,25 +135,37 @@ class Clips:
 ### --------------------------------------------------------
     def closeThese(self):  
         self.closeSettings() 
-        self.parent.closeMediaPlayer() if self.parent.player == 'two' else\
+        self.parent.closeMediaPlayer() if self.parent.player == 'two' else \
             self.parent.closeOnOpen()
               
     def makingClips(self):  ## by reading one or all files - "both"
         if not self.MakeClips: 
             self.parent.shared.msgbox('Make sure Opencv is installed and MakeClipsOn is set')
             return        
-        self.closeThese()         ## read every 'nth frame
-        self.skipFrames() if self.SkipFrames\
-            else self.readAll()
+        self.closeThese()
+        self.skipFrames() if self.SkipFrames else self.readAll()
             
     def skipFrames(self):  ## read a file reading every N'th frame - "both"
         if fileName := self.returnFileName():   
             path = os.path.dirname(fileName)  
-            fileName = os.path.basename(fileName)
-            title = self.setTitle(path)
-            if self.parent.player == "one": self.parent.shared.setFileNameInMediaPlayer(fileName)
-            QTimer.singleShot(20, partial(self.assembler, path, title, fileName)) 
+            fileName = os.path.basename(fileName)       
+            output = self.setOutput(path)
+            if self.parent.player == "one": 
+                self.parent.shared.setFileNameInMediaPlayer(fileName)
+            QTimer.singleShot(20, partial(self.assembler, path, output, fileName)) 
+                      
+    def readAll(self):  ## needed an update - was only writing to .mov
+        path = QFileDialog.getExistingDirectory(self.parent, '') 
+        if path == None or path == '':
+            return 
+        output = self.setOutput(path)
+        QTimer.singleShot(20, partial(self.assembler, path, output))
 
+    def setOutput(self, path):
+        os.chdir(path)
+        output = os.path.basename(os.getcwd())
+        return output.strip() + '.mov'
+    
     def returnFileName(self):  
         self.closeThese()  ## select a single file - open for "one" or make clips for "both"  
         path = os.getcwd() if self.parent.path == '' \
@@ -165,23 +177,7 @@ class Clips:
             self.parent.shared.msgbox('error opening file')
             return None
         return fileName 
-             
-    def readAll(self):  
-        path = QFileDialog.getExistingDirectory(self.parent, '') 
-        if path == None or path == '':
-            return  
-        title = self.setTitle(path)    
-        QTimer.singleShot(20, partial(self.parent.clips.assembler, os.getcwd(), title))
-                                            
-    def setTitle(self, path):  ## directory and name of clips *.mov there
-        os.chdir(path)
-        title = os.path.basename(path) + '.mov'  ## uses .mp4 codec - works on my mac
-        try:
-            os.remove(title)
-        except:
-            None      
-        return title
-       
+                                        
     def setDefaultSizes(self, key):  
         try:
             self.parent.key = key
@@ -210,8 +206,8 @@ class Clips:
                                       'check if opencv installed or uncommented')
             return
        
-        if not self.SkipFrames:
-            if self.FirstFrame:  
+        if not self.SkipFrames:      
+            if self.FirstFrame:  ## make a list of all the files that match the extension
                 images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos
             else:
                 images = [img for img in os.listdir(path) if img.lower().endswith(Ext)]  ## reads photos
@@ -221,26 +217,28 @@ class Clips:
             images = [fileName]  ## read only one file
             image_name = images
  
-        for image_name in images:
-            image_path = os.path.join(path, image_name)     
-            
-            if outputVideo in image_path:  ## don't read the output file
+        for image_name in images:   
+            if outputVideo == image_name:  ## don't read the output file ".mov"
                 continue
-            
+         
+            image_path = os.path.join(path, image_name)   
             cap = cv2.VideoCapture(image_path)
+            
             if not cap.isOpened():
                 self.parent.shared.msgbox("assembler: Could not open video.")
                 return
 
-            if self.FirstFrame:  ## reads the first frame of a video 
+            if self.FirstFrame:  ## reads the first frame of a video    
                 ret, img = cap.read()
                 if not ret:
                     self.parent.shared.msgbox("assembler: Could not read the first frame.")
                     return
+                
                 if self.FilterOn and not self.aspMatch(img):
                     continue     
+                
                 reads = self.writeOut(img, image_name, out, reads)
-                if reads >= self.Max:
+                if reads >= self.Max:  ## number of files to read
                     break
 
             elif self.SkipFrames:  ## reads the Nth frame of a video
@@ -256,7 +254,7 @@ class Clips:
                             break     
                     frameCount += 1
                     
-            else:  
+            else:       
                 img = cv2.imread(image_path)  ## reads a directory of photos
                 if img is None:
                     self.parent.shared.msgbox(f"assembler Could not read file {image_name}")
@@ -273,7 +271,7 @@ class Clips:
             self.parent.shared.msgbox(f"Video: {outputVideo} frames: {reads}")
             fileName = os.getcwd() + '/' + outputVideo    
             
-            self.parent.setMediaPlayer(fileName) if self.parent.player == 'one' else\
+            self.parent.setMediaPlayer(fileName) if self.parent.player == 'one' else \
                 self.parent.setMediaPlayer(fileName, 'addToScene')  ## setMediaPlayer is unique by parent
             
             if self.parent.mediaPlayer:
@@ -297,7 +295,7 @@ class Clips:
         # img = cv2.rotate(img, cv2.ROTATE_180)  ## just in case they're upsidedown 
         img = self.ctrOnBackground(img, image_name)  ## or ROTATE_90_CLOCKWISE) etc...
         if self.AddFileName:
-            self.addFileName(img, image_name)
+            self.addFileName(img, image_name.strip())
         if isinstance(img, np.ndarray):
             n = 0 
             while n < self.Wpr:  ## writes per read
@@ -309,6 +307,8 @@ class Clips:
         return k
                     
     def addFileName(self, img, name):  ## right out of google - thanks
+        if name == '.mov':
+            return
         org   = (20, self.parent.VideoH-25)
         font  = cv2.FONT_HERSHEY_SIMPLEX
         scale = 1

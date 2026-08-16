@@ -98,14 +98,12 @@ class BkgItem(QGraphicsPixmapItem):  ## background
         self.rate      = 0
         self.runWay    = 0  ## what's not visible 
          
-        self.bkgScrollWrks.setRunWay()  
+        self.bkgScrollWrks.setRunWay() 
+        self.scrollable = self.isScrollable()  ## once width and height set 
                                    
-        self.ratio = self.height/9
-        self.ratio = int(self.width/self.ratio)
-          
-        self.scrollable = self.isScrollable()  ## once width and height set
-        self.pathWatcher = None 
-                    
+        # self.ratio = self.height/9  ## used by bkgMatte
+        # self.ratio = int(self.width/self.ratio)
+               
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, False)                                 
         self.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False)  ## locked
           
@@ -196,11 +194,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
     def openMenu(self):
         self.bkgMaker.closeWidget()    
         self.helpMenu = BkgHelp(self) 
+        self.canvas.offMenuClick = self.helpMenu 
         
     def closeMenu(self):
         if self.helpMenu != None:
             self.helpMenu.closeMenu()
             self.helpMenu = None
+            self.canvas.offMenuClick = None
     
     def closeMatteWidget(self):
         if self.matteWidget != None:   
@@ -223,13 +223,13 @@ class BkgItem(QGraphicsPixmapItem):  ## background
                 return   
                        
             elif not self.addedScroller:  ## check on the distance to showtime   
-                          
+    
                 if self.direction   == 'left'     and int(value.x()-self.runWay) <= ShowTime or \
                     self.direction  == 'right'    and int(value.x()) >= -ShowTime or \
                     self.direction  == 'vertical' and int(value.y())-self.runWay <= ShowTime:  
                     self.addNextScroller()  ## the next scroller factory                     
                     self.addedScroller = True        
-                                       
+                                 
             elif self.addedScroller:  ## test if nolonger in view     
         
                 if self.direction   == 'left'     and abs((value.x())) >= self.width or \

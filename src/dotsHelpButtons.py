@@ -83,11 +83,13 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
                 else:
                     self.canvas.clear()
                     self.canvasHelp = CanvasHelp(self, self.canvas)
+                    self.canvas.offMenuClick = self.canvasHelp
             else:
                 if self.storyFlag:
                     self.storyHelp.closeMenu() 
                 else:
                     self.storyHelp = StoryHelp(self, self.canvas) 
+                    self.canvas.offMenuClick = self.storyHelp
         else:
             if self.pathFlag:
                 self.pathHelp.closeMenu() 
@@ -95,6 +97,7 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
             else:
                 self.canvas.pathMaker.pathWorks.closeMenu() 
                 self.pathHelp = PathHelp(self, self.canvas)
+                self.canvas.offMenuClick = self.pathHelp
                 self.pathFlag = True
         self.canvas.setFocus()
     
@@ -104,10 +107,12 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
                 self.canvasHelp.closeMenu() 
             elif self.storyFlag:
                 self.storyHelp.closeMenu() 
+            self.canvas.offMenuClick = None
         else:  
             if src == 'path' or self.pathFlag:
                 if self.canvas.pathMaker.pathWorks.pathHelp != None:
                     self.canvas.pathMaker.pathWorks.pathHelp.closeMenu() 
+                    self.canvas.offMenuClick = None
                     
 ### --------------------------------------------------------
 class CanvasHelp: 

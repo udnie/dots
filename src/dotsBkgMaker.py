@@ -104,7 +104,7 @@ class BkgMaker:
 
     def setBkgColor(self, color):  ## add a flat color to canvas
         if color.isValid():
-            self.flat = Flat(color, self.canvas) 
+            self.flat = Flat(color, self) 
             self.flat.setZValue(common['bkgZ'])  ## always on top       
             self.scene.addItem(self.flat) 
             self.updateZvals(self.flat)   ## update other bkg, frame zvalues 
@@ -156,17 +156,23 @@ class BkgMaker:
     def addStoryHelp2(self):
         self.closeStoryHelp2()
         self.storyHelp2 = StoryHelp2(self.canvas)
+        self.canvas.offMenuClick = self.storyHelp2
+        
+    def closeMenu(self):
+        self.closeStoryHelp2()
         
     def closeStoryHelp2(self):
         if self.storyHelp2 != None:
             self.storyHelp2.closeMenu()
             self.storyHelp2 = None  
+            self.canvas.offMenuClick = None
               
     def closeStoryHelp(self):
         if self.canvas.helpButton.storyFlag:
             self.canvas.helpButton.storyHelp.closeMenu()
             self.canvas.helpButton.storyFlag = False
             self.canvas.helpButton.storyHelp = None
+            self.canvas.offMenuClick = None
                 
     def closeWidget(self):
         if self.widget != None:

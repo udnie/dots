@@ -80,6 +80,7 @@ class FlatHelp:  ## flat and frame keyboard help for both
         self.closeMenu()
     
     def closeMenu(self):   
+        self.canvas.offMenuClick = None
         self.table.close()
         if self.switch != '':
             self.canvas.setKeys('N')
@@ -90,10 +91,10 @@ class Flat(QGraphicsPixmapItem):
     def __init__(self, color, parent, z=common['bkgZ']):
         super().__init__()
 
-        self.canvas = parent
-        self.bkgMaker  = parent.bkgMaker
-        self.scene    =  parent.scene
-        self.mapper   =  parent.mapper
+        self.bkgMaker = parent
+        self.canvas   = parent.canvas
+        self.scene    = parent.scene
+        self.mapper   = parent.mapper
             
         self.fileName = 'flat'
         self.type    = 'flat'
@@ -168,6 +169,7 @@ class Flat(QGraphicsPixmapItem):
             
     def openMenu(self):
         self.help = FlatHelp(self, self.canvas, 0,'flat')
+        self.canvas.offMenuClick = self.help
                   
     def tagThis(self):
         p = QCursor.pos()
@@ -264,6 +266,7 @@ class Frame(QGraphicsPixmapItem):
         
     def openMenu(self):
         self.help = FlatHelp(self, self.canvas, 0,'frame')
+        self.canvas.offMenuClick = self.help
                 
     def tagThis(self):
         p = QCursor.pos()

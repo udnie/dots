@@ -52,7 +52,7 @@ class Node(QObject):
         except RuntimeError:
             return None
 
-    def _setRotate(self, rotate):
+    def _setRotation(self, rotate):
         try:
             self.pix.setRotation(rotate)
         except RuntimeError:
@@ -60,9 +60,9 @@ class Node(QObject):
 
     pos = pyqtProperty(QPointF, fset=_setPos)
     scale = pyqtProperty(float,  fset=_setScale) 
-    rotate = pyqtProperty(int,  fset=_setRotate) 
+    rotate = pyqtProperty(float,  fset=_setRotation) 
     opacity = pyqtProperty(float, fset=_setOpacity)
-
+    
 ### -------------------------------------------------------- 
 class Animation:
 ### --------------------------------------------------------

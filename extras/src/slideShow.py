@@ -14,30 +14,17 @@ from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, \
 from videoPlayerHelp    import SlideShowHelp, SlideShowKeys
 
 ### --------------------------------------------------------
-Path  = ''      ## set a default directory
-SetY  = 150     ## Y position of slideShow   
-Hpad  = 60      ## padding for buttons added to height
+SetY = 150     ## Y position of slideShow   
+Hpad = 60      ## padding for buttons added to height
+CutOff = 550   ## when to stop showing text  
+OneColor = False   ## sets frame same as background
 
-CutOff   = 550      ## when to stop showing text  
-OneColor = False    ## sets frame same as background
-
-# Width, Height     = 1200,  750      ## choose one you like and delete the rest
-# ViewW, ViewH      = 1150,  700      ## starting viewport
-# MaxW, MaxH, MaxV  =  950,  550, 575 ## max image size within the ViewW/H
-
-Width, Height     = 1350,  850  
-ViewW, ViewH      = 1300,  800 
-MaxW, MaxH, MaxV  = 1100,  650, 675 
-
-# Width, Height     = 1450,  900  
-# ViewW, ViewH      = 1350,  850
-# MaxW, MaxH, MaxV  = 1150,  675, 700
-
-# Width, Height     = 1500, 1000   
-# ViewW, ViewH      = 1450,  950  
-# MaxW, MaxH, MaxV  = 1200,  750, 800 
+Width, Height     = 1450,  900  ## 
+ViewW, ViewH      = 1350,  825  ## starting viewport
+MaxW, MaxH, MaxV  = 1150,  675, 700  ## max image size within the ViewW/H
 
 Ext = (".tif", ".png", ".jpg", ".jpeg", ".webp")
+Del = 16777219  ## delete key
 
 ### --------------------- slideShow.py ---------------------
 ''' Reads and displays .png, .jpg, .jpeg, .tif, .tiff, and .webp files.
@@ -51,7 +38,7 @@ class SlideShow(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         self.setWindowTitle("SlideShow")
-          
+               
         self.setUI()     
         self.show()
         
@@ -64,7 +51,7 @@ class SlideShow(QWidget):
         self.txtlst     = ''
         self.rotters    = {}
         self.fileName    = ''
-        self.path       = Path
+        self.path       = ''
         self.current    = 0
         self.rot        = 0
         self.running    = False 
@@ -109,7 +96,7 @@ class SlideShow(QWidget):
         if key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.slideMenuKeys('X')       
             
-        elif key in (Qt.Key.Key_D, 16777219):   ## 16777219 - delete key 
+        elif key in (Qt.Key.Key_D, Del): 
             self.slideMenuKeys('D')  
 
         elif key in (Qt.Key.Key_N, Qt.Key.Key_Right):
@@ -122,7 +109,7 @@ class SlideShow(QWidget):
             self.toggleFrameless()  
             
         elif key == Qt.Key.Key_S and mod & Qt.KeyboardModifier.ShiftModifier:
-            self.selectFiles()  
+            self.selectFiles()  ## can be in some other directory other than the current
             
         elif  key in (Qt.Key.Key_B, Qt.Key.Key_Left):
             self.slideMenuKeys('B')      
@@ -201,6 +188,7 @@ class SlideShow(QWidget):
         if self.path == '':  self.path = os.getcwd()
    
         self.fileName = file
+     
         try:
             img = QImage(self.fileName) 
         except:
@@ -232,7 +220,7 @@ class SlideShow(QWidget):
         self.scene.addItem(self.pixItem)
         
         if self.setTags and self.view.height() > CutOff:   
-            self.addTextItem()    
+            self.addTextItem(self.fileName)    
                  
         del img
             
@@ -337,10 +325,12 @@ class SlideShow(QWidget):
         if length := len(self.files):
             if length == 0:
                 return
-            elif length == 1 or self.current + 1 > length -1:
+            
+            if length == 1 or self.current + 1 > length -1:
                 self.current = 0       
             else:
-                self.current += 1        
+                self.current += 1   
+                     
             self.rot = 0
             self.addPixItem(self.files[self.current])
             
@@ -348,19 +338,22 @@ class SlideShow(QWidget):
         if length := len(self.files):
             if length == 0:
                 return
-            elif self.current >= 0 and self.current <= length:
+          
+            if self.current >= 0 and self.current <= length:
                 self.current -= 1
-                if self.current < 0:
-                    self.current = length -1                     
+                
+            if self.current < 0:
+                self.current = length -1            
+            
             self.rot = 0
             self.addPixItem(self.files[self.current])
    
 ### --------------------------------------------------------
-    def addTextItem(self):   
+    def addTextItem(self, fileName):   
         if self.textItem != None:
             self.scene.removeItem(self.textItem)
             self.textItem = None    
-        if txt := self.tagIt():
+        if txt := self.tagIt(fileName):
             self.textItem = txt
             self.textItem.setZValue(100) 
             self.textItem.setPos(self.textXY()) 
@@ -376,12 +369,12 @@ class SlideShow(QWidget):
             if int(self.view.height()) > CutOff: 
                 self.textItem.setPos(self.textXY()) 
     
-    def tagIt(self):   
+    def tagIt(self, file):   
         try:
             width, height = self.saveW, self.saveH   
             asp = math.floor(width/height *100)/100.0  
         except:
-            self.msgbox('tagIt: problem with ' + file)
+            self.msgbox('tagIt: problem with ' + os.path.basename(file))
             return None
         
         file = os.path.basename(self.fileName)
@@ -495,7 +488,7 @@ class SlideShow(QWidget):
         if list := self.getPathList():      
             files = self.getFileNames(list)  ##  makes sure they're image files
             self.setImageFiles(files)
-   
+    
     def startUp(self, path=''):
         self.clearScene()  
         if path != '':  
@@ -516,8 +509,8 @@ class SlideShow(QWidget):
             path = os.path.join(self.path, file)
             if os.path.isdir(path):  ## ignore directories
                 continue  
-            file = file.lower(); 
-            if file[file.rfind('.'):] in Ext:                  
+            file = file.lower();     
+            if file[file.rfind('.'):] in Ext:  ## image file               
                 filenames.append(file)
         if len(filenames) == 0:
             self.msgbox('getFileNames: No Files Found')
@@ -531,7 +524,7 @@ class SlideShow(QWidget):
             if len(self.files) == 1:
                 self.msgbox('openFiles: Only One Matching File')                 
                        
-    def selectFiles(self):
+    def selectFiles(self):  ## keeps the path attached as it might not be the cwd
         self.startUp()
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.FileMode.ExistingFiles) 
@@ -565,7 +558,7 @@ class SlideShow(QWidget):
                 "border: 1px solid rgb(250,250,250);\n"
                 # "color: rgb(250,250,250);\n"      
                 "}")
-          
+       
         self.init()
   
         self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
