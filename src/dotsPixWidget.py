@@ -13,51 +13,10 @@ class PixWidget(QWidget):
 ### -------------------------------------------------------- 
     def __init__(self, parent, switch=''):
         super().__init__()
-           
-        self.fileName = '' 
-        self.switch = switch
-                       
-        if self.switch == '':              
-            self.pix   = parent
-            self.works = self.pix.works
-            self.pix.widgetOn = True 
-            self.fileName = os.path.basename(self.pix.fileName)
-        else:    
-            self.canvas = parent
-     
-        self.type = 'widget' 
-        self.setAccessibleName('widget')
-        
-        self.save = QPointF()
-        self.WidgetW, self.WidgetH = 365.0, 285.0
-                   
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
-        hbox.addSpacing(5) 
-        hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignBottom)
-        self.setLayout(hbox)
-        
-        self.label.setText(self.fileName)
-   
-        self.setFixedHeight(int(self.WidgetH))  
-        self.setStyleSheet('background-color: rgba(0,0,0,0)')
-        self.setContentsMargins(0,15,0,-15) 
-        
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setWindowFlags(Qt.WindowType.Window| \
-            Qt.WindowType.CustomizeWindowHint| \
-            Qt.WindowType.WindowStaysOnTopHint)
-                                                     
+              
+        self.setUI(parent, switch)
         self.show()
-           
-        if self.switch in('on', 'all'):  ## widget pos() set by pixitem
-            x, y = getVuCtr(self.canvas)  
-            self.label.setText('FileName goes Here')      
-            if self.switch == 'on':
-                self.move(x-420,y-320)
-            else:
-                self.move(x-375,y-130)
-                   
+       
 ### --------------------------------------------------------              
     def paintEvent(self, e): 
         painter = QPainter(self)
@@ -121,11 +80,57 @@ class PixWidget(QWidget):
             self.pix.setOpacity(op)
             self.pix.alpha2 = op
             self.opacityValue.setText(f'{op:.2f}') 
+   
+### --------------------------------------------------------
+    def setUI(self, parent, switch):           
+        self.switch = switch
+
+        self.fileName = '' 
+        self.switch = switch
+                        
+        if self.switch == '':              
+            self.pix   = parent
+            self.works = self.pix.works
+            self.pix.widgetOn = True 
+            self.fileName = os.path.basename(self.pix.fileName)
+        else:    
+            self.canvas = parent
+        
+        self.type = 'widget' 
+        self.setAccessibleName('widget')
+        
+        self.save = QPointF()
+        self.WidgetW, self.WidgetH = 360.0, 285.0
+                    
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.sliderGroup(), Qt.AlignmentFlag.AlignBottom)
+        hbox.addSpacing(5) 
+        hbox.addWidget(self.buttonGroup(), Qt.AlignmentFlag.AlignBottom)
+        self.setLayout(hbox)
+        
+        self.label.setText(self.fileName)
+    
+        self.setFixedHeight(int(self.WidgetH))  
+        self.setStyleSheet('background-color: rgba(0,0,0,0)')
+        self.setContentsMargins(0,15,0,-15) 
+        
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.setWindowFlags(Qt.WindowType.Window| \
+            Qt.WindowType.CustomizeWindowHint| \
+            Qt.WindowType.WindowStaysOnTopHint)
+                                                                
+        if self.switch in('on', 'all'):  ## widget pos() set by pixitem
+            x, y = getVuCtr(self.canvas)  
+            self.label.setText('FileName goes Here')      
+            if self.switch == 'on':
+                self.move(x-420,y-320)
+            else:
+                self.move(x-375,y-130)
                                         
 ### -------------------------------------------------------- 
     def sliderGroup(self):
         groupBox = QGroupBox('Rotate     Scale   Opacity ')   
-        groupBox.setFixedWidth(190)
+        groupBox.setFixedWidth(185)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
         groupBox.setStyleSheet('background: rgb(240, 240, 240)')
    

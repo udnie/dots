@@ -7,6 +7,10 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**August 21 2026**   
+Updated **dotsAnimation** to run **pySide6 6.11** along with the usual suspects, **PyQt6** and **PyQt5**.  More fun with menus and widgets.
+
+---
 
 **August 15 2026**  
 Found an interesting bug having to do with **clipsMaker**. It looks like a bit of code I thought was working wasn't. **ClipsMaker** stopped using the name of the directory plus .mov as the output file name when reading all the files but worked correctly if reading the **Nth** frame. It was dropping the directory name and leaving the .mov file which would be invisible on a mac's screen.

@@ -22,7 +22,7 @@ from dotsWings          import Wings
 
 ### ---------------------- dotsShowBiz --------------------
 ''' functions to load and add both demo and non demo items,
-            play files, to the scene/canvas/storyboard '''    
+    play files, to the scene/canvas/storyboard '''    
 ### --------------------------------------------------------
 class ShowRunner:  
 ### --------------------------------------------------------
@@ -42,17 +42,16 @@ class ShowRunner:
         self.sideCar   = SideCar(self.canvas)  
         self.showtime  = ShowTime(self.canvas)
         self.showFiles = ShowFiles(self.canvas) 
-   
+
         self.locks = 0
        
 ### --------------------------------------------------------          
-    def runThese(self):   
+    def runThese(self):  
         if self.showbiz.demoAvailable and self.canvas.openPlayFile in ('snakes', 'bats', 'hats'):  
-            if self.showbiz.helpMenus.demoHelp != None:
-                self.showbiz.helpMenus.demoHelp.runThese() 
-        else:
-            self.showtime.run()
-        
+            self.showbiz.helpMenus.runDemos() 
+        else:     
+            self.showtime.run()  ## not a demo
+                     
     def makeTableView(self, dlist, src=''):  ## called if missing files     
         if self.showbiz.tableView != None:
             self.showbiz.tableView.bye()                      
@@ -65,9 +64,8 @@ class ShowRunner:
         except IOError:
             MsgBox('openPlay: Error loading ' + file, 5)
             return '' 
-        return dlist                                                            
-                                                                                                                                                                                                                          
-### --------------------------------------------------------                            
+        return dlist                                                       
+                                                                                                                                                                                                                                
     def loadPlay(self, src=''):  ## scr='table' launch play file viewer
         if self.canvas.pathMakerOn:  
             return    
@@ -163,7 +161,7 @@ class ShowRunner:
                 
         del dlist
         self.cleanup(ns, kix)  ## add shadows
-    
+
 ### --------------------------------------------------------                         
     def cleanup(self, ns, kix):
         fileName = os.path.basename(self.canvas.openPlayFile) 

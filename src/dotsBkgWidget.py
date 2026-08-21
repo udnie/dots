@@ -42,7 +42,7 @@ class BkgWidget(QWidget):
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)
         painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,  ## border
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
-        painter.setBrush(QColor(200,200,200))  ## grayish
+        painter.setBrush(QColor(0,150,245,255))
         painter.drawRoundedRect(rect, 15, 15)
               
     def mousePressEvent(self, e):
@@ -102,7 +102,7 @@ class BkgWidget(QWidget):
         self.setAccessibleName('widget')
     
         self.save = QPointF()
-        self.WidgetW, self.WidgetH = 380.0, 300.0
+        self.WidgetW, self.WidgetH = 360.0, 285.0
                   
         vbox = QVBoxLayout()  
           
@@ -125,7 +125,7 @@ class BkgWidget(QWidget):
         
         self.setFixedHeight(int(self.WidgetH)) 
         self.setStyleSheet('background-color: rgba(0,0,0,0)')  ## gives you rounded corners
-        self.setContentsMargins(0, 0, 5, 0) 
+        self.setContentsMargins(0, 0, 0, 0) 
         
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setWindowFlags(Qt.WindowType.Window| \
@@ -142,14 +142,14 @@ class BkgWidget(QWidget):
 
 ### --------------------------------------------------------
     def sliderGroup(self):
-        groupBox = QGroupBox('  ScreenRate     Speed Factor')
-        groupBox.setFixedWidth(205) 
+        groupBox = QGroupBox('  ScreenRate   Speed Factor')
+        groupBox.setFixedWidth(185) 
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
             
         self.factorValue = QLabel('1.00',  alignment=Qt.AlignmentFlag.AlignHCenter)
         self.factorValue.setFixedWidth(40)
         self.factorDial = QDial()
-        self.factorDial.setFixedHeight(90)
+        self.factorDial.setFixedHeight(75)
         self.factorDial.setMinimum(50)
         self.factorDial.setMaximum(150)
         self.factorDial.setValue(100)
@@ -160,7 +160,7 @@ class BkgWidget(QWidget):
         if self.switch == '':
             self.factorDial.valueChanged.connect(self.setBkgFactorValue)
           
-        self.rateValue = QLabel('',  alignment=Qt.AlignmentFlag.AlignRight)
+        self.rateValue = QLabel('0',  alignment=Qt.AlignmentFlag.AlignRight)
         self.rateValue.setFixedWidth(35)
         self.rateSlider = QSlider(Qt.Orientation.Vertical)
         self.rateSlider.setMinimum(1250)

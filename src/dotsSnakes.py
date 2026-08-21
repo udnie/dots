@@ -157,7 +157,7 @@ class Snakes:
                 idx += 1   
                      
             k += 1    
-            QTimer.singleShot(k * 300, partial(self.run, path))  ## leave some time between snakes
+            QTimer.singleShot(k * 150, partial(self.run, path))  ## leave some time between snakes
             
             if k == snakes:        
                 self.canvas.showWorks.disablePlay()  ## turns off play - turns on pause/resume/stop

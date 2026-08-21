@@ -47,8 +47,8 @@ def flapper(pix):  ## used by demo bat wings
     return group
 
 ### --------------------------------------------------------  
-def demo(pix, path):  ## sets the demo path  
-    if not DemoAvailable():  ## <--- shouldn't happen
+def demo(pix, path):  ## used by bats horizontal and vertical demos
+    if not DemoAvailable(): 
         return
     
     waypts = pathLoader(path)  ## demo-path file name from the demo directory

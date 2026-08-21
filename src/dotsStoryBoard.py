@@ -141,6 +141,7 @@ class StoryBoard(QWidget):
                         
                 elif e.button() == Qt.MouseButton.LeftButton and \
                     self.canvas.offMenuClick != None:
+                        
                         self.canvas.offMenuClick.closeMenu() 
                         self.canvas.offMenuClick = None
                     
@@ -248,5 +249,7 @@ class StoryBoard(QWidget):
         e.accept()
         
 ### -------------------- dotsStoryBoard --------------------
+
+
 
 

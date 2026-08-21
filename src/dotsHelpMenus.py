@@ -35,7 +35,7 @@ demoKeys = {
     ## Sprites, Background and Shadow Menus in helpMonkey
     ## Widgets for Pixitems, Backgrounds., in helpMaker 
 ### --------------------------------------------------------    
-class HelpMenus:  ## demos and snakes
+class HelpMenus:  ## demos and screens - instantiated in showbiz - always up
 ### --------------------------------------------------------
     def __init__(self, parent):
         super().__init__()
@@ -44,23 +44,78 @@ class HelpMenus:  ## demos and snakes
         self.demoHelp = None
         self.screenHelp = None
 
+        self.snakes = Snakes(self.canvas)
+        self.bats   = Bats(self.canvas)
+        self.hats   = Hats(self.canvas)
+
+### --------------------------------------------------------
     def setMenu(self, key):
         if key == 'D':
             if self.demoHelp == None:
                 self.demoHelp = DemoHelp(self.canvas)
                 self.canvas.offMenuClick = self.demoHelp
-            else:
-                self.demoHelp.closeMenu()
-                self.demoHelp = None
-                 
+            else: 
+                self.closeMenu()
+              
         elif key == 'S':
             if  self.screenHelp == None:
                 self.screenHelp = ScreenHelp(self.canvas)  ## in screens 
                 self.canvas.offMenuClick = self.screenHelp
             else:
-                self.screenHelp.closeMenu()
-                self.screenHelp = None       
+                self.closeMenu()
+                            
+    def closeMenu(self):   
+        if self.demoHelp != None:     
+            self.demoHelp.closeMenu()
+            self.demoHelp = None
+         
+        elif self.screenHelp != None:
+            self.screenHelp.closeMenu()
+            self.screenHelp = None  
+                   
+        self.canvas.offMenuClick = None
+            
+    def runDemos(self):
+        if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
+            self.snakes.rerun(self.snakes.what)  
+            
+        elif self.canvas.openPlayFile == 'hats' and self.hats.direction != '':
+            self.hats.rerunAbstract(self.hats.direction)
+              
+        elif self.canvas.openPlayFile == 'bats':
+            self.bats.rerun()
+            
+        QTimer.singleShot(10, self.closeMenu)  
              
+    def run(self, key):  ## from demos menu      
+        if key == 'snakes':
+            self.canvas.bkgMaker.newTracker.clear()
+            self.runSnakes('vertical') if self.canvas.dots.Vertical else \
+                self.runSnakes('left')   
+                    
+        elif key == 'bats':
+            if self.bats.makeBats() == None:
+                self.closeMenu() 
+           
+        elif key in ('left', 'right'):  ## hats and bats
+            if self.canvas.dots.Vertical:     
+                MsgBox('Not Implemented for Vertical Format')
+                return   
+            self.canvas.bkgMaker.newTracker.clear()    
+            self.hats.makeHatsDemo('left') if key == 'left' else \
+                self.hats.makeHatsDemo('right') ## left to right - direction of travel    
+             
+    def runSnakes(self, what): 
+        if what == 'snakes': 
+            self.snakes.delSnakes()  
+             
+        if what != '': 
+            self.snakes.makeSnakes(what)
+            
+        elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
+            MsgBox('The Screen Needs to be Cleared to Run Snakes', 6, getCtr(-225,-175))
+            return    
+         
 ### --------------------------------------------------------     
 class DemoHelp:  
 ### --------------------------------------------------------
@@ -72,11 +127,7 @@ class DemoHelp:
 
         self.dots  = self.canvas.dots
         self.scene = self.canvas.scene
-        
-        self.snakes = Snakes(self.canvas)
-        self.bats   = Bats(self.canvas)
-        self.hats   = Hats(self.canvas)
-    
+
 ### --------------------------------------------------------   
         rows = len(demoKeys)
         if self.dots.Vertical: rows = len(demoKeys)-2
@@ -113,57 +164,20 @@ class DemoHelp:
     def clicked(self):
         if self.switch == '':
             try:
-                p = self.table.currentRow() - 1  ## position in lst to key
+                p = self.table.currentRow() - 1  ## position in list by key
                 if p+1 <= len(self.demos): 
                     help = self.demos[p]
-                    QTimer.singleShot(25, partial(self.run, help))
+                    QTimer.singleShot(5, self.closeMenu)
+                    QTimer.singleShot(10, partial(self.canvas.showbiz.helpMenus.run, help))
             except:
                 None
         self.closeMenu()
         
     def closeMenu(self):
+        QTimer.singleShot(10, self.canvas.showbiz.helpMenus.closeMenu) 
         self.table.close()
         if self.switch != '':
             self.canvas.setKeys('N')
-    
-    def run(self, key):  
-        if key == 'snakes':
-            self.canvas.bkgMaker.newTracker.clear()
-            self.runSnakes('vertical') if self.dots.Vertical else \
-                self.runSnakes('left')   
-                    
-        elif key == 'bats':
-            if self.bats.makeBats() == None:
-                self.closeMenu() 
-           
-        elif key in ('left', 'right'):  ## hats and bats
-            if self.dots.Vertical:     
-                MsgBox('Not Implemented for Vertical Format')
-                return   
-            self.canvas.bkgMaker.newTracker.clear()    
-            self.hats.makeHatsDemo('left') if key == 'left' else \
-                self.hats.makeHatsDemo('right') ## left to right - direction of travel
-         
-    def runSnakes(self, what): 
-        if what == 'snakes': 
-            self.snakes.delSnakes()  
-             
-        if what != '': 
-            self.snakes.makeSnakes(what)
-            
-        elif self.openPlayFile != 'snakes' and len(self.scene.items()) > 0:
-            MsgBox('The Screen Needs to be Cleared to Run Snakes', 6, getCtr(-225,-175))
-            return
-    
-    def runThese(self):
-        if self.canvas.openPlayFile == 'snakes' and self.snakes.what != '':
-            self.snakes.rerun(self.snakes.what)  
-            
-        elif self.canvas.openPlayFile == 'hats' and self.hats.direction != '':
-            self.hats.rerunAbstract(self.hats.direction)
-              
-        elif self.canvas.openPlayFile == 'bats':
-            self.bats.rerun()
 
 ### --------------------------------------------------------     
 class ScreenHelp:  ## screens are from dotsScreens
@@ -213,6 +227,7 @@ class ScreenHelp:  ## screens are from dotsScreens
         self.closeMenu()     
  
     def closeMenu(self):
+        QTimer.singleShot(10, self.canvas.showbiz.helpMenus.closeMenu) 
         self.table.close()
         if self.switch != '':
             self.canvas.setKeys('N')

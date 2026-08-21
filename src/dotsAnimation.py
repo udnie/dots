@@ -25,7 +25,8 @@ Slow = {
 }
 
 ### -------------------- dotsAnimation ---------------------
-''' classes: Node, Animation. Many basic animations '''
+''' classes: Node, Animation. Many basic animations 
+    python3.14.7 updated Node added _get '''
 ### --------------------------------------------------------
 class Node(QObject):
 ### --------------------------------------------------------
@@ -38,31 +39,55 @@ class Node(QObject):
         try:
             self.pix.setPos(pos)
         except RuntimeError:
-            return None
+            return None   
 
-    def _setOpacity(self, opacity):
+    def _getPos(self):
         try:
-            self.pix.setOpacity(opacity)
+            return self.pix.pos()
         except RuntimeError:
-            return None
-
-    def _setScale(self, scale):
-        try:     
-            self.pix.setScale(scale)
-        except RuntimeError:
-            return None
+            return QPointF()
 
     def _setRotation(self, rotate):
         try:
             self.pix.setRotation(rotate)
         except RuntimeError:
+            return None   
+ 
+    def _getRotation(self):
+        try:
+            return self.pix.rotation()
+        except TypeError:
+            return 0.0 
+      
+    def _setScale(self, scale):
+        try:     
+            self.pix.setScale(scale)
+        except RuntimeError:
             return None
+       
+    def _getScale(self):
+            try:
+                return self.pix.scale()
+            except TypeError:
+                return 0.0   
+         
+    def _setOpacity(self, opacity):
+        try:
+            self.pix.setOpacity(opacity)
+        except RuntimeError:
+            return None
+        
+    def _getOpacity(self):
+            try:
+                return self.pix.opacity()
+            except TypeError:
+                return 0.0  
 
-    pos = pyqtProperty(QPointF, fset=_setPos)
-    scale = pyqtProperty(float,  fset=_setScale) 
-    rotate = pyqtProperty(float,  fset=_setRotation) 
-    opacity = pyqtProperty(float, fset=_setOpacity)
-    
+    pos = pyqtProperty(QPointF,  fget=_getPos,      fset=_setPos) 
+    rotate  = pyqtProperty(float, fget=_getRotation, fset=_setRotation) 
+    scale   = pyqtProperty(float, fget=_getScale,    fset=_setScale) 
+    opacity = pyqtProperty(float, fget=_getOpacity,  fset=_setOpacity)
+
 ### -------------------------------------------------------- 
 class Animation:
 ### --------------------------------------------------------
@@ -202,9 +227,7 @@ def fin(pix):  ## delete pixitem
     pix.node = Node(pix)
 
     sync = random.randint(6,10) * 75
-    rot = 270 
-    
-    if not random.randint(0,1): rot = -270
+    rot = 270 if random.randint(0,1) == 1 else -270
     
     rotate = QPropertyAnimation(pix.node, b'rotate')
     rotate.setDuration(int(sync))

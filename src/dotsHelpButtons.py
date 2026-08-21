@@ -105,8 +105,10 @@ class ButtonHelp:  ## includes pathMaker as well - see pathWorks
         if not self.canvas.pathMakerOn:
             if self.canvasFlag:
                 self.canvasHelp.closeMenu() 
+                
             elif self.storyFlag:
                 self.storyHelp.closeMenu() 
+                
             self.canvas.offMenuClick = None
         else:  
             if src == 'path' or self.pathFlag:

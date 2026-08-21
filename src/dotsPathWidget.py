@@ -112,7 +112,7 @@ class PathWidget(QWidget):
         self.save  = QPointF()
         self.label = QLabel('', alignment=Qt.AlignmentFlag.AlignCenter)
               
-        self.WidgetW, self.WidgetH = 345.0, 285.0
+        self.WidgetW, self.WidgetH = 355.0, 285.0
         
         self.rotate = 0
         self.scale  = 1.0
@@ -222,7 +222,7 @@ class PathWidget(QWidget):
     def buttonGroup(self):
         groupBox = QGroupBox('PathMaker   ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        groupBox.setFixedWidth(115)
+        groupBox.setFixedWidth(125)
         groupBox.setStyleSheet(
             'background: rgb(245, 245, 245);\n'
             'font-size: 14pt;\n'

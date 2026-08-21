@@ -237,8 +237,13 @@ class VideoPlayer(QWidget):
      
         vbox.addWidget(self.videoWidget, Qt.AlignmentFlag.AlignCenter)
         vbox.addWidget(setButtons(self), Qt.AlignmentFlag.AlignCenter)
-        vbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignHCenter)
-   
+    
+        hbox = QHBoxLayout()
+        hbox.addSpacing(10)
+        hbox.addWidget(setSlider(self), Qt.AlignmentFlag.AlignHCenter)
+        hbox.addSpacing(15)
+        vbox.addLayout(hbox)
+    
         self.setLayout(vbox)            
    
         self.shared.openPlayer(self.key)  ## open full frame - 3:2

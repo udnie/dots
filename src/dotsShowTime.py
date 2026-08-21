@@ -39,7 +39,7 @@ class ShowTime:
         if self.canvas.control != '' or self.canvas.animationRunning:
             return  
         
-        elif self.canvas.openPlayFile in Demos:
+        elif self.canvas.openPlayFile in Demos: 
             self.canvas.showbiz.showRunner.runThese()
             return
 

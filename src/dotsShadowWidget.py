@@ -14,7 +14,7 @@ class ShadowWidget(QWidget):
     def __init__(self, parent, shadow, switch=''):
         super().__init__()
         
-        self.setUI(parent, switch)          
+        self.setUI(parent, shadow, switch)          
         self.show()         
               
 ### --------------------------------------------------------                                   
@@ -24,7 +24,7 @@ class ShadowWidget(QWidget):
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
         painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,            
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
-        painter.setBrush(QColor(0,150,245,255))
+        painter.setBrush(QColor(145,160,160, 255))  ## grayish
         painter.drawRoundedRect(rect, 15, 15)
               
     def mousePressEvent(self, e):
@@ -71,7 +71,7 @@ class ShadowWidget(QWidget):
         self.opacityValue.setText(f'{op:.2f}')        
               
 ### --------------------------------------------------------
-    def setUI(self, parent, switch):   
+    def setUI(self, parent, shadow, switch):   
         self.switch = switch  
                         
         if self.switch == '':                     
@@ -85,7 +85,7 @@ class ShadowWidget(QWidget):
         self.setAccessibleName('widget')
          
         self.save = QPointF()
-        self.WidgetW, self.WidgetH = 345.0, 285.0
+        self.WidgetW, self.WidgetH = 355.0, 285.0
                 
         hbox = QHBoxLayout()
         hbox.addWidget(self.sliderGroup())
@@ -192,7 +192,7 @@ class ShadowWidget(QWidget):
     def buttonGroup(self):
         groupBox = QGroupBox('Shadows  ')
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
-        groupBox.setFixedWidth(115)
+        groupBox.setFixedWidth(125)
         groupBox.setStyleSheet(
             'background: rgb(245, 245, 245);\n'
             'font-size: 14pt;\n'
