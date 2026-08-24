@@ -7,8 +7,12 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**August 23 2026**   
+A bit of an update to **README.md**, **StartHere.md** and to the version numbers I posted the other day after a 'pip3 list' today to be sure. 
+
+
 **August 21 2026**   
-Updated **dotsAnimation** to run **pySide6 6.11** along with the usual suspects, **PyQt6** and **PyQt5**.  More fun with menus and widgets.
+Updated **dotsAnimation** to run **pySide6 6.11.2** along with the usual suspects, **PyQt6** and **PyQt5**.  More fun with menus and widgets.
 
 ---
 
@@ -19,7 +23,7 @@ I looked through my recent time machine backups to see if I could find any .mov 
 
 Added a left-mouse-click to close an open help menu in **dots** by clicking anywhere on the screen and a clear screen button to **videoPlayerTwo**.
 
-Lastly, I've updated to **python 3.14.7**, **pyqt6 6.11** and **opencv 4.12.0.88**.  I wasn't able to include  **pyside6 6.11** in the update as currently I haven't been able to get it to run animations in **dots** using **pyside6 6.11**. There's no problem however running **pyside6 6.10** in the current mix.
+Lastly, I've updated to **python 3.14.7**, **pyqt6 6.11.0** and **opencv 4.12.0.88**.  I wasn't able to include  **pyside6 6.11** in the update as currently I haven't been able to get it to run animations in **dots** using **pyside6 6.11**. There's no problem however running **pyside6 6.10** in the current mix.
 
 ---
 

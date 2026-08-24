@@ -1,12 +1,10 @@
 ## DotsQt  
 **DotsQt** provides a canvas for creating **photo-collages** that can be run as **2D animations** using **transparent .pngs** as **sprites/clip-art** - think **"Monty Python's Flying Circus"**. It comes with some basic animations and paths that can be attached to sprite screen objects plus functions to create and modify them, set backgrounds using photos, videos or flat color, emulate cast shadows, and run animations with multiple scrolling backgrounds and create them using **wrapper.py**, it's in **../extras**.
 
-As of **August 2026**, **Dots** is now running in **Python 3.14.7** along with **PyQt6 6.11.1**, **PyQt5 5.15.14**, * **PySide6 6.11.2.** and  **opencv-python 4.12** on a **MacBookPro**, **arm64**. See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
+As of **August 2026**, **Dots** is now running in **Python 3.14.7** along with **PyQt6 6.11.0**, **PyQt5 5.15.11**, **PySide6 6.11.2.** and  **opencv-python 4.12** on a **MacBookPro**, **arm64**. See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySide6**  - there are scripts for that. 
 
-You'll need to install **opencv-python 4.12** or above to run the **videoClipsMaker** portion of **videoPlayerOne** and **Two**, and possibly to run **videoPlayerTwo** if you're not on a Mac.  Once you've installed opencv it's an simple edit to turn on **Shadows** in **Dots** as well.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  And there are demos and videos.
+You'll need to install **opencv-python 4.12** or above to run shadows in **dots** or many of the apps in **extra/src**.  I've included some materials, sprites and dopey backgrounds to play with and to help get you started but it would be more informative and entertaining if you added your own.  There are demos to run and videos - you can find links to those in **Changes.md**. 
 
-
-	  
 ## Stuff to know
 The code can change over time and it does.  One of the few coding decisions I made was to try and keep my files, modules, under/around 300 lines whenever possible. I also use camel case after many years of coding in snake.
 

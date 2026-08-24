@@ -1,5 +1,5 @@
 
-### *Last Update: 12/20/2025*
+### *Last Update: 08/23/2026*
 
 ## Scripts  
 
@@ -12,48 +12,33 @@ There is only one codebase and it's written in **pyqt6**.  These scripts will ma
         script-pyqt5.sh     See edit for PyQt5  
 
 
-Scripts should be run in the **dots** source code directory.   A **unix/linux bash/zsh** shell is required to run the  **sed** command in **script-pyqt5.sh** to do the necessary and in **script-ps6.sh** to do the search and replace of 'type' to 'desc' inorder to run **pyside6**.
-Running a conversion script in **dots** will run the same named script in **dots/extras/src**. The scripts in **extras** and apps can be run without needing **dots** to be installed.
+The scripts need to be run in the **dots** source code directory if converting **dots** to something other than **pyqt6**. These scripts also run a same named set of scripts in the **dots/extras/src** directory which will do the same conversions and can be run from  **extras/src** without needing to install **dots**.  A **unix/linux bash/zsh** shell is required to run the  **sed** commands in the **script-.sh** files in order to make the changes necessary to run either **pyQt5** or **pyside6**.  See **January 2025** and **November 30 2024**. 
 
-## Edits for Converting Dots from PyQt6 to PyQt5
+If you only plan to use **pyQt6** running the python **script-qt6.py** file will clean up the no-longer needed tokens used for converting to other versions.
 
-        1. Replace PyQt6 with PyQt5 
-        2. Replace globalPosition() with globalPos()
-        3. Replace e.position() with e.pos() in dotsControlView.py
-        4. Move QShortcut in dotsTableMaker.py from  Gui to Widgets
-        5. Make required edits and cleanup to dotsVideoPlayer.py, videoPlayerOne.py, videoPLayerTwo 
-        6. Comment out optional open-cv references to prevent crashing if not found
-        7. Change QMessageBox move(x,y) height in dotsSideGig.py
 
-    
-The shell script **script-pyqt5.sh** handles all the above work required to convert **PyQt6** code to **PyQt5** and is responsible for running the **script-qt5.py** used to in steps 1-7.  See **January 2025** and **November 30 2024**.
-
-## Edits for Converting Dots from PyQt6 to PySide6
-
-The shell script **script-ps6.sh** first runs **script-qt6.py** to cleanup the videoPlayer files and then the **sed** commands are used to replace **'type'** with **'desc'** in the **.py** and **.play** files - and any required as well.  See **February 6**.
-#
 ## Help and Stuff
-**Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command in **dots** are now accessible from the help button menus in Canvas, StoryBoard and PathMaker - the scenes that make up **dots**.  A **right mouse click** will launch a widget for most of the storyboard screen items.
+**Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command in **dots** are accessible by selecting the help button menus in **Canvas, StoryBoard** and **PathMaker** - the three scenes that make up **dots**.  A **right mouse click** on a screen item will launch its widget.
 
-The helpMenus and menuKeys for **videoPlayers** and **slideShow** are located in **videoPlayerHelp** and are separate from **dots**.  There's a mini **Menus** selection in videoPlayer help. 
+The helpMenus and menuKeys for **videoPlayers** and **slideShow** are located in **videoPlayerHelp** and are separate from **dots**.  
 
-Once you have **dots** up and running - from the blank screen, **Canvas**, click on the help button or type **'M'** to bring up the **Help Menus** menu. The easiest way to see what commands are available, where they are located and what they do.  I'd also recommend running some demos afterwards.
+Once you have **dots** up and running - from the blank screen, that is **Canvas**, you can click on the help button to bring up its menu. From there you can click on the **Help Menus** entry or type **'M'** without the menu to bring up the **Help Menus** menu as well.  It's the easiest way to see what commands are available, where they are located and what they do.  From the same blank screen  entering **'D'** from the keyboard will display the **demo menu** or entering **'S'** will bring up the **screen menu** to select other formats and sizes.
 
-**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites**, detect and set screen formats and run the clip making functions in **videoClipsMaker**, and in **videoPlayerShared** if using the **cv2** code in **getMetaData**.  
-
-The files **vhx.py**, **slideShow.py** and the **videoPlayers and videoClips...py's** are included in the src directory.  See December 2025 for more on videoPlayerOne and clipsMaker.
-   
+**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites** in **dots** and run many of the apps in the **extras/src** directory.  There's a **Extras.md** file in the **extras** directory which identifies which apps make use of it.
+  
+  
 ## Screens 
 I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
       
 ## Video  
-**PyQt5** now supports looping using the loop button - the **videoWidget** I was previously using has been removed. **PyQt5** also won't loop a video if there's an animation running with shadows.  The two stand-alone videoPlayers each share code from videoClipsMaker, videoClipsWidget, videoPlayerShared and videoPlayerHelp. There are some differences; **"one"** uses a **videoWidget** to display and still retains resizing from the keyboard and manually setting a video format/ aspect ratio; **"two"** is based on a **graphicsVideoItem** and requires selecting a means to read a video files metadata from **videoPlayerShared.getMetaData** to make it run.  **videoPlayerTwo** is based on **dotsVideoPlayer**.
+**PyQt5** now supports looping using the loop button - the **videoWidget** I was previously using has been removed. **PyQt5** also won't loop a video if there's an animation running with shadows.  The two stand-alone videoPlayers each share code from videoClipsMaker, videoClipsWidget, videoPlayerShared and videoPlayerHelp.
 
-**VideoClipsMaker** includes the functions, **assembler** and **ctrOnBackground**, used to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** is the widget used by **clipsMaker** to select functions or set variables and **VideoPlayerShared**, as the name suggests, hosts a number go functions in common including the MediaPlayer, getMetaData, buttons and the slider setups.
+There are some differences; **videoPlayerOne** uses a **VideoWidget** to display and still retains resizing from the keyboard and manually setting a video format/ aspect ratio; **videoPlayerTwo"** is based on a **GraphicsVideoItem** and additionally was written to auto-detect the video aspect ratio/format when opening a video file whereas "one" can set it manually. Both videoPlayers are able to read a video files metadata, see **videoPlayerShared.getMetaData**. The default is set to use **opencv** as it's required.  If you're on a Mac there's a mac only solution right below it. 
+
+**VideoClipsMaker** started out as a separate app but it soon became apparent I would need access to a videoPlayer to screen its output.  It includes the **opencv** functions, **assembler** and **ctrOnBackground**, used to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** is the widget used by **clipsMaker** to select functions or set variables and **VideoPlayerShared**, as the name suggests, hosts a number go functions in common including the MediaPlayer, **getMetaData**, buttons and the slider setups.
 
 ## Four Files  
-There are four **dots...py** files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens**
-as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. 
+There are four **dots...py** files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens** as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. 
 
 It also handles all/most of the multi-key function requests - the rest pass on to **Storyboard** which in turn passes them on either to **ShowBiz**, which handles most of the single key requests from **Canvas** and **Storyboard** through the **PlayFile** list, or on to functions that send keys to the current screen items to perform actions not already triggered. 
 
@@ -69,15 +54,13 @@ What I call a **sprite** needs to be **'transparent.png'** file and should be ar
 
 If you have a current model iPhone, iPad, or Mac you may be able to generate a sprite using **Remove BackGround** as found in Preview Tools or in Photos on IOS devices by using your fingers or mouse to save a selection with the background removed. You also can look into using **SpriteMaker** in the **extras** dictionary. There's a write-up and a video for it. SpriteMaker requires **opencv-python** to generate a useable image.  Opencv is also used to create shadows and as an option in videoPlayerOne in helping to set the screen format used to display the video. 
 
-The **plays** directory is made up of **.json** formatted **.play** files used to store **animated scenes** or **collage** data required to restore the last saved scene/canvas. You'll also find the **screenrates.dict** file used by scrolling backgrounds there as well. Lastly the **paths** directory is used by **pathMaker** to store **.path** files - lists of screen point locations for building animated paths sprites can follow.
+The **plays** directory is made up of **.json** formatted **.play** files used to store **animated scenes** or **collage** data required to restore the last saved scene/canvas. Lastly the **paths** directory is used by **pathMaker** to store **.path** files - lists of screen point locations for building animated paths sprites can follow.
 
 Along with these four directories there are the **demo, extras, images** and **src** directories.  The **demo** and **images** directories contain some photo assets and demo path files and are primarily used in keeping the **sprites** and **backgrounds** directories free of unnecessary clutter. 
 
-The **extras** directory contains **outline**, **dropShadow** and the  **spriteMaker** directory. In May 2024, I posted a short video that reintroduces them. There are earlier videos as well.  I've added **videoPlayerOne** to extras and it's also posted to the src directory.
+The **extras** directory has been expanded and now hosts all the non dots source files. If it doesn't begin with **dots** it's there - **wrapper.py** as an example.
 
-I would suggest looking into **Changes** to get an idea of how the various parts of **dots** work together. There are videos which cover the most recent additions while touching on the basics along the way. Unfortunately YouTube needs to collect its tariff for hosting these videos and you could get misdirected. That's not me trying to sell you something. 
-
-Another suggestion is to type in **'D'** for the demo menu or click on the **help button** to get started.
+I would suggest looking into **Changes.md** to get an idea of how the various parts of **dots** work together. There are videos which cover the most recent additions while touching on the basics along the way. Unfortunately YouTube needs to collect its tariff for hosting these videos and you could get misdirected. That's not me trying to sell you something. 
 
 ---
 
@@ -96,12 +79,6 @@ If you're in **Windows** you won't need to edit the **paths** dictionary in **Sh
     }
 
 
-
-I've recently changed the directory layout for **dots** by moving the **dots\*.py** files to **dots/src**. The following script is working for me using Mac's Automator.  It also required some setting of permissions as I had added an additional login.
-
-
-    cd '/users/your directory/python/qt5/dots/src'; /usr/local/bin/python3 ./dotsQt.py      
-    
 ## Menus and Their Locations  
 There are five help *.py files and each one has a list of help files that details the location of each help menu.  Selecting **help Menus** from a help button menu will let you examine them all. Many of the help menus will let you click on line item to perform the function attached to the key you'd actually use. Not all do and I've tried to distinguish those.
    
@@ -114,79 +91,32 @@ A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMak
      key combinations and their actions. The key assignments will change as you switch 
      between StoryBoard/Canvas and PathMaker or by entering 'K'. 
 
-*The KeysPanel has been replaced by the help buttons and menus and will eventually disappear.*
+*The KeysPanel data has been replaced by the help buttons and menus and will eventually disappear.*
 
 ## Sprites, Backgrounds and Flats  
 **Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A'** from the **canvas** or **'B'** if there are sprites but no background or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites**, **backgrounds** and **video** to a **play** file.
 
 
 ## Shadows
-If you would like to try out **shadows**, besides downloading and installing **opencv-python**, you'll need to make a small edit in **PixItem** to comment out an import and uncomment another.
+Are now on by default and requires that you've installed **opencv-python 4.12** or above. Running the left or right scrolling backgrounds demo will illustrate both **shadows** and **scrolling backgrounds**.
 
-    from dotsShadowMaker    import ShadowMaker  ## add shadows
-    ##from dotsShadow_Dummy    import ShadowMaker  ## turns off shadows
-    
-An easy test is to run a left or right scrolling demo once you've downloaded, installed and edited the comments. If you see 5 shadows it's working. 
 
 **Shadows** are created through the **sprite widget** and **right-clicking** on a shadow will trigger its widget which should take care most of the functions specific to shadows. **Double-clicking** on a shadow toggles the perspective controls (**points and outlines**) on and off.
 
 
 ## Scrolling Backgrounds
-I've moved the really gnarly stuff concerning scrolling backgrounds to the **screenrates.dict** in the **play** directory. Its contents are the dictionary **screentimes**, see **Rates and Background Widget**. You can mix formats if you use a **3:2** format to display them as each **background** is tracked separately provided they scroll correctly.
+As of **August 2026** there's been a significant change and all previous bets are off. There's essentially one major variable you may need to change and that is **ShowTime** located in **BkgWorks** - it's currently set to 4. There you'll find two other variables, **RWY** and **VT5**, for making adjustments to vertical scrolling backgrounds once **ShowTime** has been set.   
 
-You're can easily adjust the screen rate, the variable that determines how fast the **'next'** scrolling background moves, and if the new rate is a better fit you can save it as the default to **screenrates.dict** using the **update button**. The current **screen rate** value as well as the **factor** and **showtime** values are carried over if the scrolling background is saved to a **.play** file.
-
-Running a demo with a scrolling background will immediately inform you as to whether my best guess on **screenrates** was correct or not.  Probably not, which is why the demo background, **bluestone.jpg**, is in the **backgrounds** directory. As it's the same background used in the demos - once you've got the background to scroll smoothly the demo should do the same. 
-
-**Scrolling Backgrounds** are constantly being deleted and the data necessary to maintain the scrolling data is lost which is why I added the **newTracker** dictionary located in **BkgMaker**. Tracker data won't change unless there's a change in direction or to a control and it's saved between sessions when saving to a **.play** file. It's a good idea not to mix scrolling backgrounds and videos.
-
-    tmp = {
-        "fileName":   os.path.basename(bkg.fileName),
-        "direction":  bkg.direction,
-        "mirroring":  bkg.mirroring,
-        "factor":     bkg.factor,
-        "rate":       bkg.rate,
-        "showtime":   bkg.showtime,
-        "useThis":    bkg.useThis,
-        "path":       bkg.path,
-        "scrollable": bkg.scrollable,
-    }
+Running a demo with a scrolling background will immediately inform you as to whether you'll need to make any adjustments. If there's a gap between backgrounds **ShowTime** needs to be set higher and if there's an overlap then lower.  Backgrounds are constantly being deleted and the data necessary to maintain the scrolling data is lost which is why I added **Trackers**.  There's a listview widget for trackers that lets you change the order on how multiple backgrounds are positioned front to back. Trackers don't track flats.
 
 
 ## Rates for Scrolling Backgrounds and Widget Controls 
-The **rate** is a list of three values each of which I also refer to as a rate.  The first value, **10.0**, is the **first screen rate**, the other two values are the rates for **next-left** and **next-right**.  The **first** background doesn't have to travel as far to exit while the second background, **next** has to wait its turn till it's **showtime** and then match the speed the **first** is traveling without gapping or overrunning it. Once **first** has exited the screen the backgrounds that follow are now all **next** and shouldn't require further adjustments.
+You can pretty ignore the screen rate slider in the background widget as it's all based on code now rather than stored data and replaces any previous settings. The speed factor is a multiplier that can be applied to speed up or slow how fast the backgrounds scroll, its value is saved to the play file.
 
-**You can use the arrow keys** to make small adjustments, 5 points or 1, plus or minus, to the **screenrate slider**.  There's a reminder on the backgrounds menu.
+Scrolling backgrounds require different **rates** based on distance to travel and image size and are used to set the duration of the animation that drives the scrolling background. As the **first** background is already present it doesn't need to scroll as far to completely clear the screen view and it's rate is smaller compared to the **next** background which must travel further, starts off screen and travels its entire length.
+   
+The **ShowTime'** constant represents the number of pixels remaining before the current background is fully visible on screen.  When reached it triggers the **'next'** background process which creates a new background and sets it scrolling to seamlessly follow the background ahead of it.
 
-Moving the **background widgets screenrate slider** to a higher value slows the backgrounds speed and a smaller value will speed it up. Once the **next screenrate** has been established and the background is scrolling smoothly you can use the **factor** dial - it's a multiplier - to speed up or slow down the backgrounds travel without changing the sliders rate or needing to edit **screenrates.dict**.  The speed **factor** value is also saved to the **.play** file.
-
-These values were established based on a fixed size which isn't as important as it once was as you now have more flexibility in setting a rate that best fits your scrolling background especially if you save it to a .play file.  Scaling the short side to 640 pixels still helps.  These values may have changed from what you're seeing but not by much.
-
-
-Current but can change. It was two dictionaries but one works just as well.
-
-      screentimes = {
-          800 [10.00,  24.92,   0.00], 
-          SQR [10.00,  30.00,   0.00],
-          900 [10.00,  23.20,   0.00],
-          912 [10.00,  21.10,   0.00],
-          960 [10.00,  16.75,  16.75],
-         108O [10.00,  16.79,  16.79],
-         1080 [10.00,  18.65,  17.72],
-         1066 [10.00,  21.84,   0.00],
-         1024 [10.00,  21.31,   0.00],
-         1102 [10.00,  21.30,   0.00],
-         1215 [10.00,  17.35,  17.40],
-         1280 [10.00,  18.92,  19.07],
-         1296 [10.00,  17.50,  17.45],
-         1440 [10.00,  18.70,  18.82],
-         1536 [10.00,  18.65,  18.92],
-        }
-
-     
-I use 10.0 for the **'first'** value as the background is already visible and needs to travel less of a distance to **clear the screen**. The **'first'** value 10.0 translates to 10 times the screen width and is used to set the duration, time in milliseconds, required to move the backgrounds scaled width from one side of the screen to completely off the other.  A 1080 pixel screen format for the **'first'** background translates to 10.0 X 1080 = 10,800 milliseconds to clear the screen.  A **'next'** background has to cover more distance and therefore its rate would be higher and results in a longer duration, more travel time, while also matching the **first** rate of travel.   
-      
-The **background widgets 'showtime'** slider value represents the number of pixels remaining before the background appears in the scene.  When reached it triggers the **'next'** background process. This will vary depending on which direction the background is traveling and if it's a snake. It's set once you choose a direction. Hopefully you'll never need to edit showtime, but if you do it's in **BkgScrollWrks**.
 
 ## Background Matte Widget
 Selected from the **background widget** the **BkgMatte** widget draws a mat/matte around the background. Its help menu pops up when first selected and can also be triggered by entering **H** from the keyboard which toggles it on or off.  The menu should be pretty much self-explanatory and there are videos that illustrate the commands as well.
@@ -241,7 +171,7 @@ The class attribute **type** is replaced in **PySide6** with **desc** as **pysid
 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
-Strange as it seems the only changes I've made to Animation since I first wrote it were for PySide6.  You can create your own animation using **dotsAnimation.py** as a guide and add it to a sprite to run in **StoryBoard**.
+You can create your own animation using **dotsAnimation.py** as a guide and add it to a sprite to run in **StoryBoard**.
 
 **PixItems**, **BkgItems** and **BkgItems** have methods to **play, pause, resume and stop**. **Shadows** are not animated rather they can link to a **sprite** and share the ride.  **Wings** are also included as they're based on a collection of **PixItems**.  **Scrolling Backgrounds** have their own methods to set an animation but follow the  same **play** commands as do **videos**.
 
@@ -251,7 +181,7 @@ Animations come in two basic flavors, either ones that are programmatic, you wro
 
 A third possibility would be a combination of the two such as **demo** in **dotsSidePaths**. An animation can be added to a screen object, a **PixItem**, once it's been selected by right-mouse clicking on it and choosing an animation or path from the **Animations and Paths** pop-up menu. The selection is applied to the **tag** property of the **PixItem** which later is used to run the animation it references.
 
-The file **dotsSideShow.py** **loads** and **displays** the contents of a **.play** file and also is the source for launching the **Demo Menu** while **dotsShowTime.py** can both **run** and **save** an animation to a file. Originally these two were one file.
+The file **dotsSidePath.py** **loads** and the contents of a **.play**  and **path** files and also is the source for launching the **Demo Menu** items that feature bats. **DotsShowTime.py** can both **run** and **save** an animation to a file.
  
 In **dotsSidePath.py** you'll find the **demo animation** path code, the function **setPaths** that creates paths from **.path** files plus the functions to **load** the path file and set the **node origin**. The code for the actual demos is divided between **dotsAbstractBats.py** and **dotsSnakes.py** which also contains the **Demo Menu** class.
  
@@ -270,31 +200,43 @@ The first thing of interest in reading thru this file are the four variables, **
 	
 You can add your animation to one of these lists so it appears in the pop-up menu.  Some of these animations take more than input variable.
 
-The **Node** class provides the code used to control a **PixItem** property you might want to animate; **position, scale, rotation, or opacity**. They can also be combined to run in parallel or run sequentially as illustrated in some of the animations in this file.  No code changes needed here.  *Edited for brevity.*
+The **Node** class provides the code used to control a **PixItem** property you might want to animate; **position, scale, rotation, or opacity**. They can also be combined to run in parallel or run sequentially as illustrated in some of the animations in this file.  This has been updated for **python 6.11**.  *Edited for brevity.*
 
-	class Node(QObject):
-	### --------------------------------------------------------
+
+     ### --------------------------------------------------------
+     class Node(QObject):
+     ### --------------------------------------------------------
         def __init__(self, pix):
             super().__init__()
-      
+            
             self.pix = pix
     
         def _setPos(self, pos):
             try:
                 self.pix.setPos(pos)
             except RuntimeError:
-                return None
+                return None   
     
-        def _setOpacity(self, opacity):
+        def _getPos(self):
             try:
-                self.pix.setOpacity(opacity)
+                return self.pix.pos()
             except RuntimeError:
-                return None
-        ...
+                return QPointF()
+                
+        def _setRotation(self, rotate):
+            try:
+                self.pix.setRotation(rotate)
+            except RuntimeError:
+                return None   
+     
+        def _getRotation(self):
+            try:
+                return self.pix.rotation()
+            except TypeError:
+                return 0.0 
     
-        pos = pyqtProperty(QPointF, fset=_setPos)
-        opacity = pyqtProperty(float, fset=_setOpacity)
-
+        pos = pyqtProperty(QPointF,  fget=_getPos,  fset=_setPos) 
+        rotate  = pyqtProperty(float, fget=_getRotation,  fset=_setRotation) 
 
 Next is the **Animation** class.  First up, a short dictionary of animations 
 already referenced at the start followed by the **setAnimation** and **_random** 
