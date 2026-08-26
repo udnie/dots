@@ -68,7 +68,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.rnfValue.setText(f'{val:5}')
     
 ### --------------------------------------------------------     
-    def setUI(self, parent, switch, off):
+    def setUI(self, parent, switch, off): ## 'ClipsMaker Settings'
         
         self.parent = parent
         self.switch = switch

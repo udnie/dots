@@ -6,6 +6,11 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
+
+---
+**August 26 2026**  
+A bug fix to **videoPlayer**. There was a problem if the image width was less than the screen width - it wouldn't fill the screen properly. I finally saw it.  Also revisited an earlier decision to turn off auto-detect if **clipsMaker** was on. In HD format and running **clipsMaker** if you tried in the past to read the file you just made it wouldn't fill the screen. It still won't but I've added a **'Shift-O'** to open files and set **clipsMaker** off. That allows the auto-detect to work and the video runs as it was originally viewed. It's on the help menu and works from the keyboard.    
+
 ---
 **August 23 2026**   
 A bit of an update to **README.md**, **StartHere.md** and to the version numbers I posted the other day after a 'pip3 list' today to be sure. 

@@ -127,11 +127,12 @@ class Shared:
             return   
         if self.parent.player == "two": 
             self.parent.closeMediaPlayer()  
-        try:  
+        if key in (AspKeys):
             self.parent.clips.setDefaultSizes(key)  ## sets self.aspect
-            self.setScreenFormat()  ## just resize it
-        except:
-            self.msgbox('Unknown key entered')
+            self.setScreenFormat()  ## just resize it 
+            self.aspect = key
+        else:
+            self.msgbox('Unknown key entered: ' + key)
             return
 
     def setAspectRatio(self, fileName):
@@ -144,7 +145,6 @@ class Shared:
             width, height = getMetaData(fileName)  ## it's here
         except:   
             None    
-       
         if width > 0 and height > 0: 
             self.parent.aspect = math.floor((width/height) * 100)/100.0    
             if key := self.returnKey(self.parent.aspect): 
@@ -163,7 +163,7 @@ class Shared:
             return False  
         return True 
         
-    def setAutoAspect(self, fileName):
+    def setAutoAspect(self, fileName):  
         if self.parent.clips.AutoAspect and not self.parent.clips.MakeClips:
             if not self.setAspectRatio(fileName): ## skip it and open without
                 return False
@@ -299,6 +299,7 @@ class Shared:
             self.parent.buttons.hide()
             self.parent.resize(self.parent.width(), self.parent.height()-PAD)
             time.sleep(.03)      
+            
         elif not self.sliderVisible:
             self.parent.slider.show()
             self.parent.buttons.show()
@@ -312,6 +313,7 @@ class Shared:
             self.parent.setWindowFlags(self.parent.windowFlags() & ~Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
             self.frameVisible = True
             self.parent.move(p.x(), p.y()-28) 
+            
         else:
             self.parent.setWindowFlags(self.parent.windowFlags() | Qt.WindowType.FramelessWindowHint)
             self.frameVisible = False
@@ -373,6 +375,7 @@ def setButtons(self):
     if self.player == "one":            
         self.aspButton = QPushButton("Aspect")
     self.loopButton = QPushButton("Loop")
+    
     self.stopButton = QPushButton("Stop")
     if self.player == "two":  
         self.clearButton = QPushButton("Clear")

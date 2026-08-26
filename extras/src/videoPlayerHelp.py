@@ -30,6 +30,7 @@ helpMenuKeys = {   ## videoplayers
     'X, Q Escape':  'Quit/Exit',
     'Spacebar':     'Play/Pause/Resume',
     'Shift-F':      'Open File',
+    'Shift-O':      'Open File ClipsMaker Off',
     'Shift-S':      'Hide/Show All',
     '>,  +,  ]':    'Scale Up',
     '<,  _,  [':    'Scale Down',  
@@ -69,7 +70,7 @@ SlideShowKeys = ('B','C','F','H','N','O','R','L','S','T','W','X', 'S, SpaceBar',
                     'N, Right Arrow', 'B, Left Arrow', 'X, Q, Escape', 'L, R')
 
 VideoMenuKeys = AspKeys + ['L','O','X','C','M','W',']','[','Spacebar','Shift-F',\
-                    'Shift-S','Aspect','Settings','Clips']
+                    'Shift-O', 'Shift-S','Aspect','Settings','Clips']
 
 ### -------------------------------------------------------- 
 class VideoHelpWidget(QWidget):
@@ -191,11 +192,11 @@ class VideoHelp(QWidget):
             Qt.WindowType.FramelessWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
     
-        extras, width, height = 4, 286, 726
+        extras, width, height = 4, 291, 756
         if self.parent.player == "two":
-            extras, height = 1, 636
+            extras, height = 1, 666
                 
-        self.table = TableWidgetSetUp(115, 165, len(helpMenuKeys)+extras)
+        self.table = TableWidgetSetUp(115, 170, len(helpMenuKeys)+extras)
         self.table.itemClicked.connect(self.clicked)
                  
         self.table.setFixedSize(width, height)
@@ -214,11 +215,11 @@ class VideoHelp(QWidget):
                 self.table.setRow(row, 0, k, SD,True,True)
                 self.table.setRow(row, 1, "  " + val,SD,'',True)
                 
-            elif self.parent.player == "one" and row in (16,17,18):
+            elif self.parent.player == "one" and row in (14,15,16):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)
                 
-            elif self.parent.player == "two" and row in (14,15):
+            elif self.parent.player == "two" and row in (14,15,16):
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)  
                 
@@ -231,7 +232,7 @@ class VideoHelp(QWidget):
                 self.table.setRow(row, 1, "  " + val,'','',True)
      
             row += 1
-                   
+                  
         self.table.setRow(row,     0,  f"{"Scaling Up/Down and Setting Aspect":<12}",QC,True,True, 2)
         self.table.setRow(row + 1, 0,  f"{"Don't Work in VideoPlayerTwo":<12}",QC,True,True, 2)
         self.table.setRow(row + 2, 0,  f"{'Right-Click or Click Here to Close':<12}",QL,True,True, 2)

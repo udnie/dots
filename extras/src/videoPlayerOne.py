@@ -78,6 +78,9 @@ class VideoPlayer(QWidget):
                   
         elif key == Qt.Key.Key_F and mod & Qt.KeyboardModifier.ShiftModifier:
             self.clips.openFile() 
+            
+        elif key == Qt.Key.Key_O and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.VideoMenuKeys('Shift-O')
                                        
         elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
             and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
@@ -124,6 +127,10 @@ class VideoPlayer(QWidget):
                     self.openFile() 
                 case 'Shift-S':
                     self.shared.toggleSlider()
+                case 'Shift-O':
+                    if self.clips.MakeClips:
+                        self.clips.MakeClips = False  
+                    self.openFile()    
                 case 'M':
                     self.shared.videoSliderMenus()  
                 case 'W':
@@ -234,7 +241,6 @@ class VideoPlayer(QWidget):
             self.path = sys.argv[1]
          
         vbox = QVBoxLayout() 
-     
         vbox.addWidget(self.videoWidget, Qt.AlignmentFlag.AlignCenter)
         vbox.addWidget(setButtons(self), Qt.AlignmentFlag.AlignCenter)
     
@@ -245,7 +251,6 @@ class VideoPlayer(QWidget):
         vbox.addLayout(hbox)
     
         self.setLayout(vbox)            
-   
         self.shared.openPlayer(self.key)  ## open full frame - 3:2
          
         x = QGuiApplication.primaryScreen().availableGeometry().center().x()

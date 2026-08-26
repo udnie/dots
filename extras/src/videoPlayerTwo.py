@@ -70,8 +70,11 @@ class VideoPlayer(QWidget):
             self.shared.toggleSlider() 
             
         elif key == Qt.Key.Key_F and mod & Qt.KeyboardModifier.ShiftModifier:
-            self.openFile()       
-                    
+            self.openFile()    
+            
+        elif key == Qt.Key.Key_O and mod & Qt.KeyboardModifier.ShiftModifier:
+            self.VideoMenuKeys('Shift-O')
+                           
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.bye()  
                       
@@ -100,6 +103,10 @@ class VideoPlayer(QWidget):
                     self.clips.makingClips()  ## if MakeClipsOn sets path to folder
                 case 'Shift-S':
                     self.shared.toggleSlider()
+                case 'Shift-O':
+                    if self.clips.MakeClips:
+                        self.clips.MakeClips = False  
+                    self.openFile()
                 case 'Shift-F':
                     self.openFile()
                 case 'M':
@@ -134,7 +141,7 @@ class VideoPlayer(QWidget):
     def openFile(self): 
         if fileName := self.clips.returnFileName():
             path = self.path
-            self.closeMediaPlayer()
+            self.closeMediaPlayer()    
             self.init()
             self.path = path
             time.sleep(.03)
@@ -145,9 +152,8 @@ class VideoPlayer(QWidget):
     def setMediaPlayer(self, fileName, where=''):   
         if not self.shared.setFileNameInMediaPlayer(fileName):
             return False  
-           
         if where == '':   
-            self.shared.setAutoAspect(fileName)  ## won't stop it from playing  
+            self.shared.setAutoAspect(fileName)  ## won't stop it from playing
             self.addToScene(fileName) 
             return True      
                     
@@ -279,10 +285,12 @@ class VideoPlayer(QWidget):
             
             if self.mediaPlayer != None:
                 if self.backdrop == None:
+                    
                     self.shared.msgbox('backdrop not found')
                     return
                 else:
                     self.backdrop.setScale((self.width()-WID)/self.videoWidth) 
+                    
             if self.mediaPlayer != None:
                 self.backdrop.setScale((self.width()-WID)/self.videoWidth) if self.backdrop \
                 else self.shared.msgbox('backdrop not found')

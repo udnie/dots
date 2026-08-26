@@ -12,8 +12,8 @@ import numpy as np
     used by Settings. 
     Opencv is required to run assembler and by getMetaData in 
     videoPlayerShared to set the video aspect-ratio on opening if
-    self.AutoAspect is True.
-    The videoClipsWidget defaults(Settings) are set here. '''
+    self.AutoAspect is True.  The videoClipsWidget defaults(Settings) 
+    are set here. '''
 ### --------------------------------------------------------
     
 from functools          import partial
@@ -197,7 +197,7 @@ class Clips:
         self.parent.setWindowTitle(outputVideo)
 
         reads = 0;  frameCount = 0;  dim = (self.parent.VideoW, self.parent.VideoH)
-        
+ 
         try:  
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4 and .mov
             out = cv2.VideoWriter(outputVideo, fourcc, self.Fps, dim)
@@ -255,7 +255,7 @@ class Clips:
                     frameCount += 1
                     
             else:       
-                img = cv2.imread(image_path)  ## reads a directory of photos
+                img = cv2.imread(image_path)  ## read a directory of photos
                 if img is None:
                     self.parent.shared.msgbox(f"assembler Could not read file {image_name}")
                     continue  
@@ -283,7 +283,7 @@ class Clips:
             self.parent.shared.msgbox('assembler: Nothing saved')
             return
     
-    def aspMatch(self, img):
+    def aspMatch(self, img):  ## if filterOn selected
         h, w = img.shape[:2]  ## numpy - returns rows and columns
         asp  = math.floor(w/h *100)/100.0 
         if asp != self.parent.aspect:
@@ -319,39 +319,53 @@ class Clips:
         
 ### --------------------------------------------------------
     def ctrOnBackground(self, img, imgName):  
-        fg_h, fg_w = img.shape[:2]
-        bg_w, bg_h = self.parent.VideoW, self.parent.VideoH
+        img_h, img_w = img.shape[:2]
+        vid_w, vid_h = self.parent.VideoW, self.parent.VideoH
         
-        if bg_h < fg_h:  ## resize vertical - numpy likes it reversed  
-            r = bg_h / fg_h
-            fg_h = int(fg_h * r)
-            fg_w = int(fg_w * r)
-            img  = cv2.resize(img, (fg_w, fg_h), interpolation= cv2.INTER_LINEAR)    
-            fg_h, fg_w = img.shape[:2]  
+        if vid_h < img_h:  ## resize vertical - numpy likes it reversed  
+            r = vid_h / img_h
+            img_h = int(img_h * r)
+            img_w = int(img_w * r)
+            img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
+            img_h, img_w = img.shape[:2]  
         
-        if fg_w > bg_w:  ## do this till it fits
-            while (bg_w - fg_w) != 0:
-                r = bg_w / fg_w
-                fg_w = int(fg_w * r)
-                fg_h = int(fg_h * r)
-                img  = cv2.resize(img, (fg_w, fg_h), interpolation= cv2.INTER_LINEAR)    
-                fg_h, fg_w = img.shape[:2]
-                                                                                                                                                    
+        if img_w > vid_w:  ## do this till it fits   
+            while (vid_w - img_w) != 0:
+                r = vid_w / img_w
+                img_w = int(img_w * r)
+                img_h = int(img_h * r)
+                img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
+                img_h, img_w = img.shape[:2]
+                
+        elif img_w < vid_w:
+            if img_h < vid_h:
+                r = vid_h/img_h
+                if (r * img_w) <= vid_w:
+                    img_h = int(img_h * r)
+                    img_w = int(img_w * r)
+                else:
+                    s = vid_w/(img_w *r)
+                    img_w = int((img_w * r) *s)
+                    img_h = int((img_h * r) *s)
+                
+                img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)  
+                img_h, img_w = img.shape[:2]
+                                                                                                                                                
         background_color = (0, 0, 0)  ## Black (B, G, R)  ## numpy
-        bkgImage = np.full((bg_h, bg_w, 3), background_color, dtype=np.uint8)
+        bkgImage = np.full((vid_h, vid_w, 3), background_color, dtype=np.uint8)
 
-        start_x = (bg_w - fg_w) // 2  ## Calculate the centering position  
-        start_y = (bg_h - fg_h) // 2
+        start_x = (vid_w - img_w) // 2  ## Calculate the centering position  
+        start_y = (vid_h - img_h) // 2
 
-        end_x = start_x + fg_w
-        end_y = start_y + fg_h
-        
+        end_x = start_x + img_w
+        end_y = start_y + img_h
+    
         bkgImage[start_y:end_y, start_x:end_x] = img
-        
+   
         # # Ensure foreground fits within background <<------------------- shouldn't need to check
-        # # if start_x < 0 or start_y < 0 or end_x > bg_w or end_y > bg_h: 
-        # #     print(f'a: {imgName}\tstart x {start_x}  bkgW {bg_w}  
-        # #           forW {fg_w}  offs {(bg_w - fg_w) // 2}' )
+        # # if start_x < 0 or start_y < 0 or end_x > vid_w or end_y > vid_h: 
+        # #     print(f'a: {imgName}\tstart x {start_x}  bkgW {vid_w}  
+        # #           forW {img_w}  offs {(vid_w - img_w) // 2}' )
         # #     return None
         # try:
         #     if img.shape[2] == 4:  ## <<<---------------  uncomment for alpha channel
