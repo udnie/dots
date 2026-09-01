@@ -6,7 +6,7 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
                                 QPushButton, QVBoxLayout
                
 ### ------------------ videoClipsWidget.py -----------------
-''' global varibles and settings '''
+''' global Keys, format settings and clipsWidget  '''
 ### --------------------------------------------------------
 
 Keys  = {
@@ -18,16 +18,6 @@ Keys  = {
     'T': (0.66, 525,  790,  720, 1080),  ##  2:3 vertical   
     'V': (0.56, 525,  930,  720, 1280),  ## 9:16 vertical
 }
-
-ViewW,  ViewH  =  790,  525  ## starting video size
-MaxWid, MaxHgt = 1800, 1165
-
-VertW = 525  ## minimum vertical width on open
-VertH = 100  ## vertical starting height
-HorzH = 225  ## horizontal starting height 
-
-MinWid  = 300  ## minimum widget width
-MinHgt  = 400  ## minimum widget height
 
 AspKeys = list(Keys.keys())
 

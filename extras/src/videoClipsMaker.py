@@ -195,7 +195,11 @@ class Clips:
 ### --------------------------------------------------------
     def assembler(self, path, outputVideo, fileName=''):
         self.parent.setWindowTitle(outputVideo)
-
+         
+        tmp = os.path.basename(os.path.dirname(path).strip() + '.mov')
+        if os.path.exists(tmp) and tmp == outputVideo:
+            os.remove(tmp)
+        
         reads = 0;  frameCount = 0;  dim = (self.parent.VideoW, self.parent.VideoH)
  
         try:  
@@ -203,20 +207,19 @@ class Clips:
             out = cv2.VideoWriter(outputVideo, fourcc, self.Fps, dim)
         except:
             self.parent.shared.msgbox('assembler: error setting output' +  '\n' + 
-                                      'check if opencv installed or uncommented')
+                                      'check if opencv installed')
             return
-       
-        if not self.SkipFrames:      
+                          
+        if self.SkipFrames:
+            images = [fileName]  ## read only one file
+            image_name = images     
+        else:      
             if self.FirstFrame:  ## make a list of all the files that match the extension
                 images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos
             else:
                 images = [img for img in os.listdir(path) if img.lower().endswith(Ext)]  ## reads photos
             images.sort()  
-                    
-        elif self.SkipFrames:
-            images = [fileName]  ## read only one file
-            image_name = images
- 
+
         for image_name in images:   
             if outputVideo == image_name:  ## don't read the output file ".mov"
                 continue
@@ -327,7 +330,13 @@ class Clips:
             img_h = int(img_h * r)
             img_w = int(img_w * r)
             img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
-            img_h, img_w = img.shape[:2]  
+            img_h, img_w = img.shape[:2] 
+        else:
+            r = img_h / vid_h
+            img_h = int(img_h * r)
+            img_w = int(img_w * r)
+            img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
+            img_h, img_w = img.shape[:2]
         
         if img_w > vid_w:  ## do this till it fits   
             while (vid_w - img_w) != 0:
@@ -338,15 +347,15 @@ class Clips:
                 img_h, img_w = img.shape[:2]
                 
         elif img_w < vid_w:
-            if img_h < vid_h:
+            if img_h < vid_h:  ## do this first - set to height
                 r = vid_h/img_h
                 if (r * img_w) <= vid_w:
                     img_h = int(img_h * r)
                     img_w = int(img_w * r)
                 else:
-                    s = vid_w/(img_w *r)
-                    img_w = int((img_w * r) *s)
-                    img_h = int((img_h * r) *s)
+                    s = vid_w/(img_w *r)  ##  width needs to be reduced
+                    img_w = int((img_w * r) * s)
+                    img_h = int((img_h * r) * s)
                 
                 img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)  
                 img_h, img_w = img.shape[:2]

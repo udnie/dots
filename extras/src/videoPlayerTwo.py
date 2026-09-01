@@ -6,7 +6,9 @@ import time
 ### ------------------ videoPlayerTwo.py ------------------- 
 ''' Updated to reflect videoPlayerOne without resize keys and aspect
     button. Uses a GraphicsVideoItem which I refresh along with 
-    the mediaPlayercfor each new file - unlike videoPlayerOne.'''
+    the mediaPlayercfor each new file - unlike videoPlayerOne.
+    Setting clipsMakerOn blocks auto-aspect - see the docstring in 
+    videoPlayerOne for more ...  '''
 ### -------------------------------------------------------- 
 from PyQt6.QtCore       import Qt, QTimer, QPoint, QSizeF, QRect, QSize
 from PyQt6.QtGui        import QGuiApplication, QPixmap
@@ -17,7 +19,10 @@ from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, \
 from videoClipsMaker    import Clips
 from videoClipsWidget   import *
 from videoPlayerShared  import *
+from videoPlayerWorks   import *
 from videoPlayerHelp    import VideoMenuKeys
+
+WID = 40
 
 ### --------------------------------------------------------         
 class VideoPlayer(QWidget): 
@@ -43,6 +48,7 @@ class VideoPlayer(QWidget):
         self.backdrop = None
         self.saveW = self.width()
         self.saveH = self.height()
+        self.wid = WID
 
     def dragEnterEvent(self, e):  
         if e.mimeData().hasUrls():   
@@ -155,8 +161,7 @@ class VideoPlayer(QWidget):
         if where == '':   
             self.shared.setAutoAspect(fileName)  ## won't stop it from playing
             self.addToScene(fileName) 
-            return True      
-                    
+            return True                    
         elif where == 'addToScene':    ## bypasses setAspectRatio if from assembler
             hgt = HGT if self.shared.sliderVisible else HGT-PAD   
             self.videoItem.setSize(QSizeF(float(self.width()-WID), float(self.height()-hgt)))
@@ -185,7 +190,7 @@ class VideoPlayer(QWidget):
         self.shared.moveAndSet()
      
     def addMediaPlayer(self):
-        self.mediaPlayer = MediaPlayer(self)
+        self.mediaPlayer = MediaPlayer(self, ViewW, ViewH)
         self.videoItem = self.mediaPlayer.videoItem
         self.scene.addItem(self.videoItem)
         time.sleep(.03)   

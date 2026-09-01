@@ -15,7 +15,9 @@ import math
     options. The keys '[', ']'  can scale up or scale down videoPlayerOne,  
     and a right-mouse click displays the help menu.  
     See videoClipsMaker for changes to defaults and clipsWidget for settings. 
-    Size detection doesn't work if clips are on.'''
+    Size detection doesn't work if clips are on.
+    One last thing - videoWidget won't overwite itself if trying to re-read the
+    current directory - videoPlayerTwo will as it's using a graphicsVideoItem '''
 ### -------------------------------------------------------- 
 
 from PyQt6.QtCore       import Qt
@@ -25,7 +27,10 @@ from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, QSizePolicy
 from videoClipsMaker    import Clips
 from videoClipsWidget   import *
 from videoPlayerShared  import *
+from videoPlayerWorks   import *
 from videoPlayerHelp    import VideoMenuKeys
+
+WID = 30
 
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
@@ -47,9 +52,9 @@ class VideoPlayer(QWidget):
         self.flag = False
         self.helpFlag = False 
         self.helpMenu = None
-
         self.saveW = self.width()
         self.saveH = self.height()
+        self.wid = WID
                                                                
     def dragEnterEvent(self, e):  
         if e.mimeData().hasUrls():   
@@ -118,9 +123,6 @@ class VideoPlayer(QWidget):
                     self.zoom(0.95)      
                 case 'Aspect':
                     self.setAspButton()  ## set aspect ratio manually clicking on aspect button
-                case 'C':
-                    self.shared.closeHelpMenu()  ## improvised clear
-                    self.mediaPlayer.stop()        
                 case 'Clips':   
                     self.clips.makingClips()  ## if MakeClipsOn sets path to folder
                 case 'Shift-F':         
@@ -130,7 +132,7 @@ class VideoPlayer(QWidget):
                 case 'Shift-O':
                     if self.clips.MakeClips:
                         self.clips.MakeClips = False  
-                    self.openFile()    
+                    self.openFile()   
                 case 'M':
                     self.shared.videoSliderMenus()  
                 case 'W':
@@ -164,6 +166,7 @@ class VideoPlayer(QWidget):
     def openFile(self): 
         if fileName := self.clips.returnFileName():      
             self.path = os.path.dirname(fileName)  
+            self.mediaPlayer.stop()
             if self.setMediaPlayer(fileName) and self.mediaPlayer != None: 
                 if self.clips.PlayVideo:  QTimer.singleShot(100, self.shared.playVideo) 
         else:
@@ -230,11 +233,11 @@ class VideoPlayer(QWidget):
         self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
              
         self.init()  
-         
+     
         self.clips = Clips(self) 
         self.shared = Shared(self)
            
-        self.mediaPlayer = MediaPlayer(self)
+        self.mediaPlayer = MediaPlayer(self, ViewW, ViewH)
         self.videoWidget = self.mediaPlayer.videoWidget
      
         if len(sys.argv) > 1: 

@@ -8,10 +8,18 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 
 ---
+**August 31 2026**   
+More work on **videoPlayer** - added some additional code to **ctrOnBackground** and **assembler**.  I wanted to make sure I was deleting an existing file if its name matched the new output file. I'm pretty sure writing a new file in opencv will always replace the existing file when the names match. I wanted to test that assumption as I uncovered an interesting problem with **QVideoWidget** not updating a same name file if the number of reads had changed when making a new clip immediately after the making the first clip.
+
+I first created a clip with five frames - viewed the playback and then changed the number of reads to 25 which read from the same directory. The playback still showed five though that file would have been deleted and replaced with a clip of 25 frames. This won't happen in **videoPlayerTwo** as it uses a **QGraphicsVideoItem** rather than the **QVideoWidget** used by **videoPlayerOne**.
+
+Also created a new **videoPlayerWorks.py** file made up of **MediaPLayer, setSlider, setButtons and getMetaData** from **videoPlayerShared** to make **videoPlayerShared** less difficult to navigate. Last, some work in **ctrOnBackground** in an attempt to head off further screen playback sizing issues.
+ 
+
 **August 26 2026**  
 A bug fix to **videoPlayer**. There was a problem if the image width was less than the screen width - it wouldn't fill the screen properly. I finally saw it.  Also revisited an earlier decision to turn off auto-detect if **clipsMaker** was on. In HD format and running **clipsMaker** if you tried in the past to read the file you just made it wouldn't fill the screen. It still won't but I've added a **'Shift-O'** to open files and set **clipsMaker** off. That allows the auto-detect to work and the video runs as it was originally viewed. It's on the help menu and works from the keyboard.    
 
----
+
 **August 23 2026**   
 A bit of an update to **README.md**, **StartHere.md** and to the version numbers I posted the other day after a 'pip3 list' today to be sure. 
 
@@ -19,7 +27,6 @@ A bit of an update to **README.md**, **StartHere.md** and to the version numbers
 **August 21 2026**   
 Updated **dotsAnimation** to run **pySide6 6.11.2** along with the usual suspects, **PyQt6** and **PyQt5**.  More fun with menus and widgets.
 
----
 
 **August 15 2026**  
 Found an interesting bug having to do with **clipsMaker**. It looks like a bit of code I thought was working wasn't. **ClipsMaker** stopped using the name of the directory plus .mov as the output file name when reading all the files but worked correctly if reading the **Nth** frame. It was dropping the directory name and leaving the .mov file which would be invisible on a mac's screen.
@@ -29,8 +36,6 @@ I looked through my recent time machine backups to see if I could find any .mov 
 Added a left-mouse-click to close an open help menu in **dots** by clicking anywhere on the screen and a clear screen button to **videoPlayerTwo**.
 
 Lastly, I've updated to **python 3.14.7**, **pyqt6 6.11.0** and **opencv 4.12.0.88**.  I wasn't able to include  **pyside6 6.11** in the update as currently I haven't been able to get it to run animations in **dots** using **pyside6 6.11**. There's no problem however running **pyside6 6.10** in the current mix.
-
----
 
 **August 5 2026**  
 Updates to **wrapper** and **dots scrolling backgrounds**.  Added to **wrapper**, what I am calling **filters**, functions that can modify the **blendedImage** using the sliders. They're located in **wrapperFilters.py** - each filter has a description of proposed intent as provided by **google gemini**, the source behind the function's **opencv** code. The **edges** slider can also work on non-filtered backgrounds.  The only other noticeable change to **wrapper**, now that the sliders actually do something, are the **guides** appearing when you're ready to save the **blendedImage** - if they're not already visible. A reminder that they're there rather than popping them up at the start.

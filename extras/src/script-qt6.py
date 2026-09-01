@@ -7,12 +7,12 @@ import os
 
 qstring = "PyQt6"
 
-for file in ["videoPlayerShared.py", "spriteMakerWorks.py"]:
+for file in ["videoPlayerWorks.py", "videoPlayerShared.py", "spriteMakerWorks.py"]:
     lines = []
     with open(file, 'r') as fp: 
         for line in fp:
             
-            if file == "videoPlayerShared.py":
+            if file == "videoPlayerWorks.py":
                 
                 if 'aspect/ratio' in line:  ## there is only one
                     i = line.index('s')  ## self.set
@@ -28,7 +28,13 @@ for file in ["videoPlayerShared.py", "spriteMakerWorks.py"]:
                 if '##--5' in line:
                     i = line.index('##--5') 
                     line = line[0:i] + '\n' 
-                       
+                         
+            elif file ==  "videoPlayerShared.py":
+                
+                if '## 6' in line:
+                    i = line.index('## 6')  ## self.set
+                    line = line[0:i] + '\n' 
+                   
             elif file == "spriteMakerWorks.py" and qstring == "PySide6":
                 
                 if 'sizeInBytes' in line: 

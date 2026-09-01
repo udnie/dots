@@ -5,7 +5,7 @@
 ### -------------------------------------------------------
 import os
 
-for file in ["outline.py", "vhx.py", "videoPlayerShared.py"]:
+for file in ["outline.py", "vhx.py", "videoPlayerShared.py", "videoPlayerWorks.py"]:
     lines = []
     with open(file, 'r') as fp: 
         for line in fp:
@@ -22,8 +22,13 @@ for file in ["outline.py", "vhx.py", "videoPlayerShared.py"]:
                 if "e.globalPos().toPoint()" in line:
                     i = line.index('.toP')  
                     line = line[0:i] + line[i+10:]
-                    
-            elif file == "videoPlayerShared.py":
+                           
+            elif file ==  "videoPlayerShared.py":
+                
+                if '## 6' in line:
+                    continue 
+                         
+            elif file == "videoPlayerWorks.py":
 
                 if 'aspect/ratio' in line:  ## there is only one
                     i = line.index('s')  ## self.set
