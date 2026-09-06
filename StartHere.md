@@ -1,7 +1,7 @@
 
-### *Last Update: 08/23/2026*
+### *Last Update: 09/04/2026*
 
-## Scripts  
+## Read this first  
 
 There is only one codebase and it's written in **pyqt6**.  These scripts will make the necessary changes to convert the **pyqt6** code to either **pyqt5** or **pyside6** and provide any cleanup as well.
 
@@ -12,42 +12,72 @@ There is only one codebase and it's written in **pyqt6**.  These scripts will ma
         script-pyqt5.sh     See edit for PyQt5  
 
 
-The scripts need to be run in the **dots** source code directory if converting **dots** to something other than **pyqt6**. These scripts also run a same named set of scripts in the **dots/extras/src** directory which will do the same conversions and can be run from  **extras/src** without needing to install **dots**.  A **unix/linux bash/zsh** shell is required to run the  **sed** commands in the **script-.sh** files in order to make the changes necessary to run either **pyQt5** or **pyside6**.  See **January 2025** and **November 30 2024**. 
+The scripts need to be run in the **dots** source code directory if converting **dots** to something other than **pyqt6**. These scripts also run a same named set of scripts in the **dots/extras/src** directory which will do the same conversions on the **extras/src** files and can be run from  **extras/src** without needing to install **dots**.  A **unix/linux bash/zsh** shell is required to run the  **sed** commands in the **script-.sh** files in order to make the changes necessary to run either **pyQt5** or **pyside6**.  See **January 2025** and **November 30 2024**. 
 
 If you only plan to use **pyQt6** running the python **script-qt6.py** file will clean up the no-longer needed tokens used for converting to other versions.
 
+<a id="top"></a>
+##Table of Contents
+<ul>
+  <li><a href="#help-and-stuff">Help and Stuff</a></li>
+  <li><a href="#screens">Screens</a></li>
+  <li><a href="#video">Video</a></li>
+  <li><a href="#four-files">Four Files</a></li>
+  <li><a href="#files-and-directories">Files and Directories</a></li>
+  <li><a href="#menus-and-their-locations">Menus and Their Locations</a></li>
+  <li><a href="#widgets-and-keys">Widgets and Keys</a></li>
+  <li><a href="#sprites-backgrounds-and-flats">Sprites, Backgrounds and Flats</a></li>
+  <li><a href="#shadows">Shadows</a></li>
+  <li><a href="#scrolling-backgrounds">Scrolling Backgrounds</a></li>
+  <li><a href="#rates">Rates for Scrolling Backgrounds and Widget Controls</a></li>
+  <li><a href="#background-matte">Background Matte Widget</a></li>
+  <li><a href="#types">Types</a></li>
+  <li><a href="#history">A Brief History of Animation</a></li>
+</ul>
+        
 
-## Help and Stuff
+## <a id="help-and-stuff"></a>Help and Stuff
 **Dots** is primarily run using single key commands or from a help menu as there's little or no typing required except when entering file names. As of September 2024 I've added help menus that catalog the commands for each screen item, widget and screen plus a bit of extra stuff that would be good to know. The help menus for everything that gets a command in **dots** are accessible by selecting the help button menus in **Canvas, StoryBoard** and **PathMaker** - the three scenes that make up **dots**.  A **right mouse click** on a screen item will launch its widget.
 
 The helpMenus and menuKeys for **videoPlayers** and **slideShow** are located in **videoPlayerHelp** and are separate from **dots**.  
 
 Once you have **dots** up and running - from the blank screen, that is **Canvas**, you can click on the help button to bring up its menu. From there you can click on the **Help Menus** entry or type **'M'** without the menu to bring up the **Help Menus** menu as well.  It's the easiest way to see what commands are available, where they are located and what they do.  From the same blank screen  entering **'D'** from the keyboard will display the **demo menu** or entering **'S'** will bring up the **screen menu** to select other formats and sizes.
 
-**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites** in **dots** and run many of the apps in the **extras/src** directory.  There's a **Extras.md** file in the **extras** directory which identifies which apps make use of it.
+**Opencv-python**, **version 4.12** or newer, is required to add **shadows** to **sprites** in **dots** and run many of the apps in the **extras/src** directory.  There's a **Extras.md** file in the **extras** directory which identifies which apps make use of it.    
+
+<a href="#top">⬆ Return to Top</a>
   
   
-## Screens 
-I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.
+## <a id="screens"></a>Screens
+I use **'screens'** to refer to both the screen format, number of pixels and ratio - and to the three screens that make up **dots**, **Canvas, Storyboard** and **PathMaker**.  **Canvas** and **pathMaker** don't interact with each other but you can access **backgrounds** once **pathMaker** is active including selecting and running a video or to add a background or flat.    
+
+<a href="#top">⬆ Return to Top</a>
       
-## Video  
+
+## <a id="video"></a>Video
 **PyQt5** now supports looping using the loop button - the **videoWidget** I was previously using has been removed. **PyQt5** also won't loop a video if there's an animation running with shadows.  The two stand-alone videoPlayers each share code from videoClipsMaker, videoClipsWidget, videoPlayerShared and videoPlayerHelp.
 
 There are some differences; **videoPlayerOne** uses a **VideoWidget** to display and still retains resizing from the keyboard and manually setting a video format/ aspect ratio; **videoPlayerTwo"** is based on a **GraphicsVideoItem** and additionally was written to auto-detect the video aspect ratio/format when opening a video file whereas "one" can set it manually. Both videoPlayers are able to read a video files metadata, see **videoPlayerShared.getMetaData**. The default is set to use **opencv** as it's required.  If you're on a Mac there's a mac only solution right below it. 
 
-**VideoClipsMaker** started out as a separate app but it soon became apparent I would need access to a videoPlayer to screen its output.  It includes the **opencv** functions, **assembler** and **ctrOnBackground**, used to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** is the widget used by **clipsMaker** to select functions or set variables and **VideoPlayerShared**, as the name suggests, hosts a number go functions in common including the MediaPlayer, **getMetaData**, buttons and the slider setups.
+**VideoClipsMaker** started out as a separate app but it soon became apparent I would need access to a videoPlayer to screen its output.  It includes the **opencv** functions, **assembler** and **ctrOnBackground**, used to make video clips based on reading either a directory of photos, the first frame of a directory of video files or every 'Nth' frame of a video.  **VideoClipsWidget** is the widget used by **clipsMaker** to select functions or set variables and **VideoPlayerShared**, as the name suggests, hosts a number go functions in common including the MediaPlayer, **getMetaData**, buttons and the slider setups.    
 
-## Four Files  
+<a href="#top">⬆ Return to Top</a>
+
+
+
+## <a id="four-files"></a>Four Files 
 There are four **dots...py** files I'd suggest taking a look into  - **ControlView**, **ShowBiz**, **Shared** and **Screens** as they're backbone of how many of the actions are triggered and where the defaults are set. **ControlView** handles **drag** and **drop** and processes all the key stroke entries - except when **BkgMatte** has temporarily taken over. 
 
 It also handles all/most of the multi-key function requests - the rest pass on to **Storyboard** which in turn passes them on either to **ShowBiz**, which handles most of the single key requests from **Canvas** and **Storyboard** through the **PlayFile** list, or on to functions that send keys to the current screen items to perform actions not already triggered. 
 
 **Shared** is made up of lists and dictionaries that are shared throughout **dots** and **Screens** is responsible for most of the code and data used in reformatting and resizing **dots**. It now hosts four sub-classed entities in support of **pyside6**.
 
-I recently made some code changes to **ControlView**, **ShowBiz**, **Storyboard** and others, not only to accommodate new additions but to clarify working processes as well. My code can change, especially if I think there's room for improvement.
+I recently made some code changes to **ControlView**, **ShowBiz**, **Storyboard** and others, not only to accommodate new additions but to clarify working processes as well. My code can change, especially if I think there's room for improvement.  
+
+<a href="#top">⬆ Return to Top</a>
        
 
-## Files and Directories 
+## <a id="files-and-directories"></a>Files and Directories
 There are four directories to be aware of, **sprites**, **backgrounds**, **plays** and **paths**. **Sprites** and **backgrounds** are the directories where your stuff needs to go if you want to add your own material to **dots**. You can add any **videos** you plan to use to the **backgrounds** directory as they're treated as just another background.  
 
 What I call a **sprite** needs to be **'transparent.png'** file and should be around **600 pixels square**. For **backgrounds** I'd recommend using a .jpg file and keeping it under or around **500MB** in size and formatting it to **640** pixels on the short side if you plan on scrolling it. I'd considered these to be the minimum required sizes.  You'll need to do some experimenting to find out what works best for your setup, especially if scrolling backgrounds.
@@ -76,13 +106,15 @@ If you're in **Windows** you won't need to edit the **paths** dictionary in **Sh
         'spritePath':   './../sprites/',
         'paths':        './../paths/',
         'demo':         './../demo/',
-    }
+    }  
+<a href="#top">⬆ Return to Top</a>
 
-
-## Menus and Their Locations  
-There are five help *.py files and each one has a list of help files that details the location of each help menu.  Selecting **help Menus** from a help button menu will let you examine them all. Many of the help menus will let you click on line item to perform the function attached to the key you'd actually use. Not all do and I've tried to distinguish those.
+## <a id="menus-and-their-locations"></a>Menus and Their Locations
+There are five help *.py files and each one has a list of help files that details the location of each help menu.  Selecting **help Menus** from a help button menu will let you examine them all. Many of the help menus will let you click on line item to perform the function attached to the key you'd actually use. Not all do and I've tried to distinguish those.  
+ 
+[⬆ Return to Top](#top)
    
-## Widgets and Keys
+## <a id="widgets-and-keys"></a>Widgets and Keys
 A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMaker** from a blank canvas, will pop up a widget that provides access to the most often used functions such as scaling, rotation, scrolling controls or others, including a help menu, depending on what you've selected.
 
      There are a number of keyboard controls that either match the functions provided by 
@@ -91,34 +123,49 @@ A **right-mouse-click** on a **sprite, background**, **shadow** and in **pathMak
      key combinations and their actions. The key assignments will change as you switch 
      between StoryBoard/Canvas and PathMaker or by entering 'K'. 
 
-*The KeysPanel data has been replaced by the help buttons and menus and will eventually disappear.*
+*The KeysPanel data has been replaced by the help buttons and menus and will eventually disappear.*  
 
-## Sprites, Backgrounds and Flats  
-**Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A'** from the **canvas** or **'B'** if there are sprites but no background or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites**, **backgrounds** and **video** to a **play** file.
+[⬆ Return to Top](#top)  
 
 
-## Shadows
+## <a id="sprites-backgrounds-and-flats"></a>Sprites, Backgrounds and Flats
+**Sprites** are added by drag and dropping them onto the **screen/canvas**.  **Backgrounds** are loaded by either entering **'A'** from the **canvas** or **'B'** if there are sprites but no background or clicking on the **Add** button.  Clicking on the **Color** button gives you a number options to create a solid color **flat** which is treated as a **background** except for scrolling. The **save** button that's next to the **Color** button saves the **flat** to a **.bkg** file whilst the **save** button in the **play** group will save **sprites**, **backgrounds** and **video** to a **play** file.   
+  
+[⬆ Return to Top](#top)  
+
+
+## <a id="shadows"></a>Shadows
 Are now on by default and requires that you've installed **opencv-python 4.12** or above. Running the left or right scrolling backgrounds demo will illustrate both **shadows** and **scrolling backgrounds**.
 
 
-**Shadows** are created through the **sprite widget** and **right-clicking** on a shadow will trigger its widget which should take care most of the functions specific to shadows. **Double-clicking** on a shadow toggles the perspective controls (**points and outlines**) on and off.
+**Shadows** are created through the **sprite widget** and **right-clicking** on a shadow will trigger its widget which should take care most of the functions specific to shadows. **Double-clicking** on a shadow toggles the perspective controls (**points and outlines**) on and off.   
+
+[⬆ Return to Top](#top)  
 
 
-## Scrolling Backgrounds
+
+## <a id="scrolling-backgrounds"></a>Scrolling Backgrounds
 As of **August 2026** there's been a significant change and all previous bets are off. There's essentially one major variable you may need to change and that is **ShowTime** located in **BkgWorks** - it's currently set to 4. There you'll find two other variables, **RWY** and **VT5**, for making adjustments to vertical scrolling backgrounds once **ShowTime** has been set.   
 
-Running a demo with a scrolling background will immediately inform you as to whether you'll need to make any adjustments. If there's a gap between backgrounds **ShowTime** needs to be set higher and if there's an overlap then lower.  Backgrounds are constantly being deleted and the data necessary to maintain the scrolling data is lost which is why I added **Trackers**.  There's a listview widget for trackers that lets you change the order on how multiple backgrounds are positioned front to back. Trackers don't track flats.
+Running a demo with a scrolling background will immediately inform you as to whether you'll need to make any adjustments. If there's a gap between backgrounds **ShowTime** needs to be set higher and if there's an overlap then lower.  Backgrounds are constantly being deleted and the data necessary to maintain the scrolling data is lost which is why I added **Trackers**.  There's a listview widget for trackers that lets you change the order on how multiple backgrounds are positioned front to back. Trackers don't track flats. 
+     
+
+[⬆ Return to Top](#top)  
 
 
-## Rates for Scrolling Backgrounds and Widget Controls 
+
+## <a id="rates"></a>Rates for Scrolling Backgrounds and Widget Controls
 You can pretty ignore the screen rate slider in the background widget as it's all based on code now rather than stored data and replaces any previous settings. The speed factor is a multiplier that can be applied to speed up or slow how fast the backgrounds scroll, its value is saved to the play file.
 
 Scrolling backgrounds require different **rates** based on distance to travel and image size and are used to set the duration of the animation that drives the scrolling background. As the **first** background is already present it doesn't need to scroll as far to completely clear the screen view and it's rate is smaller compared to the **next** background which must travel further, starts off screen and travels its entire length.
    
-The **ShowTime'** constant represents the number of pixels remaining before the current background is fully visible on screen.  When reached it triggers the **'next'** background process which creates a new background and sets it scrolling to seamlessly follow the background ahead of it.
+The **ShowTime'** constant represents the number of pixels remaining before the current background is fully visible on screen.  When reached it triggers the **'next'** background process which creates a new background and sets it scrolling to seamlessly follow the background ahead of it.  
 
 
-## Background Matte Widget
+[⬆ Return to Top](#top)  
+
+
+## <a id="background-matte"></a>Background Matte Widget
 Selected from the **background widget** the **BkgMatte** widget draws a mat/matte around the background. Its help menu pops up when first selected and can also be triggered by entering **H** from the keyboard which toggles it on or off.  The menu should be pretty much self-explanatory and there are videos that illustrate the commands as well.
 
 This has been changed as well but marginally.  **BkgMatte** grabs the keyboard so it's best to plan ahead if you going to run an animation with a matte around it.
@@ -141,8 +188,13 @@ This has been changed as well but marginally.  **BkgMatte** grabs the keyboard s
         'Space': Pause/Resume'
         'S':    `Stop Animation'
     }
+      
 
-## Types
+
+[⬆ Return to Top](#top)  
+
+
+## <a id="types"></a>Types
 The types are **'frame', 'pix', 'bkg', 'flat', 'shadow', and 'video'** .  These are used to organize the screen items from front to back as I use the **QGraphicsitem zValue()** in combination with the types to order the scene items list. There are two functions, **toFront()** and **lastZval()** that help to make sure the different types I've created are good neighbors.  The types also determine how each row of data from the .play file is to be processed.  
 
 The class attribute **type** is replaced in **PySide6** with **desc** as **pyside** appears to treat it as a function and tosses an error.
@@ -164,10 +216,14 @@ The class attribute **type** is replaced in **PySide6** with **desc** as **pysid
 | Flat    | flat | -99 or less than background 
 
   
-**\** number of screen items + 100 decreasing by 1 per item
+**\** number of screen items + 100 decreasing by 1 per item  
+<a href="#top">
+
+⬆ Return to Top</a>
 
 
-## A Brief History of Animation
+
+## <a id="history"></a>A Brief History of Animation
 
 **It's not advisable to attempt changes or make selections when running an animation as interesting and unwanted problems can occur.**   
 
@@ -307,6 +363,9 @@ And just below that how the **pos** variable is used.
 
 
 Two other animations worth mentioning, **fin** and **reprise**, two of my little amusements. When you delete a **PixItem**, except for frames, I run **fin** which the scales the **PixItem** down in size, while rotating it and lowering its opacity before deleting it. When stopping an animation I run **reprise** to reposition screen objects back to their starting positions.  Carry overs from my original java program. 
+
+ 
+[⬆ Return to Top](#top) 
 
 ---
 ### *Have fun*

@@ -6,6 +6,9 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
            
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
+---
+**September 5 2026**  
+Added a table of contents to **StartHere.md** and a new file to **extras** named **Changes-Extras.md**, a collection of references to the **extras** apps from **Changes.md** by name, date and a video-link if there was video during the month it was written up.  No guarantees the app will be included in the video.  A table of contents added to this file as well. Another google gemini effort. 
 
 ---
 **August 31 2026**   
