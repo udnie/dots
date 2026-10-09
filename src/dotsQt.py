@@ -3,6 +3,7 @@ import sys
 import os
      
 from PyQt6.QtCore       import QTimer
+from PyQt6.QtGui        import QPalette, QColor
 from PyQt6.QtWidgets    import QStatusBar, QMainWindow, QApplication
 
 from dotsScreens        import *   ## including pathMod
@@ -47,7 +48,12 @@ class DotsQt(QMainWindow):
   
         self.setStyleSheet(open('./dotsStyle.css').read())   
         self.setFixedSize(common['DotsW'], common['DotsH'])
-                               
+        
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(230,230,230))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
+        
         self.canvas = canvas.StoryBoard(self)
         self.setCentralWidget(self.canvas)
        

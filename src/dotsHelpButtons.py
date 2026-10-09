@@ -4,7 +4,7 @@ from functools          import partial
 from PyQt6.QtCore       import QTimer
 
 from dotsSideGig        import getVuCtr
-from dotsShared         import PlayKeys 
+from dotsShared         import PlayKeys
 from dotsTableModel     import TableWidgetSetUp, QC, QL, QH, SD
 from dotsPathWorks      import PathHelp
 
@@ -34,7 +34,8 @@ storyKeys = {
     'Menus':    'Help Menus',
     'O':    'Toggle Shadow Outlines', 
     'S':    'Save Play File',    
-    'U':    'UnSelect All Sprites',
+    'T':    'Toggle Selected Scene Items',
+    'U':    'UnSelect Sprites/Pixitems',
     'V':    'Delete the Video',
     'W':    'Clear Widgets',
     'X':    'X, Q, Escape to Quit',
@@ -157,8 +158,8 @@ class CanvasHelp:
  
         x, y = getVuCtr(canvas)    
         if off != 0: x += off
-        
-        self.table.move(int(x - (width/2)), int(y - (height/2)))
+ 
+        self.table.move(int(x - (width/2)), int(y - (height/2))+10)
         self.table.show() 
        
     def clicked(self):
@@ -191,10 +192,10 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
         self.canvas = canvas
         self.switch = switch
         
-        self.table = TableWidgetSetUp(80, 185, len(storyKeys)+5,0, 27)
+        self.table = TableWidgetSetUp(80, 200, len(storyKeys)+5,0, 27)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 272, 628
+        width, height = 286, 654
         self.table.setFixedSize(width, height)
      
         self.table.setRow(0, 0, f'{"   StoryBoard Help Menu":<30}',QL, True,True,2)
@@ -226,8 +227,8 @@ class StoryHelp:  ## storyboard help goes directly to showbiz
   
         x, y = getVuCtr(canvas)  
         if off != 0: x += off  
-        
-        self.table.move(int(x - (width/2)), int(y - (height/2)))
+     
+        self.table.move(int(x - width/2), int(y - height/2)+10) 
         self.table.show()
               
     def clicked(self):

@@ -30,7 +30,7 @@ helpMenuKeys = {   ## videoplayers
     'X, Q Escape':  'Quit/Exit',
     'Spacebar':     'Play/Pause/Resume',
     'Shift-F':      'Open File',
-    'Shift-O':      'Open File ClipsMaker Off',
+    'Shift-O':      'Open File/ClipsMaker Off',
     'Shift-S':      'Hide/Show All',
     '>,  +,  ]':    'Scale Up',
     '<,  _,  [':    'Scale Down',  
@@ -192,7 +192,8 @@ class VideoHelp(QWidget):
             Qt.WindowType.FramelessWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)
     
-        extras, width, height = 4, 291, 756
+        extras, width, height = 2, 291, 696  ## one or both
+        
         if self.parent.player == "two":
             extras, height = 1, 666
                 
@@ -208,10 +209,10 @@ class VideoHelp(QWidget):
         row = 1  
         for k,  val in helpMenuKeys.items(): 
             if self.parent.player == "two":
-                if k in (">,  +,  ]",   "<,  _,  [", "Aspect"):
+                if k == "Aspect":
                     continue
               
-            if row == 6:
+            if val == 'Menus':
                 self.table.setRow(row, 0, k, SD,True,True)
                 self.table.setRow(row, 1, "  " + val,SD,'',True)
                 
@@ -233,9 +234,7 @@ class VideoHelp(QWidget):
      
             row += 1
                   
-        self.table.setRow(row,     0,  f"{"Scaling Up/Down and Setting Aspect":<12}",QC,True,True, 2)
-        self.table.setRow(row + 1, 0,  f"{"Don't Work in VideoPlayerTwo":<12}",QC,True,True, 2)
-        self.table.setRow(row + 2, 0,  f"{'Right-Click or Click Here to Close':<12}",QL,True,True, 2)
+        self.table.setRow(row,  0,  f"{'Right-Click or Click Here to Close':<12}",QL,True,True, 2)
         
         pwidth, pheight = self.parent.width(), self.parent.height() 
   
@@ -293,7 +292,7 @@ class SlideShowHelp(QWidget):
         self.table = TableWidgetSetUp(115, 145, len(slideMenuKeys)+2)
         self.table.itemClicked.connect(self.clicked)
 
-        width, height = 267, 547
+        width, height = 267, 546
         self.table.setFixedSize(width, height)  
          
         self.table.setRow(0, 0, f'{"SlideShow":<15}',QL,True, True, 2) 

@@ -31,6 +31,7 @@ bkgHelpKeys = {
     ' H ':      'This Help Menu',
     ' M ':      'Matte',
     ' T ':      'Toggle Lock',
+    ' U ':      'Update Scrolling Backgrounds',
     ' \\ ':     'Background Tag',
     'delete':   'delete from screen',  
     'enter':    'move to the front',
@@ -109,13 +110,13 @@ class PixHelp:
                 
         if self.switch != 'pix':
             if off != 0: x += off
-            x = int(x - (width/2)) 
+            x = int(x - (width/2)) + 10
+            y = int(y - (height/2)) + 10  ## default
         else: 
             b = self.pixitem.boundingRect()
             width = int(b.width() + 20)
             x = int(off + width)
-     
-        y = int(y - (height/2))  ## default
+            y = int(y - (height/2))  ## default
      
         self.table.move(x, y)     
         self.table.show()  
@@ -152,18 +153,22 @@ class BkgHelp:
         self.canvas = self.bkgItem.canvas
         self.switch = switch 
 
-        self.table = TableWidgetSetUp(65, 180, len(bkgHelpKeys)+4)
+        self.table = TableWidgetSetUp(65, 200, len(bkgHelpKeys)+4)
         self.table.itemClicked.connect(self.clicked)    
     
-        width, height = 251, 546
+        width, height = 271, 576
         
         self.table.setFixedSize(width, height)  
-        self.table.setRow(0, 0, f'{"Background Help Menu":<22}',QL,True,True,2)
+        self.table.setRow(0, 0, f'{"Backgrounds Help Menu":<22}',QL,True,True,2)
     
         row = 1
         for k , val in bkgHelpKeys.items():
-            self.table.setRow(row, 0, k,'',True,True)
-            self.table.setRow(row, 1, "  " + val,'','',True)
+            if k.strip() == 'U':
+                self.table.setRow(row, 0, k,QC,True,True)
+                self.table.setRow(row, 1, "  " + val,QC,'',True)
+            else:      
+                self.table.setRow(row, 0, k,'',True,True)
+                self.table.setRow(row, 1, "  " + val,'','',True)
             row += 1
 
         self.table.setRow(row, 0, f"{'Arrow Keys Can Modify ScreenRates ':<15}",QC,True,True, 2)
@@ -186,7 +191,7 @@ class BkgHelp:
                     help = 'del'
                 elif help == 'option':
                     help = 'opt'  
-                if help != 'H' and help in self.bkgItem.sharedKeys:
+                if help != 'H' and help in self.bkgItem.sharedKeys:  ## works better this way
                     QTimer.singleShot(25, partial(self.bkgItem.shared, help)) 
                 elif help in ('Shift-B', 'Shift-U'):  ## catches it from menu and keyboard thru controlView
                     self.canvas.view.sendIt(QKeySequence(help[-1]), Qt.KeyboardModifier.ShiftModifier)  

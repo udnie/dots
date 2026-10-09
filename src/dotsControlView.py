@@ -1,4 +1,5 @@
 
+import os
 import time
 
 from PyQt6.QtCore       import Qt, pyqtSignal
@@ -84,12 +85,16 @@ class ControlView(QGraphicsView):
                 e.setAccepted(False)
                          
     def dropEvent(self, e):
-        m = e.mimeData()  ## works for sprites
+        m = e.mimeData()  ## works for sprites and wrap-arounds
         if m.hasUrls():
-            fileName = m.urls()[0].toLocalFile() 
-            if '-wrp' in fileName:     
-                MsgBox('Add file to /backgrounds to scroll it')
-                e.ignore()
+            fileName = m.urls()[0].toLocalFile()                      
+            if '-wrp' in fileName:
+                path = os.path.dirname(fileName)
+                if not 'backgrounds' in path:
+                    MsgBox('Add file to /backgrounds to scroll it')
+                    e.ignore()
+                else:
+                    self.sideCar2.addWrptoScene(fileName)  ## to scene   
             else:
                 ## None = clone source, False = mirror right/left
                 self.canvas.pixCount = self.mapper.toFront(0)

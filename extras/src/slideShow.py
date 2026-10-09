@@ -5,7 +5,8 @@ import math
 import time
 
 from PyQt6.QtCore       import Qt, QPointF, QTimer
-from PyQt6.QtGui        import QImage, QPixmap, QGuiApplication, QFont
+from PyQt6.QtGui        import QImage, QPixmap, QGuiApplication, QFont, QColor, \
+                                QPalette
 from PyQt6.QtWidgets    import QWidget, QApplication, QGraphicsView, \
                                 QGraphicsScene, QGraphicsPixmapItem, QLabel, \
                                 QHBoxLayout,  QVBoxLayout, QPushButton, QMessageBox, \
@@ -560,7 +561,12 @@ class SlideShow(QWidget):
                 "}")
        
         self.init()
-  
+        
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(230,230,230))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)  
+        
         self.ctr = QGuiApplication.primaryScreen().availableGeometry().center() 
         self.hgt = QGuiApplication.primaryScreen().availableGeometry().height()
           

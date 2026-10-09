@@ -7,8 +7,8 @@ QL = QColor(230,230,230)  ## 10% gray
 QC = QColor(210,210,210)  ## 18% gray
 QH = QColor(220,220,220)  ## 14% gray
 SD = QColor(115,252,214,125)  ## spindrift-lite
-RH = 30
 
+RH = 30
 CTR = True
 
 Types = ['frame', 'pix', 'video', 'bkg', 'flat']  ## used by tableMaker

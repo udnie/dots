@@ -40,7 +40,7 @@ class BkgWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)        
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)
-        painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,  ## border
+        painter.setPen(QPen(QColor(0,85,225), 5, Qt.PenStyle.SolidLine,  ## border
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin)) 
         painter.setBrush(QColor(0,150,245,255))
         painter.drawRoundedRect(rect, 15, 15)
@@ -132,11 +132,13 @@ class BkgWidget(QWidget):
             Qt.WindowType.CustomizeWindowHint| \
             Qt.WindowType.WindowStaysOnTopHint)    
                                                                                                    
-        if self.switch in('on', 'all'):
+        if self.switch in('on','all','new'):
             x, y = getVuCtr(self.canvas)  
             self.label.setText('FileName  goes Here')
             if self.switch == 'on':
                 self.move(x-425, y)
+            elif self.switch == 'new':
+                self.move(x-515, y-130)
             else:
                 self.move(x-400,y-150)
 
@@ -172,8 +174,7 @@ class BkgWidget(QWidget):
         self.rateSlider.setTickInterval(250) 
         if self.switch == '': 
             self.rateSlider.valueChanged.connect(self.setBkgRateValue)  
-                  
-                                 
+                           
         sbox = QHBoxLayout()  ## sliders and dial  
         sbox.addSpacing(20)       
         sbox.addWidget(self.rateSlider) 

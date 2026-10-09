@@ -51,25 +51,25 @@ class HelpMenus:  ## demos and screens - instantiated in showbiz - always up
 ### --------------------------------------------------------
     def setMenu(self, key):
         if key == 'D':
-            if self.demoHelp == None:
+            if not self.demoHelp:
                 self.demoHelp = DemoHelp(self.canvas)
                 self.canvas.offMenuClick = self.demoHelp
             else: 
                 self.closeMenu()
               
         elif key == 'S':
-            if  self.screenHelp == None:
+            if not self.screenHelp:
                 self.screenHelp = ScreenHelp(self.canvas)  ## in screens 
                 self.canvas.offMenuClick = self.screenHelp
             else:
                 self.closeMenu()
                             
     def closeMenu(self):   
-        if self.demoHelp != None:     
+        if self.demoHelp:     
             self.demoHelp.closeMenu()
             self.demoHelp = None
          
-        elif self.screenHelp != None:
+        elif self.screenHelp:
             self.screenHelp.closeMenu()
             self.screenHelp = None  
                    
@@ -94,14 +94,15 @@ class HelpMenus:  ## demos and screens - instantiated in showbiz - always up
                 self.runSnakes('left')   
                     
         elif key == 'bats':
-            if self.bats.makeBats() == None:
+            if not self.bats.makeBats():
                 self.closeMenu() 
            
         elif key in ('left', 'right'):  ## hats and bats
             if self.canvas.dots.Vertical:     
                 MsgBox('Not Implemented for Vertical Format')
                 return   
-            self.canvas.bkgMaker.newTracker.clear()    
+            self.canvas.bkgMaker.newTracker.clear()  
+              
             self.hats.makeHatsDemo('left') if key == 'left' else \
                 self.hats.makeHatsDemo('right') ## left to right - direction of travel    
              

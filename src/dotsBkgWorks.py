@@ -10,15 +10,19 @@ from dotsShared         import common, paths
 from dotsBkgMatte       import Matte
 from dotsAnimation      import Node
 
-Ten = 10.0  ## the 'first' scrolling background rate - it's always 10
-ShowTime = 4  ## at number of pixels remaining add the next background 
 
-''' These first two values are for verticals - You may need to change them 
-    if there are gaps or overlaps.
+''' These have been replaced by the settings.json file in ./plays in an effort 
+    to make it easier to make any changes. Select 'Update Scolling Backgrounds'
+    from the Background help menu or enter 'U' and click on a background to open
+    the BkgScrollWidget - be sure to click on 'Update' for the changes to take.
+    
+    ShowTime = 4  ## number of pixels remaining when to add the next background 
+    RWY =   40    ## now RunWay - used if vertical - modifies runWay changing its starting position
+    VT5 = 1.05    ## now OffSet - used if vertical - modifies 'first' Ten value to slow it 
     '''
-RWY =   40     ## if vertical modifies runWay changing its starting position
-VT5 = 1.05     ## if vertical modifies 'first' Ten value to slow it 
-LRF = 1.00     ## modifies 'left' 'right' 'first' Ten value if necessary - not used
+
+Ten = 10.0    ## the 'first' scrolling background rate - it's always 10
+LRF = 1.00    ## modifies 'left' 'right' 'first' Ten value if necessary - not used
 
 ### --------------------- dotsBkgWorks --------------------- 
 ''' setDirection, getScreenRate, some scrolling and menu functions '''
@@ -59,7 +63,7 @@ class BkgWorks:
         self.bkgItem.tag = 'scroller'   ## trigger needed to run scrolling bkg set here
         self.bkgMaker.lockBkg(self.bkgItem)  ## locks the background to begin 
         
-        if self.bkgMaker.widget != None:
+        if self.bkgMaker.widget:
             self.bkgMaker.updateWidget(self.bkgItem)      
             QTimer.singleShot(100, partial(self.bkgItem.bkgMaker.resetSliders, self.bkgItem))
                                                   
@@ -70,10 +74,12 @@ class BkgWorks:
     def getScreenRate(self, bkg, which =''): 
         if which == 'first':
             rate = Ten
-            if bkg.direction == 'vertical':
-                rate = Ten * VT5
+            settings = bkg.bkgScrollWrks.getSettings()
+            
+            if bkg.direction == 'vertical': 
+                rate = Ten * settings['OffSet']/100
             else:
-                rate = Ten * LRF  
+                rate = Ten  ## * LRF  ## not implemented 
          
         elif bkg.rate == 0:  ## sets rate for 'next' used by tracker
             
@@ -93,7 +99,8 @@ class BkgWorks:
     def setFirstPath(self, path, bkg):  ## 'first' is already filling the scene  
         fact = bkg.factor      
         bkg.node = Node(bkg)
-        path = QPropertyAnimation(bkg.node, b'pos')
+        path = QPropertyAnimation(bkg.node, b'pos')  ## not the ../paths/
+        settings = bkg.bkgScrollWrks.getSettings()
   
         if bkg.direction == 'left':
             path.setDuration(int(common['ViewW'] * (bkg.rate*fact)))  
@@ -105,10 +112,10 @@ class BkgWorks:
             path.setStartValue(QPoint(bkg.runWay, 0))
             path.setEndValue(QPoint(int(common['ViewW']), 0))
               
-        elif bkg.direction == 'vertical':  
-            path.setDuration(int(common['ViewH'] * (bkg.rate*fact)))  ## rate time equals time to clear     
-            path.setStartValue(QPoint(0, bkg.runWay + RWY))  ## RWY shortens the number of pixels to ShowTime
-            path.setEndValue(QPoint(0, -bkg.height)) 
+        elif bkg.direction == 'vertical':  ## it appears the 'First' qt scrolling vertical needs a boost to start and must slow afterwards
+            path.setDuration(int(common['ViewH'] * (bkg.rate*fact)))   
+            path.setStartValue(QPoint(0, bkg.runWay + settings['RunWay']))  ## RunWay shortens the number of pixels to ShowTime as
+            path.setEndValue(QPoint(0, -bkg.height))                        ## bkg.runWay is a negative value
        
         group = QParallelAnimationGroup()
         group.addAnimation(path)
@@ -151,7 +158,8 @@ class BkgWorks:
             bkg.setPos(QPointF())
             
         else:
-            bkg.setPos(QPointF(0.0, float(bkg.runWay + RWY)))
+            settings = bkg.bkgScrollWrks.getSettings()
+            bkg.setPos(QPointF(0.0, float(bkg.runWay + settings['RunWay'])))
                      
     def setBtns(self, bkg, widget):  ## from bkgMaker widget
         match bkg.direction:  
@@ -196,7 +204,7 @@ class BkgWorks:
         dialog.close()
   
     def centerBkg(self):
-        if self.bkgItem != None and self.bkgItem.type == 'bkg':  
+        if self.bkgItem and self.bkgItem.type == 'bkg':  
             width = self.bkgItem.imgFile.width()
             height = self.bkgItem.imgFile.height()
             self.bkgItem.x = (common['ViewW']- width)/2

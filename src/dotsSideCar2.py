@@ -3,10 +3,11 @@ import os
 import os.path
 import random
 import subprocess
-import sys
+import time
 
-from PyQt6.QtCore       import QAbstractAnimation, QPoint, QSize, QRect
-from PyQt6.QtWidgets    import QFileDialog
+from PyQt6.QtCore       import QAbstractAnimation, QPoint, QSize, \
+                                QRect, QPointF
+from PyQt6.QtWidgets    import QFileDialog, QGraphicsPixmapItem
                                                     
 from dotsShared         import common, paths
 from dotsSideGig        import MsgBox
@@ -27,10 +28,10 @@ class SideCar2:
         self.mapper = MapMaker(self.canvas)
         
         self.qtstring = 'PyQt6'  ## updated by scripts to reflect framework
-      
+
 ### --------------------------------------------------------      
     def snapShot(self, pathMaker):  ## screen capture
-        if self.hasBackGround() > 0 or self.scene.items():
+        if self.hasBackGrounds() > 0 or self.scene.items():
             self.unSelect()  ## turn off any select borders
             if not self.canvas.pathMakerOn:
                 if self.mapper.isMapSet():
@@ -65,20 +66,20 @@ class SideCar2:
     def snapTag(self):
         return str(random.randrange(1000,9999)) + chr(random.randrange(65,90))
                          
-### --------------------------------------------------------   
+### --------------------------------------------------------
     def gotFlats(self):
         for itm in self.scene.items():  ## used in showbiz
             if itm.type == 'flat':
                 return True
         return False
     
-    def hasBackGround(self): 
+    def hasBackGrounds(self): 
         return sum(pix.type == 'bkg' for pix in self.scene.items())
                    
     def bkgStuff(self):
         if self.gotFlats() or len(self.canvas.bkgMaker.newTracker) > 0:
             self.sendPixKeys('B')
-        elif self.hasBackGround() == 0:
+        elif self.hasBackGrounds() == 0:
             self.canvas.bkgMaker.openBkgFiles()
         
     def aye(self):
@@ -88,7 +89,7 @@ class SideCar2:
                 break
             
     def mirrorBkg(self, switch):  ## either 1 mirrored default or -1, flip it and mirrored
-        if self.hasBackGround() and self.canvas.openPlayFile == '':  ## only a background
+        if self.hasBackGrounds() and self.canvas.openPlayFile == '':  ## only a background
             bkgtmp = None
             for bkg in self.scene.items():  
                 if bkg.type == 'bkg':
@@ -96,31 +97,33 @@ class SideCar2:
                     break  
             if bkgtmp == None: 
                 return   
-            bkg.setMirrored(bkg.flopped, switch)   
-             
+            bkg.setMirrored(bkg.flopped, switch)      
             x = int(common['ViewW']/2- bkg.width)  ## starts off screen - left
             bkg.setPos(x , 0)   
+     
             akg = BkgItem(bkgtmp.fileName, self.canvas, common['bkgZ'], bkgtmp.imgFile)
             if akg == None:  
-                return       
-            self.scene.addItem(akg)  
-            
+                return      
+             
+            self.scene.addItem(akg)      
             akg.setPos(int(common['ViewW']/2), 0)  ## start center screen  
             if switch < 2:         
                 akg.setMirrored(True, switch) if not bkg.flopped else akg.setMirrored(False, switch) 
             else:
                 akg.setMirrored(False, switch) 
-   
         self.delDupes()
-                                   
+      
+    def addWrptoScene(self, fileName):  ## dnd for wrp files from backgrounds
+        self.canvas.bkgMaker.addBkg(fileName)
+                    
     def delDupes(self):  ## otherwise they can build up
-        if self.hasBackGround() >= 3:
+        if self.hasBackGrounds() >= 3:
             i = 0
-            for bkg in self.scene.items():  
+            for bkg in self.canvas.scene.items():  
                 if bkg.type == 'bkg':
                     i += 1 
                     if i >= 3:
-                        self.scene.removeItem(bkg)
+                        self.canvas.scene.removeItem(bkg)
                                 
     def typedesc(self):  ## run it directly from dots when switching from pyqt to pyside or back
         if len(self.canvas.scene.items()) == 0:    
@@ -132,7 +135,44 @@ class SideCar2:
                 MsgBox("./plays failed")
                 return
             MsgBox("./plays updating...")
+  
+  ### --------------------------------------------------------  
+    def scrollingUpdates(self, bkg):  ## replace the current background with 
+        fileName   = bkg.fileName       ## updated version
+        direction = bkg.direction   
+        factor    = bkg.factor
+
+        bkg.bkgScrollWrks.closeScrollWidget() 
+        if self.canvas.control == 'resume' or self.canvas.animationRunning: 
+            self.canvas.showbiz.keysInPlay('S')  ## stop whatever is running
+            time.sleep(.05)     
             
+        self.canvas.bkgMaker.deleteBkg(bkg)       
+        self.setBackGround(fileName, direction, factor)  
+                  
+    def setBackGround(self, fileName, direction, factor):  ## from bats and hats
+        self.scroller = BkgItem(fileName, self.canvas)
+        if self.scroller.type == None: 
+            return None
+        
+        self.scroller.direction = direction  
+        self.scroller.factor = factor    
+        
+        self.scroller.tag = 'scroller'
+        self.scroller.mirroring = False   
+       
+        self.canvas.bkgMaker.bkgTrackers.addTracker(self.scroller)  
+        self.scroller.bkgWorks.setDirection(self.scroller.direction)
+        self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  
+        
+        if self.scroller.direction == 'right':
+            self.scroller.setPos(QPointF(self.scroller.runWay, 0))  ## offset to right 
+           
+        self.scroller.addedScroller = False   
+        self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)  
+                   
+        self.scene.addItem(self.scroller)    
+                 
 ### --------------------------------------------------------
     def sendPixKeys(self, key):
         if self.canvas.bkgMaker.trackerWidget != None and \
@@ -165,7 +205,7 @@ class SideCar2:
                 pix.isHidden = False
             elif pix.zValue() <= common['pathZ']:
                 break
- 
+                 
     def deleteSelected(self):  ## self.pathMakerOn equals false   
         if len(self.scene.items()) == 0:
             self.canvas.setKeys('D')
@@ -185,10 +225,9 @@ class SideCar2:
             if k > 0: self.canvas.showWorks.enablePlay()  ## stop it - otherwise it's hung
   
     def unSelect(self):
-        for itm in self.scene.items():  
-            if itm.type == 'pix':       
-                itm.isHidden = False 
-                itm.setSelected(False) 
+        for pix in self.scene.selectedItems():  
+            if pix.type == 'pix':       
+                pix.setSelected(False) 
             
     def unlockAll(self):
         for itm in self.scene.items():  

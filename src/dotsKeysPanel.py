@@ -6,6 +6,10 @@ from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QTableView, QHeaderView, \
                                 
 from dotsShared         import common    
 
+Offset = 0
+SliderW = 127
+Fix = 23
+
 ### --------------------- dotsKeysAndHelp ------------------
 ''' classes:  KeysPanel and TableModel '''              
 ### --------------------------------------------------------
@@ -21,7 +25,7 @@ class KeysPanel(QWidget):
         self.pathKeys    = pathMaker()   ## list of path keys
         self.pathKeysSet = False
                                                  
-        self.setFixedSize(common['SliderW'], common['SliderH']) 
+        self.setFixedSize(SliderW, common['SliderH']) 
         
         self.layout = QVBoxLayout(self)        
         self.layout.addWidget(self.addTableGroup(), Qt.AlignmentFlag.AlignVCenter) 
@@ -49,8 +53,7 @@ class KeysPanel(QWidget):
         self.setTableModel(self.storyKeys)  ## initial menu
          
         if not self.canvas.dots.Vertical:
-            self.tableView.setFixedSize(common['SliderW']-common['OffSet'], \
-                common['SliderH']-common['fix'])       
+            self.tableView.setFixedSize(SliderW-Offset, common['SliderH']-Fix)       
         
         self.tableView.setAlternatingRowColors(True) 
         self.tableView.setStyleSheet('border: 1px solid rgb(180,180,180)')

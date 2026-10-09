@@ -11,7 +11,7 @@ import time
     videoPlayerOne for more ...  '''
 ### -------------------------------------------------------- 
 from PyQt6.QtCore       import Qt, QTimer, QPoint, QSizeF, QRect, QSize
-from PyQt6.QtGui        import QGuiApplication, QPixmap
+from PyQt6.QtGui        import QGuiApplication, QPixmap, QPalette
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, \
                                 QSizePolicy,  QGraphicsView, QGraphicsScene, \
                                 QGraphicsPixmapItem
@@ -29,6 +29,7 @@ class VideoPlayer(QWidget):
 ### -------------------------------------------------------
     def __init__(self):
         super().__init__()
+        
         self.setWindowTitle("VideoPlayerTwo and ClipsMaker")
         
         self.setUI()                                       
@@ -71,7 +72,7 @@ class VideoPlayer(QWidget):
           
         if key == Qt.Key.Key_Space:  ## spacebar to pause/resume
             self.shared.playVideo()  
-                     
+                              
         elif key == Qt.Key.Key_S and mod & Qt.KeyboardModifier.ShiftModifier:
             self.shared.toggleSlider() 
             
@@ -81,6 +82,14 @@ class VideoPlayer(QWidget):
         elif key == Qt.Key.Key_O and mod & Qt.KeyboardModifier.ShiftModifier:
             self.VideoMenuKeys('Shift-O')
                            
+        elif key == Qt.Key.Key_BracketRight or mod & Qt.KeyboardModifier.ShiftModifier \
+            and key in (Qt.Key.Key_Greater, Qt.Key.Key_Plus):
+                 if self.backdrop: self.VideoMenuKeys(']')
+                             
+        elif key == Qt.Key.Key_BracketLeft or mod & Qt.KeyboardModifier.ShiftModifier \
+            and key in (Qt.Key.Key_Less, Qt.Key.Key_Underscore):
+                 if self.backdrop: self.VideoMenuKeys('[')
+                                             
         elif key in (Qt.Key.Key_X, Qt.Key.Key_Q, Qt.Key.Key_Escape):
             self.bye()  
                       
@@ -121,13 +130,19 @@ class VideoPlayer(QWidget):
                     self.shared.msgbox(self.path) if self.path != '' else self.shared.msgbox(os.getcwd())  
                 case 'X' | 'Q':
                     self.bye()   
+                case ']':
+                    if self.backdrop:
+                        self.shared.zoom(1.05, WID, HGT, self.aspect)
+                case '[':
+                    if self.backdrop:    
+                        self.shared.zoom(0.95, WID, HGT, self.aspect)      
                 case _:
                     return
     
 ### -------------------------------------------------------                     
     def mousePressEvent(self, e):  
         if e.button() == Qt.MouseButton.RightButton:
-            if self.clips.settings == None:
+            if not self.clips.settings:
                 self.shared.closeHelpMenu() if self.helpFlag else \
                     self.shared.openHelpMenu() 
         else:
@@ -146,8 +161,8 @@ class VideoPlayer(QWidget):
 ### --------------------------------------------------------
     def openFile(self): 
         if fileName := self.clips.returnFileName():
-            path = self.path
-            self.closeMediaPlayer()    
+            path = self.path   
+            self.closeMediaPlayer() 
             self.init()
             self.path = path
             time.sleep(.03)
@@ -161,7 +176,7 @@ class VideoPlayer(QWidget):
         if where == '':   
             self.shared.setAutoAspect(fileName)  ## won't stop it from playing
             self.addToScene(fileName) 
-            return True                    
+            return True                      
         elif where == 'addToScene':    ## bypasses setAspectRatio if from assembler
             hgt = HGT if self.shared.sliderVisible else HGT-PAD   
             self.videoItem.setSize(QSizeF(float(self.width()-WID), float(self.height()-hgt)))
@@ -196,17 +211,17 @@ class VideoPlayer(QWidget):
         time.sleep(.03)   
 
     def closeMediaPlayer(self): 
-        if self.mediaPlayer != None and self.backdrop != None:
+        if self.mediaPlayer and self.backdrop:
             self.shared.stopVideo() 
             time.sleep(.03)  
             self.shared.looperOff()
             self.scene.removeItem(self.backdrop)
             self.scene.removeItem(self.videoItem)
             self.backdrop = None
-            self.addMediaPlayer()  
+            self.addMediaPlayer() 
                     
     def setBackDrop(self):  
-        if self.backdrop != None:
+        if self.backdrop:
             self.scene.removeItem(self.backdrop)
             self.backdrop = None
             time.sleep(.03) 
@@ -221,9 +236,9 @@ class VideoPlayer(QWidget):
         self.backdrop.setZValue(0)  ## set to 300 to test - to make sure it's there
         # self.backdrop.setOpacity(.50)  ## also for test
         self.scene.addItem(self.backdrop)
-      
+        
 ### --------------------------------------------------------  
-    def setUI(self):
+    def setUI(self):        
         self.setMinimumHeight(MinHgt)
         self.setMinimumWidth(MinWid)
         
@@ -246,6 +261,11 @@ class VideoPlayer(QWidget):
         self.view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
          
         self.init()
+        
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(230,230,230))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True) 
         
         self.clips = Clips(self)
         self.shared = Shared(self)
@@ -288,15 +308,14 @@ class VideoPlayer(QWidget):
             maxwid = int((MaxHgt-hgt) * self.aspect)+WID  
             which  = self.shared.getDirection() 
             
-            if self.mediaPlayer != None:
-                if self.backdrop == None:
-                    
+            if self.mediaPlayer:
+                if not self.backdrop:
                     self.shared.msgbox('backdrop not found')
                     return
                 else:
                     self.backdrop.setScale((self.width()-WID)/self.videoWidth) 
                     
-            if self.mediaPlayer != None:
+            if self.mediaPlayer:
                 self.backdrop.setScale((self.width()-WID)/self.videoWidth) if self.backdrop \
                 else self.shared.msgbox('backdrop not found')
                 

@@ -7,7 +7,7 @@ import os.path
 import numpy as np  
 
 ### ----------------- videoClipsMaker.py -------------------
-''' Source for assembler, ctrOnBackground, a single-file dialog.
+''' Source for assembler, ctrOnBkg, a single-file dialog.
     and a number of functions including setDefaultSizes and those 
     used by Settings. 
     Opencv is required to run assembler and by getMetaData in 
@@ -75,7 +75,6 @@ class Clips:
                 else: 
                     self.AutoAspect = False
                     self.settings.aspBtn.setText('AutoAspect')
-           
             case 'clips':
                 if not self.MakeClips:
                     self.MakeClips = True
@@ -83,7 +82,6 @@ class Clips:
                 else: 
                     self.MakeClips = False
                     self.settings.clpsBtn.setText('MakeClipsOff')
-           
             case 'first':
                 if not self.FirstFrame:
                     self.FirstFrame = True
@@ -93,8 +91,7 @@ class Clips:
                         self.settings.skipBtn.setText("NthFrame")     
                 else: 
                     self.FirstFrame = False
-                    self.settings.firstBtn.setText('FirstFrame')
-                         
+                    self.settings.firstBtn.setText('FirstFrame')        
             case 'skip':
                 if not self.SkipFrames:
                     self.SkipFrames = True
@@ -104,8 +101,7 @@ class Clips:
                         self.settings.firstBtn.setText('FirstFrame')
                 else: 
                     self.SkipFrames = False
-                    self.settings.skipBtn.setText("NthFrame")                    
-                         
+                    self.settings.skipBtn.setText("NthFrame")                          
             case 'filter':
                 if not self.FilterOn:
                     self.FilterOn = True
@@ -113,15 +109,13 @@ class Clips:
                 else: 
                     self.FilterOn = False
                     self.settings.filterBtn.setText('Filter')       
-            
             case 'play':
                 if not self.PlayVideo:
                     self.PlayVideo = True
                     self.settings.playBtn.setText('PlayVideoOn')
                 else: 
                     self.PlayVideo = False
-                    self.settings.playBtn.setText('PlayVideo')  
-                    
+                    self.settings.playBtn.setText('PlayVideo')       
             case 'name':
                 if not self.AddFileName:
                     self.AddFileName = True
@@ -153,13 +147,29 @@ class Clips:
             if self.parent.player == "one": 
                 self.parent.shared.setFileNameInMediaPlayer(fileName)
             QTimer.singleShot(20, partial(self.assembler, path, output, fileName)) 
-                      
+                    
     def readAll(self):  ## needed an update - was only writing to .mov
         path = QFileDialog.getExistingDirectory(self.parent, '') 
         if path == None or path == '':
             return 
         output = self.setOutput(path)
         QTimer.singleShot(20, partial(self.assembler, path, output))
+
+    def readSelect(self):  ## needed an update - was only writing to .mov
+        if self.SkipFrames:
+            self.parent.shared.msgbox("Use Make a Clip for NthFrame")
+            return
+        self.closeSettings()  
+         
+        if self.parent.player == "two":
+            self.parent.closeMediaPlayer()
+            
+        if files := self.parent.shared.selectFiles():
+            path = self.parent.shared.path
+            output = self.setOutput(path)    
+            QTimer.singleShot(20, partial(self.assembler, path, output, files))
+        else:
+            self.parent.shared.msgbox('Error reading selected files')
 
     def setOutput(self, path):
         os.chdir(path)
@@ -171,7 +181,7 @@ class Clips:
         path = os.getcwd() if self.parent.path == '' \
             else self.parent.path    
         try:
-            fileName, _ = QFileDialog.getOpenFileName(self.parent, "Select Media",\
+            fileName, _ = QFileDialog.getOpenFileName(self.parent, "Select Media", \
                 path, "Video Files (*.mov *.mp4 *.mp3 *.m4a *.wav)")
         except:
             self.parent.shared.msgbox('error opening file')
@@ -193,13 +203,12 @@ class Clips:
             self.parent.showHideAspectBtn()   ## <- "one"
                                                                   
 ### --------------------------------------------------------
-    def assembler(self, path, outputVideo, fileName=''):
+    def assembler(self, path, outputVideo, fileName=''):  
         self.parent.setWindowTitle(outputVideo)
-         
-        tmp = os.path.basename(os.path.dirname(path).strip() + '.mov')
-        if os.path.exists(tmp) and tmp == outputVideo:
-            os.remove(tmp)
-        
+  
+        if os.path.exists(outputVideo):
+            os.remove(outputVideo)
+       
         reads = 0;  frameCount = 0;  dim = (self.parent.VideoW, self.parent.VideoH)
  
         try:  
@@ -209,18 +218,25 @@ class Clips:
             self.parent.shared.msgbox('assembler: error setting output' +  '\n' + 
                                       'check if opencv installed')
             return
-                          
-        if self.SkipFrames:
+                                 
+        if self.SkipFrames: 
             images = [fileName]  ## read only one file
             image_name = images     
-        else:      
-            if self.FirstFrame:  ## make a list of all the files that match the extension
-                images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos
+            
+        else:       
+            if type(fileName) is list:  ## a work around for selected files
+                if self.FirstFrame:  
+                    images = [img for img in fileName if img.endswith(Mxt)]  ## reads videos
+                else:
+                    images = [img for img in fileName if img.endswith(Ext)]  ## reads photos           
             else:
-                images = [img for img in os.listdir(path) if img.lower().endswith(Ext)]  ## reads photos
+                if self.FirstFrame:  ## make a list of all the files that match the extension
+                    images = [img for img in os.listdir(path) if img.lower().endswith(Mxt)]  ## reads videos
+                else:
+                    images = [img for img in os.listdir(path) if img.lower().endswith(Ext)]  ## reads photos
             images.sort()  
 
-        for image_name in images:   
+        for image_name in images:         
             if outputVideo == image_name:  ## don't read the output file ".mov"
                 continue
          
@@ -295,20 +311,20 @@ class Clips:
         return True
  
     def writeOut(self, img, image_name, out, k):     
-        # img = cv2.rotate(img, cv2.ROTATE_180)  ## just in case they're upsidedown 
-        img = self.ctrOnBackground(img, image_name)  ## or ROTATE_90_CLOCKWISE) etc...
+        # img = cv2.rotate(img, cv2.ROTATE_180)  ## just in case they're upsidedown           
+        img = self.ctrOnBkg(img, image_name)  ## or ROTATE_90_CLOCKWISE) etc...
         if self.AddFileName:
-            self.addFileName(img, image_name.strip())
+            self.addFileName(img, image_name.strip())   
         if isinstance(img, np.ndarray):
             n = 0 
             while n < self.Wpr:  ## writes per read
-                time.sleep(.03)
-                out.write(img)  
+                time.sleep(.020)
+                out.write(img)     
                 n += 1        
             del img
             k += 1
         return k
-                    
+                
     def addFileName(self, img, name):  ## right out of google - thanks
         if name == '.mov':
             return
@@ -321,45 +337,39 @@ class Clips:
         cv2.putText(img, name, org, font, scale, color, thickness, type)
         
 ### --------------------------------------------------------
-    def ctrOnBackground(self, img, imgName):  
+    def ctrOnBkg(self, img, imgName):  
         img_h, img_w = img.shape[:2]
         vid_w, vid_h = self.parent.VideoW, self.parent.VideoH
         
         if vid_h < img_h:  ## resize vertical - numpy likes it reversed  
             r = vid_h / img_h
             img_h = int(img_h * r)
-            img_w = int(img_w * r)
-            img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
-            img_h, img_w = img.shape[:2] 
+            img_w = int(img_w * r)       
         else:
             r = img_h / vid_h
             img_h = int(img_h * r)
             img_w = int(img_w * r)
-            img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
-            img_h, img_w = img.shape[:2]
-        
+            
         if img_w > vid_w:  ## do this till it fits   
             while (vid_w - img_w) != 0:
                 r = vid_w / img_w
                 img_w = int(img_w * r)
-                img_h = int(img_h * r)
-                img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)    
-                img_h, img_w = img.shape[:2]
-                
+                img_h = int(img_h * r)  
+                      
         elif img_w < vid_w:
             if img_h < vid_h:  ## do this first - set to height
                 r = vid_h/img_h
                 if (r * img_w) <= vid_w:
                     img_h = int(img_h * r)
-                    img_w = int(img_w * r)
+                    img_w = int(img_w * r)           
                 else:
                     s = vid_w/(img_w *r)  ##  width needs to be reduced
                     img_w = int((img_w * r) * s)
                     img_h = int((img_h * r) * s)
                 
-                img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)  
-                img_h, img_w = img.shape[:2]
-                                                                                                                                                
+        img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)  
+        img_h, img_w = img.shape[:2]
+         
         background_color = (0, 0, 0)  ## Black (B, G, R)  ## numpy
         bkgImage = np.full((vid_h, vid_w, 3), background_color, dtype=np.uint8)
 
@@ -370,27 +380,9 @@ class Clips:
         end_y = start_y + img_h
     
         bkgImage[start_y:end_y, start_x:end_x] = img
-   
-        # # Ensure foreground fits within background <<------------------- shouldn't need to check
-        # # if start_x < 0 or start_y < 0 or end_x > vid_w or end_y > vid_h: 
-        # #     print(f'a: {imgName}\tstart x {start_x}  bkgW {vid_w}  
-        # #           forW {img_w}  offs {(vid_w - img_w) // 2}' )
-        # #     return None
-        # try:
-        #     if img.shape[2] == 4:  ## <<<---------------  uncomment for alpha channel
-        #         alpha_channel = img[:, :, 3] / 255.0
-        #         for c in range(0, 3):
-        #             bkgImage[start_y:end_y, start_x:end_x, c] = (
-        #                 bkgImage[start_y:end_y, start_x:end_x, c] * (1 - alpha_channel) +
-        #                 img[:, :, c] * alpha_channel
-        #             )
-        #     else:   ## No alpha channel      
-        #         bkgImage[start_y:end_y, start_x:end_x] = img
-        # except:
-        #     return None  
-                          
+                   
         return bkgImage
-                         
+
 ### ---------------------- that's all ---------------------- 
 
 

@@ -7,6 +7,20 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**October 9 2026**   
+Changes to August 5th's work on scrolling backgrounds. There's now a **Scrolling Backgrounds Settings Widget** which makes it easier to make adjustments to any of the three variables mentioned in the video posted in August which covered the updates to scrolling backgrounds.  The **settings.json** file in the **plays** directory serves to replace the three variables mentioned in **BkgWorks.py**.  The **BackUp** data and the functions to support the widget with a provision to create a backup should the file not exist are in **BkgScrollWrks.py** - as in the original scrolling version but with a smaller profile.  
+
+Added **Select Files**, rather than selecting the entire directory, to **ClipsMaker** - similar to what I added to **SlideSHow** and also what I call **zoom keys** to **VideoPlayerTwo**.  
+
+I traded my M1 Mac in on a M5 with the idea that it might help with the stuttering video issues - seems that's a known problem. I'll need to look into trying something else other than Quicktime for video capture. Current settings that seemed to help; turned off true tone, selected Apple DR Display (P3-1600 nits) and chose ProMotion. And don't run the scrolling background at the maximum factor speed .50 if doing a video capture.
+
+Last, an apology for a dumb bug - the left/right scrolling backgrounds demos weren't able to locate the background.  My fault entirely - it's been fixed.
+
+
+New video:  <https://youtu.be/8uOhS7vb6D4>
+
+
+---
 **September 5 2026**  
 Added a table of contents to **StartHere.md** and a new file to **extras** named **Changes-Extras.md**, a collection of references to the **extras** apps from **Changes.md** by name, date and a video-link if there was video during the month it was written up.  No guarantees the app will be included in the video.  A table of contents added to this file as well. Another google gemini effort. 
 

@@ -1,5 +1,6 @@
 
 
+from dotsBkgScrollWrks import BkgScrollWrks
 from dotsSideGig        import *
 from dotsTableModel     import TableWidgetSetUp, QL, QC, QH
 
@@ -7,6 +8,7 @@ from dotsBkgWidget      import BkgWidget
 from dotsPathWidget     import PathWidget
 from dotsPixWidget      import PixWidget
 from dotsShadowWidget   import ShadowWidget
+from dotsBkgScrollWidget    import ScrollWidget
 
 from dotsHelpButtons    import CanvasHelp, StoryHelp
 from dotsHelpMenus      import DemoHelp, ScreenHelp
@@ -26,6 +28,7 @@ switchKeys = {
     'flats':     'Frame, Flats and Matte Help',          ## in flat and frames and bkgMatte   
     'story':    'Sprite and StoryBoard Menus',  
     'path':     'PathMaker Widget and Menus',
+    'back':     'Scrolling Background Settings',
 }
 
 SpinDrift = QColor('#73fcd6')
@@ -83,7 +86,7 @@ class  MainMenu:
         self.table.setRow(row, 0,f'{"Select From Above":<57}',QL,True,True, 2)   ## :<23 in qt5 <<---
         self.table.setRow(row + 1, 0,f'{"Click Here to Close":<20}','',True,True, 2)    ## :<23 in qt5 <<---
           
-        self.table.setFixedSize(267, 306)
+        self.table.setFixedSize(267, 336)
         
         x, y = getVuCtr(self.canvas)      
         if self.canvas.dots.Vertical:
@@ -94,8 +97,8 @@ class  MainMenu:
     
     def clicked(self):  
         p = self.table.currentRow() - 1  ## skip first row    
-        if p in range(0,7):  ## the reason for this is the keys are hidden   
-            help = self.lst[p].strip()    
+        if p in range(len(switchKeys)):  ## the reason for this is the keys are hidden   
+            help = self.lst[p].strip()
             
             self.sideCar.clearWidgets()
             self.canvas.bkgMaker.setBkgColor(SpinDrift)  
@@ -137,6 +140,11 @@ class  MainMenu:
                     self.pathHelp   = PathHelp(self, self.canvas, 30, 'all')   
                     self.pathHelpMenu2  = PathHelp2(self.canvas, 365, 'all')  
                                 
+                case 'back':
+                    bkg  = BkgWidget(self.canvas, -5, 'new')
+                    self.bkgHelp = BkgHelp(self.canvas, 0, 'on')
+                    self.wid = ScrollWidget(self.canvas, 0, 'new') 
+                                            
                 case 'bkg':   
                     bkg = BkgWidget(self.canvas, 0, 'all')
                     self.bkgHelp = BkgHelp(self.canvas, 250, 'all')

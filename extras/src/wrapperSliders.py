@@ -23,6 +23,7 @@ class Sliders: ## and buttons
     def setFilterBtns(self):
         self.filter8Btn.setText("Filter 8")
         self.filter9Btn.setText("Filter 9")
+        # self.filter10Btn.setText("Filter 10")
 
     def enableSliders(self, bool=False): 
         self.topEndSlider.setEnabled(bool)
@@ -91,25 +92,43 @@ class Sliders: ## and buttons
         groupBox.setFixedSize(95, ViewH+73)
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)    
         groupBox.setStyleSheet("QGroupBox {\n"
-            "background-color: rgb(220,220,220);\n"
+            "background: rgb(220,220,220);\n"
             "border: 1px solid rgb(125,125,125);\n"
             "}")
+
+        style = """ QSlider::handle:horizontal {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                stop:0 #e4e4e4, stop:1 #4f4f4f);
+            border: 1px solid rgb(115,115,115);
+            width: 11px;
+            margin: -7px 0;
+            border-radius: 3px;
+            }
+            QSlider {
+                background: rgb(245,245,245);
+            } 
+            QSlider::tick-mark {
+                color: black;
+                background-color: black;
+                width: 1px;
+            } """
 
 ### ------------------------- topEnd ---------------------
         self.topEndSlider = QSlider(Qt.Orientation.Vertical)
         self.topEndSlider.setFixedSize(50,180)  
         self.topEndSlider.setRange(0,100)
         self.topEndSlider.setValue(0)
-        
+                               
         self.topEndSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.topEndSlider.setTickInterval(10)  
         self.topEndSlider.valueChanged.connect(self.backgoundClamp)
-        self.topEndSlider.setStyleSheet("QSlider {\n"
-            "background-color: rgb(240,240,240);;}")
-  
+        self.topEndSlider.setStyleSheet(style)
+        
         abox = QVBoxLayout() 
-        abox.addWidget(QLabel("TopEnd", alignment=Qt.AlignmentFlag.AlignCenter))    
+        abox.addWidget(QLabel("TopEnd", alignment=Qt.AlignmentFlag.AlignCenter)) 
+        abox.addSpacing(5)   
         abox.addWidget(self.topEndSlider, alignment=Qt.AlignmentFlag.AlignHCenter)  
+        abox.addSpacing(5) 
         self.topEndLabel = QLabel("0.0")  
         abox.addWidget(self.topEndLabel,alignment=Qt.AlignmentFlag.AlignCenter)             
 
@@ -122,12 +141,13 @@ class Sliders: ## and buttons
         self.bottomSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.bottomSlider.setTickInterval(10)      
         self.bottomSlider.valueChanged.connect(self.foregoundClamp)
-        self.bottomSlider.setStyleSheet("QSlider {\n"
-            "background-color: rgb(240,240,240);}")
+        self.bottomSlider.setStyleSheet(style)
            
         gbox = QVBoxLayout() 
         gbox.addWidget(QLabel("Bottom", alignment=Qt.AlignmentFlag.AlignCenter))
+        gbox.addSpacing(5)
         gbox.addWidget(self.bottomSlider,alignment=Qt.AlignmentFlag.AlignHCenter)  
+        gbox.addSpacing(5)
         self.bottomLabel = QLabel("0.0")  
         gbox.addWidget(self.bottomLabel,alignment=Qt.AlignmentFlag.AlignCenter)  
  
@@ -140,12 +160,13 @@ class Sliders: ## and buttons
         self.EdgesSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
         self.EdgesSlider.setTickInterval(10)      
         self.EdgesSlider.valueChanged.connect(self.edgeWorkClamp)
-        self.EdgesSlider.setStyleSheet("QSlider {\n"
-            "background-color: rgb(240,240,240);}")
+        self.EdgesSlider.setStyleSheet(style)
            
         mbox = QVBoxLayout() 
         mbox.addWidget(QLabel("Edges", alignment=Qt.AlignmentFlag.AlignCenter))
+        mbox.addSpacing(5)
         mbox.addWidget(self.EdgesSlider,alignment=Qt.AlignmentFlag.AlignHCenter)  
+        mbox.addSpacing(5)
         self.edgesLabel = QLabel("0.0")  
         mbox.addWidget(self.edgesLabel,alignment=Qt.AlignmentFlag.AlignCenter) 
  
@@ -165,7 +186,7 @@ class Sliders: ## and buttons
 ### -------------------------- blend -----------------------          
     def setblendImgSlider(self):
         groupBox = QGroupBox()
-        groupBox.setFixedSize(BtnsW-100,70)
+        groupBox.setFixedSize(BtnsW-75,70)
         
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter)  
         groupBox.setStyleSheet("QGroupBox {\n"
@@ -237,6 +258,7 @@ class Sliders: ## and buttons
         newBtn   = QPushButton('Guides') 
         self.filter8Btn = QPushButton('Filter 8')
         self.filter9Btn = QPushButton('Filter 9') 
+        # self.filter10Btn = QPushButton('Filter 10') 
         delBtn   = QPushButton('Delete Blended')     
         saveBtn  = QPushButton('Save')
         clearBtn = QPushButton("Clear")
@@ -247,6 +269,7 @@ class Sliders: ## and buttons
         newBtn.clicked.connect(self.parent.guides.toggleGuides)
         self.filter8Btn.clicked.connect(lambda: self.works.swap(8))
         self.filter9Btn.clicked.connect(lambda: self.works.swap(9))
+        # self.filter10Btn.clicked.connect(lambda: self.works.swap(10))
         delBtn.clicked.connect(self.parent.deleteBlended)
         saveBtn.clicked.connect(self.works.saveDialog)
         clearBtn.clicked.connect(self.parent.clear)
@@ -259,6 +282,7 @@ class Sliders: ## and buttons
         hbox.addWidget(newBtn)   
         hbox.addWidget(self.filter8Btn)
         hbox.addWidget(self.filter9Btn)
+        # hbox.addWidget(self.filter10Btn)
         hbox.addWidget(delBtn)       
         hbox.addWidget(saveBtn)
         hbox.addWidget(clearBtn)   

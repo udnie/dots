@@ -129,7 +129,7 @@ class Filters:
         return np.clip(s1_float * master_alpha + s2_float * (1.0 - master_alpha), \
                 0, 255).astype(np.uint8)
  
- ### -------------------------------------------------------- 
+### -------------------------------------------------------- 
     '''        --- EDGE WORK: DYNAMIC SEAM FEATHERING ---
     A universal edge-cleanup utility designed to eliminate harsh vertical cut-lines 
     where the processed blend strip meets the unedited main canvas. It calculates a 
@@ -139,7 +139,7 @@ class Filters:
     the heavily edited blend zone smoothly into the surrounding photograph, 
     regardless of which primary filter was used.
     '''
- ### -------------------------------------------------------- 
+### -------------------------------------------------------- 
     def EdgesSlider(self, edgeValue, blended, strip1, strip2):         
         h, w_blend, _ = blended.shape    
         max_safe_radius = w_blend // 2
@@ -174,7 +174,7 @@ class Filters:
         blended[:, w_blend-feather_radius : w_blend] = (blend_r_edge * ramp_right + s2_edge * (1.0 - ramp_right)).astype(np.uint8)
 
         return blended
-                         
+
 ### --------------------- that's all -----------------------
 
 

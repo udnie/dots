@@ -1,13 +1,14 @@
 
 import time
 import math  
+import os
 
 from PyQt6.QtCore       import Qt, QTimer, QPoint, QRect
 from PyQt6.QtGui        import QGuiApplication, QCursor
-from PyQt6.QtWidgets    import QMessageBox
+from PyQt6.QtWidgets    import QMessageBox,  QFileDialog
 
 from videoClipsWidget   import *
-from videoClipsMaker    import Ext  
+from videoClipsMaker    import Ext, Mxt
 from videoPlayerHelp    import VideoHelp, SlideShowHelp, VideoHelpWidget
 from videoPlayerWorks   import getMetaData
 
@@ -42,6 +43,7 @@ class Shared:
         self.helpMenus = False
         self.videoPlaying = False
         self.loopSet = False
+        self.path = ''
         
         self.frameVisible = True
         self.sliderVisible = True 
@@ -137,7 +139,51 @@ class Shared:
         self.loopSet = False
         self.parent.loopButton.setText('Loop')
         self.parent.stopButton.setEnabled(True)
-                   
+      
+    def selectFiles(self):  ## keeps the path attached as it might not be the cwd 
+        dialog = QFileDialog()
+        dialog.setFileMode(QFileDialog.FileMode.ExistingFiles) 
+        if dialog.exec() == QFileDialog.DialogCode.Accepted:
+            files = dialog.selectedFiles()
+            if files != None:
+                self.path = os.path.dirname(files[0])
+                return self.getFileNames(files) 
+            self.msgbox('getFileNames: No Files Found') 
+            return None
+
+    def getFileNames(self, files):  ## make sure it's viewable  
+        filenames = []
+        path = self.path  
+        for file in files: 
+            path = os.path.join(path, file)
+            if os.path.isdir(path):  ## ignore directories
+                continue        
+            file = os.path.basename(file.lower()) 
+            if self.parent.clips.FirstFrame:
+                if file[file.rfind('.'):] in Mxt:  ## video file               
+                    filenames.append(file)
+            else:  
+                if file[file.rfind('.'):] in Ext:  ## image file               
+                    filenames.append(file)
+        if len(filenames) == 0:
+            return None
+        return filenames
+     
+    def zoom(self, zoom, WID, HGT, asp ):
+        height = int(self.parent.height()* zoom)    
+        nvH = (height - HGT)  ## new video height
+        
+        nvW = int(nvH * asp)  ## new video width   
+        nwidth = nvW + WID    ## new widget width   
+        
+        p, width = self.parent.pos(), self.parent.width()  
+        self.parent.resize(nwidth, height)  
+            
+        dif = int((self.parent.width() - width)/2) 
+        self.parent.move(p.x()-dif, p.y())  
+                
+        self.parent.ViewW, self.parent.ViewH = self.parent.width()-WID, self.parent.height()-HGT    
+                      
 ### --------------------------------------------------------
     def openHelpMenu(self):
         if self.parent.helpFlag:

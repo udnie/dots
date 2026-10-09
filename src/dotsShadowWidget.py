@@ -22,7 +22,7 @@ class ShadowWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)   
         rect = QRectF(2, 2, self.WidgetW-4, self.WidgetH-4)                   
-        painter.setPen(QPen(QColor(0,80,255), 5, Qt.PenStyle.SolidLine,            
+        painter.setPen(QPen(QColor(0,85,225), 5, Qt.PenStyle.SolidLine,            
             Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
         painter.setBrush(QColor(145,160,160, 255))  ## grayish
         painter.drawRoundedRect(rect, 15, 15)

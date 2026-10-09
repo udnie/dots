@@ -140,8 +140,7 @@ class StoryBoard(QWidget):
                         self.helpButton.openMenus()  ## opens canvas help menu
                         
                 elif e.button() == Qt.MouseButton.LeftButton and \
-                    self.canvas.offMenuClick != None:
-                        
+                    self.canvas.offMenuClick:
                         self.canvas.offMenuClick.closeMenu() 
                         self.canvas.offMenuClick = None
                     
@@ -176,7 +175,7 @@ class StoryBoard(QWidget):
                 ## will unselect all - possibly a default as it works the same as 
                 ## single click outside the map area do this if nothing at location          
                 if p := self.scene.itemAt(QPointF(e.pos()), QTransform()):
-                    if p != None and p.type != 'pix' and self.mapper.isMapSet():
+                    if p and p.type != 'pix' and self.mapper.isMapSet():
                         self.mapper.removeMap()
                         self.setKeys('noMap')                                                 
         return QWidget.eventFilter(self, source, e)
@@ -188,7 +187,7 @@ class StoryBoard(QWidget):
         else:
             self.pixCount += 1  ## can't move this
             pix = PixItem(fileName, self.pixCount, x, y, self, mirror)            
-            if clone != None:  ## clone it - uses id and in pixitem to clone itself         
+            if clone:  ## clone it - uses id and in pixitem to clone itself         
                 self.sideCar.transFormPixItem(pix,
                     clone[0],
                     clone[1] * random.randrange(95, 105)/100.0,
@@ -205,7 +204,7 @@ class StoryBoard(QWidget):
         QTimer.singleShot(200, self.dots.close)   
                            
     def clear(self):
-        if  self.canvas.videoPlayer != None:  ## this is seriously redundant but necessary
+        if  self.canvas.videoPlayer:  ## this is seriously redundant but necessary
             self.canvas.videoPlayer.stopVideo()
             time.sleep(.10) 
             self.canvas.sideCar.videoOff()
@@ -217,7 +216,7 @@ class StoryBoard(QWidget):
         
         if self.canvas.pathMakerOn:
             self.pathMaker.pathMakerOff() 
-        if self.showbiz.tableView != None:
+        if self.showbiz.tableView:
             self.showbiz.tableView.bye()
                                  
         self.sideCar.clearWidgets()   
@@ -242,7 +241,7 @@ class StoryBoard(QWidget):
 ### --------------------------------------------------------
     def contextMenuEvent(self, e):  ## if sprites are selected and right-mouse click
         if len(self.scene.selectedItems()) > 0:  ## don't remove e
-            if self.animeHelp != None:
+            if self.animeHelp:
                 self.animeHelp == None
             self.animeHelp = AnimationHelp(self.canvas, QCursor.pos(), 'story')  
             self.animeHelp = self.animeHelp

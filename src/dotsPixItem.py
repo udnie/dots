@@ -231,7 +231,7 @@ class PixItem(QGraphicsPixmapItem):
         self.widget.move(x,y)
         
         self.works.resetSliders()
-        self.setLockBtnText()
+        # self.setLockBtnText()    ### testing - not needed for next widget
 
     def addShadow(self):  ## from pixwidget 
         if self.shadowMaker != None and self.shadowMaker.isActive:

@@ -10,13 +10,13 @@ from PyQt6.QtWidgets    import QWidget, QHBoxLayout, QGroupBox, QLabel,QSlider,\
 ### --------------------------------------------------------
 
 Keys  = {
-    'A': (1.33, 700,  525,  960,  720),  ##  4:3 apple horizontal    
-    'F': (1.50, 790,  525, 1080,  720),  ##  3:2 horizontal   
-    'H': (1.77, 930,  525, 1280,  720),  ## 16:9 horizontal
+    'A': (1.33, 698,  525,  960,  720),  ##  4:3 apple horizontal    
+    'F': (1.50, 788,  525, 1080,  720),  ##  3:2 horizontal   
+    'H': (1.77, 929,  525, 1280,  720),  ## 16:9 horizontal
     'S': (1.00, 525,  525,  720,  720),  ##  1:1 square   
-    'U': (0.75, 525,  700,  720,  960),  ##  3:4 digital-camera/iphone vertical  
-    'T': (0.66, 525,  790,  720, 1080),  ##  2:3 vertical   
-    'V': (0.56, 525,  930,  720, 1280),  ## 9:16 vertical
+    'U': (0.75, 525,  698,  720,  960),  ##  3:4 digital-camera/iphone vertical  
+    'T': (0.66, 525,  788,  720, 1080),  ##  2:3 vertical   
+    'V': (0.56, 525,  929,  720, 1280),  ## 9:16 vertical
 }
 
 AspKeys = list(Keys.keys())
@@ -64,18 +64,18 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.switch = switch
               
         self.clips  = self.parent.clips
-        self.WidgetW, self.WidgetH = 505.0, 325.0
+        self.WidgetW, self.WidgetH = 525.0, 320.0
                  
-        vbox = QVBoxLayout()
-        vbox.addSpacing(20) 
- 
         label = QLabel('ClipsMaker Settings', alignment=Qt.AlignmentFlag.AlignHCenter)
         label.setFont(QFont("Arial", 15))
-        vbox.addWidget(label)
         
-        vbox.addWidget(self.sliderGroup())
-        vbox.addSpacing(50) 
-      
+        vbox = QVBoxLayout()
+        vbox.addSpacing(20) 
+        vbox.addWidget(label)
+        vbox.addSpacing(5) 
+        vbox.addWidget(self.sliderGroup(), alignment=Qt.AlignmentFlag.AlignVCenter)
+        vbox.addSpacing(80) 
+     
         hbox = QHBoxLayout()    
         hbox.addLayout(vbox)
         hbox.addWidget(self.buttonGroup(), alignment=Qt.AlignmentFlag.AlignVCenter)
@@ -148,7 +148,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         
         self.waitSlider = QSlider(Qt.Orientation.Horizontal)   
         self.waitSlider.setMinimum(1)
-        self.waitSlider.setMaximum(5)   ## <<-------- waittime - probably won't need to adjust
+        self.waitSlider.setMaximum(7)   ## <<-------- waittime - probably won't need to adjust
         self.waitSlider.setSingleStep(1)  
         self.waitSlider.setTickInterval(1) 
         self.waitSlider.setValue(int(self.clips.Wpr))
@@ -208,9 +208,9 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
     def buttonGroup(self):
         groupBox = QGroupBox()
         groupBox.setAlignment(Qt.AlignmentFlag.AlignCenter) 
-        groupBox.setFixedWidth(150)
+        groupBox.setFixedWidth(170)
    
-        groupBox.setFixedHeight(260)
+        groupBox.setFixedHeight(270)
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
       
         self.aspBtn = QPushButton('AutoAspect')   ## buttons true/false set in clipsmaker
@@ -242,6 +242,8 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
             self.nameBtn.setText('FileNameOn')
             
         self.makeClipsBtn = QPushButton('Make a Clip')  
+        self.makeClipsSelectBtn = QPushButton('Make a Clip - Select')  
+        
         self.quitBtn = QPushButton('Close')
         
         if self.switch == '':
@@ -252,6 +254,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
             self.filterBtn.clicked.connect(lambda: self.clips.setWidgetButtons("filter"))
             self.playBtn.clicked.connect(lambda: self.clips.setWidgetButtons("play"))
             self.makeClipsBtn.clicked.connect(self.parent.clips.makingClips)
+            self.makeClipsSelectBtn.clicked.connect(self.parent.clips.readSelect)
             self.nameBtn.clicked.connect(lambda: self.clips.setWidgetButtons("name"))
             self.quitBtn.clicked.connect(self.clips.closeSettings)
         else:
@@ -267,6 +270,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         hbox.addWidget(self.nameBtn)   
         hbox.addWidget(self.playBtn) 
         hbox.addWidget(self.makeClipsBtn)  
+        hbox.addWidget(self.makeClipsSelectBtn) 
         hbox.addWidget(self.quitBtn)
         hbox.addSpacing(10) 
   

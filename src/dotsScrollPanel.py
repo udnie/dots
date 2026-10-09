@@ -1,12 +1,12 @@
 
 import os
 
-from PyQt6.QtCore    import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF, \
-                            QEvent
-from PyQt6.QtGui     import QPainter, QImage, QPen, QFont, \
-                            QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
-from PyQt6.QtWidgets import QWidget, QLabel, QVBoxLayout, QScrollArea, \
-                            QFrame, QLayout
+from PyQt6.QtCore       import Qt, QTimer, QSize, QPoint, QMimeData, QUrl, QPointF, \
+                                QEvent
+from PyQt6.QtGui        import QPainter, QImage, QPen, QFont, \
+                                QFontMetrics, QBrush, QPolygon, QDrag, QPixmap
+from PyQt6.QtWidgets    import QWidget, QLabel, QVBoxLayout, QScrollArea, \
+                                QFrame, QLayout
 
 from dotsShared      import paths, Star, common
 from functools       import partial

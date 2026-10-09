@@ -1,13 +1,24 @@
 
+import json
+import time
+
 from PyQt6.QtCore       import Qt, QPoint, QTimer
 from PyQt6.QtGui        import QCursor
+                
+from dotsShared         import common, paths                          
+from dotsSideGig        import tagBkg, MsgBox
 
-                    
-from dotsShared         import common                           
-from dotsSideGig        import tagBkg
+''' Settings for scrolling Backgrounds, Tracker and scrolling functions 
+    '''
+
+BackUp = {  ## original settings in case you need to reset
+    'ShowTime':   4,
+    'RunWay':    44,
+    'OffSet':   105,
+}
 
 ### ------------------ dotsBkgScrollWrks -------------------      
-class BkgScrollWrks:  ## Tracker and scrolling functons 
+class BkgScrollWrks: 
 ### --------------------------------------------------------
     def __init__(self, parent):  
         super().__init__()
@@ -15,8 +26,48 @@ class BkgScrollWrks:  ## Tracker and scrolling functons
         self.bkgItem  = parent    
         self.canvas   = self.bkgItem.canvas 
         self.bkgMaker = self.bkgItem.bkgMaker
-                                                                                                                                        
-### --------------------------------------------------------
+      
+        self.fromBackUp = False
+        self.settings = self.getSettings()  
+        if self.fromBackUp:  
+            self.update()
+            
+### --------------------------------------------------------  
+    def updWrks(self, settings):  ## settings and scrollWidget
+        self.settings = settings
+ 
+    def getSettings(self):  
+        try:  
+            with open(paths['playPath'] +  "settings.json", 'r') as fp: 
+                return json.load(fp)    
+        except:
+            self.settings = BackUp 
+            self.fromBackUp = True
+        return self.settings
+  
+    def update(self):
+        try:
+            with open(paths['playPath'] +  "settings.json", 'w') as fp:  
+                json.dump(self.settings, fp)
+        except:
+            MsgBox('Error writing settings file', 5)
+            return
+        time.sleep(.05)
+        if not self.fromBackUp:
+            self.canvas.sideCar2.scrollingUpdates(self.bkgItem)
+        
+    def closeScrollWidget(self):
+        if self.bkgItem.scrollWidget:
+            self.bkgItem.scrollWidget.close()
+            self.bkgItem.scrollWidget = None
+
+### --------------------------------------------------------                    
+    def setRunWay(self):  ## set in add.bkgItem       
+        if not self.canvas.dots.Vertical:             
+            self.bkgItem.runWay = int(common['ViewW'] - self.bkgItem.width)  ## pixels outside of view
+        else:
+            self.bkgItem.runWay = int(common['ViewH'] - self.bkgItem.height)        
+            
     def setTrackerRate(self, bkg):
         if bkg.scrollable:                                                                          
             fileName = bkg.fileName   
@@ -33,14 +84,8 @@ class BkgScrollWrks:  ## Tracker and scrolling functons
         if rate := self.bkgMaker.newTracker[bkg.fileName]['rate']:  
             return rate
         return 0  
-           
-### --------------------------------------------------------    
-    def setRunWay(self):  ## set in add.bkgItem       
-        if not self.canvas.dots.Vertical:             
-            self.bkgItem.runWay = int(common['ViewW'] - self.bkgItem.width)  ## pixels outside of view
-        else:
-            self.bkgItem.runWay = int(common['ViewH'] - self.bkgItem.height) 
-   
+
+### -------------------------------------------------------- 
     def setMirroring(self):
         if self.bkgItem.scrollable:                                  
             self.bkgItem.mirroring = False if self.bkgItem.mirroring \
@@ -52,13 +97,14 @@ class BkgScrollWrks:  ## Tracker and scrolling functons
             self.setMirrorBtnText(self.bkgItem, self.bkgMaker.widget) 
                             
     def setLeft(self):     
-        self.bkgItem.bkgWorks.setDirection('left') if self.bkgItem.isScrollable()\
+        self.bkgItem.bkgWorks.setDirection('left') if self.bkgItem.isScrollable() \
             else self.bkgItem.notScrollable()  
 
     def setRight(self): 
-        self.bkgItem.bkgWorks.setDirection('right') if self.bkgItem.isScrollable()\
+        self.bkgItem.bkgWorks.setDirection('right') if self.bkgItem.isScrollable() \
             else self.bkgItem.notScrollable()  
-                    
+
+### --------------------------------------------------------                     
     def setWidthHeight(self, img):     
         if img == None:
             return   
@@ -101,7 +147,7 @@ class BkgScrollWrks:  ## Tracker and scrolling functons
 ### --------------------------------------------------------
     def toggleBkgLocks(self):
         if self.bkgItem:
-            self.bkgMaker.lockBkg(self.bkgItem) if not self.bkgItem.locked else\
+            self.bkgMaker.lockBkg(self.bkgItem) if not self.bkgItem.locked else \
                 self.bkgMaker.unlockBkg(self.bkgItem)  
                 
             if self.bkgMaker.widget != None:     

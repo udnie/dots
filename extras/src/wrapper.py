@@ -29,7 +29,6 @@ class Wrapper(QWidget):
 ### --------------------------------------------------------       
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(f'{"wrapper":<12}')
 
         self.setUI()   
         self.show()  
@@ -96,7 +95,7 @@ class Wrapper(QWidget):
             case Qt.Key.Key_D:
                 self.deleteBlended()
             case Qt.Key.Key_H:
-                if self.blended != None:
+                if self.blended:
                     self.blended.hide() if self.blended.isVisible() else self.blended.show()
             case Qt.Key.Key_Space:
                 self.guides.toggleGuides()
@@ -138,7 +137,7 @@ class Wrapper(QWidget):
         self.moveIt(0) 
                            
     def moveIt(self, pos):  
-        if self.rightSide != None and pos > 0:   
+        if self.rightSide and pos > 0:   
             p = abs(float(pos - self.rightSide.start))
             self.blendWidth = pos  ## only place it's set, same as blendval
             self.rightSide.setPos(p, 0.0)  ## provides a visual reference
@@ -148,7 +147,7 @@ class Wrapper(QWidget):
             self.guides.updateGuides()
             
     def wrapIt(self, saveas=''):   
-        if self.fileName != ''and self.blendWidth > 0:
+        if self.fileName != '' and self.blendWidth > 0:
             img = self.works.wrapper(self.fileName)  
             if self.displayBlended(img):  ## only call to it
                 self.blended.setPos(float(self.leftSide.start), 0)  ## doesn't move  
@@ -156,12 +155,12 @@ class Wrapper(QWidget):
                     self.first = False
                     if not self.guides.addGuides():
                         return
-                elif self.blended != None and saveas != '':
+                elif self.blended and saveas != '':
                     self.works.cropIt(img, saveas)  ## if saving
   
 ### --------------------------------------------------------  
     def displayBlended(self, img): 
-        if self.blended != None:
+        if self.blended:
             try:
                 self.scene.removeItem(self.blended)     
             except: 
@@ -182,7 +181,7 @@ class Wrapper(QWidget):
                                  
 ### --------------------------------------------------------
     def deleteBlended(self):
-        if self.blended != None:
+        if self.blended:
             try:
                 self.scene.removeItem(self.blended)
             except:
@@ -197,7 +196,7 @@ class Wrapper(QWidget):
         time.sleep(.005)
     
     def setBlendLabel(self):
-        if self.rightSide != None:
+        if self.rightSide:
             try:
                 rgt = int(self.rightSide.pos().x())
             except:

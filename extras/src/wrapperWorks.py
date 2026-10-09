@@ -59,25 +59,27 @@ class Works:
 ### --------------------------------------------------------                            
     def swap(self, which):
         if self.parent.leftSide == None:
-            return
-        filter = self.parent.filtered
-
-        if which == 8:
-            if filter == '':
-                filter = '8'
-            elif filter == '8':
-                filter = ''
-    
-        elif which == 9:
-            if filter == '':      
-                filter = '9'
-            elif filter == '9':
-                filter = ''
-                
-        self.parent.filtered = filter           
+            return  
+        filter = self.parent.filtered   
+        match which:
+            case 8:
+                if filter == '':
+                    filter = '8'
+                elif filter == '8':
+                    filter = ''
+            case 9:
+                if filter == '':      
+                    filter = '9'
+                elif filter == '9':
+                    filter = ''  
+            # case 10:
+            #     if filter == '':      
+            #         filter = '10'
+            #     elif filter == '10':
+            #         filter = ''   
+        self.parent.filtered = filter                 
         if filter == '': 
-            self.parent.sliders.setFilterBtns()   
-          
+            self.parent.sliders.setFilterBtns()            
         self.parent.deleteBlended()
         self.parent.guides.deleteGuides()
         self.parent.wrapIt()
@@ -130,16 +132,19 @@ class Works:
         # Create a linear gradient (1.0 to 0.0 for Image 1, 0.0 to 1.0 for Image 2)
         alpha = np.linspace(0, 1, blendWidth).reshape(1, blendWidth, 1)
         blended = (strip1 * (1 - alpha) + strip2 * alpha).astype(np.uint8)
-
+    
         if self.parent.filtered == '8':
             blended = self.parent.filters.Filter8(strip1, strip2)
             
         elif self.parent.filtered == '9':
             blended = self.parent.filters.Filter9(strip1, strip2)
-                                              
-        mid_val = int(self.parent.edgesValue)   
-    
-        if mid_val > 5:   
+            
+        # elif self.parent.filtered == '10':
+        #     blended = self.parent.filters.Filter10(strip1, strip2)
+            
+    # if self.parent.filtered in ("8","9"):                                  
+        mid_val = int(self.parent.edgesValue)           
+        if mid_val > 5: 
             blended = self.parent.filters.EdgesSlider(mid_val, blended, strip1, strip2)
 
         # blended is based on rows and columns - select all rows[:,

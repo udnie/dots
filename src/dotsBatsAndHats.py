@@ -54,8 +54,9 @@ class Bats:    ## backGrounds only used here
 ### --------------------------------------------------------
     def makeBats(self):  ## makes aliens and bats                             
         self.canvas.openPlayFile = 'bats'
-        bkg = BkgItem(backGrounds[common['Screen']], self.canvas) 
-        if bkg.type == None:
+        
+        bkg = BkgItem(backGrounds[common['Screen']], self.canvas)     
+        if not bkg.type:
             self.canvas.openPlayFile = ''
             MsgBox('Error on makeBats')
             return
@@ -120,8 +121,7 @@ class Bats:    ## backGrounds only used here
             case '960V':
                 pix.tag = 'demo-' + '1080' + '.path'  
             case _:
-                pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory   
-                      
+                pix.tag = 'demo-' + common['Screen'] + '.path'  ## in the demo directory                   
         return pix
                                        
     def runGrey(self, pix, k, scale):
@@ -140,8 +140,8 @@ class Bats:    ## backGrounds only used here
             if pix.type =='pix': 
                 if 'alien' in pix.fileName:
                     self.runGrey(pix, k,  scale)
-                    k += 1
-                    
+                    k += 1  
+                            
                 elif pix.part in pix.part in ('pivot','left','right'):
                     t = (random.randint(13, 18) * 2) - 1  ## 25 to 35.ms            
                     self.runBat(pix, n, t)
@@ -169,45 +169,42 @@ class Hats:  ## hats - was abstract
         self.shadows = False
         self.direction = ''
         
-        self.viewW, self.viewH = common['ViewW'],common['ViewH'] 
-        
+        self.viewW, self.viewH = common['ViewW'],common['ViewH']      
         self.scroller = None
         
 ### --------------------------------------------------------      
-    def makeHatsDemo(self, direction):     
+    def makeHatsDemo(self, direction):  ## run scrolling background  
         if 'cv2' not in sys.modules:
             MsgBox('No Shadows - OpenCV not Imported', 5)
             return
-               
-        self.direction = direction
-        self.canvas.openPlayFile = 'hats'        
-                       
-        if self.setBackGround() == None:
-            return  
-        self.setHats()        
-        
+        self.canvas.openPlayFile = 'hats'      
+                                        
+        if not self.setBackGround('shadows-wrp.jpg', direction):
+            return 
+            
+        self.setHats()    
         if self.shadows:   
             MsgBox('Adding Shadows,  please wait...', int(1 + (self.hats * .25)))
             self.addShadows()
    
-        QTimer.singleShot(200, self.scroller.anime.start)  ## run scrolling background  
+        QTimer.singleShot(200, self.scroller.anime.start)  
         self.run()  
         self.showWorks.disablePlay()
 
 ### --------------------------------------------------------            
-    def setBackGround(self):
-        self.scroller = BkgItem('shadows-wrp.jpg', self.canvas)
-        if self.scroller.type == None: 
+    def setBackGround(self, fileName, direction):
+        self.scroller = BkgItem(fileName, self.canvas)
+        if not self.scroller.type: 
             return None
     
-        self.scroller.direction = self.direction       
+        self.scroller.direction = direction  
         self.scroller.path = paths['demo']  
+       
         self.scroller.tag = 'scroller'
         self.scroller.mirroring = False  
-            
+        
         self.canvas.bkgMaker.bkgTrackers.addTracker(self.scroller)  
         self.scroller.bkgWorks.setDirection(self.scroller.direction)
-
         self.scroller.anime = self.scroller.setScrollerPath(self.scroller, 'first')  
     
         if self.direction == 'right':
@@ -215,8 +212,8 @@ class Hats:  ## hats - was abstract
   
         self.scroller.addedScroller = False   
         self.scroller.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemSendsScenePositionChanges, True)        
-        self.scene.addItem(self.scroller) 
         
+        self.scene.addItem(self.scroller) 
         return True 
   
     def setHats(self): 

@@ -28,9 +28,11 @@ class MediaPlayer(QMediaPlayer):
         self.mediaPlayer = QMediaPlayer(self) ## 6
         # self.mediaPlayer = QMediaPlayer(None, QMediaPlayer.VideoSurface)  ## 5 
             
-        if self.parent.player == "one":
-            self.setVideoWidget()
-     
+        if self.parent.player == "one":  
+            self.videoWidget = QVideoWidget()   
+            self.mediaPlayer.setVideoOutput(self.videoWidget) 
+            self.videoWidget.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
+   
         elif self.parent.player == "two":
             self.videoItem = QGraphicsVideoItem()   
             self.mediaPlayer.setVideoOutput(self.videoItem)  
@@ -56,12 +58,7 @@ class MediaPlayer(QMediaPlayer):
             return False
         self.mediaPlayer.pause()  ## makes it visible 
         return True
-        
-    def setVideoWidget(self):   
-        self.videoWidget = QVideoWidget()   
-        self.mediaPlayer.setVideoOutput(self.videoWidget) 
-        self.videoWidget.setAspectRatioMode(Qt.AspectRatioMode.KeepAspectRatio)
-        
+         
     def playVideo(self):  
         if self.mediaPlayer.playbackState() == QMediaPlayer.PlaybackState.PlayingState:  ## 6
         # if self.mediaPlayer.state() == QMediaPlayer.PlayingState:  ## 5

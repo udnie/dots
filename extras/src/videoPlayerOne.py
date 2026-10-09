@@ -21,7 +21,7 @@ import math
 ### -------------------------------------------------------- 
 
 from PyQt6.QtCore       import Qt
-from PyQt6.QtGui        import QGuiApplication
+from PyQt6.QtGui        import QGuiApplication, QPalette
 from PyQt6.QtWidgets    import QWidget, QVBoxLayout, QApplication, QSizePolicy
                                     
 from videoClipsMaker    import Clips
@@ -30,15 +30,16 @@ from videoPlayerShared  import *
 from videoPlayerWorks   import *
 from videoPlayerHelp    import VideoMenuKeys
 
-WID = 30
+WID = 35
 
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
 ### --------------------------------------------------------
     def __init__(self):
-        super(VideoPlayer, self).__init__()         
+        super(VideoPlayer, self).__init__()       
+   
         self.setWindowTitle("VideoPlayerOne and ClipsMaker")
-           
+    
         self.setUI()
         self.show()
               
@@ -146,7 +147,7 @@ class VideoPlayer(QWidget):
 ### --------------------------------------------------------                                                                              
     def mousePressEvent(self, e): 
         if e.button() == Qt.MouseButton.RightButton:
-            if self.clips.settings == None:
+            if not self.clips.settings:
                 self.shared.closeHelpMenu() if self.helpFlag else \
                     self.shared.openHelpMenu() 
         else:
@@ -165,9 +166,8 @@ class VideoPlayer(QWidget):
 ### --------------------------------------------------------
     def openFile(self): 
         if fileName := self.clips.returnFileName():      
-            self.path = os.path.dirname(fileName)  
-            self.mediaPlayer.stop()
-            if self.setMediaPlayer(fileName) and self.mediaPlayer != None: 
+            self.path = os.path.dirname(fileName) 
+            if self.setMediaPlayer(fileName) and self.mediaPlayer: 
                 if self.clips.PlayVideo:  QTimer.singleShot(100, self.shared.playVideo) 
         else:
             return
@@ -218,7 +218,7 @@ class VideoPlayer(QWidget):
         self.clips.closeSettings()
         time.sleep(.03)  
         self.shared.looperOff() 
-        if self.mediaPlayer != None:
+        if self.mediaPlayer:
             self.shared.stopVideo()
  
 ### --------------------------------------------------------
@@ -233,10 +233,15 @@ class VideoPlayer(QWidget):
         self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
              
         self.init()  
-     
+        
+        palette = self.palette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(230,230,230))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
+        
         self.clips = Clips(self) 
         self.shared = Shared(self)
-           
+                
         self.mediaPlayer = MediaPlayer(self, ViewW, ViewH)
         self.videoWidget = self.mediaPlayer.videoWidget
      
@@ -264,17 +269,16 @@ class VideoPlayer(QWidget):
    
 ### -------------------------------------------------------- 
     def zoom(self, zoom):  ## maintain current aspect ratio
-        if self.mediaPlayer != None:  
+        if self.mediaPlayer:  
             if int(self.height() * zoom) > 1280 or int(self.height()* zoom) < 300:
-                return  
-                
-            asp = 0    
+                return   
+                    
+            asp = 0        
             if self.aspect == 0 and (self.key != '' and self.key != 'O'):
                 self.aspect = Keys[self.key][0]  
                       
             elif self.key == 'O' and self.aspect > 0:  ## horizontals
                 asp = self.aspect
-                nwidth = self.VideoW
                 
             if self.aspect != 0:
                 asp = self.aspect
@@ -282,28 +286,16 @@ class VideoPlayer(QWidget):
             elif asp == 0:
                 self.shared.msgbox('The Aspect Ratio Has Not Been Set')
                 return 
-                                                       
-            height = int(self.height()* zoom)  ## new height   
-            nvH = (height - HGT)  ## new video height
-            
-            nvW = int(nvH * asp)  ## new video width   
-            nwidth = nvW + WID    ## new widget width   
-            
-            p, width = self.pos(), self.width()  
-            self.resize(nwidth, height)  
-             
-            dif = int((self.width() - width)/2) 
-            self.move(p.x()-dif, p.y())  
-                   
-            self.ViewW, self.ViewH = self.width()-WID, self.height()-HGT 
-            self.showHideAspectBtn() 
+                      
+            self.shared.zoom(zoom, WID, HGT, self.aspect )          
                                                                                                                                
 ### --------------------------------------------------------   
     def resizeEvent(self, e):  ## maintains current aspect ratio
         if self.flag:
             self.flag = False
             return 
-        elif self.aspect > 0:    
+        
+        if self.aspect > 0:    
             
             hgt = HGT if self.shared.sliderVisible else HGT-PAD
             

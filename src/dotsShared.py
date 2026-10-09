@@ -2,7 +2,6 @@
 from PyQt6.QtCore       import Qt
 from PyQt6.QtGui        import QPixmap
 
-
 from PyQt6.QtWidgets    import QGraphicsPathItem, QGraphicsItemGroup, \
                             QGraphicsPolygonItem, QGraphicsPixmapItem, \
                             QGraphicsSimpleTextItem
@@ -68,9 +67,6 @@ common = {  ## wherever it's needed
     'points':    40.0,    ## Zvalue for points in shadows
     'outline':   30.0,    ## Zvalue for outline in shadows
     
-    'SliderW':      127,  ## used by keysPanel
-    'OffSet':         0,  ## keysPanel width, used to set fixed size 
-    'fix':            23,  ## keysPanel height, used to set fixed size 
     'V':           12.0,  ## diameter of pointItems in shadows
     'widgetXY': (25,25),  ## position pathWidget and BkgWidget 
 } 

@@ -87,7 +87,7 @@ class BkgMaker:
         self.lockBkg(bkg)  ## always lock it
                         
         bkg.setFlag(QGraphicsPixmapItem.GraphicsItemFlag.ItemIsMovable, False) 
-                      
+                                          
 ### --------------------------------------------------------
     def openFlatFile(self, file):  ## read from .bkg file - a 'flat'
         try:

@@ -93,8 +93,7 @@ class Trackers(QWidget):
     def setUI(self, parent, dump): 
                
         self.canvas = parent
-        
-              
+       
         self.setWindowTitle('trackers')  
         self.setWindowFlags(Qt.WindowType.Window| \
             Qt.WindowType.WindowStaysOnTopHint)

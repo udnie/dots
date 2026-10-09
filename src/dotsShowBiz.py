@@ -1,9 +1,7 @@
 
 from dotsSideGig        import Grid, DemoAvailable
-
 from dotsSideCar        import SideCar 
-from dotsSideCar2       import SideCar2
- 
+from dotsSideCar2       import SideCar2 
 from dotsShowTime       import ShowTime
 
 from dotsHelpMenus      import HelpMenus
@@ -40,7 +38,7 @@ class ShowBiz:
         self.helpMaker   = HelpMaker(self.canvas)
         self.helpMenus   = HelpMenus(self.canvas)  ## can be demo or screens
         self.helpButtons = ButtonHelp(self.canvas)
-        
+      
         self.grid = Grid(self.canvas)
         
         self.locks = 0
@@ -52,8 +50,8 @@ class ShowBiz:
     def keysInPlay(self, key):
         if key == 'X':  ## from help menus
             self.canvas.exit()    
-
-        if key in ('G', 'K', 'R'):
+   
+        if key in ('G','K','R'):
             match key:
                 case'G':
                     self.grid.toggleGrid()                 
@@ -69,7 +67,7 @@ class ShowBiz:
     ## animations running  'P', 'S', 'space'
 ### --------------------------------------------------------   
         elif len(self.scene.items()) > 0:    
-            if key in ('P', 'S', 'space') and self.canvas.control != '' or self.canvas.animationRunning: 
+            if key in ('P','S','space') and self.canvas.control != '' or self.canvas.animationRunning: 
                 match key:
                     case 'P': 
                         self.mapper.tagsAndPaths.togglePaths()                                                                                    
@@ -81,8 +79,8 @@ class ShowBiz:
 ### --------------------------------------------------------    
     ## no animations running - from storyboard menu
 ### --------------------------------------------------------  
-            elif self.canvas.control == '' or not self.canvas.animationRunning:                     
-                if key in ('A', 'B','D', 'I', 'J', 'L', 'M', 'N', 'O', 'S','T', 'U', 'V', 'W', 'del'):          
+            elif self.canvas.control == '' or not self.canvas.animationRunning:              
+                if key in ('A','B','D','I','J','L','M','N','O','S','T','U','V','W','del'):          
                     match key:
                         case 'A':            
                             self.sideCar2.unSelect() if self.scene.selectedItems() else \
@@ -108,13 +106,16 @@ class ShowBiz:
                             self.helpMaker.menuHelp()  ## called from help menus to avoid 'M' conflicts
                         case 'O':
                             self.sideCar.clearWidgets()  
-                            self.sideCar.toggleOutlines()   ## run from shadowWorks                    
+                            self.sideCar.toggleOutlines()   ## run from shadowWorks            
                         case 'S':
                             self.showtime.savePlay()
                         case 'T':
                             self.mapper.toggleSelectedSceneItems()    
-                        case 'U':                           ## unselect for storyBoard
-                            self.sideCar2.unSelect()            
+                        case 'U':   
+                            if self.scene.selectedItems():   
+                                self.sideCar2.unSelect()        ## unselect pix types from storyBoard
+                            elif self.sideCar2.hasBackGrounds():
+                                self.sideCar2.sendPixKeys('U')  ## update Scrolling Backgrounds
                         case 'V':
                             if self.canvas.videoPlayer != None:     ## delete video
                                 self.canvas.videoPlayer.ask2deleteVideo() 
@@ -127,7 +128,7 @@ class ShowBiz:
         elif len(self.scene.items()) == 0:    
             if self.demoAvailable:  ## does the demo directory exist 
                 self.canvas.clear()  
-            if key in ('A', 'D', 'J', 'L', 'M', 'P', 'S'):                 
+            if key in ('A','D','J','L','M','P','S'):                 
                 match key:
                     case 'A': 
                         self.bkgMaker.openBkgFiles() 
@@ -145,7 +146,7 @@ class ShowBiz:
                     case 'S':   
                         if self.demoAvailable: 
                             self.helpMenus.setMenu(key) ## displays screen menu in canvas
-                     
+                 
 ### ---------------------- dotsShowBiz --------------------
 
 

@@ -37,9 +37,9 @@ class ShowWorks:
                             self.dothis(p) 
                             p.bkgWorks.setStartingPos(p)
                             k = 1
-                        elif k > 0:
+                        elif k > 0: 
                             self.scene.removeItem(p)
-
+                     
 ### --------------------------------------------------------                                                            
     def dothis(self, p):  ##refresh background
         direction = p.direction
