@@ -299,7 +299,14 @@ class VideoPlayer(QWidget):
         if self.flag:
             self.flag = False
             return 
-    
+        
+        if self.mediaPlayer:
+            if not self.backdrop:
+                self.shared.msgbox('backdrop not found')
+                return
+            else:
+                self.backdrop.setScale((self.width()-WID)/self.videoWidth) 
+                          
         if self.aspect > 0: 
             hgt = HGT if self.shared.sliderVisible else HGT-PAD
             
@@ -307,18 +314,7 @@ class VideoPlayer(QWidget):
             height = int((self.width()-WID) / self.aspect)+hgt  
             maxwid = int((MaxHgt-hgt) * self.aspect)+WID  
             which  = self.shared.getDirection() 
-            
-            if self.mediaPlayer:
-                if not self.backdrop:
-                    self.shared.msgbox('backdrop not found')
-                    return
-                else:
-                    self.backdrop.setScale((self.width()-WID)/self.videoWidth) 
-                    
-            if self.mediaPlayer:
-                self.backdrop.setScale((self.width()-WID)/self.videoWidth) if self.backdrop \
-                else self.shared.msgbox('backdrop not found')
-                
+                 
             if width != self.saveW:         
                 if width > maxwid:
                     self.videoItem.setSize(QSizeF(float(maxwid-WID), float(height-hgt)))
@@ -355,7 +351,8 @@ class VideoPlayer(QWidget):
             self.move(self.pos().x()-dif, self.pos().y()) 
               
             time.sleep(.007)  
-            self.saveW, self.saveH = self.width(), self.height()        
+            self.saveW, self.saveH = self.width(), self.height()  
+         
         e.accept() 
 
 ### ------------------------------------------------------

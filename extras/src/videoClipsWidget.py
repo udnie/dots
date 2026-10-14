@@ -54,6 +54,9 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.waitValue.setText(f'{val:5}')
         
     def setRnfVal(self, val):
+        if self.clips.SkipFrames and val < 1: 
+            self.parent.shared.msgbox("Must be between 1 and 30")
+            return
         self.clips.Rnf = val
         self.rnfValue.setText(f'{val:5}')
     
@@ -103,11 +106,7 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         groupBox.setFixedHeight(165)         
         groupBox.setFixedWidth(int(300))
         groupBox.setStyleSheet('background: rgb(245, 245, 245)')
-    
-        self.fpslabel = QLabel('FPS')   
-        self.fpslabel.setFixedWidth(40)
-        self.fpsValue = QLabel(str(self.clips.Fps), alignment=Qt.AlignmentFlag.AlignRight)  
-           
+        
         style = """ QSlider::handle:horizontal {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
                 stop:0 #e4e4e4, stop:1 #4f4f4f);
@@ -115,10 +114,15 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
             width: 11px;
             margin: -7px 0;
             border-radius: 3px;} """
- 
+            
+        self.fpslabel = QLabel('FPS')  ## write n'frames per second 
+        self.fpslabel.setFixedWidth(40)
+        self.fpsValue = QLabel(str(self.clips.Fps), alignment=Qt.AlignmentFlag.AlignRight)       
+            
         self.fpsSlider =  QSlider(Qt.Orientation.Horizontal)    
-        self.fpsSlider.setMinimum(5)
-        self.fpsSlider.setMaximum(30)  ## <<-------- max number of frames per second
+        self.fpsSlider.setMinimum(5)  ## below 5 or some combinations of fps/wpr produces garbage
+        self.fpsSlider.setMaximum(30) 
+        
         self.fpsSlider.setSingleStep(1)
         self.fpsSlider.setTickInterval(5) 
         self.fpsSlider.setValue(self.clips.Fps)
@@ -127,13 +131,14 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.fpsSlider.valueChanged.connect(self.setFpsVal)
         self.fpsSlider.setStyleSheet(style)
             
-        self.maxlabel = QLabel('MAX') 
+        self.maxlabel = QLabel('MAX')  ## max number to read and write
         self.maxlabel.setFixedWidth(40)  
         self.maxValue = QLabel(str(self.clips.Max), alignment=Qt.AlignmentFlag.AlignRight) 
         
         self.maxSlider = QSlider(Qt.Orientation.Horizontal)  
         self.maxSlider.setMinimum(25)
-        self.maxSlider.setMaximum(650)  ## <<----------- max number to read and write
+        self.maxSlider.setMaximum(650) 
+        
         self.maxSlider.setSingleStep(25)
         self.maxSlider.setTickInterval(50)  
         self.maxSlider.setValue(self.clips.Max)
@@ -142,13 +147,14 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.maxSlider.valueChanged.connect(self.setMaxVal)
         self.maxSlider.setStyleSheet(style)
  
-        self.waitlabel = QLabel('WPR') 
+        self.waitlabel = QLabel('WPR')   ## writes per read
         self.waitlabel.setFixedWidth(40)
         self.waitValue = QLabel(str(self.clips.Wpr), alignment=Qt.AlignmentFlag.AlignRight) 
         
         self.waitSlider = QSlider(Qt.Orientation.Horizontal)   
         self.waitSlider.setMinimum(1)
-        self.waitSlider.setMaximum(7)   ## <<-------- waittime - probably won't need to adjust
+        self.waitSlider.setMaximum(7)  
+        
         self.waitSlider.setSingleStep(1)  
         self.waitSlider.setTickInterval(1) 
         self.waitSlider.setValue(int(self.clips.Wpr))
@@ -157,12 +163,14 @@ class Settings(QWidget):  ## settings for clipsMaker and autoAspect
         self.waitSlider.valueChanged.connect(self.setWaitVal)
         self.waitSlider.setStyleSheet(style)
         
-        self.rnflabel = QLabel("RNF") 
+        self.rnflabel = QLabel("RNF")  ## read Nth frame
         self.rnflabel.setFixedWidth(40)
         self.rnfValue = QLabel(str(self.clips.Rnf), alignment=Qt.AlignmentFlag.AlignRight) 
+        
         self.rnfSlider = QSlider(Qt.Orientation.Horizontal)   
-        self.rnfSlider.setMinimum(0)  ## unfortunate - should be one 
-        self.rnfSlider.setMaximum(30)   ## <<-------- number of frames to skip
+        self.rnfSlider.setMinimum(0)  
+        self.rnfSlider.setMaximum(30) 
+        
         self.rnfSlider.setSingleStep(5)          
         self.rnfSlider.setTickInterval(5)    
         self.rnfSlider.setValue(int(self.clips.Rnf))

@@ -16,7 +16,7 @@ import math
     and a right-mouse click displays the help menu.  
     See videoClipsMaker for changes to defaults and clipsWidget for settings. 
     Size detection doesn't work if clips are on.
-    One last thing - videoWidget won't overwite itself if trying to re-read the
+    One last thing - videoWidget won't overwrite itself if trying to re-read the
     current directory - videoPlayerTwo will as it's using a graphicsVideoItem '''
 ### -------------------------------------------------------- 
 
@@ -30,7 +30,7 @@ from videoPlayerShared  import *
 from videoPlayerWorks   import *
 from videoPlayerHelp    import VideoMenuKeys
 
-WID = 35
+WID = 30  ## not the same for "two" - compensates for videoWidget
 
 ### --------------------------------------------------------
 class VideoPlayer(QWidget):
@@ -223,11 +223,11 @@ class VideoPlayer(QWidget):
  
 ### --------------------------------------------------------
     def setUI(self):
-        self.setMinimumHeight(MinWid+100)
+        self.setMinimumHeight(MinHgt)
         self.setMinimumWidth(MinWid)
-        
-        self.setMaximumHeight(1200)
-        self.setMaximumWidth(1850)
+                
+        self.setMaximumHeight(MaxHgt)
+        self.setMaximumWidth(MaxWid)
         
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.resize(int(ViewH*1.5)+WID, ViewH+HGT)  ## default 3:2
@@ -295,12 +295,11 @@ class VideoPlayer(QWidget):
             self.flag = False
             return 
         
-        if self.aspect > 0:    
-            
+        if self.aspect > 0:     
             hgt = HGT if self.shared.sliderVisible else HGT-PAD
             
             width  = int((self.height()-hgt) * self.aspect)+WID
-            height = int((self.width()-WID)/ self.aspect)+hgt  
+            height = int((self.width()-WID)/self.aspect)+hgt  
             maxwid = int((MaxHgt-hgt) * self.aspect)+WID 
             which  = self.shared.getDirection()     
             
@@ -317,30 +316,33 @@ class VideoPlayer(QWidget):
                         self.videoWidget.resize(MinWid-WID, MinHgt-hgt) 
                         self.resize(MinWid, MinHgt)  ## square  
               
+                ## added 10 to some widths as the enclosing widgets right frame can lose width
+              
                 elif which in ('botleft', 'botright'):   
                     self.videoWidget.resize(self.width()-WID, height-hgt)
-                    self.resize(self.width(), height)       
+                    self.resize(self.width()+10, height)
                       
                 else:
                     self.videoWidget.resize(width-WID, self.height()-hgt)
-                    self.resize(width, self.height())   
+                    self.resize(width+10, self.height())   
                               
             elif height != self.saveH: 
                 if height > MaxHgt:
                     self.resize(maxwid, MaxHgt)
                                            
                 elif height < MinHgt:       
-                    self.resize(width, MinHgt-hgt)  
+                    self.resize(width+10, MinHgt-hgt)  
                     
                 elif height > MinHgt:  
                     self.videoWidget.resize(self.width()-WID, height-hgt)
-                    self.resize(self.width(), height) 
+                    self.resize(self.width()+10, height) 
       
             dif = int((self.width() - self.saveW)/2)
             self.move(self.pos().x()-dif, self.pos().y()) 
              
             time.sleep(.007)  
-            self.saveW, self.saveH = self.width(), self.height()        
+            self.saveW, self.saveH = self.width(), self.height()   
+                         
         e.accept() 
 
 ### --------------------------------------------------------

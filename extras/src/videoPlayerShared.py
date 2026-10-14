@@ -12,9 +12,9 @@ from videoClipsMaker    import Ext, Mxt
 from videoPlayerHelp    import VideoHelp, SlideShowHelp, VideoHelpWidget
 from videoPlayerWorks   import getMetaData
 
-HGT, PAD = 140, 100 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
+WID, HGT, PAD = 40, 145, 105 ## pixels added to videowidget size when resizing videoPlayerOne's width and height
 
-ViewW,  ViewH  =  790,  525  ## starting video size
+ViewW,  ViewH  =  788,  525  ## starting video size
 MaxWid, MaxHgt = 1800, 1165
 
 MinWid  = 300  ## minimum widget width
@@ -131,7 +131,7 @@ class Shared:
             
         elif self.loopSet:
             self.looperOff()
-            if self.parent.mediaPlayer != None:
+            if self.parent.mediaPlayer:
                 self.parent.shared.stopVideo()
             time.sleep(.03)
  
@@ -145,7 +145,7 @@ class Shared:
         dialog.setFileMode(QFileDialog.FileMode.ExistingFiles) 
         if dialog.exec() == QFileDialog.DialogCode.Accepted:
             files = dialog.selectedFiles()
-            if files != None:
+            if files:
                 self.path = os.path.dirname(files[0])
                 return self.getFileNames(files) 
             self.msgbox('getFileNames: No Files Found') 
@@ -194,7 +194,7 @@ class Shared:
             time.sleep(.03)
  
     def closeHelpMenu(self):
-        if self.parent.helpMenu != None: 
+        if self.parent.helpMenu: 
             self.parent.helpMenu.tableClose()
             self.parent.helpMenu.close()
             self.parent.helpFlag = False
@@ -220,12 +220,12 @@ class Shared:
    
 ### --------------------------------------------------------     
     def playVideo(self):  ## setButtons and setSlider don't know about mediaPlayer
-        if self.parent.mediaPlayer != None:
+        if self.parent.mediaPlayer:
             self.parent.mediaPlayer.playVideo()
             self.videoPlaying = True
       
     def stopVideo(self):  
-        if self.parent.mediaPlayer != None:
+        if self.parent.mediaPlayer:
             if self.loopSet:
                 self.looperOff()
             self.parent.mediaPlayer.stopVideo()
@@ -233,7 +233,7 @@ class Shared:
             self.videoPlaying = False
             
     def setPosition(self, position):  ## called by slider if finger pull
-        if self.parent.mediaPlayer != None:
+        if self.parent.mediaPlayer:
             self.parent.mediaPlayer.setPosition(position)
     
     def positionChanged(self, position):  

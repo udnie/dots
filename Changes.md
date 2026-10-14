@@ -7,6 +7,14 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**October 14 20226**  
+Some small edits to **extras**.  In **videoClipsWidget** I made sure the **Nth** slider would not accept **0** if the **Nth** button were pressed to **on** and in **videoClipsMaker** I replaced the code I used to scale images to fit with a more compact solution from **google a.i.**.
+
+I added some magic numbers to **videoPlayerOne** to insure the enclosing widgets framing would appear correctly. When scaling the display the right side wouldn't maintain the expected width.
+
+Changed the startup of **SlideShow** so the help menu will appear when it opens. The empty screen started to bother me and now both open file choices are immediately available.
+
+---
 **October 9 2026**   
 Changes to August 5th's work on scrolling backgrounds. There's now a **Scrolling Backgrounds Settings Widget** which makes it easier to make adjustments to any of the three variables mentioned in the video posted in August which covered the updates to scrolling backgrounds.  The **settings.json** file in the **plays** directory serves to replace the three variables mentioned in **BkgWorks.py**.  The **BackUp** data and the functions to support the widget with a provision to create a backup should the file not exist are in **BkgScrollWrks.py** - as in the original scrolling version but with a smaller profile.  
 
@@ -15,7 +23,6 @@ Added **Select Files**, rather than selecting the entire directory, to **ClipsMa
 I traded my M1 Mac in on a M5 with the idea that it might help with the stuttering video issues - seems that's a known problem. I'll need to look into trying something else other than Quicktime for video capture. Current settings that seemed to help; turned off true tone, selected Apple DR Display (P3-1600 nits) and chose ProMotion. And don't run the scrolling background at the maximum factor speed .50 if doing a video capture.
 
 Last, an apology for a dumb bug - the left/right scrolling backgrounds demos weren't able to locate the background.  My fault entirely - it's been fixed.
-
 
 New video:  <https://youtu.be/8uOhS7vb6D4>
 
@@ -36,14 +43,12 @@ Also created a new **videoPlayerWorks.py** file made up of **MediaPLayer, setSli
 **August 26 2026**  
 A bug fix to **videoPlayer**. There was a problem if the image width was less than the screen width - it wouldn't fill the screen properly. I finally saw it.  Also revisited an earlier decision to turn off auto-detect if **clipsMaker** was on. In HD format and running **clipsMaker** if you tried in the past to read the file you just made it wouldn't fill the screen. It still won't but I've added a **'Shift-O'** to open files and set **clipsMaker** off. That allows the auto-detect to work and the video runs as it was originally viewed. It's on the help menu and works from the keyboard.    
 
-
+---
 **August 23 2026**   
 A bit of an update to **README.md**, **StartHere.md** and to the version numbers I posted the other day after a 'pip3 list' today to be sure. 
 
-
 **August 21 2026**   
 Updated **dotsAnimation** to run **pySide6 6.11.2** along with the usual suspects, **PyQt6** and **PyQt5**.  More fun with menus and widgets.
-
 
 **August 15 2026**  
 Found an interesting bug having to do with **clipsMaker**. It looks like a bit of code I thought was working wasn't. **ClipsMaker** stopped using the name of the directory plus .mov as the output file name when reading all the files but worked correctly if reading the **Nth** frame. It was dropping the directory name and leaving the .mov file which would be invisible on a mac's screen.
@@ -54,6 +59,7 @@ Added a left-mouse-click to close an open help menu in **dots** by clicking anyw
 
 Lastly, I've updated to **python 3.14.7**, **pyqt6 6.11.0** and **opencv 4.12.0.88**.  I wasn't able to include  **pyside6 6.11** in the update as currently I haven't been able to get it to run animations in **dots** using **pyside6 6.11**. There's no problem however running **pyside6 6.10** in the current mix.
 
+---
 **August 5 2026**  
 Updates to **wrapper** and **dots scrolling backgrounds**.  Added to **wrapper**, what I am calling **filters**, functions that can modify the **blendedImage** using the sliders. They're located in **wrapperFilters.py** - each filter has a description of proposed intent as provided by **google gemini**, the source behind the function's **opencv** code. The **edges** slider can also work on non-filtered backgrounds.  The only other noticeable change to **wrapper**, now that the sliders actually do something, are the **guides** appearing when you're ready to save the **blendedImage** - if they're not already visible. A reminder that they're there rather than popping them up at the start.
 

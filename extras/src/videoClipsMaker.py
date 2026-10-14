@@ -94,6 +94,9 @@ class Clips:
                     self.settings.firstBtn.setText('FirstFrame')        
             case 'skip':
                 if not self.SkipFrames:
+                    if self.Rnf == 0:
+                        self.parent.shared.msgbox("Must be between 1 and 30")
+                        return
                     self.SkipFrames = True
                     self.settings.skipBtn.setText("NthFrameOn")
                     if self.FirstFrame:
@@ -337,39 +340,25 @@ class Clips:
         cv2.putText(img, name, org, font, scale, color, thickness, type)
         
 ### --------------------------------------------------------
-    def ctrOnBkg(self, img, imgName):  
+    def ctrOnBkg(self, img, imgName):  ## google updated scaling logic
         img_h, img_w = img.shape[:2]
         vid_w, vid_h = self.parent.VideoW, self.parent.VideoH
         
-        if vid_h < img_h:  ## resize vertical - numpy likes it reversed  
-            r = vid_h / img_h
-            img_h = int(img_h * r)
-            img_w = int(img_w * r)       
-        else:
-            r = img_h / vid_h
-            img_h = int(img_h * r)
-            img_w = int(img_w * r)
-            
-        if img_w > vid_w:  ## do this till it fits   
-            while (vid_w - img_w) != 0:
-                r = vid_w / img_w
-                img_w = int(img_w * r)
-                img_h = int(img_h * r)  
-                      
-        elif img_w < vid_w:
-            if img_h < vid_h:  ## do this first - set to height
-                r = vid_h/img_h
-                if (r * img_w) <= vid_w:
-                    img_h = int(img_h * r)
-                    img_w = int(img_w * r)           
-                else:
-                    s = vid_w/(img_w *r)  ##  width needs to be reduced
-                    img_w = int((img_w * r) * s)
-                    img_h = int((img_h * r) * s)
-                
-        img  = cv2.resize(img, (img_w, img_h), interpolation= cv2.INTER_LINEAR)  
+        # 1. Determine the limiting scale factor for width and height
+        scale_w = vid_w / img_w
+        scale_h = vid_h / img_h
+        
+        # 2. Pick the smaller ratio so the image fits fully inside both dimensions
+        r = min(scale_w, scale_h)
+        
+        # 3. Calculate new dimensions based on the single ratio
+        new_w = int(img_w * r)
+        new_h = int(img_h * r)
+        
+        # 4. Perform the resize
+        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)  
         img_h, img_w = img.shape[:2]
-         
+     
         background_color = (0, 0, 0)  ## Black (B, G, R)  ## numpy
         bkgImage = np.full((vid_h, vid_w, 3), background_color, dtype=np.uint8)
 
