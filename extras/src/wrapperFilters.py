@@ -140,14 +140,14 @@ class Filters:
     regardless of which primary filter was used.
     '''
 ### -------------------------------------------------------- 
-    def EdgesSlider(self, edgeValue, blended, strip1, strip2):         
+    def edgesSlider(self, edgesValue, blended, strip1, strip2):         
         h, w_blend, _ = blended.shape    
         max_safe_radius = w_blend // 2
         
         # Map the 1-100 slider to a percentage of that maximum safe distance
         # 100 on the slider = feather reaches the center.
         # 10 on the slider = tight, narrow edge feather.
-        feather_radius = max(1, int((edgeValue / 100.0) * max_safe_radius))
+        feather_radius = max(1, int((edgesValue / 100.0) * max_safe_radius))
 
         # --- LEFT SEAM FEATHER ---
         # Fades from 0.0 (100% Left Image) to 1.0 (100% Blended Math)
@@ -175,6 +175,46 @@ class Filters:
 
         return blended
 
+### --------------------------------------------------------
+    ''' A throwaway filter - creates a blurred background using the
+        edgesSlider or add your own filter - you can use all three
+        sliders.
+    '''
+### --------------------------------------------------------
+    def Filter10(self, image):
+        self.sliders.filter10Btn.setText("Filter 10 On") 
+      
+        k = self.parent.edgesValue if self.parent.edgesValue > 2 else 2
+        kernel_size =  k // 2
+        
+        brightness_threshold = 255  ## keeps it from bleaching out
+      
+        # 2. Create a circular Bokeh kernel (Lens blur diaphragm shape)
+        # This creates a disk-like shape where the edges are smooth
+        kernel = np.zeros((kernel_size, kernel_size), dtype=np.float32)
+        cv2.circle(kernel, (kernel_size // 2, kernel_size // 2), kernel_size // 2, 1, -1)
+        kernel /= np.sum(kernel)  # Normalize kernel so image brightness doesn't change
+
+        # 3. Create a heavy background blur across the entire image
+        blurred_img = cv2.filter2D(image, -1, kernel)
+        # Optional: Mix in a standard Gaussian blur for extra softness
+        blurred_img = cv2.GaussianBlur(blurred_img, (kernel_size | 1, kernel_size | 1), 0)
+
+        # 4. Isolate the bright spots (highlights) to create the bokeh discs
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        _, mask = cv2.threshold(gray, brightness_threshold, 255, cv2.THRESH_BINARY)
+        
+        # Soften the mask edges to blend smoothly
+        mask_blur = cv2.GaussianBlur(mask, (21, 21), 0) / 255.0
+        mask_blur = np.expand_dims(mask_blur, axis=2) # Match 3-channel image shapes
+
+        # 5. Amplify highlights on the blurred background
+        # This blends the heavily blurred image with the bright bokeh spots
+        bokeh_effect = (blurred_img * (1 - mask_blur) + (blurred_img * 1.5) * mask_blur)
+        bokeh_effect = np.clip(bokeh_effect, 0, 255).astype(np.uint8)
+
+        return bokeh_effect
+        
 ### --------------------- that's all -----------------------
 
 

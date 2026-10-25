@@ -302,6 +302,9 @@ class SlideShowHelp(QWidget):
             if 'Shift' in k:
                 self.table.setRow(row, 0, k, QL,True,True)
                 self.table.setRow(row, 1, "  " + val,QL,'',True)  
+            elif 'F' in k:
+                self.table.setRow(row, 0, k, QL,True,True)
+                self.table.setRow(row, 1, "  " + val,QL,'',True) 
             else:
                 self.table.setRow(row, 0, k, '',True,True)
                 self.table.setRow(row, 1, "  " + val,'','',True)

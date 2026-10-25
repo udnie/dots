@@ -146,7 +146,7 @@ class Wrapper(QWidget):
         if self.guidesOn and not self.first:
             self.guides.updateGuides()
             
-    def wrapIt(self, saveas=''):   
+    def wrapIt(self, saveas=''):  ## update blended image
         if self.fileName != '' and self.blendWidth > 0:
             img = self.works.wrapper(self.fileName)  
             if self.displayBlended(img):  ## only call to it
@@ -282,7 +282,7 @@ class Wrapper(QWidget):
         self.init()
            
         palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor("silver"))
+        palette.setColor(QPalette.ColorRole.Window, QColor(220,220,220))
         self.setPalette(palette)
         self.setAutoFillBackground(True)
        

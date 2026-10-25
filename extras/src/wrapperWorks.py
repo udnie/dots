@@ -58,7 +58,7 @@ class Works:
         
 ### --------------------------------------------------------                            
     def swap(self, which):
-        if self.parent.leftSide == None:
+        if not self.parent.leftSide:
             return  
         filter = self.parent.filtered   
         match which:
@@ -72,11 +72,12 @@ class Works:
                     filter = '9'
                 elif filter == '9':
                     filter = ''  
-            # case 10:
-            #     if filter == '':      
-            #         filter = '10'
-            #     elif filter == '10':
-            #         filter = ''   
+            case 10:
+                if filter == '':      
+                    filter = '10'
+                elif filter == '10':
+                    filter = '' 
+                      
         self.parent.filtered = filter                 
         if filter == '': 
             self.parent.sliders.setFilterBtns()            
@@ -138,23 +139,24 @@ class Works:
             
         elif self.parent.filtered == '9':
             blended = self.parent.filters.Filter9(strip1, strip2)
-            
-        # elif self.parent.filtered == '10':
-        #     blended = self.parent.filters.Filter10(strip1, strip2)
-            
-    # if self.parent.filtered in ("8","9"):                                  
-        mid_val = int(self.parent.edgesValue)           
-        if mid_val > 5: 
-            blended = self.parent.filters.EdgesSlider(mid_val, blended, strip1, strip2)
+                  
+        if self.parent.filtered in ("8","9"):                                  
+            mid_val = int(self.parent.edgesValue)           
+            if mid_val > 5: 
+                blended = self.parent.filters.edgesSlider(mid_val, blended, strip1, strip2)
 
         # blended is based on rows and columns - select all rows[:,
         # select all the columns starting at w1 minus the blendWidth
         # paste blended starting there
         final_img[:, w1 - blendWidth:w1] = blended 
-         
+        
         del blended, strip1, strip2, img1, img2
-
+         
         time.sleep(.010)
+        
+        if self.parent.filtered == '10':
+            final_img = self.parent.filters.Filter10(final_img)
+   
         return final_img
 
 ### --------------------------------------------------------
@@ -202,7 +204,7 @@ class Works:
             cv2.destroyAllWindows()
         
         del crop1, crop2
-        if crop3 != None: del crop3, crop2_extended
+        if crop3: del crop3, crop2_extended
         
         time.sleep(.015)
         

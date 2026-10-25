@@ -7,7 +7,7 @@ from wrapperWorks       import Works, ViewH, ViewW
 
 BtnsW, Max = ViewW, 200  
  
-MinLimit = 3
+MinLimit = 1
 MaxLimit = 97
 
 ### ----------------------- Sliders ------------------------                                                                                                                                                                                                                                                                           
@@ -23,19 +23,19 @@ class Sliders: ## and buttons
     def setFilterBtns(self):
         self.filter8Btn.setText("Filter 8")
         self.filter9Btn.setText("Filter 9")
-        # self.filter10Btn.setText("Filter 10")
+        self.filter10Btn.setText("Filter 10")
 
     def enableSliders(self, bool=False): 
         self.topEndSlider.setEnabled(bool)
         self.bottomSlider.setEnabled(bool)
-        self.EdgesSlider.setEnabled(bool)
+        self.edgesSlider.setEnabled(bool)
         self.blendImgSlider.setEnabled(bool)
         self.zeroSliders()
         
     def zeroSliders(self):
-        self.topEndSlider.setValue(0)
-        self.bottomSlider.setValue(0)
-        self.EdgesSlider.setValue(0)
+        self.topEndSlider.setValue(1)
+        self.bottomSlider.setValue(1)
+        self.edgesSlider.setValue(1)
         self.blendImgSlider.setValue(0)   
         self.blendImgSlider.setSliderPosition(0)
           
@@ -43,6 +43,7 @@ class Sliders: ## and buttons
         self.parent.setTopEndValue(MinLimit)
         self.parent.setBottomValue(MinLimit)
         self.parent.setEdgeValue(0)
+        self.zeroSliders()
         
     def resetblendImgSlider(self):
         self.parent.setBlendVal(0)
@@ -74,12 +75,12 @@ class Sliders: ## and buttons
         self.parent.setBottomValue(clamped_val)
         
     def edgeWorkClamp(self):  
-        val = self.EdgesSlider.value() 
+        val = self.edgesSlider.value() 
         clamped_val = max(MinLimit, min(val, MaxLimit))   
         if val != clamped_val:
-            self.EdgesSlider.blockSignals(True)
-            self.EdgesSlider.setValue(clamped_val)
-            self.EdgesSlider.blockSignals(False)      
+            self.edgesSlider.blockSignals(True)
+            self.edgesSlider.setValue(clamped_val)
+            self.edgesSlider.blockSignals(False)      
         self.parent.setEdgeValue(clamped_val)
 
 ### --------------------------------------------------------
@@ -151,21 +152,21 @@ class Sliders: ## and buttons
         self.bottomLabel = QLabel("0.0")  
         gbox.addWidget(self.bottomLabel,alignment=Qt.AlignmentFlag.AlignCenter)  
  
-### ----------------------- EdgesSlider -------------------- 
-        self.EdgesSlider = QSlider(Qt.Orientation.Vertical)
-        self.EdgesSlider.setFixedSize(50,180)    
-        self.EdgesSlider.setRange(0,100)                  
-        self.EdgesSlider.setValue(0)
+### ----------------------- edgesSlider -------------------- 
+        self.edgesSlider = QSlider(Qt.Orientation.Vertical)
+        self.edgesSlider.setFixedSize(50,180)    
+        self.edgesSlider.setRange(0,100)                  
+        self.edgesSlider.setValue(0)
         
-        self.EdgesSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
-        self.EdgesSlider.setTickInterval(10)      
-        self.EdgesSlider.valueChanged.connect(self.edgeWorkClamp)
-        self.EdgesSlider.setStyleSheet(style)
+        self.edgesSlider.setTickPosition(QSlider.TickPosition.TicksBothSides)
+        self.edgesSlider.setTickInterval(10)      
+        self.edgesSlider.valueChanged.connect(self.edgeWorkClamp)
+        self.edgesSlider.setStyleSheet(style)
            
         mbox = QVBoxLayout() 
         mbox.addWidget(QLabel("Edges", alignment=Qt.AlignmentFlag.AlignCenter))
         mbox.addSpacing(5)
-        mbox.addWidget(self.EdgesSlider,alignment=Qt.AlignmentFlag.AlignHCenter)  
+        mbox.addWidget(self.edgesSlider,alignment=Qt.AlignmentFlag.AlignHCenter)  
         mbox.addSpacing(5)
         self.edgesLabel = QLabel("0.0")  
         mbox.addWidget(self.edgesLabel,alignment=Qt.AlignmentFlag.AlignCenter) 
@@ -204,7 +205,7 @@ class Sliders: ## and buttons
         
         self.blendImgSlider.setTickInterval(10)  
         self.blendImgSlider.setPageStep(50)
-        self.blendImgSlider.setFixedSize(600,40)
+        self.blendImgSlider.setFixedSize(600,45)
         
         self.blendImgSlider.valueChanged.connect(self.parent.setBlendVal)
                           
@@ -256,9 +257,11 @@ class Sliders: ## and buttons
         filesBtn  = QPushButton("Files")      
         alignBtn = QPushButton("Align")
         newBtn   = QPushButton('Guides') 
+        
         self.filter8Btn = QPushButton('Filter 8')
         self.filter9Btn = QPushButton('Filter 9') 
-        # self.filter10Btn = QPushButton('Filter 10') 
+        self.filter10Btn = QPushButton('Filter 10') 
+        
         delBtn   = QPushButton('Delete Blended')     
         saveBtn  = QPushButton('Save')
         clearBtn = QPushButton("Clear")
@@ -267,9 +270,11 @@ class Sliders: ## and buttons
         filesBtn.clicked.connect(self.works.openFiles)
         alignBtn.clicked.connect(self.parent.align)
         newBtn.clicked.connect(self.parent.guides.toggleGuides)
+        
         self.filter8Btn.clicked.connect(lambda: self.works.swap(8))
         self.filter9Btn.clicked.connect(lambda: self.works.swap(9))
-        # self.filter10Btn.clicked.connect(lambda: self.works.swap(10))
+        self.filter10Btn.clicked.connect(lambda: self.works.swap(10))
+        
         delBtn.clicked.connect(self.parent.deleteBlended)
         saveBtn.clicked.connect(self.works.saveDialog)
         clearBtn.clicked.connect(self.parent.clear)
@@ -279,10 +284,12 @@ class Sliders: ## and buttons
         
         hbox.addWidget(filesBtn)
         hbox.addWidget(alignBtn)
-        hbox.addWidget(newBtn)   
+        hbox.addWidget(newBtn) 
+          
         hbox.addWidget(self.filter8Btn)
         hbox.addWidget(self.filter9Btn)
-        # hbox.addWidget(self.filter10Btn)
+        hbox.addWidget(self.filter10Btn)
+        
         hbox.addWidget(delBtn)       
         hbox.addWidget(saveBtn)
         hbox.addWidget(clearBtn)   

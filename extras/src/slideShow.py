@@ -44,6 +44,7 @@ class SlideShow(QWidget):
         self.show()
         
         self.setAcceptDrops(True) 
+        self.openHelpMenu()
              
 ### --------------------------------------------------------
     def init(self):  ## on each new files action
@@ -181,11 +182,11 @@ class SlideShow(QWidget):
 
 ### --------------------------------------------------------       
     def addPixItem(self, file):  ## the scene is cleared each new file  
-        if self.pixItem != None:
+        if self.pixItem:
             self.scene.removeItem(self.pixItem)
             del self.pixItem
             
-        if self.helpMenu != None: self.closeHelpMenu()  ## close help menu   
+        if self.helpMenu: self.closeHelpMenu()  ## close help menu   
         if self.path == '':  self.path = os.getcwd()
    
         self.fileName = file
@@ -258,7 +259,7 @@ class SlideShow(QWidget):
             self.helpFlag = True
        
     def closeHelpMenu(self):
-        if self.helpMenu != None: 
+        if self.helpMenu: 
             self.helpMenu.tableClose()
             self.helpMenu.close()
             self.helpFlag = False  
@@ -274,7 +275,7 @@ class SlideShow(QWidget):
         self.scene.setSceneRect(0, 0, self.view.width(), self.view.height())
         
     def zoom(self, zoom):
-        if self.pixItem != None:           
+        if self.pixItem:           
             if self.width() *zoom > 1920 or self.height() * zoom < 350:
                 return    
             # self.setScene()     
@@ -288,13 +289,13 @@ class SlideShow(QWidget):
         return int(SetY*.40) if hgt < 135 else p.y()
     
     def resizeEvent(self, e):  
-        if self.pixItem != None:  
+        if self.pixItem:  
             self.pixItem.setScale(self.scaleW)  
             self.addPixItem(self.files[self.current])   
         e.accept()       
            
     def openingLayout(self):  ## refresh to start
-        if self.pixItem != None:
+        if self.pixItem:
             # self.setScene() 
             x, H = int(self.ctr.x() - (Width)/2), Height
             if self.buttonsVisible: H = Height + Hpad
@@ -303,7 +304,7 @@ class SlideShow(QWidget):
         
 ### --------------------------------------------------------                  
     def rotateThis(self, r=0):
-        if self.pixItem != None:  
+        if self.pixItem:  
             r = r + self.rot
             if r > 270: r = 0
             self.rot = r
@@ -351,7 +352,7 @@ class SlideShow(QWidget):
    
 ### --------------------------------------------------------
     def addTextItem(self, fileName):   
-        if self.textItem != None:
+        if self.textItem:
             self.scene.removeItem(self.textItem)
             self.textItem = None    
         if txt := self.tagIt(fileName):
@@ -366,7 +367,7 @@ class SlideShow(QWidget):
         return QPointF(W-15, self.view.height()-35)
     
     def updTextItem(self):
-        if self.setTags and self.textItem != None:
+        if self.setTags and self.textItem:
             if int(self.view.height()) > CutOff: 
                 self.textItem.setPos(self.textXY()) 
     
@@ -394,11 +395,11 @@ class SlideShow(QWidget):
         return textItem
     
     def toggleText(self):   
-        if self.pixItem != None:    
+        if self.pixItem:    
             if not self.setTags:
                 self.setTags = True
                 self.addTextItem()
-            elif self.textItem != None:
+            elif self.textItem:
                 self.scene.removeItem(self.textItem)
                 self.textItem = None
                 self.setTags = False
@@ -467,7 +468,7 @@ class SlideShow(QWidget):
         self.timer.start(self.delay)
   
     def timerStop(self):
-        if self.timer != None:
+        if self.timer:
             self.timer.stop()
         self.running = False
         
@@ -479,7 +480,7 @@ class SlideShow(QWidget):
                           
     def selectDirectory(self):
         path = QFileDialog.getExistingDirectory(self, '') 
-        if path == None or path == '':
+        if not path or path == '':
             return 
         os.chdir(path)
         return os.getcwd()                      
@@ -519,7 +520,7 @@ class SlideShow(QWidget):
         return filenames
   
     def setImageFiles(self, files):
-        if files != None:
+        if files:
             self.files = sorted(files)
             self.addPixItem(self.files[0]) 
             if len(self.files) == 1:
@@ -531,7 +532,7 @@ class SlideShow(QWidget):
         dialog.setFileMode(QFileDialog.FileMode.ExistingFiles) 
         if dialog.exec() == QFileDialog.DialogCode.Accepted:
             filenames = dialog.selectedFiles()
-            if filenames != None:
+            if filenames:
                 files = self.getFileNames(filenames)  
                 self.setImageFiles(files)       
                                                                 

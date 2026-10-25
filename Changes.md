@@ -7,6 +7,12 @@ See **Start Here** for converting **Dots** from **PyQt6** to **PyQt5** or **PySi
 Before all else I'd like to thank those individuals who were kind enough to award me a star.  I'm sorry for being so late in acknowledging you. It means a lot to know that my efforts have found a home somewhere.  Your stars are very nice early birthday present.  Thank you once again.   
 
 ---
+**October 24 20226**  
+Added a "throwaway filter10"" to wrapper. It's there as a functioning placeholder for you to add your own creation and experiment with. I was debating whether to post it but decided I could use it for future investigations.
+
+Seems I somehow missed sending **SlideShow** with the change I made a few days back.  Had made some additional edits which most probably accounts for holding it over.
+   
+---
 **October 14 20226**  
 Some small edits to **extras**.  In **videoClipsWidget** I made sure the **Nth** slider would not accept **0** if the **Nth** button were pressed to **on** and in **videoClipsMaker** I replaced the code I used to scale images to fit with a more compact solution from **google a.i.**.
 
