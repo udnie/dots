@@ -8,7 +8,8 @@ Before all else I'd like to thank those individuals who were kind enough to awar
 
 ---
 **October 24 20226**  
-Added a "throwaway filter10"" to wrapper. It's there as a functioning placeholder for you to add your own creation and experiment with. I was debating whether to post it but decided I could use it for future investigations.
+Added a "throwaway filter10"" to wrapper. It's there as a functioning placeholder for you to add your own creation and experiment with. I was debating whether to post it but decided I could use it for future investigations.  The filter blurs the image using a function based on the 
+**'bokeh effect'** and is wired-up to the **'Edges'** slider. 
 
 Seems I somehow missed sending **SlideShow** with the change I made a few days back.  Had made some additional edits which most probably accounts for holding it over.
    
